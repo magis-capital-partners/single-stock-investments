@@ -54,6 +54,30 @@ class RefreshValuationDashboardRowsTests(unittest.TestCase):
             untouched = json.loads((data_dir / "tickers/BBB.json").read_text(encoding="utf-8"))
             self.assertNotIn("valuation_workbench", untouched)
 
+    def test_private_snapshot_boot_file_is_not_rewritten(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data_dir = Path(tmp)
+            (data_dir / "tickers").mkdir()
+            placeholder = {"private_snapshot": True, "source_shape": "object", "entry_count": 1, "collection_counts": {"tickers": 1}}
+            (data_dir / "core.json").write_text(json.dumps(placeholder), encoding="utf-8")
+            (data_dir / "tickers" / "AAA.json").write_text(json.dumps({"private_snapshot": True}), encoding="utf-8")
+            (data_dir / "tickers" / "BBB.json").write_text(json.dumps({"ticker": "BBB", "company": "Bee"}), encoding="utf-8")
+            before_core = (data_dir / "core.json").read_bytes()
+            before_aaa = (data_dir / "tickers" / "AAA.json").read_bytes()
+
+            def attach(row, *, include_detail):
+                row["valuation_decision"] = {"model_level": "unmodeled"}
+                return True
+
+            with patch.object(refresh, "_attach_current_valuation", side_effect=attach):
+                result = refresh.refresh_served_data(data_dir, None)
+
+            self.assertEqual(result, {"core_rows": 0, "ticker_shards": 1})
+            self.assertEqual((data_dir / "core.json").read_bytes(), before_core)
+            self.assertEqual((data_dir / "tickers" / "AAA.json").read_bytes(), before_aaa)
+            detail = json.loads((data_dir / "tickers" / "BBB.json").read_text(encoding="utf-8"))
+            self.assertEqual(detail["valuation_decision"]["model_level"], "unmodeled")
+
 
 if __name__ == "__main__":
     unittest.main()

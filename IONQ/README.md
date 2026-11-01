@@ -1,20 +1,11 @@
-# IonQ, Inc. (IONQ)
+# IonQ, Inc.  (IONQ)  (CIK 0001824920) contingent / CVR candidate (IONQ)
 
-**Ticker:** IONQ | **Market:** US | **CIK:** 0001824920
-**Last updated:** 2026-07-18
+**Ticker:** IONQ | **Market:** US  
+**Last updated:** 2026-10-19  
+**Stage:** pre-close stub (discovery)
 
-## Company
+## Next actions
 
-Trapped-ion quantum computing systems, QCaaS, and expanded quantum networking/sensing platform via acquisitions (Capella Space, Skyloom, Oxford Ionics, Vector Atomic, id Quantique).
-
-## Download
-
-```powershell
-python IONQ/investor-documents/download_ionq_investor_docs.py
-```
-
-## Research
-
-- Deep dive: `research/deep_dive_2026-07-18.md`
-- Valuation: `research/valuation.json`
-- Cross-check: `research/cross_check_third_party_2026-07-18.md`
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.

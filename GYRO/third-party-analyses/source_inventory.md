@@ -1,7 +1,7 @@
 # GYRO — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 63 total (0 approved, 0 pending, 63 context)
+**Date:** 2026-10-25
+**Sources:** 64 total (0 approved, 0 pending, 64 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -68,5 +68,6 @@
 | activist_long | acc0001437749 25 033874 | `GYRO/third-party-analyses/activist_reports/long/8-K_20251107_acc0001437749_25_033874.htm` | context | activist/long — local |
 | activist_long | acc0001437749 26 001119 | `GYRO/third-party-analyses/activist_reports/long/8-K_20260112_acc0001437749_26_001119.htm` | context | activist/long — local |
 | activist_long | acc0001437749 26 026570 | `GYRO/third-party-analyses/activist_reports/long/8-K_20260807_acc0001437749_26_026570.htm` | context | activist/long — local |
+| activist_long | acc0001437749 26 033007 | `GYRO/third-party-analyses/activist_reports/long/8-K_20261020_acc0001437749_26_033007.htm` | context | activist/long — local |
 
-Cross-check required: `GYRO/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GYRO/research/cross_check_third_party_2026-10-25.md`

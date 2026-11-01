@@ -1,6 +1,6 @@
 # MP — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 91 total (0 approved, 0 pending, 91 context)
 
 | ID | Title | Path | Status | Use |
@@ -26,8 +26,6 @@
 | activist_long | QVT (+4) — SC 13D | `MP/third-party-analyses/activist_reports/long/SC-13D_20201127_acc0001193125_20_304569.htm` | context | activist/long — sec_edgar |
 | activist_long | James H. Litinsky — SC 13D/A | `MP/third-party-analyses/activist_reports/long/SC-13D/A_20260113_acc0001831746_26_000009.xml` | context | activist/long — sec_edgar |
 | activist_long | James H. Litinsky — SC 13D/A | `MP/third-party-analyses/activist_reports/long/SC-13D/A_20250319_acc0001628280_25_013949.xml` | context | activist/long — sec_edgar |
-| activist_long | acc0001193125 20 296150 | `MP/third-party-analyses/activist_reports/long/8-K_20201117_acc0001193125_20_296150.htm` | context | activist/long — local |
-| activist_long | acc0001193125 20 293724 | `MP/third-party-analyses/activist_reports/long/8-K_20201116_acc0001193125_20_293724.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 132562 | `MP/third-party-analyses/activist_reports/long/8-K_20200504_acc0001193125_20_132562.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 137733 | `MP/third-party-analyses/activist_reports/long/8-K_20200508_acc0001193125_20_137733.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 170909 | `MP/third-party-analyses/activist_reports/long/8-K_20200617_acc0001193125_20_170909.htm` | context | activist/long — local |
@@ -35,6 +33,8 @@
 | activist_long | acc0001193125 20 192954 | `MP/third-party-analyses/activist_reports/long/8-K_20200715_acc0001193125_20_192954.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 231554 | `MP/third-party-analyses/activist_reports/long/8-K_20200827_acc0001193125_20_231554.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 288079 | `MP/third-party-analyses/activist_reports/long/8-K_20201106_acc0001193125_20_288079.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 293724 | `MP/third-party-analyses/activist_reports/long/8-K_20201116_acc0001193125_20_293724.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 296150 | `MP/third-party-analyses/activist_reports/long/8-K_20201117_acc0001193125_20_296150.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 296980 | `MP/third-party-analyses/activist_reports/long/8-K_20201118_acc0001193125_20_296980.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 301512 | `MP/third-party-analyses/activist_reports/long/8-K_20201123_acc0001193125_20_301512.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 301518 | `MP/third-party-analyses/activist_reports/long/8-K_20201123_acc0001193125_20_301518.htm` | context | activist/long — local |
@@ -97,4 +97,4 @@
 | activist_long | acc0001801368 26 000035 | `MP/third-party-analyses/activist_reports/long/8-K_20260610_acc0001801368_26_000035.htm` | context | activist/long — local |
 | activist_long | acc0001801368 26 000047 | `MP/third-party-analyses/activist_reports/long/8-K_20260806_acc0001801368_26_000047.htm` | context | activist/long — local |
 
-Cross-check required: `MP/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `MP/research/cross_check_third_party_2026-10-27.md`

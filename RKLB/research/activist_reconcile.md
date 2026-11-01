@@ -1,7 +1,7 @@
 # RKLB — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 4
+**Date:** 2026-10-25
+**Reports processed:** 3
 **Human review:** 3
 
 ## Summary
@@ -11,7 +11,6 @@
 | Unresolved SEC filer | long | 2023-09-18 | activist_13d | human_review | needs_human | `RKLB/third-party-analyses/activist_reports/long/SC-13D/A_20230918_acc0001193125_23_236978.htm` |
 | Unresolved SEC filer | long | 2024-12-05 | activist_13d | human_review | needs_human | `RKLB/third-party-analyses/activist_reports/long/SC-13D/A_20241205_acc0001193125_24_271812.htm` |
 | Unresolved SEC filer | long | 2021-09-07 | activist_13d | human_review | needs_human | `RKLB/third-party-analyses/activist_reports/long/SC-13D_20210907_acc0001193125_21_266747.htm` |
-| Bleecker Street Research | short | None | publisher_report | auto_signal | campaign_active | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-10_rklb.html` |
 
 ## Notes (human review)
 

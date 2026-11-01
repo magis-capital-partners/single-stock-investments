@@ -1,0 +1,15 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "single-stock-reverse-split-live",
+  "account_id": "e1cac493b315c8fd7398500dd1bfd687",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-29",
+  "workers_dev": false,
+  "preview_urls": false,
+  "vars": {"ENABLED":"false","EXPECTED_CADENCE_SECONDS":"300","SEC_USER_AGENT":"MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)"},
+  "triggers": {"crons":[]},
+  "observability": {"enabled":true,"logs":{"enabled":true},"traces":{"enabled":true,"head_sampling_rate":0.01}},
+  "d1_databases":[{"binding":"DB","database_name":"single-stock-reverse-splits","database_id":"de0ec6d5-9619-48be-b02e-d007456517ee","migrations_dir":"migrations"}],
+  "r2_buckets":[{"binding":"EVIDENCE","bucket_name":"single-stock-reverse-splits-evidence"}],
+  "queues":{"producers":[],"consumers":[]}
+}

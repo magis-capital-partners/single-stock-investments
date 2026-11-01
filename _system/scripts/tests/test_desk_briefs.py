@@ -98,7 +98,7 @@ def _check(root: Path, today: str = "2026-10-12") -> dict:
 def test_schema_is_valid_draft_2020_12_and_accepts_the_fixture():
     schema = checker.load_schema()
     assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
-    assert schema["properties"]["schema_version"]["const"] == "desk_briefs.v1"
+    assert set(schema["properties"]["schema_version"]["enum"]) == {"desk_briefs.v1", "desk_briefs.v2"}
     assert set(schema["properties"]["desk"]["enum"]) == set(checker.DESKS)
     assert schema["properties"]["items"]["maxItems"] == 12
     assert schema["properties"]["items"]["items"]["properties"]["headline"]["maxLength"] == 160
@@ -148,7 +148,10 @@ def test_thirteen_items_are_rejected(root: Path):
 # -------------------------------------------------------------------------- checker
 
 def test_committed_seed_brief_passes_the_checker():
-    report = checker.check_all(today=date(2026, 10, 12))
+    # The seed is dated 2026-10-12. Freezing the checker on that day made
+    # every later committed brief look "in the future" (tape_index
+    # 2026-10-19, PR #1225). Judge the corpus against the real clock.
+    report = checker.check_all(today=date.today())
     assert report["errors"] == [], report["errors"]
     seed = next(b for b in report["briefs"] if b["path"].endswith("special_situations/2026-10-12.json"))
     assert seed["desk"] == "special_situations"
@@ -224,6 +227,53 @@ def test_confidence_must_be_backed_by_evidence_of_that_kind(root: Path):
     brief["items"][0]["handoff"] = "activism"
     _write(root, "activism", "2026-10-12", brief)
     assert any("own id" in e for e in _check(root)["errors"])
+
+
+def test_filing_instructions_rebuild_the_dashboard_payload_in_the_same_commit():
+    readme = (ROOT / "_system" / "data" / "desk_briefs" / "README.md").read_text(encoding="utf-8")
+    prompt = (ROOT / "_system" / "prompts" / "grok_scan_agents.md").read_text(encoding="utf-8")
+    tape = prompt.split("## 5. Index, forced flow, and tape", 1)[1].split("## 6. Short selling", 1)[0]
+    for text in (readme, tape):
+        assert "python _system/scripts/build_desk_briefs.py" in text
+        assert "dashboard/data/desk_briefs.json" in text
+        assert "same commit" in text
+
+
+def test_checker_rejects_a_stale_dashboard_payload(root: Path):
+    _write(root, "activism", "2026-10-12", GOOD)
+    payload = root / "dashboard" / "data" / "desk_briefs.json"
+    payload.parent.mkdir(parents=True, exist_ok=True)
+    payload.write_text(json.dumps({"schema_version": "desk_briefs.v1", "desks": []}) + "\n", encoding="utf-8")
+    args = [
+        "--briefs-dir", str(root / "_system" / "data" / "desk_briefs"),
+        "--registry", str(root / "_system" / "portfolio" / "registry.json"),
+        "--schema", str(root / "_system" / "data" / "desk_briefs" / "schema.json"),
+        "--root", str(root), "--today", "2026-10-12",
+    ]
+    errors = checker.committed_payload_errors(
+        root=root,
+        briefs_dir=root / "_system" / "data" / "desk_briefs",
+        registry_path=root / "_system" / "portfolio" / "registry.json",
+        schema_path=root / "_system" / "data" / "desk_briefs" / "schema.json",
+    )
+    assert errors and "build_desk_briefs.py" in errors[0]
+    assert "same commit" in errors[0]
+    assert checker.main(args) == 1
+    assert checker.main(args + ["--warn-only"]) == 0
+    assert builder.main([
+        "--out", str(payload),
+        "--briefs-dir", str(root / "_system" / "data" / "desk_briefs"),
+        "--registry", str(root / "_system" / "portfolio" / "registry.json"),
+        "--schema", str(root / "_system" / "data" / "desk_briefs" / "schema.json"),
+        "--root", str(root), "--now", "2026-10-12T12:00:00Z",
+    ]) == 0
+    assert checker.committed_payload_errors(
+        root=root,
+        briefs_dir=root / "_system" / "data" / "desk_briefs",
+        registry_path=root / "_system" / "portfolio" / "registry.json",
+        schema_path=root / "_system" / "data" / "desk_briefs" / "schema.json",
+    ) == []
+    assert checker.main(args) == 0
 
 
 def test_cli_exit_codes_and_warn_only(root: Path):
@@ -336,7 +386,8 @@ def test_committed_dashboard_payload_matches_the_committed_briefs():
     assert doc["health"]["structural_errors"] == []
     assert doc["authority"] == "none"
     paths = {d["path"] for d in doc["desks"]}
-    assert "_system/data/desk_briefs/special_situations/2026-10-12.json" in paths
+    latest_special = max((ROOT / "_system" / "data" / "desk_briefs" / "special_situations").glob("????-??-??.json"))
+    assert f"_system/data/desk_briefs/special_situations/{latest_special.name}" in paths
     now = datetime.now(timezone.utc)
     fresh = builder.build(now=now)
     assert [d["path"] for d in fresh["desks"]] == [d["path"] for d in doc["desks"]], "rebuild dashboard/data/desk_briefs.json"

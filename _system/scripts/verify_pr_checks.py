@@ -36,6 +36,7 @@ import subprocess
 import sys
 import time
 from typing import Any, Callable, Iterable
+from urllib.parse import urlencode
 
 GREEN = {"success", "neutral", "skipped"}
 STATUS_RED = {"failure", "error"}
@@ -148,13 +149,49 @@ def evaluate(*args, **kwargs) -> list[str]:
 
 
 def _gh_lines(path: str, jq: str) -> list[dict[str, Any]]:
-    proc = subprocess.run(
-        ["gh", "api", "--paginate", path, "--jq", jq],
-        capture_output=True, text=True, check=False,
-    )
+    try:
+        proc = subprocess.run(
+            ["gh", "api", "--paginate", path, "--jq", jq],
+            capture_output=True, text=True, check=False, timeout=60,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError('Timed out reading commit checks') from exc
     if proc.returncode != 0:
         raise RuntimeError((proc.stderr or proc.stdout or f"gh api {path} failed").strip())
     return [json.loads(line) for line in proc.stdout.splitlines() if line.strip()]
+
+
+def _gh_page(path: str) -> dict[str, Any]:
+    try:
+        proc = subprocess.run(['gh', 'api', path], capture_output=True, text=True, check=False, timeout=30)
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError('Timed out reading dispatch checks') from exc
+    if proc.returncode != 0:
+        raise RuntimeError((proc.stderr or proc.stdout or 'Cannot read dispatch checks').strip())
+    return json.loads(proc.stdout)
+
+
+def dispatch_runs(repo: str, sha: str, on_sha: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    # A trusted server timestamp bounds the scan. Author/committer dates are
+    # caller-controlled and must never hide an earlier failed dispatch.
+    pulls = _gh_lines(f'repos/{repo}/commits/{sha}/pulls?per_page=100', '.[]')
+    times = [r['created_at'] for r in pulls+on_sha if r.get('created_at')]
+    if not times:
+        raise RuntimeError('No server-recorded PR or workflow time bounds the dispatch scan')
+    query = urlencode({'event': 'repository_dispatch', 'created': '>='+min(times), 'per_page': 100})
+    path = f'repos/{repo}/actions/runs?'+query
+    first = _gh_page(path)
+    total = int(first['total_count'])
+    if total > 1000:
+        # GitHub's filtered run API caps results at 1,000. Missing runs must
+        # block a merge, never turn a truncated history into a green verdict.
+        raise RuntimeError('Dispatch check window exceeds the complete 1,000-run API limit')
+    rows = list(first['workflow_runs'])
+    for page in range(2, (total+99)//100+1):
+        rows.extend(_gh_page(path+'&page='+str(page))['workflow_runs'])
+    if len(rows) < total or len({r['id'] for r in rows}) < total:
+        raise RuntimeError('Dispatch check window changed or was truncated; retry the check')
+    return rows
 
 
 def run_titles_sha(run: dict[str, Any], sha: str) -> bool:
@@ -187,7 +224,7 @@ def fetch(repo: str, sha: str) -> tuple[list, list, list]:
     workflow_runs = _gh_lines(f"repos/{repo}/actions/runs?head_sha={sha}&per_page=100", ".workflow_runs[]")
     # The conflict-resolver re-trigger is a repository_dispatch. GitHub records
     # that run under main, not under the PR commit, so head_sha= misses it.
-    recent = _gh_lines(f"repos/{repo}/actions/runs?per_page=50", ".workflow_runs[]")
+    recent = dispatch_runs(repo, sha, workflow_runs)
     workflow_runs = merge_titled_runs(workflow_runs, recent, sha)
     statuses = _gh_lines(f"repos/{repo}/commits/{sha}/status?per_page=100", ".statuses[]")
     return check_runs, workflow_runs, statuses

@@ -1,8 +1,8 @@
-# DELL — Insider conviction (2026-10-17)
+# DELL — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.03 (weak) · **Bull case support:** none
+**ICS:** 2.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -13,7 +13,7 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Radakovich Lynn Vojvodich | 2026-06-22 | 12022 | $31.14 | $374365.08 | 1.601 |
-| Radakovich Lynn Vojvodich | 2026-07-22 | 2022 | $31.14 | $62965.08 | 1.16 |
+| Radakovich Lynn Vojvodich | 2026-07-22 | 2022 | $31.14 | $62965.08 | 1.141 |
 
 **Routine / planned sales (context):**
 

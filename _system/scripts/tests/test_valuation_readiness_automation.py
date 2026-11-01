@@ -54,6 +54,33 @@ class ValuationAutomationTests(unittest.TestCase):
         self.assertEqual(tag, "CashAndCashEquivalentsAtCarryingValue")
         self.assertEqual(row["val"], 1_067_000_000)
 
+    def test_registry_archetype_outranks_compounder_default(self):
+        identity = automation.resolve_identity(
+            "TIPT",
+            {
+                "company": "Tiptree Inc.",
+                "market": "US",
+                "classification": {"archetype": "holding_co", "stance": "watch"},
+            },
+            {},
+            "2026-10-19",
+        )
+        self.assertEqual(identity["archetype"], "holding_co")
+        unknown = automation.resolve_identity(
+            "NEW",
+            {"company": "New Co", "market": "US", "classification": {"archetype": "unknown"}},
+            {},
+            "2026-10-19",
+        )
+        self.assertEqual(unknown["archetype"], "compounder")
+        reviewed = automation.resolve_identity(
+            "TIPT",
+            {"company": "Tiptree Inc.", "market": "US", "classification": {"archetype": "holding_co"}},
+            {"tickers": {"TIPT": {"archetype": "optionality"}}},
+            "2026-10-19",
+        )
+        self.assertEqual(reviewed["archetype"], "optionality")
+
     def test_etf_identity_never_routes_to_operating_company_default(self):
         identity = automation.resolve_identity("FUND", {"company": "Example Index ETF", "market": "US"}, {}, "2026-07-19")
         self.assertEqual(identity["security_type"], "exchange_traded_fund")

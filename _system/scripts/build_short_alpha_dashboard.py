@@ -1008,9 +1008,24 @@ def build(
             "excluded": "ECHX is managed in the ls-algo universe and is omitted from this book. Leads dropped by a human or an audit are listed with their reason in excluded_leads.json and are never re-added.",
             "desk_notes": "A desk_note row is a bot's or an author's idea entry: it names its source, category, dates and tags here, and its narrative lives in the private research vault behind note_ref. The category adds lenses; it never adds the fraud tag.",
             "reverse_splits": "A reverse_split_research row is a discovery lead from the reverse-split engine with its six dated lens reviews carried as lens_reviews. Impairment is not reviewed until a lens review says so.",
+            "buyback_issuance": "Names whose share count rose over the last year after a multi-year shrink. Candidate signals for the dilution / financing lens. Not ranked shorts.",
         },
+        "buyback_issuance_signals": _buyback_issuance_signals(),
+        "buyback_snapshot": __import__("build_buyback_radar").load_shared_snapshot().get("manifest",{}),
         "category_lenses": CATEGORY_LENSES,
     }
+
+
+def _buyback_issuance_signals() -> list[dict]:
+    """issuing_again names from the buyback companies file. Empty when that file is absent."""
+    scripts = Path(__file__).resolve().parent
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    try:
+        from build_buyback_radar import issuance_signals, load_companies_index
+    except Exception:
+        return []
+    return issuance_signals(list(load_companies_index().values()))
 
 
 def sync_leads() -> list[str]:
@@ -1054,5 +1069,21 @@ def main() -> None:
     )
 
 
+def refresh_buyback_projection():
+    """The Shorts producer owns its projection; the radar never stamps this file."""
+    from build_buyback_radar import load_shared_snapshot
+    from atomic_io import write_json_if_changed
+    path=ROOT/"dashboard/data/short_alpha.json"
+    doc=_read_json(path)
+    shared=load_shared_snapshot()
+    if not doc or not shared:
+        raise SystemExit("Shorts or verified buyback snapshot is unavailable")
+    doc["buyback_issuance_signals"]=shared["companies"].get("issuance_signals",[])
+    doc["buyback_snapshot"]={k:shared["manifest"].get(k) for k in ("snapshot_id","as_of","health")}
+    write_json_if_changed(path,doc)
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["--refresh-buyback-projection"]:
+        refresh_buyback_projection()
+    else:
+        main()

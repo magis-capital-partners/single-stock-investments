@@ -127,6 +127,25 @@ def harvest_documents(holdings: dict, *, tickers: list[str], include_aggregates:
         run([PY, str(SCRIPTS / "refresh_equity_model.py")], "Equity model refresh (IR + pipeline)")
 
 
+def assign_valuation_universe_tiers(root: Path = ROOT) -> dict:
+    """Tier every registry name before a dashboard row is published.
+
+    The generator is the only assignment rule. A new registry member with no
+    position, committee, watchlist, or priority stance is Tier 3. A name that
+    already meets a higher gate keeps that tier. The manifest is written
+    first so the dashboard rebuild cannot ship a row with no tier.
+    """
+    from build_valuation_universe_tiers import write_manifest
+
+    payload = write_manifest(root)
+    summary = payload.get("summary") or {}
+    print(
+        "Valuation universe tiers: "
+        f"{summary.get('security_count')} names {summary.get('tier_counts')}"
+    )
+    return payload
+
+
 def daily_refresh(holdings: dict, *, build_indexes: bool = True) -> None:
     """Fast, daily-changing market/thematic refresh plus dashboard rebuild."""
     for ticker in sorted(holdings.keys()):
@@ -170,7 +189,19 @@ def daily_refresh(holdings: dict, *, build_indexes: bool = True) -> None:
         [PY, str(SCRIPTS / "check_cvr_universe.py")],
         "CVR universe integrity check",
     )
-    run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
+    # Tier first, then rebuild. build_dashboard_data writes core.json and one
+    # shard per row together; a row that still has no tier is refused there,
+    # so a new registry name cannot reach the dashboard until this step
+    # assigns it. A failure here must fail the job: swallowing it would
+    # commit the registry change and leave the deploy red.
+    assign_valuation_universe_tiers()
+    completed = subprocess.run(
+        [PY, str(SCRIPTS / "build_dashboard_data.py")],
+        cwd=ROOT,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise SystemExit(f"Dashboard rebuild failed ({completed.returncode})")
 
 
 def select_batch(holdings: dict, batch_size: int, cursor_path: Path) -> list[str]:

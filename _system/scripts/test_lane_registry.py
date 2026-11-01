@@ -188,6 +188,7 @@ class RealRegistry(unittest.TestCase):
                          "data-pipeline-technicals", "data-pipeline-intake-full",
                          "data-pipeline-drive", "data-pipeline-warrant-discover",
                          "data-pipeline-world-model", "data-pipeline-cvr-discover",
+                         "data-pipeline-thirteen-f",
                          "research-watchdog", "falsifier", "memory-digest"):
             self.assertIn(required, names)
         workflows = {lane["workflow_file"] for lane in self.lanes}

@@ -1,8 +1,8 @@
-# VLTO — Insider conviction (2026-10-17)
+# VLTO — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 6.28 (strong) · **Bull case support:** moderate
+**ICS:** 6.26 (strong) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -15,7 +15,7 @@
 | Kapity Melissa | 2026-02-27 | 7105 | $83.23 | $591349.15 | 1.497 |
 | Beneteau Lesley | 2026-02-24 | 7004 | $22.01 | $154158.04 | 1.356 |
 | Kapity Melissa | 2026-02-27 | 2639 | $83.23 | $219643.97 | 1.304 |
-| Honeycutt Jennifer | 2026-07-17 | 7097 | $28.76 | $204109.72 | 1.122 |
+| Honeycutt Jennifer | 2026-07-17 | 7097 | $28.76 | $204109.72 | 1.104 |
 | Beneteau Lesley | 2025-11-14 | 1622 | $23.64 | $38344.08 | 0.965 |
 
 **Routine / planned sales (context):**

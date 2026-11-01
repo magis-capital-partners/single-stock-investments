@@ -1,7 +1,7 @@
 # UAL — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 188 total (0 approved, 0 pending, 188 context)
+**Date:** 2026-10-25
+**Sources:** 190 total (0 approved, 0 pending, 190 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -12,6 +12,7 @@
 | activist_long | United Airlines Holdings, Inc. 36-2675207 — SC 13D/A | `UAL/third-party-analyses/activist_reports/long/SC-13D/A_20230504_acc0001140361_23_022974.htm` | context | activist/long — sec_edgar |
 | activist_long | United Airlines Holdings, Inc. 36-2675207 — SC 13D/A | `UAL/third-party-analyses/activist_reports/long/SC-13D/A_20230308_acc0001140361_23_010697.htm` | context | activist/long — sec_edgar |
 | activist_long | United Airlines Holdings, Inc. 36-2675207 — SC 13D | `UAL/third-party-analyses/activist_reports/long/SC-13D_20230123_acc0001140361_23_002444.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 18 007258 | `UAL/third-party-analyses/activist_reports/long/8-K_20180109_acc0001193125_18_007258.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 017361 | `UAL/third-party-analyses/activist_reports/long/8-K_20180123_acc0001193125_18_017361.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 017620 | `UAL/third-party-analyses/activist_reports/long/8-K_20180123_acc0001193125_18_017620.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 036252 | `UAL/third-party-analyses/activist_reports/long/8-K_20180208_acc0001193125_18_036252.htm` | context | activist/long — local |
@@ -193,5 +194,6 @@
 | activist_long | acc0001104659 26 048992 | `UAL/third-party-analyses/activist_reports/long/8-K_20260427_acc0001104659_26_048992.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 065739 | `UAL/third-party-analyses/activist_reports/long/8-K_20260522_acc0001104659_26_065739.htm` | context | activist/long — local |
 | activist_long | acc0000100517 26 000135 | `UAL/third-party-analyses/activist_reports/long/8-K_20260715_acc0000100517_26_000135.htm` | context | activist/long — local |
+| activist_long | acc0000100517 26 000184 | `UAL/third-party-analyses/activist_reports/long/8-K_20261020_acc0000100517_26_000184.htm` | context | activist/long — local |
 
-Cross-check required: `UAL/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `UAL/research/cross_check_third_party_2026-10-25.md`

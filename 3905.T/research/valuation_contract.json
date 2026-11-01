@@ -2194,7 +2194,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "e2a20300dc41518ffb6fc13920216ab31089dc00441f32e111dbd1d0f57f72f9",
+    "model_hash": "70d97729142602c4878b7d156c459f3f87dd62e4e6725c2d74d4ea821aaca5b5",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -2204,6 +2204,168 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "3905.T",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-21",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 2591.0,
+      "as_of": "2026-07-21",
+      "source_url": "Yahoo 3905.T close 2026-07-21",
+      "currency": null
+    },
+    "forecast_hash": "a085c27fe68f88731666b7993303e9a865c4174f20b4f7418de38719d4711583",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_ai_datacenter_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 1144.0,
+          "base": 3282.0,
+          "high": 4666.0
+        }
+      },
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "high": 0.0
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "case": "base",
+        "code": "realization_timing_missing:option_value_per_share"
+      },
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "case": "high",
+        "code": "realization_timing_missing:option_value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:reserve_per_share"
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:reserve_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "normalized_owner_cash",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+        "as_of": "2026-04-21",
+        "source_id": "ae1233091ac7730bba95fb2c1977781631be73fe0e83097b4aebf82de59c1fdb"
+      },
+      {
+        "node_id": "guided_eps",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+        "as_of": "2026-04-21",
+        "source_id": "16c83673bfc532d0570ef7ba456ebc82809cb74f27a3fad9c4e900a8bc82721f"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+        "as_of": "2026-04-21",
+        "source_id": "784e739cc41d18018439bb59320517528e3ea967ad44d6fd05af97fba8071c36"
+      },
+      {
+        "node_id": "gpu_order_usd_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+        "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+        "as_of": "2026-05-07",
+        "source_id": "e200fa2899f3994c4375442e596358188dd0be68da823ed6625caab5b15d310a"
+      },
+      {
+        "node_id": "owner_cash_per_share",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+        "as_of": "2026-04-21",
+        "source_id": "39b78e249299d97b33b38d28b92152ce4e5b52fa128ac8177e7db7621bb23819"
+      },
+      {
+        "node_id": "giga_commitment_usd_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+        "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+        "as_of": "2026-05-07",
+        "source_id": "7bd8cbc44c99b1942874704faa6e15139f7cb2818355ac2b6112fde8d253b6b1"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "079f3fb8ffafdf6edaf4135a9711a35effc4aff6545871d9e47aa9791154d8be"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

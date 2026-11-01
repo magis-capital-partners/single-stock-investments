@@ -24,7 +24,21 @@ FILING_SKIP_FLAGS = {
     "magnitude_mismatch",
     "legacy_pairing",
     "non_statement_debt",
+    "unit_mismatch", "entity_context_mismatch", "conflicting_context_values",
 }
+
+
+def values_in_thousands(prior, current, unit):
+    """Normalize explicit USD scales for the existing USD-thousands thresholds."""
+    factor = {'USD': 0.001, 'USD thousands': 1.0, 'USD millions': 1000.0}.get(unit, 1.0)
+    import math
+    def scaled(value):
+        try:
+            result = float(value or 0) * factor
+            return result if math.isfinite(result) else 0.0
+        except (ValueError, TypeError):
+            return 0.0
+    return scaled(prior), scaled(current)
 
 
 def filing_metric_needs_review(metric: dict, change: float | None = None) -> bool:
@@ -46,9 +60,9 @@ def filing_metric_passes_magnitude(name: str, metric: dict, change: float | None
     if change is None:
         return True
     try:
-        prior_abs = abs(float(metric.get("prior") or 0))
-        current = float(metric.get("current") or 0)
-        abs_delta = abs(current - prior_abs)
+        prior, current = values_in_thousands(metric.get('prior'), metric.get('current'), metric.get('unit'))
+        prior_abs = abs(prior)
+        abs_delta = abs(current - prior)
     except (TypeError, ValueError):
         prior_abs = 0.0
         abs_delta = 0.0
@@ -70,7 +84,7 @@ def filing_metric_passes_sanity(name: str, metric: dict, change: float | None) -
         return False
     if change is None:
         return False
-    if abs(change) > 500:
+    if abs(change) > 500 and not metric.get('context_verified'):
         return False
     if name in {"revenues", "revenue"}:
         current = metric.get("current")

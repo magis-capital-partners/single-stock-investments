@@ -1,0 +1,347 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "tape_index",
+  "as_of": "2026-10-27",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-10-27T08:02:46Z"
+    },
+    {
+      "path": "dashboard/data/capitulation_daily.json",
+      "generated_at": "2026-10-27T08:04:58.872238+00:00"
+    },
+    {
+      "path": "dashboard/data/index_membership.json",
+      "generated_at": "2026-10-27T10:03:10Z"
+    },
+    {
+      "path": "dashboard/data/portfolio_news.json",
+      "generated_at": "2026-10-27T06:03:15.660097+00:00"
+    },
+    {
+      "path": "dashboard/data/fico_watch.json",
+      "generated_at": "2026-10-27T09:19:03Z"
+    },
+    {
+      "path": "_system/portfolio/registry.json",
+      "generated_at": "2026-10-27T10:11:34Z"
+    },
+    {
+      "path": "_system/sources.json",
+      "generated_at": null
+    },
+    {
+      "path": "_system/data/desk_briefs/schema.json",
+      "generated_at": null
+    },
+    {
+      "path": "_system/data/desk_briefs/tape_index/2026-10-26.json",
+      "generated_at": null
+    },
+    {
+      "path": "dashboard/data/agent_shards/XP.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    },
+    {
+      "path": "dashboard/data/agent_shards/NU.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    },
+    {
+      "path": "dashboard/data/agent_shards/B3SA3.SA.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    },
+    {
+      "path": "dashboard/data/agent_shards/FICO.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    },
+    {
+      "path": "dashboard/data/agent_shards/META.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    },
+    {
+      "path": "dashboard/data/agent_shards/NBIS.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    }
+  ],
+  "items": [
+    {
+      "ticker": "XP",
+      "headline": "XP's S&P 400 size-band near-miss still rests on an $8.13B market cap stored before its 48% one-day fall on Brazil's election.",
+      "one_number": "sp400 distance -0.91% (mcap input $8.13B vs $8.0B floor)",
+      "lane": "index_near_miss",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json by_ticker.XP scorecards sp400 inclusion_candidate size_band_watch; market_cap 8133580000 vs [8.0B,22.7B]; distance -0.91; mcap_source rank_day_snapshot:2026-10-31",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.XP close 15.705 (prior 30.41); r5=-48.1; rvol_20d=10.09; cmf_20d=+0.359; cap=capitulation_candidate (prior normal)",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "Valor Investe 2026-10-26: XP fell 48.4% to $15.71 on Nasdaq after Lula's reelection",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Index input predates the drop; recheck sp400 band after the next market-cap refresh. Tape print held: capitulation_candidate with CMF +0.359 is self-contradictory.",
+      "handoff": null
+    },
+    {
+      "ticker": "AMKR",
+      "headline": "Amkor moved from panic to capitulation_candidate on 5.7x volume with RSI 11.0.",
+      "one_number": "rvol 5.70 (capitulation_candidate; RSI 11.0)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.AMKR cap=capitulation_candidate (prior panic); rsi_14=11.0; stretch_z=-1.719; cmf_20d=-0.299; rvol_20d=5.7; r5=-12.13",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "No AMKR item in portfolio_news this window; agent shard not built.",
+      "handoff": null
+    },
+    {
+      "ticker": "CLS",
+      "headline": "Celestica moved from panic to capitulation_candidate as stretch_z deepened past -2 on 2.8x volume.",
+      "one_number": "stretch_z -2.25 vs -2 (capitulation_candidate; RSI 11.2)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.CLS cap=capitulation_candidate (prior panic); rsi_14=11.2; stretch_z=-2.248; cmf_20d=-0.204; rvol_20d=2.77; r5=-17.88; regime washed_out",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fundamental Analyst posted CLS guide (FCF $460M from $600M) 2026-10-27; shard not built.",
+      "handoff": "fundamentals"
+    },
+    {
+      "ticker": "VALE",
+      "headline": "Vale ADR moved from stress_building to capitulation_candidate on 2.8x volume, RSI 16.0.",
+      "one_number": "RSI 16.0 vs 25 (capitulation_candidate; rvol 2.79)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.VALE cap=capitulation_candidate (prior stress_building); rsi_14=16.0; stretch_z=-1.807; cmf_20d=-0.158; rvol_20d=2.79; r5=-8.47",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Brazil cluster day; CMF negative so not held with XP/NU/B3SA3.SA. Shard not opened.",
+      "handoff": null
+    },
+    {
+      "ticker": "FICO",
+      "headline": "Fair Isaac jumped from stress_building to capitulation_candidate on a 13% one-day drop; RSI fell 71.1 to 51.6.",
+      "one_number": "rvol 1.88 (capitulation_candidate; close 708.07 vs 815.31)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.FICO cap=capitulation_candidate (prior stress_building); rsi_14=51.6 (prior 71.1); stretch_z=-1.843; cmf_20d=0.068; rvol_20d=1.88; r5=-9.35; low 671.19",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/fico_watch.json verdict fail (debt >3x operating income)",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "No cause in portfolio_news this window; shard news last 2026-10-07.",
+      "handoff": "fundamentals"
+    },
+    {
+      "ticker": "META",
+      "headline": "Meta moved from stress_building to panic with RSI 23.3 on 1.6x volume.",
+      "one_number": "RSI 23.3 vs 25 (panic; 5d -10.6%)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.META cap=panic (prior stress_building); rsi_14=23.3 (prior 24.3); stretch_z=-0.857; cmf_20d=-0.118; rvol_20d=1.6; r5=-10.61",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "Axios Pro Rata 2026-10-26 newsletter lead: Meta to seek up to $95bn equity financing (unconfirmed by filing)",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "inference"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Equity-financing lead belongs to Fundamental/Special Situations; tape only here.",
+      "handoff": "fundamentals"
+    },
+    {
+      "ticker": "NBIS",
+      "headline": "Nebius moved from stress_building to panic with RSI 8.5; CRWV and IREN made the same move.",
+      "one_number": "RSI 8.5 vs 25 (panic; 5d -10.0%)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.NBIS cap=panic (prior stress_building); rsi_14=8.5 (prior 21.2); stretch_z=-1.752; cmf_20d=-0.16; r5=-9.97",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.CRWV cap=panic rsi_14=12.9; by_ticker.IREN cap=panic rsi_14=11.9",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Neocloud cluster (NBIS, CRWV, IREN) all panic; shard as_of 2026-06-08.",
+      "handoff": null
+    },
+    {
+      "ticker": "GOOGL",
+      "headline": "Alphabet RSI fell below 25 to 23.3 with CMF -0.254 ahead of its October 28 report.",
+      "one_number": "RSI 23.3 vs 25 (stress_building; CMF -0.254)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.GOOGL cap=stress_building; rsi_14=23.3 (prior 26.4); stretch_z=-1.405; trend_z=-1.34; cmf_20d=-0.254; r5=-7.96",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "Yahoo/Motley Fool via dashboard/data/portfolio_news.json 2026-10-27: Alphabet reports Oct 28",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "GOOG RSI 22.0; |trend_z| 1.34 > 1.25.",
+      "handoff": null
+    },
+    {
+      "ticker": "AVGO",
+      "headline": "Broadcom RSI fell below 25 to 23.9 with trend_z -1.59 and CMF -0.166.",
+      "one_number": "RSI 23.9 vs 25 (stress_building; trend_z -1.59)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.AVGO cap=stress_building; rsi_14=23.9 (prior 28.6); stretch_z=-1.58; trend_z=-1.589; cmf_20d=-0.166",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Seeking Alpha 2026-10-27 on $63B Anthropic debt deal in portfolio_news; shard not opened.",
+      "handoff": null
+    },
+    {
+      "ticker": "LEU",
+      "headline": "Centrus RSI fell from 25.2 to 10.5 in one print; uranium names UEC and UROY also crossed below 25.",
+      "one_number": "RSI 10.5 vs 25 (stress_building; 5d -10.6%)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.LEU cap=stress_building; rsi_14=10.5 (prior 25.2); stretch_z=-1.549; cmf_20d=-0.189; r5=-10.61; price_vs_50d=-34.77%",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.UEC rsi_14=16.9; by_ticker.UROY rsi_14=14.7",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Shard not opened.",
+      "handoff": null
+    },
+    {
+      "ticker": "CART",
+      "headline": "Instacart stretch_z crossed +2 to 2.58 as volume rose to 8.4x on a second breakout print.",
+      "one_number": "stretch_z 2.58 vs 2 (breakout; rvol 8.38)",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.CART direction=leading_uptrend; price_vs_50d=+25.8%; rsi_14=88.7; stretch_z=2.583 (prior 1.742); cmf_20d=0.39; rvol_20d=8.38; r5=21.98; regime extended",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Posted 2026-10-26 as breakout rvol 5.07; RSI 88.7 above 70.",
+      "handoff": null
+    },
+    {
+      "ticker": "HWM",
+      "headline": "Howmet moved from capitulation_candidate to panic while stretch_z stays the deepest in the cluster at -3.34.",
+      "one_number": "stretch_z -3.34 vs -2 (panic; RSI 22.5)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.HWM cap=panic (prior capitulation_candidate); rsi_14=22.5 (prior 14.4); stretch_z=-3.339 (prior -3.787); trend_z=-3.151; cmf_20d=-0.026",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "FIX, T, TMUS, PWR, GL also capitulation_candidate to panic; GTX, MGM to stress_building.",
+      "handoff": null
+    }
+  ],
+  "screens_empty": [
+    "index_adds_new",
+    "index_deletes_new",
+    "index_migrations_new",
+    "confirmed_next_30d",
+    "index_distance_changes"
+  ],
+  "notes": "SPY stress_building (panic 60.4 to 50.6, breadth_panic 0.107 to 0.051); capitulation_daily SPY observe to normal (-1.76%), XLC raw stress. Held self-contradictory: XP, B3SA3.SA, NU (capitulation_candidate with CMF > +0.10 after Brazil election gap), PBR (panic yet breakout). Held thin: INV, HKHC, STLR, FPS, XNDU. 22 rows still as_of 2026-10-23 (EU incl. SAF.PA, RMS.PA). No _envelope on L0 feeds.",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}

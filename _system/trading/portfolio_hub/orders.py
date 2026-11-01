@@ -87,11 +87,16 @@ class GuardedOrderService:
         self.max_price_deviation_bps = max_price_deviation_bps
         self.kill_switch = kill_switch
 
-    def create(self, intent: OrderIntent) -> dict[str, Any]:
+    def create(self, intent: OrderIntent, *, framework_binding: str | None = None) -> dict[str, Any]:
         if self.kill_switch:
             raise ValueError("kill switch engaged")
         ticket = intent.normalized()
         self._validate(ticket)
+        if ticket.get("strategy") == "short_framework":
+            from .short_framework import validate_framework_order
+            ledger_path = self.ledger.connection.execute("PRAGMA database_list").fetchone()[2]
+            validate_framework_order(ticket, framework_binding, ledger_path=ledger_path)
+            ticket["framework_binding"] = framework_binding
         now = utc_now()
         ticket["order_ref"] = f"MAGIS|{ticket['strategy']}|{ticket['owner']}|{ticket['intent_uuid']}"
         with self.ledger.transaction() as db:
@@ -129,6 +134,10 @@ class GuardedOrderService:
             valid_reduce = (order["action"] == "SELL" and current > 0 and quantity <= current) or (order["action"] == "BUY" and current < 0 and quantity <= abs(current))
             if not valid_reduce:
                 return self._transition(intent_uuid, "Rejected", "reduce_only_violation", {"current_position": decimal_text(current)})
+        if order.get("strategy") == "short_framework" and order["action"] == "SELL":
+            current = Decimal(str(quote.get("current_position", "NaN")))
+            if not current.is_finite() or current != 0:
+                return self._transition(intent_uuid, "Rejected", "framework_existing_position", {"detail": "A new short requires a confirmed flat instrument."})
         notional = abs(Decimal(order["quantity_decimal"]) * limit_price * Decimal(str(quote.get("multiplier", "1"))))
         if notional > self.max_notional:
             return self._transition(intent_uuid, "Rejected", "notional_limit", {"notional": decimal_text(notional)})
@@ -164,6 +173,18 @@ class GuardedOrderService:
             return self._transition(intent_uuid, "Rejected", "kill_switch_engaged", {})
         if order["mode"] == "live" and not self.live_enabled:
             return self._transition(intent_uuid, "Rejected", "live_interlock_disabled", {})
+        if order.get("strategy") == "short_framework":
+            from .short_framework import validate_framework_order
+            created = self.ledger.connection.execute(
+                "SELECT payload_json FROM order_events WHERE intent_uuid=? AND event_type='intent_created' ORDER BY created_at LIMIT 1",
+                (intent_uuid,),
+            ).fetchone()
+            try:
+                payload = json.loads(created["payload_json"]) if created else {}
+                ledger_path = self.ledger.connection.execute("PRAGMA database_list").fetchone()[2]
+                validate_framework_order({**order, "reduce_only": bool(order["reduce_only"])}, payload.get("framework_binding"), ledger_path=ledger_path)
+            except (ValueError, TypeError, KeyError) as exc:
+                return self._transition(intent_uuid, "Rejected", "framework_revalidation_failed", {"error": str(exc)})
         # A non-live ticket must never reach a broker that can transmit.
         #
         # Only `dry_run` was short-circuited below, so a `paper` ticket fell

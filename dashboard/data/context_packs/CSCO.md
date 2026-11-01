@@ -17,7 +17,7 @@ The market may be paying for AI networking, security cross-sell, and Splunk subs
 - Base return: pending
 
 ## Key assumptions (stable)
-- Price today: **$107.39** (source: Yahoo CSCO close 2026-10-16)
+- Price today: **$118.39** (source: Yahoo CSCO close 2026-10-09)
 - Normalized owner earnings: **$13,288M** (source: us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0000858877-25-000111; form 10-K)
 - Cash: **$7,083M** (source: us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0000858877-26-000078; form 10-Q)
 - Debt: **$19,371M** (source: us-gaap:LongTermDebtNoncurrent; accession 0000858877-26-000078; form 10-Q)
@@ -107,12 +107,12 @@ Documents in folder: **75** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-04-06 | `investor-documents/sec-edgar/8-K_20260406_rpt20260331_acc0000
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CSCO/research/deep_dive_2026-10-18.md (sha256 sha256:b111f14390d6c5a5...)
+- deep_dive: CSCO/research/deep_dive_2026-09-12.md (sha256 sha256:6ebd3562009981b7...)
 - filing_digest: CSCO/research/evidence/filing_digest.md (sha256 sha256:111ae640f30736ea...)
-- adversarial: CSCO/research/adversarial_2026-10-18.md (sha256 sha256:707c4e284a9b17d1...)
-- valuation: CSCO/research/valuation.json (sha256 sha256:e9f854230ca874ba...)
-- thesis_card: CSCO/research/thesis_card.json (sha256 sha256:9f8a1e09745bdc87...)
-- cross_check: CSCO/research/cross_check_third_party_2026-10-18.md (sha256 sha256:8fc2e5dca19c953e...)
+- adversarial: CSCO/research/adversarial_2026-09-12.md (sha256 sha256:b8924f44e685fec7...)
+- valuation: CSCO/research/valuation.json (sha256 sha256:f56b4d7ae5b785e9...)
+- thesis_card: CSCO/research/thesis_card.json (sha256 sha256:1f479f11929ad06e...)
+- cross_check: CSCO/research/cross_check_third_party_2026-09-12.md (sha256 sha256:d4997a0cce9639d6...)
 
 ## Excluded from this pack
 - CSCO/research/valuation.json (full; returns block included, open only for assumption audit)

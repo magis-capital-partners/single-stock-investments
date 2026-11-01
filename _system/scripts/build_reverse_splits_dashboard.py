@@ -66,6 +66,10 @@ def edge_v3_reference(ledger_dir):
     if clean.exists() and read_json(clean).get("source_collection_complete") is True:
         reference["clean_data_research_ref"] = {"url": "data/shorts_clean_data_research.json", "sha256": digest(clean),
                                                  "base_summary_sha256": digest(source)}
+    fundamental = ledger_dir / "fundamental_research.json"
+    if fundamental.exists():
+        reference["fundamental_research_ref"] = {"url": "data/shorts_fundamental_research.json", "sha256": digest(fundamental),
+                                                  "base_summary_sha256": digest(source)}
     return reference
 
 # Two event rows for one issuer are the same split recorded twice when their
@@ -640,6 +644,9 @@ def main(argv: list[str] | None = None) -> int:
     target = args.out or DASHBOARD_PATH
     write_json(target, payload)
     import shutil
+    profit_source = (args.ledger_dir or DATA_DIR) / "profit_program"
+    if (profit_source / "manifest.json").exists():
+        shutil.copytree(profit_source, target.parent / "short_profit_program", dirs_exist_ok=True)
     audit_source = (args.ledger_dir or DATA_DIR) / "net_edge_audits_v3"
     if audit_source.exists():
         shutil.copytree(audit_source, target.parent / "net_edge_audits_v3", dirs_exist_ok=True)
@@ -659,6 +666,10 @@ def main(argv: list[str] | None = None) -> int:
         shutil.copyfile(clean_source, target.parent / "shorts_clean_data_research.json")
         shutil.copyfile(clean_source.with_name("clean_data_changes.json"), target.parent / "shorts_clean_data_changes.json")
         shutil.copytree(clean_source.parent / "clean_data_queue", target.parent / "shorts_clean_data_queue", dirs_exist_ok=True)
+    fundamental_source = (args.ledger_dir or DATA_DIR) / "fundamental_research.json"
+    if fundamental_source.exists():
+        shutil.copyfile(fundamental_source, target.parent / "shorts_fundamental_research.json")
+        shutil.copytree(fundamental_source.parent / "fundamental_packets", target.parent / "shorts_fundamental_packets", dirs_exist_ok=True)
     free_source = (args.ledger_dir or DATA_DIR) / "free_evidence.json"
     if free_source.exists():
         shutil.copyfile(free_source, target.parent / "shorts_free_evidence.json")

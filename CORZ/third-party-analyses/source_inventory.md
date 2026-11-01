@@ -1,6 +1,6 @@
 # CORZ — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 196 total (0 approved, 0 pending, 196 context)
 
 | ID | Title | Path | Status | Use |
@@ -43,6 +43,7 @@
 | activist_long | Two Seas Capital — SC 13D/A | `CORZ/third-party-analyses/activist_reports/long/SC-13D/A_20251009_acc0001011438_25_000471.xml` | context | activist/long — sec_edgar |
 | activist_long | Situational Awareness LP — SC 13D | `CORZ/third-party-analyses/activist_reports/long/SC-13D_20250819_acc0000935836_25_000543.xml` | context | activist/long — sec_edgar |
 | activist_long | Two Seas Capital — SC 13D | `CORZ/third-party-analyses/activist_reports/long/SC-13D_20250808_acc0001315863_25_000581.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001140361 26 006037 | `CORZ/third-party-analyses/activist_reports/long/8-K_20260218_acc0001140361_26_006037.htm` | context | activist/long — local |
 | activist_long | acc0001213900 21 009090 | `CORZ/third-party-analyses/activist_reports/long/8-K_20210212_acc0001213900_21_009090.htm` | context | activist/long — local |
 | activist_long | acc0001213900 21 010515 | `CORZ/third-party-analyses/activist_reports/long/8-K_20210219_acc0001213900_21_010515.htm` | context | activist/long — local |
 | activist_long | acc0001213900 21 020155 | `CORZ/third-party-analyses/activist_reports/long/8-K_20210405_acc0001213900_21_020155.htm` | context | activist/long — local |
@@ -183,7 +184,6 @@
 | activist_long | acc0001140361 25 039808 | `CORZ/third-party-analyses/activist_reports/long/8-K_20251030_acc0001140361_25_039808.htm` | context | activist/long — local |
 | activist_long | acc0001140361 25 039864 | `CORZ/third-party-analyses/activist_reports/long/8-K_20251030_acc0001140361_25_039864.htm` | context | activist/long — local |
 | activist_long | acc0001140361 25 040020 | `CORZ/third-party-analyses/activist_reports/long/8-K_20251031_acc0001140361_25_040020.htm` | context | activist/long — local |
-| activist_long | acc0001140361 26 006037 | `CORZ/third-party-analyses/activist_reports/long/8-K_20260218_acc0001140361_26_006037.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 013214 | `CORZ/third-party-analyses/activist_reports/long/8-K_20260302_acc0001628280_26_013214.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 015622 | `CORZ/third-party-analyses/activist_reports/long/8-K_20260306_acc0001628280_26_015622.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 020327 | `CORZ/third-party-analyses/activist_reports/long/8-K_20260323_acc0001628280_26_020327.htm` | context | activist/long — local |
@@ -202,4 +202,4 @@
 | activist_long | acc0001839341 26 000021 | `CORZ/third-party-analyses/activist_reports/long/8-K_20260827_acc0001839341_26_000021.htm` | context | activist/long — local |
 | activist_long | acc0001839341 26 000023 | `CORZ/third-party-analyses/activist_reports/long/8-K_20260910_acc0001839341_26_000023.htm` | context | activist/long — local |
 
-Cross-check required: `CORZ/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `CORZ/research/cross_check_third_party_2026-10-25.md`

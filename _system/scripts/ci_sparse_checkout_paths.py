@@ -6,9 +6,12 @@ Profiles:
   marvin-pick  — marvin_pick_ticker metadata (holdings research md/json)
   two-phase-watch — INV Accelsius cooling watch (eight ticker trees + INV shard)
   dashboard    — deploy rebuild checkout (base paths only)
+  thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
 
-Base paths (_system, .github, dashboard) are always set by
-ci_checkout_workspace.sh; this script only emits extra ticker paths.
+Base paths (_system, .github, and for most profiles the whole dashboard
+tree) are set by ci_checkout_workspace.sh. This script emits the extra
+paths. thirteen-f emits dashboard files instead of ticker trees; the shell
+passes files-only so the whole dashboard tree stays out of the checkout.
 """
 from __future__ import annotations
 
@@ -86,6 +89,18 @@ def paths_for_profile(profile: str) -> list[str]:
         # The pages rebuild reads market-data / portfolio / dashboard under
         # _system and dashboard/ (already in base sparse set). No ticker trees.
         return []
+
+    if profile == "thirteen-f":
+        # Read by build_overlap_holdings.py / ingest_13f.py, and rewritten by
+        # the thirteen-f job. holdings/ covers by_ticker, by_manager, the
+        # managers index, and the feed. Not the rest of dashboard/data.
+        return [
+            "dashboard/data/overlap_holders.json",
+            "dashboard/data/overlap_holdings.json",
+            "dashboard/data/fund_holdings_summary.json",
+            "dashboard/data/index_membership.json",
+            "dashboard/data/holdings",
+        ]
 
     raise SystemExit(f"Unknown sparse profile: {profile}")
 

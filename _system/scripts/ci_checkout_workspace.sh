@@ -15,7 +15,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/ci_resolve_checkout_ref.sh"
 
-PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch}"
+PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f}"
 REF_INPUT="${2:-}"
 FETCH_DEPTH="${3:-}"
 
@@ -53,12 +53,17 @@ checkout_ref() {
 }
 
 apply_sparse_paths() {
+  # "files-only" skips the whole dashboard tree. thirteen-f uses that: the
+  # tree is about 1 GB, and the job only reads the files the path script lists.
+  local include_dashboard="${1:-dashboard}"
   local paths_file
   paths_file=$(mktemp)
   {
     echo "_system"
     echo ".github"
-    echo "dashboard"
+    if [ "$include_dashboard" != "files-only" ]; then
+      echo "dashboard"
+    fi
     python3 "$SCRIPT_DIR/ci_sparse_checkout_paths.py" "$PROFILE"
   } >"$paths_file"
   local count
@@ -124,6 +129,15 @@ case "$PROFILE" in
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     apply_sparse_paths
+    git read-tree -mu HEAD
+    ;;
+  thirteen-f)
+    git sparse-checkout init --no-cone
+    # Seed scripts only. Seeding dashboard would fetch the whole data tree.
+    git sparse-checkout set _system .github
+    git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
+    checkout_ref
+    apply_sparse_paths files-only
     git read-tree -mu HEAD
     ;;
   *)

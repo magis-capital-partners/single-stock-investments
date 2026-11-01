@@ -16,15 +16,15 @@
     "model_as_of": "2026-07-29",
     "latest_fact_as_of": "2026-05-14",
     "oldest_fact_as_of": "2025-07-26",
-    "price_as_of": "2026-10-30"
+    "price_as_of": "2026-10-16"
   },
   "legacy_audit": {
     "actionable": false,
     "status": "audit_only",
     "annualized_return_at_price_pct": {
-      "low": -15.6,
-      "base": -8.06,
-      "high": 0.9
+      "low": -15.92,
+      "base": -8.41,
+      "high": 0.51
     },
     "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
     "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
@@ -1642,12 +1642,12 @@
     "generated_at": "2026-07-29T21:06:45.463725+00:00"
   },
   "market": {
-    "price_per_share": 104.51,
+    "price_per_share": 107.39,
     "fully_diluted_shares": 3941434665.0,
-    "market_cap_m": 411919.34,
-    "enterprise_value_m": 424207.34,
-    "price_source": "Yahoo CSCO close 2026-10-30",
-    "price_as_of": "2026-10-30"
+    "market_cap_m": 423270.67,
+    "enterprise_value_m": 435558.67,
+    "price_source": "Yahoo CSCO close 2026-10-16",
+    "price_as_of": "2026-10-16"
   },
   "valuation": {
     "output_basis": "present_value_today",
@@ -1698,17 +1698,17 @@
     "annualized_return_field_status": "compatibility_alias_of_forward_return",
     "required_return_pct": 10.0,
     "margin_of_safety_pct": {
-      "low": -227.69,
-      "base": -80.03,
-      "high": 6.06
+      "low": -236.72,
+      "base": -84.99,
+      "high": 3.47
     },
     "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
     "upside_to_value_pct": {
-      "low": -69.48,
-      "base": -44.45,
-      "high": 6.45
+      "low": -70.3,
+      "base": -45.94,
+      "high": 3.59
     },
-    "downside_to_low_pct": -69.48,
+    "downside_to_low_pct": -70.3,
     "horizon_years": 7,
     "equity_liability_floor": 0.0,
     "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
@@ -1810,7 +1810,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "e943b620e740ef9cff21e594790f86e67f95ba63859a0575289b5098a13d4632",
+    "model_hash": "6ff17c9faa924a56445a6712c05c142ee3bf009f3837e3019826e450c7acd68e",
     "method_versions": [
       "owner_earnings_reinvestment_dcf@1.0"
     ],
@@ -1818,6 +1818,463 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "CSCO",
+    "status": "available",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-10-16",
+    "model_as_of": "2026-07-29",
+    "quote": {
+      "value": 107.39,
+      "as_of": "2026-10-16",
+      "source_url": "Yahoo CSCO close 2026-10-16",
+      "currency": null
+    },
+    "forecast_hash": "82b4630ac9869ce2af2d221f47633d8cfecee68b7e505e9741cca5a71d4fc694",
+    "forward_irr_pct": {
+      "low": -7.63663286,
+      "base": 0.32691437,
+      "high": 9.89972645
+    },
+    "present_value_today_per_share": {
+      "low": 32.7616074062,
+      "base": 59.3251082269,
+      "high": 113.398933447
+    },
+    "model_present_value_per_share": {
+      "low": 31.8928,
+      "base": 58.051,
+      "high": 111.2473
+    },
+    "required_return_pct": {
+      "low": 12.0,
+      "base": 10.0,
+      "high": 9.0
+    },
+    "forward_cashflow_schedule": {
+      "low": [
+        {
+          "year": 0.783709787816564,
+          "amount_per_share": 2.761819115426083,
+          "discount_rate": 0.12,
+          "proof_node": "owner_cash_y1",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 1.0,
+          "date": "2027-07-29"
+        },
+        {
+          "year": 1.783709787816564,
+          "amount_per_share": 2.8281027741963087,
+          "discount_rate": 0.12,
+          "proof_node": "owner_cash_y2",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 2.0,
+          "date": "2028-07-28"
+        },
+        {
+          "year": 2.783709787816564,
+          "amount_per_share": 2.8959772407771216,
+          "discount_rate": 0.12,
+          "proof_node": "owner_cash_y3",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 3.0,
+          "date": "2029-07-29"
+        },
+        {
+          "year": 3.783709787816564,
+          "amount_per_share": 2.965480694555671,
+          "discount_rate": 0.12,
+          "proof_node": "owner_cash_y4",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 4.0,
+          "date": "2030-07-29"
+        },
+        {
+          "year": 4.783709787816564,
+          "amount_per_share": 3.036652231225048,
+          "discount_rate": 0.12,
+          "proof_node": "owner_cash_y5",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 5.0,
+          "date": "2031-07-29"
+        },
+        {
+          "year": 5.783709787816564,
+          "amount_per_share": 3.1095318847737383,
+          "discount_rate": 0.12,
+          "proof_node": "owner_cash_y6",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 6.0,
+          "date": "2032-07-29"
+        },
+        {
+          "year": 6.783709787816564,
+          "amount_per_share": 3.184160650007882,
+          "discount_rate": 0.12,
+          "proof_node": "owner_cash_y7",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 7.0,
+          "date": "2033-07-29"
+        },
+        {
+          "year": 6.783709787816564,
+          "amount_per_share": 47.762409750135994,
+          "discount_rate": 0.12,
+          "proof_node": "terminal_pv",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 7.0,
+          "date": "2033-07-29"
+        },
+        {
+          "year": 0,
+          "amount_per_share": 1.797061375365967,
+          "discount_rate": 0,
+          "proof_node": "cash",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "immediate_net_asset_settlement",
+          "model_year": 0,
+          "date": "2026-10-16"
+        },
+        {
+          "year": 0,
+          "amount_per_share": -4.91470787833039,
+          "discount_rate": 0,
+          "proof_node": "debt",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "immediate_net_asset_settlement",
+          "model_year": 0,
+          "date": "2026-10-16"
+        }
+      ],
+      "base": [
+        {
+          "year": 0.783709787816564,
+          "amount_per_share": 2.3294420383345362,
+          "discount_rate": 0.1,
+          "proof_node": "owner_cash_y1",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 1.0,
+          "date": "2027-07-29"
+        },
+        {
+          "year": 1.783709787816564,
+          "amount_per_share": 2.476196886749612,
+          "discount_rate": 0.1,
+          "proof_node": "owner_cash_y2",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 2.0,
+          "date": "2028-07-28"
+        },
+        {
+          "year": 2.783709787816564,
+          "amount_per_share": 2.632197290615243,
+          "discount_rate": 0.1,
+          "proof_node": "owner_cash_y3",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 3.0,
+          "date": "2029-07-29"
+        },
+        {
+          "year": 3.783709787816564,
+          "amount_per_share": 2.798025719923991,
+          "discount_rate": 0.1,
+          "proof_node": "owner_cash_y4",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 4.0,
+          "date": "2030-07-29"
+        },
+        {
+          "year": 4.783709787816564,
+          "amount_per_share": 2.974301340278591,
+          "discount_rate": 0.1,
+          "proof_node": "owner_cash_y5",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 5.0,
+          "date": "2031-07-29"
+        },
+        {
+          "year": 5.783709787816564,
+          "amount_per_share": 3.1616823247151298,
+          "discount_rate": 0.1,
+          "proof_node": "owner_cash_y6",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 6.0,
+          "date": "2032-07-29"
+        },
+        {
+          "year": 6.783709787816564,
+          "amount_per_share": 3.3608683111736926,
+          "discount_rate": 0.1,
+          "proof_node": "owner_cash_y7",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 7.0,
+          "date": "2033-07-29"
+        },
+        {
+          "year": 6.783709787816564,
+          "amount_per_share": 93.07019938634197,
+          "discount_rate": 0.1,
+          "proof_node": "terminal_pv",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 7.0,
+          "date": "2033-07-29"
+        },
+        {
+          "year": 0,
+          "amount_per_share": 1.797061375365967,
+          "discount_rate": 0,
+          "proof_node": "cash",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "immediate_net_asset_settlement",
+          "model_year": 0,
+          "date": "2026-10-16"
+        },
+        {
+          "year": 0,
+          "amount_per_share": -4.91470787833039,
+          "discount_rate": 0,
+          "proof_node": "debt",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "immediate_net_asset_settlement",
+          "model_year": 0,
+          "date": "2026-10-16"
+        }
+      ],
+      "high": [
+        {
+          "year": 0.783709787816564,
+          "amount_per_share": 1.8963906889980122,
+          "discount_rate": 0.09,
+          "proof_node": "owner_cash_y1",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 1.0,
+          "date": "2027-07-29"
+        },
+        {
+          "year": 1.783709787816564,
+          "amount_per_share": 2.1334395251227636,
+          "discount_rate": 0.09,
+          "proof_node": "owner_cash_y2",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 2.0,
+          "date": "2028-07-28"
+        },
+        {
+          "year": 2.783709787816564,
+          "amount_per_share": 2.400119465763109,
+          "discount_rate": 0.09,
+          "proof_node": "owner_cash_y3",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 3.0,
+          "date": "2029-07-29"
+        },
+        {
+          "year": 3.783709787816564,
+          "amount_per_share": 2.700134398982864,
+          "discount_rate": 0.09,
+          "proof_node": "owner_cash_y4",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 4.0,
+          "date": "2030-07-29"
+        },
+        {
+          "year": 4.783709787816564,
+          "amount_per_share": 3.0376511988560386,
+          "discount_rate": 0.09,
+          "proof_node": "owner_cash_y5",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 5.0,
+          "date": "2031-07-29"
+        },
+        {
+          "year": 5.783709787816564,
+          "amount_per_share": 3.4173575987133606,
+          "discount_rate": 0.09,
+          "proof_node": "owner_cash_y6",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 6.0,
+          "date": "2032-07-29"
+        },
+        {
+          "year": 6.783709787816564,
+          "amount_per_share": 3.8445272985515793,
+          "discount_rate": 0.09,
+          "proof_node": "owner_cash_y7",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 7.0,
+          "date": "2033-07-29"
+        },
+        {
+          "year": 6.783709787816564,
+          "amount_per_share": 184.5373103305291,
+          "discount_rate": 0.09,
+          "proof_node": "terminal_pv",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "dated_forecast",
+          "model_year": 7.0,
+          "date": "2033-07-29"
+        },
+        {
+          "year": 0,
+          "amount_per_share": 1.797061375365967,
+          "discount_rate": 0,
+          "proof_node": "cash",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "immediate_net_asset_settlement",
+          "model_year": 0,
+          "date": "2026-10-16"
+        },
+        {
+          "year": 0,
+          "amount_per_share": -4.91470787833039,
+          "discount_rate": 0,
+          "proof_node": "debt",
+          "component_id": "operating_business_and_net_assets",
+          "timing": "immediate_net_asset_settlement",
+          "model_year": 0,
+          "date": "2026-10-16"
+        }
+      ]
+    },
+    "buy_prices": [
+      {
+        "hurdle_pct": 8,
+        "prices": {
+          "low": 40.8212843025,
+          "base": 66.7448978014,
+          "high": 120.538539043
+        }
+      },
+      {
+        "hurdle_pct": 10,
+        "prices": {
+          "low": 36.524896714,
+          "base": 59.3251082269,
+          "high": 106.743376186
+        }
+      },
+      {
+        "hurdle_pct": 12,
+        "prices": {
+          "low": 32.7616074062,
+          "base": 52.8532607937,
+          "high": 94.7395320574
+        }
+      },
+      {
+        "hurdle_pct": 15,
+        "prices": {
+          "low": 27.9540713625,
+          "base": 44.630234218,
+          "high": 79.535014188
+        }
+      },
+      {
+        "hurdle_pct": 18,
+        "prices": {
+          "low": 23.9713519679,
+          "base": 37.8646381928,
+          "high": 67.075000958
+        }
+      },
+      {
+        "hurdle_pct": 20,
+        "prices": {
+          "low": 21.6932058999,
+          "base": 34.0179633809,
+          "high": 60.0156565877
+        }
+      }
+    ],
+    "components": [
+      {
+        "component_id": "operating_business_and_net_assets",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 31.8928,
+          "base": 58.051,
+          "high": 111.2473
+        }
+      }
+    ],
+    "gaps": [],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "owner_earnings",
+        "ref": "CSCO/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0000858877-25-000111; form 10-K",
+        "as_of": "2025-07-26",
+        "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
+        "source_id": "635f10e8226fb60910c3e2c79bf018ebe00144044bee31f8ddbf2431367f1411"
+      },
+      {
+        "node_id": "cash",
+        "ref": "CSCO/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0000858877-26-000078; form 10-Q",
+        "as_of": "2026-04-25",
+        "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
+        "source_id": "01a835638579a8983190446b6978fff3cd029f1e8d57a34976791318a4b22bbb"
+      },
+      {
+        "node_id": "debt",
+        "ref": "CSCO/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:LongTermDebtNoncurrent; accession 0000858877-26-000078; form 10-Q",
+        "as_of": "2026-04-25",
+        "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
+        "source_id": "620bfbd35324b1beb26224346008ced1924161252ab7460f28abf6b84c92d1f2"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "CSCO/research/evidence/sec_companyfacts.json",
+        "locator": "dei:EntityCommonStockSharesOutstanding; accession 0000858877-26-000078; form 10-Q",
+        "as_of": "2026-05-14",
+        "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
+        "source_id": "e610e455c7fcb4125717b2a81efac23eaf0882128bf6098981cf6d15fc4ab6e5"
+      }
+    ],
+    "next_action": "scheduled_refresh",
+    "reconciliation": {
+      "passed": true,
+      "method": "component_proof_to_dated_cashflows",
+      "model_present_value_per_share": {
+        "low": 31.8928,
+        "base": 58.051,
+        "high": 111.2473
+      }
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "2f686916a0953ddb564409d6dcc2b5a5f4b1c141c9c1dc5957da801252a092a1",
+    "horizon_years": 6.783709787816564
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": false,
   "falsifier_coverage": {

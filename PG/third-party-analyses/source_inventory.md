@@ -1,7 +1,7 @@
 # PG — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 77 total (0 approved, 0 pending, 77 context)
+**Date:** 2026-10-25
+**Sources:** 81 total (0 approved, 0 pending, 81 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -82,5 +82,9 @@
 | activist_long | acc0000080424 26 000093 | `PG/third-party-analyses/activist_reports/long/8-K_20260729_acc0000080424_26_000093.htm` | context | activist/long — local |
 | activist_long | acc0000080424 26 000094 | `PG/third-party-analyses/activist_reports/long/8-K_20260729_acc0000080424_26_000094.htm` | context | activist/long — local |
 | activist_long | acc0000080424 26 000097 | `PG/third-party-analyses/activist_reports/long/8-K_20260729_acc0000080424_26_000097.htm` | context | activist/long — local |
+| activist_long | acc0000080424 26 000214 | `PG/third-party-analyses/activist_reports/long/8-K_20261013_acc0000080424_26_000214.htm` | context | activist/long — local |
+| activist_long | acc0000080424 26 000245 | `PG/third-party-analyses/activist_reports/long/8-K_20261016_acc0000080424_26_000245.htm` | context | activist/long — local |
+| activist_long | acc0000080424 26 000250 | `PG/third-party-analyses/activist_reports/long/8-K_20261022_acc0000080424_26_000250.htm` | context | activist/long — local |
+| activist_long | acc0000080424 26 000252 | `PG/third-party-analyses/activist_reports/long/8-K_20261022_acc0000080424_26_000252.htm` | context | activist/long — local |
 
-Cross-check required: `PG/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `PG/research/cross_check_third_party_2026-10-25.md`

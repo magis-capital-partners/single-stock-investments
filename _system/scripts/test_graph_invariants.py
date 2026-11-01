@@ -434,13 +434,51 @@ class PlantedViolationTests(unittest.TestCase):
         self.assertIn("revenue-m", results["E2"].violations[0])
         self.assertEqual(exit_code, 1)
 
-    def add_outcome(self, metric, verdict, resolved_on):
+    def add_outcome(self, metric, verdict, resolved_on, **extra):
         path = self.root / "_system" / "research" / "falsifier_outcomes.jsonl"
-        path.write_text(path.read_text(encoding="utf-8") + json.dumps(
-            {"ticker": "TST", "component_id": "core", "metric": metric,
-             "verdict": verdict, "resolved_on": resolved_on,
-             "method_id": "owner_earnings_reinvestment_dcf",
-             "power_zone": "quality_reinvestment"}) + "\n", encoding="utf-8")
+        row = {"ticker": "TST", "component_id": "core", "metric": metric,
+               "verdict": verdict, "resolved_on": resolved_on,
+               "method_id": "owner_earnings_reinvestment_dcf",
+               "power_zone": "quality_reinvestment", **extra}
+        path.write_text(path.read_text(encoding="utf-8") + json.dumps(row) + "\n",
+                        encoding="utf-8")
+        return row
+
+    def test_e2_a_hit_superseding_an_on_time_unresolvable_is_not_late(self):
+        from falsifier_specs import outcome_id
+        plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
+        first = self.add_outcome("late_m", "unresolvable", "2026-07-16")
+        self.add_outcome("late_m", "hit", "2026-07-20",
+                         supersedes_outcome_ids=[outcome_id(first)])
+        results, _ = run_invariants(self.root)
+        self.assertEqual(results["E2"].violations, [])
+        self.assertEqual(results["E3"].violations, [])
+
+    def test_e2_a_hit_superseding_a_late_unresolvable_is_still_late(self):
+        from falsifier_specs import outcome_id
+        plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
+        first = self.add_outcome("late_m", "unresolvable", "2026-07-17")
+        self.add_outcome("late_m", "hit", "2026-07-20",
+                         supersedes_outcome_ids=[outcome_id(first)])
+        results, _ = run_invariants(self.root)
+        self.assertEqual(len(results["E2"].violations), 1, results["E2"].violations)
+        self.assertIn("late-m: due 2026-07-01, resolved late (2026-07-17)",
+                      results["E2"].violations[0])
+
+    def test_e2_a_plain_late_miss_is_still_late(self):
+        plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
+        self.add_outcome("late_m", "miss", "2026-07-17")
+        results, _ = run_invariants(self.root)
+        self.assertEqual(len(results["E2"].violations), 1, results["E2"].violations)
+        self.assertIn("resolved late (2026-07-17)", results["E2"].violations[0])
+
+    def test_e2_a_supersede_naming_no_known_outcome_is_judged_on_its_own_date(self):
+        plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
+        self.add_outcome("late_m", "hit", "2026-07-20",
+                         supersedes_outcome_ids=["000000000000000000000000"])
+        results, _ = run_invariants(self.root)
+        self.assertEqual(len(results["E2"].violations), 1, results["E2"].violations)
+        self.assertIn("resolved late (2026-07-20)", results["E2"].violations[0])
 
     def test_e2_unresolvable_written_the_day_after_the_deadline_is_on_time(self):
         # resolve_falsifiers.py can only declare `unresolvable` once the

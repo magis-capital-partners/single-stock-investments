@@ -117,7 +117,7 @@ def test_python_tests_completing_is_a_retry():
     assert on["workflow_run"]["workflows"] == [
         "Research quality", "Python tests", "CI bootstrap smoke",
         "LLM Workflow Governance", "Energy model tests",
-        "Filing Sentinel gold set", "Agent context",
+        "Filing Sentinel gold set", "Agent context", "Underwriting contract validation",
     ]
 
 
@@ -209,6 +209,23 @@ def test_drafts_are_marked_ready_before_the_gate_waits_on_ci():
     resolve = step(load()["jobs"]["resolve-pr"], "Resolve PR number")
     assert 'gh pr ready "$PR"' in resolve["run"]
     assert resolve["run"].index('gh pr ready "$PR"') < resolve["run"].index('echo "eligible=true"')
+
+
+def test_data_guard_materializes_desk_briefs_inside_the_sparse_checkout():
+    """PR #1225: `core.sparseCheckout=false` left schema.json unwritten on
+    git 2.55, and `|| true` hid the checkout error. The checker then died
+    before it could read the brief."""
+    data_guard = load()["jobs"]["data-guard"]
+    checkout = next(s for s in data_guard["steps"] if str(s.get("uses", "")).startswith("actions/checkout"))
+    assert checkout["with"]["ref"] == "${{ github.event.repository.default_branch }}"
+    fetch = step(data_guard, "Fetch the PR head data paths")["run"]
+    assert "git sparse-checkout add --skip-checks" in fetch
+    assert "_system/data/desk_briefs/" in fetch
+    assert "/dashboard/data/desk_briefs.json" in fetch
+    assert "overlay dashboard/data/desk_briefs.json" in fetch
+    assert "|| true" not in fetch
+    assert 'test -f _system/data/desk_briefs/schema.json' in fetch
+    assert "brief-inputs.txt" in fetch
 
 
 def test_merge_jobs_stay_serialized_on_one_lock():

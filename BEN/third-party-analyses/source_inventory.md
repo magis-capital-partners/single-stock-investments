@@ -1,7 +1,7 @@
 # BEN — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 165 total (0 approved, 0 pending, 165 context)
+**Date:** 2026-10-27
+**Sources:** 166 total (0 approved, 0 pending, 166 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -118,6 +118,7 @@
 | activist_long | HoldCo Asset Management — SC 13D/A | `BEN/third-party-analyses/activist_reports/long/SC-13D/A_20241217_acc0000038777_24_000224.xml` | context | activist/long — sec_edgar |
 | activist_long | Franklin Templeton, Inc — SC 13D/A | `BEN/third-party-analyses/activist_reports/long/SC-13D/A_20261002_acc0000038777_26_000256.xml` | context | activist/long — sec_edgar |
 | activist_long | HoldCo Asset Management — SC 13D/A | `BEN/third-party-analyses/activist_reports/long/SC-13D/A_20260928_acc0000038777_26_000255.xml` | context | activist/long — sec_edgar |
+| activist_long | Franklin Templeton, Inc — SC 13D/A | `BEN/third-party-analyses/activist_reports/long/SC-13D/A_20261023_acc0000038777_26_000271.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0000038777 20 000179 | `BEN/third-party-analyses/activist_reports/long/8-K_20201027_acc0000038777_20_000179.htm` | context | activist/long — local |
 | activist_long | acc0000038777 21 000028 | `BEN/third-party-analyses/activist_reports/long/8-K_20210202_acc0000038777_21_000028.htm` | context | activist/long — local |
 | activist_long | acc0000038777 21 000074 | `BEN/third-party-analyses/activist_reports/long/8-K_20210210_acc0000038777_21_000074.htm` | context | activist/long — local |
@@ -171,4 +172,4 @@
 | activist_long | acc0000038777 26 000215 | `BEN/third-party-analyses/activist_reports/long/8-K_20260731_acc0000038777_26_000215.htm` | context | activist/long — local |
 | activist_long | acc0001552781 26 000423 | `BEN/third-party-analyses/activist_reports/long/8-K_20260810_acc0001552781_26_000423.htm` | context | activist/long — local |
 
-Cross-check required: `BEN/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `BEN/research/cross_check_third_party_2026-10-27.md`

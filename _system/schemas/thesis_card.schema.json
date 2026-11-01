@@ -1,25 +1,194 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "magis.thesis_card.v2",
+  "$id": "magis.thesis_card.v3",
   "title": "Magis thesis_card.json",
   "type": "object",
-  "required": ["ticker", "schema_version", "returns"],
+  "required": [
+    "ticker",
+    "schema_version",
+    "returns"
+  ],
   "properties": {
-    "ticker": {"type": "string", "minLength": 1},
-    "schema_version": {"const": "2.0"},
-    "base_irr_pct": {"type": ["number", "null"]},
-    "base_irr_unit": {"const": "percent_per_year"},
+    "ticker": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "enum": [
+        "2.0",
+        "3.0"
+      ]
+    },
+    "base_irr_pct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "base_irr_unit": {
+      "const": "percent_per_year"
+    },
     "returns": {
       "type": "object",
-      "required": ["base_irr_pct", "unit"],
+      "required": [
+        "base_irr_pct",
+        "unit"
+      ],
       "properties": {
-        "base_irr_pct": {"type": ["number", "null"]},
-        "unit": {"const": "percent_per_year"},
-        "label": {"type": ["string", "null"]},
-        "display": {"type": ["string", "null"]},
-        "scenarios_pct": {"type": "object"}
+        "base_irr_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "const": "percent_per_year"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "display": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scenarios_pct": {
+          "type": "object"
+        }
       }
     },
-    "filing_digest": {"type": ["string", "null"]}
-  }
+    "filing_digest": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "quality_assessment": {
+      "type": "object",
+      "required": [
+        "status",
+        "criteria"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "gap",
+            "pending_human_review",
+            "reviewed"
+          ]
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "criterion",
+              "rating",
+              "value",
+              "sources",
+              "claim_type"
+            ],
+            "properties": {
+              "criterion": {
+                "enum": [
+                  "moat_barrier",
+                  "real_pricing_power",
+                  "capex_revenue_pct",
+                  "capex_da_pct",
+                  "incremental_roic_pct",
+                  "capital_allocation",
+                  "governance"
+                ]
+              },
+              "rating": {
+                "enum": [
+                  "strong",
+                  "mixed",
+                  "weak",
+                  null
+                ]
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "ref",
+                    "as_of",
+                    "claim_type"
+                  ],
+                  "properties": {
+                    "ref": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "locator": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "as_of": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "claim_type": {
+                      "enum": [
+                        "fact",
+                        "inference",
+                        "opinion"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "locked",
+                        "assumption",
+                        "gap",
+                        "pending_human_review"
+                      ]
+                    }
+                  }
+                }
+              },
+              "claim_type": {
+                "enum": [
+                  "fact",
+                  "inference",
+                  "opinion"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "2.0"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "quality_assessment"
+          ]
+        }
+      }
+    }
+  ]
 }

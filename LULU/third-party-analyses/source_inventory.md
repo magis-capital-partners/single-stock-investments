@@ -1,7 +1,7 @@
 # LULU — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 156 total (0 approved, 0 pending, 156 context)
+**Date:** 2026-10-25
+**Sources:** 157 total (0 approved, 0 pending, 157 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -161,5 +161,6 @@
 | activist_long | acc0001397187 26 000126 | `LULU/third-party-analyses/activist_reports/long/8-K_20260903_acc0001397187_26_000126.htm` | context | activist/long — local |
 | activist_long | acc0001397187 26 000129 | `LULU/third-party-analyses/activist_reports/long/8-K_20260914_acc0001397187_26_000129.htm` | context | activist/long — local |
 | activist_long | acc0001397187 26 000131 | `LULU/third-party-analyses/activist_reports/long/8-K_20261007_acc0001397187_26_000131.htm` | context | activist/long — local |
+| activist_long | acc0001397187 26 000135 | `LULU/third-party-analyses/activist_reports/long/8-K_20261022_acc0001397187_26_000135.htm` | context | activist/long — local |
 
-Cross-check required: `LULU/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LULU/research/cross_check_third_party_2026-10-25.md`

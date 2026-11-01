@@ -1,6 +1,6 @@
 # BBY — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 90 total (0 approved, 0 pending, 90 context)
 
 | ID | Title | Path | Status | Use |
@@ -10,6 +10,7 @@
 | activist_long | S 1 RMSJS LLC — SC 13D/A | `BBY/third-party-analyses/activist_reports/long/SC-13D/A_20240605_acc0000947871_24_000563.htm` | context | activist/long — sec_edgar |
 | activist_long | SCHULZE (+2) — SC 13D/A | `BBY/third-party-analyses/activist_reports/long/SC-13D/A_20260602_acc0000947871_26_000598.xml` | context | activist/long — sec_edgar |
 | activist_long | SCHULZE (+2) — SC 13D/A | `BBY/third-party-analyses/activist_reports/long/SC-13D/A_20250611_acc0000947871_25_000600.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0000764478 20 000012 | `BBY/third-party-analyses/activist_reports/long/8-K_20200311_acc0000764478_20_000012.htm` | context | activist/long — local |
 | activist_long | acc0000764478 18 000004 | `BBY/third-party-analyses/activist_reports/long/8-K_20180301_acc0000764478_18_000004.htm` | context | activist/long — local |
 | activist_long | acc0000764478 18 000007 | `BBY/third-party-analyses/activist_reports/long/8-K_20180301_acc0000764478_18_000007.htm` | context | activist/long — local |
 | activist_long | acc0000764478 18 000009 | `BBY/third-party-analyses/activist_reports/long/8-K_20180306_acc0000764478_18_000009.htm` | context | activist/long — local |
@@ -36,7 +37,6 @@
 | activist_long | acc0000764478 19 000061 | `BBY/third-party-analyses/activist_reports/long/8-K_20191216_acc0000764478_19_000061.htm` | context | activist/long — local |
 | activist_long | acc0000764478 20 000002 | `BBY/third-party-analyses/activist_reports/long/8-K_20200204_acc0000764478_20_000002.htm` | context | activist/long — local |
 | activist_long | acc0000764478 20 000007 | `BBY/third-party-analyses/activist_reports/long/8-K_20200227_acc0000764478_20_000007.htm` | context | activist/long — local |
-| activist_long | acc0000764478 20 000012 | `BBY/third-party-analyses/activist_reports/long/8-K_20200311_acc0000764478_20_000012.htm` | context | activist/long — local |
 | activist_long | acc0000764478 20 000014 | `BBY/third-party-analyses/activist_reports/long/8-K_20200323_acc0000764478_20_000014.htm` | context | activist/long — local |
 | activist_long | acc0000764478 20 000021 | `BBY/third-party-analyses/activist_reports/long/8-K_20200415_acc0000764478_20_000021.htm` | context | activist/long — local |
 | activist_long | acc0000764478 20 000026 | `BBY/third-party-analyses/activist_reports/long/8-K_20200521_acc0000764478_20_000026.htm` | context | activist/long — local |
@@ -96,4 +96,4 @@
 | activist_long | acc0000764478 26 000034 | `BBY/third-party-analyses/activist_reports/long/8-K_20260803_acc0000764478_26_000034.htm` | context | activist/long — local |
 | activist_long | acc0000764478 26 000037 | `BBY/third-party-analyses/activist_reports/long/8-K_20260827_acc0000764478_26_000037.htm` | context | activist/long — local |
 
-Cross-check required: `BBY/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `BBY/research/cross_check_third_party_2026-10-25.md`

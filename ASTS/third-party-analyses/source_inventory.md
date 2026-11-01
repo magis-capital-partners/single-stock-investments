@@ -1,7 +1,7 @@
 # ASTS — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 161 total (0 approved, 0 pending, 161 context)
+**Date:** 2026-10-25
+**Sources:** 162 total (0 approved, 0 pending, 162 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -166,5 +166,6 @@
 | activist_long | acc0001493152 26 033912 | `ASTS/third-party-analyses/activist_reports/long/8-K_20260720_acc0001493152_26_033912.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 342540 | `ASTS/third-party-analyses/activist_reports/long/8-K_20260810_acc0001193125_26_342540.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 044647 | `ASTS/third-party-analyses/activist_reports/long/8-K_20260928_acc0001493152_26_044647.htm` | context | activist/long — local |
+| activist_long | acc0001493152 26 047766 | `ASTS/third-party-analyses/activist_reports/long/8-K_20261020_acc0001493152_26_047766.htm` | context | activist/long — local |
 
-Cross-check required: `ASTS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `ASTS/research/cross_check_third_party_2026-10-25.md`

@@ -1,490 +1,1932 @@
 {
   "schema_version": "desk_briefs.v1",
-  "generated_at": "2026-10-17T08:44:26Z",
+  "generated_at": "2026-10-30T12:33:01Z",
   "caption": "Ranked output from the Magis desk bots, one brief per desk per day, filed by pull request and checked by schema. A brief is research only: it carries no authority, sizes nothing, and never enters a base IRR. The one number on each row is the dashboard's or the filing's, not the bot's.",
   "desks": [
     {
       "desk": "special_situations",
       "desk_label": "Special Situations",
       "owner": "drew",
-      "author": "claude-drew-special-situations",
-      "as_of": "2026-10-12",
-      "age_hours": 128.7,
+      "author": "grok-drew-special-situations",
+      "as_of": "2026-10-29",
+      "age_hours": 36.4,
       "stale": false,
-      "path": "_system/data/desk_briefs/special_situations/2026-10-12.json",
+      "path": "_system/data/desk_briefs/special_situations/2026-10-29.json",
       "items": [
         {
-          "ticker": "MDT",
-          "headline": "MiniMed (MMED) exchange offer expired 2026-10-09 with the upper limit in effect; final ratio 4.5939 MMED per MDT; final-results 8-K not yet filed.",
-          "one_number": "final exchange ratio 4.5939 (upper limit binding)",
-          "lane": "split_offs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "SC TO-I/A 0001628280-26-065406 (filed 2026-10-08)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065406/mdt-amendedno2scheduleissu.htm"
-            },
-            {
-              "kind": "filing",
-              "ref": "424B3 0001628280-26-064932 (7% discount, upper limit 4.5939, expires 2026-10-09, odd-lot priority)",
-              "url": "https://www.sec.gov/Archives/edgar/data/2062583/000162828026064932/minimedgroupinc-424b3.htm"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:mdt-mmed-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the final-results 8-K (accepted and tendered MDT shares, proration factor, settlement date) and append a version-2 row to separation_registry.jsonl; then the unwind flow can be modelled.",
-          "handoff": null
-        },
-        {
-          "ticker": "MDT",
-          "headline": "Capped ratio gave a 2.33% realized discount on 2026-10-09 closes (MDT 88.48 / MMED 19.71); odd-lot payoff $195.55 per 99 shares; no sleeve odd lot.",
-          "one_number": "realized discount 2.33% vs 7% headline",
-          "lane": "split_offs",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json spread (basis final_filed, quotes as_of 2026-10-09)",
-              "url": null
-            },
-            {
-              "kind": "provider",
-              "ref": "Yahoo delayed closes via _system/data/separations/separation_market.json (market_as_of 2026-10-11T18:04:51Z)",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Nothing to tender; the offer has expired. Record the realized discount beside the filed proration factor once the 8-K prints, so the reference set gains a fifth data point.",
-          "handoff": null
-        },
-        {
-          "ticker": "unresolved",
-          "headline": "MiniMed (MMED, not in registry): modelled post-settlement selling 27.7% of float over 13.7 ADV days, 2026-10-09 to 2027-10-09 (estimate).",
-          "one_number": "-27.7% of float (estimate)",
-          "lane": "forced_sellers",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json forced_seller_rows (sep:mdt-mmed-2026, side spinco, run 2026-10-12)",
-              "url": null
-            },
-            {
-              "kind": "filing",
-              "ref": "SC TO-I 0001628280-26-061683 (225,361,295 MiniMed shares offered, 80.1% of outstanding)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026061683/kangaroo-scheduleto.htm"
-            }
-          ],
-          "confidence": "provider",
-          "next": "Onboard MMED so the row can carry a registry ticker; rerun the flow model when the accepted share count is filed. A modelled flow is a timing input, not a value.",
-          "handoff": "tape_index"
-        },
-        {
-          "ticker": "HON",
-          "headline": "Honeywell Aerospace spin-off: Form 10 on file (10-12B/A 2026-06-08); ratio, record and distribution dates not yet read; row stays in discovery.",
-          "one_number": "10-12B/A filed 2026-06-08",
+          "ticker": "ABT",
+          "headline": "Abbott plans a tax-free spin of Nutrition into its own public company, expected by the end of 2027.",
+          "one_number": "about $8.5 billion annual sales",
           "lane": "spinoffs",
           "evidence": [
             {
               "kind": "filing",
-              "ref": "10-12B/A 0001628280-26-041399",
-              "url": "https://www.sec.gov/Archives/edgar/data/773840/000162828026041399"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:hon-hona-2026 (gates.terms missing distribution_ratio, dates.distribution)",
-              "url": null
+              "ref": "8-K 0001104659-26-117587 filed 2026-10-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/1800/000110465926117587/tm2627971d1_8k.htm"
             }
           ],
           "confidence": "filing",
-          "next": "Read the Form 10 for the ratio, record and distribution dates, SpinCo debt and insider equity; the identity and terms gates can then rank it and the flow model can ask who must sell.",
-          "handoff": null
+          "next": "Pass until a Form 10 states a ratio, a record date, or who must sell.",
+          "handoff": "nol_tax_assets"
         },
         {
           "ticker": "FDX",
-          "headline": "FedEx Freight (FDXF) spin-off: Form 10 on file (10-12B/A 2026-04-10); terms not extracted; row held in discovery until the ratio and the dates are read.",
-          "one_number": "10-12B/A filed 2026-04-10",
-          "lane": "spinoffs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "10-12B/A 0001104659-26-041977",
-              "url": "https://www.sec.gov/Archives/edgar/data/2082247/000110465926041977"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:fdx-fdxf-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-          "handoff": null
-        },
-        {
-          "ticker": "CTVA",
-          "headline": "Corteva's Vylor (VYLR) spin-off: Form 10 amended 2026-09-21 (10-12B/A); distribution ratio and dates not yet read; row in discovery.",
-          "one_number": "10-12B/A filed 2026-09-21",
-          "lane": "spinoffs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "10-12B/A 0001193125-26-396054",
-              "url": "https://www.sec.gov/Archives/edgar/data/2128626/000119312526396054"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:ctva-vylr-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-          "handoff": null
-        },
-        {
-          "ticker": "APTV",
-          "headline": "Aptiv's Versigent spin-off: Form 10 amended 2026-03-06 (10-12B/A); no SpinCo ticker in the register yet; ratio and dates not yet read.",
-          "one_number": "10-12B/A filed 2026-03-06",
-          "lane": "spinoffs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "10-12B/A 0001193125-26-096776",
-              "url": "https://www.sec.gov/Archives/edgar/data/2078008/000119312526096776"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:aptv-versigent-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the Form 10 for the ratio and the dates, and record the SpinCo ticker when the listing notice names it.",
-          "handoff": null
-        },
-        {
-          "ticker": "CSGP",
-          "headline": "Nasdaq-100 deletion flagged from a headline dated 2026-05-11, not a provider notice; the selling is not mechanical until the notice is confirmed.",
-          "one_number": "announced 2026-05-11 (headline)",
+          "headline": "FedEx kept a 19.9% FedEx Freight stake and expects to monetize it within 12 months of September 30, 2026.",
+          "one_number": "19.9% stake; 12 months from 2026-09-30",
           "lane": "forced_sellers",
           "evidence": [
             {
-              "kind": "dashboard",
-              "ref": "dashboard/data/special_situations.json row ss:27d427fca304 (source_feed index_membership, evidence_kind news)",
-              "url": null
-            },
-            {
-              "kind": "news",
-              "ref": "Index note via Google News RSS, 2026-05-11",
-              "url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxOWEQ3cjN1MU13cjZ0cEM3NEN5d1NwQU5Zd3VWVmdXNkhiY2I5ZXVpbFNCNEFCZE4xaGRfZG0yWnZRMkhiVTMtY2Z6R001dGE2S3dtRnhPa2NnRmx6ZllDdjMzTGc2eVlQSUJkSnF6ZDlTSHZYQUZWMDdpNjJ0ZGV6UUt3bGNjNVBiTDN5Y0pfdHFTc2d5bXdfazlLWVZzd3FkQTJudXl1RFQ2MDFwakxlUmFoLWIxNFY3MUxyLXZhSy11U1JOZ1ZqVGhRN1BsV0NpZGt1LWtjenliNmRqUUllN056dmttTk1Na1pKRWJyV01xdUXSAfgBQVVfeXFMTWxORFlzeDlqckJ0cWFQbUwzT0s4ZGZDdWRtWmpMUHA0cVV1Ui1MZE1tVF9SMFJycTQ2cmZkcjdybUszUzZiWHRzUDR4SmZZNVk5bS1DSTRZV1VRaHdRd0FYV0NDYUo2RzlMdnk3QlhhaFFKUC03ZkNsT2dXamZGQUR3NS1GY1AwdnBjQWxlLXY2ZXp5UGs1ajJwQ0VGVktLbllBLTBYREVxdGxVTlFDYVZ3b01GZjExMUp2MFVabEY1SHJ2TnJqNU1Rbm43T3FMZEMyM0dVTDF3Snh1MXFGUVRaSnRUMWVfTm1XTGwtWHVjQWN6TDVvT3M?oc=5"
+              "kind": "filing",
+              "ref": "10-Q 0001048911-26-000131 filed 2026-10-28",
+              "url": "https://www.sec.gov/Archives/edgar/data/1048911/000104891126000131/fdx-20260930.htm"
             }
           ],
-          "confidence": "news",
-          "next": "Confirm the Nasdaq provider notice (announced and effective dates) in index_membership before treating the selling as mechanical; until then this is a headline.",
+          "confidence": "filing",
+          "next": "The 10-Q says expects, subject to market conditions. It does not say FedEx must sell.",
           "handoff": "tape_index"
         },
         {
-          "ticker": "TAP",
-          "headline": "S&P 500 deletion flagged from a headline dated 2026-09-21, not a provider notice; no confirmed_event in index_membership as of this run.",
-          "one_number": "announced 2026-09-21 (headline)",
-          "lane": "forced_sellers",
+          "ticker": "DASH",
+          "headline": "DoorDash agreed to buy Maplebear (Instacart) for $65.00 a share, at least 75% cash and up to 25% stock.",
+          "one_number": "$65.00 per share",
+          "lane": "mergers",
           "evidence": [
             {
-              "kind": "dashboard",
-              "ref": "dashboard/data/special_situations.json row ss:255a109bb35d (source_feed index_membership, evidence_kind news)",
-              "url": null
-            },
-            {
-              "kind": "news",
-              "ref": "Index note via Google News RSS, 2026-09-21",
-              "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPQ3dydU5xWFVKSjZRU29UeERNeW9IMm91SERmR2NqS045S2xFMGQ1eHN4S19MdmZ5VE5LWEYtNmpNWThYY29VR0xzR2trZ3JFQWUtVjVjZFdtNUJERU1raVE0N25leEJkMTB1NE14N2FRclBjR0N0bjN4bzczVHRSc2JlbGVVSjU1T2JKMlo5ejZnN2I2QktxMXVOcXBmR0w0ZDMtVVVQZHhJT3NRcmZ4Nm9aLW5JSTVmM01GQVZYOTk1MHh2WEE?oc=5"
+              "kind": "filing",
+              "ref": "425 0001792789-26-000065 filed 2026-10-29",
+              "url": "https://www.sec.gov/Archives/edgar/data/1792789/000179278926000065/dashform425combined.htm"
             }
           ],
-          "confidence": "news",
-          "next": "Confirm the S&P provider notice and the effective date before treating the selling as mechanical.",
-          "handoff": "tape_index"
+          "confidence": "filing",
+          "next": "The 425 states no closing date and no vote. Do not call it a no-vote deal until a filing does.",
+          "handoff": "fundamentals"
+        },
+        {
+          "ticker": "MDT",
+          "headline": "MiniMed exchange offer expired October 9, 2026. Final proration is 18.289133%. Odd lots were accepted in full.",
+          "one_number": "proration 18.289133%; odd lots in full",
+          "lane": "split_offs",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "425 0001628280-26-065819 filed 2026-10-14",
+              "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065819/a425-finalresultsofexchang.htm"
+            }
+          ],
+          "confidence": "filing",
+          "next": "The offer is over. Medtronic said it will keep no MiniMed shares. The results release does not state the settlement date.",
+          "handoff": null
         }
       ],
       "inputs_read": [
         {
-          "path": "dashboard/data/separations.json",
-          "generated_at": "2026-10-12T00:04:30Z",
-          "age_hours_at_read": 23.9,
+          "path": "dashboard/data/portfolio_news.json",
+          "generated_at": "2026-10-28T15:17:56.502197+00:00",
+          "age_hours_at_read": 32.7,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/warrants.json",
+          "generated_at": "2026-10-27T13:57:56Z",
+          "age_hours_at_read": 58.0,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/activist_feed.json",
+          "generated_at": "2026-10-27T13:55:22Z",
+          "age_hours_at_read": 58.1,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/document_catalog_summary.json",
+          "generated_at": "2026-10-16T16:17:11Z",
+          "age_hours_at_read": 319.7,
           "exists": true
         },
         {
           "path": "dashboard/data/special_situations.json",
-          "generated_at": "2026-10-11T23:08:15Z",
-          "age_hours_at_read": 24.9,
+          "generated_at": "2026-10-27T13:58:22Z",
+          "age_hours_at_read": 58.0,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/separations.json",
+          "generated_at": "2026-10-27T13:57:57Z",
+          "age_hours_at_read": 58.0,
+          "exists": true
+        },
+        {
+          "path": "_system/data/special_situations/situations.jsonl",
+          "generated_at": null,
+          "age_hours_at_read": null,
           "exists": true
         },
         {
           "path": "_system/portfolio/registry.json",
-          "generated_at": "2026-10-11T20:17:50Z",
-          "age_hours_at_read": 27.7,
+          "generated_at": "2026-10-29T09:17:36Z",
+          "age_hours_at_read": 14.7,
           "exists": true
         }
       ],
       "screens_empty": [
-        "odd_lot_alerts",
+        "topping_bid",
         "rights_offering",
-        "carve_out_ipo",
-        "clean_up_spin",
-        "retained_stake_sale",
-        "reverse_morris_trust"
+        "recap_stub",
+        "no_vote_deal"
       ],
-      "notes": "Seed brief built by Claude for Drew on 2026-10-12 from the committed dashboard files only: no web, Drive or email reads this run, and the Greenblatt PDF was unread. Every figure is the dashboard's or the filing's; nothing was recomputed. Screens listed as empty come from separations.json (odd_lot_alerts is empty; counts.by_kind holds only split_off and spin_off) and the restructurings lane (post-reorganization warrants only, no rights offering)."
+      "notes": "SKYA, KBR, and ARI are in _system/data/special_situations/situations.jsonl. They are not registry holdings, so this brief cannot list them. SKYA's tender now expires November 12, 2026. KBR targets a Trinzic spin on January 4, 2027. ARI expects its last NYSE day on November 6, 2026."
+    },
+    {
+      "desk": "activism",
+      "desk_label": "Activism",
+      "owner": "drew",
+      "author": "grok-drew-activism",
+      "as_of": "2026-10-30",
+      "age_hours": 12.6,
+      "stale": false,
+      "path": "_system/data/desk_briefs/activism/2026-10-30.json",
+      "items": [
+        {
+          "ticker": "CBRS",
+          "headline": "Culper Research short (2026-10-28): Cerebras wafers last 1.5-2.5 years vs the 3-5 year S-1 depreciation life",
+          "one_number": "1.5-2.5 years in the field vs 3-5 year S-1 depreciation life",
+          "lane": "short_report",
+          "evidence": [
+            {
+              "kind": "web",
+              "ref": "Culper Research short report 2026-10-28, publisher PDF, no SEC accession",
+              "url": "https://culperresearch.com/wp-content/uploads/2026/10/Culper_CBRS_10-28-2026.pdf"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped TMUS: Deutsche Telekom 13D/A No.36, 55.9% control filing, 0000950157-26-001134",
+              "url": "https://www.sec.gov/Archives/edgar/data/946770/000095015726001134/primary_doc.xml"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped CIFR: V3/Bitfury Form 4 tranche 2 settled 2026-10-26, 1,805,000 sh, 0001123292-26-001436",
+              "url": "https://www.sec.gov/Archives/edgar/data/1819989/000112329226001436/form4.xml"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped NG: no opposition filing before Nov 3; DEFM14A 0001104659-26-113697",
+              "url": "https://www.sec.gov/Archives/edgar/data/1173420/000110465926113697/tm2624608-2_defm14a.htm"
+            },
+            {
+              "kind": "web",
+              "ref": "Also read: EDGAR form.20261029.idx and current feeds (13D through DEFM14A) to 08:18 ET 2026-10-30",
+              "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261029.idx"
+            },
+            {
+              "kind": "web",
+              "ref": "Also read: data.sec.gov submissions CIK0001819989 (CIFR)",
+              "url": "https://data.sec.gov/submissions/CIK0001819989.json"
+            },
+            {
+              "kind": "web",
+              "ref": "Also read: data.sec.gov submissions CIK0001173420 (NG)",
+              "url": "https://data.sec.gov/submissions/CIK0001173420.json"
+            }
+          ],
+          "confidence": "web",
+          "next": "New activist short on a held name (book holdings, stance watch, shard -27.17 percent per year as of 2026-06-16). Caught one day late (on-time window was Oct 28-29); feed missed it. ACT-10: a short report alone rarely gets a confirming event (34/39). Next dated check: Q3 results 2026-11-12.",
+          "handoff": null
+        },
+        {
+          "ticker": "IRM",
+          "headline": "J Capital short (2026-10-28): data centers ~81% of capex vs ~13% of revenue; ~$17.3B loans",
+          "one_number": "~81% of capex vs ~13% of revenue; ~$17.3B loans, 1.7x interest cover",
+          "lane": "short_report",
+          "evidence": [
+            {
+              "kind": "web",
+              "ref": "J Capital Research short 2026-10-28, Substack preview, paywalled, no SEC accession",
+              "url": "https://jcapitalresearch.substack.com/p/iron-mountain-inc-irm"
+            },
+            {
+              "kind": "news",
+              "ref": "Newsquawk: J Capital announces short on Iron Mountain (IRM), 2026-10-28 16:21 UTC",
+              "url": "https://www.newsquawk.com/headlines/jcapital-research-announces-short-on-iron-mountain-irm"
+            },
+            {
+              "kind": "web",
+              "ref": "Dropped NVDA: Culper 'Oct 27' is an aggregator re-date of the 2026-05-13 report",
+              "url": null
+            },
+            {
+              "kind": "web",
+              "ref": "Dropped company-only DEFA14A: TSLA 0001104659-26-120263; CSCO, CLX, FLEX",
+              "url": null
+            },
+            {
+              "kind": "web",
+              "ref": "Dropped not in universe: ETD, UMH, VOYA, CTNT, MTN; shorts NSP, HUBG, MAAS, SHLS, CSQR",
+              "url": null
+            }
+          ],
+          "confidence": "web",
+          "next": "New activist short on a universe name; mostly a business-model and credit view (soft). Published midday Oct 28, so on time today. No shard; thesis card empty. Next dated check: Q3 results 2026-11-05 before the open.",
+          "handoff": null
+        }
+      ],
+      "inputs_read": [
+        {
+          "path": "dashboard/data/activist_feed.json",
+          "generated_at": "2026-10-27T13:55:22Z",
+          "age_hours_at_read": 82.1,
+          "exists": true
+        },
+        {
+          "path": "_system/portfolio/registry.json",
+          "generated_at": "2026-10-29T19:27:21Z",
+          "age_hours_at_read": 28.5,
+          "exists": true
+        },
+        {
+          "path": "AGENT_INDEX.md",
+          "generated_at": null,
+          "age_hours_at_read": null,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/agent_shards/CBRS.json",
+          "generated_at": "2026-10-16T20:26:21Z",
+          "age_hours_at_read": 339.6,
+          "exists": true
+        },
+        {
+          "path": "CBRS/research/latest.json",
+          "generated_at": "2026-10-16T20:26:13Z",
+          "age_hours_at_read": 339.6,
+          "exists": true
+        },
+        {
+          "path": "IRM/research/thesis_card.json",
+          "generated_at": "2026-10-17T08:43:15+00:00",
+          "age_hours_at_read": 327.3,
+          "exists": true
+        },
+        {
+          "path": "IRM/research/latest.json",
+          "generated_at": "2026-10-16T20:26:14Z",
+          "age_hours_at_read": 339.6,
+          "exists": true
+        }
+      ],
+      "screens_empty": [],
+      "notes": "Feed stale (build 2026-10-27T13:55:22Z, newest row 2026-10-23). EDGAR fallback for 2026-10-29 through 2026-10-30 08:18 ET. Below bar: TMUS Deutsche Telekom 13D/A No.36 55.9% control (0000950157-26-001134); CIFR V3/Bitfury Form 4 tranche 2 settled 2026-10-26, 1,805,000 shares (0001123292-26-001436; catalyst dates corrected); NG no opposition before Nov 3 (DEFM14A 0001104659-26-113697); NVDA Culper Oct 27 is a re-date of the 2026-05-13 report; company-only DEFA14A CSCO/CLX/FLEX/TSLA; not in universe: ETD, UMH, VOYA, CTNT, MTN, NSP, HUBG, MAAS, SHLS, CSQR."
+    },
+    {
+      "desk": "fundamentals",
+      "desk_label": "Fundamentals",
+      "owner": "drew",
+      "author": "codex-core-compounders",
+      "as_of": "2026-10-27",
+      "age_hours": 84.4,
+      "stale": false,
+      "path": "_system/data/desk_briefs/fundamentals/2026-10-27.json",
+      "items": [
+        {
+          "ticker": "PSK.TO",
+          "headline": "PSK.TO: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "PSK.TO/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "MIAX",
+          "headline": "MIAX: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "MIAX/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "TEQ.ST",
+          "headline": "TEQ.ST: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "TEQ.ST/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "FRMO",
+          "headline": "FRMO: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "FRMO/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "RMS.PA",
+          "headline": "RMS.PA: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "RMS.PA/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "GOOGL",
+          "headline": "GOOGL: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "GOOGL/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "RACE",
+          "headline": "RACE: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "RACE/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "AMZN",
+          "headline": "AMZN: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "AMZN/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "CP",
+          "headline": "CP: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "CP/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "LSEG",
+          "headline": "LSEG: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "LSEG/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "DB1.DE",
+          "headline": "DB1.DE: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "DB1.DE/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        },
+        {
+          "ticker": "CBOE",
+          "headline": "CBOE: what missing changed; research review required",
+          "one_number": "1 changed research condition",
+          "lane": "what_missing",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "CBOE/research/valuation_contract.json",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Review sources and pending model proposal; no capital action authorized.",
+          "handoff": null
+        }
+      ],
+      "inputs_read": [
+        {
+          "path": "_system/data/core_compounder_state.json",
+          "generated_at": "2026-10-27",
+          "age_hours_at_read": 24.0,
+          "exists": true
+        }
+      ],
+      "screens_empty": [],
+      "notes": null
+    },
+    {
+      "desk": "nol_tax_assets",
+      "desk_label": "NOL and Tax Assets",
+      "owner": "drew",
+      "author": "grok-drew-nol-tax-assets",
+      "as_of": "2026-10-30",
+      "age_hours": 12.4,
+      "stale": false,
+      "path": "_system/data/desk_briefs/nol_tax_assets/2026-10-30.json",
+      "items": [
+        {
+          "ticker": "unresolved",
+          "headline": "SIRI: the Q3 10-Q holds a $79M valuation allowance tied to net operating loss limitations.",
+          "one_number": "valuation allowance $79M at 2026-09-30",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "10-Q accession 0000908937-26-000028, Note (15) Income Taxes",
+              "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000028/0000908937-26-000028.txt"
+            },
+            {
+              "kind": "filing",
+              "ref": "10-Q accession 0000908937-26-000022, XBRL DeferredTaxAssetsValuationAllowance 79000000 at 2026-06-30",
+              "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000022/0000908937-26-000022.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: $79M at 2026-09-30, unchanged from 2026-06-30 in XBRL; $87M at 2025-12-31. VA 'not likely to be realized due to the timing of certain federal and state net operating loss limitations'. No Section 382 dollar limit stated.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "SIRI: Q3 income tax expense was $99M on $416M pretax income, an effective rate of 23.8 percent.",
+          "one_number": "tax $99M on $416M pretax, ETR 23.8%",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "10-Q accession 0000908937-26-000028, condensed statements of comprehensive income",
+              "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000028/0000908937-26-000028.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: FY2026 effective tax rate estimate about 23 percent per the same 10-Q. No NOL present value. No Section 382 dollar limit. An NOL is not the buy thesis.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "SIRI: the 10-K says NOLs are 'subject to Section 382 limitations' but states no dollar limit.",
+          "one_number": "382 dollar limit: not stated",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "10-K accession 0000908937-26-000006 p. F-41, Income Taxes",
+              "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000006/0000908937-26-000006.txt"
+            },
+            {
+              "kind": "dashboard",
+              "ref": "nol_382_facts.json SIRI row needs_review true; generated_at 2026-10-29T16:47:08Z (commit 1393b05, PR #1368)",
+              "url": null
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: the limitations language is present; no ownership change and no dollar limit stated. No 382 dollar limit inferred.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "NWL: the Q3 8-K shows a $92M GAAP pretax loss and an $11M tax benefit, including a $101M impairment.",
+          "one_number": "Q3 pretax loss $92M; tax benefit $11M",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "8-K Ex.99.1 accession 0000814453-26-000035",
+              "url": "https://www.sec.gov/Archives/edgar/data/814453/000081445326000035/0000814453-26-000035.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: the $101M impairment is of acquired intangible assets. No NOL, valuation allowance or Section 382 disclosure in the release. 10-Q pending.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "NOL facts file rebuilt: 8 rows, zero stated Section 382 dollar limits.",
+          "one_number": "8 rows, 0 stated 382 dollar limits",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_382_facts.json generated_at 2026-10-29T16:47:08Z (commit 1393b05, PR #1368)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Ops: each row carries its income-tax-note accession. WYY is not covered by the facts file. No dollar limit in any row.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "REI: the 10-K records a prior ownership change; it states no Section 382 dollar limit.",
+          "one_number": "prior ownership change; no dollar limit",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "10-K accession 0001384195-26-000050 p. F-41, Note 14 Income Taxes",
+              "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000050/0001384195-26-000050.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact per filing. Blocked: prior_ownership_change. No dollar limit stated.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "VNDA: ownership changes in 2014 and 2025; full valuation allowance at 2026-09-30.",
+          "one_number": "full VA at 2026-09-30; no dollar limit",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "10-K accession 0001628280-26-007460; 10-Q accession 0001347178-26-000002 Note 11 Income Taxes",
+              "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/0001347178-26-000002.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact per filings. Blocked. No Section 382 dollar limit stated.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "TTI: the NOL rights plan triggers at a 4.99 percent acquisition threshold.",
+          "one_number": "rights-plan trigger 4.99%",
+          "lane": "rights_plan",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "10-K accession 0000844965-26-000015 Note 15 p. F-35; DEF 14A accession 0000844965-26-000026",
+              "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000015/0000844965-26-000015.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: 4.99 percent trigger. Inference: the effect on a change of control is inference, not stated.",
+          "handoff": null
+        },
+        {
+          "ticker": "BIIB",
+          "headline": "BIIB: the screener's 283.4 percent allowance ratio is a data error, not used.",
+          "one_number": "allowance_pct 283.4% (data error)",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json BIIB allowance_pct 283.4 (VA exceeds DTA); built 2026-10-29T19:31:29Z (commit 19408b8)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "TAX-07 data flag carried. Correction proposal, not a screener edit. Not a buy case.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "SIRI: still on the screener actionable list (material_after_382). That is not a reason to buy.",
+          "one_number": "screener actionable (not a buy case)",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json SIRI material_after_382; built 2026-10-29T19:31:29Z (commit 19408b8)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "WYY: still on the screener actionable list (material_after_382). That is not a reason to buy.",
+          "one_number": "screener actionable (not a buy case)",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json WYY material_after_382; built 2026-10-29T19:31:29Z (commit 19408b8)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "NWL: still on the screener actionable list (material_after_382). That is not a reason to buy.",
+          "one_number": "screener actionable (not a buy case)",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json NWL material_after_382; built 2026-10-29T19:31:29Z (commit 19408b8)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+          "handoff": null
+        }
+      ],
+      "inputs_read": [
+        {
+          "path": "dashboard/data/nol_screener.json",
+          "generated_at": "2026-10-29T19:31:29Z",
+          "age_hours_at_read": 28.5,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/nol_382_facts.json",
+          "generated_at": "2026-10-29T16:47:08Z",
+          "age_hours_at_read": 31.2,
+          "exists": true
+        },
+        {
+          "path": "_system/portfolio/registry.json",
+          "generated_at": "2026-10-29T19:27:21Z",
+          "age_hours_at_read": 28.5,
+          "exists": true
+        },
+        {
+          "path": "_system/data/desk_briefs/schema.json",
+          "generated_at": null,
+          "age_hours_at_read": null,
+          "exists": true
+        }
+      ],
+      "screens_empty": [],
+      "notes": "Blocker tally, fact, matches nol_screener.json built 2026-10-29: fully reserved 61; prior ownership change 2; carryforward above the 382 model 8; DTA mostly timing 16; rights plan 1; needs review 1; no NOL component 13; no market cap 21; stale CIK 4. No present value. No control premium. A deferred tax asset is not cash. No Section 382 dollar limit unless an item names an accession. SIRI 10-Q -000028 landed 2026-10-29, the same day as its 8-K -000027."
+    },
+    {
+      "desk": "tape_index",
+      "desk_label": "Index, forced flow and tape",
+      "owner": "drew",
+      "author": "grok-drew-tape-index",
+      "as_of": "2026-10-30",
+      "age_hours": 12.4,
+      "stale": false,
+      "path": "_system/data/desk_briefs/tape_index/2026-10-30.json",
+      "items": [
+        {
+          "ticker": "GOOGL",
+          "headline": "Alphabet went stress_building to capitulation_candidate on 5.4x volume after its Q3 print; the open gapped -11.7%, held until the next close (TAPE-06).",
+          "one_number": "rvol 5.41 (capitulation_candidate; gap -11.7%, held)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z GOOGL cap=capitulation_candidate (prior stress_building) rsi14=15.6 rvol=5.41 cmf=-0.146 dir=lagging_downtrend gap=-11.73%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z GOOGL stretch_z=-2.326 trend_z=-1.994 close=283.82 (prior 324.89) r5=-12.46% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fundamentals owns the Q3 read; tape timing only. Recheck after the Oct 30 close.",
+          "handoff": "fundamentals"
+        },
+        {
+          "ticker": "AMZN",
+          "headline": "Amazon moved stress_building to panic on 2.3x volume; the Oct 29 row predates its after-close Q3 print, so the next row will reflect the reaction.",
+          "one_number": "RSI 34.1 (panic)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z AMZN cap=panic (prior stress_building) rsi14=34.1 rvol=2.25 cmf=-0.01 dir=pullback_in_uptrend gap=-3.02%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z AMZN stretch_z=-0.984 trend_z=-1.275 close=243.79 (prior 254.6) r5=-2.63% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Row is pre-earnings; Fundamentals owns the print.",
+          "handoff": "fundamentals"
+        },
+        {
+          "ticker": "MGM",
+          "headline": "MGM eased from panic to stress_building but stretch_z and trend_z remain beyond thresholds.",
+          "one_number": "stretch_z -2.09",
+          "lane": "tape",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MGM cap=stress_building (prior panic) rsi14=47.2 rvol=2.26 cmf=-0.072 dir=lagging_downtrend gap=-0.18%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MGM stretch_z=-2.086 trend_z=-1.9 close=28.83 (prior 27.27) r5=-2.27% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Timing only; Activism owns the Diller stake read.",
+          "handoff": "activism"
+        },
+        {
+          "ticker": "MIAX",
+          "headline": "MIAX trend_z crossed the 1.25 threshold on a -10.2% five-day move into its Q3 beat.",
+          "one_number": "trend_z -1.68",
+          "lane": "tape",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MIAX cap=stress_building (prior stress_building) rsi14=53.6 rvol=0.85 cmf=0.022 dir=lagging_downtrend gap=1.97%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MIAX stretch_z=-1.346 trend_z=-1.676 close=31.44 (prior 31.98) r5=-10.15% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fundamentals owns the Q3 read.",
+          "handoff": "fundamentals"
+        },
+        {
+          "ticker": "NOW",
+          "headline": "ServiceNow jumped normal to capitulation_candidate on 6.0x volume after a -19.5% open gap; held until the next close shows whether the gap held.",
+          "one_number": "rvol 6.02 (capitulation_candidate; gap -19.5%, held)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z NOW cap=capitulation_candidate (prior normal) rsi14=31.7 rvol=6.02 cmf=-0.176 dir=lagging_downtrend gap=-19.47%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z NOW stretch_z=-1.344 trend_z=-0.492 close=109.67 (prior 150.13) r5=-30.15% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Recheck after the Oct 30 close.",
+          "handoff": null
+        },
+        {
+          "ticker": "FTNT",
+          "headline": "Fortinet moved panic to capitulation_candidate on 4.3x volume after a -26.7% open gap; held under TAPE-06.",
+          "one_number": "rvol 4.31 (capitulation_candidate; gap -26.7%, held)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FTNT cap=capitulation_candidate (prior panic) rsi14=19.3 rvol=4.31 cmf=0.099 dir=pullback_in_uptrend gap=-26.66%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FTNT stretch_z=-1.186 trend_z=-0.965 close=139.1 (prior 174.08) r5=-19.59% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Recheck after the Oct 30 close.",
+          "handoff": null
+        },
+        {
+          "ticker": "CAT",
+          "headline": "Caterpillar moved panic to capitulation_candidate with RSI 18.1 after a -10.8% open gap; held under TAPE-06.",
+          "one_number": "RSI 18.1 (capitulation_candidate; gap -10.8%, held)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z CAT cap=capitulation_candidate (prior panic) rsi14=18.1 rvol=2.98 cmf=-0.064 dir=lagging_downtrend gap=-10.8%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z CAT stretch_z=-2.383 trend_z=-2.207 close=647.39 (prior 713.38) r5=-7.83% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Recheck after the Oct 30 close.",
+          "handoff": null
+        },
+        {
+          "ticker": "FORM",
+          "headline": "FormFactor moved stress_building to capitulation_candidate; gap -7.7% is under the 10% hold line.",
+          "one_number": "RSI 27.1 (capitulation_candidate)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FORM cap=capitulation_candidate (prior stress_building) rsi14=27.1 rvol=1.55 cmf=-0.058 dir=lagging_downtrend gap=-7.71%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FORM stretch_z=-1.181 trend_z=-1.156 close=97.46 (prior 110.31) r5=2.56% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Persistence check next snapshot.",
+          "handoff": null
+        },
+        {
+          "ticker": "FFIV",
+          "headline": "F5 stayed capitulation_candidate for a second session; RSI fell to 17.3, counter-trend to its stored pullback_in_uptrend.",
+          "one_number": "RSI 17.3 (capitulation_candidate day 2)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FFIV cap=capitulation_candidate (prior capitulation_candidate) rsi14=17.3 rvol=2.82 cmf=-0.155 dir=pullback_in_uptrend gap=-1.51%",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FFIV stretch_z=-1.804 trend_z=-1.406 close=363.46 (prior 365.53) r5=-19.25% as_of 2026-10-29",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Persistence check next snapshot.",
+          "handoff": null
+        },
+        {
+          "ticker": "ENPH",
+          "headline": "Index feed rebuild now scores Enphase a Russell 1000 deletion_risk, 42% below the boundary; a feed candidate, not an announcement.",
+          "one_number": "Russell 1000 deletion_risk -42.2%",
+          "lane": "index",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z ENPH russell_1000 deletion_risk distance_to_boundary_pct=-42.22 market_cap=3.29B demand_shock_pct_of_adv=165.9 confidence=rules_only",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z ENPH cap=panic (prior capitulation_candidate) rsi14=28.8 rvol=1.59 cmf=0.08 dir=lagging_downtrend gap=-0.52%",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Russell semi-annual recon eff. Dec 11 2026; no provider announcement.",
+          "handoff": null
+        },
+        {
+          "ticker": "PBT",
+          "headline": "Largest stored demand shock among 17 names newly gated as inclusion candidates in the Oct 29 index rebuild; candidate only (Sep 19 feed candidates all missed).",
+          "one_number": "S&P 600 candidate -5.25%",
+          "lane": "index",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z PBT sp600 inclusion_candidate distance_to_boundary_pct=-5.25 market_cap=1.56B demand_shock_pct_of_adv=2478.5 confidence=rules_only",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z PBT cap=normal (prior normal) rsi14=32.9 rvol=0.37 cmf=0.151 dir=pullback_in_uptrend gap=0.3%",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "S&P DJI rebalance eff. Dec 19 2026.",
+          "handoff": null
+        },
+        {
+          "ticker": "LGND",
+          "headline": "Newly gated Russell 1000 candidate sitting 11.5% above the boundary; a 2000-to-1000 promotion is usually net passive selling (FLOW-02).",
+          "one_number": "Russell 1000 candidate +11.5%",
+          "lane": "index",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z LGND russell_1000 inclusion_candidate distance_to_boundary_pct=11.49 market_cap=6.36B demand_shock_pct_of_adv=529.1 confidence=rules_only",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z LGND cap=normal (prior normal) rsi14=59.8 rvol=1.3 cmf=-0.065 dir=leading_uptrend gap=-1.14%",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Russell semi-annual recon eff. Dec 11 2026.",
+          "handoff": null
+        }
+      ],
+      "inputs_read": [
+        {
+          "path": "dashboard/data/technical_summary.json",
+          "generated_at": "2026-10-29T22:12:21Z",
+          "age_hours_at_read": 25.8,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/capitulation_daily.json",
+          "generated_at": "2026-10-30T01:36:07.429532+00:00",
+          "age_hours_at_read": 22.4,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/index_membership.json",
+          "generated_at": "2026-10-29T16:11:20Z",
+          "age_hours_at_read": 31.8,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/portfolio_news.json",
+          "generated_at": "2026-10-30T06:57:53.962894+00:00",
+          "age_hours_at_read": 17.0,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/desk_briefs.json",
+          "generated_at": "2026-10-29T19:28:19Z",
+          "age_hours_at_read": 28.5,
+          "exists": true
+        },
+        {
+          "path": "_system/portfolio/registry.json",
+          "generated_at": "2026-10-29T19:27:21Z",
+          "age_hours_at_read": 28.5,
+          "exists": true
+        }
+      ],
+      "screens_empty": [],
+      "notes": "SPY fear normal (panic 51.4, prior 39.9); capitulation_candidate count 8 (prior 16), panic 35 (33); breadth_panic 5.1% (6.3%). Index rebuild (gen 2026-10-29T16:11Z) gated 17 new inclusion candidates and ENPH deletion_risk; 0 provider-confirmed events. Held: GOOG, MRVL, GEN, PURR (gap >10%, TAPE-06); XP, NU, B3SA3.SA (Brazil cluster, XP panic with CMF +0.26 and sp400 mcap stale, prop-e4cf81d09cfaeff1 pending in PR #1364); HKHC; LAND, STHO, SOEZ, SUM, LIF.TO (thin)."
     }
   ],
   "items_flat": [
     {
-      "ticker": "MDT",
-      "headline": "MiniMed (MMED) exchange offer expired 2026-10-09 with the upper limit in effect; final ratio 4.5939 MMED per MDT; final-results 8-K not yet filed.",
-      "one_number": "final exchange ratio 4.5939 (upper limit binding)",
-      "lane": "split_offs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "SC TO-I/A 0001628280-26-065406 (filed 2026-10-08)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065406/mdt-amendedno2scheduleissu.htm"
-        },
-        {
-          "kind": "filing",
-          "ref": "424B3 0001628280-26-064932 (7% discount, upper limit 4.5939, expires 2026-10-09, odd-lot priority)",
-          "url": "https://www.sec.gov/Archives/edgar/data/2062583/000162828026064932/minimedgroupinc-424b3.htm"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:mdt-mmed-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the final-results 8-K (accepted and tendered MDT shares, proration factor, settlement date) and append a version-2 row to separation_registry.jsonl; then the unwind flow can be modelled.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": false
-    },
-    {
-      "ticker": "MDT",
-      "headline": "Capped ratio gave a 2.33% realized discount on 2026-10-09 closes (MDT 88.48 / MMED 19.71); odd-lot payoff $195.55 per 99 shares; no sleeve odd lot.",
-      "one_number": "realized discount 2.33% vs 7% headline",
-      "lane": "split_offs",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json spread (basis final_filed, quotes as_of 2026-10-09)",
-          "url": null
-        },
-        {
-          "kind": "provider",
-          "ref": "Yahoo delayed closes via _system/data/separations/separation_market.json (market_as_of 2026-10-11T18:04:51Z)",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Nothing to tender; the offer has expired. Record the realized discount beside the filed proration factor once the 8-K prints, so the reference set gains a fifth data point.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": false
-    },
-    {
-      "ticker": "unresolved",
-      "headline": "MiniMed (MMED, not in registry): modelled post-settlement selling 27.7% of float over 13.7 ADV days, 2026-10-09 to 2027-10-09 (estimate).",
-      "one_number": "-27.7% of float (estimate)",
-      "lane": "forced_sellers",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json forced_seller_rows (sep:mdt-mmed-2026, side spinco, run 2026-10-12)",
-          "url": null
-        },
-        {
-          "kind": "filing",
-          "ref": "SC TO-I 0001628280-26-061683 (225,361,295 MiniMed shares offered, 80.1% of outstanding)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026061683/kangaroo-scheduleto.htm"
-        }
-      ],
-      "confidence": "provider",
-      "next": "Onboard MMED so the row can carry a registry ticker; rerun the flow model when the accepted share count is filed. A modelled flow is a timing input, not a value.",
-      "handoff": "tape_index",
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": false
-    },
-    {
-      "ticker": "HON",
-      "headline": "Honeywell Aerospace spin-off: Form 10 on file (10-12B/A 2026-06-08); ratio, record and distribution dates not yet read; row stays in discovery.",
-      "one_number": "10-12B/A filed 2026-06-08",
+      "ticker": "ABT",
+      "headline": "Abbott plans a tax-free spin of Nutrition into its own public company, expected by the end of 2027.",
+      "one_number": "about $8.5 billion annual sales",
       "lane": "spinoffs",
       "evidence": [
         {
           "kind": "filing",
-          "ref": "10-12B/A 0001628280-26-041399",
-          "url": "https://www.sec.gov/Archives/edgar/data/773840/000162828026041399"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:hon-hona-2026 (gates.terms missing distribution_ratio, dates.distribution)",
-          "url": null
+          "ref": "8-K 0001104659-26-117587 filed 2026-10-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/1800/000110465926117587/tm2627971d1_8k.htm"
         }
       ],
       "confidence": "filing",
-      "next": "Read the Form 10 for the ratio, record and distribution dates, SpinCo debt and insider equity; the identity and terms gates can then rank it and the flow model can ask who must sell.",
-      "handoff": null,
+      "next": "Pass until a Form 10 states a ratio, a record date, or who must sell.",
+      "handoff": "nol_tax_assets",
       "desk": "special_situations",
       "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
       "stale": false
     },
     {
       "ticker": "FDX",
-      "headline": "FedEx Freight (FDXF) spin-off: Form 10 on file (10-12B/A 2026-04-10); terms not extracted; row held in discovery until the ratio and the dates are read.",
-      "one_number": "10-12B/A filed 2026-04-10",
-      "lane": "spinoffs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "10-12B/A 0001104659-26-041977",
-          "url": "https://www.sec.gov/Archives/edgar/data/2082247/000110465926041977"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:fdx-fdxf-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": false
-    },
-    {
-      "ticker": "CTVA",
-      "headline": "Corteva's Vylor (VYLR) spin-off: Form 10 amended 2026-09-21 (10-12B/A); distribution ratio and dates not yet read; row in discovery.",
-      "one_number": "10-12B/A filed 2026-09-21",
-      "lane": "spinoffs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "10-12B/A 0001193125-26-396054",
-          "url": "https://www.sec.gov/Archives/edgar/data/2128626/000119312526396054"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:ctva-vylr-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": false
-    },
-    {
-      "ticker": "APTV",
-      "headline": "Aptiv's Versigent spin-off: Form 10 amended 2026-03-06 (10-12B/A); no SpinCo ticker in the register yet; ratio and dates not yet read.",
-      "one_number": "10-12B/A filed 2026-03-06",
-      "lane": "spinoffs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "10-12B/A 0001193125-26-096776",
-          "url": "https://www.sec.gov/Archives/edgar/data/2078008/000119312526096776"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:aptv-versigent-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the Form 10 for the ratio and the dates, and record the SpinCo ticker when the listing notice names it.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": false
-    },
-    {
-      "ticker": "CSGP",
-      "headline": "Nasdaq-100 deletion flagged from a headline dated 2026-05-11, not a provider notice; the selling is not mechanical until the notice is confirmed.",
-      "one_number": "announced 2026-05-11 (headline)",
+      "headline": "FedEx kept a 19.9% FedEx Freight stake and expects to monetize it within 12 months of September 30, 2026.",
+      "one_number": "19.9% stake; 12 months from 2026-09-30",
       "lane": "forced_sellers",
       "evidence": [
         {
-          "kind": "dashboard",
-          "ref": "dashboard/data/special_situations.json row ss:27d427fca304 (source_feed index_membership, evidence_kind news)",
-          "url": null
-        },
-        {
-          "kind": "news",
-          "ref": "Index note via Google News RSS, 2026-05-11",
-          "url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxOWEQ3cjN1MU13cjZ0cEM3NEN5d1NwQU5Zd3VWVmdXNkhiY2I5ZXVpbFNCNEFCZE4xaGRfZG0yWnZRMkhiVTMtY2Z6R001dGE2S3dtRnhPa2NnRmx6ZllDdjMzTGc2eVlQSUJkSnF6ZDlTSHZYQUZWMDdpNjJ0ZGV6UUt3bGNjNVBiTDN5Y0pfdHFTc2d5bXdfazlLWVZzd3FkQTJudXl1RFQ2MDFwakxlUmFoLWIxNFY3MUxyLXZhSy11U1JOZ1ZqVGhRN1BsV0NpZGt1LWtjenliNmRqUUllN056dmttTk1Na1pKRWJyV01xdUXSAfgBQVVfeXFMTWxORFlzeDlqckJ0cWFQbUwzT0s4ZGZDdWRtWmpMUHA0cVV1Ui1MZE1tVF9SMFJycTQ2cmZkcjdybUszUzZiWHRzUDR4SmZZNVk5bS1DSTRZV1VRaHdRd0FYV0NDYUo2RzlMdnk3QlhhaFFKUC03ZkNsT2dXamZGQUR3NS1GY1AwdnBjQWxlLXY2ZXp5UGs1ajJwQ0VGVktLbllBLTBYREVxdGxVTlFDYVZ3b01GZjExMUp2MFVabEY1SHJ2TnJqNU1Rbm43T3FMZEMyM0dVTDF3Snh1MXFGUVRaSnRUMWVfTm1XTGwtWHVjQWN6TDVvT3M?oc=5"
+          "kind": "filing",
+          "ref": "10-Q 0001048911-26-000131 filed 2026-10-28",
+          "url": "https://www.sec.gov/Archives/edgar/data/1048911/000104891126000131/fdx-20260930.htm"
         }
       ],
-      "confidence": "news",
-      "next": "Confirm the Nasdaq provider notice (announced and effective dates) in index_membership before treating the selling as mechanical; until then this is a headline.",
+      "confidence": "filing",
+      "next": "The 10-Q says expects, subject to market conditions. It does not say FedEx must sell.",
       "handoff": "tape_index",
       "desk": "special_situations",
       "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
       "stale": false
     },
     {
-      "ticker": "TAP",
-      "headline": "S&P 500 deletion flagged from a headline dated 2026-09-21, not a provider notice; no confirmed_event in index_membership as of this run.",
-      "one_number": "announced 2026-09-21 (headline)",
-      "lane": "forced_sellers",
+      "ticker": "DASH",
+      "headline": "DoorDash agreed to buy Maplebear (Instacart) for $65.00 a share, at least 75% cash and up to 25% stock.",
+      "one_number": "$65.00 per share",
+      "lane": "mergers",
       "evidence": [
         {
-          "kind": "dashboard",
-          "ref": "dashboard/data/special_situations.json row ss:255a109bb35d (source_feed index_membership, evidence_kind news)",
+          "kind": "filing",
+          "ref": "425 0001792789-26-000065 filed 2026-10-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/1792789/000179278926000065/dashform425combined.htm"
+        }
+      ],
+      "confidence": "filing",
+      "next": "The 425 states no closing date and no vote. Do not call it a no-vote deal until a filing does.",
+      "handoff": "fundamentals",
+      "desk": "special_situations",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
+      "stale": false
+    },
+    {
+      "ticker": "MDT",
+      "headline": "MiniMed exchange offer expired October 9, 2026. Final proration is 18.289133%. Odd lots were accepted in full.",
+      "one_number": "proration 18.289133%; odd lots in full",
+      "lane": "split_offs",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "425 0001628280-26-065819 filed 2026-10-14",
+          "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065819/a425-finalresultsofexchang.htm"
+        }
+      ],
+      "confidence": "filing",
+      "next": "The offer is over. Medtronic said it will keep no MiniMed shares. The results release does not state the settlement date.",
+      "handoff": null,
+      "desk": "special_situations",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
+      "stale": false
+    },
+    {
+      "ticker": "MGM",
+      "headline": "People Inc (Diller) 13D/A No.10: 26.5% of MGM; voting pact amended to cap at 29.9% and vote with board on any change of control",
+      "one_number": "26.5% (66,822,350 shares); standstill cap 29.9%; excess-vote threshold 25.73%",
+      "lane": "13d",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "SCHEDULE 13D/A 0001104659-26-119439",
+          "url": "https://www.sec.gov/Archives/edgar/data/789570/000110465926119439/0001104659-26-119439-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "MGM 8-K Item 1.01 0000789570-26-000104",
+          "url": "https://www.sec.gov/Archives/edgar/data/789570/000078957026000104/0000789570-26-000104-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped CORZ: MFN Partners SCHEDULE 13G (13d-1(c) passive) 7.6% incl. 7.79M option shares, event 2026-10-13, 0001193125-26-436502; passive, below bar",
           "url": null
         },
         {
-          "kind": "news",
-          "ref": "Index note via Google News RSS, 2026-09-21",
-          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPQ3dydU5xWFVKSjZRU29UeERNeW9IMm91SERmR2NqS045S2xFMGQ1eHN4S19MdmZ5VE5LWEYtNmpNWThYY29VR0xzR2trZ3JFQWUtVjVjZFdtNUJERU1raVE0N25leEJkMTB1NE14N2FRclBjR0N0bjN4bzczVHRSc2JlbGVVSjU1T2JKMlo5ejZnN2I2QktxMXVOcXBmR0w0ZDMtVVVQZHhJT3NRcmZ4Nm9aLW5JSTVmM01GQVZYOTk1MHh2WEE?oc=5"
+          "kind": "filing",
+          "ref": "Dropped NG: Company DEFA14A 0001104659-26-119230: comp-committee letter rebutting ISS on equity plans ahead of Nov 3 special meeting; company-only",
+          "url": "https://www.sec.gov/Archives/edgar/data/1173420/000110465926119230/0001104659-26-119230-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped MSFT: PX14A6G 0000921895-26-002869 (JLens) and 0001214659-26-013276; shareholder-proposal ESG solicitations, below bar",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000092189526002869/0000921895-26-002869-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped SATS: Strive Inc 13D/A 0000950103-26-016309 (Ramaswamy) matched SATS only via SEC company_tickers CIK collision for Strive (ASST/SATA); Strive not in universe. Ticker-mapping caution.",
+          "url": "https://www.sec.gov/Archives/edgar/data/1920406/000095010326016309/0000950103-26-016309-index.htm"
+        },
+        {
+          "kind": "web",
+          "ref": "Also read: /workspace/shared/magis/status.json (2026-10-29); leads.json (2026-10-29, no activism-tagged leads); posted_state.json.",
+          "url": null
+        },
+        {
+          "kind": "web",
+          "ref": "Also read: EDGAR daily-index form.20261028.idx; current feeds (13D, 13D/A, 13G, DFAN14A, PX14A6G, DEFC14A, PREC14A, DEFA14A) to ~08:30 ET 2026-10-29.",
+          "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261028.idx"
         }
       ],
-      "confidence": "news",
-      "next": "Confirm the S&P provider notice and the effective date before treating the selling as mechanical.",
-      "handoff": "tape_index",
-      "desk": "special_situations",
+      "confidence": "filing",
+      "next": "Large-holder governance agreement (not a campaign). People Inc (formerly IAC Inc.). Materiality 75. Run 2026-10-29T08:35:00-04:00. Activist feed stale: build 2026-10-27T13:55:22Z, blob unchanged since Oct 28; EDGAR fallback (Oct 28 daily index plus current feeds to ~08:30 ET Oct 29).",
+      "handoff": null,
+      "desk": "activism",
       "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-activism",
+      "stale": false
+    },
+    {
+      "ticker": "PSK.TO",
+      "headline": "PSK.TO: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "PSK.TO/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "MIAX",
+      "headline": "MIAX: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "MIAX/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "TEQ.ST",
+      "headline": "TEQ.ST: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "TEQ.ST/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "FRMO",
+      "headline": "FRMO: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "FRMO/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "RMS.PA",
+      "headline": "RMS.PA: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "RMS.PA/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "GOOGL",
+      "headline": "GOOGL: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "GOOGL/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "RACE",
+      "headline": "RACE: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "RACE/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "AMZN",
+      "headline": "AMZN: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "AMZN/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "CP",
+      "headline": "CP: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "CP/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "LSEG",
+      "headline": "LSEG: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "LSEG/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "DB1.DE",
+      "headline": "DB1.DE: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "DB1.DE/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "CBOE",
+      "headline": "CBOE: what missing changed; research review required",
+      "one_number": "1 changed research condition",
+      "lane": "what_missing",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "CBOE/research/valuation_contract.json",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Review sources and pending model proposal; no capital action authorized.",
+      "handoff": null,
+      "desk": "fundamentals",
+      "owner": "drew",
+      "as_of": "2026-10-27",
+      "author": "codex-core-compounders",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "VNDA: the Q3 10-Q maintains a valuation allowance against all net deferred tax assets.",
+      "one_number": "full valuation allowance at 2026-09-30",
+      "lane": "needs_review",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0001347178-26-000002, heading 11. Income Taxes",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/0001347178-26-000002.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: allowance against all net DTAs at 2026-09-30 and 2025-12-31; Q4 2025 non-cash charge $113.7 million. Not cash. No 382 dollar limit in that passage.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: the Q3 exhibit shows income before income taxes of 416 and tax expense of (99).",
+      "one_number": "416 pretax and tax (99), in millions",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "8-K accession 0000908937-26-000027, exhibit in millions",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000027/0000908937-26-000027.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: parentheses are the filing's. No NOL or Section 382 dollar limit in those lines. Not a buy case.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: Beade's Form 4 reports a 129,390-share award on 2026-10-26.",
+      "one_number": "129,390 shares, code A (Form 4)",
+      "lane": "ownership_change_risk",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "Form 4 accession 0002160533-26-000008",
+          "url": "https://www.sec.gov/Archives/edgar/data/2160533/000216053326000008/0002160533-26-000008.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: transaction code A, 129390 shares. Inference: an insider award is not itself a Section 382 ownership change. Form 3 0002160533-26-000006 did not contain that share count.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json SIRI material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "WYY: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json WYY material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json NWL material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "BIIB",
+      "headline": "BIIB: the screener's 283.4 percent allowance ratio mixes two different DTA tags.",
+      "one_number": "283.4% allowance ratio (data error)",
+      "lane": "needs_review",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json BIIB allowance_pct 283.4; dta_gross_usd 293700000; allowance 832200000",
+          "url": null
+        },
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0000875045-26-000096 DeferredIncomeTaxAssetsNet 293700000 at 2026-09-30",
+          "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000096/0000875045-26-000096.txt"
+        },
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0000875045-26-000013 valuation allowance 832200000 at 2025-12-31",
+          "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000013/0000875045-26-000013.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: net DTA at 2025-12-31 is 2305100000. Do not use 283.4 percent. Correction proposal, not a screener edit. Not a buy case.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "ATNM: the screener's 26932 percent allowance ratio uses net DTA in the gross field.",
+      "one_number": "26932% allowance ratio (data error)",
+      "lane": "needs_review",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json ATNM dta_gross_usd 431000; allowance 116077000; allowance_pct 26932",
+          "url": null
+        },
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0001213900-26-036504 gross DTA 116508000; net DTA 431000; allowance 116077000",
+          "url": "https://www.sec.gov/Archives/edgar/data/1388320/000121390026036504/0001213900-26-036504.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: same period, three tags. Inference: dividing the allowance by gross DTA is about 99.6 percent, not 26932. Not a filed percentage. Not a buy case.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "GOOGL",
+      "headline": "Alphabet went stress_building to capitulation_candidate on 5.4x volume after its Q3 print; the open gapped -11.7%, held until the next close (TAPE-06).",
+      "one_number": "rvol 5.41 (capitulation_candidate; gap -11.7%, held)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z GOOGL cap=capitulation_candidate (prior stress_building) rsi14=15.6 rvol=5.41 cmf=-0.146 dir=lagging_downtrend gap=-11.73%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z GOOGL stretch_z=-2.326 trend_z=-1.994 close=283.82 (prior 324.89) r5=-12.46% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fundamentals owns the Q3 read; tape timing only. Recheck after the Oct 30 close.",
+      "handoff": "fundamentals",
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "AMZN",
+      "headline": "Amazon moved stress_building to panic on 2.3x volume; the Oct 29 row predates its after-close Q3 print, so the next row will reflect the reaction.",
+      "one_number": "RSI 34.1 (panic)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z AMZN cap=panic (prior stress_building) rsi14=34.1 rvol=2.25 cmf=-0.01 dir=pullback_in_uptrend gap=-3.02%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z AMZN stretch_z=-0.984 trend_z=-1.275 close=243.79 (prior 254.6) r5=-2.63% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Row is pre-earnings; Fundamentals owns the print.",
+      "handoff": "fundamentals",
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "MGM",
+      "headline": "MGM eased from panic to stress_building but stretch_z and trend_z remain beyond thresholds.",
+      "one_number": "stretch_z -2.09",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MGM cap=stress_building (prior panic) rsi14=47.2 rvol=2.26 cmf=-0.072 dir=lagging_downtrend gap=-0.18%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MGM stretch_z=-2.086 trend_z=-1.9 close=28.83 (prior 27.27) r5=-2.27% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Timing only; Activism owns the Diller stake read.",
+      "handoff": "activism",
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "MIAX",
+      "headline": "MIAX trend_z crossed the 1.25 threshold on a -10.2% five-day move into its Q3 beat.",
+      "one_number": "trend_z -1.68",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MIAX cap=stress_building (prior stress_building) rsi14=53.6 rvol=0.85 cmf=0.022 dir=lagging_downtrend gap=1.97%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z MIAX stretch_z=-1.346 trend_z=-1.676 close=31.44 (prior 31.98) r5=-10.15% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fundamentals owns the Q3 read.",
+      "handoff": "fundamentals",
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "NOW",
+      "headline": "ServiceNow jumped normal to capitulation_candidate on 6.0x volume after a -19.5% open gap; held until the next close shows whether the gap held.",
+      "one_number": "rvol 6.02 (capitulation_candidate; gap -19.5%, held)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z NOW cap=capitulation_candidate (prior normal) rsi14=31.7 rvol=6.02 cmf=-0.176 dir=lagging_downtrend gap=-19.47%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z NOW stretch_z=-1.344 trend_z=-0.492 close=109.67 (prior 150.13) r5=-30.15% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Recheck after the Oct 30 close.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "FTNT",
+      "headline": "Fortinet moved panic to capitulation_candidate on 4.3x volume after a -26.7% open gap; held under TAPE-06.",
+      "one_number": "rvol 4.31 (capitulation_candidate; gap -26.7%, held)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FTNT cap=capitulation_candidate (prior panic) rsi14=19.3 rvol=4.31 cmf=0.099 dir=pullback_in_uptrend gap=-26.66%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FTNT stretch_z=-1.186 trend_z=-0.965 close=139.1 (prior 174.08) r5=-19.59% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Recheck after the Oct 30 close.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "CAT",
+      "headline": "Caterpillar moved panic to capitulation_candidate with RSI 18.1 after a -10.8% open gap; held under TAPE-06.",
+      "one_number": "RSI 18.1 (capitulation_candidate; gap -10.8%, held)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z CAT cap=capitulation_candidate (prior panic) rsi14=18.1 rvol=2.98 cmf=-0.064 dir=lagging_downtrend gap=-10.8%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z CAT stretch_z=-2.383 trend_z=-2.207 close=647.39 (prior 713.38) r5=-7.83% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Recheck after the Oct 30 close.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "FORM",
+      "headline": "FormFactor moved stress_building to capitulation_candidate; gap -7.7% is under the 10% hold line.",
+      "one_number": "RSI 27.1 (capitulation_candidate)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FORM cap=capitulation_candidate (prior stress_building) rsi14=27.1 rvol=1.55 cmf=-0.058 dir=lagging_downtrend gap=-7.71%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FORM stretch_z=-1.181 trend_z=-1.156 close=97.46 (prior 110.31) r5=2.56% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Persistence check next snapshot.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "FFIV",
+      "headline": "F5 stayed capitulation_candidate for a second session; RSI fell to 17.3, counter-trend to its stored pullback_in_uptrend.",
+      "one_number": "RSI 17.3 (capitulation_candidate day 2)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FFIV cap=capitulation_candidate (prior capitulation_candidate) rsi14=17.3 rvol=2.82 cmf=-0.155 dir=pullback_in_uptrend gap=-1.51%",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z FFIV stretch_z=-1.804 trend_z=-1.406 close=363.46 (prior 365.53) r5=-19.25% as_of 2026-10-29",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Persistence check next snapshot.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "ENPH",
+      "headline": "Index feed rebuild now scores Enphase a Russell 1000 deletion_risk, 42% below the boundary; a feed candidate, not an announcement.",
+      "one_number": "Russell 1000 deletion_risk -42.2%",
+      "lane": "index",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z ENPH russell_1000 deletion_risk distance_to_boundary_pct=-42.22 market_cap=3.29B demand_shock_pct_of_adv=165.9 confidence=rules_only",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z ENPH cap=panic (prior capitulation_candidate) rsi14=28.8 rvol=1.59 cmf=0.08 dir=lagging_downtrend gap=-0.52%",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Russell semi-annual recon eff. Dec 11 2026; no provider announcement.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "PBT",
+      "headline": "Largest stored demand shock among 17 names newly gated as inclusion candidates in the Oct 29 index rebuild; candidate only (Sep 19 feed candidates all missed).",
+      "one_number": "S&P 600 candidate -5.25%",
+      "lane": "index",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z PBT sp600 inclusion_candidate distance_to_boundary_pct=-5.25 market_cap=1.56B demand_shock_pct_of_adv=2478.5 confidence=rules_only",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z PBT cap=normal (prior normal) rsi14=32.9 rvol=0.37 cmf=0.151 dir=pullback_in_uptrend gap=0.3%",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "S&P DJI rebalance eff. Dec 19 2026.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "LGND",
+      "headline": "Newly gated Russell 1000 candidate sitting 11.5% above the boundary; a 2000-to-1000 promotion is usually net passive selling (FLOW-02).",
+      "one_number": "Russell 1000 candidate +11.5%",
+      "lane": "index",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z LGND russell_1000 inclusion_candidate distance_to_boundary_pct=11.49 market_cap=6.36B demand_shock_pct_of_adv=529.1 confidence=rules_only",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-10-29T22:12:21Z LGND cap=normal (prior normal) rsi14=59.8 rvol=1.3 cmf=-0.065 dir=leading_uptrend gap=-1.14%",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Russell semi-annual recon eff. Dec 11 2026.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-30",
+      "author": "grok-drew-tape-index",
       "stale": false
     }
   ],
   "desks_without_brief": [
-    "activism",
-    "fundamentals",
-    "nol_tax_assets",
-    "tape_index",
     "stahl",
     "short_selling"
   ],
@@ -498,23 +1940,58 @@
     "short_selling": "Short Selling"
   },
   "counts": {
-    "briefs": 1,
-    "items": 9,
-    "files": 1,
+    "briefs": 5,
+    "items": 42,
+    "files": 24,
     "by_desk": {
-      "special_situations": 9
+      "special_situations": 4,
+      "activism": 2,
+      "fundamentals": 12,
+      "nol_tax_assets": 12,
+      "tape_index": 12
     },
     "by_owner": {
-      "drew": 9
+      "drew": 42
     }
   },
   "health": {
     "status": "healthy",
     "structural_errors": [],
     "problems": [],
-    "warnings": [],
+    "warnings": [
+      "_system/data/desk_briefs/activism/2026-10-29.json: items[0].evidence[2] (MGM): filing without a URL",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-19.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-19.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-20.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-20.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-21.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-21.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-22.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-22.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-23.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-23.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-26.json: inputs_read[0] (dashboard/data/nol_screener.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-26.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-26.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-27.json: inputs_read[0] (dashboard/data/nol_screener.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-27.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-27.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-28.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-28.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-29.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/special_situations/2026-10-29.json: inputs_read[6] (_system/data/special_situations/situations.jsonl) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[11] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[12] (_system/agents/DESKS.md) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-21.json: inputs_read[12] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-22.json: inputs_read[6] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-23.json: inputs_read[11] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-26.json: inputs_read[5] (_system/sources.json) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-26.json: inputs_read[10] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-29.json: inputs_read[4] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/tape_index/2026-10-29.json: inputs_read[5] (_system/data/desk_briefs/schema.json) carries no stamp"
+    ],
     "stale_days": 7,
-    "checked_at": "2026-10-17T08:44:26Z"
+    "checked_at": "2026-10-30T12:21:24Z"
   },
   "research_only": true,
   "in_base_irr": false,
@@ -522,10 +1999,10 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "dashboard-desk-briefs",
-    "generated_at": "2026-10-17T08:44:26Z",
-    "as_of": "2026-10-17",
-    "content_sha256": "sha256:d34f84510a7d723a3927e57a627ed8a3b76ad13ab4057c8136aea48a4f1f5d0d",
-    "row_count": 9,
+    "generated_at": "2026-10-30T12:21:24Z",
+    "as_of": "2026-10-30",
+    "content_sha256": "sha256:78220023a174b6d86ab72f6c632bd074a559ac6cd99ef2d7802070aeb3131927",
+    "row_count": 37,
     "upstream_inputs": [],
     "health": {
       "status": "healthy",

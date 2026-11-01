@@ -41,7 +41,7 @@ class WorkflowTests(unittest.TestCase):
     def test_job_exists_with_the_per_job_concurrency_group(self):
         job = self.doc["jobs"][JOB]
         self.assertEqual(job["if"], "needs.decide.outputs.separation_discover == 'true'")
-        self.assertEqual(job["concurrency"]["group"], "data-commit-main-${{ github.job }}")
+        self.assertEqual(job["concurrency"]["group"], "data-commit-main-separation-discover")
         self.assertFalse(job["concurrency"]["cancel-in-progress"])
         self.assertIn("decide", job["needs"] if isinstance(job["needs"], list) else [job["needs"]])
         self.assertIn(JOB, self.doc["jobs"]["pipeline-summary"]["needs"])
@@ -50,7 +50,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("heal-separations", self.doc[True]["repository_dispatch"]["types"])
         self.assertIn("separation_discover", self.doc["jobs"]["decide"]["outputs"])
         run = self.doc["jobs"]["decide"]["steps"][0]["run"]
-        self.assertRegex(run, r'"13 15 \* \* 1"\) cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;')
+        self.assertRegex(run, r'"13 15 \* \* 1"\) cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true; buyback_radar=true ;;')
         self.assertIn('"dispatch:heal-separations") separation_discover=true ;;', run)
         self.assertIn('echo "separation_discover=$separation_discover"', run)
 

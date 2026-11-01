@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import date
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 from . import PKG_DIR
+from .etf_0dte_delivery import DEFAULT_MAX_AGE_DAYS, read_expected_delivery
 
 
 def apply_ibkr_env(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -66,6 +68,35 @@ def load_etf_ls_universe(cfg: dict[str, Any] | None = None) -> set[str]:
     rel = str((cfg.get("paths") or {}).get("etf_ls_universe_json") or "data/etf_ls_universe.json")
     payload = _read_json(rel)
     return {str(s).strip().upper() for s in payload.get("symbols") or [] if str(s).strip()}
+
+
+def load_etf_0dte_expected_delivery(
+    cfg: dict[str, Any] | None = None, *, today: date | None = None,
+) -> dict[str, float] | None:
+    """spx-0dte's SPY / QQQ delivery forecast for the configured account, or None.
+
+    The path is `etf_0dte.live_dir` (spx-0dte's `data/live` on this host), which
+    `ETF_0DTE_LIVE_DIR` overrides. Unset, or no account, means no forecast: every
+    SPY / QQQ share no other book is known to hold is then unattributed.
+    """
+    cfg = load_config() if cfg is None else cfg
+    section = cfg.get("etf_0dte") or {}
+    live_dir = os.environ.get("ETF_0DTE_LIVE_DIR") or section.get("live_dir")
+    account = str((cfg.get("ibkr") or {}).get("account_id") or "").strip()
+    max_age = section.get("forecast_max_age_days")
+    return read_expected_delivery(
+        live_dir,
+        account,
+        today=today,
+        max_age_days=DEFAULT_MAX_AGE_DAYS if max_age is None else int(max_age),
+    )
+
+
+def load_etf_0dte_known_holdings(cfg: dict[str, Any] | None = None) -> dict[str, float]:
+    """Signed SPY / QQQ shares another book is known to hold (they keep their bucket)."""
+    cfg = load_config() if cfg is None else cfg
+    raw = (cfg.get("etf_0dte") or {}).get("known_share_holdings") or {}
+    return {str(k).strip().upper(): float(v) for k, v in raw.items() if str(k).strip()}
 
 
 def operator_config(cfg: dict[str, Any], owner: str) -> dict[str, Any]:

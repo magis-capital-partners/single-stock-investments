@@ -102,7 +102,7 @@
 | B3SA3.SA | no_hit | — | — | No activist index hits |
 | BA | no_hit | — | — | No activist index hits |
 | BABA | indexed | L16/S0 | 2026-09-22 | 16 long, 0 short indexed; 0 short feed-eligible |
-| BAC | indexed | L16/S0 | 2026-10-05 | 16 long, 0 short indexed; 0 short feed-eligible |
+| BAC | indexed | L17/S0 | 2026-10-15 | 17 long, 0 short indexed; 0 short feed-eligible |
 | BALL | indexed | L2/S0 | 2025-04-21 | 2 long, 0 short indexed; 0 short feed-eligible |
 | BAX | indexed | L2/S0 | 2019-05-17 | 2 long, 0 short indexed; 0 short feed-eligible |
 | BB | indexed | L7/S0 | 2026-05-06 | 7 long, 0 short indexed; 0 short feed-eligible |
@@ -184,7 +184,7 @@
 | CMS | no_hit | — | — | No activist index hits |
 | CMSG | no_hit | — | — | No activist index hits |
 | CNC | indexed | L2/S0 | 2021-12-14 | 2 long, 0 short indexed; 0 short feed-eligible |
-| CNI | no_hit | — | — | No activist index hits |
+| CNI | indexed | L19/S1 | 2025-04-30 | 19 long, 1 short indexed; 0 short feed-eligible |
 | CNP | indexed | L15/S0 | 2021-12-03 | 15 long, 0 short indexed; 0 short feed-eligible |
 | COF | indexed | L1/S0 | 2024-04-08 | 1 long, 0 short indexed; 0 short feed-eligible |
 | COHR | indexed | L9/S0 | 2026-02-11 | 9 long, 0 short indexed; 0 short feed-eligible |
@@ -197,7 +197,7 @@
 | CORBF | no_hit | — | — | No activist index hits |
 | CORZ | indexed | L39/S0 | 2026-08-14 | 39 long, 0 short indexed; 0 short feed-eligible |
 | COST | indexed | L1/S0 | 2024-01-17 | 1 long, 0 short indexed; 0 short feed-eligible |
-| CP | no_hit | — | — | No activist index hits |
+| CP | indexed | L16/S1 | 2024-02-14 | 16 long, 1 short indexed; 0 short feed-eligible |
 | CPAY | no_hit | — | — | No activist index hits |
 | CPNG | no_hit | — | — | No activist index hits |
 | CPRT | no_hit | — | — | No activist index hits |
@@ -658,7 +658,7 @@
 | RIVN | indexed | L1/S0 | 2022-05-11 | 1 long, 0 short indexed; 0 short feed-eligible |
 | RJF | no_hit | — | — | No activist index hits |
 | RKLB | indexed | L23/S10 | 2026-03-30 | 23 long, 10 short indexed; 10 short feed-eligible |
-| RKT | indexed | L9/S0 | 2025-10-15 | 9 long, 0 short indexed; 0 short feed-eligible |
+| RKT | indexed | L10/S0 | 2025-10-15 | 10 long, 0 short indexed; 0 short feed-eligible |
 | RL | no_hit | — | — | No activist index hits |
 | RMBS | no_hit | — | — | No activist index hits |
 | RMD | no_hit | — | — | No activist index hits |
@@ -678,7 +678,7 @@
 | SAF.PA | no_hit | — | — | No activist index hits |
 | SATS | indexed | L55/S0 | 2026-07-31 | 55 long, 0 short indexed; 0 short feed-eligible |
 | SBAC | no_hit | — | — | No activist index hits |
-| SBET | indexed | L2/S0 | 2026-04-16 | 2 long, 0 short indexed; 0 short feed-eligible |
+| SBET | indexed | L3/S0 | 2026-10-13 | 3 long, 0 short indexed; 0 short feed-eligible |
 | SBR | no_hit | — | — | No activist index hits |
 | SBUX | indexed | L42/S0 | 2026-03-20 | 42 long, 0 short indexed; 0 short feed-eligible |
 | SCHW | indexed | L5/S0 | 2025-02-12 | 5 long, 0 short indexed; 0 short feed-eligible |
@@ -749,6 +749,7 @@
 | TFPM | indexed | L5/S0 | 2026-06-30 | 5 long, 0 short indexed; 0 short feed-eligible |
 | TGT | indexed | L1/S0 | 2026-05-15 | 1 long, 0 short indexed; 0 short feed-eligible |
 | THYP | no_hit | — | — | No activist index hits |
+| TIPT | indexed | L17/S0 | 2026-03-12 | 17 long, 0 short indexed; 0 short feed-eligible |
 | TJX | no_hit | — | — | No activist index hits |
 | TKO | indexed | L28/S0 | 2026-01-02 | 28 long, 0 short indexed; 0 short feed-eligible |
 | TLT | no_hit | — | — | No activist index hits |

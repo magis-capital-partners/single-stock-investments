@@ -1,7 +1,7 @@
 # EOSE — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 175 total (0 approved, 0 pending, 175 context)
+**Date:** 2026-10-25
+**Sources:** 176 total (0 approved, 0 pending, 176 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -20,7 +20,7 @@
 | activist_long | B. Riley Financial, Inc. — SC 13D | `EOSE/third-party-analyses/activist_reports/long/SC-13D_20200601_acc0001213900_20_013848.htm` | context | activist/long — sec_edgar |
 | activist_long | AltEnergy LLC — SC 13D | `EOSE/third-party-analyses/activist_reports/long/SC-13D_20201127_acc0001213900_20_039706.htm` | context | activist/long — sec_edgar |
 | activist_long | Cerberus Capital Management II, L.P. — SC 13D | `EOSE/third-party-analyses/activist_reports/long/SC-13D_20240628_acc0001011438_24_000386.htm` | context | activist/long — sec_edgar |
-| activist_short | Eos Energy (EOSE): Former Execs Say Eos Defrauded the DOE +  | `_system/reference/activist-reports/fuzzy_panda/fuzzy_panda_2025-01-01_eos-energy-eose-deadly-gas-doe-loan-defa.html` | context | activist/short — publisher_site |
+| activist_short | Eos Energy (EOSE): Former Execs Say Eos Defrauded the DOE +  | `_system/reference/activist-reports/fuzzy_panda/fuzzy_panda_2025-10-30_eos-energy-eose-deadly-gas-doe-loan-defa.html` | context | activist/short — publisher_site |
 | activist_long | HoldCo Asset Management — SC 13D/A | `EOSE/third-party-analyses/activist_reports/long/SC-13D/A_20260806_acc0001011438_26_000469.xml` | context | activist/long — sec_edgar |
 | activist_long | Cerberus Capital Management II, L.P — SC 13D/A | `EOSE/third-party-analyses/activist_reports/long/SC-13D/A_20260709_acc0001011438_26_000400.xml` | context | activist/long — sec_edgar |
 | activist_long | Cerberus Capital Management II, L.P — SC 13D/A | `EOSE/third-party-analyses/activist_reports/long/SC-13D/A_20260702_acc0001011438_26_000388.xml` | context | activist/long — sec_edgar |
@@ -28,6 +28,8 @@
 | activist_long | Cerberus Capital Management II, L.P — SC 13D/A | `EOSE/third-party-analyses/activist_reports/long/SC-13D/A_20260420_acc0001011438_26_000246.xml` | context | activist/long — sec_edgar |
 | activist_long | Cerberus Capital Management II, L.P — SC 13D/A | `EOSE/third-party-analyses/activist_reports/long/SC-13D/A_20250317_acc0001011438_25_000186.xml` | context | activist/long — sec_edgar |
 | activist_long | Cerberus Capital Management II, L.P — SC 13D/A | `EOSE/third-party-analyses/activist_reports/long/SC-13D/A_20250127_acc0000950170_25_009083.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0000950103 26 012019 | `EOSE/third-party-analyses/activist_reports/long/8-K_20260806_acc0000950103_26_012019.htm` | context | activist/long — local |
+| activist_long | acc0001213900 20 038551 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201120_acc0001213900_20_038551.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 013346 | `EOSE/third-party-analyses/activist_reports/long/8-K_20200522_acc0001213900_20_013346.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 013599 | `EOSE/third-party-analyses/activist_reports/long/8-K_20200528_acc0001213900_20_013599.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 013636 | `EOSE/third-party-analyses/activist_reports/long/8-K_20200529_acc0001213900_20_013636.htm` | context | activist/long — local |
@@ -50,7 +52,6 @@
 | activist_long | acc0001213900 20 036278 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201112_acc0001213900_20_036278.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 036610 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201112_acc0001213900_20_036610.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 037458 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201116_acc0001213900_20_037458.htm` | context | activist/long — local |
-| activist_long | acc0001213900 20 038551 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201120_acc0001213900_20_038551.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 041700 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201209_acc0001213900_20_041700.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 042497 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201214_acc0001213900_20_042497.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 042686 | `EOSE/third-party-analyses/activist_reports/long/8-K_20201215_acc0001213900_20_042686.htm` | context | activist/long — local |
@@ -177,8 +178,8 @@
 | activist_long | acc0001628280 26 048253 | `EOSE/third-party-analyses/activist_reports/long/8-K_20260715_acc0001628280_26_048253.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 049296 | `EOSE/third-party-analyses/activist_reports/long/8-K_20260723_acc0001628280_26_049296.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 052903 | `EOSE/third-party-analyses/activist_reports/long/8-K_20260805_acc0001628280_26_052903.htm` | context | activist/long — local |
-| activist_long | acc0000950103 26 012019 | `EOSE/third-party-analyses/activist_reports/long/8-K_20260806_acc0000950103_26_012019.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 058890 | `EOSE/third-party-analyses/activist_reports/long/8-K_20260825_acc0001628280_26_058890.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 061689 | `EOSE/third-party-analyses/activist_reports/long/8-K_20260914_acc0001628280_26_061689.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066229 | `EOSE/third-party-analyses/activist_reports/long/8-K_20261019_acc0001628280_26_066229.htm` | context | activist/long — local |
 
-Cross-check required: `EOSE/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `EOSE/research/cross_check_third_party_2026-10-25.md`

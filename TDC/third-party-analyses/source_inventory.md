@@ -1,6 +1,6 @@
 # TDC — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 74 total (0 approved, 0 pending, 74 context)
 
 | ID | Title | Path | Status | Use |
@@ -80,4 +80,4 @@
 | activist_long | acc0001628280 26 052549 | `TDC/third-party-analyses/activist_reports/long/8-K_20260804_acc0001628280_26_052549.htm` | context | activist/long — local |
 | activist_long | acc0000816761 26 000032 | `TDC/third-party-analyses/activist_reports/long/8-K_20260817_acc0000816761_26_000032.htm` | context | activist/long — local |
 
-Cross-check required: `TDC/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TDC/research/cross_check_third_party_2026-10-27.md`

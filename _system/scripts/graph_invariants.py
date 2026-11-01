@@ -336,10 +336,27 @@ def inv_e2(conn, root, today) -> Result:
         explicit_deadline = _parse_due(data.get("resolution_deadline"))
         deadline = (explicit_deadline or
                     (due_date + timedelta(days=E2_GRACE_DAYS))).isoformat()
+        # Judge the outcome that stands, not a row a re-resolution replaced.
         outcome = conn.execute(
-            "SELECT n.as_of FROM edges e JOIN nodes n ON n.id=e.dst"
-            " WHERE e.src=? AND e.type='RESOLVED_BY' LIMIT 1",
+            "SELECT n.id, n.as_of FROM edges e JOIN nodes n ON n.id=e.dst"
+            " WHERE e.src=? AND e.type='RESOLVED_BY'"
+            " AND NOT EXISTS (SELECT 1 FROM edges s"
+            "   WHERE s.dst=n.id AND s.type='SUPERSEDES')"
+            " ORDER BY n.as_of DESC LIMIT 1",
             (row["id"],)).fetchone()
+        resolved_as_of = outcome["as_of"] if outcome is not None else None
+        if outcome is not None:
+            # A re-resolution answers for the terminal verdict it replaced:
+            # it is on time only when the earliest superseded row was.
+            # check_falsifier_history.py limits supersedes to a later hit or
+            # miss replacing an unresolvable row of the same forecast.
+            superseded = conn.execute(
+                "SELECT MIN(n.as_of) AS as_of FROM edges s"
+                " JOIN nodes n ON n.id=s.dst"
+                " WHERE s.src=? AND s.type='SUPERSEDES' AND n.type='Outcome'",
+                (outcome["id"],)).fetchone()
+            if superseded is not None and superseded["as_of"]:
+                resolved_as_of = superseded["as_of"]
         # The falsifier lane runs once a day, so the first run that can see
         # deadline-day evidence may be the one on deadline + 1: resolve_
         # falsifiers.py only declares `unresolvable` once the deadline has
@@ -353,9 +370,9 @@ def inv_e2(conn, root, today) -> Result:
         if outcome is None:
             if today.isoformat() > terminal_by:
                 violations.append(f"{fid}: due {due}, no outcome by {deadline}")
-        elif outcome["as_of"] and str(outcome["as_of"])[:10] > terminal_by:
+        elif resolved_as_of and str(resolved_as_of)[:10] > terminal_by:
             violations.append(f"{fid}: due {due}, resolved late"
-                              f" ({outcome['as_of']})")
+                              f" ({resolved_as_of})")
     return Result("E2", len(violations), violations,
                   note=f"{typed_n} typed, {matured} matured")
 
@@ -546,7 +563,7 @@ def inv_e8(conn, root, today) -> Result:
 
 
 def inv_e9(conn, root, today) -> Result:
-    from falsifier_specs import calibration_eligibility, spec_payload_hash
+    from falsifier_specs import calibration_eligibility, effective_outcomes, spec_payload_hash
     outcomes_path = root / "_system/research/falsifier_outcomes.jsonl"
     rows = []
     if outcomes_path.exists():
@@ -557,6 +574,7 @@ def inv_e9(conn, root, today) -> Result:
                 rows.append(json.loads(line))
             except json.JSONDecodeError:
                 continue
+    rows = effective_outcomes(rows)
     violations = []
     eligible = []
     for row in rows:

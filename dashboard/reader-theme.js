@@ -1,0 +1,1 @@
+(function(){try{document.documentElement.dataset.theme=localStorage.getItem('ssi-display-theme')==='light'?'light':'dark';document.documentElement.dataset.density=localStorage.getItem('ssi-display-density')==='compact'?'compact':'comfortable';}catch(_){}})();

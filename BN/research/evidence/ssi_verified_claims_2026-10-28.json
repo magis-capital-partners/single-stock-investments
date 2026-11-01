@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "ticker": "BN",
+  "as_of": "2026-10-28",
+  "pack_hash": "a7b45c6c596cb723532fe6edc2583839ea2ede75cfdc8a4ba4dea351e8571af4",
+  "source_claims_file": "ssi_claims_2026-10-28.json",
+  "pack_integrity": {
+    "pack_hash_ok": true,
+    "drifted_sources": [],
+    "missing_sources": [],
+    "ok": true
+  },
+  "verified_claims": [
+    {
+      "claim_id": "be6ceea5d3fcee75",
+      "source": "filing_sentinel",
+      "taxonomy": "earnings_quality",
+      "statement": "New 'material weakness' language added to controls vs comparable prior filing",
+      "direction": "new",
+      "magnitude_pct": null,
+      "severity": 5,
+      "confidence": "high",
+      "falsifier": "Re-diff section 'controls' between BN/research/evidence/_text/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm.txt and BN/research/evidence/_text/40-F_20250324_rpt20241231_acc0001001085_25_000007.htm.txt; claim fails if 'material weakness' appears in the prior period too",
+      "evidence_ref": {
+        "pack_hash": "a7b45c6c596cb723532fe6edc2583839ea2ede75cfdc8a4ba4dea351e8571af4",
+        "source_path": "BN/research/evidence/_text/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm.txt",
+        "source_sha256": "2a53b3c128f76c4191c70305e9fd9f20b044b78de4fda10bfe40aaa8a2afce4f",
+        "prior_path": "BN/research/evidence/_text/40-F_20250324_rpt20241231_acc0001001085_25_000007.htm.txt",
+        "prior_sha256": "c8fdd67d3423f6a57cf35e8737052f622a423122cd9381598c2bb427ac45cdf4",
+        "section": "controls",
+        "snippet": "he registrant's internal control over financial reporting was effective. Also, management determined that there were no material weaknesses in the registrant's internal control over financial reporting as of December 31, 2025."
+      },
+      "flags": [
+        "critical_narrative"
+      ],
+      "verification": "verified"
+    },
+    {
+      "claim_id": "823922229b3b9352",
+      "source": "filing_sentinel",
+      "taxonomy": "identity_instrument",
+      "statement": "NumberOfSharesOutstanding moved 1.646e+09 → 2.477e+09 (+50.5%) vs comparable prior filing",
+      "direction": "up",
+      "magnitude_pct": 50.49,
+      "severity": 3,
+      "concept_tier": "secondary",
+      "confidence": "high",
+      "falsifier": "Re-extract NumberOfSharesOutstanding from BN/research/evidence/_text/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm.txt and BN/research/evidence/_text/40-F_20250324_rpt20241231_acc0001001085_25_000007.htm.txt; claim fails if either value or the comparability pairing differs",
+      "evidence_ref": {
+        "pack_hash": "a7b45c6c596cb723532fe6edc2583839ea2ede75cfdc8a4ba4dea351e8571af4",
+        "source_path": "BN/research/evidence/_text/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm.txt",
+        "source_sha256": "2a53b3c128f76c4191c70305e9fd9f20b044b78de4fda10bfe40aaa8a2afce4f",
+        "prior_path": "BN/research/evidence/_text/40-F_20250324_rpt20241231_acc0001001085_25_000007.htm.txt",
+        "prior_sha256": "c8fdd67d3423f6a57cf35e8737052f622a423122cd9381598c2bb427ac45cdf4",
+        "tag": "NumberOfSharesOutstanding",
+        "line_current": 2,
+        "line_prior": 2
+      },
+      "flags": [
+        "extreme_move"
+      ],
+      "verification": "verified"
+    }
+  ],
+  "verified_count": 2,
+  "failed_count": 0,
+  "failure_reasons": [],
+  "gold_cases_appended": 0,
+  "routing": {
+    "authority_level": "valuation_contract",
+    "contract_status": "evidence_blocked",
+    "committee_state": "not_started",
+    "committee_eligible": false,
+    "reason": "contract_status=evidence_blocked (needs decision_grade)",
+    "high_severity_claim_ids": [
+      "be6ceea5d3fcee75"
+    ],
+    "dispatch_note": "Reporting only — committee dispatch stays with investment-committee.yml; human_decision.json remains the sole capital authority."
+  }
+}

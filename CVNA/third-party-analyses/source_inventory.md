@@ -1,13 +1,13 @@
 # CVNA — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 52 total (0 approved, 0 pending, 52 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
 | vic | 04-Carvana-CVNA-3997733949_3268 | `CVNA/third-party-analyses/vic/04-Carvana-CVNA-3997733949_3268.pdf` | context | Value Investors Club (licensed corpus; variant view, not base IRR) |
 | activist_short | Carvana: A Father-Son Accounting Grift For The Ages | `_system/reference/activist-reports/hindenburg/hindenburg_2025-01-01_carvana.html` | context | activist/short — publisher_site |
-| activist_short | Mar 1, 2019 | `_system/reference/activist-reports/spruce_point/spruce_point_2019-03-01_carvana-co.html` | context | activist/short — publisher_site |
+| activist_short | Carvana Co. | `_system/reference/activist-reports/spruce_point/spruce_point_2019-03-01_carvana-co.html` | context | activist/short — publisher_site |
 | activist_long | Verde Investments, Inc. — SC 13D/A | `CVNA/third-party-analyses/activist_reports/long/SC-13D/A_20230825_acc0001193125_23_221542.htm` | context | activist/long — sec_edgar |
 | activist_long | Verde Investments, Inc. — SC 13D/A | `CVNA/third-party-analyses/activist_reports/long/SC-13D/A_20231113_acc0001193125_23_275213.htm` | context | activist/long — sec_edgar |
 | activist_long | Verde Investments, Inc. — SC 13D/A | `CVNA/third-party-analyses/activist_reports/long/SC-13D/A_20240514_acc0001193125_24_138445.htm` | context | activist/long — sec_edgar |
@@ -58,4 +58,4 @@
 | activist_long | acc0001690820 26 000054 | `CVNA/third-party-analyses/activist_reports/long/8-K_20260729_acc0001690820_26_000054.htm` | context | activist/long — local |
 | activist_long | acc0001690820 26 000059 | `CVNA/third-party-analyses/activist_reports/long/8-K_20260814_acc0001690820_26_000059.htm` | context | activist/long — local |
 
-Cross-check required: `CVNA/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `CVNA/research/cross_check_third_party_2026-10-25.md`

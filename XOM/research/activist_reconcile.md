@@ -1,6 +1,6 @@
 # XOM — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
+**Date:** 2026-10-25
 **Reports processed:** 7
 **Human review:** 7
 

@@ -55,6 +55,7 @@ STEM_QUARTER_RE = re.compile(
 )
 
 sys.path.insert(0, str(SCRIPTS))
+from drive_config import load_google_drive_config  # noqa: E402
 from drive_store_common import (  # noqa: E402
     CONFIG_PATH,
     FOLDER_INDEX_PATH,
@@ -474,13 +475,8 @@ def main() -> int:
     if not args.all and not args.quarter and not args.skip_download:
         parser.error("Provide --all, --quarter 2025Q4, or --skip-download")
 
-    config = load_json(CONFIG_PATH)
-    root_ids = [
-        (config.get("drive_roots") or {}).get("hedge_fund_letters", {}).get("folder_id"),
-    ]
-    root_ids = [rid for rid in root_ids if rid]
-    if not root_ids:
-        raise SystemExit("hedge_fund_letters folder_id missing in google_drive_config.json")
+    config = load_google_drive_config(CONFIG_PATH)
+    root_ids = [config["drive_roots"]["hedge_fund_letters"]["folder_id"]]
 
     quarter_filter = args.quarter.upper() if args.quarter else None
     since_year = args.since_year

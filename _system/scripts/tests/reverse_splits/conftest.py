@@ -24,6 +24,19 @@ from reverse_splits.ledger import (  # noqa: E402
 AS_OF = "2026-10-11"
 
 
+def assert_contiguous_hypothesis_ids(rows: list[dict]) -> list[str]:
+    """Ids are unique and exactly H1..Hn in file order, and H20 is registered.
+
+    Later hypotheses may be appended. The run must stay contiguous: a gap,
+    a duplicate, or a missing H20 is a registry error.
+    """
+    ids = [row["id"] for row in rows]
+    assert len(ids) == len(set(ids))
+    assert ids == [f"H{n}" for n in range(1, len(ids) + 1)]
+    assert "H20" in ids
+    return ids
+
+
 def decision_rows(tickers=("DFLI", "NXGL")) -> list[dict]:
     """A valid two-link decision chain shaped like strategy.record_decision output."""
     rows, previous = [], ""

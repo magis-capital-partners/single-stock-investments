@@ -188,6 +188,11 @@ def merge_ticker(ticker: str, *, force: bool = False, create_stub: bool = False)
         print(f"STUB {t}: created minimal valuation.json")
     else:
         val = json.loads(vpath.read_text(encoding="utf-8"))
+    if val.get('underwriting'):
+        # The shared quote cache owns these prices. Never edit the sealed model
+        # or manufacture a human-review flag during a mechanical price update.
+        print(f"SKIP {t}: independently underwritten model uses shared quote refresh")
+        return True
     inputs = val.setdefault("inputs", {})
     ps = str(inputs.get("price_source") or "")
     if not force and ps and not PLACEHOLDER_RE.search(ps):

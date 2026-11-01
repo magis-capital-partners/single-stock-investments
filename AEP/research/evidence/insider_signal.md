@@ -1,28 +1,23 @@
-# AEP — Insider conviction (2026-10-15)
+# AEP — Insider conviction (2026-09-09)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 0.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Eckert Johannes G | 2026-02-17 | 2879 | $130.24 | $374960.96 | 1.823 |
-| Knapp Alicia R | 2026-02-17 | 4798 | $130.24 | $624891.52 | 1.695 |
-| Fehrman William | 2026-02-17 | 26105 | $130.24 | $3399915.2 | 1.566 |
-| Ferneau Kelly J | 2026-02-16 | 2693 | $129.94 | $349928.42 | 1.565 |
-| Berntsen Robert | 2026-02-17 | 3839 | $130.24 | $499991.36 | 1.559 |
 
 **Routine / planned sales (context):**
 
-- MIHALIK TREVOR I: 28 @ $132.31 on 2026-03-10
-- MIHALIK TREVOR I: 1424 @ $132.03 on 2026-02-23
-- MIHALIK TREVOR I: 1590 @ $132.03 on 2026-02-23
+- FOWKE BENJAMIN G S III: 5000 @ $115.07 on 2025-12-12 (10b5-1)
+- FOWKE BENJAMIN G S III: 5000 @ $121.58 on 2025-11-14 (10b5-1)
+- Dixon Kate: 2000 @ $125.0 on 2026-09-08 (10b5-1)
 
 Source: `_system/reference/market-data/insider/AEP_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

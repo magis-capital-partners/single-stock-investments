@@ -36,6 +36,7 @@ Files live in `dashboard/data/`. Read the build date before the contents.
 | `short_alpha.json` | `generated_at` | Short Alpha ledger view: candidates with lenses, categories and lens reviews. Desk: Short Selling. |
 | `reverse_splits.json` | `generated_at` | Reverse-split ledger view: recent announcements, upcoming effective dates, repeat splitters. Desk: Short Selling. |
 | `special_situations.json` | `generated_at` | Ranked special situations, discovery list, history, by lane. Desk: Special Situations. |
+| `buyback_radar.json` | `generated_at` | Share-cannibal summary, buyback events, and the grading method. Per-company rows are in `buyback_companies.json`. Buyback yield is a percent of market value, not percent per year. Desk: Special Situations. |
 | `separations.json` | `generated_at` | Split-offs and spin-offs: filed terms, spread, who-must-sell flows, odd-lot alerts, discovery events. Desk: Special Situations; the forced_seller_rows also feed the Technical Analyst. |
 | `desk_briefs.json` | `generated_at` | The latest desk brief per desk, joined for the Inbox. Built from `_system/data/desk_briefs/`. |
 | `portfolio_summary.json` | `generated_at` (`_envelope.generated_at`) | **L0 summary (< 100 KB)** of active/classified portfolio tickers with stance, archetype, `base_irr_pct`, and `_envelope` freshness. Read this before opening L1 shards. |
@@ -77,7 +78,7 @@ Drop a VIC PDF with:
 python _system/scripts/drive_intake_drop.py --kind VIC --ticker TICKER path/to/writeup.pdf
 ```
 
-The ticker folder must already exist. The procedure is in `_system/agents/GROK.md`. The Data Pipeline job `drive` is the Drive Intake Sync. It runs daily at 14:00 UTC from `.github/workflows/data-pipeline.yml` (`0 14 * * *`). GitHub Actions can start later than that clock time.
+The ticker folder must already exist. The procedure is in `_system/agents/GROK.md`. The Data Pipeline job `drive` is the Drive Intake Sync. It runs daily at 14:41 UTC from `.github/workflows/data-pipeline.yml` (`41 14 * * *`). GitHub Actions can start later than that clock time.
 
 Manager letters, short-thesis pitch folders, and conference decks live on Drive. Search by name. Fund letters in the repo's Drive map sit under `Letters/{year and quarter}` (`_system/reference/document-store/google_drive_config.json`). Do not invent a folder id for those searches.
 
@@ -118,7 +119,7 @@ Ranked desk output is a data drop, not a note. One JSON file per desk per day at
 | Desks | `special_situations`, `activism`, `fundamentals`, `nol_tax_assets`, `tape_index`, `stahl`, `short_selling`. |
 | Items | At most 12, best first. Every item has a ticker from `_system/portfolio/registry.json` (or the literal `unresolved`), a headline of at most 160 characters, one number, evidence with the accession or URL, and a confidence of `filing`, `provider`, `news`, or `web`. |
 | Inputs | `inputs_read` records every file read with the stamp it carried, so a brief built on stale data says so. |
-| Push | A pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch that touches only the brief and, if needed, the hub daily note. The check must pass. |
+| Push | A pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch that touches the brief, the rebuilt `dashboard/data/desk_briefs.json` from `build_desk_briefs.py` in that same commit, and, if needed, the hub daily note. The check must pass. |
 | Authority | `research_only: true`, `in_base_irr: false`, `authority: "none"`. No position, no size, no stance, no fraud tag. |
 
 ## Room and desks
@@ -135,7 +136,7 @@ Weekday digests go out around 8:10-8:14 AM ET. Say nothing when nothing is new. 
 | --- | --- |
 | Code and repo data | A pull request from a cloud agent or the GitHub connector. |
 | Desk briefs | `_system/data/desk_briefs/<desk>/<YYYY-MM-DD>.json` by pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch; `check_desk_briefs.py` must pass. |
-| Documents | Shared Drive `Admin/Intake/...`, using `drive_intake_drop.py` for VIC. The 14:00 UTC Drive Intake Sync imports them. |
+| Documents | Shared Drive `Admin/Intake/...`, using `drive_intake_drop.py` for VIC. The 14:41 UTC Drive Intake Sync imports them. |
 | Notes and lessons | The `research-equity` hub only, within the writing rules above. |
 | Anything outbound to a person | Needs Drew's approval before it is sent. |
 

@@ -1,7 +1,7 @@
 # EBAY — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 81 total (0 approved, 0 pending, 81 context)
+**Date:** 2026-10-25
+**Sources:** 82 total (0 approved, 0 pending, 82 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -86,5 +86,6 @@
 | activist_long | acc0001552781 26 000322 | `EBAY/third-party-analyses/activist_reports/long/8-K_20260512_acc0001552781_26_000322.htm` | context | activist/long — local |
 | activist_long | acc0001065088 26 000135 | `EBAY/third-party-analyses/activist_reports/long/8-K_20260618_acc0001065088_26_000135.htm` | context | activist/long — local |
 | activist_long | acc0001065088 26 000174 | `EBAY/third-party-analyses/activist_reports/long/8-K_20260805_acc0001065088_26_000174.htm` | context | activist/long — local |
+| activist_long | acc0001065088 26 000205 | `EBAY/third-party-analyses/activist_reports/long/8-K_20261022_acc0001065088_26_000205.htm` | context | activist/long — local |
 
-Cross-check required: `EBAY/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `EBAY/research/cross_check_third_party_2026-10-25.md`

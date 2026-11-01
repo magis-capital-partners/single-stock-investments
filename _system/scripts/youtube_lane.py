@@ -39,9 +39,11 @@ until someone asks for them.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -75,6 +77,17 @@ MAIN_PATHS = (
 # click. Scoped to this one directory so the `git add -A` discipline above still
 # holds: nothing outside it is ever staged by this lane.
 MAIN_DIRS = ("dashboard/data/insights/video_details",)
+
+# The podcast batch publishes the same way. The manifest is shared with the
+# video shard, so a podcast push rewrites it and must start from the copy
+# already on main rather than an empty file.
+PODCAST_PATHS = (
+    "dashboard/data/feed_status.json",
+    "dashboard/data/insights/manifest.json",
+    "dashboard/data/insights/podcasts.json",
+    "_system/reference/podcasts/insights_index_mirror.json",
+)
+PODCAST_DIRS = ("dashboard/data/insights/podcast_episodes",)
 
 # The branch this lane publishes to. It commits to HEAD and then pushes, so
 # `git push origin main` -- which resolves the *local* ref of that name --
@@ -175,8 +188,13 @@ def step(name: str, args: list[str], *, required: bool, timeout: float | None = 
     return False
 
 
-def self_update() -> None:
+def self_update() -> bool:
     """Pull main into this worktree so the lane runs current code.
+
+    Returns True when HEAD moved. The caller re-executes in that case: the
+    modules already imported are the code from before the pull, and that is
+    how a lane that had just updated itself still published with the old
+    in-place manifest write.
 
     autoStash because the worktree carries `_secrets/` and whatever a previous
     run left behind; a plain rebase refuses outright when anything is unstaged,
@@ -204,7 +222,19 @@ def self_update() -> None:
         if (ROOT / rel).is_dir():
             run_git(ROOT, "checkout", "--", rel, check=False, timeout=120)
             run_git(ROOT, "clean", "-fdq", "--", rel, check=False, timeout=120)
+    before = run_git(ROOT, "rev-parse", "HEAD", check=False, timeout=60)
+    before_sha = before.stdout.strip() if before.returncode == 0 else ""
     try:
+        # This Mac runs the lane from the media-lane commit, which is not on
+        # main. Rebasing that checkout replays the commit onto main inside the
+        # worktree the LaunchAgent is executing. Leave it. The shard is
+        # published from a separate main worktree instead.
+        contained = run_git(ROOT, "merge-base", "--is-ancestor", "HEAD",
+                            f"origin/{MAIN_BRANCH}", check=False, timeout=60)
+        if contained.returncode != 0:
+            log("self-update skipped: checkout is not on origin/main, "
+                "so rebasing it would replay local commits")
+            return False
         run_git(ROOT, "-c", "rebase.autoStash=true", "pull", "--rebase",
                 "origin", "main", timeout=900)
         log("worktree updated from origin/main")
@@ -212,6 +242,10 @@ def self_update() -> None:
         # Running slightly stale beats not running. Say so rather than dying.
         log(f"self-update skipped: {describe_failure(exc)}")
         run_git(ROOT, "rebase", "--abort", check=False, timeout=120)
+        return False
+    after = run_git(ROOT, "rev-parse", "HEAD", check=False, timeout=60)
+    after_sha = after.stdout.strip() if after.returncode == 0 else ""
+    return bool(before_sha and after_sha and before_sha != after_sha)
 
 
 def push_vault(message: str) -> bool | None:
@@ -265,7 +299,568 @@ def _push_vault_locked(repo: Path, message: str) -> bool | None:
         return False
 
 
-def push_main(message: str) -> bool | None:
+def _publish_worktree() -> Path:
+    override = os.environ.get("YOUTUBE_PUBLISH_WORKTREE", "").strip()
+    if override:
+        return Path(override)
+    return Path.home() / "Projects" / "ssi-dashboard-publish"
+
+
+def _head_is_origin_main() -> bool:
+    """True when this checkout has nothing origin/main does not already have."""
+    run_git(ROOT, "fetch", "origin", MAIN_BRANCH, timeout=300)
+    contained = run_git(ROOT, "merge-base", "--is-ancestor", "HEAD",
+                        f"origin/{MAIN_BRANCH}", check=False, timeout=60)
+    return contained.returncode == 0
+
+
+def _ensure_publish_worktree() -> Path:
+    """A detached sparse checkout of origin/main, used only to publish shards.
+
+    The lane worktree on this Mac is the media-lane commit. Committing the
+    shard there and pushing HEAD:main would publish that commit to the public
+    repository. The shard is copied onto a checkout that starts at origin/main,
+    and only the published paths are committed.
+    """
+    path = _publish_worktree()
+    if not (path / ".git").exists():
+        if path.exists():
+            raise OSError(f"publish worktree path exists and is not a worktree: {path}")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # --no-checkout first. `worktree add --sparse` is not in this git, and a
+        # normal add would materialize the whole repository (~15 GB) just to
+        # publish a handful of dashboard files.
+        run_git(ROOT, "worktree", "add", "--detach", "--no-checkout", str(path),
+                f"origin/{MAIN_BRANCH}", timeout=300)
+        run_git(path, "sparse-checkout", "init", "--cone", timeout=120)
+        run_git(path, "sparse-checkout", "set",
+                "dashboard/data/insights", "_system/reference/video", timeout=120)
+        run_git(path, "checkout", "--detach", f"origin/{MAIN_BRANCH}", timeout=300)
+    # Expand before reset so a cone created for videos also materializes the
+    # podcast mirror. set is idempotent.
+    run_git(path, "sparse-checkout", "set",
+            "dashboard/data/insights",
+            "_system/reference/video",
+            "_system/reference/podcasts",
+            timeout=120)
+    run_git(path, "fetch", "origin", MAIN_BRANCH, timeout=300)
+    run_git(path, "reset", "--hard", f"origin/{MAIN_BRANCH}", timeout=180)
+    return path
+
+
+INSIGHT_MANIFEST = "dashboard/data/insights/manifest.json"
+
+
+def _read_json(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _manifest_repo_root(path: Path) -> Path | None:
+    parts = path.parts
+    if "dashboard" not in parts:
+        return None
+    return Path(*parts[: parts.index("dashboard")])
+
+
+def _managed_manifest(path: Path) -> tuple[Path, str, dict] | None:
+    """Return repo root, dashboard-relative path, and receipt when this file is managed."""
+    root = _manifest_repo_root(path)
+    if root is None:
+        return None
+    relative = path.relative_to(root / "dashboard").as_posix()
+    receipt = root / "dashboard" / "private-assets.json"
+    if not receipt.is_file() and (root / ".git").exists():
+        # git show, not sparse-checkout add. add turns a full checkout into a
+        # sparse one. The publish worktree is already sparse; the blob is still
+        # in HEAD, and writing it here is enough to read the receipt.
+        shown = run_git(root, "show", "HEAD:dashboard/private-assets.json",
+                        check=False, timeout=120)
+        if shown.returncode == 0 and shown.stdout.strip():
+            receipt.parent.mkdir(parents=True, exist_ok=True)
+            text = shown.stdout if shown.stdout.endswith("\n") else shown.stdout + "\n"
+            receipt.write_text(text, encoding="utf-8")
+    if not receipt.is_file():
+        return None
+    try:
+        manifest = json.loads(receipt.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    entry = (manifest.get("assets") or {}).get(relative)
+    if not isinstance(entry, dict) or "public_sha256" not in entry or "private_sha256" not in entry:
+        return None
+    return root, relative, entry
+
+
+def _resolved_manifest(path: Path) -> dict:
+    """The full manifest to patch. A public placeholder is read from the vault."""
+    from private_dashboard_assets import digest, read_resolved_json
+    from reconcile_insights_event_summary import is_publishable_manifest
+
+    managed = _managed_manifest(path)
+    doc = _read_json(path)
+    if managed is None:
+        if not is_publishable_manifest(doc):
+            raise RuntimeError(f"refusing to publish onto a stub insight manifest at {path}")
+        return doc
+    root, relative, entry = managed
+    current = digest(path) if path.is_file() else None
+    if current not in (entry["public_sha256"], entry["private_sha256"]):
+        raise RuntimeError(
+            "Managed dashboard asset changed; export its private snapshot before deployment: "
+            + relative
+        )
+    if doc.get("private_snapshot") is True:
+        resolved, _restored = read_resolved_json(root / "dashboard", relative)
+    else:
+        resolved = doc
+    if not is_publishable_manifest(resolved):
+        raise RuntimeError(f"refusing to publish onto a stub insight manifest at {path}")
+    return resolved
+
+
+def _canonical_json(document: dict) -> str:
+    return json.dumps(document, ensure_ascii=False, separators=(",", ":")) + "\n"
+
+
+def _events_beside(manifest_path: Path) -> list | None:
+    """The events list for this manifest, read from the vault when the public file is a placeholder."""
+    document = _read_json(manifest_path.parent / "events.json")
+    if document.get("private_snapshot") is True:
+        root = _manifest_repo_root(manifest_path)
+        if root is None:
+            return None
+        from private_dashboard_assets import read_resolved_json
+        try:
+            document, _restored = read_resolved_json(root / "dashboard", "data/insights/events.json")
+        except (OSError, RuntimeError, ValueError):
+            return None
+    events = document.get("events")
+    if isinstance(events, list) and all(isinstance(event, dict) for event in events):
+        return events
+    return None
+
+
+def _write_receipt_entry(path: Path, relative: str, entry: dict) -> None:
+    document = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {"assets": {}}
+    if not isinstance(document, dict):
+        raise RuntimeError(f"private receipt is not an object: {path}")
+    assets = document.setdefault("assets", {})
+    if not isinstance(assets, dict):
+        raise RuntimeError(f"private receipt has no asset map: {path}")
+    assets[relative] = {"private_sha256": entry["private_sha256"], "public_sha256": entry["public_sha256"]}
+    text = json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(text, encoding="utf-8")
+    temporary.replace(path)
+
+
+def _export_managed_document(repo: Path, relative: str, document: dict) -> None:
+    """Store one dashboard document privately and leave its public path a placeholder.
+
+    This does not walk the rest of the receipt. migrate() re-exports every
+    hydrated file it can see, which would redact the lane's other working copies.
+    """
+    import hashlib
+
+    from migrate_dashboard_sources import public_snapshot
+    from private_dashboard_assets import private_object
+    from vault_paths import research_vault_root
+
+    vault = research_vault_root()
+    if vault is None or not (vault / ".git").exists():
+        raise RuntimeError(
+            "A configured private research-vault checkout is required; public files were not changed."
+        )
+    payload = _canonical_json(document).encode("utf-8")
+    private_hash = hashlib.sha256(payload).hexdigest()
+    destination = private_object(vault, private_hash)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if not destination.exists():
+        temporary = destination.with_name(destination.name + ".tmp")
+        temporary.write_bytes(payload)
+        if hashlib.sha256(temporary.read_bytes()).hexdigest() != private_hash:
+            temporary.unlink(missing_ok=True)
+            raise RuntimeError(f"Private copy failed verification: {relative}")
+        temporary.replace(destination)
+    public_text = _canonical_json(public_snapshot(document))
+    entry = {
+        "private_sha256": private_hash,
+        "public_sha256": hashlib.sha256(public_text.encode("utf-8")).hexdigest(),
+    }
+    journal = vault / "dashboard-private" / "migration-journal.jsonl"
+    journal.parent.mkdir(parents=True, exist_ok=True)
+    with journal.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"path": relative, "scope": "dashboard", "entry": entry}) + "\n")
+    receipt = repo / "dashboard" / "private-assets.json"
+    _write_receipt_entry(receipt, relative, entry)
+    vault_receipt = vault / "dashboard-private" / "manifest.json"
+    if vault_receipt.is_file():
+        _write_receipt_entry(vault_receipt, relative, entry)
+    else:
+        vault_receipt.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(receipt, vault_receipt)
+    public_path = repo / "dashboard" / relative
+    temporary = public_path.with_suffix(public_path.suffix + ".tmp")
+    temporary.write_text(public_text, encoding="utf-8")
+    temporary.replace(public_path)
+    if _read_json(public_path).get("private_snapshot") is not True:
+        raise RuntimeError(f"Managed dashboard asset was published in full: {relative}")
+
+
+def _merged_published_manifest(repo: Path, relative: str, entry: dict, document: dict,
+                               *, videos: bool, podcasts: bool) -> dict:
+    """Patch this publish onto the vault copy so a lane manifest cannot replace the corpus."""
+    from private_dashboard_assets import private_object
+    from reconcile_insights_event_summary import (
+        apply_media_fields, is_publishable_manifest, reconciled_manifest,
+    )
+    from vault_paths import research_vault_root
+
+    base = None
+    vault = research_vault_root()
+    if vault is not None:
+        private = private_object(vault, entry["private_sha256"])
+        if private.is_file():
+            loaded = _read_json(private)
+            if is_publishable_manifest(loaded):
+                base = loaded
+    merged = document if base is None else apply_media_fields(
+        base, document, videos=videos, podcasts=podcasts)
+    events = _events_beside(repo / "dashboard" / relative)
+    if events is not None:
+        merged = reconciled_manifest(merged, events)
+    if not is_publishable_manifest(merged):
+        raise RuntimeError(f"refusing to publish onto a stub insight manifest at {relative}")
+    return merged
+
+
+def _restore_recorded_placeholder(path: Path, document: dict, entry: dict) -> None:
+    """Put back the receipt's public bytes when the working file is the private object."""
+    import hashlib
+
+    from migrate_dashboard_sources import public_snapshot
+
+    public_text = _canonical_json(public_snapshot(document))
+    if hashlib.sha256(public_text.encode("utf-8")).hexdigest() != entry["public_sha256"]:
+        raise RuntimeError(
+            "Managed dashboard asset changed; export its private snapshot before deployment: "
+            + path.as_posix()
+        )
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(public_text, encoding="utf-8")
+    temporary.replace(path)
+
+
+def seal_insights_manifest(path: Path, *, videos: bool, podcasts: bool) -> bool:
+    """Export a managed insights manifest and leave the public file as its placeholder.
+
+    Returns True when a new private object has to be pushed before the public commit.
+    An unmanaged manifest is left as written. The Mac Mini media lane commits this
+    file in place on main; the off-main worktree path already sealed it.
+    """
+    managed = _managed_manifest(path)
+    if managed is None or not path.is_file():
+        return False
+    repo, relative, entry = managed
+    from private_dashboard_assets import digest
+
+    current = digest(path)
+    if current == entry["public_sha256"]:
+        return False
+    document = _read_json(path)
+    if document.get("private_snapshot") is True or current == entry["private_sha256"]:
+        if current == entry["private_sha256"] and document.get("private_snapshot") is not True:
+            _restore_recorded_placeholder(path, document, entry)
+            return False
+        raise RuntimeError(
+            "Managed dashboard asset changed; export its private snapshot before deployment: "
+            + relative
+        )
+    merged = _merged_published_manifest(
+        repo, relative, entry, document, videos=videos, podcasts=podcasts)
+    _export_managed_document(repo, relative, merged)
+    return True
+
+
+def _seal_managed_payload(path: Path) -> bool:
+    """Keep a managed episode or shard file out of the public commit.
+
+    A working copy that still is the recorded private object is put back to its
+    placeholder. A new payload is exported. Returns True when the vault must be pushed.
+    """
+    managed = _managed_manifest(path)
+    if managed is None or not path.is_file():
+        return False
+    repo, relative, entry = managed
+    from private_dashboard_assets import digest
+
+    current = digest(path)
+    if current == entry["public_sha256"]:
+        return False
+    document = _read_json(path)
+    if not document:
+        raise RuntimeError(
+            "Managed dashboard asset changed; export its private snapshot before deployment: "
+            + relative
+        )
+    if current == entry["private_sha256"] and document.get("private_snapshot") is not True:
+        _restore_recorded_placeholder(path, document, entry)
+        return False
+    if document.get("private_snapshot") is True:
+        raise RuntimeError(
+            "Managed dashboard asset changed; export its private snapshot before deployment: "
+            + relative
+        )
+    _export_managed_document(repo, relative, document)
+    return True
+
+
+def _managed_relative_paths(repo: Path) -> set[str]:
+    receipt = repo / "dashboard" / "private-assets.json"
+    if not receipt.is_file():
+        return set()
+    try:
+        document = json.loads(receipt.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set()
+    assets = document.get("assets") if isinstance(document, dict) else None
+    return set(assets) if isinstance(assets, dict) else set()
+
+
+def _vault_dashboard_private_dirty() -> bool:
+    from vault_paths import research_vault_root
+
+    vault = research_vault_root()
+    if vault is None or not (vault / ".git").exists():
+        return False
+    status = run_git(vault, "status", "--porcelain", "--", "dashboard-private",
+                     check=False, timeout=120)
+    return bool(status.stdout.strip())
+
+
+def _receipt_dirty(repo: Path) -> bool:
+    rel = "dashboard/private-assets.json"
+    if not (repo / rel).is_file():
+        return False
+    diff = run_git(repo, "diff", "--quiet", "HEAD", "--", rel, check=False, timeout=60)
+    return diff.returncode != 0
+
+
+def _seal_in_place_publish(repo: Path, paths: tuple[str, ...], dirs: tuple[str, ...],
+                           *, videos: bool, podcasts: bool) -> None:
+    """Seal managed files on a main checkout before they are staged.
+
+    The Mac Mini lane (metis@Drews-Mac-mini.local) is a checkout of main, so
+    push_main commits this worktree directly. The private-snapshot export added
+    for the off-main worktree never ran, and the full insights manifest was
+    pushed over its placeholder (ed7a50a16bb and the publishes after it).
+    """
+    receipt = repo / "dashboard" / "private-assets.json"
+    if not receipt.is_file():
+        # Materialize from HEAD when this checkout is sparse. A repository
+        # that has never managed dashboard files must not touch a vault.
+        _managed_manifest(repo / INSIGHT_MANIFEST)
+    if not receipt.is_file():
+        return
+    exported = False
+    manifest = repo / INSIGHT_MANIFEST
+    if INSIGHT_MANIFEST in paths and manifest.is_file():
+        exported = seal_insights_manifest(manifest, videos=videos, podcasts=podcasts) or exported
+    for rel in paths:
+        if rel == INSIGHT_MANIFEST:
+            continue
+        path = repo / rel
+        if path.is_file():
+            exported = _seal_managed_payload(path) or exported
+    managed_keys = _managed_relative_paths(repo)
+    for rel in dirs:
+        root = repo / rel
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*"):
+            if not path.is_file():
+                continue
+            try:
+                relative = path.relative_to(repo / "dashboard").as_posix()
+            except ValueError:
+                continue
+            if relative not in managed_keys:
+                continue
+            exported = _seal_managed_payload(path) or exported
+    if exported or _vault_dashboard_private_dirty():
+        preserved = _push_private_dashboard_objects(
+            "Preserve restricted insights manifest snapshot")
+        if preserved is False:
+            raise RuntimeError(
+                "Private snapshot was not pushed; refusing to publish the public insights manifest"
+            )
+
+
+def _republish_managed_manifest(path: Path, document: dict) -> None:
+    """Write a manifest. A managed asset is exported privately and the public file stays a placeholder."""
+    managed = _managed_manifest(path)
+    text = json.dumps(document, ensure_ascii=False, separators=(",", ":")) + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if managed is None:
+        path.write_text(text, encoding="utf-8")
+        return
+    root, relative, entry = managed
+    from migrate_dashboard_sources import migrate
+    from private_dashboard_assets import hydration_state, write_hydration
+
+    state = hydration_state(root)
+    state["dashboard/" + relative] = entry["private_sha256"]
+    write_hydration(root, state)
+    path.write_text(text, encoding="utf-8")
+    migrate(root, paths=["dashboard/" + relative])
+    published = _read_json(path)
+    if published.get("private_snapshot") is not True:
+        raise RuntimeError(f"Managed dashboard asset was published in full: {relative}")
+
+
+def _sync_insight_manifest(src: Path, dst: Path, *, videos: bool, podcasts: bool) -> None:
+    """Patch this lane's media fields onto the manifest that already matches events.
+
+    The lane worktree keeps its own manifest for hours. Copying that file
+    onto origin/main put a retained_event_count of 1539 next to an events
+    shard of 1530. The destination events list is the one this commit leaves
+    in place, so the count is derived from it.
+
+    The public file is a managed private snapshot. Patching it in place and
+    committing the result published the full feed (08cf14351, de15a0e1d,
+    de5b8ff43). The updated document is stored as the vault object and the
+    public path is left as the metadata placeholder.
+    """
+    from reconcile_insights_event_summary import apply_media_fields, reconciled_manifest
+
+    destination = _resolved_manifest(dst)
+    merged = apply_media_fields(destination, _read_json(src), videos=videos, podcasts=podcasts)
+    events = _events_beside(dst)
+    if not isinstance(events, list):
+        raise RuntimeError(f"insight events shard missing beside {dst}")
+    _republish_managed_manifest(dst, reconciled_manifest(merged, events))
+
+
+def _sync_published(src: Path, dst: Path, paths: tuple[str, ...] = MAIN_PATHS,
+                    dirs: tuple[str, ...] = MAIN_DIRS) -> None:
+    videos = "dashboard/data/insights/videos.json" in paths
+    podcasts = "dashboard/data/insights/podcasts.json" in paths
+    for rel in (*paths, *dirs):
+        source = src / rel
+        target = dst / rel
+        if rel == INSIGHT_MANIFEST:
+            _sync_insight_manifest(source, target, videos=videos, podcasts=podcasts)
+            continue
+        if source.is_dir():
+            _sync_directory(source, target, dst)
+            continue
+        if source.is_file() and _managed_manifest(target) is not None:
+            # A managed public file stays the placeholder. Copying the lane's
+            # full document is how podcast episode shards landed in the public repo.
+            continue
+        if target.is_dir():
+            shutil.rmtree(target)
+        elif target.exists():
+            target.unlink()
+        if source.is_file():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+
+
+def _sync_directory(source: Path, target: Path, repo: Path) -> None:
+    """Copy a shard directory without replacing managed public placeholders."""
+    target.mkdir(parents=True, exist_ok=True)
+    incoming = {path.relative_to(source).as_posix() for path in source.rglob("*") if path.is_file()}
+    for existing in list(target.rglob("*")):
+        if not existing.is_file():
+            continue
+        child = existing.relative_to(target).as_posix()
+        if child in incoming:
+            continue
+        if _managed_manifest(existing) is not None:
+            continue
+        existing.unlink()
+    for path in source.rglob("*"):
+        if not path.is_file():
+            continue
+        dest = target / path.relative_to(source)
+        if _managed_manifest(dest) is not None:
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, dest)
+
+
+def _push_private_dashboard_objects(message: str) -> bool | None:
+    """Commit dashboard-private objects before the public receipt that names them."""
+    from vault_paths import research_vault_root
+
+    repo = research_vault_root()
+    if repo is None or not (repo / ".git").exists():
+        log("vault: no checkout; cannot preserve the insight manifest")
+        return False
+    try:
+        with vault_lock(repo, owner="youtube_lane", log=lambda m: log(m.strip())):
+            clear_stale_git_state(repo, log=lambda m: log(m.strip()))
+            run_git(repo, "add", "-A", "--", "dashboard-private", timeout=300)
+            staged = run_git(repo, "diff", "--cached", "--quiet", "--", "dashboard-private",
+                             check=False, timeout=120)
+            if staged.returncode == 0:
+                return None
+            run_git(repo, "commit", "-m", message, timeout=300)
+            run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
+                    "origin", "main", timeout=900)
+            run_git(repo, "push", "origin", "HEAD:main", timeout=600)
+            log("vault: preserved dashboard snapshot")
+            return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
+        log(f"vault snapshot push failed: {describe_failure(exc)}")
+        try:
+            run_git(repo, "rebase", "--abort", check=False, timeout=120)
+            clear_stale_git_state(repo, log=lambda m: log(m.strip()))
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as undo:
+            log(f"vault unwind failed: {describe_failure(undo)}")
+        return False
+
+
+def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
+                          dirs: tuple[str, ...] = MAIN_DIRS) -> bool | None:
+    """Commit the shard on a main checkout and push that, not the lane HEAD."""
+    repo = _ensure_publish_worktree()
+    _sync_published(ROOT, repo, paths, dirs)
+    if INSIGHT_MANIFEST in paths:
+        preserved = _push_private_dashboard_objects(
+            "Preserve restricted insights manifest snapshot")
+        if preserved is False:
+            return False
+    present = [p for p in paths if (repo / p).is_file()]
+    receipt = "dashboard/private-assets.json"
+    if INSIGHT_MANIFEST in paths and (repo / receipt).is_file():
+        present.append(receipt)
+    if present:
+        run_git(repo, "add", "--sparse", "--", *present, timeout=300)
+    # Always stage the shard directory, including when the sync removed it.
+    # Gating on the directory still existing left a deleted corpus in the index.
+    for rel in dirs:
+        run_git(repo, "add", "--sparse", "-A", rel, timeout=300)
+    staged = run_git(repo, "diff", "--cached", "--quiet", check=False, timeout=120)
+    if staged.returncode == 0:
+        log("main: nothing to commit")
+        return None
+    run_git(repo, "commit", "-m", message, timeout=300)
+    run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
+            "origin", MAIN_BRANCH, timeout=900)
+    run_git(repo, "push", "origin", f"HEAD:{MAIN_BRANCH}", timeout=600)
+    log("main: pushed")
+    return True
+
+
+def push_main(message: str, paths: tuple[str, ...] = MAIN_PATHS,
+              dirs: tuple[str, ...] = MAIN_DIRS) -> bool | None:
     """Commit the published video shard to this repository's main.
 
     True on a completed push, None when there was nothing to push, False when
@@ -274,11 +869,12 @@ def push_main(message: str) -> bool | None:
     a failed push exit 0.
     """
     try:
-        # Detached (the lane worktree's normal state) reports no branch and is
-        # fine. A *named* branch that is not main is not: on 2026-09-24 and -25
-        # this worktree sat on wip/youtube-video-details, where a commit to HEAD
-        # and a push of `main` were two unrelated things, and two days of work
-        # went nowhere while the vault push succeeded and the lane logged green.
+        # Detached at origin/main (the lane worktree's normal state) reports no
+        # branch and publishes in place. A *named* branch that is not main is
+        # not: on 2026-09-24 and -25 this worktree sat on
+        # wip/youtube-video-details, where a commit to HEAD and a push of `main`
+        # were two unrelated things, and two days of work went nowhere while
+        # the vault push succeeded and the lane logged green.
         head = run_git(ROOT, "symbolic-ref", "-q", "--short", "HEAD",
                        check=False, timeout=120)
         branch = head.stdout.strip() if head.returncode == 0 else ""
@@ -286,14 +882,32 @@ def push_main(message: str) -> bool | None:
             log(f"main: worktree is on '{branch}', not '{MAIN_BRANCH}' or detached; "
                 "refusing to publish from a branch this lane does not track")
             return False
-        present = [p for p in MAIN_PATHS if (ROOT / p).is_file()]
-        dirs = [d for d in MAIN_DIRS if (ROOT / d).is_dir()]
-        if not present and not dirs:
+        present = [p for p in paths if (ROOT / p).is_file()]
+        present_dirs = [d for d in dirs if (ROOT / d).is_dir()]
+        if not present and not present_dirs:
             log("main: no published shard to commit")
             return None
+        # Detached is fine only when it is origin/main. A detached media-lane
+        # commit is not: pull --rebase would replay it and HEAD:main would
+        # publish it. The shard still has to reach main, so it is committed on
+        # a checkout that starts there.
+        if not _head_is_origin_main():
+            log("main: checkout is not origin/main; publishing the shard from "
+                "a main worktree so local commits stay local")
+            return _push_published_apart(message, paths, dirs)
+        videos = "dashboard/data/insights/videos.json" in paths
+        podcasts = "dashboard/data/insights/podcasts.json" in paths
+        try:
+            _seal_in_place_publish(ROOT, paths, dirs, videos=videos, podcasts=podcasts)
+        except RuntimeError as exc:
+            log(f"main: {exc}")
+            return False
+        present = [p for p in paths if (ROOT / p).is_file()]
+        if _receipt_dirty(ROOT):
+            present.append("dashboard/private-assets.json")
         if present:
             run_git(ROOT, "add", "--sparse", *present, timeout=300)
-        for rel in dirs:
+        for rel in present_dirs:
             # -A so a shard that disappeared from the corpus is staged as a
             # deletion; without it the index keeps advertising a dead video.
             run_git(ROOT, "add", "--sparse", "-A", rel, timeout=300)
@@ -313,6 +927,9 @@ def push_main(message: str) -> bool | None:
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
         log(f"main push failed: {describe_failure(exc)}")
         run_git(ROOT, "rebase", "--abort", check=False, timeout=120)
+        apart = _publish_worktree()
+        if (apart / ".git").exists():
+            run_git(apart, "rebase", "--abort", check=False, timeout=120)
         return False
 
 
@@ -338,8 +955,9 @@ def main() -> int:
     log(f"loaded {keys} key(s) from _secrets/youtube.env")
     log(f"vault -> {videos_root()}")
 
-    if not args.no_update:
-        self_update()
+    if not args.no_update and self_update() is True:
+        log("re-executing so this run uses the publisher it just pulled")
+        os.execv(sys.executable, [sys.executable, *sys.argv])
 
     # Discovery is cheap (playlistItems at 1 unit per 50 videos against a
     # 10,000/day free tier) but it is also the only stage that can add work.

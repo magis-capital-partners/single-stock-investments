@@ -24,10 +24,15 @@ GROK_BRANCH_RE = re.compile(r"^grok/[a-z0-9_]+/\d{4}-\d{2}-\d{2}-[a-z0-9][a-z0-9
 # Path globs a grok/ branch may touch. Keep in step with docs/WRITE_MAP.md.
 GROK_DATA_ALLOWLIST: tuple[str, ...] = (
     "_system/data/desk_briefs/*/????-??-??.json",
+    # Rebuilt by build_desk_briefs.py in the same commit as a new brief.
+    # The Inbox reads this file; the brief directory alone leaves it stale.
+    "dashboard/data/desk_briefs.json",
     "_system/memory-hub/research-equity/daily/????-??-??.md",
     "_system/memory-hub/research-equity/CONTEXT.md",
     "_system/data/separations/separation_registry.jsonl",
     "_system/data/separations/separation_amendments.jsonl",
+    # Weekly verdicts append a line. The schema and the checker stay human-gated.
+    "_system/data/special_situations/situations.jsonl",
     "_system/research/short-alpha/candidates.json",
     "_system/reference/activist-reports/short_scorecard/*",
     "*/third-party-analyses/vic/*.md",

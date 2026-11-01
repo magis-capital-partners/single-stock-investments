@@ -1,6 +1,8 @@
 name: Deploy Dashboard (Cloudflare Pages)
 
 on:
+  repository_dispatch:
+    types: [market-risk-source-ready]
   # Recovery path after the 00:00 UTC D1 quota reset: retries D1 stages that a
   # deploy deferred, and guarantees one retention pass per UTC day. Cheap when
   # there is nothing to do: the deploy gate skips it unless the deploy inputs
@@ -18,18 +20,46 @@ on:
       - "_system/scripts/fetch_float_adv.py"
       - "_system/scripts/build_technical_signals.py"
       - "_system/scripts/build_cloudflare_pages_site.py"
+      - "_system/scripts/build_company_research.py"
+      - "_system/scripts/company_sources.py"
+      - "_system/scripts/company_research_themes.json"
+      - "_system/scripts/stage_company_research.py"
+      - "_system/scripts/stage_investor_history.py"
+      - "_system/scripts/investor_universe.py"
+      - "_system/scripts/investor_corpus.py"
+      - "_system/scripts/build_superinvestor_insights.py"
+      - "_system/scripts/fund_registry.py"
+      - "_system/scripts/fund_identity.py"
+      - "_system/scripts/letter_dedup.py"
+      - "_system/scripts/letter_date_parser.py"
+      - "_system/reference/investors/public_roster.json"
+      - "_system/reference/investors/manager_aliases.json"
+      - "_system/reference/investors/historical_filers.json"
+      - "_system/scripts/holdings_asset_bundles.py"
+      - "_system/scripts/investor_history.py"
+      - "_system/scripts/investor_history_checkpoint.py"
+      - "_system/scripts/global_disclosures.py"
+      - "_system/scripts/public_holdings.py"
+      - "_system/scripts/letter_holdings_tables.py"
+      - "_system/reference/investors/public_holdings_sources.json"
+      - "_system/reference/investors/required_managers.json"
+      - "_system/scripts/private_dashboard_assets.py"
+      - "_system/scripts/stage_pages_functions.py"
       - "_system/scripts/export_dashboard_d1_seed.py"
       - "_system/scripts/export_sleeve_d1.py"
       - "_system/scripts/prune_cloudflare_d1.py"
       - "_system/scripts/validate_portfolio_private_boundary.py"
       - "_system/scripts/workflow_run_deploy_gate.py"
       - "_system/scripts/validate_dashboard_data.py"
+      - "_system/scripts/reconcile_insights_event_summary.py"
       - "_system/scripts/ci_dashboard_deploy_mode.sh"
       - "_system/scripts/ci_rebuild_profile.py"
       - ".github/workflows/dashboard-pages.yml"
       - ".github/actions/publish-dashboard/**"
       - ".github/actions/rebuild-data/**"
       - ".github/actions/deploy-cloudflare-dashboard/**"
+      - ".github/actions/preserve-private-dashboard/**"
+      - ".github/actions/checkout-vault/**"
   workflow_dispatch:
     inputs:
       reason:
@@ -45,9 +75,16 @@ on:
     workflows:
       - Data Pipeline
       - Forced Flow Daily
+      - Market Close
+      - Market Risk Components
+      - Autonomous compounder IRRs
+      - Aggregates Screener
       - Power Zone Universe
       - LS-algo Universe Intake
       - Darwin Covered Call
+      - Reverse-split borrow indications
+      - Investor holdings history
+      - Public daily fund holdings
     types: [completed]
     branches: [main]
 
@@ -257,11 +294,13 @@ jobs:
       group: dashboard-deploy
       cancel-in-progress: false
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The initial complete archive index is cold; later builds reuse private caches.
+    timeout-minutes: 120
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
     environment:
       name: cloudflare-pages
       url: ${{ steps.cloudflare.outputs.page_url }}
@@ -280,8 +319,8 @@ jobs:
         run: |
           bash _system/scripts/ci_dashboard_deploy_mode.sh
           echo "Deploy mode: $(cat "$GITHUB_OUTPUT")"
+      # The complete private research cache expands during every deploy mode.
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
-        if: steps.mode.outputs.needs_disk_cleanup == 'true'
         with:
           tool-cache: false
           android: true
@@ -368,6 +407,7 @@ jobs:
           PORTFOLIO_INGEST_TOKEN: ${{ secrets.PORTFOLIO_INGEST_TOKEN }}
           CF_ACCESS_TEAM_DOMAIN: ${{ secrets.CF_ACCESS_TEAM_DOMAIN }}
           CF_ACCESS_AUD: ${{ secrets.CF_ACCESS_AUD }}
+          CF_ACCESS_REVOKED_EMAILS: ${{ secrets.CF_ACCESS_REVOKED_EMAILS }}
           PORTFOLIO_DREW_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_DREW_ACCESS_EMAILS }}
           PORTFOLIO_MICHAEL_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_MICHAEL_ACCESS_EMAILS }}
           IBKR_ACCOUNT_IDS_FOR_SCAN: ${{ secrets.IBKR_ACCOUNT_IDS_FOR_SCAN }}

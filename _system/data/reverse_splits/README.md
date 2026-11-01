@@ -1,5 +1,79 @@
 # Reverse-split research data
 
+### Shared backtest, shadow and order-review framework on 23 October 2026
+
+The [shared short framework](FRAMEWORK.md) reuses the existing event, as-filed
+fundamental and execution research with one browser/Node decision engine. Its
+new dashboard Framework tab retains all 180 matched comparisons and exposes
+missing evidence. Private source reviews, broker imports, frozen forecasts,
+position/loan accounting and content-bound handoffs feed the existing human
+order desk. Current cached evidence admits zero verified entries; live evidence
+and policy approval remain outstanding. The older studies are unchanged.
+
+### Strategy lab and expanded event dataset on 22 October 2026
+
+The [short alpha strategy lab](PROFIT_PROGRAM.md) joins financing discoveries,
+listing deficiencies and reverse splits with source links, availability clocks
+and as-filed financial features. The dashboard retains all 420 declared daily
+holding/cost/sizing/exit comparisons, funding estimates, conditional Monte Carlo
+and source-study return distributions. A separate replay repairs the older
+patient model's unsupported covers as persistent short obligations. Extracted
+contexts and conditional fills are not verified financing terms or broker fills;
+source review, observed execution and prospective validation remain explicit gates.
+
+### Patient entries, SSR and $25k–$50k targets on 20 October 2026
+
+The [patient execution sensitivity](patient_execution_2026-10-20.md) now tests all
+551 priced 2023–2026 primary events, partial SSR fills and 30-minute to four-hour
+entry windows. H21 retains 48 declared variants; H22 adds 48 separately declared
+10%/20% participation sensitivities after observing H21. All results remain in
+[aggregate research](patient_execution_2026-10-20.json). The dashboard shows dollar
+profit, actual filled size, drawdown, margin, collateral and unsupported covers;
+its smaller chart payload preserves every daily-calculated risk statistic.
+
+Base one-hour flow estimates at 5% participation produce about $10.4k/$21.1k annual
+trading profit at $25k/$50k targets, averaging only $3.2k/$4.4k filled. At 20%,
+mean fills grow to $7.0k/$9.7k, but profit falls to $6.7k/$18.2k and drawdown rises.
+Assumed larger fills across the entire universe lose money; additional execution
+time generally gives up price edge. These are conditional modeled returns before
+overhead and locate charges, not demonstrated executable business income.
+
+The opening full-depth gate, fixed opening-price anchor, forecast-profit cutoff,
+blanket SSR exclusion and three-name cap are removed in this sensitivity. Dynamic
+status also captures nine SSR triggers during the first second after the open.
+Additional one-second Nasdaq/Arca/EDGX bars cost $0; three individual feed requests
+still failed and nine event sessions have a provider day-quality flag on at least
+one planned feed. Missing venues, actual queue fills, approved borrows, own impact
+and difficult covers remain unvalidated. No production rules or live authority change.
+
+### Dollar profit and smaller targets on 20 October 2026
+
+The [business sizing sensitivity](business_sizing_2026-10-20.md) reports annual
+dollar trading profit, observed dollar drawdown and operating-overhead break-even
+for $250 through $100k opening targets. All 57 declared size/filter/cost variants
+are retained in [aggregate results](business_sizing_2026-10-20.json), registered as
+H20 before the run. The base adaptive mix generates about $4,095 per year before
+operating overhead under the modeled fill/fee assumptions. Smaller fixed targets
+admit more trades but do not demonstrate steadier profits. This remains
+retrospective research with unverified borrows and fills; the patient execution
+proposal and new event families are not included.
+
+### Intraday execution research on 20 October 2026
+
+The [entry-capacity explanation and intraday algorithm proposal](intraday_execution_research_2026-10-20.md)
+reproduces the $2,587.48 median opening bid capacity and specifies a test of partial
+positions, incoming buying flow, alpha decay and cover liquidity. It is a research
+proposal. The new H21/H22 sensitivities implement partial fills and time-spread
+entry assumptions; signed-flow, queue and measured-impact tests remain future work.
+The earlier backtests retain their frozen entry and exit rules.
+
+Eight free research PDFs were downloaded into ignored local literature storage.
+The [bibliography and checksums](intraday_execution_literature_2026-10-20.json)
+identify the exact versions; the [capacity audit](entry_capacity_audit_2026-10-20.json)
+contains aggregate results. Reproduce the latter offline with
+`python _system/scripts/short_entry_capacity_audit.py --source-root <cached-repo> --out <aggregate.json> --local-out <cached-repo>/_system/data/reverse_splits/local/adaptive_sizing/20261020_v1/entry_capacity_audit.local.json`.
+No paid market data, broker connections or orders are involved.
+
 US listed and OTC reverse-split research: completed events and candidates with
 an ex date, filing disclosures, FINRA positioning
 context, the persisted shared-capital book runs and the append-only RSI-1.0
@@ -229,6 +303,294 @@ Official auction prices come from the venue `statistics` files, obtained with
 not establish an official open or close. The benchmark follows the listing
 venue in dated definitions; missing auction prices remain missing.
 See [Databento's statistics definition](https://databento.com/docs/schemas-and-data-formats/statistics).
+
+## Shorts alpha program: Phase 0 (2026-10-18)
+
+Phase 0 of `_system/proposals/shorts_alpha_program_2026-10-18.md` installs
+pre-registration and answers two questions from data already local. Code:
+`reverse_splits/phase0_research.py` (from `_system/scripts`:
+`python -m reverse_splits.phase0_research --publish`); tests in
+`tests/reverse_splits/test_rs_phase0.py`. No broker, ThetaData or vendor
+request is involved and no new licensed data was downloaded.
+
+| File | Purpose |
+|---|---|
+| `hypotheses.jsonl` | The registry: H1-H17 with cohort, horizon, exit, cost model, metric, success and kill criteria, split and `declared_at`. Rows may gain a `status` or `result_ref`; `declared_at` never changes. |
+| `phase0_research.json` | Aggregate results for H1, H7 and H8 on the train (2018-05 to 2022-12) and validation (2023 to 2024) splits, with each hypothesis read against its registered criteria. |
+| `phase0_manifest.json` | Hashes of the output, the registry, the module, the frozen run inputs and every venue file read. |
+| `local/holdout/phase0_holdout.json` | Sealed: results for entry sessions from 2025-01-01, not committed and not read until the program's final review. |
+| `local/phase0/phase0_full.local.json` | Per-event rows and control matches; licensed returns stay local. |
+
+`check_reverse_splits.py --strict` now refuses a research JSON beside the
+ledger that cites a hypothesis id missing from the registry or declared after
+the result's `built_at`, that does not declare `aggregate_only: true`, or that
+contains per-event or per-symbol-day keys.
+
+### H1: the SSR cohort
+
+Of the 671 verified ex+1 paths, 388 opened under an observed Rule 201
+restriction, 282 did not and 1 is unknown. Gross official-open-to-close short
+returns with issuer-clustered 95% intervals:
+
+| Split | Restricted | Unrestricted | Difference |
+|---|---|---|---|
+| Train (2018-2022) | n 64, +3.4% [+1.3%, +5.6%] | n 56, +0.5% [-2.0%, +2.8%] | +2.9% [-0.2%, +6.0%], t 1.8 |
+| Validate (2023-2024) | n 154, +3.7% [+1.9%, +5.4%] | n 88, +4.1% [+2.2%, +5.9%] | -0.4% [-3.0%, +2.2%], t -0.3 |
+
+Both intervals cover zero, which is H1's registered kill branch: restricted
+and unrestricted sessions are one population for the gross return, so the 58%
+of events the account replays skip under SSR carry no return penalty. Rule 201
+belongs in the fill model as a price constraint (workstream A3), not in the
+admission rule. The bar-based proxy (prior low at or below 90% of the restated
+prior close) agrees with the cached status on 551 of 668 events.
+
+### H7 and H8: the generic weak-microcap fade
+
+Universe: listed common, ordinary and ADS shares on Nasdaq, NYSE and NYSE
+American; prior listing-venue close under $5; prior 20-session three-venue
+dollar volume $50k-$20M; at least 20 prior printed sessions; no catalogued
+reverse split within 30 days; both official auction prints present.
+1,595,187 eligible symbol-days over 35 quarters (2.9% of otherwise eligible
+days lack an official print). Gross short return from the official open to
+the official close, equal weight per symbol-day; symbol-clustered intervals,
+month-clustered in brackets.
+
+| Condition | Train | Validate |
+|---|---|---|
+| All sessions | n 786,332: +0.20% [+0.18%, +0.22%] (month [+0.10%, +0.30%]) | n 409,808: +0.21% [+0.19%, +0.24%] (month [+0.08%, +0.33%]) |
+| After a close down 10% or more | n 29,472: +0.36% [+0.24%, +0.49%] | n 16,103: +0.72% [+0.54%, +0.89%] |
+| After a close up 20% or more | n 8,835: +1.28% [+0.94%, +1.61%] | n 5,261: +0.81% [+0.27%, +1.33%] |
+| Prior close under $1 | +0.44% | +0.47% |
+| Prior close $2 to $5 | +0.15% | +0.13% |
+| H8 difference (down 10% minus up 20%) | -0.92% [-1.26%, -0.56%], t -5.2 | -0.09% [-0.64%, +0.46%], t -0.3 |
+
+The fade is real, small and steady: +0.10% to +0.51% a year from 2018 to
+2024, strongest under $1. H8 as registered (a larger fade after a -10% close)
+is reversed on train and flat on validation; it is reported, not promoted.
+
+### The split family in excess of the fade
+
+Each event's return is compared with the same session's eligible universe and
+with up to three same-session listed names nearest in log prior close (within
+x2) and log dollar volume (within x3), with the subject's prior sessions
+restated by the split ratio. The recomputed auction returns matched the frozen
+study's for all 363 train and validation events.
+
+| Comparator | Train (n 120) | Validate (n 243) |
+|---|---|---|
+| Same-session universe mean | subject +2.1% vs +0.1%: excess +1.9% [+0.3%, +3.6%] | subject +3.8% vs +0.3%: excess +3.5% [+2.2%, +4.8%] |
+| Matched controls, calipers only | n 105: +1.8% [+0.2%, +3.4%] | n 185: +3.7% [+1.9%, +5.2%] |
+| Matched controls, same prior-session bucket | n 97: +1.1% [-0.6%, +2.8%] | n 166: +3.3% [+1.5%, +5.1%] |
+
+The post-split return is not the generic fade: comparable names fade a few
+tenths of a percent on the same sessions, and the split-specific excess is
++1.8% on train and +3.5% on validation. All of this is gross price behaviour;
+no borrow, fill, spread or commission assumption enters any Phase 0 number.
+
+## Shorts alpha program: workstream A, execution and capacity realism (2026-10-18)
+
+Workstream A of `_system/proposals/shorts_alpha_program_2026-10-18.md` tests
+the three fill-model conventions that the proposal says consume the gross
+edge: the opening auction as a size lever (H4), passive offers under Rule 201
+on restricted sessions (H18, the free-data form of H2) and participation over
+time instead of a 0.1%-of-ADV cap (H19, the free-data form of H3), with IBKR
+tiered commissions beside the fixed schedule as a declared variant. Code:
+`reverse_splits/execution_realism.py` (events, requests, the free-only data
+gate) and `reverse_splits/execution_realism_build.py` (analysis and
+publication); tests in `tests/reverse_splits/test_rs_execution_realism.py`.
+From `_system/scripts`:
+
+```powershell
+python -m reverse_splits.execution_realism quote      # price every request; downloads nothing; resumable
+python -m reverse_splits.execution_realism download   # fetches only requests quoted at exactly $0.00
+python -m reverse_splits.execution_realism build --publish
+```
+
+| File | Purpose |
+|---|---|
+| `execution_realism.json` | Aggregate results for H4, H18 and H19 on the train (2018-05 to 2022-12) and validation (2023 to 2024) splits, each read against its registered criteria, plus the commission variants and the data coverage and cost actually incurred ($0). |
+| `execution_realism_manifest.json` | Hashes of the output, the registry, both modules, the frozen run inputs, the cached books, every statistics file and every bar file read; the list of hypotheses the build actually measured; the download receipts. |
+| `local/holdout/execution_realism_holdout.json` | Sealed: the same results for entry sessions from 2025-01-01, not committed and not read until the program's final review. |
+| `local/workstream_a/` | Per-event rows (`execution_realism_full.local.json`), `quotes.json` (every request with its quote), `downloads.json` and the archived paid-plan quote that was declined. |
+| `local/raw/databento/{venue}/ohlcv-1s/sessions/` | The free one-second bar files, one per venue-session with its `.ok.json` receipt. Never committed. |
+
+**Free data only.** The plan as proposed needed `trades` and `mbp-1` for
+each event session. Every request was quoted first: $0.3245 for all 671
+sessions ($0.2366 for train and validation only; $0.4778 with full-session
+mbp-1), recorded in `local/workstream_a/quotes_paid_plan_2026-10-18.json`.
+Drew's decision on 2026-10-18 was "nothing for now" and, going forward, free
+data only. So H2 and H3 stay `registered` and unmeasured in
+`hypotheses.jsonl`, blocked on that budget decision (their rows carry the
+note and the quoted amounts so it can be revisited), and H18 and H19 measure
+the same two questions on free data with the same success and kill
+thresholds and an explicitly declared bar-based cost model, registered before
+the bars were pulled. On this plan `ohlcv-1s`, `ohlcv-1m`, `ohlcv-1h`,
+`statistics`, `status` and `definition` quote $0.00 on all three venues;
+every quote, trade and book schema does not. `quote` prices every request
+with `metadata.get_cost` and `download` fetches only those quoted at exactly
+$0.00, with no override; the refused count and the receipts are in the
+manifest. The book-level queue model and the print-based participation
+pricer stay in `execution_realism_build.py` as the tested design for H2 and
+H3; they are not run.
+
+### H4: the opening cross is not a size lever at $50k
+
+Official opening cross price and matched shares from the listing venue's
+`statistics` file (every one of the 671 events has exactly one cross row and
+its price equals the frozen study's official open). The modeled order is 2.5%
+of a $50k account ($1,250) in whole shares at the printed price; "replay" is
+that order capped at 0.1% of the prior 20-session split-adjusted venue ADV,
+the frozen account replay's sizing. Feasible means at most 5% of the cross.
+
+| Split, SSR state | n | $1,250 order feasible (issuer CI) | median cross | median order / cross | replay order feasible | replay orders under $100 |
+|---|---:|---|---:|---:|---:|---:|
+| Train, all | 120 | 45.0% [35.9%, 53.5%] | $21.4k | 0.06 | 100% | 54 |
+| Train, restricted | 64 | 45.3% [33.9%, 57.4%] | $22.7k | 0.05 | 100% | 29 |
+| Train, unrestricted | 56 | 44.6% [32.1%, 57.1%] | $16.2k | 0.08 | 100% | 25 |
+| Validate, all | 243 | 24.3% [19.1%, 30.0%] | $6.7k | 0.19 | 92.2% | 173 |
+| Validate, restricted | 153 | 19.6% [13.4%, 26.5%] | $6.5k | 0.19 | 95.4% | 118 |
+| Validate, unrestricted | 88 | 33.0% [23.0%, 42.7%] | $10.3k | 0.12 | 86.4% | 53 |
+
+By year the feasible share runs 38% to 82% in 2018 to 2021 and 20% to 28% in
+2022 to 2024 as the median cross falls from $22k-$82k to $6k-$10k; it is 18% to
+20% for opens under $5 and 49% at $5 and over; 51% on NYSE against 27% on
+Nasdaq and NYSE American. The closing cross supports the $1,250 cover in 15%
+of validation events. The replay order is feasible almost everywhere only
+because it is tiny: its median is 9 shares on validation and 173 of 243 such
+orders fall under the replay's own $100 minimum.
+
+**Assessment.** H4's kill branch (under 50% on validation) is met: 24.3%.
+The auction is a legality lever under Rule 201, not a size lever; a $1,250
+order is a fifth of the median cross in 2023-2024, so an auction entry of the
+modeled size would itself set the print. The SSR state does not change the
+reading (restricted 19.6%, unrestricted 33.0%).
+
+### H18: a passive offer under SSR rarely fills in 15 minutes
+
+Inputs: one-second listing-venue bars for each event session (550 files,
+$0.00) and the opening and closing books the earlier quote study cached for
+every event (bid, ask and displayed sizes one second and thirty seconds after
+the open and one second before the close; 555, 647 and 636 valid books). The
+offer rests at the cached venue best offer one second after the open (thirty
+seconds where that book is missing), behind that level's displayed size. Each
+later second's volume is spread evenly over the bar's tick prices; the part
+at or above the offer depletes the queue ahead and then fills the order at
+the offer. No cancellations are credited and no re-pricing is modeled, so the
+fill rate is an upper bound against the book-level model and the fill price a
+lower bound. Adverse selection is the last bar close five minutes after
+completion minus the fill price, over the arrival midpoint.
+
+| Restricted sessions, $1,250 order | Train | Validate |
+|---|---|---|
+| Simulated (no arrival book) | 58 (6) | 149 (4) |
+| Filled within 15 minutes (issuer CI) | 48.3% [35.7%, 60.7%] | 22.1% [15.9%, 28.7%] |
+| of which on bars entirely above the offer (possible re-pricing) | 20 of 28 | 21 of 33 |
+| Partial fills; mean filled fraction | 5; 52% | 20; 25% |
+| Time to fill, median (p75) | 139 s (324 s) | 176 s (422 s) |
+| Displayed queue ahead, median; order, median | 166 sh; 330 sh | 53 sh; 337 sh |
+| Fill price over the arrival mid (the half-spread earned) | +1.12% | +1.15% |
+| Adverse selection, 5 min, mean (CI); median | +1.89% [+0.1%, +4.1%]; +0.48% | +0.75% [-0.9%, +2.2%]; +0.99% |
+| Unfilled: midpoint drift to the 15-minute deadline | -2.05% | -2.44% |
+| Filled: gross short return to the official close | +3.43% | +4.19% |
+
+The $1,250 order is six times the displayed size at the offer on validation,
+and buyers lift that much within 15 minutes in only a fifth of restricted
+sessions (2018-2021: 50% to 86% on small samples; 2022-2024: 18% to 35%).
+Unrestricted sessions fill less often still (30.6% train, 15.9% validate).
+The order the replay actually sized (median 9 shares) fills 31.3% of the
+time; a $6,250 order 13.4%; a $25,000 order 4.0%. While the offer waits, the
+midpoint falls about 2.4%: the fade happens without the position. Filled
+orders earn the half-spread and then give it back within five minutes
+(adverse selection +0.75% mean, +0.99% median on validation, above the 0.5%
+threshold).
+
+**Assessment.** H18's kill branch (fill rate under 25% on validation) is
+met at 22.1%, and the adverse-selection half of the success criterion fails
+as well. Rule 201 is a price constraint, as Phase 0 said, but resting at the
+offer is not the way through it at this order size: the displayed book at the
+open is too thin and the price moves away while the order waits.
+
+### H19: participation over time gives the edge away before it pays the spread
+
+A fixed share (1%, 2%, 5%) of every bar's volume from the arrival book for
+60 minutes, at the bar's range midpoint, with the opening cross removed by
+its statistics size (removed on every priced event); the cover is the same
+schedule over the last 60 minutes from the first bar at or after 15:00 (the
+last close before it when nothing printed within five minutes), any residual
+at the official closing print. Cost = entry shortfall + exit shortfall +
+crossing fraction x the cached half-spreads (open books for the entry, close
+book for the cover), over the entry arrival midpoint. The primary reading is
+the registered one: the order is 1% of the window's volume and every fill
+pays the half-spread.
+
+| 1% of first-hour volume, 634 priced events | Train (n 106) | Validate (n 233) |
+|---|---|---|
+| Entry shortfall (arrival mid minus sell VWAP) | +0.49% | +1.79% |
+| Exit shortfall (buy VWAP minus 15:00 price) | -0.25% | -0.07% |
+| Half-spreads, round trip (cached open and close books) | +1.72% | +2.73% |
+| Round-trip cost, crossing fraction 1.0 (issuer CI) | +1.96% [+0.8%, +3.0%] | +4.45% [+3.6%, +5.3%] |
+| Round-trip cost, crossing fraction 0.5 | +1.10% | +3.08% |
+| Open-to-close benchmark, same events | +2.28% | +3.77% |
+| Benchmark minus cost (CI) | +0.32% [-1.4%, +2.0%] | -0.68% [-2.1%, +0.7%] |
+| Realized short return, net of the spread term (CI) | +0.11% [-1.3%, +1.5%] | -0.21% [-1.5%, +1.1%] |
+| Position at 1%: median (IQR) | $432 ($140 to $1,723) | $190 ($56 to $545) |
+| Position at 5%: median | $2,162 | $952 |
+| Residual covered at the closing print | 34% | 34% |
+
+The cost per share does not depend on the rate under a print-following model
+(1%, 2% and 5% give the same VWAP); the rate sets capacity, and capacity is
+small: median first-hour volume is $53k on train and $20k on validation, so
+1% is a few hundred dollars per event and 5% is under $1,000. The entry
+shortfall is the fade itself: on validation the price falls 1.8% during the
+hour the schedule is still selling, before any spread is paid. By year the
+cost is 0% to 1% in 2018-2021 and 4.2% to 4.5% in 2022-2024 against
+benchmarks of 3.4% to 4.1%; by venue 2.8% on NYSE against a 1.1% benchmark
+and 3.9% on Nasdaq against 3.8%. A fixed $1,250 order completes within the
+hour in 35% of train and 15% of validation events at 1% (63% and 42% at 5%).
+The official open prints 0.2% to 0.4% below the one-second midpoint, so the
+auction is not the price lever either.
+
+**Assessment.** H19's kill branch is met on validation: the round-trip cost
+(4.45%) exceeds the same events' open-to-close benchmark (3.77%). Train sits
+between the thresholds (1.96% against 2.28%). With the crossing fraction at
+0.5 the validation cost is still 3.08%, above the 1.5% success line.
+
+### What workstream A says
+
+All three fill conventions the proposal expected to release the edge fail on
+validation with free data: the opening cross cannot absorb the order, a
+passive offer under SSR seldom fills before the fade happens, and spreading
+the order over the first hour converts most of the edge into shortfall before
+the spread is paid. The sessions the account replay skips under SSR carry the
+same gross return (Phase 0), but no execution modeled here collects it at
+$1,250 a name, let alone at $6,250 or $25,000. The proposal's own stop
+condition ("the SSR cohort and the participation cost curve both fail")
+applies to the execution side: capacity really is this edge's ceiling, and
+weight moves to breadth (workstream C). Everything above is an upper bound on
+fills and a model without impact, so the real numbers are worse, not better.
+
+### Commissions as declared variants
+
+Round-trip commission, venue fees and clearing over the entry notional for the
+auction orders (official open and close prints), regulatory pass-through
+reported separately and identical under both schedules:
+
+| Order | Fixed ($0.005/sh, $1 min, 1% cap) | Tiered ($0.0035/sh, $0.35 min, 1% cap, exchange fees, clearing) | Tiered cheaper |
+|---|---:|---:|---:|
+| $1,250 account order, train (median 268 sh) | 0.3% | 0.4% | 24% |
+| $1,250 account order, validate (median 318 sh) | 0.3% | 0.4% | 14% |
+| Replay order, train (median 26 sh) | 1.3% | 1.0% | 66% |
+| Replay order, validate (median 10 sh) | 1.6% | 1.5% | 44% |
+
+At the account order the fixed schedule is cheaper because the tiered
+take-fee ($0.0030/sh removing liquidity) outweighs the lower per-share rate;
+tiered only wins on the replay's tiny tickets, where the $1 minimum binds.
+Passive fills from H18 earn the tiered add-liquidity rebate only when the
+fill model fills: on the 43 train and 49 validation fills the round trip is
+0.27% / 0.30% fixed against 0.20% / 0.24% tiered, tiered cheaper on every
+one. The 1%-participation position (median 116 shares train, 38 validate)
+costs 0.82% / 1.19% fixed against 0.72% / 0.98% tiered: at these ticket sizes
+the fixed minimum is a material part of the cost either way.
 
 ## Original ledger schemas
 
@@ -740,3 +1102,165 @@ from a completed immutable snapshot; mutable databases are separately frozen.
 
 Do not edit the JSONL files by hand. Run
 `python _system/scripts/check_reverse_splits.py` after any change.
+
+## Portfolio-NAV sleeve illustration (2026-10-19)
+
+The backtest route opens with incremental portfolio contribution, observed
+price-cohort distributions, five-year month-block Monte Carlo, and hypothetical
+margin/collateral. Existing strategy versions and source audits remain in the
+research fold below it.
+
+`_system/scripts/short_sleeve_research.py` reads the frozen local 20261013 run
+and cached quote observations, without network or broker access. Rebuild with:
+
+```text
+python _system/scripts/short_sleeve_research.py --source-root /path/to/local/repo --out dashboard/data/short_sleeve.json
+```
+
+CI uses the committed aggregate feed; licensed prices, per-trade observations,
+actual account NAV and account identifiers are not published. The feed contains
+90 comparisons: a fixed hypothetical $10m total NAV, three position weights
+(25/50/100 bps = $25k/$50k/$100k), five holding periods, two capacity conventions
+and exactly three combined cost cases. The default requests the full ticket;
+the capacity alternative reduces it to the prior-volume limit.
+Sizing is a fixed fraction of starting total NAV in dollars, not an independently
+funded $50k sleeve. Core investment returns are held at zero.
+Combined Michael-portfolio performance cannot be inferred from these results.
+
+Bear/base/bull combine the 75th/50th/25th cached half-spread percentiles plus
+the measured full-population mean displayed-depth cost, respectively, with
+the 90th-percentile/mean/median current indicative borrowing rate for quoted
+reverse-split names. Fixed commissions are additional. Larger orders and
+multi-session execution remain cost sensitivities, not verified fills.
+Borrow uses rounded 102% collateral and settled calendar days under T+2/T+1.
+IBKR Pro USD short-proceeds interest is credited separately, once per account,
+on settled rounded collateral including weekends until cover settlement.
+Other USD shorts are assumed to consume the first $100k zero-rate band; a
+minimum $100k external balance makes the sleeve's marginal credit conservative
+relative to unknown higher account tiers. The current 2026-10-19 tier rates
+(2.63%/3.38%/3.63%) are held fixed throughout as a sensitivity, not a reconstruction
+of historical paid interest. Same-day settled-flat trades earn no short credit.
+Core-account debit interest, collateral top-up funding and ordinary cash interest
+are excluded because settled account cash and financing history are unavailable.
+Closed-trade descriptive statistics exclude the account-level proceeds credit;
+portfolio performance and Monte Carlo include it.
+Missing closes retain the last liability mark; covers wait for an observed close.
+Open positions at the cutoff remain open rather than being deleted.
+
+An explicit reconciliation reproduces the original 1/5/10/20-session gross
+event-study counts and means. It also rebases the original eligible account's
+exact daily cash P&L onto $10m without enlarging its 115 historical tickets.
+The original account used event-specific quotes, displayed depth, entry-margin
+and trading-status checks; its accepted trades had about 1.38% weighted
+spread/depth costs. The new Base's 3.11% is a broad-cohort sensitivity: 2.44%
+median paired quote half-spreads plus 0.67% depth from a separate $500-reference
+study. Neither estimate establishes executable costs at $25k-$100k.
+
+The browser worker resamples whole interior calendar months, omitting partial
+endpoint months, with the same draws across all three cases (2,000 paths,
+five years, fixed seed). It resamples aggregate daily dollar P&L against starting
+NAV, along with margin and collateral; it does not reconstruct broker fills or
+position continuity at block boundaries. Insolvent paths keep their lower-tail
+rank in CAGR summaries. Unseen squeezes are assessed separately, not assigned
+bootstrap probabilities. Calmar is unavailable when drawdown is zero.
+
+Margin is a hypothetical 100% house floor plus FINRA per-share floors. Collateral
+includes restricted short proceeds and must not be added to margin as a second
+equity charge. The +200% squeeze reserve adds price loss to post-shock margin
+under a 200% house requirement. This is neither a worst possible loss nor
+Michael's actual available excess liquidity. All published statistics are
+conditional research; none changes a strategy threshold or order permission.
+
+### Matched execution-cost audit (2026-10-19)
+
+`_system/scripts/short_execution_audit.py` verifies the frozen books, decision
+points, path index and each of 671 cached path files before comparing listing
+and observed multi-venue quotes at identical decision times. It separately
+sweeps the same original share quantity through entry and cover depth at
+$500/$25k/$50k/$100k. Spread, additional depth, commissions and timing relative
+to the auction benchmark reconcile to the exact price-P&L shortfall.
+
+`dashboard/data/short_execution_audit.json` publishes aggregates only; the
+generated `execution_cost_audit_2026-10-19.md` reports the comparisons. Static
+book support is not a broker fill. Unsupported quantities remain coverage gaps;
+cost summaries condition on both legs fitting the displayed books, so different
+size rows have different surviving samples. A common-support table holds the
+same events fixed and explicitly identifies that hindsight selection.
+
+Rebuild using the existing licensed local cache:
+
+```text
+python _system/scripts/short_execution_audit.py --source-root /path/to/local/repo --local-out /path/to/local/execution_cost_audit/20261019_v1 --out dashboard/data/short_execution_audit.json --report _system/data/reverse_splits/execution_cost_audit_2026-10-19.md --databento-access-receipt /path/to/local/databento_access_summary.local.json
+```
+
+The local acquisition plan defines 4,000 entry/exit windows for the five
+holding periods, including 595 windows for 100 events selected deterministically
+by year, listing venue and prior liquidity, without return outcomes. Multi-day
+historical exit symbols require confirmation before collection. The optional
+Massive collector uses an existing licensed environment key, bounded requests,
+safe pagination, local-only raw records and SIP timestamps for as-of quote
+selection. Provider denials stop collection. No purchases, subscription upgrades,
+broker connections, ThetaData calls or trades occur.
+
+Databento access was verified on 2026-10-19 using the existing protected local
+credential. The earlier environment-only credential check missed it. Through
+the authenticated historical API, EQUS.SIP and EQUS.ALL returned
+`dataset_not_found`; this is an observed access result, not a claim that the
+provider cannot supply those products. EQUS.MINI is available from 2023-03-28
+and provides a derived BBO from a venue subset, not official consolidated NBBO.
+Individual historical venue feeds are also available. The local same-day
+100-event pilot expands to 2,444 concrete quote/depth requests. Free metadata
+checks priced sampled requests above zero; no chargeable downloads were made.
+The user explicitly confirmed a **$0 cap on new downloads**. No new data have
+replaced the existing cached estimates. Verified NBBO pairs and actual broker
+fills remain zero. Raw receipts, request plans and credentials stay local;
+the public feed includes only allowlisted access/pricing metadata.
+
+The dashboard shows these findings inside execution evidence. Its 90 sleeve
+scenarios retain the legacy costs as sensitivities: neither the conditional
+supported-order means nor the available-venue touch spread is substituted for
+the missing full-population, size-dependent, multi-session execution costs.
+
+### Adaptive sizing experiment (2026-10-20)
+
+`_system/scripts/short_adaptive_sizing.py` tests fixed $25k/$50k/$100k,
+cost-filtered sizing and conditional gross-edge-plus-cost sizing on $10m NAV.
+The 56 eligible events before 2023 initialize an expanding fit; all 226 eligible
+events from 2023-01-03 to 2026-10-13 remain in the test population. Only earlier
+sessions supply training labels. Entry quotes, prior venue dollar volume,
+price and split multiple are entry-time features. The protocol is fixed before
+the first run and published inside `dashboard/data/short_adaptive_sizing.json`.
+This is retrospective walk-forward research designed after previous inspection
+of the sample, not an untouched or prospective validation cohort.
+
+Admissions never inspect the future cover book or realized test return.
+Candidate orders must fit the decision book within 3% below the midpoint.
+The response book 100ms later can give partial or zero IOC fills. Missing cover
+depth is retained using declared residual-price sensitivities, with its share
+fraction and trade count disclosed. Additional impact is 0/25/50 bps per side
+for bull/base/bear; unsupported cover shares are priced 2/5/10% above the worst
+available ask. These are assumptions, not calibrated fill or impact estimates.
+All policies share three-name, issuer and entry squeeze-reserve constraints.
+Same-session modeled closes have zero settled borrow and proceeds-interest
+accrual; delayed real completions would change financing.
+
+The first base run takes five adaptive trades, all $25k targets, and earns
+$13,348 versus $30,693 on 32 fixed-$25k trades. It does not establish a return
+uplift from fitting gross edge. The adaptive sample has zero observed drawdown
+and undefined Calmar; five winners cannot establish a squeeze-tail estimate.
+One adaptive cover includes modeled residual shares. Results, financing/risk
+limits and all three cases are in `adaptive_sizing_2026-10-20.md`.
+
+The shared month-block bootstrap now keeps every boundary-month session. The
+prior routine dropped the first and last month, which could remove a real tail
+loss and reverse the apparent result in a sparse sleeve. A regression test
+ensures those losses remain eligible for resampling. Resampling still cannot
+invent losses absent from five profitable trades or refit the policy.
+
+```text
+python _system/scripts/short_adaptive_sizing.py --source-root /path/to/licensed/cache/repo --local-out /path/to/local/adaptive_sizing/20261020_v1 --out dashboard/data/short_adaptive_sizing.json --report _system/data/reverse_splits/adaptive_sizing_2026-10-20.md
+```
+
+No additional downloads occur. Individual decisions, training counts, forecasts
+and fills stay local. Only aggregate performance and the protocol publish.
+This first test is same-day; multi-session cover costs remain unmeasured.
