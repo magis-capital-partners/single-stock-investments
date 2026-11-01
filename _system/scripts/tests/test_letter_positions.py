@@ -95,6 +95,31 @@ def test_explicit_curated_brand_links_a_letter_without_firm_letterhead(tmp_path)
     assert result["source_ids"]["baupost"] == "baupost-group"
 
 
+def test_semper_vic_links_to_its_adviser_without_linking_semper_augustus(tmp_path):
+    corpus = tmp_path / "insights.json"
+    records = []
+    for fund_id, name in [("semper-vic", "Semper Vic"), ("semper-augustus", "Semper Augustus")]:
+        (tmp_path / f"{fund_id}.txt").write_text(
+            f"{name}\nDear Partners,\nWe own Delta Equipment.", encoding="utf-8"
+        )
+        records.append({
+            "fund_id": fund_id, "fund": name, "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + f"{fund_id}.txt",
+        })
+    current = {
+        "managers": [
+            {"manager_id": "gardner-russo-quinn", "display_name": "Gardner Russo & Quinn", "cik": "860643"},
+            {"manager_id": "semper-vic", "display_name": "Semper Vic", "cik": None},
+            {"manager_id": "semper-augustus", "display_name": "Semper Augustus", "cik": None},
+        ],
+        "source_ids": {"semper-vic": "semper-vic", "semper-augustus": "semper-augustus"},
+    }
+    result = universe.refresh_document_profiles(current, corpus, records)
+    assert result["source_ids"]["semper-vic"] == "gardner-russo-quinn"
+    assert result["source_ids"]["semper-augustus"] == "semper-augustus"
+
+
 def test_a_named_adviser_link_is_not_undone_by_a_similarly_named_publisher():
     document = {
         "manager_id": "ruane-cunniff",

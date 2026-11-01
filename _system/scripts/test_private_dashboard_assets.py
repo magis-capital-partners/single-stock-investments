@@ -107,6 +107,7 @@ def test_cold_investor_export_can_publish_and_build_a_managed_ignored_directory(
 
     root, source, _ = workspace
     data = source / "data/holdings"
+    write(root / "_system/reference/investors/required_managers.json", {"managers": {}})
     path = data / "directory_index.json"
     write(path, {"fund_ids": ["old-source"], "managers": []})
     migration.migrate(root, paths=["dashboard/data/holdings/directory_index.json"])

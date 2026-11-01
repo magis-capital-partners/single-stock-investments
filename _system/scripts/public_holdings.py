@@ -123,6 +123,101 @@ def snapshot(source, period, rows, *, observed_at, partial=False):
     }
 
 
+def parse_report_table(text, source):
+    """Only an explicit dated USD table with a reconciled total establishes stakes."""
+    section = re.search(source["section_pattern"], text, re.IGNORECASE)
+    if not section:
+        return None
+    block = text[section.end():]
+    header = re.search(
+        r"Company\s+Owned\s+Cost\s+Basis\s+Market\s+Value\s+\d{4}\s+Dividends",
+        block,
+    )
+    if not header:
+        return None
+    preamble = block[:header.start()]
+    if not re.search(r"\(Dollars\s+in\s+millions\)", preamble):
+        raise ValueError("Annual holdings table has no verified currency and scale")
+    dates = re.findall(r"[A-Z][a-z]+\s+\d{1,2},\s+\d{4}", preamble)
+    if len(dates) != 1:
+        raise ValueError("Annual holdings table must have one explicit reporting date")
+    period = date(re.sub(r"\s+", " ", dates[0]))
+    number = r"[\d,]+(?:\.\d+)?"
+    row_pattern = re.compile(
+        rf"(?P<issuer>\S.*?)\s+(?P<stake>\d+(?:\.\d+)?)%\s+"
+        rf"\$?\s*(?P<cost>{number})\s+\$?\s*(?P<value>{number})\s+"
+        rf"\$?\s*(?P<dividend>{number})"
+    )
+    total_pattern = re.compile(
+        rf"Total\s+\$?\s*{number}\s+\$?\s*(?P<value>{number})\s+\$?\s*{number}"
+    )
+    rows, total = [], None
+    for line in block[header.end():].splitlines():
+        line = line.strip()
+        summary = total_pattern.fullmatch(line)
+        if summary:
+            total = numeric(summary["value"]) * 1_000_000
+            break
+        match = row_pattern.fullmatch(line)
+        if not match:
+            continue
+        stake = numeric(match["stake"])
+        if not 0 <= stake <= 100:
+            raise ValueError("Annual report issuer ownership is outside 0–100 percent")
+        rows.append({
+            "issuer": match["issuer"],
+            "country": source["country"],
+            "shares": None,
+            "weight_pct": None,
+            "issuer_ownership_pct": stake,
+            "value_usd": numeric(match["value"]) * 1_000_000,
+            "cost_basis_usd": numeric(match["cost"]) * 1_000_000,
+        })
+    if len(rows) < source.get("minimum_positions", 1) or total is None:
+        raise ValueError("Annual report holdings table is incomplete")
+    if len({row["issuer"] for row in rows}) != len(rows):
+        raise ValueError("Annual report holdings table repeats an issuer")
+    # Each published row and the total can have been rounded independently.
+    if abs(sum(row["value_usd"] for row in rows) - total) > len(rows) * 500_000:
+        raise ValueError("Annual report holdings do not reconcile to its table total")
+    return period, rows
+
+
+def parse_public_report(raw, source, *, observed_at):
+    from pypdf import PdfReader
+    from pypdf.errors import PyPdfError
+
+    try:
+        reader = PdfReader(io.BytesIO(raw))
+        pages = [
+            (number, page.extract_text() or "") for number, page in enumerate(
+                reader.pages[:source.get("max_pages", 35)], 1
+            )
+        ]
+    except PyPdfError as exc:
+        raise ValueError("Official report could not be read as a PDF") from exc
+    matches = []
+    for page_number, text in pages:
+        parsed = parse_report_table(text, source)
+        if parsed:
+            period, rows = parsed
+            if source.get("report_year") and period[:4] != str(source["report_year"]):
+                raise ValueError("Annual table date does not match its published report year")
+            item = snapshot(source, period, rows, observed_at=observed_at, partial=True)
+            item.update(
+                scope="reported_foreign_equity_stakes",
+                date_basis="publisher_report_date",
+                report_page=page_number,
+                reporting_currency="USD",
+                source_url=source["url"] + f"#page={page_number}",
+                publisher_url=source["url"] + f"#page={page_number}",
+            )
+            matches.append(item)
+    if len(matches) != 1:
+        raise ValueError("Expected one uniquely identified annual holdings table")
+    return matches
+
+
 def parse_filepoint_csv(raw, source, *, observed_at):
     """US Bank publishes every line, including cash, zero values and foreign shares."""
     rows, dates = [], set()
@@ -344,6 +439,7 @@ PARSERS = {
     "filepoint_json": parse_filepoint_json,
     "issuer_ownership": parse_kap,
     "horizon_xlsx": parse_horizon_xlsx,
+    "annual_report_pdf": parse_public_report,
 }
 
 
@@ -352,11 +448,27 @@ def collect(sources, archive, *, fetcher=fetch, observed_at=None):
     documents, review = [], []
     expanded = []
     for source in sources:
-        if source["kind"] != "horizon_family":
+        if source["kind"] not in {"horizon_family", "annual_report_family"}:
             expanded.append(source)
             continue
         try:
             raw = fetcher(source)
+            if source["kind"] == "annual_report_family":
+                years = [
+                    int(year) for year in re.findall(
+                        source["annual_link_pattern"], raw.decode("utf-8")
+                    ) if int(year) >= source["first_year"]
+                ]
+                if not years:
+                    raise ValueError("No current official annual report discovered")
+                expanded.append({
+                    **source,
+                    "kind": "annual_report_pdf",
+                    "report_year": max(years),
+                    "publisher_url": source["url"],
+                    "url": source["report_url_template"].format(year=max(years)),
+                })
+                continue
             tickers = sorted(
                 set(
                     re.findall(
@@ -423,6 +535,7 @@ def collect(sources, archive, *, fetcher=fetch, observed_at=None):
             TypeError,
             zipfile.BadZipFile,
             ET.ParseError,
+            ImportError,
         ) as exc:
             review.append(
                 {
