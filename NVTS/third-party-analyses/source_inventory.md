@@ -1,6 +1,6 @@
 # NVTS — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 89 total (0 approved, 0 pending, 89 context)
 
 | ID | Title | Path | Status | Use |
@@ -14,7 +14,6 @@
 | activist_long | Capricorn-Libra Investment Group, LP — SC 13D/A | `NVTS/third-party-analyses/activist_reports/long/SC-13D/A_20251216_acc0001890033_25_000004.xml` | context | activist/long — sec_edgar |
 | activist_long | SiCPower, LLC — SC 13D/A | `NVTS/third-party-analyses/activist_reports/long/SC-13D/A_20250425_acc0000921895_25_001176.xml` | context | activist/long — sec_edgar |
 | activist_long | SiCPower, LLC — SC 13D | `NVTS/third-party-analyses/activist_reports/long/SC-13D_20250227_acc0000921895_25_000634.xml` | context | activist/long — sec_edgar |
-| activist_long | acc0001821769 25 000076 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250514_acc0001821769_25_000076.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 041432 | `NVTS/third-party-analyses/activist_reports/long/8-K_20201208_acc0001213900_20_041432.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 042274 | `NVTS/third-party-analyses/activist_reports/long/8-K_20201211_acc0001213900_20_042274.htm` | context | activist/long — local |
 | activist_long | acc0001213900 21 003331 | `NVTS/third-party-analyses/activist_reports/long/8-K_20210121_acc0001213900_21_003331.htm` | context | activist/long — local |
@@ -64,6 +63,7 @@
 | activist_long | acc0001821769 25 000049 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250410_acc0001821769_25_000049.htm` | context | activist/long — local |
 | activist_long | acc0001821769 25 000053 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250429_acc0001821769_25_000053.htm` | context | activist/long — local |
 | activist_long | acc0001821769 25 000063 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250505_acc0001821769_25_000063.htm` | context | activist/long — local |
+| activist_long | acc0001821769 25 000076 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250514_acc0001821769_25_000076.htm` | context | activist/long — local |
 | activist_long | acc0001628280 25 027705 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250527_acc0001628280_25_027705.htm` | context | activist/long — local |
 | activist_long | acc0001821769 25 000155 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250701_acc0001821769_25_000155.htm` | context | activist/long — local |
 | activist_long | acc0001821769 25 000158 | `NVTS/third-party-analyses/activist_reports/long/8-K_20250703_acc0001821769_25_000158.htm` | context | activist/long — local |
@@ -95,4 +95,4 @@
 | activist_long | acc0001104659 26 109125 | `NVTS/third-party-analyses/activist_reports/long/8-K_20260921_acc0001104659_26_109125.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 114051 | `NVTS/third-party-analyses/activist_reports/long/8-K_20261006_acc0001104659_26_114051.htm` | context | activist/long — local |
 
-Cross-check required: `NVTS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `NVTS/research/cross_check_third_party_2026-10-27.md`

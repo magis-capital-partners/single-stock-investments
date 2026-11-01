@@ -28,7 +28,7 @@ REVIEWS = wm.ROOT / "_system" / "reviews" / "pending"
 def queue_fail_reviews(ticker: str, ledger: dict) -> Path | None:
     fails = [
         k for k in (ledger.get("kpis") or [])
-        if k.get("status") == "fail"
+        if k.get("status") in {"fail", "stale"}
     ]
     if not fails:
         return None
@@ -80,7 +80,7 @@ def queue_fail_reviews(ticker: str, ledger: dict) -> Path | None:
 def refresh_kpi(ticker: str, kpi: dict, *, mark_auto: bool) -> bool:
     changed = False
     source = str(kpi.get("source") or "")
-    if source.startswith(("theme:", "valuation:", "derived:")):
+    if source.startswith(("theme:", "valuation:", "derived:", "operating:")):
         value, as_of = wm.resolve_source_actual(source, ticker)
         if value is not None:
             actual = kpi.get("actual") if isinstance(kpi.get("actual"), dict) else {}
@@ -100,6 +100,12 @@ def refresh_kpi(ticker: str, kpi: dict, *, mark_auto: bool) -> bool:
 
     last = wm.parse_as_of(kpi.get("last_checked"))
     age_stale = bool(last and (date.today() - last).days > wm.STALE_DAYS)
+    if source.startswith("operating:"):
+        # Observing an unchanged release again does not make the economic
+        # period fresh. Thresholds can be set per monthly/quarterly driver.
+        actual_date = wm.parse_as_of((kpi.get("actual") or {}).get("as_of"))
+        max_age = (kpi.get("tci_binding") or {}).get("maximum_age_days") or 160
+        age_stale = actual_date is None or (date.today() - actual_date).days > max_age
 
     if mark_auto:
         # Age on last_checked owns staleness. Theme.stale alone only forces

@@ -1,23 +1,11 @@
-# Viatris Inc (VTRS)
+# Viatris Inc  (VTRS)  (CIK 0001792044) contingent / CVR candidate (VTRS)
 
-**Ticker:** VTRS | **Market:** US (NASDAQ)  
-**CIK:** 1792044  
-**IR:** https://investor.viatris.com  
-**Last updated:** 2026-06-02
+**Ticker:** VTRS | **Market:** US  
+**Last updated:** 2026-10-19  
+**Stage:** pre-close stub (discovery)
 
-## Folder map
+## Next actions
 
-| Path | Contents |
-|------|----------|
-| `investor-documents/sec-edgar/` | SEC 10-K, 10-Q, 8-K, proxies |
-| `investor-documents/ir-vtrs/` | IR PDFs (harvest when available) |
-| `research/` | Marvin deep dives, valuation, evidence |
-| `third-party-analyses/` | Source inventory |
-
-## Download
-
-```bash
-python3 VTRS/investor-documents/download_vtrs_investor_docs.py
-```
-
-Rebuild indexes: `python3 _system/scripts/build_folder_indexes.py --ticker VTRS`
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.

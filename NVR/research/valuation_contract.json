@@ -2876,7 +2876,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "7ea414e65137b12db8af2fafcd86184d5e1f76ac4f26459291e652ec550c0fd6",
+    "model_hash": "45624f12c43b3ff364044bdbaa622477d4a0220667390542b5245c8e8d8d6c25",
     "method_versions": [
       "cycle_reserve@1.0",
       "net_cash_after_operating_buffer@1.0",
@@ -2888,8 +2888,165 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
-  "profile_match": true,
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "NVR",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 6315.23,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo NVR close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "1828aceaaed158564d4c655d1ee0ba4c730ff28727c136666b2e506c1d5e2090",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "homebuilding_owner_earnings",
+        "method": "normalized_owner_earnings",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "mortgage_banking",
+        "method": "normalized_earnings",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_surplus_cash",
+        "method": "net_cash_after_operating_buffer",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "lot_control_and_future_communities",
+        "method": "risked_lot_option_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "housing_cycle_and_execution_reserve",
+        "method": "cycle_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "homebuilding_owner_earnings",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "homebuilding_owner_earnings",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "homebuilding_owner_earnings",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "mortgage_banking",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "mortgage_banking",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "mortgage_banking",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_surplus_cash",
+        "case": "low",
+        "code": "realization_timing_missing:cash_m"
+      },
+      {
+        "component_id": "net_surplus_cash",
+        "case": "base",
+        "code": "realization_timing_missing:cash_m"
+      },
+      {
+        "component_id": "net_surplus_cash",
+        "case": "high",
+        "code": "realization_timing_missing:cash_m"
+      },
+      {
+        "component_id": "lot_control_and_future_communities",
+        "case": "low",
+        "code": "realization_timing_missing:incremental_lot_option_per_share"
+      },
+      {
+        "component_id": "lot_control_and_future_communities",
+        "case": "base",
+        "code": "realization_timing_missing:incremental_lot_option_per_share"
+      },
+      {
+        "component_id": "lot_control_and_future_communities",
+        "case": "high",
+        "code": "realization_timing_missing:incremental_lot_option_per_share"
+      },
+      {
+        "component_id": "housing_cycle_and_execution_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:reserve_gross"
+      },
+      {
+        "component_id": "housing_cycle_and_execution_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:reserve_gross"
+      },
+      {
+        "component_id": "housing_cycle_and_execution_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:reserve_gross"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "31bd360bdad0345bf4e2b0a1f2c22a3bfc4f69a0f5124f11c55398cc2704d930"
+  },
   "cohort_expected_profile": "quality_reinvestment",
+  "profile_match": true,
   "cohort_purpose": "Land-light homebuilding, owner earnings, housing cycle, and repurchase economics.",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,

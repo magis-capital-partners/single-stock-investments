@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "GCCO",
-  "as_of": "2026-10-19",
+  "as_of": "2026-10-27",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
   "model_level_reason": "Curated primary-evidence follow-ups remain open.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-06-10",
     "latest_fact_as_of": null,
     "oldest_fact_as_of": null,
-    "price_as_of": "2026-06-10"
+    "price_as_of": "2026-06-10",
+    "forecast_as_of": "2026-06-10",
+    "calculation_as_of": "2026-06-10"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": null,
     "downside_to_low_pct": null,
     "unvalued_component_count": 1,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 0.0,
-    "model_hash": "6de927b51738e59435628632a93057f764ce4c954f5665c43be860e55ca5145d",
+    "model_hash": "178bc0b684759b7e3a0d3262b49bb38f2198158ddd6e44fd0d885002fe5a245c",
     "dates": {
       "model_as_of": "2026-06-10",
       "latest_fact_as_of": null,
       "oldest_fact_as_of": null,
-      "price_as_of": "2026-06-10"
+      "price_as_of": "2026-06-10",
+      "forecast_as_of": "2026-06-10",
+      "calculation_as_of": "2026-06-10"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "Scarce assets, royalties, and optionality",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": "f4a3c38691d1f05a09b98afd64470ae90ece7421cc2e73962a1e77ed793830f9",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "issuer_forecast_missing"
   },
   "business": {
     "status": "incomplete",
@@ -134,7 +142,9 @@
       "model_as_of": "2026-06-10",
       "latest_fact_as_of": null,
       "oldest_fact_as_of": null,
-      "price_as_of": "2026-06-10"
+      "price_as_of": "2026-06-10",
+      "forecast_as_of": "2026-06-10",
+      "calculation_as_of": "2026-06-10"
     },
     "legacy_audit": {
       "actionable": false,
@@ -263,7 +273,7 @@
     },
     "source_lineage": [],
     "change_control": {
-      "model_hash": "6de927b51738e59435628632a93057f764ce4c954f5665c43be860e55ca5145d",
+      "model_hash": "178bc0b684759b7e3a0d3262b49bb38f2198158ddd6e44fd0d885002fe5a245c",
       "method_versions": [],
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
@@ -457,21 +467,27 @@
     "category_totals_per_share": {},
     "unexplained_per_share": null,
     "legacy_value_per_share": null,
-    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
+    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline.",
+    "tci_irr": {
+      "status": "waiting_for_comparable_baseline",
+      "unit": "percentage_points_per_year"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-19",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-06-10",
       "latest_fact_as_of": null,
       "oldest_fact_as_of": null,
-      "price_as_of": "2026-06-10"
+      "price_as_of": "2026-06-10",
+      "forecast_as_of": "2026-06-10",
+      "calculation_as_of": "2026-06-10"
     },
     "age_days": {
-      "model_as_of": 131,
+      "model_as_of": 139,
       "latest_fact_as_of": null,
-      "price_as_of": 131
+      "price_as_of": 139
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -480,7 +496,7 @@
     },
     "warnings": [
       "latest_fact_as_of is not dated",
-      "price_as_of is 131 days old (review threshold 7)"
+      "price_as_of is 139 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

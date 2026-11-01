@@ -239,22 +239,12 @@ def clean_filing_text(path: Path) -> str:
     """
     text = path.read_text(encoding="utf-8", errors="ignore")
     if "<ix:nonFraction" in text or "xmlns:ix=" in text:
-        snippets = []
-        for m in re.finditer(
-            r'name="([^"]+)"[^>]*>([^<]*)</ix:nonFraction>', text
-        ):
-            name, val = m.group(1), m.group(2).strip()
-            if any(
-                k in name
-                for k in (
-                    "Revenue", "Operating", "NetIncome", "Earnings", "Assets",
-                    "Liabilities", "Equity", "Debt", "Cash", "EPS", "Income",
-                )
-            ):
-                if "Member" not in name and "Axis" not in name:
-                    snippets.append(f"{name.split(':')[-1]}: {val}")
-        ix_block = "\n".join(snippets[:2000])
-        return ix_block + "\n\n" + _strip_html_keep_lines(text)
+        from xbrl_context import contextual_metrics, parse_inline_facts
+        metrics = contextual_metrics(text)
+        parsed = parse_inline_facts(text)
+        snippets = [f"{fact['tag']}: {fact['value']}" for fact in parsed.facts]
+        header = 'XBRL_CONTEXT_METRICS: ' + json.dumps(metrics, separators=(',', ':')) + '\n'
+        return header + '\n'.join(snippets[:2000]) + '\n\n' + _strip_html_keep_lines(text)
     return _strip_html_keep_lines(text)
 
 

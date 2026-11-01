@@ -1,6 +1,6 @@
 # FTRE — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 51 total (0 approved, 0 pending, 51 context)
 
 | ID | Title | Path | Status | Use |
@@ -14,6 +14,8 @@
 | activist_long | Starboard (+7) — SC 13D/A | `FTRE/third-party-analyses/activist_reports/long/SC-13D/A_20250512_acc0001193805_25_000632.xml` | context | activist/long — sec_edgar |
 | activist_long | Starboard (+7) — SC 13D/A | `FTRE/third-party-analyses/activist_reports/long/SC-13D/A_20250224_acc0000921895_25_000590.xml` | context | activist/long — sec_edgar |
 | activist_long | Starboard (+7) — SC 13D/A | `FTRE/third-party-analyses/activist_reports/long/SC-13D/A_20250131_acc0000921895_25_000216.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 25 051088 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250310_acc0001193125_25_051088.htm` | context | activist/long — local |
+| activist_long | acc0001193125 25 032114 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250221_acc0001193125_25_032114.htm` | context | activist/long — local |
 | activist_long | acc0001965040 23 000005 | `FTRE/third-party-analyses/activist_reports/long/8-K_20230612_acc0001965040_23_000005.htm` | context | activist/long — local |
 | activist_long | acc0001965040 23 000008 | `FTRE/third-party-analyses/activist_reports/long/8-K_20230621_acc0001965040_23_000008.htm` | context | activist/long — local |
 | activist_long | acc0001965040 23 000015 | `FTRE/third-party-analyses/activist_reports/long/8-K_20230630_acc0001965040_23_000015.htm` | context | activist/long — local |
@@ -35,9 +37,7 @@
 | activist_long | acc0001193125 24 177519 | `FTRE/third-party-analyses/activist_reports/long/8-K_20240711_acc0001193125_24_177519.htm` | context | activist/long — local |
 | activist_long | acc0001965040 24 000050 | `FTRE/third-party-analyses/activist_reports/long/8-K_20240812_acc0001965040_24_000050.htm` | context | activist/long — local |
 | activist_long | acc0001965040 24 000060 | `FTRE/third-party-analyses/activist_reports/long/8-K_20241108_acc0001965040_24_000060.htm` | context | activist/long — local |
-| activist_long | acc0001193125 25 032114 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250221_acc0001193125_25_032114.htm` | context | activist/long — local |
 | activist_long | acc0001965040 25 000008 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250303_acc0001965040_25_000008.htm` | context | activist/long — local |
-| activist_long | acc0001193125 25 051088 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250310_acc0001193125_25_051088.htm` | context | activist/long — local |
 | activist_long | acc0001965040 25 000022 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250512_acc0001965040_25_000022.htm` | context | activist/long — local |
 | activist_long | acc0001965040 25 000023 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250512_acc0001965040_25_000023.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 139161 | `FTRE/third-party-analyses/activist_reports/long/8-K_20250611_acc0001193125_25_139161.htm` | context | activist/long — local |
@@ -57,4 +57,4 @@
 | activist_long | acc0001628280 26 061218 | `FTRE/third-party-analyses/activist_reports/long/8-K_20260910_acc0001628280_26_061218.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 063970 | `FTRE/third-party-analyses/activist_reports/long/8-K_20260930_acc0001628280_26_063970.htm` | context | activist/long — local |
 
-Cross-check required: `FTRE/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `FTRE/research/cross_check_third_party_2026-10-25.md`

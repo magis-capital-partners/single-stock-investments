@@ -30,28 +30,34 @@ YAHOO_UA = "MarvinResearch/1.0 (advantaged-banks-screener)"
 SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 
-DEPOSITS_TAGS = ("Deposits",)
+DEPOSITS_TAGS = ("Deposits", "DepositsFromCustomers")
 NONINTEREST_DEPOSIT_TAGS = (
     "NoninterestBearingDepositLiabilities",
     "NoninterestBearingDeposits",
+    "NoninterestBearingDomesticDepositDemand",
 )
 INTEREST_EXPENSE_DEPOSITS_TAGS = (
     "InterestExpenseDeposits",
     "InterestExpenseDepositAccounts",
+    "InterestExpenseDomesticDeposits",
+    "InterestExpenseOnDepositsFromCustomers",
 )
 EQUITY_TAGS = (
     "StockholdersEquity",
     "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+    "EquityAttributableToOwnersOfParent",
 )
 GOODWILL_TAGS = ("Goodwill",)
 INTANGIBLE_TAGS = (
     "IntangibleAssetsNetExcludingGoodwill",
     "FiniteLivedIntangibleAssetsNet",
+    "IntangibleAssetsOtherThanGoodwill",
 )
 INCOME_TAGS = (
     "NetIncomeLoss",
     "NetIncomeLossAvailableToCommonStockholdersBasic",
     "ProfitLoss",
+    "ProfitLossAttributableToOwnersOfParent",
 )
 ASSETS_TAGS = ("Assets",)
 SHARES_TAGS = (
@@ -163,6 +169,12 @@ def _pick_best_entry(entries: list[dict], *, prefer_annual: bool = False) -> tup
 
 
 def _is_annual_entry(entry: dict) -> bool:
+    if entry.get("start") and entry.get("end"):
+        try:
+            duration=(datetime.fromisoformat(entry["end"])-datetime.fromisoformat(entry["start"])).days
+            return 300 <= duration <= 400
+        except (ValueError,TypeError):
+            return False
     form = entry.get("form")
     fp = str(entry.get("fp") or "")
     return form in ("10-K", "20-F", "40-F") or fp == "FY"
@@ -179,13 +191,13 @@ def latest_usd_fact(
     annual_val: float | None = None
     any_date = ""
     any_val: float | None = None
-    us_gaap = facts.get("facts", {}).get("us-gaap", {})
+    us_gaap = {**facts.get("facts", {}).get("ifrs-full", {}), **facts.get("facts", {}).get("us-gaap", {})}
     for tag in tags:
         block = us_gaap.get(tag)
         if not block:
             continue
         for unit_key, entries in (block.get("units") or {}).items():
-            if "USD" not in unit_key.upper():
+            if unit_key.upper() != "USD":
                 continue
             for entry in entries or []:
                 form = entry.get("form")
@@ -205,6 +217,8 @@ def latest_usd_fact(
                     annual_val = fval
     if prefer_annual and annual_val is not None:
         return annual_val, annual_date or None
+    if prefer_annual:
+        return None, None
     return any_val, any_date or None
 
 
@@ -243,9 +257,9 @@ def fetch_yahoo_price(symbol: str) -> tuple[float | None, str | None]:
     return None, None
 
 
-def screen_ticker(ticker: str, cik: str) -> dict:
+def screen_ticker(ticker: str, cik: str, *, facts: dict | None = None) -> dict:
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-    data = fetch_json(url)
+    data = facts if facts is not None else fetch_json(url)
     if not data:
         return {"sec_error": "companyfacts unavailable"}
 
@@ -285,6 +299,9 @@ def screen_ticker(ticker: str, cik: str) -> dict:
         "shares_as_of": shares_date,
         "filing_as_of": filing_as_of,
         "sec_entity": data.get("entityName"),
+        "source_url": url,
+        "accounting_basis": "IFRS" if "ifrs-full" in data.get("facts",{}) else "US GAAP",
+        "reporting_currencies": sorted({unit for namespace in data.get("facts",{}).values() for block in namespace.values() for unit in block.get("units",{}) if unit in {"USD","CAD","BRL"}}),
     }
 
 
@@ -447,6 +464,10 @@ def build_rows() -> list[dict]:
                 "p_tbv_display": fmt_multiple(metrics["p_tbv"]),
             }
         )
+        row["source_url"]=sec.get("source_url")
+        row["accounting_basis"]=sec.get("accounting_basis")
+        row["source_checked_at"]=datetime.now(timezone.utc).isoformat()
+        row["evidence_gaps"]=evidence_gaps(row)
         row.pop("cap_tier_seed", None)
         out.append(row)
 
@@ -462,6 +483,16 @@ def build_rows() -> list[dict]:
         ),
     )
     return out
+
+
+def evidence_gaps(row: dict) -> dict:
+    reasons={
+        "deposits_total_usd":"A matching USD deposit fact or verified reporting-currency bridge is required.",
+        "dda_share_pct":"The standard source lacks a matching noninterest-bearing deposit disclosure.",
+        "cost_of_deposits_pct":"A full-year deposit-interest expense and matching deposit balance are required.",
+        "p_tbv":"A dated USD quote and verified common-share / tangible-equity basis are required.",
+    }
+    return {key:reason for key,reason in reasons.items() if row.get(key) is None}
 
 
 def build_payload(rows: list[dict] | None = None) -> dict:

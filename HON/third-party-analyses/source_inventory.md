@@ -1,7 +1,7 @@
 # HON — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 123 total (0 approved, 0 pending, 123 context)
+**Date:** 2026-10-27
+**Sources:** 124 total (0 approved, 0 pending, 124 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -128,5 +128,6 @@
 | activist_long | acc0000773840 26 000084 | `HON/third-party-analyses/activist_reports/long/8-K_20260629_acc0000773840_26_000084.htm` | context | activist/long — local |
 | activist_long | acc0000773840 26 000120 | `HON/third-party-analyses/activist_reports/long/8-K_20260723_acc0000773840_26_000120.htm` | context | activist/long — local |
 | activist_long | acc0000773840 26 000130 | `HON/third-party-analyses/activist_reports/long/8-K_20260819_acc0000773840_26_000130.htm` | context | activist/long — local |
+| activist_long | acc0000773840 26 000141 | `HON/third-party-analyses/activist_reports/long/8-K_20261022_acc0000773840_26_000141.htm` | context | activist/long — local |
 
-Cross-check required: `HON/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `HON/research/cross_check_third_party_2026-10-27.md`

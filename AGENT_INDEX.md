@@ -20,6 +20,10 @@ as context. Do not glob the 1,000+ ticker folders. Use the ladder below.
 - Returns are always **percent per year**: `base_irr_pct: 13.98` means 13.98%
   per year. The unit is stated in every `returns` block
   (`unit: percent_per_year`). Never rescale.
+- Issuer operating levels (monthly volume, market share, revenue per contract)
+  are on each ticker shard and in `dashboard/data/kpi_summary.json` under
+  `operating_latest`, including series that are not accelerating. The
+  inflection list is still only accelerating and decelerating series.
 - `latest.json` is the only source for which deep dive, digest, adversarial
   pass, or cross-check is current. Do not guess from dated filenames.
 - Facts, inferences, and opinions are separated in `_system/data/claims.jsonl`
@@ -67,3 +71,7 @@ python _system/scripts/agent_proposals.py submit proposal.json
 Proposals land in `_system/data/agent_proposals/inbox.jsonl` with status
 `pending_human_review`. Nothing becomes final without a file in
 `_system/reviews/approved/`.
+
+Special-situations rows live in `_system/data/special_situations/situations.jsonl`
+(one versioned line per update; `check_situation_rows.py`). The Ideas book
+projects the latest line onto `dashboard/data/special_situations.json`.

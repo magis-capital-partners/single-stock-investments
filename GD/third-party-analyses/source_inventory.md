@@ -1,7 +1,7 @@
 # GD — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 64 total (0 approved, 0 pending, 64 context)
+**Date:** 2026-10-25
+**Sources:** 61 total (0 approved, 0 pending, 61 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -9,9 +9,6 @@
 | activist_long | Longview Asset Management, LLC — SC 13D/A | `GD/third-party-analyses/activist_reports/long/SC-13D/A_20240410_acc0001193125_24_091969.htm` | context | activist/long — sec_edgar |
 | activist_long | Longview Asset Management, LLC — SC 13D/A | `GD/third-party-analyses/activist_reports/long/SC-13D/A_20260828_acc0001193125_26_374975.xml` | context | activist/long — sec_edgar |
 | activist_long | Longview Asset Management, LLC — SC 13D/A | `GD/third-party-analyses/activist_reports/long/SC-13D/A_20261006_acc0001193125_26_415880.xml` | context | activist/long — sec_edgar |
-| activist_long | READ MORE March 20, 2026 Trian Releases Investor Presentatio | `_system/reference/activist-reports/trian/trian_2026-03-20_Trian-General-Catalyst-Amended-Merger-Ag.pdf` | context | activist/long — publisher_site |
-| activist_long | READ MORE December 22, 2025 Janus Henderson Group plc to be  | `_system/reference/activist-reports/trian/trian_2025-12-22_Trian-and-General-Catalyst-Affirm-Commit.pdf` | context | activist/long — publisher_site |
-| activist_long | READ MORE February 26, 2025 Trian Comments on Solventum’s Sa | `_system/reference/activist-reports/trian/trian_2025-02-26_PRESS-RELEASE-Janus-Henderson-Group-plc.pdf` | context | activist/long — publisher_site |
 | activist_long | acc0000040533 19 000054 | `GD/third-party-analyses/activist_reports/long/8-K_20191023_acc0000040533_19_000054.htm` | context | activist/long — local |
 | activist_long | acc0000040533 20 000007 | `GD/third-party-analyses/activist_reports/long/8-K_20200129_acc0000040533_20_000007.htm` | context | activist/long — local |
 | activist_long | acc0000040533 20 000012 | `GD/third-party-analyses/activist_reports/long/8-K_20200206_acc0000040533_20_000012.htm` | context | activist/long — local |
@@ -70,4 +67,4 @@
 | activist_long | acc0001193125 26 340490 | `GD/third-party-analyses/activist_reports/long/8-K_20260807_acc0001193125_26_340490.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 417188 | `GD/third-party-analyses/activist_reports/long/8-K_20261008_acc0001193125_26_417188.htm` | context | activist/long — local |
 
-Cross-check required: `GD/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GD/research/cross_check_third_party_2026-10-25.md`

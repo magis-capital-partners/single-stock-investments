@@ -117,7 +117,7 @@ def test_python_tests_completing_is_a_retry():
     assert on["workflow_run"]["workflows"] == [
         "Research quality", "Python tests", "CI bootstrap smoke",
         "LLM Workflow Governance", "Energy model tests",
-        "Filing Sentinel gold set", "Agent context",
+        "Filing Sentinel gold set", "Agent context", "Underwriting contract validation",
     ]
 
 
@@ -221,6 +221,8 @@ def test_data_guard_materializes_desk_briefs_inside_the_sparse_checkout():
     fetch = step(data_guard, "Fetch the PR head data paths")["run"]
     assert "git sparse-checkout add --skip-checks" in fetch
     assert "_system/data/desk_briefs/" in fetch
+    assert "/dashboard/data/desk_briefs.json" in fetch
+    assert "overlay dashboard/data/desk_briefs.json" in fetch
     assert "|| true" not in fetch
     assert 'test -f _system/data/desk_briefs/schema.json' in fetch
     assert "brief-inputs.txt" in fetch

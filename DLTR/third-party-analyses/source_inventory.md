@@ -1,6 +1,6 @@
 # DLTR — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 191 total (0 approved, 0 pending, 191 context)
 
 | ID | Title | Path | Status | Use |
@@ -20,6 +20,7 @@
 | activist_long | Mantle (+2) — SC 13D/A | `DLTR/third-party-analyses/activist_reports/long/SC-13D/A_20260625_acc0001104659_26_077544.xml` | context | activist/long — sec_edgar |
 | activist_long | Mantle (+2) — SC 13D/A | `DLTR/third-party-analyses/activist_reports/long/SC-13D/A_20250715_acc0001104659_25_068081.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0000935703 22 000025 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220321_acc0000935703_22_000025.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 031501 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220308_acc0001104659_22_031501.htm` | context | activist/long — local |
 | activist_long | acc0000935703 18 000002 | `DLTR/third-party-analyses/activist_reports/long/8-K_20180104_acc0000935703_18_000002.htm` | context | activist/long — local |
 | activist_long | acc0000935703 18 000004 | `DLTR/third-party-analyses/activist_reports/long/8-K_20180116_acc0000935703_18_000004.htm` | context | activist/long — local |
 | activist_long | acc0000935703 18 000006 | `DLTR/third-party-analyses/activist_reports/long/8-K_20180221_acc0000935703_18_000006.htm` | context | activist/long — local |
@@ -115,7 +116,6 @@
 | activist_long | acc0000935703 22 000014 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220307_acc0000935703_22_000014.htm` | context | activist/long — local |
 | activist_long | acc0000935703 22 000015 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220307_acc0000935703_22_000015.htm` | context | activist/long — local |
 | activist_long | acc0000935703 22 000017 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220308_acc0000935703_22_000017.htm` | context | activist/long — local |
-| activist_long | acc0001104659 22 031501 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220308_acc0001104659_22_031501.htm` | context | activist/long — local |
 | activist_long | acc0000935703 22 000035 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220406_acc0000935703_22_000035.htm` | context | activist/long — local |
 | activist_long | acc0000935703 22 000038 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220512_acc0000935703_22_000038.htm` | context | activist/long — local |
 | activist_long | acc0000935703 22 000043 | `DLTR/third-party-analyses/activist_reports/long/8-K_20220526_acc0000935703_22_000043.htm` | context | activist/long — local |
@@ -197,4 +197,4 @@
 | activist_long | acc0000935703 26 000108 | `DLTR/third-party-analyses/activist_reports/long/8-K_20260827_acc0000935703_26_000108.htm` | context | activist/long — local |
 | activist_long | acc0000935703 26 000116 | `DLTR/third-party-analyses/activist_reports/long/8-K_20260925_acc0000935703_26_000116.htm` | context | activist/long — local |
 
-Cross-check required: `DLTR/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `DLTR/research/cross_check_third_party_2026-10-25.md`

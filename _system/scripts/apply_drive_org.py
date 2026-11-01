@@ -28,16 +28,17 @@ from drive_store_common import (
     web_folder_url,
     write_json,
 )
+from letter_quarter_folders import (
+    CANONICAL_LETTERS_ID,
+    PREFERRED_LETTER_QUARTERS,
+    canonical_letter_path,
+    choose_quarter_keeper,
+    parse_quarter_name,
+)
 
 REPORT_PATH = SSI_ROOT / "_system" / "reference" / "document-store" / "drive_org_apply_report.json"
 
-CANONICAL_LETTERS_ID = "1z8P-tKj3lvWmx72bXUxJQ9BcUmKrhTg4"
 CANONICAL_RESEARCH_SOURCES_ID = "1yK75I60EbARPMyP6ibSggJ1-VLxtYXwU"
-PREFERRED_LETTER_QUARTERS = {
-    ("2026", "1"): "1QxQd4VhLv7HK1qa45izn80MMYFcS-gxg",
-    ("2026", "2"): "1CtFKEdK0eTXZlY-t6bddds5rLSX5V7sO",
-    ("2026", "3"): "1wBnJHPU6-rCk4nz11JhvCL5y39rdV12W",
-}
 CANONICAL_TOP = {"Letters", "Single Stocks", "Research Sources", "Admin", "Manager Meetings"}
 KEEP_EMPTY = CANONICAL_TOP | {"Intake", "Investment Wisdom"}
 
@@ -52,18 +53,6 @@ NON_LETTERS = {
     "WP_2023_Pershing Square and Berkshire.pdf": "Research Sources/Uncategorized",
     "US_Mind_the_Gap_2025.pdf": "Research Sources/Uncategorized",
 }
-
-
-def parse_quarter_name(name: str) -> tuple[str, str] | None:
-    text = (name or "").strip()
-    m = QUARTER_CANON_RE.match(text) or QUARTER_ALIAS_RE.match(text)
-    if not m:
-        return None
-    return m.group(1), m.group(2)
-
-
-def canonical_letter_path(year: str, quarter: str) -> str:
-    return f"Letters/{year} Q{quarter}"
 
 
 def children_of(items_by_parent: dict[str, list[dict]], folder_id: str) -> list[dict]:
@@ -211,11 +200,9 @@ def keeper_for_duplicate_roots(name: str, folders: list[dict]) -> dict:
                 return folder
     parsed = parse_quarter_name(name)
     if parsed:
-        preferred = PREFERRED_LETTER_QUARTERS.get(parsed)
-        if preferred:
-            for folder in folders:
-                if folder["id"] == preferred:
-                    return folder
+        chosen = choose_quarter_keeper(parsed[0], parsed[1], folders)
+        if chosen is not None:
+            return chosen
     folders_sorted = sorted(folders, key=lambda f: (-int(f.get("_child_count") or 0), f["id"]))
     return folders_sorted[0]
 
@@ -317,16 +304,14 @@ def apply_org(dry_run: bool) -> dict:
                 for child in children_of(items_by_parent, CANONICAL_LETTERS_ID)
                 if child.get("mimeType") == FOLDER_MIME and parse_quarter_name(child.get("name") or "") == (year, q)
             ]
-            preferred_id = PREFERRED_LETTER_QUARTERS.get((year, q))
-            dest = next((c for c in matches if c["id"] == preferred_id), None)
-            if dest is None and matches:
-                dest = max(
-                    matches,
-                    key=lambda c: int(c.get("_child_count") or len(children_of(items_by_parent, c["id"]))),
+            for child in matches:
+                child["_child_count"] = int(
+                    child.get("_child_count") or len(children_of(items_by_parent, child["id"]))
                 )
+            dest = choose_quarter_keeper(year, q, matches, assume_under_letters=True) if matches else None
             if dest is None:
                 dest = folder_by_path(target_path) or ensure_path(target_path)
-            if item["id"] == dest["id"] or item["id"] == preferred_id:
+            if item["id"] == dest["id"]:
                 continue
             path = folder_paths.get(item["id"]) or item.get("name")
             if path.startswith("Single Stocks/"):

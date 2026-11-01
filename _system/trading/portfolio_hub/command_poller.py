@@ -46,6 +46,7 @@ from typing import Any
 
 from contextlib import contextmanager
 
+from .allocation_policy import etf_0dte_ticket_refusal
 from .orders import GuardedOrderService, OrderIntent
 from .publisher import signed_headers
 
@@ -379,6 +380,12 @@ class OrderCommandLoop:
         # disagreement between the two shows up in the fingerprint the human is
         # asked to confirm.
         identity = self._identity(row, broker)
+        # Judged on what IBKR says the conId is, never on the form. A SPY / QQQ
+        # contract is etf-0dte's, and nothing is drafted for it.
+        refusal = etf_0dte_ticket_refusal(identity)
+        if refusal:
+            self.channel.publish(row["request_id"], {"state": "rejected", "reject_reason": refusal})
+            return
         intent = OrderIntent(
             account_alias=self.account_alias,
             conid=int(row["conid"]),
@@ -391,8 +398,12 @@ class OrderCommandLoop:
             mode=row.get("mode") or "dry_run",
             tif=row.get("tif") or "DAY",
             outside_rth=bool(row.get("outside_rth")),
+            reduce_only=(row["action"] == "BUY") if row.get("strategy") == "short_framework" else None,
         )
-        draft = self.service.create(intent)
+        if row.get("strategy") == "short_framework":
+            draft = self.service.create(intent, framework_binding=row.get("rationale"))
+        else:
+            draft = self.service.create(intent)
         self.channel.publish(row["request_id"], {"state": "drafting", "intent_uuid": draft["intent_uuid"]})
 
         previewed = self.service.preview(draft["intent_uuid"])

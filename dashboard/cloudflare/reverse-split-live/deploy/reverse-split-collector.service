@@ -1,0 +1,26 @@
+[Unit]
+Description=Reverse-split public-disclosure research collector
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=3600
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=research
+WorkingDirectory=/srv/reverse-split-live
+EnvironmentFile=/etc/reverse-split-live.env
+ExecStart=/usr/bin/node /srv/reverse-split-live/collector.mjs --watch --interval 60
+Restart=on-failure
+RestartSec=300
+Nice=15
+CPUQuota=25%
+IOSchedulingClass=idle
+MemoryMax=512M
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

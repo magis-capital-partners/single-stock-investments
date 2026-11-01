@@ -1,12 +1,10 @@
 # HCA — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 110 total (0 approved, 0 pending, 110 context)
+**Date:** 2026-10-25
+**Sources:** 108 total (0 approved, 0 pending, 108 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Jun 30, 2020 | `_system/reference/activist-reports/spruce_point/spruce_point_2020-06-30_prestige-consumer-healthcare-inc.html` | context | activist/short — publisher_site |
-| activist_short | Jun 7, 2018 | `_system/reference/activist-reports/spruce_point/spruce_point_2018-06-07_healthcare-trust-of-america-inc.html` | context | activist/short — publisher_site |
 | activist_long | Frisco (+5) — SC 13D | `HCA/third-party-analyses/activist_reports/long/SC-13D_20260210_acc0001140361_26_004673.xml` | context | activist/long — sec_edgar |
 | activist_long | Greenlight Capital — PX14A6G | `HCA/third-party-analyses/activist_reports/long/PX14A6G_20230418_acc0001973134_23_000001.txt` | context | activist/long — sec_edgar |
 | activist_long | acc0001193125 18 080824 | `HCA/third-party-analyses/activist_reports/long/8-K_20180313_acc0001193125_18_080824.htm` | context | activist/long — local |
@@ -116,4 +114,4 @@
 | activist_long | acc0001193125 26 315151 | `HCA/third-party-analyses/activist_reports/long/8-K_20260724_acc0001193125_26_315151.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 323731 | `HCA/third-party-analyses/activist_reports/long/8-K_20260729_acc0001193125_26_323731.htm` | context | activist/long — local |
 
-Cross-check required: `HCA/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `HCA/research/cross_check_third_party_2026-10-25.md`

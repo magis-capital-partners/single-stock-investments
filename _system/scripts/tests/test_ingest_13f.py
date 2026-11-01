@@ -167,6 +167,56 @@ def test_confidentiality_guard_rejects_letter_provenance_and_licensed_names(tmp_
     assert any("tikr" in item for item in guard.scan(root))
 
 
+def test_a_plain_manager_keeps_the_ssi_book_and_new_positions():
+    universe = {"JNJ"}
+    changes = [
+        {"ssi_ticker": "JNJ", "ticker": "JNJ", "change_type": "trim", "shares_delta_pct": -4},
+        {"ssi_ticker": "", "ticker": "UBER", "change_type": "add", "shares_delta_pct": 20},
+        {"ssi_ticker": "", "ticker": "META", "change_type": "new", "shares_delta_pct": None},
+        {"ssi_ticker": "", "ticker": "X", "change_type": "exit", "shares_delta_pct": -100},
+    ]
+    kept = ingest_13f.reported_changes({"roles": ["active"]}, changes, universe, 5)
+    assert [row["ticker"] for row in kept] == ["JNJ", "META"]
+
+
+def test_watchlist_reports_the_whole_book_at_the_threshold():
+    universe = {"JNJ"}
+    changes = [
+        {"ssi_ticker": "JNJ", "ticker": "JNJ", "change_type": "trim", "shares_delta_pct": -4},
+        {"ssi_ticker": "", "ticker": "UBER", "change_type": "add", "shares_delta_pct": 5},
+        {"ssi_ticker": "", "ticker": "META", "change_type": "new", "shares_delta_pct": None},
+        {"ssi_ticker": "", "ticker": "X", "change_type": "exit", "shares_delta_pct": -100},
+        {"ssi_ticker": "", "ticker": "Y", "change_type": "trim", "shares_delta_pct": -4.9},
+    ]
+    kept = ingest_13f.reported_changes({"roles": ["active", "watchlist"]}, changes, universe, 5)
+    assert [row["ticker"] for row in kept] == ["UBER", "META", "X"]
+
+
+def test_watchlist_threshold_defaults_to_five_percent():
+    assert ingest_13f.watchlist_threshold_pct({}) == 5
+    assert ingest_13f.watchlist_threshold_pct({"watchlist_share_change_pct": 8}) == 8
+    assert ingest_13f.watchlist_threshold_pct({"watchlist_share_change_pct": 8}, 3) == 3
+
+
+def test_a_successor_cik_does_not_replace_quarters_the_old_filer_still_reported():
+    """Pershing Square Inc. filed its own small book before the LP's Q2 2026 notice."""
+    history = [{"cik": "0001336528", "name": "Pershing Square Capital Management, L.P.", "through": "2026-08-14"}]
+    filings = [
+        {"cik": "0001336528", "form": "13F-HR", "report_date": "2026-03-31", "filing_date": "2026-05-15", "accession": "old-q1"},
+        {"cik": "0001336528", "form": "13F-NT", "report_date": "2026-06-30", "filing_date": "2026-08-14", "accession": "old-q2-notice"},
+        {"cik": "0002026053", "form": "13F-HR", "report_date": "2026-03-31", "filing_date": "2026-05-15", "accession": "new-q1"},
+        {"cik": "0002026053", "form": "13F-HR", "report_date": "2026-06-30", "filing_date": "2026-08-14", "accession": "new-q2"},
+        {"cik": "0002026053", "form": "13F-HR", "report_date": "2026-09-30", "filing_date": "2026-11-14", "accession": "new-q3"},
+        {"cik": "0001336528", "form": "13F-HR", "report_date": "2026-09-30", "filing_date": "2026-11-14", "accession": "old-after-through"},
+    ]
+    kept = ingest_13f.select_successor_filings(filings, "0002026053", history)
+    assert [row["accession"] for row in kept] == ["old-q1", "old-q2-notice", "new-q2", "new-q3"]
+    from thirteenf_period import periods_for_fund
+
+    groups = periods_for_fund(kept, 4)
+    assert [group[-1]["accession"] for group in groups] == ["old-q1", "new-q2", "new-q3"]
+
+
 def test_workflow_runs_the_registry_ingest():
     text = Path(__file__).resolve().parents[3].joinpath(".github/workflows/data-pipeline.yml").read_text(encoding="utf-8")
     assert 'python _system/scripts/ingest_13f.py --periods "${THIRTEEN_F_PERIODS:-2}" --alerts' in text

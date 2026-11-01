@@ -154,6 +154,8 @@ def build_episode_record(
         "themes": analysis_themes(analysis, theme_hits(text or (meta.get("description") or ""))),
         "highlights": meta.get("highlights") or [],
         "summary": meta.get("summary") or None,
+        "description": (meta.get("description") or "").strip()[:8000] or None,
+        "enclosure_hash": meta.get("enclosure_hash"),
         "reader_summary": meta.get("reader_summary") if isinstance(meta.get("reader_summary"), dict) else None,
         "in_book": any(bool(c.get("in_book")) for c in (resolved.get("companies") or []))
         or any(bool(o.get("in_book")) for o in (resolved.get("officers") or [])),
@@ -326,7 +328,7 @@ def reader_summary_detail(reader: dict | None) -> dict | None:
         "source_label": reader.get("source_label"),
         "headline": (reader.get("headline") or "")[:240] or None,
         "overview": (reader.get("overview") or "")[:1200],
-        "key_points": points[:5],
+        "key_points": points[:8],
         "why_it_matters": (reader.get("why_it_matters") or "")[:500] or None,
         "coverage": {
             "source_chars": coverage.get("source_chars"),
@@ -437,7 +439,21 @@ def write_podcast_index_mirror(payload: dict) -> Path:
     return INDEX_MIRROR_PATH
 
 
-def episode_detail_payload(ep: dict) -> dict:
+# The vault is private, so the public detail page can only show a transcript
+# that was copied into the shard. Longer episodes keep the opening.
+TRANSCRIPT_CAP = 400_000
+
+
+def episode_notes(ep: dict) -> str | None:
+    """Publisher notes for episodes that do not yet have a real transcript."""
+    text = " ".join(str(ep.get("description") or "").split()).strip()
+    if len(text) < 80:
+        return None
+    return text[:6000]
+
+
+def episode_detail_payload(ep: dict, transcript: str | None = None,
+                           transcript_truncated: bool = False) -> dict:
     """Lazy-load payload for Podcasts tab episode click (~2 KB avg)."""
     try:
         from summarize_podcast_episode import filter_highlights  # noqa: WPS433
@@ -516,7 +532,12 @@ def episode_detail_payload(ep: dict) -> dict:
         "source_document": ep.get("source_document"),
         "link": ep.get("link"),
         "highlight_count": len(highlights),
+        "notes": episode_notes(ep),
+        "transcript_source": ep.get("transcript_source"),
     }
+    if transcript:
+        detail["transcript"] = transcript
+        detail["transcript_truncated"] = bool(transcript_truncated)
     analysis = ep.get("analysis") if isinstance(ep.get("analysis"), dict) else None
     if analysis or claims:
         detail["thesis"] = (ep.get("thesis") or "").strip() or None
@@ -526,7 +547,9 @@ def episode_detail_payload(ep: dict) -> dict:
     return detail
 
 
-def emit_episode_detail_shards(payload: dict | None = None) -> int:
+def emit_episode_detail_shards(payload: dict | None = None,
+                               transcripts: dict | None = None,
+                               truncated: dict | None = None) -> int:
     """Write dashboard/data/insights/podcast_episodes/{episode_id}.json for click-through."""
     out_dir = ROOT / "dashboard" / "data" / "insights" / "podcast_episodes"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -543,7 +566,11 @@ def emit_episode_detail_shards(payload: dict | None = None) -> int:
         # Safe filename
         safe = re.sub(r"[^A-Za-z0-9._-]+", "_", str(eid))[:180]
         keep.add(f"{safe}.json")
-        detail = episode_detail_payload(ep)
+        detail = episode_detail_payload(
+            ep,
+            transcript=(transcripts or {}).get(str(eid)),
+            transcript_truncated=bool((truncated or {}).get(str(eid))),
+        )
         path = out_dir / f"{safe}.json"
         path.write_text(json.dumps(detail, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
         written += 1
@@ -555,6 +582,80 @@ def emit_episode_detail_shards(payload: dict | None = None) -> int:
             except OSError:
                 pass
     return written
+
+
+def _episode_rank(ep: dict) -> tuple:
+    reader = ep.get("reader_summary") if isinstance(ep.get("reader_summary"), dict) else {}
+    return (
+        1 if reader.get("status") == "ready" and reader.get("source_basis") == "transcript" else 0,
+        1 if ep.get("claims") or ep.get("analysis") else 0,
+        1 if ep.get("transcript_source") == "whisper" else 0,
+        1 if reader.get("source_basis") == "transcript" else 0,
+        1 if reader.get("overview") else 0,
+        len(ep.get("description") or ""),
+        str(ep.get("published") or ""),
+    )
+
+
+def merge_episode_pair(a: dict, b: dict) -> dict:
+    """Keep the richer copy of one recording and fill gaps from the other."""
+    winner, loser = (a, b) if _episode_rank(a) >= _episode_rank(b) else (b, a)
+    winner = dict(winner)
+    for key in (
+        "claims", "numbers", "analysis", "thesis", "description", "summary",
+        "highlights", "positions", "themes", "guests", "reader_summary",
+    ):
+        if not winner.get(key) and loser.get(key):
+            winner[key] = loser[key]
+    for flag in ("in_book", "near_universe", "has_pz_guest", "has_officer_hit"):
+        winner[flag] = bool(winner.get(flag) or loser.get(flag))
+    return winner
+
+
+def dedupe_episodes(episodes: list[dict]) -> list[dict]:
+    """Collapse the same recording saved twice under different ids.
+
+    Podcast Index and a show's own feed often mint different guids for one
+    audio file. The enclosure hash is the recording; the episode id is not.
+    """
+    parent = list(range(len(episodes)))
+
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    def union(i: int, j: int) -> None:
+        ri, rj = find(i), find(j)
+        if ri != rj:
+            parent[rj] = ri
+
+    by_enc: dict[str, int] = {}
+    by_id: dict[str, int] = {}
+    for i, ep in enumerate(episodes):
+        enc = str(ep.get("enclosure_hash") or "")
+        eid = str(ep.get("episode_id") or "")
+        if enc:
+            if enc in by_enc:
+                union(i, by_enc[enc])
+            else:
+                by_enc[enc] = i
+        if eid:
+            if eid in by_id:
+                union(i, by_id[eid])
+            else:
+                by_id[eid] = i
+    groups: dict[int, list[dict]] = {}
+    for i, ep in enumerate(episodes):
+        groups.setdefault(find(i), []).append(ep)
+    out: list[dict] = []
+    for members in groups.values():
+        kept = members[0]
+        for other in members[1:]:
+            kept = merge_episode_pair(kept, other)
+        out.append(kept)
+    return out
 
 
 def build() -> dict:
@@ -575,6 +676,8 @@ def build() -> dict:
         filter_highlights = lambda hs: list(hs or [])  # type: ignore
 
     episodes: list[dict] = []
+    transcripts: dict[str, str] = {}
+    truncated: dict[str, bool] = {}
     for txt_path, meta_path in iter_episode_files(root) or []:
         meta = load_json(meta_path) or {}
         if not meta.get("episode_id"):
@@ -587,8 +690,14 @@ def build() -> dict:
             rec["summary"] = meta["summary"]
         if isinstance(meta.get("reader_summary"), dict):
             rec["reader_summary"] = meta["reader_summary"]
+        eid = str(rec.get("episode_id") or "")
+        if eid and txt_path.is_file():
+            raw = txt_path.read_text(encoding="utf-8", errors="replace")
+            transcripts[eid] = raw[:TRANSCRIPT_CAP]
+            truncated[eid] = len(raw) > TRANSCRIPT_CAP
         episodes.append(rec)
 
+    episodes = dedupe_episodes(episodes)
     episodes.sort(key=lambda e: e.get("published") or "", reverse=True)
     # Progress metrics
     txt_count = sum(1 for _ in (root / "episodes").rglob("*.txt")) if (root / "episodes").is_dir() else 0
@@ -608,7 +717,7 @@ def build() -> dict:
     }
     (root / "insights.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     write_podcast_index_mirror(payload)
-    detail_n = emit_episode_detail_shards(payload)
+    detail_n = emit_episode_detail_shards(payload, transcripts, truncated)
     payload["episode_detail_shards"] = detail_n
     return payload
 

@@ -2107,7 +2107,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "4e99c518e26e6febecdf481e951efad96d47f4c3b63fa1dd4964cdbf00b4c3ae",
+    "model_hash": "113aa73ebf047cdb9ac6ec07b82bf47c224e8dc92ce1ef142235eaca79014c43",
     "method_versions": [
       "infrastructure_owner_cash_dcf@1.0",
       "milestone_project_option@1.0",
@@ -2127,6 +2127,142 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "APLD",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-08-04",
+    "quote": {
+      "value": 25.41,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo APLD close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "77140906368d98e3cff201bec60d56c9dc27789ed99ba416fac79f7e468a4ffd",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "existing_network",
+        "method": "infrastructure_owner_cash_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "contracted_expansion",
+        "method": "reinvestment_return_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "uncontracted_option",
+        "method": "milestone_project_option",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "method": "net_debt_and_realization_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "existing_network",
+        "case": "low",
+        "code": "realization_timing_missing:gross_per_share"
+      },
+      {
+        "component_id": "existing_network",
+        "case": "base",
+        "code": "realization_timing_missing:gross_per_share"
+      },
+      {
+        "component_id": "existing_network",
+        "case": "high",
+        "code": "realization_timing_missing:gross_per_share"
+      },
+      {
+        "component_id": "contracted_expansion",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "contracted_expansion",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "contracted_expansion",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "uncontracted_option",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "uncontracted_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "uncontracted_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:claim_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "0ede83d145ea353cee7dd31cb5252e8847085376d855b3be228a93caafef95b5"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

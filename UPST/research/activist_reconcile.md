@@ -1,6 +1,6 @@
 # UPST — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
+**Date:** 2026-10-24
 **Reports processed:** 1
 **Human review:** 0
 
@@ -8,7 +8,7 @@
 
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
-| Bleecker Street Research | short | None | publisher_report | auto_signal | campaign_active | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-10_upst.html` |
+| Bleecker Street Research | short | None | publisher_report | auto_signal | campaign_active | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-11_upst.html` |
 ## [HUMAN REVIEW]
 
 - Confirm activist 13D intent vs passive 13G before stance changes.

@@ -23,6 +23,8 @@ def test_private_sleeve_snapshots_are_never_deployed(tmp_path: Path, monkeypatch
     _write_json(source / "data" / "sleeves_michael.json", {"positions": [{"ticker": "SECRET"}]})
     _write_json(source / "data" / "sleeves_future_owner.json", {"positions": [{"ticker": "SECRET"}]})
     _write_json(source / "data" / "portfolio" / "latest.json", {"positions": [{"ticker": "SECRET"}]})
+    (source / "original.pdf").write_bytes(b"private original")
+    (source / "extract.txt").write_text("private extract", encoding="utf-8")
 
     monkeypatch.setattr(builder, "ROOT", tmp_path)
     monkeypatch.setattr(builder, "DEFAULT_SOURCE", source)
@@ -35,6 +37,10 @@ def test_private_sleeve_snapshots_are_never_deployed(tmp_path: Path, monkeypatch
     reasons = {row["path"]: row["reason"] for row in report["excluded"]}
     assert reasons["data/sleeves_drew.json"] == "private account artifact"
     assert reasons["data/sleeves_michael.json"] == "private account artifact"
+    assert not (output / "original.pdf").exists()
+    assert not (output / "extract.txt").exists()
+    assert json.loads((output / "_routes.json").read_text()) == {"version": 1, "include": ["/*"], "exclude": []}
+    assert "public, max-age" not in (output / "_headers").read_text()
 
 
 def test_asset_versions_are_stamped_from_content(tmp_path: Path) -> None:
@@ -70,6 +76,56 @@ def test_asset_versions_are_stamped_from_content(tmp_path: Path) -> None:
     (site / "app.js").write_text("console.log(2)", encoding="utf-8")
     builder.stamp_asset_versions(site)
     assert (site / "index.html").read_text(encoding="utf-8") != first
+
+
+def test_published_buyback_histories_are_bundled_and_old_snapshots_are_omitted(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    current = "a" * 20
+    retired = "b" * 20
+    _write_json(site / "data" / "buyback_manifest.json", {"snapshot_id": current})
+    first = {"issuer_id": "cik:1", "series": {"actual": [1]}}
+    second = {"issuer_id": "cik:2", "series": {"actual": [2]}}
+    _write_json(site / "data" / "buyback_snapshots" / current / "companies.json", {"companies": []})
+    _write_json(site / "data" / "buyback_snapshots" / current / "details" / "cik_1.json", first)
+    _write_json(site / "data" / "buyback_snapshots" / current / "details" / "cik_2.json", second)
+    _write_json(site / "data" / "buyback_snapshots" / retired / "companies.json", {"companies": ["retired"]})
+    _write_json(site / "data" / "buyback_snapshots" / retired / "details" / "cik_9.json", {"issuer_id": "cik:9"})
+
+    packed = builder.pack_published_buyback_details(site, max_bytes=180)
+
+    assert packed["packed_details"] == 2
+    assert packed["detail_bundles"] == 2
+    assert packed["omitted_snapshots"] == [retired]
+    assert not (site / "data" / "buyback_snapshots" / retired).exists()
+    assert not (site / "data" / "buyback_snapshots" / current / "details").exists()
+    assert (site / "data" / "buyback_snapshots" / current / "companies.json").is_file()
+    mapping = json.loads((site / "data" / "buyback_snapshots" / current / "detail_bundles.json").read_text())
+    assert set(mapping) == {
+        f"buyback_snapshots/{current}/details/cik_1.json",
+        f"buyback_snapshots/{current}/details/cik_2.json",
+    }
+    restored = {}
+    for relative, bundle in mapping.items():
+        body = json.loads((site / "data" / bundle).read_text(encoding="utf-8"))
+        restored[relative] = body["assets"][relative]
+        assert (site / "data" / bundle).stat().st_size <= 180
+    assert restored[f"buyback_snapshots/{current}/details/cik_1.json"] == first
+    assert restored[f"buyback_snapshots/{current}/details/cik_2.json"] == second
+
+
+def test_buyback_detail_names_outside_the_reader_pattern_stop_the_build(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    current = "c" * 20
+    _write_json(site / "data" / "buyback_manifest.json", {"snapshot_id": current})
+    (site / "data" / "buyback_snapshots" / current / "details").mkdir(parents=True)
+    (site / "data" / "buyback_snapshots" / current / "details" / "notes.txt").write_text("no", encoding="utf-8")
+
+    try:
+        builder.pack_published_buyback_details(site)
+    except RuntimeError as exc:
+        assert "published name pattern" in str(exc)
+    else:
+        raise AssertionError("unexpected detail names were packed")
 
 
 def test_stamping_leaves_missing_assets_alone(tmp_path: Path) -> None:

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/magis-capital-partners/single-stock-investments/blob/main/_system/data/desk_briefs/schema.json",
+  "$id": "magis.desk_briefs.v2",
   "title": "Desk brief",
   "description": "One ranked brief from one Magis desk bot for one day. Proposal: _system/proposals/one_hub_for_humans_and_bots_2026-10-11.md, 'Desk brief contract'. Validated by _system/scripts/check_desk_briefs.py, which also checks what a schema cannot: the ticker is in the registry, as_of matches the file name, inputs_read paths exist.",
   "type": "object",
@@ -20,7 +20,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "desk_briefs.v1"
+      "enum": ["desk_briefs.v1", "desk_briefs.v2"]
     },
     "desk": {
       "description": "The desk id. Also the directory the file lives in.",
@@ -100,6 +100,7 @@
           "confidence"
         ],
         "properties": {
+          "event_id": {"type": "string", "minLength": 8},
           "ticker": {
             "description": "A ticker in _system/portfolio/registry.json holdings or watchlist, or the literal 'unresolved'.",
             "type": "string",
@@ -138,6 +139,8 @@
                 "ref"
               ],
               "properties": {
+                "as_of": {"type": ["string", "null"], "maxLength": 40},
+                "claim_type": {"enum": ["fact", "inference", "opinion"]},
                 "kind": {
                   "enum": [
                     "filing",

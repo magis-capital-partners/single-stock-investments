@@ -1,0 +1,250 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "nol_tax_assets",
+  "as_of": "2026-10-30",
+  "author": "grok-drew-nol-tax-assets",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/nol_screener.json",
+      "generated_at": "2026-10-29T19:31:29Z"
+    },
+    {
+      "path": "dashboard/data/nol_382_facts.json",
+      "generated_at": "2026-10-29T16:47:08Z"
+    },
+    {
+      "path": "_system/portfolio/registry.json",
+      "generated_at": "2026-10-29T19:27:21Z"
+    },
+    {
+      "path": "_system/data/desk_briefs/schema.json",
+      "generated_at": null
+    }
+  ],
+  "items": [
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: the Q3 10-Q holds a $79M valuation allowance tied to net operating loss limitations.",
+      "one_number": "valuation allowance $79M at 2026-09-30",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0000908937-26-000028, Note (15) Income Taxes",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000028/0000908937-26-000028.txt",
+          "as_of": "2026-09-30",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0000908937-26-000022, XBRL DeferredTaxAssetsValuationAllowance 79000000 at 2026-06-30",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000022/0000908937-26-000022.txt",
+          "as_of": "2026-06-30",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: $79M at 2026-09-30, unchanged from 2026-06-30 in XBRL; $87M at 2025-12-31. VA 'not likely to be realized due to the timing of certain federal and state net operating loss limitations'. No Section 382 dollar limit stated.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: Q3 income tax expense was $99M on $416M pretax income, an effective rate of 23.8 percent.",
+      "one_number": "tax $99M on $416M pretax, ETR 23.8%",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0000908937-26-000028, condensed statements of comprehensive income",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000028/0000908937-26-000028.txt",
+          "as_of": "2026-09-30",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: FY2026 effective tax rate estimate about 23 percent per the same 10-Q. No NOL present value. No Section 382 dollar limit. An NOL is not the buy thesis.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: the 10-K says NOLs are 'subject to Section 382 limitations' but states no dollar limit.",
+      "one_number": "382 dollar limit: not stated",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0000908937-26-000006 p. F-41, Income Taxes",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000006/0000908937-26-000006.txt",
+          "as_of": "2025-12-31",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "nol_382_facts.json SIRI row needs_review true; generated_at 2026-10-29T16:47:08Z (commit 1393b05, PR #1368)",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: the limitations language is present; no ownership change and no dollar limit stated. No 382 dollar limit inferred.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: the Q3 8-K shows a $92M GAAP pretax loss and an $11M tax benefit, including a $101M impairment.",
+      "one_number": "Q3 pretax loss $92M; tax benefit $11M",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "8-K Ex.99.1 accession 0000814453-26-000035",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000081445326000035/0000814453-26-000035.txt",
+          "as_of": "2026-10-30",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: the $101M impairment is of acquired intangible assets. No NOL, valuation allowance or Section 382 disclosure in the release. 10-Q pending.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NOL facts file rebuilt: 8 rows, zero stated Section 382 dollar limits.",
+      "one_number": "8 rows, 0 stated 382 dollar limits",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_382_facts.json generated_at 2026-10-29T16:47:08Z (commit 1393b05, PR #1368)",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Ops: each row carries its income-tax-note accession. WYY is not covered by the facts file. No dollar limit in any row.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "REI: the 10-K records a prior ownership change; it states no Section 382 dollar limit.",
+      "one_number": "prior ownership change; no dollar limit",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0001384195-26-000050 p. F-41, Note 14 Income Taxes",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000050/0001384195-26-000050.txt",
+          "as_of": "2025-12-31",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact per filing. Blocked: prior_ownership_change. No dollar limit stated.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "VNDA: ownership changes in 2014 and 2025; full valuation allowance at 2026-09-30.",
+      "one_number": "full VA at 2026-09-30; no dollar limit",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0001628280-26-007460; 10-Q accession 0001347178-26-000002 Note 11 Income Taxes",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/0001347178-26-000002.txt",
+          "as_of": "2026-09-30",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact per filings. Blocked. No Section 382 dollar limit stated.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "TTI: the NOL rights plan triggers at a 4.99 percent acquisition threshold.",
+      "one_number": "rights-plan trigger 4.99%",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0000844965-26-000015 Note 15 p. F-35; DEF 14A accession 0000844965-26-000026",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000015/0000844965-26-000015.txt",
+          "as_of": "2025-12-31",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: 4.99 percent trigger. Inference: the effect on a change of control is inference, not stated.",
+      "lane": "rights_plan"
+    },
+    {
+      "ticker": "BIIB",
+      "headline": "BIIB: the screener's 283.4 percent allowance ratio is a data error, not used.",
+      "one_number": "allowance_pct 283.4% (data error)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json BIIB allowance_pct 283.4 (VA exceeds DTA); built 2026-10-29T19:31:29Z (commit 19408b8)",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TAX-07 data flag carried. Correction proposal, not a screener edit. Not a buy case.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: still on the screener actionable list (material_after_382). That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json SIRI material_after_382; built 2026-10-29T19:31:29Z (commit 19408b8)",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "WYY: still on the screener actionable list (material_after_382). That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json WYY material_after_382; built 2026-10-29T19:31:29Z (commit 19408b8)",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: still on the screener actionable list (material_after_382). That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json NWL material_after_382; built 2026-10-29T19:31:29Z (commit 19408b8)",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "lane": "actionable"
+    }
+  ],
+  "screens_empty": [],
+  "notes": "Blocker tally, fact, matches nol_screener.json built 2026-10-29: fully reserved 61; prior ownership change 2; carryforward above the 382 model 8; DTA mostly timing 16; rights plan 1; needs review 1; no NOL component 13; no market cap 21; stale CIK 4. No present value. No control premium. A deferred tax asset is not cash. No Section 382 dollar limit unless an item names an accession. SIRI 10-Q -000028 landed 2026-10-29, the same day as its 8-K -000027.",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}

@@ -1,7 +1,7 @@
 # GD — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 2
+**Date:** 2026-10-24
+**Reports processed:** 1
 **Human review:** 1
 
 ## Summary
@@ -9,7 +9,6 @@
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
 | Unresolved SEC filer | long | 2023-10-02 | activist_13d | human_review | needs_human | `GD/third-party-analyses/activist_reports/long/SC-13D/A_20231002_acc0001193125_23_249110.htm` |
-| Longview Asset Management, LLC | long | 2026-10-06 | activist_13d | auto_context | context | `GD/third-party-analyses/activist_reports/long/SC-13D/A_20261006_acc0001193125_26_415880.xml` |
 
 ## Notes (human review)
 

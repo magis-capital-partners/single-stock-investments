@@ -1,7 +1,7 @@
 # KRP — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 134 total (0 approved, 0 pending, 134 context)
+**Date:** 2026-10-25
+**Sources:** 135 total (0 approved, 0 pending, 135 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -139,5 +139,6 @@
 | activist_long | acc0001104659 26 084429 | `KRP/third-party-analyses/activist_reports/long/8-K_20260717_acc0001104659_26_084429.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 092355 | `KRP/third-party-analyses/activist_reports/long/8-K_20260807_acc0001104659_26_092355.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 099989 | `KRP/third-party-analyses/activist_reports/long/8-K_20260824_acc0001104659_26_099989.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 116612 | `KRP/third-party-analyses/activist_reports/long/8-K_20261016_acc0001104659_26_116612.htm` | context | activist/long — local |
 
-Cross-check required: `KRP/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `KRP/research/cross_check_third_party_2026-10-25.md`

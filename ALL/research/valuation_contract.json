@@ -3715,7 +3715,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "952f41d55270fdc6af0becbcca4ddd1b2e49f1de932606cf7802f445a31ea158",
+    "model_hash": "e87e5ba1f6f593fb139020b0b4efb044a4a1298061c2b2acf0eabb0bf401aea7",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0"
@@ -3724,6 +3724,170 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "ALL",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-21",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 251.72,
+      "as_of": "2026-07-21",
+      "source_url": "Yahoo ALL close 2026-07-21",
+      "currency": null
+    },
+    "forecast_hash": "42032a2b0a0747766c8baf599dae49b4d9e5c2b869038708aa01e48ad4d49fc4",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "property_liability_underwriting_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 167.999,
+          "base": 231.9987,
+          "high": 294.9983
+        }
+      },
+      {
+        "component_id": "protection_services_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 6.0013,
+          "base": 12.0027,
+          "high": 22.0049
+        }
+      },
+      {
+        "component_id": "investment_float_surplus",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "catastrophe_and_cycle_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "investment_float_surplus",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "investment_float_surplus",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "investment_float_surplus",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:net_debt_claim_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_debt_claim_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_debt_claim_m"
+      },
+      {
+        "component_id": "catastrophe_and_cycle_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "catastrophe_and_cycle_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "catastrophe_and_cycle_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "segment_claim_m",
+        "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+        "locator": "Property-Liability underwriting income $8540.0M FY2025 segment table",
+        "as_of": "2025-12-31",
+        "source_id": "e1cb33de118a3362446d82d1cd7ed6a07668395409b130d0eac296aec5aefa3b"
+      },
+      {
+        "node_id": "normalized_owner_cash_m",
+        "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+        "locator": "Owner cash $30.0/sh on 267.1M shares; PL+PS pool $8758.0M",
+        "as_of": "2025-12-31",
+        "source_id": "60c8a06a12b03fa35a85c9be6833138121d6158f895ef5afba544d00631cfab4"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 267.1M FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "942a43e2df8bdec9c614888660dbf70628f376c310c7de92e2d966445ff48d1f"
+      },
+      {
+        "node_id": "segment_claim_m",
+        "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+        "locator": "Protection Services adjusted net income after-tax $218.0M FY2025 segment table",
+        "as_of": "2025-12-31",
+        "source_id": "39c7052fb003bf35bc1800d50b410bb648ac018638aa07d4237c10e2048cec4a"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "94d9ad354204552f502c3d4f8d8682e1787f311600169370983ecf9ab2364c63"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

@@ -1,7 +1,7 @@
 # NG — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 121 total (0 approved, 0 pending, 121 context)
+**Date:** 2026-10-25
+**Sources:** 122 total (0 approved, 0 pending, 122 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -126,5 +126,6 @@
 | activist_long | acc0001104659 26 113739 | `NG/third-party-analyses/activist_reports/long/8-K_20261005_acc0001104659_26_113739.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 113779 | `NG/third-party-analyses/activist_reports/long/8-K_20261005_acc0001104659_26_113779.htm` | context | activist/long — local |
 | activist_long | acc0001171843 26 006528 | `NG/third-party-analyses/activist_reports/long/8-K_20261008_acc0001171843_26_006528.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 118473 | `NG/third-party-analyses/activist_reports/long/8-K_20261023_acc0001104659_26_118473.htm` | context | activist/long — local |
 
-Cross-check required: `NG/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `NG/research/cross_check_third_party_2026-10-25.md`

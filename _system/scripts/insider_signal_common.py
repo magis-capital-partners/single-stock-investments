@@ -192,7 +192,13 @@ def parse_form4_html(html: str, meta: dict) -> list[dict]:
             "price": price,
             "value_usd": round(shares * price, 2),
             "acquired_disposed": ad_code,
-            "transaction_code": "P" if ad_code == "A" else "S",
+            "transaction_code": "",  # A/D is acquisition/disposal, not a transaction code.
+            "issuer_ticker": None,
+            "issuer_cik": None,
+            "issuer_name": None,
+            "owner_cik": None,
+            "security_title": "Common Stock",
+            "identity_status": "unresolved_html",
             "shares_owned_after": shares_after,
             "is_10b5_1": is_10b5_1,
             "is_proposed_sale": is_proposed,
@@ -200,6 +206,23 @@ def parse_form4_html(html: str, meta: dict) -> list[dict]:
             "source_path": meta.get("source_path"),
         })
     return txs
+
+
+def issuer_symbol_for_security(raw: str | None, security_title: str | None) -> str | None:
+    symbols = re.findall(r'[A-Z][A-Z0-9]*(?:[.\-][A-Z0-9]+)?', (raw or '').upper())
+    if len(symbols) == 1:
+        return symbols[0]
+    share_class = re.search(r'\bClass\s+([A-Z])\b', security_title or '', re.I)
+    if share_class:
+        letter = share_class[1].upper()
+        match = [s for s in symbols if s.endswith(('.' + letter, '-' + letter))]
+        if len(match) == 1:
+            return match[0]
+        # Issuers commonly leave Class A unsuffixed and suffix their Class B.
+        base = [s for s in symbols if '.' not in s and '-' not in s]
+        if letter == 'A' and len(base) == 1 and all(s == base[0] or s.startswith((base[0] + '.', base[0] + '-')) for s in symbols):
+            return base[0]
+    return None
 
 
 def parse_form4_xml(xml: str, meta: dict) -> list[dict]:
@@ -224,7 +247,7 @@ def parse_form4_xml(xml: str, meta: dict) -> list[dict]:
     is_10b5_1 = (_xml_text(doc, "aff10b5One") or "0") == "1"
 
     txs: list[dict] = []
-    for tx in doc.findall(".//nonDerivativeTransaction"):
+    for tx_index, tx in enumerate(doc.findall(".//nonDerivativeTransaction")):
         tx_date = _xml_text(tx, "transactionDate")
         if not tx_date:
             continue
@@ -242,9 +265,15 @@ def parse_form4_xml(xml: str, meta: dict) -> list[dict]:
         shares_after = int(float(after_s.replace(",", ""))) if after_s else None
         # Prefer explicit Form 4 transactionCode (P=open-market purchase, A=grant, etc.)
         tx_code = (_xml_text(tx, ".//transactionCode") or "").upper().strip()
-        if not tx_code:
-            tx_code = "P" if ad_code == "A" else "S"
         txs.append({
+            "transaction_index": tx_index,
+            "issuer_ticker": issuer_symbol_for_security(_xml_text(doc, './/issuerTradingSymbol'), _xml_text(tx, 'securityTitle')),
+            "issuer_symbols": _xml_text(doc, './/issuerTradingSymbol'),
+            "issuer_cik": _xml_text(doc, ".//issuerCik"),
+            "issuer_name": _xml_text(doc, ".//issuerName"),
+            "owner_cik": _xml_text(doc, ".//rptOwnerCik"),
+            "security_title": _xml_text(tx, "securityTitle"),
+            "identity_status": "verified_xml" if _xml_text(doc, ".//issuerCik") and issuer_symbol_for_security(_xml_text(doc, './/issuerTradingSymbol'), _xml_text(tx, 'securityTitle')) else "ambiguous_share_class",
             "insider": insider,
             "title": title,
             "is_director": is_director,
@@ -378,6 +407,16 @@ def cluster_bonus(txs: list[dict], cfg: dict) -> float:
     return 0.0
 
 
+def verified_issuer_transaction(tx: dict, ticker: str, expected_cik: str | None = None) -> bool:
+    from security_profiles import canonical_symbol
+    cik = str(tx.get('issuer_cik') or '').lstrip('0')
+    expected = cik_for_ticker(ticker) if expected_cik is None else expected_cik
+    code = tx.get('transaction_code')
+    return (bool(cik) and canonical_symbol(tx.get('issuer_ticker')) == canonical_symbol(ticker)
+            and (not expected or cik == str(expected).lstrip('0'))
+            and (code, tx.get('acquired_disposed')) in {('P', 'A'), ('S', 'D')})
+
+
 def score_transactions(
     ticker: str,
     txs: list[dict],
@@ -387,6 +426,8 @@ def score_transactions(
 ) -> dict:
     cfg = cfg or load_json(CONFIG_PATH)
     domain_cfg = domain_cfg or load_json(DOMAIN_PATH)
+    expected_cik = cik_for_ticker(ticker) or ''
+    txs = [t for t in txs if verified_issuer_transaction(t, ticker, expected_cik)]
     half_life = float(cfg.get("recency_half_life_days", 120))
     recency_floor = float(cfg.get("recency_floor", 0.45))
     sale_cap = float(cfg.get("sale_negative_cap", 1.0))
@@ -396,7 +437,7 @@ def score_transactions(
     scored_rows: list[dict] = []
 
     for tx in txs:
-        if tx.get("acquired_disposed") == "A":
+        if tx.get("transaction_code") == "P":
             # Open-market buys only; skip grants/awards with no price.
             if not tx.get("price") or float(tx.get("price") or 0) <= 0:
                 continue
@@ -538,7 +579,8 @@ def write_transactions_csv(ticker: str, txs: list[dict]) -> Path:
     fields = [
         "insider", "title", "transaction_date", "filing_date", "shares", "price",
         "value_usd", "acquired_disposed", "transaction_code", "shares_owned_after",
-        "is_10b5_1", "is_director", "is_officer", "accession", "source_path",
+        "is_10b5_1", "is_director", "is_officer", "is_ten_pct_owner", "accession", "source_path",
+        "issuer_ticker", "issuer_symbols", "issuer_cik", "issuer_name", "owner_cik", "security_title", "identity_status", "transaction_index",
     ]
     with path.open("w", encoding="utf-8", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=fields, extrasaction="ignore")
@@ -567,7 +609,7 @@ def read_transactions_csv(ticker: str) -> list[dict]:
                         row[key] = float(row[key])
                     except ValueError:
                         pass
-            for key in ("is_10b5_1", "is_director", "is_officer"):
+            for key in ("is_10b5_1", "is_director", "is_officer", 'is_ten_pct_owner'):
                 if key in row:
                     row[key] = str(row[key]).lower() in ("1", "true", "yes")
             rows.append(row)
@@ -582,7 +624,8 @@ def update_manifest(ticker: str, txs: list[dict], *, error: str | None = None) -
     buys = [t for t in txs if t.get("acquired_disposed") == "A"]
     sells = [t for t in txs if t.get("acquired_disposed") == "D"]
     manifest["tickers"][ticker.upper()] = {
-        "as_of": TODAY,
+        "as_of": max((t.get('filing_date') or t.get('transaction_date') or '' for t in txs), default=TODAY),
+        "processed_at": TODAY,
         "transaction_count": len(txs),
         "buy_count": len(buys),
         "sell_count": len(sells),
@@ -614,6 +657,12 @@ def build_insider_signal(ticker: str, txs: list[dict] | None = None) -> dict | N
         txs = fetch_transactions_for_ticker(ticker, window)
     if not txs:
         return None
+    # A reporting owner's filing history also contains trades in other issuers.
+    # Those trades must never inflate conviction in the reporting owner's shares.
+    expected_cik = cik_for_ticker(ticker) or ''
+    txs = [t for t in txs if verified_issuer_transaction(t, ticker, expected_cik)]
+    if not txs:
+        return None
     cutoff = (date.today() - timedelta(days=window)).isoformat()
     txs = [t for t in txs if (t.get("transaction_date") or "") >= cutoff]
     if not txs:
@@ -640,8 +689,11 @@ def build_insider_signal(ticker: str, txs: list[dict] | None = None) -> dict | N
             hooks.append(f"{tb['insider']}: domain-relevant open-market buy (×{dm})")
 
     return {
-        "as_of": TODAY,
+        "as_of": max((t.get('filing_date') or t.get('transaction_date') or '' for t in txs), default=TODAY),
         "disclaimer": DISCLAIMER,
+        "processed_at": TODAY,
+        "constituent_identity_verified": True,
+        "score_version": 2,
         "in_base_irr": False,
         "window_days": window,
         "ics": scored["ics"],

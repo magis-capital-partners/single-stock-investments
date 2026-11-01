@@ -1356,7 +1356,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "3ed476291db5155f0b33ba0ff789f80e5599f933acd460b91236fc80d56098a2",
+    "model_hash": "369a481e0eab0ca57e8d764068c7ce81051d6765b95e4112003eb2071be42a29",
     "method_versions": [
       "net_asset_value@1.0",
       "probability_weighted_legal_option@1.0",
@@ -1378,8 +1378,131 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
-  "profile_match": true,
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "MSB",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 24.46,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo MSB close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "68e46bf453f5b968d2d3ecae67832d65661472fc5546b60de3f8de6494b0e700",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "producing_royalty_stream",
+        "method": "royalty_distribution_curve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "arbitration_and_bonus_option",
+        "method": "probability_weighted_legal_option",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0,
+          "base": 0.0
+        }
+      },
+      {
+        "component_id": "trust_cash_and_other_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "producing_royalty_stream",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "producing_royalty_stream",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "producing_royalty_stream",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "arbitration_and_bonus_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "trust_cash_and_other_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "trust_cash_and_other_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "trust_cash_and_other_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "units_m",
+        "ref": "MSB/investor-documents/sec-edgar/10-K_20260422_rpt20260131_acc0001104659_26_046864.htm",
+        "locator": "Cover page, 13,120,010 units outstanding at April 21, 2026",
+        "as_of": "2026-04-21",
+        "source_id": "361629f7c4ccc889be17aa623104e0b414706e566364dbf4f4c1de9719086b9a"
+      },
+      {
+        "node_id": "prior_award_m",
+        "ref": "MSB/investor-documents/sec-edgar/8-K_20241017_rpt20241017_acc0001558370_24_013375.htm",
+        "locator": "Cliffs paid $71,185,029 on 2024-10-04; prior dispute closed",
+        "as_of": "2024-10-04",
+        "source_id": "86e8f6723f7d2fd99d017fc96deac242adc76b929a5706037dc975b7a28a6701"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "969983e4a1dceb69850d797d9885126aa924d770a4bb6d1e993a9b1d6423ba5e"
+  },
   "cohort_expected_profile": "scarce_asset_optionality",
+  "profile_match": true,
   "cohort_purpose": "Finite royalty reserves, depletion, commodity exposure, and distributions.",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,

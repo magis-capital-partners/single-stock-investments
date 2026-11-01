@@ -25,6 +25,7 @@ GROK = "grok/special_situations/2026-10-12-mdt-mmed"
         "_system/memory-hub/research-equity/CONTEXT.md",
         "_system/data/separations/separation_registry.jsonl",
         "_system/data/separations/separation_amendments.jsonl",
+        "_system/data/special_situations/situations.jsonl",
         "_system/research/short-alpha/candidates.json",
         "_system/reference/activist-reports/short_scorecard/Fugazi.csv",
         "MDT/third-party-analyses/vic/vic_2026-10-12_note_ab12.md",
@@ -80,6 +81,18 @@ def test_non_grok_branches_are_not_guarded_here():
 @pytest.mark.parametrize("ref", ["grok/x", "grok/special_situations/notadate-x", "grok/Desk/2026-10-12-x", "GROK/a/2026-10-12-x"])
 def test_malformed_grok_branch_is_other(ref):
     assert guard.classify_branch(ref) == "other"
+
+
+def test_rebuilt_dashboard_payload_stays_on_the_data_lane():
+    ref = "grok/tape_index/2026-10-23-digest"
+    files = [
+        "_system/data/desk_briefs/tape_index/2026-10-23.json",
+        "_system/memory-hub/research-equity/daily/2026-10-23.md",
+        "dashboard/data/desk_briefs.json",
+    ]
+    ok, offending = guard.check(ref, files)
+    assert ok, offending
+    assert lanes.classify(ref, files) == "data"
 
 
 def test_classifier_routes_grok_data_prs_to_the_data_lane():

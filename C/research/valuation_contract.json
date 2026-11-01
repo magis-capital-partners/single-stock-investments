@@ -2866,7 +2866,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "37f57058b990d0c025c0d3ddbc8ad3506554f6b53496b5660078fbb2baf78bf3",
+    "model_hash": "d36884b8801afb7f56d864690248d8ae81f79894765bddefad86ddbaf7816122",
     "method_versions": [
       "capital_structure_and_excess_return@1.0",
       "net_asset_value@1.0",
@@ -2876,8 +2876,198 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
-  "profile_match": true,
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "C",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-08-13",
+    "quote": {
+      "value": 131.62,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo C close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "e579c15ea03b17243cb6e7cc79955194d9238b190ae712b806a2dbc423654228",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "tangible_common_equity",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "normalized_franchise_returns",
+        "method": "capital_structure_and_excess_return",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "transformation_and_excess_capital",
+        "method": "probability_weighted_catalyst_nav",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": -0.0
+        }
+      },
+      {
+        "component_id": "credit_funding_and_regulatory_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "tangible_common_equity",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "tangible_common_equity",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "tangible_common_equity",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "normalized_franchise_returns",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "normalized_franchise_returns",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "normalized_franchise_returns",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "transformation_and_excess_capital",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "transformation_and_excess_capital",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "credit_funding_and_regulatory_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:reserve_gross"
+      },
+      {
+        "component_id": "credit_funding_and_regulatory_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:reserve_gross"
+      },
+      {
+        "component_id": "credit_funding_and_regulatory_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:reserve_gross"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "rwa_m",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "Capital resources: RWA $1,192,174 million under Standardized Approach",
+        "as_of": "2025-12-31",
+        "source_id": "4797d0eedcc4b3d8b554d3449e0b40843787f34d2889fe936819ac0cc905f3bb"
+      },
+      {
+        "node_id": "cet1_ratio_pct",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "CET1 ratio 13.2% vs regulatory minimum 11.6% (Standardized Approach)",
+        "as_of": "2025-12-31",
+        "source_id": "356649cfebd13a731005fa774d0884f1e62ed1e21d67fb2e3840003a01c41a65"
+      },
+      {
+        "node_id": "cet1_required_pct",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "Required CET1 11.6% = 4.5% minimum + 3.6% SCB + 3.5% GSIB surcharge",
+        "as_of": "2025-12-31",
+        "source_id": "d782e0198ff3629b5cfe9f61cd0c3d818876ed60f7832f72be0a7f98a2badf67"
+      },
+      {
+        "node_id": "scb_pct",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "Capital Resources: 3.6% SCB under current Fed stress-test framework",
+        "as_of": "2025-12-31",
+        "source_id": "f0a0f207bf30b1cac93363c6cfc99533b805529610562b35433def2a597caad1"
+      },
+      {
+        "node_id": "gsib_surcharge_pct",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "GSIB surcharge 3.5% for 2025 under method 2",
+        "as_of": "2025-12-31",
+        "source_id": "43bb7d3d2c11b7ffdef29c5d630bb4bd581ce25dc8f69eb5949c71fd81e4f493"
+      },
+      {
+        "node_id": "capital_return_m",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "MD&A: returned $17.6 billion to common shareholders (repurchases $13.3B + dividends)",
+        "as_of": "2025-12-31",
+        "source_id": "c6438d7ef97557ecf8709758d3b6f672d9eb705bb417a58b28dac363c24bcc57"
+      },
+      {
+        "node_id": "transformation_expense_m",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "MD&A: transformation expense approximately $3.3 billion, up 14% YoY",
+        "as_of": "2025-12-31",
+        "source_id": "8f8b7aaa78c0142bfa28bbb581bf10d9945b2a31bb683d796a48c2b1ba7bd4db"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "C/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000831001_26_000011.htm",
+        "locator": "CSO 1,747.5 million",
+        "as_of": "2025-12-31",
+        "source_id": "a7773ff2d95924abf6299562b757fb8d93bae2018f8c9c6b43df90138aea6184"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "a6f8ee8d6afe243ca0009d0d01e0c16af719136e8f81d963ea56b54a3e77db73"
+  },
   "cohort_expected_profile": "credit_and_normalized_returns",
+  "profile_match": true,
   "cohort_purpose": "Tangible capital, normalized RoTCE, credit loss, regulation, and capital return.",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": false,

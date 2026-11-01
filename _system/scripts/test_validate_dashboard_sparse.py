@@ -8,6 +8,7 @@ from pathlib import Path
 from _system.scripts.validate_dashboard_data import (
     repository_file_exists,
     resolve_payload_path,
+    retained_event_count_issue,
 )
 
 
@@ -79,6 +80,31 @@ class ResolvePayloadPathTests(unittest.TestCase):
                 resolve_payload_path(monolith=monolith, core=core, deploy_only=True),
                 core,
             )
+
+
+class RetainedEventCountTests(unittest.TestCase):
+    def test_matching_count_is_not_a_problem(self) -> None:
+        self.assertIsNone(
+            retained_event_count_issue({"retained_event_count": 1549}, 1549, deploy_only=True)
+        )
+
+    def test_stale_count_stays_an_error_in_a_full_validation(self) -> None:
+        self.assertEqual(
+            retained_event_count_issue({"retained_event_count": 1539}, 1549, deploy_only=False),
+            (
+                "error",
+                "event triage retained_event_count does not match events list (1539 vs 1549)",
+            ),
+        )
+
+    def test_deploy_only_validation_warns_instead_of_failing_the_run(self) -> None:
+        self.assertEqual(
+            retained_event_count_issue({"retained_event_count": 1539}, 1549, deploy_only=True),
+            (
+                "warning",
+                "event triage retained_event_count does not match events list (1539 vs 1549)",
+            ),
+        )
 
 
 if __name__ == "__main__":

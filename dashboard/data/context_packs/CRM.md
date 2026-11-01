@@ -17,7 +17,7 @@ The market may be treating Salesforce as a mature, low-growth CRM vendor while A
 - Base return: pending
 
 ## Key assumptions (stable)
-- Price today: **$248.88** (source: Yahoo CRM close 2026-10-22)
+- Price today: **$238.53** (source: Yahoo CRM close 2026-10-13)
 - Normalized owner earnings: **$14,402M** (source: us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001108524-26-000060; form 10-K)
 - Cash: **$8,935M** (source: us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001108524-26-000127; form 10-Q)
 - Debt: **$39,280M** (source: us-gaap:LongTermDebtNoncurrent; accession 0001108524-26-000127; form 10-Q)
@@ -107,11 +107,11 @@ Documents in folder: **87** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2024-08-28 | `third-party-analyses/activist_reports/long/8-K_20240828_acc0001108524_24_
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CRM/research/deep_dive_2026-09-12.md (sha256 sha256:22c5a3e86daa6d1a...)
+- deep_dive: CRM/research/deep_dive_2026-09-12.md (sha256 sha256:257fea8f3429712a...)
 - filing_digest: CRM/research/evidence/filing_digest.md (sha256 sha256:ddff157bc4dc9ce5...)
 - adversarial: CRM/research/adversarial_2026-09-12.md (sha256 sha256:b990ad2bebc5eaca...)
-- valuation: CRM/research/valuation.json (sha256 sha256:903a39200e572bbf...)
-- thesis_card: CRM/research/thesis_card.json (sha256 sha256:4b1083b56dbd4c89...)
+- valuation: CRM/research/valuation.json (sha256 sha256:bdf860851a2426fa...)
+- thesis_card: CRM/research/thesis_card.json (sha256 sha256:fd03941b34275d17...)
 - cross_check: CRM/research/cross_check_third_party_2026-09-12.md (sha256 sha256:ceeb9fe8b0e7f5b9...)
 
 ## Excluded from this pack

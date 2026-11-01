@@ -32,6 +32,7 @@ All gates fail closed. There is no UI override except `execution.allow_live` in 
 - Drew cannot submit systematic LETF names (`ETF_LS` / `B5P` / universe snapshot) or blacklist-family names (those are Michael's).
 - Michael can submit blacklist-family names (JPM, BRK-B, AXP, APLD, SMR, CBRS and wrappers such as APLZ).
 - Michael cannot submit SPXW or systematic LETF plan names.
+- Neither owner can submit SPY or QQQ, shares or options. They are etf-0dte's: its 0DTE executors trade the options in this account, and an assignment delivers shares overnight for its 09:30 unwind to sell. A sleeve SELL could sell that delivery, and a BUY could net against it. The hub's order loop refuses the same contracts on IBKR's identity of the conId (`allocation_policy.etf_0dte_ticket_refusal`).
 
 ## Logging
 

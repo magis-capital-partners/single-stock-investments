@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-10-19",
-  "git_head": "3c5b69521ce876e66ff1d509625e262588aecbbf",
+  "as_of": "2026-11-01",
+  "git_head": "444d036a1f77851845e9b59b281c85ae1eb76f6c",
   "forecast_loop": {
-    "specs": 118,
-    "v2_specs": 118,
-    "testable": 55,
-    "matured": 19,
+    "specs": 126,
+    "v2_specs": 126,
+    "testable": 63,
+    "matured": 23,
     "calibration_eligible": 7,
-    "diagnostic_only": 48,
-    "resolved": 13,
+    "diagnostic_only": 56,
+    "resolved": 17,
     "pending_evidence": 6,
     "overdue": 0
   },
@@ -18,41 +18,41 @@
     "resolved_committee_outcomes": 0
   },
   "proposal_loop": {
-    "total_unique": 1169,
-    "undecided": 290,
+    "total_unique": 1200,
+    "undecided": 311,
     "undecided_by_kind": {
-      "durable_belief": 281,
+      "durable_belief": 302,
       "process_learning": 9
     },
     "duplicate_sightings": 17,
     "dispositions": {
-      "dropped": 607,
-      "routed": 272
+      "dropped": 611,
+      "routed": 278
     },
-    "intake_last_7d": 13,
-    "closures_last_7d": 47,
-    "oldest_undecided_days": 151,
+    "intake_last_7d": 16,
+    "closures_last_7d": 8,
+    "oldest_undecided_days": 164,
     "over_30_days": 254,
-    "p90_age_days": 140,
+    "p90_age_days": 153,
     "sla": {
       "deterministic_disposition_days": 7,
       "durable_human_decision_days": 30,
       "target_p90_days": 14
     },
-    "routed_delivery_pending": 39,
-    "routed_delivery_acknowledged": 233,
+    "routed_delivery_pending": 41,
+    "routed_delivery_acknowledged": 237,
     "ledger_authority": "projection_of_triage_events_jsonl"
   },
   "calibration": {
     "falsifier": {
       "schema_version": "3.0",
       "status": "insufficient_outcomes",
-      "resolved_outcomes": 13,
-      "scored_outcomes": 7,
-      "diagnostic_scored_outcomes": 6,
-      "eligible_scored_outcomes": 1,
-      "probabilistic_outcomes": 1,
-      "brier_score": 0.0324,
+      "resolved_outcomes": 17,
+      "scored_outcomes": 11,
+      "diagnostic_scored_outcomes": 7,
+      "eligible_scored_outcomes": 4,
+      "probabilistic_outcomes": 4,
+      "brier_score": 0.35935,
       "minimum_outcomes": 20,
       "minimum_effective_outcomes": 20,
       "readiness_policy": {
@@ -100,6 +100,76 @@
           "base_rate": null,
           "learning_status": "plumbing_only"
         },
+        "net_asset_value|scarce_asset_optionality": {
+          "method_id": "net_asset_value",
+          "power_zone": "scarce_asset_optionality",
+          "hit": 1,
+          "miss": 0,
+          "unresolvable": 0,
+          "eligible_hit": 1,
+          "eligible_miss": 0,
+          "eligible_unresolvable": 0,
+          "scored_outcomes": 1,
+          "hit_rate": 1.0,
+          "hit_rate_wilson_95": [
+            0.206549,
+            1
+          ],
+          "diagnostic_scored_outcomes": 0,
+          "eligible_scored_outcomes": 1,
+          "effective_outcomes": 1,
+          "probabilistic_outcomes": 1,
+          "distinct_tickers": 1,
+          "distinct_industries": 1,
+          "measurement_periods": 1,
+          "resolution_yield": 1.0,
+          "maximum_cluster_share": 1.0,
+          "hit_rate_eligible": 1.0,
+          "hit_rate_eligible_wilson_95": [
+            0.206549,
+            1
+          ],
+          "brier_score": 0.5625,
+          "brier_skill_vs_climatology": null,
+          "log_loss": 1.386294,
+          "base_rate": 1.0,
+          "learning_status": "collecting"
+        },
+        "owner_cash_or_dividend_discount|predictable_cash_flow": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "power_zone": "predictable_cash_flow",
+          "hit": 1,
+          "miss": 0,
+          "unresolvable": 0,
+          "eligible_hit": 1,
+          "eligible_miss": 0,
+          "eligible_unresolvable": 0,
+          "scored_outcomes": 1,
+          "hit_rate": 1.0,
+          "hit_rate_wilson_95": [
+            0.206549,
+            1
+          ],
+          "diagnostic_scored_outcomes": 0,
+          "eligible_scored_outcomes": 1,
+          "effective_outcomes": 1,
+          "probabilistic_outcomes": 1,
+          "distinct_tickers": 1,
+          "distinct_industries": 1,
+          "measurement_periods": 1,
+          "resolution_yield": 1.0,
+          "maximum_cluster_share": 1.0,
+          "hit_rate_eligible": 1.0,
+          "hit_rate_eligible_wilson_95": [
+            0.206549,
+            1
+          ],
+          "brier_score": 0.64,
+          "brier_skill_vs_climatology": null,
+          "log_loss": 1.609438,
+          "base_rate": 1.0,
+          "learning_status": "collecting"
+        },
         "owner_cash_or_dividend_discount|quality_reinvestment": {
           "method_id": "owner_cash_or_dividend_discount",
           "power_zone": "quality_reinvestment",
@@ -135,36 +205,36 @@
         "owner_earnings_reinvestment_dcf|quality_reinvestment": {
           "method_id": "owner_earnings_reinvestment_dcf",
           "power_zone": "quality_reinvestment",
-          "hit": 1,
+          "hit": 3,
           "miss": 4,
           "unresolvable": 6,
-          "eligible_hit": 0,
+          "eligible_hit": 1,
           "eligible_miss": 1,
           "eligible_unresolvable": 0,
-          "scored_outcomes": 5,
-          "hit_rate": 0.2,
+          "scored_outcomes": 7,
+          "hit_rate": 0.428571,
           "hit_rate_wilson_95": [
-            0.036224,
-            0.624465
+            0.15822,
+            0.749542
           ],
-          "diagnostic_scored_outcomes": 4,
-          "eligible_scored_outcomes": 1,
-          "effective_outcomes": 1,
-          "probabilistic_outcomes": 1,
-          "distinct_tickers": 1,
-          "distinct_industries": 1,
-          "measurement_periods": 1,
+          "diagnostic_scored_outcomes": 5,
+          "eligible_scored_outcomes": 2,
+          "effective_outcomes": 2,
+          "probabilistic_outcomes": 2,
+          "distinct_tickers": 2,
+          "distinct_industries": 2,
+          "measurement_periods": 2,
           "resolution_yield": 1.0,
-          "maximum_cluster_share": 1.0,
-          "hit_rate_eligible": 0.0,
+          "maximum_cluster_share": 0.5,
+          "hit_rate_eligible": 0.5,
           "hit_rate_eligible_wilson_95": [
-            0,
-            0.793451
+            0.094531,
+            0.905469
           ],
-          "brier_score": 0.0324,
-          "brier_skill_vs_climatology": null,
-          "log_loss": 0.198451,
-          "base_rate": 0.0,
+          "brier_score": 0.11745,
+          "brier_skill_vs_climatology": 0.5302,
+          "log_loss": 0.398144,
+          "base_rate": 0.5,
           "learning_status": "collecting"
         }
       },
@@ -183,7 +253,7 @@
   },
   "fast_feedback_loop": {
     "gold_pending": 1,
-    "alerts_pending": 11243,
+    "alerts_pending": 11281,
     "weekly_sample_size": 21,
     "human_ground_truth_required": true,
     "service_level_days": 7

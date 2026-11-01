@@ -50,6 +50,9 @@ jobs:
       # when the push hits a rebase conflict on dashboard/data, and that
       # rebuild refuses without the opt-in (marvin-pick carries every tree).
       DASHBOARD_PRESERVE_DOCUMENT_REGISTRY: "1"
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +64,17 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace
         run: bash _system/scripts/ci_checkout_workspace.sh marvin-pick
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+        with:
+          hydrate: "false"
+      - name: Restore private repository inputs
+        run: python _system/scripts/private_dashboard_assets.py --repository-only
+      # core.json and the other dashboard inputs are private placeholders too.
+      # The forecast refresh refuses to run on a placeholder. Hydrate them for
+      # the build; the commit step redacts managed assets before they are staged.
+      - name: Restore private dashboard inputs
+        run: python _system/scripts/private_dashboard_assets.py
       - name: Checkout LS-algo screener
         env:
           LS_ALGO_TOKEN: ${{ secrets.LS_ALGO_TOKEN || secrets.LS_ALGO_REPO_TOKEN }}
@@ -98,16 +112,43 @@ jobs:
           python _system/scripts/build_dashboard_data.py
           python _system/scripts/validate_dashboard_data.py
       - name: Commit the complete onboarding transaction
+        # A healthy commit finishes in a few minutes (run 40677843575 did it
+        # in just over three). Run 40704555082 stayed on this step for 79
+        # minutes after "Vault pushed (attempt 1)." until the 90-minute job
+        # timeout cancelled it. Bound the step so the next stall fails here.
+        timeout-minutes: 20
         run: |
-          git add --sparse -A -- _system/data/evidence_recovery_queue.json _system/reviews/pending \
-                         dashboard/data _system/portfolio
-          shopt -s nullglob
-          evidence_paths=(*/README.md */.onboard_status.json */research */third-party-analyses */investor-documents)
-          if ((${#evidence_paths[@]})); then
-            git add --sparse -A -- "${evidence_paths[@]}"
-          fi
+          # Put full snapshots back in the vault and leave public placeholders.
+          echo "Redacting public dashboard snapshots."
+          python _system/scripts/migrate_dashboard_sources.py
+          echo "Pushing private snapshots to the research vault."
+          bash _system/scripts/ci_push_vault.sh \
+            "Preserve restricted dashboard source snapshots" \
+            "--force dashboard-private"
+          echo "Vault push returned. Staging owned paths."
+          # Stage only paths this job owns. --sparse -A would record deletions of
+          # tracked files the checkout never materialized, and it force-adds
+          # new blobs outside the sparse patterns. git status on this checkout
+          # re-matches every index path against every sparse pattern and does
+          # not return; ci_stage_owned_paths.py must not call it.
+          python -u _system/scripts/ci_stage_owned_paths.py \
+            _system/data/evidence_recovery_queue.json \
+            _system/reviews/pending \
+            dashboard/data \
+            dashboard/private-assets.json \
+            .gitattributes \
+            _system/portfolio \
+            ':(glob)**/README.md' \
+            ':(glob)**/.onboard_status.json' \
+            ':(glob)**/research/**' \
+            ':(glob)**/third-party-analyses/**' \
+            ':(glob)**/investor-documents/**'
+          echo "Owned-path staging returned."
           if ! git diff --cached --quiet; then
+            echo "Pushing the onboarding commit to main."
             bash _system/scripts/ci_push_main.sh "chore(ls-algo): onboard, evidence, and valuation authority"
+          else
+            echo "No owned changes to commit."
           fi
       - name: Admit newly ready blocker evidence
         env:

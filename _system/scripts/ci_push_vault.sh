@@ -13,6 +13,14 @@ MAX_ATTEMPTS="${CI_PUSH_MAX_ATTEMPTS:-5}"
 CLONE_TOKEN="$(trim_clone_token "${RESEARCH_VAULT_CLONE_TOKEN:-}")"
 REPO_URL="${RESEARCH_VAULT_REPO_URL:-https://github.com/magis-capital-partners/research-vault.git}"
 AUTH_URL="$(vault_authenticated_url "$REPO_URL")"
+fetch_options=()
+push_options=()
+if [ "${CI_PUSH_NO_THIN:-0}" = "1" ]; then
+  # Already-compressed archive blocks need no remote delta bases. Fetching
+  # those bases from a partial clone can download unrelated source history.
+  fetch_options+=(--filter=blob:none)
+  push_options+=(--no-thin)
+fi
 
 if [ ! -d "$VAULT_ROOT/.git" ]; then
   echo "::error::Vault git dir not found at $VAULT_ROOT"
@@ -40,18 +48,22 @@ git commit -m "$MSG"
 
 attempt=1
 while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
-  git fetch "$AUTH_URL" main:refs/remotes/origin/main 2>/dev/null \
-    || git fetch "$AUTH_URL" master:refs/remotes/origin/master 2>/dev/null \
+  git fetch "${fetch_options[@]}" "$AUTH_URL" main:refs/remotes/origin/main 2>/dev/null \
+    || git fetch "${fetch_options[@]}" "$AUTH_URL" master:refs/remotes/origin/master 2>/dev/null \
     || true
   BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo main)
   if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
     if ! git rebase "origin/$BRANCH"; then
-      echo "::error::Vault rebase failed (attempt $attempt/$MAX_ATTEMPTS)."
-      git rebase --abort 2>/dev/null || true
-      exit 1
+      if python "$SCRIPT_DIR/resolve_vault_manifest_conflict.py" "$PWD" && GIT_EDITOR=true git rebase --continue; then
+        echo "Preserved independent private receipts and newer upstream pointers."
+      else
+        echo "::error::Vault rebase failed (attempt $attempt/$MAX_ATTEMPTS)."
+        git rebase --abort 2>/dev/null || true
+        exit 1
+      fi
     fi
   fi
-  if git push "$AUTH_URL" "HEAD:$BRANCH"; then
+  if git push "${push_options[@]}" "$AUTH_URL" "HEAD:$BRANCH"; then
     echo "Vault pushed (attempt $attempt)."
     exit 0
   fi

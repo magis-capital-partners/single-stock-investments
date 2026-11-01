@@ -2583,7 +2583,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "19df7ff0814344154de9eae81082e164291612500fec3ace9caf138e55f3789c",
+    "model_hash": "ab2ed830c4ed7168bb482d8ebf1a93b515be94fe820c9edd47dd090af86ab84e",
     "method_versions": [
       "midcycle_capacity_value@1.0",
       "net_asset_value@1.0",
@@ -2593,8 +2593,213 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
-  "profile_match": true,
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "NUE",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 249.64,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo NUE close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "84b4771673ad3760016fa8fd90f6f577cd9857422dd538f4b1c2e101306c6dd3",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "steel_mills",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "steel_products",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "raw_materials",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_debt_and_leases",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "new_project_ramp",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "supply_response_and_downcycle_reserve",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "high": -0.0
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "steel_mills",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "steel_mills",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "steel_mills",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "steel_products",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "steel_products",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "steel_products",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "raw_materials",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "raw_materials",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_debt_and_leases",
+        "case": "low",
+        "code": "realization_timing_missing:debt_m"
+      },
+      {
+        "component_id": "net_debt_and_leases",
+        "case": "base",
+        "code": "realization_timing_missing:debt_m"
+      },
+      {
+        "component_id": "net_debt_and_leases",
+        "case": "high",
+        "code": "realization_timing_missing:debt_m"
+      },
+      {
+        "component_id": "new_project_ramp",
+        "case": "low",
+        "code": "realization_timing_missing:risked_incremental_value_per_share"
+      },
+      {
+        "component_id": "new_project_ramp",
+        "case": "base",
+        "code": "realization_timing_missing:risked_incremental_value_per_share"
+      },
+      {
+        "component_id": "new_project_ramp",
+        "case": "high",
+        "code": "realization_timing_missing:risked_incremental_value_per_share"
+      },
+      {
+        "component_id": "supply_response_and_downcycle_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:supply_response_reserve_per_share"
+      },
+      {
+        "component_id": "supply_response_and_downcycle_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:supply_response_reserve_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "shares_m",
+        "ref": "NUE/research/evidence_reconciliation_2026-07-15.json",
+        "locator": "230.9 million diluted shares in FY2025 results",
+        "as_of": "2025-12-31",
+        "content_sha256": "4884a11e6b6188aad9ef07ce003cd6e7aded735f431403fbda7e9ec43bc26477",
+        "source_id": "1dada8adb0aa4b4495659cf64614a7c539f921567d9cb2efe6c83225fce4b1b1"
+      },
+      {
+        "node_id": "segment_pretax_m",
+        "ref": "NUE/research/evidence_reconciliation_2026-07-15.json",
+        "locator": "2025 raw materials pretax earnings $153 million",
+        "as_of": "2025-12-31",
+        "content_sha256": "4884a11e6b6188aad9ef07ce003cd6e7aded735f431403fbda7e9ec43bc26477",
+        "source_id": "2b44d9415046a4761fefa65120416e9b91bfc520c0af75af4a9ef45d31188b21"
+      },
+      {
+        "node_id": "steel_mill_shipments_m",
+        "ref": "NUE/research/evidence_reconciliation_2026-07-15.json",
+        "locator": "Steel-mill shipments 25.271 million tons in 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "4884a11e6b6188aad9ef07ce003cd6e7aded735f431403fbda7e9ec43bc26477",
+        "source_id": "a542ce0af32e961c64769d61fff789f9b3cfb100e4faa63436450fc9ab7f5142"
+      },
+      {
+        "node_id": "steel_mill_utilization",
+        "ref": "NUE/research/evidence_reconciliation_2026-07-15.json",
+        "locator": "Steel-mill utilization 83% versus 76% in 2024",
+        "as_of": "2025-12-31",
+        "content_sha256": "4884a11e6b6188aad9ef07ce003cd6e7aded735f431403fbda7e9ec43bc26477",
+        "source_id": "15300d2162912f59168b0ef7f300fe8bf1f3693621beaa42492ace1d581a428f"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "18a1546ad7eecc11b4ede8895a77cee01c956e6d5f80fe20e88aa8382a1b4547"
+  },
   "cohort_expected_profile": "capital_cycle",
+  "profile_match": true,
   "cohort_purpose": "Capacity, normalized margins, supply response, replacement cost, and low-case liquidity.",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,

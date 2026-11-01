@@ -7,7 +7,7 @@ import math
 from datetime import datetime, timezone
 from pathlib import Path
 
-from filing_review import FILING_SKIP_FLAGS
+from filing_review import FILING_SKIP_FLAGS, values_in_thousands
 
 ROOT = Path(__file__).resolve().parents[2]
 RULES_PATH = ROOT / "_system" / "data" / "event_triage_rules.json"
@@ -85,6 +85,7 @@ def magnitude_factor(event: dict, rules: dict) -> float:
     prior = _to_float(event.get("prior_value"))
     current = _to_float(event.get("current_value"))
     change_pct = _to_float(event.get("change_pct"))
+    prior, current = values_in_thousands(prior, current, (event.get('verification') or {}).get('unit'))
     if event.get("source") != "filing" or change_pct is None:
         if event.get("event_type") in {"inflection", "regime_shift", "leadership_risk"}:
             if event.get("trend_signal_tier") == "confirmed":
@@ -112,7 +113,7 @@ def magnitude_factor(event: dict, rules: dict) -> float:
             if abs(change_pct or 0) > pct_cap:
                 scale *= 0.6
             return scale
-        abs_delta = abs((current or 0) - prior_abs)
+        abs_delta = abs((current or 0) - (prior or 0))
         min_delta = float(thresholds.get("balance_abs_delta_usd_k_min") or 5000)
         if abs_delta < min_delta:
             return 0.55
@@ -180,6 +181,7 @@ def materiality_score(event: dict, *, rules: dict | None = None) -> tuple[int, d
         "book": book_factor(bool(event.get("in_our_book")), event.get("portfolio_relevance")),
         "verification": verification_factor(event),
         "stance": stance_factor(event),
+        "economic_relevance": float(event.get("economic_relevance", 1.0)),
     }
     if event.get("superseded_penalty"):
         components["superseded"] = 0.4
@@ -208,6 +210,7 @@ def _to_float(value) -> float | None:
     if value is None:
         return None
     try:
-        return float(value)
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else None
     except (TypeError, ValueError):
         return None

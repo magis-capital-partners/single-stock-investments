@@ -856,7 +856,11 @@ def buyback_event_rows(doc: dict | None) -> list[dict]:
         ticker = str(event.get("ticker") or "").upper()
         if not ticker:
             continue
-        book = event.get("book") if event.get("book") in {"ranked", "discovery", "history"} else "ranked"
+        if event.get("book") == "mentions":
+            continue
+        book = event.get("book") if event.get("book") in {"ranked", "discovery", "history"} else "discovery"
+        if (doc or {}).get("schema_version") == "buyback_radar.v2" and book == "ranked" and not event.get("terms_verified"):
+            book = "discovery"
         row = _row(
             lane="buyback_events",
             book=book,
@@ -870,12 +874,16 @@ def buyback_event_rows(doc: dict | None) -> list[dict]:
             evidence_kind="filing",
             source_feed="buyback_radar",
             as_of=str(event.get("filed") or "")[:10] or None,
-            next_action="Read the filing. This row is research only.",
+            next_action=event.get("next") or "Verify the current terms and status.",
             extra_id=str(event.get("accession") or event.get("event_type") or ""),
         )
         row["event_type"] = event.get("event_type")
         row["accession"] = event.get("accession")
         row["one_number"] = event.get("one_number")
+        row["id"] = event.get("id") or row["id"]
+        row["status"] = event.get("status") or "needs_review"
+        row["buyback_event"] = event
+        row["snapshot_id"] = (doc or {}).get("snapshot_id")
         row["research_only"] = True
         row["annualized_spread"] = None
         rows.append(row)
@@ -976,6 +984,7 @@ def build_book(
         "discovery": discovery,
         "history": history,
         "buyback_mentions": list(buyback.get("program_mentions") or []),
+        "buyback_snapshot": {"snapshot_id": buyback.get("snapshot_id"), "as_of": buyback.get("as_of")},
     }
 
 
@@ -997,11 +1006,13 @@ def write_book(path: Path | None = None) -> Path | None:
         cvr=_load(CVR_PATH),
         nol=_load(NOL_PATH),
         separations=_load(SEPARATIONS_PATH),
-        buyback=_load(BUYBACK_PATH) if BUYBACK_PATH.is_file() else {},
+        buyback=__import__("build_buyback_radar").load_buyback_projection(),
     )
+    from situation_rows import attach_to_book
+    attach_to_book(payload)
     target = path or OUT_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    target.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     ranked = payload["counts"]["ranked"]
     print(
         f"Wrote {target} ranked={sum(ranked.values())} "
@@ -1010,8 +1021,32 @@ def write_book(path: Path | None = None) -> Path | None:
     return target
 
 
+def refresh_buyback_projection(path=None):
+    """Update this producer's buyback lane without rebuilding unrelated research."""
+    from build_buyback_radar import load_buyback_projection
+    from atomic_io import write_json_if_changed
+    target=path or OUT_PATH
+    doc=_load(target)
+    if not doc:raise ValueError("Existing Special Situations book is required")
+    projection=load_buyback_projection()
+    if not projection.get("snapshot_id"):raise ValueError("Verified buyback snapshot unavailable")
+    for key,book in (("rows","ranked"),("discovery","discovery"),("history","history")):
+        rows=[r for r in doc.get(key,[]) if r.get("lane")!="buyback_events" or r.get("source_feed")=="situation_register"]
+        rows.extend(r for r in buyback_event_rows(projection) if r["book"]==book)
+        doc[key]=sorted(rows,key=_sort_key)
+        counts=doc.setdefault("counts",{}).setdefault(book,{})
+        counts["buyback_events"]=sum(r.get("lane")=="buyback_events" for r in rows)
+    doc["buyback_mentions"]=projection.get("program_mentions",[])
+    doc["buyback_snapshot"]={k:projection.get(k) for k in ("snapshot_id","as_of","generated_at")}
+    write_json_if_changed(target,doc)
+    return doc
+
 def main() -> None:
-    write_book()
+    import sys
+    if sys.argv[1:]==["--refresh-buyback-projection"]:
+        refresh_buyback_projection()
+    else:
+        write_book()
 
 
 if __name__ == "__main__":
