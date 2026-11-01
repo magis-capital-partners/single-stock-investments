@@ -96,6 +96,7 @@ runs:
           _system/scripts/tests/test_dashboard_d1_seed_budget.py \
           _system/scripts/tests/test_prune_cloudflare_d1.py \
           _system/scripts/tests/test_deploy_d1_sync.py \
+          _system/scripts/tests/test_release_deploy_workspace.py \
           _system/scripts/tests/test_dashboard_deploy_workflow.py
         node --test _system/scripts/tests/test_investor_history_ui.cjs
 
@@ -122,6 +123,9 @@ runs:
         set -euo pipefail
         python _system/scripts/build_cloudflare_pages_site.py
         python _system/scripts/stage_company_research.py --hardlink
+        # The staged assets retain their bytes; release the reproducible ZIP
+        # and extraction working copies before expanding the holdings archive.
+        python _system/scripts/release_deploy_workspace.py
         # Reuse an existing processing checkout without cleaning its new objects.
         # Only deployment needs to materialize the complete holdings checkpoint.
         if [ -f dashboard/data/holdings/archive_receipt.json ] && [ "$(git -C "$RESEARCH_VAULT_ROOT" config --bool core.sparseCheckout)" = "true" ]; then
