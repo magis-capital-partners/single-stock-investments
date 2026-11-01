@@ -2439,7 +2439,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "e206fe9362b710c41d3f5c2173c16e6bf64e0ab861c7063e58cf24052955d6a3",
+    "model_hash": "b36a9f4a792d0e9475789b01bfa6d112bdc52e15cec37f5ce22ef0c423eda31d",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_earnings_reinvestment_dcf@1.0"
@@ -2448,6 +2448,118 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "TEQ.ST",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-08-31",
+    "quote": {
+      "value": 186.0,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo TEQ.ST close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "fc235e35d5b58f932752192750f99d9b6ef723fc3984340a1e72b5610f910171",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "operating_enterprise",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 81.4164,
+          "base": 182.8311,
+          "high": 263.3257
+        }
+      },
+      {
+        "component_id": "financing_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "financing_claims",
+        "case": "low",
+        "code": "realization_timing_missing:net_financing_claims_per_share"
+      },
+      {
+        "component_id": "financing_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_financing_claims_per_share"
+      },
+      {
+        "component_id": "financing_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_financing_claims_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "operating_cash_flow_m",
+        "ref": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf",
+        "locator": "page 18: R12 cash flow from operating activities 213.5 MSEK",
+        "as_of": "2026-06-30",
+        "source_id": "5cf5109159c44fcfc3650d40f2ed3e06e97be2e95dae6b8fb2ce5e8db3707492"
+      },
+      {
+        "node_id": "maintenance_capex_m",
+        "ref": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf",
+        "locator": "page 18: R12 net capital expenditure 8.6 MSEK",
+        "as_of": "2026-06-30",
+        "source_id": "0c1dc08fc6227192b43c430ce84b42d9dc34cf42b7e6070ae57a6a7c57821619"
+      },
+      {
+        "node_id": "cash_net_finance_m",
+        "ref": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf",
+        "locator": "page 18: R12 interest and other financial items, net -31.7 MSEK",
+        "as_of": "2026-06-30",
+        "source_id": "0d9cb305c48b4280ba12ac7cc65d63c42bb77ef04977fb28efd0ee7bfa320c66"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf",
+        "locator": "page 17: Q2/YTD average shares after dilution and period-end shares 17,165,756",
+        "as_of": "2026-06-30",
+        "source_id": "06590dc8495a0af9b78eb8c0c73416562ad0ec7fce295a1a0923278ebffc8dd5"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "fa44d1e39b7a1eff5c5c4204e390bd94e49e52ee0da8b9b1cced2a4066aebccf"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": false,
   "falsifier_coverage": {

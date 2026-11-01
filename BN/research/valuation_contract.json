@@ -11,9 +11,9 @@
     "reason": "Close prospective falsifier coverage before committee review."
   },
   "ticker": "BN",
-  "as_of": "2026-09-17",
+  "as_of": "2026-10-28",
   "dates": {
-    "model_as_of": "2026-09-17",
+    "model_as_of": "2026-10-28",
     "latest_fact_as_of": "2026-03-31",
     "oldest_fact_as_of": "2025-12-31",
     "price_as_of": "2026-09-17"
@@ -2043,7 +2043,7 @@
     "label": "High-return compounder",
     "score": 19.0,
     "reasons": [
-      "archetype=compounder",
+      "archetype=platform",
       "component categories=operating_business",
       "existing methods=dcf, reinvestment",
       "explicit reviewed profile"
@@ -2109,7 +2109,7 @@
       "quality_reinvestment": {
         "score": 19.0,
         "reasons": [
-          "archetype=compounder",
+          "archetype=platform",
           "component categories=operating_business",
           "existing methods=dcf, reinvestment",
           "explicit reviewed profile"
@@ -2146,18 +2146,19 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "BN",
-    "as_of": "2026-09-17",
+    "as_of": "2026-10-28",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "compounder",
+      "archetype": "platform",
       "moat": "stable",
       "dhando": "partial",
       "stance": "hold",
       "cycle": "-",
       "investment_sleeve": "holding_conglomerates",
-      "payoff_lens": "operating"
+      "valuation_profile": "quality_reinvestment",
+      "method_source": "power_zone_route"
     },
     "specialist_power_zones": [
       {
@@ -2165,34 +2166,16 @@
         "label": "Buffett / Weschler",
         "independence_group": "quality_reinvestment",
         "in_power_zone": true,
-        "fit": 1.0,
-        "matched": 3,
+        "fit": 0.667,
+        "matched": 2,
         "known_fields": 3,
         "matched_fields": [
-          "archetype",
           "moat",
           "investment_sleeve"
         ],
         "excluded_by": null,
         "match_rate": null,
-        "score": 85
-      },
-      {
-        "persona": "lawrence",
-        "label": "Bryan Lawrence",
-        "independence_group": "quality_reinvestment",
-        "in_power_zone": true,
-        "fit": 1.0,
-        "matched": 3,
-        "known_fields": 3,
-        "matched_fields": [
-          "archetype",
-          "moat",
-          "dhando"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 85
+        "score": 57
       },
       {
         "persona": "hohn",
@@ -2205,6 +2188,22 @@
         "matched_fields": [
           "archetype",
           "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "lawrence",
+        "label": "Bryan Lawrence",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "moat",
+          "dhando"
         ],
         "excluded_by": null,
         "match_rate": null,
@@ -2250,8 +2249,8 @@
         }
       ]
     },
-    "input_hash": "58c2e788e250f877c0b7ab2e45caa8085d8a8fe49b91637cb03c96dba36ab2d1",
-    "generated_at": "2026-09-17T18:31:50.829264+00:00"
+    "input_hash": "f20b29198ccc99ceff64cdb3e59d834718608178df48d62921a50c29f4b01f2e",
+    "generated_at": "2026-10-28T17:44:25.068690+00:00"
   },
   "market": {
     "price_per_share": 37.31,
@@ -2474,7 +2473,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "eea6f515444af888f8d946a6a1bfdd8dc4dc4a4b143b4c0985f8d6dfc2918d42",
+    "model_hash": "16ed46289f7f4db4089c4782a5a030c04e7062c306bab89b73070dd4e440b41a",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_earnings_reinvestment_dcf@1.0"
@@ -2483,6 +2482,76 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.3",
+    "ticker": "BN",
+    "status": "sync_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-09-17",
+    "model_as_of": "2026-10-28",
+    "quote": {
+      "value": 37.31,
+      "as_of": "2026-09-17",
+      "source_url": "Yahoo BN 2026-09-17"
+    },
+    "forecast_hash": null,
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "listing_calendar_or_completed_close_unverified"
+      },
+      {
+        "code": "model_assumptions_expired"
+      },
+      {
+        "code": "corporate_action_history_unverified"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_source_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "financial_period": "2026-03-31",
+    "market_sync": {
+      "status": "updating",
+      "price_as_of": "2026-09-17",
+      "financial_period": "2026-03-31",
+      "model_as_of": "2026-10-28",
+      "price_policy": "latest_completed_exchange_session",
+      "basis_id": null,
+      "latest_report": {}
+    },
+    "assumptions_as_of": "2026-10-28",
+    "calculation_id": "dfa9e82740927c55b031ea6db368bde398ee47436bf19bff0461b9dbe66eb40a"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

@@ -1,10 +1,12 @@
 {
-  "schema_version": "3.0",
+  "schema_version": "3.1",
   "ticker": "INV",
-  "as_of": "2026-10-19",
+  "as_of": "2026-10-27",
+  "model_as_of": "2026-07-28",
   "authority": "valuation_contract",
   "contract_source": "valuation_contract.json",
   "contract_status": "evidence_blocked",
+  "contract_model_hash": "bc2bc2e0726724a52b04339a278086fb0271a7cfb714433cd6dc9afd3f40e90f",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
   "price": 2.96,
@@ -45,21 +47,27 @@
   },
   "entry_prices_by_hurdle_and_case": {
     "low": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "base": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "high": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     }
   },
@@ -90,5 +98,27 @@
     "profile_id": "scarce_asset_optionality",
     "label": "Scarce assets, royalties, and optionality",
     "input_hash": "1acbe1ff3b65db1c4567b9a0035be9d4077797ca6db6b03375d8b25a7f6aff51"
+  },
+  "evidence_blockers": [
+    "Base equity value is zero or negative. Supply an explicit zero_value_policy with a supported terminal outcome, rationale, and evidence_refs before decision_grade."
+  ],
+  "buy_zones": {
+    "schema_version": "1.0",
+    "config_version": "2026-10-26.1",
+    "status": "withheld",
+    "research_only": true,
+    "capital_actionable": false,
+    "model_level": "evidence_blocked",
+    "blockers": [
+      "Base equity value is zero or negative. Supply an explicit zero_value_policy with a supported terminal outcome, rationale, and evidence_refs before decision_grade.",
+      "The valuation workbench is evidence-blocked; hurdle prices are withheld until proof is decision-grade."
+    ],
+    "zones": [],
+    "deepest_active_zone": null,
+    "royalty_corroboration": {
+      "status": "unavailable",
+      "signal": null,
+      "role": "corroborating_only"
+    }
   }
 }

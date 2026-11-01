@@ -5,6 +5,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[3]
 SCRIPTS = ROOT / "_system" / "scripts"
 if str(SCRIPTS) not in sys.path:
@@ -14,6 +16,15 @@ import atomic_io  # noqa: E402
 import build_local_search_index  # noqa: E402
 import compact_dated_artifacts  # noqa: E402
 import query_magis_index  # noqa: E402
+
+
+def _is_private_snapshot(path: Path) -> bool:
+    """Public checkouts replace fund-letter-linked stores with a metadata line."""
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    except (OSError, json.JSONDecodeError, IndexError):
+        return False
+    return isinstance(payload, dict) and payload.get("private_snapshot") is True
 
 
 def test_semantic_text_sha256_ignores_volatile_dates(tmp_path: Path) -> None:
@@ -108,10 +119,33 @@ def test_l0_summary_feeds_exist_and_respect_size_budget() -> None:
         assert env.get("health", {}).get("status") == "healthy"
 
 
+def test_kpi_startup_preview_is_bounded_without_losing_source_rows(tmp_path: Path) -> None:
+    from build_progressive_shards import write_kpi_summary
+
+    rows = [{"ticker": f"T{i}", "kpi": "orders", "label": "Orders", "period": "2026-09",
+             "value": i, "unit": "count", "yoy": .1, "yoy_basis": "ratio",
+             "source_url": "https://issuer.test/" + "source/" * 150, "doc": "Filing"}
+            for i in range(900)]
+    payload = {"generated_at": "2026-10-27T00:00:00Z", "as_of": "2026-10-27",
+               "operating_latest": rows, "inflection_count": 120,
+               "inflections": [{"ticker": "T1", "human_summary": "growth " * 200}] * 120,
+               "full_feed_path": "dashboard/data/kpi_trends.json"}
+    preview = write_kpi_summary(payload, tmp_path)
+    assert (tmp_path / "kpi_summary.json").stat().st_size < 102_400
+    assert preview["operating_latest_count"] == len(rows)
+    assert preview["inflection_count"] == 120
+    full = json.loads((tmp_path / "operating_kpi_latest.json").read_text(encoding="utf-8"))
+    assert full["rows"] == rows
+    assert payload["operating_latest"] == rows
+    assert len(payload["inflections"]) == 120
+
+
 def test_l1_agent_shards_and_canonical_evidence() -> None:
     for ticker in ("TPL", "GOOGL"):
         shard_path = ROOT / "dashboard" / "data" / "agent_shards" / f"{ticker}.json"
         assert shard_path.is_file(), f"Missing L1 agent shard for {ticker}"
+        if _is_private_snapshot(shard_path):
+            pytest.skip(f"{ticker} agent shard is a private snapshot in this checkout")
         shard = json.loads(shard_path.read_text(encoding="utf-8"))
         assert shard.get("schema_version") == "magis.agent_shard.v2"
         assert shard.get("ticker") == ticker
@@ -129,6 +163,8 @@ def test_l1_agent_shards_and_canonical_evidence() -> None:
 def test_cross_store_document_catalog_jsonl() -> None:
     catalog_path = ROOT / "_system" / "data" / "catalog" / "documents.jsonl"
     assert catalog_path.is_file()
+    if _is_private_snapshot(catalog_path):
+        pytest.skip("document catalog is a private snapshot in this checkout")
     lines = [ln for ln in catalog_path.read_text(encoding="utf-8").splitlines() if ln.strip()]
     assert len(lines) >= 8000
     first = json.loads(lines[0])
@@ -164,6 +200,10 @@ def test_compact_dated_artifacts_on_synthetic_dir(tmp_path: Path) -> None:
 
 
 def test_local_fts5_search_index_queries() -> None:
+    shard_path = ROOT / "dashboard" / "data" / "agent_shards" / "TPL.json"
+    catalog_path = ROOT / "_system" / "data" / "catalog" / "documents.jsonl"
+    if _is_private_snapshot(shard_path) or _is_private_snapshot(catalog_path):
+        pytest.skip("ticker search corpus is a private snapshot in this checkout")
     db_path = ROOT / "_system" / "cache" / "magis_index.sqlite"
     if not db_path.is_file():
         build_local_search_index.build_index(db_path)

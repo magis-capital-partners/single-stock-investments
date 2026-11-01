@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "ACLS",
-  "as_of": "2026-10-19",
+  "as_of": "2026-10-29",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,12 @@
     "model_as_of": "2026-07-22",
     "latest_fact_as_of": "2025-12-31",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-07-20"
+    "price_as_of": "2026-07-20",
+    "forecast_as_of": "2026-07-22",
+    "calculation_as_of": "2026-07-20",
+    "financial_period": "2025-12-31",
+    "assumptions_as_of": "2026-07-22",
+    "share_basis_as_of": null
   },
   "legacy_audit": {
     "actionable": false,
@@ -34,30 +39,30 @@
     "model_level": "stock_specific",
     "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
     "return_publishable": false,
-    "price_per_share": 131.7,
+    "price_per_share": null,
     "market_cap_m": 4170.68,
     "enterprise_value_m": 4025.18,
     "value_per_share": {
-      "low": 0.0,
-      "base": 66.3997,
-      "high": 145.6733
+      "low": null,
+      "base": null,
+      "high": null
     },
     "present_value_today_per_share": {
-      "low": 0.0,
-      "base": 66.3997,
-      "high": 145.6733
+      "low": null,
+      "base": null,
+      "high": null
     },
     "output_basis": "present_value_today",
     "output_basis_status": "method_declared",
     "margin_of_safety_pct": {
       "low": null,
-      "base": -98.34,
-      "high": 9.59
+      "base": null,
+      "high": null
     },
     "upside_to_value_pct": {
-      "low": -100.0,
-      "base": -49.58,
-      "high": 10.61
+      "low": null,
+      "base": null,
+      "high": null
     },
     "forward_return_at_price_pct": {
       "low": null,
@@ -70,18 +75,23 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 10.0,
     "downside_to_low_pct": -100.0,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "42f0be7985efb4726340011d9514115ff33ba4bc8e9a6ecc0a55a1c352f5892f",
+    "model_hash": "b42cbcd0aa795f60d1c0ae8b7e58cff18a906540f054f4ffaa0ceca40c25396f",
     "dates": {
       "model_as_of": "2026-07-22",
       "latest_fact_as_of": "2025-12-31",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-22",
+      "calculation_as_of": "2026-07-20",
+      "financial_period": "2025-12-31",
+      "assumptions_as_of": "2026-07-22",
+      "share_basis_as_of": null
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +112,26 @@
     },
     "primary_power_zone": "Capital cycle and normalized industry economics",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": "a22a3ee01aefda391c362c4afeb1f02589750304f8a44a3766bf9f38feb5d61e",
+    "calculation_status": "sync_gap",
+    "research_return_available": false,
+    "calculation_reason": "listing_calendar_or_completed_close_unverified; model_assumptions_expired; corporate_action_history_unverified",
+    "market_sync": {
+      "status": "updating",
+      "valid_until": null
+    },
+    "upside_downside_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "target_price_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "horizon_years": null
   },
   "business": {
     "status": "complete",
@@ -2098,7 +2127,12 @@
       "model_as_of": "2026-07-22",
       "latest_fact_as_of": "2025-12-31",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-22",
+      "calculation_as_of": "2026-07-20",
+      "financial_period": "2025-12-31",
+      "assumptions_as_of": "2026-07-22",
+      "share_basis_as_of": null
     },
     "legacy_audit": {
       "actionable": false,
@@ -4316,7 +4350,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "42f0be7985efb4726340011d9514115ff33ba4bc8e9a6ecc0a55a1c352f5892f",
+      "model_hash": "b42cbcd0aa795f60d1c0ae8b7e58cff18a906540f054f4ffaa0ceca40c25396f",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4851,21 +4885,38 @@
       "timing": -2.47
     },
     "unexplained_per_share": 9.89,
-    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope."
+    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope.",
+    "tci_irr": {
+      "status": "available",
+      "method": "price_then_fcf_then_growth_then_multiple",
+      "unit": "percentage_points_per_year",
+      "total_delta_pp": 0.0,
+      "price_pp": 0.0,
+      "fcf_pp": 0.0,
+      "growth_pp": 0.0,
+      "multiple_pp": 0.0,
+      "residual_pp": 0.0,
+      "prior_snapshot": "valuation_history/valuation_2026-07-21.json"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-19",
+    "as_of": "2026-10-29",
     "dates": {
       "model_as_of": "2026-07-22",
       "latest_fact_as_of": "2025-12-31",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-22",
+      "calculation_as_of": "2026-07-20",
+      "financial_period": "2025-12-31",
+      "assumptions_as_of": "2026-07-22",
+      "share_basis_as_of": null
     },
     "age_days": {
-      "model_as_of": 89,
-      "latest_fact_as_of": 292,
-      "price_as_of": 91
+      "model_as_of": 99,
+      "latest_fact_as_of": 302,
+      "price_as_of": 101
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -4873,7 +4924,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 91 days old (review threshold 7)"
+      "price_as_of is 101 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

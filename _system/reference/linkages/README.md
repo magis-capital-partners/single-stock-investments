@@ -42,7 +42,7 @@ python _system/scripts/ci_rebuild_profile.py world-model-weekly
 ## Pilot edges + ledger coverage
 
 1. `hyperscaler_capex_to_land_power` → TPL / APLD / LB ledgers
-2. `gold_spot_to_royalty_sentiment` → RGLD / MSB ledgers
+2. `gold_spot_to_royalty_sentiment` → gold royalty ledgers (FNV / WPM / RGLD / TFPM / OR). Uses a new `gold_futures_usd_oz` KPI in USD/troy ounce; the retired GLD-share threshold is not reused. MSB has no gold linkage.
 3. `vix_to_exchange_vol_context` → ICE ledger (US); foreign venues use home realized series from `exchange_vol_map.json`
 
 ## Operating rules (tight)

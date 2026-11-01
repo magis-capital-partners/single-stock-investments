@@ -159,7 +159,7 @@
       </div>`;
     }).join('');
 
-    const ideaRows = ideas.filter((i) => !allPositions.some((p) => p.ticker === i.ticker)).map((i) => `
+    const ideaRows = ideas.filter((i) => !['filled', 'closed'].includes(i.status) && !allPositions.some((p) => p.ticker === i.ticker)).map((i) => `
       <div class="sleeve-book-row sleeve-idea-row">
         <div>
           <div class="sleeve-ticker mono">${esc(i.ticker)}</div>
@@ -313,6 +313,7 @@
         </form>
       </details>
 
+      ${global.SleeveRealized ? global.SleeveRealized.shell() : ''}
       <details class="sleeve-quality">
         <summary>Quality over time</summary>
         <p class="sleeve-quality-copy">Four levers, after notes exist: how independent the names are, money-weighted return, risk of permanent loss of capital (not a mark-to-market drawdown), and whether high conviction actually earned more.</p>
@@ -325,6 +326,7 @@
   }
 
   function attach(container, owner, reload) {
+    if (global.SleeveRealized) global.SleeveRealized.attach(container, owner);
     container.querySelectorAll('[data-sleeve-note]').forEach((btn) => {
       btn.addEventListener('click', (event) => {
         event.preventDefault();

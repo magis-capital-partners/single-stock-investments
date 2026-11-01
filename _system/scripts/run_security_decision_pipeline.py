@@ -450,11 +450,13 @@ def workbench_status(ticker: str) -> tuple[str, str, str]:
 
 def stage_pricing(tickers: list[str], as_of: str, dry_run: bool) -> dict:
     priced, neutralized, skipped, errors = [], [], [], []
+    core_config = read_json(ROOT / "_system/reference/core_compounders.json")
+    core_names = set(core_config.get("tickers") or [])
     for ticker in tickers:
         decision, _, _model_level = workbench_status(ticker)
         if decision != "decision_grade":
             pricing_path = ROOT / ticker / "research" / "pricing_analysis.json"
-            if pricing_path.exists():
+            if pricing_path.exists() or ticker in core_names:
                 try:
                     if not dry_run:
                         build_contract_pricing(ticker, as_of)
@@ -662,6 +664,13 @@ def main() -> int:
     print(f"[4/8] workbenches: {len(workbenches['written'])} built, {len(workbenches['skipped'])} skipped, {len(workbenches['errors'])} errors")
 
     pricing = stage_pricing(workbenches["written"], as_of, args.dry_run)
+    core_monitor = {"status": "skipped"}
+    core_config = read_json(ROOT / "_system/reference/core_compounders.json")
+    core_selected = sorted(set(tickers) & set(core_config.get("tickers") or []))
+    if core_selected and not args.dry_run:
+        from refresh_core_compounders import refresh as refresh_core_compounders
+        monitoring = refresh_core_compounders(root=ROOT, as_of=as_of, write=True, propose=True, tickers=core_selected)
+        core_monitor = {"status": "updated", "tickers": len(core_selected), "new_events": len(monitoring["events_this_run"])}
     print(f"[5/8] pricing: {len(pricing['priced'])} priced, {len(pricing['errors'])} errors")
     for row in pricing.get("errors") or []:
         print(f"  pricing error {row.get('ticker')}: {row.get('error')}")
@@ -707,6 +716,7 @@ def main() -> int:
         "contracts": contracts,
         "workbenches": workbenches,
         "pricing": pricing,
+        "core_compounders": core_monitor,
         "committees": committees,
         "tier_1_readiness": tier_1_readiness,
         "dashboard": dashboard,

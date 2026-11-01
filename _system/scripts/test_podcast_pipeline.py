@@ -71,6 +71,17 @@ class PodcastRegistryTests(unittest.TestCase):
 
 
 class PodcastResolveGoldTests(unittest.TestCase):
+    def test_daniel_zhang_needs_teqnion_in_the_text(self):
+        # The same name ran Alibaba. A bare mention must not become TEQ.ST.
+        bare = resolve_text("Daniel Zhang on the Alibaba cloud spinoff", "Former Alibaba CEO")
+        self.assertNotIn("TEQ.ST", bare["tickers"])
+        self.assertFalse(any(o.get("ticker") == "TEQ.ST" for o in bare["officers"]))
+        hit = resolve_text(
+            "Daniel Zhang, Deputy CEO of Teqnion",
+            "Teqnion AB serial acquirer",
+        )
+        self.assertIn("TEQ.ST", hit["tickers"])
+
     def test_evolution_officer_true_positive(self):
         r = resolve_text(
             "Martin Carlesund, CEO of Evolution Gaming on live casino",
@@ -527,6 +538,40 @@ class PodcastHarvestTests(unittest.TestCase):
         self.assertEqual(summary["status"], "ready")
         self.assertEqual(len(summary["key_points"]), 3)
         self.assertTrue(all(p["evidence_quote"] for p in summary["key_points"]))
+
+    def test_dedupe_collapses_same_recording(self):
+        from build_podcast_insights import dedupe_episodes
+
+        notes = {
+            "episode_id": "copy-a",
+            "enclosure_hash": "same-audio",
+            "title": "One recording",
+            "reader_summary": {
+                "overview": "From the show notes.",
+                "status": "ready",
+                "source_basis": "notes",
+            },
+        }
+        transcript = {
+            "episode_id": "copy-b",
+            "enclosure_hash": "same-audio",
+            "title": "One recording",
+            "claims": [{"claim": "The guest prefers patient owners."}],
+            "reader_summary": {
+                "overview": "The guest explains patient ownership.",
+                "status": "ready",
+                "source_basis": "transcript",
+            },
+        }
+        kept = dedupe_episodes([notes, transcript])
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(kept[0]["episode_id"], "copy-b")
+        self.assertEqual(len(kept[0]["claims"]), 1)
+        distinct = dedupe_episodes([
+            {"episode_id": "one", "enclosure_hash": "a", "title": "First"},
+            {"episode_id": "two", "enclosure_hash": "b", "title": "Second"},
+        ])
+        self.assertEqual(len(distinct), 2)
 
     def test_reader_summary_flows_to_index_and_detail(self):
         from build_podcast_insights import episode_detail_payload, index_row_from_episode

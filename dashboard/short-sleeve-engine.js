@@ -11,7 +11,9 @@
     const months=[];
     days.forEach((d,i)=>{if(!i||d.slice(0,7)!==days[i-1].slice(0,7))months.push([]);months.at(-1).push(i);});
     if(!months.length)throw new Error('Historical session blocks are missing.');
-    const blocks=months.length>2?months.slice(1,-1):months;
+    // Boundary months can contain the worst loss. Retain every available
+    // session, including partial months, rather than conditioning on omission.
+    const blocks=months;
     const rng=random(seed), sessions=Math.round(252*years), selections=[];
     for(let n=0;n<trials;n++){
       const indices=[];

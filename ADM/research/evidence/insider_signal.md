@@ -1,13 +1,13 @@
-# ADM — Insider conviction (2026-10-15)
+# ADM — Insider conviction (2026-03-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 0.08 (negligible) · **Bull case support:** none
+**ICS:** 1.08 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 28% |
-| Base | 55% | 47% |
+| Bear | 20% | 26% |
+| Base | 55% | 49% |
 | Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
@@ -16,9 +16,9 @@
 
 **Routine / planned sales (context):**
 
-- Patolawala Monish D: 6720 @ $79.27 on 2026-08-03
-- Patolawala Monish D: 9161 @ $69.5 on 2026-02-13
-- Jones Regina: 1706 @ $84.61 on 2026-09-08
+- Pinner Ian R: 34106 @ $71.53 on 2026-03-13
+- Cuddy Christopher M: 35000 @ $73.5 on 2026-03-13
+- Morris Gregory A: 50000 @ $68.48 on 2026-03-10
 
 Source: `_system/reference/market-data/insider/ADM_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

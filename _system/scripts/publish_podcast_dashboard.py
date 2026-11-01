@@ -9,11 +9,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 from pathlib import Path
 
 import build_podcast_insights as bpi
 import youtube_lane
 from build_insights import podcast_by_show
+from reconcile_insights_event_summary import prepare_published_manifest
 
 ROOT = Path(__file__).resolve().parents[2]
 INSIGHTS_DIR = ROOT / "dashboard" / "data" / "insights"
@@ -45,8 +48,16 @@ def _manifest() -> dict:
     """The manifest on this checkout, or the one already on the publish worktree.
 
     A podcast publish rewrites manifest.json. Starting from an empty file would
-    drop every other shard the site loads.
+    drop every other shard the site loads. A public placeholder is read from
+    the vault so the rewrite is not applied to the metadata stub.
     """
+    if MANIFEST_PATH.is_file():
+        try:
+            manifest = youtube_lane._resolved_manifest(MANIFEST_PATH)
+        except RuntimeError:
+            manifest = load_json(MANIFEST_PATH)
+        if len((manifest.get("shards") or {})) >= 3:
+            return manifest
     manifest = load_json(MANIFEST_PATH)
     if len((manifest.get("shards") or {})) >= 3:
         return manifest
@@ -85,26 +96,39 @@ def publish() -> dict:
         for ep in payload.get("episodes") or []
         if isinstance(ep.get("reader_summary"), dict)
         and (ep["reader_summary"].get("overview") or "").strip()
-    )
-    manifest = _manifest()
-    manifest.setdefault("shards", {})["podcasts"] = "data/insights/podcasts.json"
-    manifest["shards"]["podcast_episodes"] = "data/insights/podcast_episodes/"
-    health = manifest.setdefault("source_health", {})
-    health["podcasts"] = {
-        "status": "ok" if rows else "empty",
-        "items": len(rows),
-        "episode_count": len(rows),
-        "transcript_count": payload.get("transcript_count"),
-        "whisper_pending": payload.get("whisper_pending"),
-        "generated_at": payload.get("generated_at"),
-        "with_analysis": analysed,
-        "with_reader_summary": with_reader_summary,
-        "transcript_ready": transcript_ready,
-        "claims": claims,
-        "detail_shards": payload.get("episode_detail_shards", 0),
-        "path": "_system/reference/podcasts/insights_index_mirror.json",
-    }
+        )
+
+    def mutate(manifest: dict) -> None:
+        manifest.setdefault("shards", {})["podcasts"] = "data/insights/podcasts.json"
+        manifest["shards"]["podcast_episodes"] = "data/insights/podcast_episodes/"
+        health = manifest.setdefault("source_health", {})
+        health["podcasts"] = {
+            "status": "ok" if rows else "empty",
+            "items": len(rows),
+            "episode_count": len(rows),
+            "transcript_count": payload.get("transcript_count"),
+            "whisper_pending": payload.get("whisper_pending"),
+            "generated_at": payload.get("generated_at"),
+            "with_analysis": analysed,
+            "with_reader_summary": with_reader_summary,
+            "transcript_ready": transcript_ready,
+            "claims": claims,
+            "detail_shards": payload.get("episode_detail_shards", 0),
+            "path": "_system/reference/podcasts/insights_index_mirror.json",
+        }
+
+    events = youtube_lane._events_beside(MANIFEST_PATH)
+    try:
+        manifest = prepare_published_manifest(_manifest(), events, mutate)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     write_json(MANIFEST_PATH, manifest)
+    try:
+        youtube_lane.seal_insights_manifest(MANIFEST_PATH, videos=False, podcasts=True)
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
+    from build_feed_status import write_feed_status
+    write_feed_status(ROOT)
     return {
         "episode_count": len(rows),
         "with_analysis": analysed,
@@ -122,6 +146,9 @@ def main() -> int:
     parser.add_argument("--push", action="store_true",
                         help="Commit the shard on origin/main and push it.")
     args = parser.parse_args()
+    if args.push and youtube_lane.self_update() is True:
+        print("re-executing so this publish uses the publisher it just pulled")
+        os.execv(sys.executable, [sys.executable, *sys.argv])
     result = publish()
     print(
         f"podcast dashboard: {result['episode_count']} episodes, "

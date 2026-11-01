@@ -150,7 +150,7 @@
       <table class="insights-table" style="margin-top:6px"><thead><tr>
         <th>Leg</th><th>Dir</th><th>Shares (base)</th><th>% float</th><th>Window</th><th>Confidence</th><th>Basis</th>
       </tr></thead><tbody>${body}</tbody></table>
-      <p class="muted" style="margin-top:6px;font-size:11px">Negative % float = net forced selling. Both sides of the separation are modelled. An <em>n a</em> leg had a missing input and carries its reason instead of a number. Research only; changes no value and no IRR.</p>
+      <p class="muted" style="margin-top:6px;font-size:var(--font-caption,12px)">Negative % float = net forced selling. Both sides of the separation are modelled. An <em>n a</em> leg had a missing input and carries its reason instead of a number. Research only; changes no value and no IRR.</p>
     </details>`;
   }
 

@@ -3,6 +3,8 @@
 **Date:** 2026-07-08  
 **Status:** Implemented (Phases 0–7 full roadmap, 2026-07-09). Insider / spend / consensus / SI / peer marked `live` in FACTOR_SPEC. Paper book on Biotech tab only (no Darwin). Multi-quarter ingest via `--backfill-quarters N`.
 
+**Planning amendment 2026-10-29:** The full quant workspace is planned to move from Research Memory to Strategies beside Darwin CC. See the [updated reorganization and strategy-development plan](research_insights_strategy_reorganization_2026-10-29.md) for destinations, actual input coverage, historical-data gaps, and validation phases. This amendment does not change the shipped history below or assert trading readiness.
+
 ## Goal
 
 Ingest biotech specialist fund 13F holdings for portfolio tickers, compute quant signals, and surface them in Research memory and Insights ownership events.

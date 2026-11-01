@@ -1,6 +1,6 @@
 # SBET — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-01
+**Date:** 2026-10-24
 **Reports processed:** 1
 **Human review:** 0
 
@@ -8,7 +8,7 @@
 
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
-| Consensys Software Inc | long | 2026-04-16 | activist_13d | auto_context | context | `SBET/third-party-analyses/activist_reports/long/SC-13D/A_20260416_acc0001493152_26_017133.xml` |
+| Consensys Software Inc | long | 2026-10-13 | activist_13d | auto_context | context | `SBET/third-party-analyses/activist_reports/long/SC-13D/A_20261013_acc0001493152_26_046897.xml` |
 ## [HUMAN REVIEW]
 
 - Confirm activist 13D intent vs passive 13G before stance changes.

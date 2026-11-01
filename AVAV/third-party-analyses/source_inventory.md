@@ -1,12 +1,13 @@
 # AVAV — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 125 total (0 approved, 0 pending, 125 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
 | activist_long | Altitude V Holdings, LLC — SC 13D/A | `AVAV/third-party-analyses/activist_reports/long/SC-13D/A_20260624_acc0001104659_26_077403.xml` | context | activist/long — sec_edgar |
 | activist_long | Altitude V Holdings, LLC — SC 13D | `AVAV/third-party-analyses/activist_reports/long/SC-13D_20250508_acc0001104659_25_046333.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001104659 25 043118 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250501_acc0001104659_25_043118.htm` | context | activist/long — local |
 | activist_long | acc0001104659 18 000376 | `AVAV/third-party-analyses/activist_reports/long/8-K_20180103_acc0001104659_18_000376.htm` | context | activist/long — local |
 | activist_long | acc0001558370 18 001561 | `AVAV/third-party-analyses/activist_reports/long/8-K_20180306_acc0001558370_18_001561.htm` | context | activist/long — local |
 | activist_long | acc0001104659 18 022055 | `AVAV/third-party-analyses/activist_reports/long/8-K_20180403_acc0001104659_18_022055.htm` | context | activist/long — local |
@@ -102,7 +103,6 @@
 | activist_long | acc0001104659 25 023774 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250314_acc0001104659_25_023774.htm` | context | activist/long — local |
 | activist_long | acc0001104659 25 030632 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250401_acc0001104659_25_030632.htm` | context | activist/long — local |
 | activist_long | acc0001104659 25 032610 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250407_acc0001104659_25_032610.htm` | context | activist/long — local |
-| activist_long | acc0001104659 25 043118 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250501_acc0001104659_25_043118.htm` | context | activist/long — local |
 | activist_long | acc0001104659 25 044368 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250505_acc0001104659_25_044368.htm` | context | activist/long — local |
 | activist_long | acc0001104659 25 056028 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250603_acc0001104659_25_056028.htm` | context | activist/long — local |
 | activist_long | acc0001558370 25 008826 | `AVAV/third-party-analyses/activist_reports/long/8-K_20250624_acc0001558370_25_008826.htm` | context | activist/long — local |
@@ -131,4 +131,4 @@
 | activist_long | acc0001104659 26 106304 | `AVAV/third-party-analyses/activist_reports/long/8-K_20260909_acc0001104659_26_106304.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 112083 | `AVAV/third-party-analyses/activist_reports/long/8-K_20260930_acc0001104659_26_112083.htm` | context | activist/long — local |
 
-Cross-check required: `AVAV/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `AVAV/research/cross_check_third_party_2026-10-25.md`

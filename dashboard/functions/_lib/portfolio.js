@@ -166,6 +166,11 @@ export async function storeAccountSnapshot(env, payload, bytes) {
   const db = requireDatabase(env);
   const archive = requirePrivateArchive(env);
   const digest = await sha256Hex(bytes);
+  const ownership = validateSnapshotOwnership(payload);
+  if (!ownership && payload.complete && payload.completeness?.feed === 'flex_eod') {
+    const current = await db.prepare("SELECT completeness_json FROM portfolio_source_runs WHERE source='ibkr' AND complete=1 AND account_alias=? ORDER BY as_of DESC LIMIT 1").bind(payload.account_alias).first();
+    if (parseCompleteness(current?.completeness_json).ownership_required) throw new TypeError("Verified lot ownership cannot be replaced by a legacy snapshot");
+  }
   const objectKey = `portfolio/account/${payload.account_alias}/${payload.as_of.slice(0, 10)}/${payload.source_run_id}.json`;
   const existing = await db.prepare("SELECT content_sha256 FROM portfolio_source_runs WHERE source_run_id=?").bind(payload.source_run_id).first();
   if (existing) {
@@ -213,6 +218,20 @@ export async function storeAccountSnapshot(env, payload, bytes) {
       row.limit_price ?? null, row.tif || null, row.status || null, row.order_ref || null, row.ownership || "foreign",
       row.parent_id ?? null, row.oca_group || null, row.as_of || payload.as_of,
     ));
+  }
+  if (ownership) {
+    // The snapshot and its ownership projection become visible in ONE D1
+    // transaction. A failed publish leaves the previous complete book intact.
+    const projectionId = `${payload.source_run_id}:ownership`;
+    statements.push(
+      db.prepare("DELETE FROM portfolio_allocations WHERE account_alias=?").bind(payload.account_alias),
+      db.prepare("INSERT INTO portfolio_allocation_projections VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)")
+        .bind(projectionId, payload.source_run_id, payload.account_alias, payload.as_of, digest, objectKey),
+    );
+    for (const [index, row] of ownership.allocations.entries()) statements.push(db.prepare(`INSERT INTO portfolio_allocations
+      (allocation_id,account_alias,conid,model_code,owner,strategy,bucket,quantity_decimal,confidence,effective_at,ended_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?)`).bind(`${projectionId}:${index}`, payload.account_alias, row.conid, row.model_code || "",
+        row.owner, row.strategy, null, row.quantity_decimal, row.confidence, payload.as_of, null));
   }
   await db.batch(statements);
   // Every position seeds the contract cache. This is what makes the order
@@ -282,8 +301,15 @@ export async function storeAllocationProjection(env, payload, bytes) {
     if (existing.content_sha256 !== digest) throw new TypeError("projection_id reused with different content");
     return { duplicate: true, object_key: objectKey };
   }
-  const source = await db.prepare("SELECT account_alias FROM portfolio_source_runs WHERE source_run_id=? AND source='ibkr' AND complete=1").bind(payload.source_run_id).first();
+  const source = await db.prepare("SELECT account_alias,completeness_json FROM portfolio_source_runs WHERE source_run_id=? AND source='ibkr' AND complete=1").bind(payload.source_run_id).first();
   if (!source || source.account_alias !== payload.account_alias) throw new TypeError("projection does not reference a matching complete broker snapshot");
+  const current = await db.prepare("SELECT source_run_id,completeness_json FROM portfolio_source_runs WHERE source='ibkr' AND complete=1 AND account_alias=? ORDER BY as_of DESC LIMIT 1").bind(payload.account_alias).first();
+  if (parseCompleteness(current?.completeness_json).ownership_required && current.source_run_id !== payload.source_run_id) {
+    throw new TypeError("Older allocation projection cannot replace verified lot ownership");
+  }
+  if (parseCompleteness(source.completeness_json).ownership_required) {
+    return { duplicate: true, ownership: "atomic_snapshot_projection" };
+  }
   const brokerCount = await db.prepare("SELECT COUNT(*) AS count FROM portfolio_positions WHERE source_run_id=?").bind(payload.source_run_id).first();
   if (Number(brokerCount?.count || 0) > 0 && payload.allocations.length === 0) {
     throw new TypeError("non-empty broker snapshot cannot publish an empty allocation projection");
@@ -354,6 +380,7 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
   const run = await db.prepare(`SELECT * FROM portfolio_source_runs
     WHERE source='ibkr' AND complete=1 ORDER BY as_of DESC LIMIT 1`).first();
   if (!run) return { schema_version: "portfolio_read_model.v1", status: "unknown", reason: "no complete broker snapshot", scope: owner, account_values: [], positions: [], reconciliation_breaks: [] };
+  const completeness = parseCompleteness(run.completeness_json);
   const [values, rows, breaks, cash, openOrders, brokerPositions, allocationStatus] = await db.batch([
     db.prepare("SELECT * FROM portfolio_account_values WHERE source_run_id=? ORDER BY tag,currency").bind(run.source_run_id),
     db.prepare(`SELECT p.*, a.allocation_id, a.owner, a.strategy, a.bucket, a.quantity_decimal AS allocated_quantity_decimal, a.confidence
@@ -399,7 +426,11 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
       delete position.allocated_quantity_decimal; delete position.confidence;
       positions.push(position); keyed.set(key, position);
     }
-    if (row.allocation_id) position.allocations.push({ allocation_id: row.allocation_id, owner: row.owner, strategy: row.strategy, bucket: row.bucket, quantity_decimal: row.allocated_quantity_decimal, confidence: row.confidence });
+    if (row.allocation_id) {
+      const owned = completeness.ownership?.allocations?.find(a => a.conid === row.conid && a.model_code === row.model_code && a.owner === row.owner && a.strategy === row.strategy);
+      position.allocations.push({ allocation_id: row.allocation_id, owner: row.owner, strategy: row.strategy, bucket: row.bucket,
+        quantity_decimal: row.allocated_quantity_decimal, confidence: row.confidence, ...(owned ? { position: owned.position } : {}) });
+    }
   }
   const brokerPositionCount = Number(brokerPositions.results?.[0]?.count || 0);
   const allocationRow = allocationStatus.results?.[0] || null;
@@ -409,7 +440,7 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
   // matches nothing, so Michael renders as an empty book while the broker
   // count stays positive. His book is the residual of that broker book.
   // A published projection (allocationState complete) is left untouched.
-  if (owner === "michael" && allocationState === "upstream_absent") {
+  if (owner === "michael" && allocationState === "upstream_absent" && !completeness.ownership_required) {
     const brokerRows = await db.prepare(
       "SELECT * FROM portfolio_positions WHERE source_run_id=? ORDER BY symbol, conid, model_code",
     ).bind(run.source_run_id).all();
@@ -418,6 +449,9 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
       lsSymbols: lsUniverseSymbols(), drewSymbols,
     });
     allocationState = "residual_fallback";
+  }
+  if (owner !== "all" && completeness.ownership_required) {
+    positions = positions.map(position => scopeOwnedPosition(position, owner, completeness.ownership));
   }
   return {
     schema_version: "portfolio_read_model.v1",
@@ -436,8 +470,73 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
         ? "Owner projection is absent. Michael is the broker book minus LS Algo, SPX 0DTE, and Drew."
         : null,
     allocation_projection_as_of: allocationRow?.as_of || null,
+    ownership_version: completeness.ownership?.version || null,
+    ownership_review_count: (completeness.ownership?.allocations || []).filter(a => a.strategy === "ownership_review").length,
     broker_open_order_count: Number(openOrders.results?.[0]?.count || 0), reconciliation_breaks: breaks.results || [],
   };
+}
+
+function sumDecimals(values) {
+  const scale = Math.max(0, ...values.map(value => String(value).split(".")[1]?.length || 0));
+  const units = values.map(value => {
+    const negative = String(value).startsWith("-");
+    const [whole, fraction = ""] = String(value).replace(/^[+-]/, "").split(".");
+    return BigInt((whole || "0") + fraction.padEnd(scale, "0")) * (negative ? -1n : 1n);
+  }).reduce((a, b) => a + b, 0n);
+  const sign = units < 0n ? "-" : "";
+  const digits = (units < 0n ? -units : units).toString().padStart(scale + 1, "0");
+  return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : sign + digits;
+}
+
+export function validateSnapshotOwnership(payload) {
+  const ownership = payload.completeness?.ownership;
+  if (!payload.completeness?.ownership_required && !ownership) return null;
+  if (!ownership || !/^[a-f0-9]{64}$/.test(ownership.version || "") || !Array.isArray(ownership.allocations)
+      || ownership.through !== payload.completeness.session_date) throw new TypeError("Invalid snapshot ownership registry");
+  const positions = new Map(payload.positions.map(p => [`${p.conid}:${p.model_code || ""}`, p]));
+  const groups = new Map();
+  const identities = new Set();
+  for (const row of ownership.allocations) {
+    const key = `${row.conid}:${row.model_code || ""}`;
+    const identity = `${key}:${row.owner}:${row.strategy}`;
+    if (!positions.has(key) || identities.has(identity) || !["drew", "michael", "unallocated"].includes(row.owner)
+        || !row.strategy || !DECIMAL.test(String(row.quantity_decimal)) || !row.position
+        || row.position.quantity_decimal !== row.quantity_decimal) throw new TypeError("Invalid lot allocation");
+    for (const value of Object.values(row.position)) if (value !== null && !DECIMAL.test(String(value))) throw new TypeError("Invalid lot economics");
+    identities.add(identity);
+    groups.set(key, [...(groups.get(key) || []), row]);
+  }
+  for (const [key, position] of positions) {
+    const parts = groups.get(key) || [];
+    const negativeQuantity = String(position.quantity).startsWith("-") ? String(position.quantity).slice(1) : `-${position.quantity}`;
+    if (!parts.length || Number(sumDecimals([...parts.map(a => a.quantity_decimal), negativeQuantity])) !== 0) {
+      throw new TypeError("Lot allocation quantities do not conserve broker position");
+    }
+    for (const [field, source] of [["market_value_native_decimal", "market_value_native"], ["market_value_base_decimal", "market_value_base"],
+      ["unrealized_pnl_base_decimal", "unrealized_pnl_base"]]) {
+      if (position[source] != null && parts.every(a => a.position[field] != null)
+          && Math.abs(Number(sumDecimals(parts.map(a => a.position[field]))) - Number(position[source])) > 0.000001) {
+        throw new TypeError("Lot economics do not conserve broker position");
+      }
+    }
+  }
+  return ownership;
+}
+
+export function scopeOwnedPosition(position, owner, ownership) {
+  const parts = (ownership?.allocations || []).filter(a => a.conid === position.conid
+    && (a.model_code || "") === (position.model_code || "") && a.owner === owner);
+  if (!parts.length) throw new TypeError("Missing scoped ownership economics");
+  const scoped = { ...position };
+  for (const field of ["quantity_decimal", "market_value_decimal", "market_value_native_decimal", "market_value_base_decimal",
+    "unrealized_pnl_decimal", "unrealized_pnl_base_decimal"]) {
+    scoped[field] = parts.some(a => a.position[field] == null) ? null : sumDecimals(parts.map(a => a.position[field]));
+  }
+  for (const field of ["average_cost_decimal", "average_cost_native_decimal"]) {
+    scoped[field] = parts.length === 1 ? parts[0].position[field] : scoped.quantity_decimal && String(parts.reduce((sum, a) =>
+      sum + Number(a.quantity_decimal) * Number(a.position[field]), 0) / Number(scoped.quantity_decimal));
+  }
+  return scoped;
 }
 
 // Sources whose rate is inferred rather than stated by IBKR. Mirrors INFERRED_FX

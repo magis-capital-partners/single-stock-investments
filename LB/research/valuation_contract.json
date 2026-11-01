@@ -2190,7 +2190,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "80c6c6355b43dd58e952e96045086255f13f1e0a161dd858ad83ed0e8f7a94f0",
+    "model_hash": "26b3666021561ea033ef9b8bdab3642f6df135c0a8b971b33807e06962307415",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -2200,8 +2200,184 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
-  "profile_match": true,
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "LB",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-23",
+    "quote": {
+      "value": 87.58,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo LB close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "525908a310aa96bf2ef1242ea44138d00c1ce415f8075d69e05b74c0a6fe7368",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "current_fee_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_debt",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "dormant_acreage",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "alpha_digital_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0,
+          "base": 0.0
+        }
+      },
+      {
+        "component_id": "pore_space_other_options",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "current_fee_engine",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "current_fee_engine",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "current_fee_engine",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_debt",
+        "case": "low",
+        "code": "realization_timing_missing:net_debt_m"
+      },
+      {
+        "component_id": "net_debt",
+        "case": "base",
+        "code": "realization_timing_missing:net_debt_m"
+      },
+      {
+        "component_id": "net_debt",
+        "case": "high",
+        "code": "realization_timing_missing:net_debt_m"
+      },
+      {
+        "component_id": "dormant_acreage",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "dormant_acreage",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "dormant_acreage",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "alpha_digital_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "pore_space_other_options",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "pore_space_other_options",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "powerbridge_option_acres",
+        "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+        "locator": "PowerBridge option to lease ~2,580 acres for data centers; initial option to March 2027 with up to two one-year extensions; $2.6M non-refundable option fee (DEF 14A related-party note)",
+        "as_of": "2025-12-31",
+        "source_id": "3078d1295df83864d7b5d841641396fae940089b4b86f73f23c5c90a0cbdc986"
+      },
+      {
+        "node_id": "plp_lease_acres",
+        "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+        "locator": "PLP lease development on ~2,000 Reeves County acres; $8.0M non-refundable deposit (Dec 2024); rent schedule begins only after construction milestones",
+        "as_of": "2025-12-31",
+        "source_id": "8a8f545d18e71a9aee3eeb97dc03cd60393effab48fc2e3be25c36cc9c7617b9"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+        "locator": "Q1 2026: 27.839229M Class A shares plus 49.177775M Class B/OpCo units",
+        "as_of": "2026-03-31",
+        "source_id": "d4c95eb595c3a4f546908c8ad83b86b88dfb09ffe2b1aac951a701353dc05489"
+      },
+      {
+        "node_id": "surface_acres",
+        "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
+        "locator": "315,000+ surface acres support pore space, water, fiber, and industrial uses (Item 1)",
+        "as_of": "2025-12-31",
+        "source_id": "65ccbb371e2e07f3b82225522b2133084d44a8b511243e8873cd043b85f12e4d"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "625a6306b7875e6cf3ef9ef557ed1543aaca1092366bb105a791c109870f542a"
+  },
   "cohort_expected_profile": "scarce_asset_optionality",
+  "profile_match": true,
   "cohort_purpose": "Fee engine, land-use contracts, and powered-land optionality.",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,

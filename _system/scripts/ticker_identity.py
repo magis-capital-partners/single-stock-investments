@@ -9,6 +9,7 @@ ticker.
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 from typing import Iterable
 
 # Venue families used for compatibility checks (not MIC codes).
@@ -173,18 +174,26 @@ def families_compatible(left: str | None, right: str | None) -> bool:
     return left == right
 
 
+def _exchange_pairs(text: str) -> tuple[tuple[str, str], ...]:
+    if ':' not in text:
+        return ()
+    return tuple((m.group('sym').upper().replace('-', '.'), m.group('exch'))
+                 for m in EXPLICIT_EXCHANGE_TICKER_RE.finditer(text))
+
+
+_cached_exchange_pairs = lru_cache(maxsize=64)(_exchange_pairs)
+
+
 def explicit_exchange_mentions(text: str, ticker: str) -> list[str]:
     """Return exchange tokens explicitly paired with ``ticker`` in ``text``."""
     if not text or not ticker:
         return []
     base = ticker.split(".", 1)[0].upper()
     dotted = ticker.upper()
-    out: list[str] = []
-    for match in EXPLICIT_EXCHANGE_TICKER_RE.finditer(text):
-        sym = match.group("sym").upper().replace("-", ".")
-        if sym in {base, dotted}:
-            out.append(match.group("exch"))
-    return out
+    # Each document window is checked against many issuers. Parse its exchange
+    # pairs once, without retaining large books in the process-wide cache.
+    pairs = _cached_exchange_pairs(text) if len(text) <= 65536 else _exchange_pairs(text)
+    return [exchange for symbol, exchange in pairs if symbol in {base, dotted}]
 
 
 def text_has_incompatible_exchange(

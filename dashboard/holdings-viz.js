@@ -92,73 +92,56 @@
   }
 
   function renderManagersPage() {
-    return `<div id="managers-page"><p class="tier-sub">Loading 13F managers…</p></div>`;
+    return (window.WorkspaceTools ? WorkspaceTools.investorNav(true) : '<h2>Investors</h2>') + '<div id="managers-page" aria-live="polite">Loading the investor directory.</div>';
   }
 
-  function managerLine(row) {
-    const weight = row.top_weight_pct != null ? `${escapeHtml(row.top_weight_pct)}% in ${escapeHtml(row.top_ticker || row.top_issuer || "")}` : "";
-    return `<button type="button" class="hr-line" data-manager="${escapeHtml(row.manager_id)}" style="display:block;width:100%;text-align:left;background:none;border:0;padding:4px 0;cursor:pointer"><strong>${escapeHtml(row.name)}</strong> · ${escapeHtml(row.quarter || "")} · ${row.positions || 0} positions · ${row.ssi_overlap || 0} in this book${weight ? ` · top ${weight}` : ""}</button>`;
-  }
-
-  function fillManagersPage() {
-    const root = document.getElementById("managers-page");
-    if (!root) return;
-    Promise.all([
-      fetch(dataUrl("data/holdings/managers_index.json")).then((response) => (response.ok ? response.json() : null)),
-      fetch(dataUrl("data/holdings/feed.json")).then((response) => (response.ok ? response.json() : null)),
-    ]).then(([index, feed]) => {
-      if (!document.getElementById("managers-page")) return;
-      const managers = (index && index.managers) || [];
-      const consensus = ((feed && feed.consensus) || []).slice(0, 20).map((row) =>
-        `<div class="hr-line"><strong>${escapeHtml(row.ticker)}</strong> · ${(row.managers || []).slice(0, 8).map(escapeHtml).join(", ")}</div>`
-      ).join("");
-      const changes = ((feed && feed.changes) || []).slice(0, 40).map((row) =>
-        `<div class="hr-line">${escapeHtml(row.name)} · ${escapeHtml(row.change_type)} ${escapeHtml(row.ticker)}${row.shares_delta_pct != null ? ` · ${escapeHtml(row.shares_delta_pct)}%` : ""}</div>`
-      ).join("");
-      const outside = ((feed && feed.outside_book) || []).slice(0, 20).map((row) =>
-        `<div class="hr-line"><strong>${escapeHtml(row.ticker)}</strong> ${escapeHtml(row.issuer || "")} · ${(row.managers || []).map((item) => escapeHtml(item.name)).join(", ")}</div>`
-      ).join("");
-      root.innerHTML = `
-        <p class="tier-sub">${escapeHtml((feed && feed.context) || (index && index.context) || "")}</p>
-        <h3>Consensus</h3>
-        <p class="tier-sub">SSI names where at least three managers added or started a position in ${escapeHtml((feed && feed.quarter) || "")}.</p>
-        ${consensus || '<p class="tier-sub">None this quarter.</p>'}
-        <h3>Changes</h3>
-        ${changes || '<p class="tier-sub">No SSI changes on file.</p>'}
-        <h3>Outside this book</h3>
-        <p class="tier-sub">New positions of at least 3 percent of a manager's book, held by two or more managers, and not in the SSI book.</p>
-        ${outside || '<p class="tier-sub">None this quarter.</p>'}
-        <h3>Managers</h3>
-        <div id="manager-list">${managers.map(managerLine).join("")}</div>
-        <div id="manager-detail"></div>`;
-      root.querySelectorAll("[data-manager]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const id = button.getAttribute("data-manager");
-          const detail = document.getElementById("manager-detail");
-          if (!detail || !id) return;
-          detail.textContent = "Loading…";
-          fetch(dataUrl(`data/holdings/by_manager/${encodeURIComponent(id)}.json`))
-            .then((response) => (response.ok ? response.json() : null))
-            .then((page) => {
-              if (!page) {
-                detail.textContent = "No page for that manager.";
-                return;
-              }
-              const rows = (page.positions || []).map((row) =>
-                `<div class="hr-line">${escapeHtml(row.ticker || row.issuer)} · ${shares(row.shares)} shares · ${money(row.value_usd)} · ${row.weight_pct != null ? `${escapeHtml(row.weight_pct)}%` : ""}</div>`
-              ).join("");
-              const moved = (page.ssi_changes || []).slice(0, 12).map((row) =>
-                `<div class="hr-line">${escapeHtml(row.change_type)} ${escapeHtml(row.ticker)}</div>`
-              ).join("");
-              detail.innerHTML = `<h3>${escapeHtml(page.name)}</h3><p class="tier-sub">${escapeHtml(page.quarter || "")} · <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${escapeHtml(page.cik || "")}&type=13F-HR" target="_blank" rel="noopener">SEC filings</a></p>${rows}${moved ? `<h3>SSI changes</h3>${moved}` : ""}`;
-            })
-            .catch(() => { detail.textContent = "Could not load that manager."; });
-        });
-      });
-    }).catch(() => {
-      const node = document.getElementById("managers-page");
-      if (node) node.textContent = "Manager filings could not be loaded.";
-    });
+  async function fillManagersPage() {
+    if (window.InvestorHistory) return window.InvestorHistory.fill();
+    const root=document.getElementById('managers-page'); if(!root)return;
+    try {
+      const response=await fetch(dataUrl('data/holdings/managers_index.json'));
+      if(!response.ok)throw new Error('Directory unavailable');
+      const index=await response.json(); if(!root.isConnected)return;
+      const managers=index.managers || [], quarters=[...new Set(managers.map(r=>r.quarter).filter(Boolean))].sort().reverse();
+      const coverage=Object.fromEntries(quarters.map(q=>[q,managers.filter(r=>r.quarter===q).length]));
+      const broadest=quarters.slice().sort((a,b)=>coverage[b]-coverage[a])[0] || '';
+      let query='',quarter=broadest,overlap=true,page=0,request=0;
+      root.innerHTML=`<p class="investor-context">Quarter-end US holdings from 13F filings. Filings arrive after the holdings date; positions do not reveal current exposure or trade intent.</p>
+        <div class="workspace-filter"><label class="workspace-search">Find an investor<input type="search" data-manager-search placeholder="Manager name"></label>
+        <label>Holdings quarter<select data-manager-quarter>${quarters.map(q=>`<option value="${escapeHtml(q)}"${q===quarter?' selected':''}>${escapeHtml(q)} · ${coverage[q]} filed</option>`).join('')}</select></label>
+        <label><span>Portfolio relevance</span><select data-manager-overlap><option value="book">Overlaps our book</option><option value="all">All investors</option></select></label></div>
+        <div class="investor-directory"><div><p data-manager-count class="investor-context"></p><div class="workspace-scroll" data-manager-list></div><div class="workspace-filter"><button type="button" data-manager-prev>Previous</button><span data-manager-page></span><button type="button" data-manager-next>Next</button></div></div>
+        <aside class="investor-detail" data-manager-detail tabindex="-1" aria-label="Investor details"><h3>Select an investor</h3><p>Holdings and changes appear here with their reporting quarter.</p></aside></div>`;
+      const list=root.querySelector('[data-manager-list]'),detail=root.querySelector('[data-manager-detail]');
+      async function selectManager(id) {
+        const ticket=++request;detail.innerHTML='<p>Loading filing details.</p>';
+        try {
+          const response=await fetch(dataUrl(`data/holdings/by_manager/${encodeURIComponent(id)}.json`));
+          if(!response.ok)throw new Error('No verified filing page is available.');
+          const d=await response.json();if(ticket!==request || !root.isConnected)return;
+          const positions=(d.positions || []).slice().sort((a,b)=>(b.weight_pct || 0)-(a.weight_pct || 0));
+          detail.innerHTML=`<h3>${escapeHtml(d.name)}</h3><p>Holdings: ${escapeHtml(d.period_end || d.quarter || 'undated')}<br>Filed: ${escapeHtml(d.filed_at || d.filing_date || 'See SEC filing history')}</p>
+            <p><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(d.cik || '')}&type=13F-HR" target="_blank" rel="noopener">SEC filing history</a></p>
+            <div class="workspace-scroll"><table class="workspace-table"><thead><tr><th>Position</th><th>Weight</th><th>Value</th></tr></thead><tbody>${positions.map(r=>`<tr><td>${escapeHtml(r.ssi_ticker || r.ticker || r.issuer)}<small>${escapeHtml(r.issuer)}</small></td><td>${r.weight_pct==null?'—':Number(r.weight_pct).toFixed(1)+'%'}</td><td>${money(r.value_usd)}</td></tr>`).join('')}</tbody></table></div>
+            <details class="workspace-fold"><summary>Changes in our book · ${(d.ssi_changes || []).length}</summary>${(d.ssi_changes || []).map(r=>`<p>${escapeHtml(r.change_type)} ${escapeHtml(r.ticker)}</p>`).join('') || '<p>No changes recorded.</p>'}</details>
+            ${d.watchlist ? `<details class="workspace-fold"><summary>All reported changes · ${(d.changes || []).length}</summary>${(d.changes || []).map(r=>`<p>${escapeHtml(r.change_type)} ${escapeHtml(r.ticker || r.issuer || r.cusip || "position")}${r.shares_delta_pct==null?'':` ${Number(r.shares_delta_pct).toFixed(1)}%`}</p>`).join('') || '<p>No changes at the reporting threshold.</p>'}</details>` : ''}`;
+          detail.focus({preventScroll:true});if(window.innerWidth<900)detail.scrollIntoView({block:'start'});
+        } catch(e) { if(ticket===request && root.isConnected)detail.textContent=e.message; }
+      }
+      function paint() {
+        const rows=managers.filter(r=>(!quarter || r.quarter===quarter) && (!overlap || r.ssi_overlap>0) && r.name.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>(b.ssi_overlap || 0)-(a.ssi_overlap || 0) || a.name.localeCompare(b.name));
+        page=Math.max(0,Math.min(page,Math.ceil(rows.length/25)-1));
+        root.querySelector('[data-manager-count]').textContent=`${rows.length} investors · sorted by portfolio overlap`;
+        list.innerHTML=`<table class="workspace-table"><thead><tr><th>Investor</th><th>In our book</th><th>Positions</th><th>Holdings date</th></tr></thead><tbody>${rows.slice(page*25,(page+1)*25).map(r=>`<tr><td><button type="button" data-manager="${escapeHtml(r.manager_id)}">${escapeHtml(r.name)}</button><small>${escapeHtml(r.top_ticker || r.top_issuer || '')}${r.top_weight_pct==null?'':' · '+Number(r.top_weight_pct).toFixed(1)+'% top position'}</small></td><td>${r.ssi_overlap || 0}</td><td>${r.positions || 0}</td><td>${escapeHtml(r.period_end || r.quarter)}</td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="workspace-empty">No investors match these filters.</div>'}`;
+        root.querySelector('[data-manager-page]').textContent=`Page ${page+1} of ${Math.max(1,Math.ceil(rows.length/25))}`;
+        root.querySelector('[data-manager-prev]').disabled=page===0;root.querySelector('[data-manager-next]').disabled=(page+1)*25>=rows.length;
+        list.querySelectorAll('[data-manager]').forEach(button=>button.addEventListener('click',()=>selectManager(button.dataset.manager)));
+      }
+      root.querySelector('[data-manager-search]').addEventListener('input',e=>{query=e.target.value;page=0;paint();});
+      root.querySelector('[data-manager-quarter]').addEventListener('change',e=>{quarter=e.target.value;page=0;paint();});
+      root.querySelector('[data-manager-overlap]').addEventListener('change',e=>{overlap=e.target.value==='book';page=0;paint();});
+      root.querySelector('[data-manager-prev]').addEventListener('click',()=>{page--;paint();});root.querySelector('[data-manager-next]').addEventListener('click',()=>{page++;paint();});paint();
+    } catch(e) { if(root.isConnected)root.textContent='Investor filings could not be loaded. '+e.message; }
   }
 
   ensureSummary();

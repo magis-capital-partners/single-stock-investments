@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import subprocess
 import sys
@@ -69,7 +70,15 @@ INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 INSIGHTS_DIR = ROOT / "dashboard" / "data" / "insights"
 ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 INDEX_MEMBERSHIP_PATH = ROOT / "dashboard" / "data" / "index_membership.json"
-INDEX_STATUS_ENUM = {"member", "inclusion_candidate", "deletion_risk", "ineligible", "n_a"}
+INDEX_STATUS_ENUM = {
+    "member",
+    "inclusion_candidate",
+    "deletion_risk",
+    "banding_hold",
+    "committee_watch",
+    "ineligible",
+    "n_a",
+}
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 MIN_LETTER_CORPUS = 15000
 MIN_LETTER_LINKS_RATIO = 0.99
@@ -110,6 +119,47 @@ def standalone_embed_errors(payload: dict) -> list[str]:
 def pages_deploy_only() -> bool:
     """True when CI is publishing committed dashboard/ without a data rebuild."""
     return os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
+
+
+def retained_event_count_issue(
+    summary: dict, event_count: int, *, deploy_only: bool
+) -> tuple[str, str] | None:
+    """Return (severity, message) when a triage summary lags its events list.
+
+    Media publishers have shipped this exact drift (a retained count of 1539
+    beside a longer events shard). The count is derived from the events list
+    before a publish. Deploy-only validation reports it as a warning so the
+    drift cannot block an unrelated boot-payload job; a full validation still
+    fails.
+    """
+    retained = int(summary.get("retained_event_count") or 0)
+    if retained == event_count:
+        return None
+    message = (
+        "event triage retained_event_count does not match events list "
+        f"({retained} vs {event_count})"
+    )
+    return ("warning" if deploy_only else "error", message)
+
+
+def load_dashboard_document(path: Path) -> dict:
+    """Read a dashboard JSON file, following a private snapshot without copying it.
+
+    Hydrated checkouts already hold the private bytes in the public path, so
+    this returns that file unchanged. A metadata placeholder is read from the
+    vault object and never written back.
+    """
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(document, dict) or document.get("private_snapshot") is not True:
+        return document if isinstance(document, dict) else {}
+    relative = path.relative_to(ROOT / "dashboard").as_posix()
+    from private_dashboard_assets import read_resolved_json
+    resolved, _restored = read_resolved_json(ROOT / "dashboard", relative)
+    if resolved.get("private_snapshot") is True:
+        raise ValueError(
+            f"{relative} is a private snapshot. Check out the research vault before validating."
+        )
+    return resolved
 
 
 def resolve_payload_path(
@@ -302,6 +352,11 @@ def main() -> int:
             errors.append(msg)
 
     payload = json.loads(payload_path.read_text(encoding="utf-8"))
+    if isinstance(payload, dict) and payload.get("private_snapshot") is True:
+        try:
+            payload = load_dashboard_document(payload_path)
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            errors.append(f"{payload_path.name} is a private snapshot and could not be read: {exc}")
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     if payload.get("insights"):
         errors.append(
@@ -348,9 +403,9 @@ def main() -> int:
                 errors.append(f"{path} contains unresolved git merge conflict markers")
                 continue
             try:
-                shard = json.loads(raw_shard)
-            except json.JSONDecodeError:
-                errors.append(f"{path} is invalid JSON")
+                shard = load_dashboard_document(path)
+            except (json.JSONDecodeError, OSError, RuntimeError, ValueError) as exc:
+                errors.append(f"{path} could not be read: {exc}")
                 continue
             if isinstance(shard, dict):
                 insights.update(shard)
@@ -383,7 +438,14 @@ def main() -> int:
         model_level = decision.get("model_level")
         if model_level not in MODEL_LEVELS:
             invalid_model_levels.append(f"{row.get('ticker')}={model_level}")
-        if decision.get("output_basis") == "present_value_today" and any(
+        shared = bool(decision.get('calculation_status'))
+        shared_valid = (shared and decision.get('calculation_status') == 'available'
+                        and decision.get('research_return_available') is True
+                        and len(str(decision.get('forecast_id') or '')) == 64
+                        and decision.get('forward_return_status') == 'available'
+                        and all(isinstance(returns.get(c), (int, float)) and not isinstance(returns[c], bool)
+                                and math.isfinite(returns[c]) for c in ('low', 'base', 'high')))
+        if decision.get("output_basis") == "present_value_today" and not shared_valid and any(
             returns.get(case) is not None for case in ("low", "base", "high")
         ):
             present_value_return_leaks.append(str(row.get("ticker") or ""))
@@ -391,6 +453,13 @@ def main() -> int:
         if base_return is None:
             continue
         ticker = str(row.get("ticker") or "")
+        if shared:
+            if not shared_valid:
+                blocked_with_published_irr.append(ticker)
+            # Source-bound shared forecasts are research calculations. Capital
+            # maturity and outlier approvals remain separate; they cannot gate
+            # a reproducible research IRR or authorize a capital decision.
+            continue
         if (
             decision.get("status") != "decision_grade"
             or decision.get("model_level") not in RETURN_PUBLISHABLE_MODEL_LEVELS
@@ -603,8 +672,15 @@ def main() -> int:
                     errors.append("event triage summary missing history_start")
                 if events and not triage_summary.get("history_end"):
                     errors.append("event triage summary missing history_end")
-                if int(triage_summary.get("retained_event_count") or 0) != len(events):
-                    errors.append("event triage retained_event_count does not match events list")
+                issue = retained_event_count_issue(
+                    triage_summary, len(events), deploy_only=deploy_only
+                )
+                if issue is not None:
+                    severity, message = issue
+                    if severity == "warning":
+                        warnings.append(message)
+                    else:
+                        errors.append(message)
         if "records" in insights:
             errors.append("insights payload should not include raw records; use record_archive.path")
         archive = insights.get("record_archive") or {}

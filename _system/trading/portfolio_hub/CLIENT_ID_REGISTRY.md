@@ -58,7 +58,11 @@ Before accepting commands, startup recovery reads open orders, classifies each
 one by positive ownership, and refuses an unresolved `MAGIS|` namespace.
 Uncertain-send reconciliation also checks completed orders. Manual,
 foreign, and legacy orders are visible and never bound, modified, or cancelled.
-`reqGlobalCancel` is prohibited.
+`reqGlobalCancel` is prohibited. etf-0dte's `SPY0DTE|` / `QQQ0DTE|` orders
+(clients 50/51 and watchdogs 130/131, including the 09:30 unwind of a delivery)
+are foreign by the same rule, even on client 91, with no special case in the
+bridge (`tests/test_ib_bridge.py`); the order loop also refuses to draft any
+SPY or QQQ ticket (`allocation_policy.etf_0dte_ticket_refusal`).
 
 Positive hub ownership requires all three: a `MAGIS|` orderRef, the configured
 account, and client ID 91. `find_owned_order`, startup recovery, and cancellation

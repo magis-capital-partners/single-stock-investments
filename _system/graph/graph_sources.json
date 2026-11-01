@@ -280,6 +280,16 @@
       "subject_regex": "^(chore|feat|fix)\\((letters|letter)\\)|letter backfill|Refresh dashboard payloads after letter backfill"
     },
     {
+      "name": "licensed-research",
+      "workflow_file": "licensed-research-sync.yml",
+      "job": "plan",
+      "cadence_cron": [
+        "17 17 * * 6"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "Refresh ValueLine and Expert Call labels|Ingest ValueLine and Expert Call text"
+    },
+    {
       "name": "podcasts",
       "workflow_file": "podcast-refresh.yml",
       "job": "refresh",
@@ -354,6 +364,95 @@
       ],
       "freshness_hours": 102,
       "subject_regex": "^chore: archive reverse-split borrow indications"
+    },
+    {
+      "name": "data-pipeline-buyback-radar",
+      "workflow_file": "data-pipeline.yml",
+      "job": "buyback-radar",
+      "cadence_cron": [
+        "13 15 * * 1",
+        "19 15 * * 2-5"
+      ],
+      "freshness_hours": 102,
+      "subject_regex": "^chore: buyback radar (refresh|weekly)"
+    },
+    {
+      "name": "market-close",
+      "workflow_file": "market-close.yml",
+      "job": "refresh",
+      "cadence_cron": [
+        "13,43 13,16 * * 1-5",
+        "19 18 * * 1-5"
+      ],
+      "timezone": "America/New_York",
+      "freshness_hours": 102,
+      "subject_regex": "^chore\\(risk\\): (publish completed-session|reconcile close)"
+    },
+    {
+      "name": "aggregates-screener",
+      "workflow_file": "aggregates-screener.yml",
+      "job": "refresh",
+      "cadence_cron": [
+        "27 18 * * 1-5"
+      ],
+      "timezone": "America/New_York",
+      "freshness_hours": 102,
+      "subject_regex": "^chore: refresh aggregates"
+    },
+    {
+      "name": "autonomous-compounder-irrs",
+      "workflow_file": "autonomous-compounders.yml",
+      "job": "refresh",
+      "work_step": "Verify every served PV and IRR against the same model",
+      "cadence_cron": [
+        "23 8,18 * * 1-5",
+        "37 16,20 * * 1-5"
+      ],
+      "timezone": "America/New_York",
+      "freshness_hours": 96,
+      "subject_regex": "^chore\\(research\\): refresh autonomous compounder IRRs"
+    },
+    {
+      "name": "company-underwriting",
+      "workflow_file": "valuation-underwriting.yml",
+      "job": "underwrite",
+      "work_step": "Author, independently challenge and build company valuations",
+      "cadence_cron": [
+        "47 9,17,21 * * 1-5"
+      ],
+      "timezone": "America/New_York",
+      "freshness_hours": 96
+    },
+    {
+      "name": "reverse-split-announcement-monitor",
+      "workflow_file": "reverse-split-live.yml",
+      "job": "collect",
+      "work_step": "Detect announcements and analyze every company",
+      "cadence_cron": [
+        "3-58/5 * * * *"
+      ],
+      "freshness_hours": 7
+    },
+    {
+      "name": "investor-holdings-history",
+      "workflow_file": "investor-history.yml",
+      "job": "refresh",
+      "work_step": "Complete or resume the full public history",
+      "cadence_cron": [
+        "37 4 * * *"
+      ],
+      "freshness_hours": 60
+    },
+    {
+      "name": "public-fund-holdings",
+      "workflow_file": "public-fund-holdings.yml",
+      "job": "refresh",
+      "work_step": "Fetch current public disclosures and retain dated history",
+      "cadence_cron": [
+        "15 14 * * 1-5",
+        "15 23 * * 1-5"
+      ],
+      "freshness_hours": 84
     }
   ],
   "unmonitored_workflows": {},
@@ -712,6 +811,18 @@
         "health.structural_errors": {
           "max_count": 0,
           "why": "duplicate event keys, enum violations and chain breaks are structural, not freshness"
+        }
+      }
+    },
+    "buyback_radar": {
+      "path": "dashboard/data/buyback_manifest.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 102,
+      "healer": "data-pipeline buyback-radar; repository_dispatch heal-buyback-radar",
+      "assert_fields": {
+        "schema_version": {
+          "equals": "buyback_manifest.v2",
+          "why": "one coherent issuer and event snapshot owns all three views"
         }
       }
     }

@@ -16,8 +16,10 @@ from economic_value_framework import build_economic_value_analysis  # noqa: E402
 from calculation_proof import floor_equity_value_range  # noqa: E402
 from decision_authority import load_contract, load_route, read_json  # noqa: E402
 from universal_valuation_contract import entry_price_for_contract_valuation  # noqa: E402
+from atomic_io import write_json_if_changed  # noqa: E402
+from buy_zones import build_buy_zones, load_config  # noqa: E402
 
-HURDLES = (0.10, 0.12, 0.15, 0.20)
+HURDLES = tuple(value / 100 for value in load_config()["hurdles_pct"])
 VALUE_CASES = ("low", "base", "high")
 
 
@@ -60,10 +62,11 @@ def build_contract_pricing(ticker: str, as_of: str | None = None) -> dict:
     proof_ready = (
         contract.get("status") == "decision_grade"
         and proof_status == "decision_grade"
+        and model_level in {"stock_specific", "committee_reviewed", "owner_approved"}
     )
     entries = {
         case: {
-            f"{int(hurdle * 100)}pct": (
+            f"{hurdle * 100:g}pct": (
                 round(entry, 2) if entry is not None else None
             )
             for hurdle in HURDLES
@@ -98,12 +101,14 @@ def build_contract_pricing(ticker: str, as_of: str | None = None) -> dict:
         if isinstance(item, str) and item not in falsifiers:
             falsifiers.append(item)
     pricing = {
-        "schema_version": "3.0",
+        "schema_version": "3.1",
         "ticker": ticker,
-        "as_of": (as_of or contract.get("as_of") or date.today().isoformat())[:10],
+        "as_of": (as_of or date.today().isoformat())[:10],
+        "model_as_of": (contract.get("dates") or {}).get("model_as_of") or valuation.get("as_of"),
         "authority": "valuation_contract",
         "contract_source": contract_source,
         "contract_status": contract.get("status"),
+        "contract_model_hash": (contract.get("change_control") or {}).get("model_hash"),
         "proof_status": proof_status,
         "model_level": model_level,
         "price": float(price) if price is not None else None,
@@ -149,7 +154,10 @@ def build_contract_pricing(ticker: str, as_of: str | None = None) -> dict:
         "falsifiers": falsifiers,
         "power_zone": {"profile_id": route.get("profile_id"), "label": route.get("label"), "input_hash": route.get("input_hash")},
     }
-    (research / "pricing_analysis.json").write_text(json.dumps(pricing, indent=2) + "\n", encoding="utf-8")
+    pricing["evidence_blockers"] = (contract.get("evidence") or {}).get("blockers") or []
+    from refresh_core_compounders import load_royalty_signals
+    pricing["buy_zones"] = build_buy_zones(pricing, royalty_signal=load_royalty_signals(ROOT).get(ticker), as_of=as_of)
+    write_json_if_changed(research / "pricing_analysis.json", pricing)
     return pricing
 
 
@@ -493,7 +501,7 @@ def main() -> int:
             if seeded is None:
                 print(f"{ticker}: skipped (valuation.json missing or model incomplete; no config seeded)")
                 continue
-        result = build(ticker)
+        result = build_contract_pricing(ticker)
         print(f"{ticker}: price={result['price']} base={result['component_value_per_share']['base']} entry15={result['primary_entry_price_15pct_base']} decision={result['decision']}")
     return 0
 

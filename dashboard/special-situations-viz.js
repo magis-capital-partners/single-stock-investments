@@ -20,6 +20,7 @@
 
   function laneLabel(payload, id) {
     const lane = (payload.lanes || []).find((row) => row.id === id);
+    if(id==='forced_sellers')return 'Index & forced flows';
     return lane ? lane.label : String(id || '').replaceAll('_', ' ');
   }
 
@@ -146,6 +147,7 @@
       <p><strong>Next.</strong> ${esc(row.next || '')}</p>
       <p><strong>Annualized spread.</strong> ${row.annualized_spread == null ? 'Not stated. Shown only when a filing states it.' : esc(row.annualized_spread)}</p>
       ${exchangeTermsHtml(row.spread)}
+      ${row.buyback_event && global.BuybackViz ? global.BuybackViz.renderEventDetails(row.buyback_event) : ''}
       ${whoMustSellHtml(row.flow)}
       <p><strong>Source.</strong> ${evidenceCell(row)} · ${esc(row.evidence_kind || '')}</p>
     </td></tr>` : '';
@@ -159,32 +161,65 @@
     </tr>${detail}`;
   }
 
+  function registerBlock(doc) {
+    const rows = Array.isArray(doc.situation_rows) ? doc.situation_rows : [];
+    if (!rows.length) return '';
+    const shown = rows.filter((row) => matchesQuery({
+      ticker: (row.tickers || []).join(' '),
+      company: row.company,
+      what: (row.catalyst || {}).what_ends_it || '',
+      ends_label: '',
+      lane: row.situation_type,
+      terms_summary: (row.one_number || {}).text || '',
+    }));
+    if (!shown.length) return '';
+    const body = shown.map((row) => {
+      const filing = row.primary_filing || {};
+      const number = (row.one_number || {}).text || '';
+      const tag = (row.field_tags || {}).one_number || '';
+      const href = filing.url
+        ? `<a href="${esc(filing.url)}" target="_blank" rel="noopener">${esc(filing.form || 'filing')} ${esc(filing.accession || '')}</a>`
+        : esc(filing.accession || '—');
+      return `<tr><td>${esc((row.tickers || []).join(' / '))}</td><td>${esc(row.situation_type || '')}</td><td>${esc(row.status || '')}</td><td>${esc(number)} <span class="muted">${esc(tag)}</span></td><td>${esc((row.catalyst || {}).date || '—')}</td><td>${href}</td><td>${esc(row.drew_verdict ? row.drew_verdict.text : '—')}</td></tr>`;
+    }).join('');
+    return `<section class="ideas-surface"><div class="ideas-surface-head"><strong>Situation register</strong><span>${shown.length} filing-backed row${shown.length === 1 ? '' : 's'}. Research only. Verdicts append; they do not rewrite.</span></div><div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Tickers</th><th>Type</th><th>Status</th><th>One number</th><th>Ends</th><th>Filing</th><th>Drew</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
+  }
+
   function render(payload, options) {
     const opts = options || {};
     if (opts.lane) state.lane = opts.lane;
     if (Object.prototype.hasOwnProperty.call(opts, 'focus')) state.focus = opts.focus || '';
     if (opts.gatesOpen) state.gatesOpen = true;
     const doc = payload || {};
-    const counts = (doc.counts && doc.counts.ranked) || {};
-    const ranked = selectRows(doc.rows, state.lane);
-    const discovery = selectRows(doc.discovery, state.lane);
-    const history = selectRows(doc.history, state.lane);
+    const today = new Date().toISOString().slice(0,10);
+    const activeRows=[], endedFlows=[], undatedFlows=[];
+    for(const row of doc.rows || []) {
+      if(!matchesLane(row,'forced_sellers')) { activeRows.push(row); continue; }
+      const end=row.flow?.window_end || row.ends;
+      if(['closed','ended','cancelled','expired'].includes(row.status) || /^\d{4}-\d{2}-\d{2}$/.test(end||'') && end<today) endedFlows.push(row);
+      else if(!/^\d{4}-\d{2}-\d{2}$/.test(end||'') || row.evidence_kind==='news') undatedFlows.push(row);
+      else activeRows.push(row);
+    }
+    const ranked = selectRows(activeRows, state.lane);
+    const discovery = selectRows([...(doc.discovery || []),...undatedFlows], state.lane);
+    const history = selectRows([...(doc.history || []),...endedFlows], state.lane);
+    if(state.focus && history.some(row=>row.ticker===state.focus))state.showHistory=true;
     if (state.focus && !ranked.some((row) => row.ticker === state.focus) && discovery.some((row) => row.ticker === state.focus)) {
       state.showDiscovery = true;
     }
     const shownDiscovery = state.showDiscovery ? discovery : discovery.slice(0, 12);
-    const chips = [{ id: 'all', label: 'All', count: (doc.rows || []).length }].concat(
-      (doc.lanes || []).map((lane) => ({ id: lane.id, label: lane.label, count: counts[lane.id] || 0 })),
+    const chips = [{ id: 'all', label: 'All', count: activeRows.length }].concat(
+      (doc.lanes || []).map((lane) => ({ id: lane.id, label: lane.id==='forced_sellers'?'Index & forced flows':lane.label, count: activeRows.filter(row=>matchesLane(row,lane.id)).length })),
     );
-    const mentionRows = state.lane === 'buyback_events' ? (doc.buyback_mentions || []) : [];
+    const mentionRows = state.lane === 'buyback_events' ? (doc.buyback_mentions || []).filter(row => !state.query || `${row.ticker} ${row.line}`.toLowerCase().includes(state.query.toLowerCase())) : [];
     const mentionBlock = mentionRows.length
-      ? `<section class="ideas-surface"><div class="ideas-surface-head"><strong>Ordinary programs</strong><span>One line each. Not a situation row.</span></div><ul>${mentionRows.map((row) => `<li>${esc(row.ticker || '—')} · ${esc(row.line || '')}${row.url ? ` · <a href="${esc(row.url)}" target="_blank" rel="noopener">filing</a>` : ''}</li>`).join('')}</ul></section>`
+      ? `<section class="ideas-surface"><div class="ideas-surface-head"><strong>Ordinary programs</strong><span>One line each. Not a situation row.</span></div><ul>${mentionRows.map((row) => `<li>${esc(row.ticker || '—')} · ${esc(row.filed || '')} · ${esc(row.line || '')}${row.url ? ` · <a href="${esc(row.url)}" target="_blank" rel="noopener">filing</a>` : ''}</li>`).join('')}</ul></section>`
       : '';
     const gates = state.lane === 'warrants'
       ? `<details class="situation-gates" data-situation-gates ${state.gatesOpen ? 'open' : ''}><summary>Contract gates</summary><div data-situation-gates-host></div></details>`
       : '';
     const historyBlock = history.length
-      ? `<p class="form-hint"><label><input type="checkbox" data-situation-history ${state.showHistory ? 'checked' : ''}/> Show ${history.length} ended contract${history.length === 1 ? '' : 's'}</label></p>${state.showHistory ? `<div class="ideas-table-wrap"><table class="ideas-table"><tbody>${history.map((row) => rowHtml(row, doc)).join('')}</tbody></table></div>` : ''}`
+      ? `<p class="form-hint"><label><input type="checkbox" data-situation-history ${state.showHistory ? 'checked' : ''}/> Show ${history.length} ended situation${history.length === 1 ? '' : 's'}</label></p>${state.showHistory ? `<div class="ideas-table-wrap"><table class="ideas-table"><tbody>${history.map((row) => rowHtml(row, doc)).join('')}</tbody></table></div>` : ''}`
       : '';
     const discoveryBlock = discovery.length
       ? `<details class="situation-discovery" ${state.showDiscovery ? 'open' : ''}><summary>Unverified candidates · ${discovery.length}. Terms unknown. Not a position.</summary>
@@ -195,19 +230,22 @@
     return `<div class="ideas-shell">
       <header class="ideas-header"><div>
         <div class="warrant-kicker">Special situations</div>
-        <h2>The situation ends.</h2>
-        <p>${esc(doc.definition || '')}</p>
+        <h2>${state.lane==='forced_sellers'?'Index & forced flows':'Special situations'}</h2>
+        <p>${state.lane==='forced_sellers'?'One place for index changes, reconstitutions and forced selling. Compare the timing, estimated demand and original evidence.':esc(doc.definition || '')}</p>
         ${doc.caption && CAPTION_LANES.has(state.lane) ? `<p class="situation-caption" data-situation-caption>${esc(doc.caption)}</p>` : ''}
       </div><span class="ideas-asof">As of ${esc((doc.generated_at || '').slice(0, 10) || '—')}</span></header>
       <div class="screen-switcher" aria-label="Special situation lanes">${chips.map((chip) => `<button type="button" class="${state.lane === chip.id ? 'active' : ''}" data-situation-lane="${esc(chip.id)}">${esc(chip.label)} · ${chip.count}</button>`).join('')}</div>
       <div class="warrant-toolbar">
         <input class="search" data-situation-search aria-label="Search special situations" placeholder="Search ticker, company, or situation…" value="${esc(state.query)}">
       </div>
+      ${state.lane==='forced_sellers' ? `<section class="ideas-surface"><h3>Index calendar &amp; flow evidence</h3><p class="desk-caption">Provider notices, prospective flows and historical evidence. Dated situations follow below; missing timing and headlines remain in candidates.</p>${doc.index_membership && global.IndexViz ? global.IndexViz.renderIndexWatch(doc.index_membership,{escapeHtml:esc,consolidated:true}) : '<p class="desk-empty">Index evidence is unavailable in this snapshot.</p>'}</section>` : ''}
+      ${registerBlock(doc)}
       <section class="ideas-surface"><div class="ideas-surface-head"><strong>${ranked.length} ranked</strong><span>Filing before headline · click a ticker for the clock and the next step</span></div>
         <div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Ticker</th><th>What</th><th>Lane</th><th>Ends</th><th>Evidence</th><th>Next</th></tr></thead><tbody>${ranked.length ? ranked.map((row) => rowHtml(row, doc)).join('') : '<tr><td colspan="6">Nothing ranked in this lane. Unverified candidates, when the screen has them, stay below.</td></tr>'}</tbody></table></div>
       </section>
       ${historyBlock}
       ${discoveryBlock}
+      ${state.lane === 'buyback_events' ? `<p class="bb-notice">${doc.buyback_error ? esc(doc.buyback_error) : `Buyback evidence snapshot ${esc(doc.buyback_snapshot?.as_of || 'unavailable')}. Review items have unresolved terms, status, or size.`}</p>` : ''}
       ${mentionBlock}
       ${gates}
       ${doc.error ? `<p class="form-hint">${esc(doc.error)}</p>` : ''}
@@ -249,6 +287,7 @@
     container.querySelector('[data-situation-gates]')?.addEventListener('toggle', (event) => {
       state.gatesOpen = event.target.open;
     });
+    global.BuybackViz?.attachScenarios(container);
     const focusRow = container.querySelector('tr.is-focus');
     if (focusRow) focusRow.scrollIntoView({ block: 'nearest' });
   }

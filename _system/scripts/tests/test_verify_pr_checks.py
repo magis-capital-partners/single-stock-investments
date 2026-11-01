@@ -11,6 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 SCRIPT = Path(__file__).resolve().parents[1] / "verify_pr_checks.py"
 spec = importlib.util.spec_from_file_location("verify_pr_checks", SCRIPT)
 vpc = importlib.util.module_from_spec(spec)
@@ -191,8 +193,13 @@ def test_red_fails_at_once_without_waiting():
 def test_cli_reads_github_and_exits_nonzero_for_the_1021_head(monkeypatch, capsys):
     pages = {"check-runs": [], "actions/runs": UNTESTED_1021, "/status": []}
 
-    def fake_run(cmd, capture_output, text, check):
+    def fake_run(cmd, capture_output, text, check, timeout):
+        assert timeout <= 60
+        if cmd[:3] != ['gh','api','--paginate']:
+            return subprocess.CompletedProcess(cmd,0,stdout=json.dumps({'total_count':0,'workflow_runs':[]}),stderr='')
         assert cmd[:3] == ["gh", "api", "--paginate"]
+        if '/pulls?' in cmd[3]:
+            return subprocess.CompletedProcess(cmd,0,stdout=json.dumps({'created_at':'2026-09-24T19:00:00Z'}),stderr='')
         key = next(k for k in pages if k in cmd[3])
         out = "\n".join(json.dumps(row) for row in pages[key])
         return subprocess.CompletedProcess(cmd, 0, stdout=out, stderr="")
@@ -218,8 +225,49 @@ def test_a_dispatch_run_recorded_on_main_counts_as_the_pr_commit():
 
 
 def test_cli_reports_api_errors_as_usage_errors(monkeypatch):
-    def failing_run(cmd, capture_output, text, check):
+    def failing_run(cmd, capture_output, text, check, timeout):
         return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="HTTP 502")
 
     monkeypatch.setattr(vpc.subprocess, "run", failing_run)
     assert vpc.main(["--repo", "o/r", "--sha", "abc"]) == vpc.EXIT_API
+
+
+def test_dispatch_lookup_is_bounded_by_the_server_recorded_pr_creation(monkeypatch):
+    requested = []
+    def lines(path, jq):
+        requested.append(path)
+        return [{'created_at':'2026-10-28T05:00:00Z'}] if '/pulls?' in path else []
+    monkeypatch.setattr(vpc,'_gh_lines',lines)
+    def page(path):
+        assert 'event=repository_dispatch' in path and 'created=%3E%3D2026-10-28T05%3A00%3A00Z' in path
+        return {'total_count':0,'workflow_runs':[]}
+    monkeypatch.setattr(vpc,'_gh_page',page,raising=False)
+    vpc.fetch('o/r','a'*40)
+    assert any('/pulls?' in p for p in requested)
+    assert not any('/actions/runs?per_page=50' in p for p in requested)
+
+
+def test_all_dispatch_pages_are_checked_and_an_older_red_run_cannot_disappear(monkeypatch):
+    sha = 'c'*40
+    monkeypatch.setattr(vpc,'_gh_lines',lambda *a:[{'created_at':'2026-10-28T00:00:00Z'}])
+    rows = [{'id':i,'display_title':'Another unrelated run'} for i in range(100)]
+    red = {**run(QUALITY,1,number=1,conclusion='failure'),'id':101,'display_title':f'research-quality-pr 12 {sha}'}
+    monkeypatch.setattr(vpc,'_gh_page',lambda path:{'total_count':101,'workflow_runs':[red] if '&page=2' in path else rows})
+    matched = vpc.merge_titled_runs([],vpc.dispatch_runs('o/r',sha,[]),sha)
+    assert matched == [red]
+    assert vpc.assess([],matched)[0]
+
+
+@pytest.mark.parametrize('total,rows',[(1001,[]),(2,[{'id':1}]),(2,[{'id':1},{'id':1}])])
+def test_incomplete_dispatch_history_fails_closed(monkeypatch,total,rows):
+    monkeypatch.setattr(vpc,'_gh_lines',lambda *a:[{'created_at':'2026-10-28T00:00:00Z'}])
+    monkeypatch.setattr(vpc,'_gh_page',lambda path:{'total_count':total,'workflow_runs':rows})
+    with pytest.raises(RuntimeError):
+        vpc.dispatch_runs('o/r','a'*40,[])
+
+
+def test_check_api_timeout_returns_an_api_error_instead_of_hanging(monkeypatch):
+    def timeout(*args,**kw):
+        raise subprocess.TimeoutExpired(args[0],kw['timeout'])
+    monkeypatch.setattr(vpc.subprocess,'run',timeout)
+    assert vpc.main(['--repo','o/r','--sha','a'*40]) == vpc.EXIT_API

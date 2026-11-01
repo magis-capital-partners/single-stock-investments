@@ -12,7 +12,7 @@ This repository is the one hub for Magis Capital Partners research. Drew, Michae
 
 | Kind of change | Path | Checked by | Merged by |
 |---|---|---|---|
-| Desk brief (ranked hits from a desk bot) | `_system/data/desk_briefs/<desk>/<date>.json` | `check_desk_briefs.py` | Automerge on a `grok/` branch when checks pass |
+| Desk brief (ranked hits from a desk bot) | `_system/data/desk_briefs/<desk>/<date>.json` and the rebuilt `dashboard/data/desk_briefs.json` | `check_desk_briefs.py`, then `build_desk_briefs.py` in the same commit | Automerge on a `grok/` branch when checks pass |
 | Lesson or proposal | `_system/memory-hub/research-equity/daily/<date>.md`, at most three `[PROPOSED]` bullets per session | Hub README rules | Automerge on a `grok/` branch |
 | Separation terms read from a filing | `_system/data/separations/separation_registry.jsonl` (new rows) or `separation_amendments.jsonl` (new versions) | `check_separation_universe.py --strict` | Automerge on a `grok/` branch |
 | Short idea | A row in `_system/research/short-alpha/candidates.json` (`origin: desk_note`) plus the narrative note in the private research vault, pointed to by `note_ref` | `build_short_alpha_dashboard.py --check` | Automerge on a `grok/` branch |
@@ -37,7 +37,8 @@ This repository is the one hub for Magis Capital Partners research. Drew, Michae
 
 ```bash
 python _system/scripts/check_contributor_paths.py --head-ref <your-branch> --files <changed-paths.txt>
-python _system/scripts/check_desk_briefs.py          # if you added a brief
+python _system/scripts/build_desk_briefs.py        # same commit as a new brief
+python _system/scripts/check_desk_briefs.py          # if you added a brief; fails if the payload is stale
 python _system/scripts/check_separation_universe.py --strict   # if you touched the register
 python _system/scripts/build_short_alpha_dashboard.py --check  # if you touched the short ledgers
 python _system/scripts/validate_sources.py           # if you touched SOURCES.md or sources.json

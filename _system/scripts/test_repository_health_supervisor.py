@@ -901,7 +901,7 @@ class CompatibilityTests(unittest.TestCase):
 
         market = (ROOT / ".github/workflows/market-risk-components.yml").read_text(encoding="utf-8")
         self.assertLess(
-            market.index("Commit daily dashboard fallback snapshot"),
+            market.index("Commit changed dashboard fallback snapshot"),
             market.index("Publish signed component snapshot"),
         )
         publish_block = market.split("name: Publish signed component snapshot", 1)[1]

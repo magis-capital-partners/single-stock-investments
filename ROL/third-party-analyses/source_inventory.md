@@ -1,11 +1,11 @@
 # ROL — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 155 total (0 approved, 0 pending, 155 context)
+**Date:** 2026-10-25
+**Sources:** 156 total (0 approved, 0 pending, 156 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Oct 4, 2023 | `_system/reference/activist-reports/spruce_point/spruce_point_2023-10-04_rollins-inc.html` | context | activist/short — publisher_site |
+| activist_short | Rollins, Inc. | `_system/reference/activist-reports/spruce_point/spruce_point_2023-10-04_rollins-inc.html` | context | activist/short — publisher_site |
 | activist_long | R. Randall Rollins Voting Trust U/A dated Aug... — SC 13D/A | `ROL/third-party-analyses/activist_reports/long/SC-13D/A_20260921_acc0001104659_26_109332.xml` | context | activist/long — sec_edgar |
 | activist_long | Gary W. Rollins Voting Trust U/A dated Septem... — SC 13D/A | `ROL/third-party-analyses/activist_reports/long/SC-13D/A_20251112_acc0001104659_25_110334.xml` | context | activist/long — sec_edgar |
 | activist_long | Gary W. Rollins Voting Trust U/A dated Septem... — SC 13D/A | `ROL/third-party-analyses/activist_reports/long/SC-13D/A_20230911_acc0001104659_23_099726.htm` | context | activist/long — sec_edgar |
@@ -160,5 +160,6 @@
 | activist_long | acc0000084839 26 000029 | `ROL/third-party-analyses/activist_reports/long/8-K_20260501_acc0000084839_26_000029.htm` | context | activist/long — local |
 | activist_long | acc0000084839 26 000032 | `ROL/third-party-analyses/activist_reports/long/8-K_20260527_acc0000084839_26_000032.htm` | context | activist/long — local |
 | activist_long | acc0000084839 26 000038 | `ROL/third-party-analyses/activist_reports/long/8-K_20260722_acc0000084839_26_000038.htm` | context | activist/long — local |
+| activist_long | acc0000084839 26 000042 | `ROL/third-party-analyses/activist_reports/long/8-K_20261021_acc0000084839_26_000042.htm` | context | activist/long — local |
 
-Cross-check required: `ROL/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `ROL/research/cross_check_third_party_2026-10-25.md`

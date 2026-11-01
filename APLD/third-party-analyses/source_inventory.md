@@ -1,6 +1,6 @@
 # APLD — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 160 total (4 approved, 0 pending, 156 context)
 
 | ID | Title | Path | Status | Use |
@@ -30,6 +30,7 @@
 | activist_long | Wesley Cummins — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20250905_acc0001641172_25_026783.xml` | context | activist/long — sec_edgar |
 | activist_long | Wesley Cummins — SC 13D/A | `APLD/third-party-analyses/activist_reports/long/SC-13D/A_20250328_acc0001641172_25_001404.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0001144879 24 000099 | `APLD/third-party-analyses/activist_reports/long/8-K_20240501_acc0001144879_24_000099.htm` | context | activist/long — local |
+| activist_long | acc0001493152 26 017092 | `APLD/third-party-analyses/activist_reports/long/8-K_20260416_acc0001493152_26_017092.htm` | context | activist/long — local |
 | activist_long | acc0001262463 20 000508 | `APLD/third-party-analyses/activist_reports/long/8-K_20201222_acc0001262463_20_000508.htm` | context | activist/long — local |
 | activist_long | acc0001104659 22 045556 | `APLD/third-party-analyses/activist_reports/long/8-K_20220413_acc0001104659_22_045556.htm` | context | activist/long — local |
 | activist_long | acc0001104659 22 046905 | `APLD/third-party-analyses/activist_reports/long/8-K_20220418_acc0001104659_22_046905.htm` | context | activist/long — local |
@@ -155,7 +156,6 @@
 | activist_long | acc0001493152 26 008849 | `APLD/third-party-analyses/activist_reports/long/8-K_20260304_acc0001493152_26_008849.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 009538 | `APLD/third-party-analyses/activist_reports/long/8-K_20260310_acc0001493152_26_009538.htm` | context | activist/long — local |
 | activist_long | acc0001144879 26 000029 | `APLD/third-party-analyses/activist_reports/long/8-K_20260408_acc0001144879_26_000029.htm` | context | activist/long — local |
-| activist_long | acc0001493152 26 017092 | `APLD/third-party-analyses/activist_reports/long/8-K_20260416_acc0001493152_26_017092.htm` | context | activist/long — local |
 | activist_long | acc0001144879 26 000036 | `APLD/third-party-analyses/activist_reports/long/8-K_20260423_acc0001144879_26_000036.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 021333 | `APLD/third-party-analyses/activist_reports/long/8-K_20260505_acc0001493152_26_021333.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 027857 | `APLD/third-party-analyses/activist_reports/long/8-K_20260609_acc0001493152_26_027857.htm` | context | activist/long — local |
@@ -166,4 +166,4 @@
 | activist_long | acc0001144879 26 000044 | `APLD/third-party-analyses/activist_reports/long/8-K_20260727_acc0001144879_26_000044.htm` | context | activist/long — local |
 | activist_long | acc0001144879 26 000057 | `APLD/third-party-analyses/activist_reports/long/8-K_20261007_acc0001144879_26_000057.htm` | context | activist/long — local |
 
-Cross-check required: `APLD/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `APLD/research/cross_check_third_party_2026-10-25.md`

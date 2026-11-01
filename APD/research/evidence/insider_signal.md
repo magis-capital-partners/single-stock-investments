@@ -1,4 +1,4 @@
-# APD — Insider conviction (2026-10-15)
+# APD — Insider conviction (2026-05-04)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,13 +15,8 @@
 
 **Routine / planned sales (context):**
 
-- Mantle Ridge LP: 3943847 @ $0.0 on 2026-02-12
 - Mantle Ridge LP: 70175 @ $284.21 on 2026-02-12
-- Mantle Ridge LP: 1759 @ $0.0 on 2026-02-12
-
-**Narrative hooks:**
-
-- Multiple insiders bought within cluster window
+- Schaeffer Melissa N.: 2714 @ $303.76 on 2026-05-01
 
 Source: `_system/reference/market-data/insider/APD_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

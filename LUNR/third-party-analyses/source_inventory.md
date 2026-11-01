@@ -1,7 +1,7 @@
 # LUNR — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 80 total (0 approved, 0 pending, 80 context)
+**Date:** 2026-10-25
+**Sources:** 81 total (0 approved, 0 pending, 81 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -85,5 +85,6 @@
 | activist_long | acc0001628280 26 041526 | `LUNR/third-party-analyses/activist_reports/long/8-K_20260608_acc0001628280_26_041526.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 330778 | `LUNR/third-party-analyses/activist_reports/long/8-K_20260803_acc0001193125_26_330778.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 056476 | `LUNR/third-party-analyses/activist_reports/long/8-K_20260813_acc0001628280_26_056476.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066926 | `LUNR/third-party-analyses/activist_reports/long/8-K_20261022_acc0001628280_26_066926.htm` | context | activist/long — local |
 
-Cross-check required: `LUNR/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LUNR/research/cross_check_third_party_2026-10-25.md`

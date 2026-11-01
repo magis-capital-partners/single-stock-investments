@@ -1,5 +1,79 @@
 # Reverse-split research data
 
+### Shared backtest, shadow and order-review framework on 23 October 2026
+
+The [shared short framework](FRAMEWORK.md) reuses the existing event, as-filed
+fundamental and execution research with one browser/Node decision engine. Its
+new dashboard Framework tab retains all 180 matched comparisons and exposes
+missing evidence. Private source reviews, broker imports, frozen forecasts,
+position/loan accounting and content-bound handoffs feed the existing human
+order desk. Current cached evidence admits zero verified entries; live evidence
+and policy approval remain outstanding. The older studies are unchanged.
+
+### Strategy lab and expanded event dataset on 22 October 2026
+
+The [short alpha strategy lab](PROFIT_PROGRAM.md) joins financing discoveries,
+listing deficiencies and reverse splits with source links, availability clocks
+and as-filed financial features. The dashboard retains all 420 declared daily
+holding/cost/sizing/exit comparisons, funding estimates, conditional Monte Carlo
+and source-study return distributions. A separate replay repairs the older
+patient model's unsupported covers as persistent short obligations. Extracted
+contexts and conditional fills are not verified financing terms or broker fills;
+source review, observed execution and prospective validation remain explicit gates.
+
+### Patient entries, SSR and $25k–$50k targets on 20 October 2026
+
+The [patient execution sensitivity](patient_execution_2026-10-20.md) now tests all
+551 priced 2023–2026 primary events, partial SSR fills and 30-minute to four-hour
+entry windows. H21 retains 48 declared variants; H22 adds 48 separately declared
+10%/20% participation sensitivities after observing H21. All results remain in
+[aggregate research](patient_execution_2026-10-20.json). The dashboard shows dollar
+profit, actual filled size, drawdown, margin, collateral and unsupported covers;
+its smaller chart payload preserves every daily-calculated risk statistic.
+
+Base one-hour flow estimates at 5% participation produce about $10.4k/$21.1k annual
+trading profit at $25k/$50k targets, averaging only $3.2k/$4.4k filled. At 20%,
+mean fills grow to $7.0k/$9.7k, but profit falls to $6.7k/$18.2k and drawdown rises.
+Assumed larger fills across the entire universe lose money; additional execution
+time generally gives up price edge. These are conditional modeled returns before
+overhead and locate charges, not demonstrated executable business income.
+
+The opening full-depth gate, fixed opening-price anchor, forecast-profit cutoff,
+blanket SSR exclusion and three-name cap are removed in this sensitivity. Dynamic
+status also captures nine SSR triggers during the first second after the open.
+Additional one-second Nasdaq/Arca/EDGX bars cost $0; three individual feed requests
+still failed and nine event sessions have a provider day-quality flag on at least
+one planned feed. Missing venues, actual queue fills, approved borrows, own impact
+and difficult covers remain unvalidated. No production rules or live authority change.
+
+### Dollar profit and smaller targets on 20 October 2026
+
+The [business sizing sensitivity](business_sizing_2026-10-20.md) reports annual
+dollar trading profit, observed dollar drawdown and operating-overhead break-even
+for $250 through $100k opening targets. All 57 declared size/filter/cost variants
+are retained in [aggregate results](business_sizing_2026-10-20.json), registered as
+H20 before the run. The base adaptive mix generates about $4,095 per year before
+operating overhead under the modeled fill/fee assumptions. Smaller fixed targets
+admit more trades but do not demonstrate steadier profits. This remains
+retrospective research with unverified borrows and fills; the patient execution
+proposal and new event families are not included.
+
+### Intraday execution research on 20 October 2026
+
+The [entry-capacity explanation and intraday algorithm proposal](intraday_execution_research_2026-10-20.md)
+reproduces the $2,587.48 median opening bid capacity and specifies a test of partial
+positions, incoming buying flow, alpha decay and cover liquidity. It is a research
+proposal. The new H21/H22 sensitivities implement partial fills and time-spread
+entry assumptions; signed-flow, queue and measured-impact tests remain future work.
+The earlier backtests retain their frozen entry and exit rules.
+
+Eight free research PDFs were downloaded into ignored local literature storage.
+The [bibliography and checksums](intraday_execution_literature_2026-10-20.json)
+identify the exact versions; the [capacity audit](entry_capacity_audit_2026-10-20.json)
+contains aggregate results. Reproduce the latter offline with
+`python _system/scripts/short_entry_capacity_audit.py --source-root <cached-repo> --out <aggregate.json> --local-out <cached-repo>/_system/data/reverse_splits/local/adaptive_sizing/20261020_v1/entry_capacity_audit.local.json`.
+No paid market data, broker connections or orders are involved.
+
 US listed and OTC reverse-split research: completed events and candidates with
 an ex date, filing disclosures, FINRA positioning
 context, the persisted shared-capital book runs and the append-only RSI-1.0
@@ -1116,7 +1190,7 @@ same events fixed and explicitly identifies that hindsight selection.
 Rebuild using the existing licensed local cache:
 
 ```text
-python _system/scripts/short_execution_audit.py --source-root /path/to/local/repo --local-out /path/to/local/execution_cost_audit/20261019_v1 --out dashboard/data/short_execution_audit.json --report _system/data/reverse_splits/execution_cost_audit_2026-10-19.md --collect-nbbo
+python _system/scripts/short_execution_audit.py --source-root /path/to/local/repo --local-out /path/to/local/execution_cost_audit/20261019_v1 --out dashboard/data/short_execution_audit.json --report _system/data/reverse_splits/execution_cost_audit_2026-10-19.md --databento-access-receipt /path/to/local/databento_access_summary.local.json
 ```
 
 The local acquisition plan defines 4,000 entry/exit windows for the five
@@ -1126,10 +1200,67 @@ historical exit symbols require confirmation before collection. The optional
 Massive collector uses an existing licensed environment key, bounded requests,
 safe pagination, local-only raw records and SIP timestamps for as-of quote
 selection. Provider denials stop collection. No purchases, subscription upgrades,
-broker connections, ThetaData calls or trades occur. As published, no key was
-configured: verified NBBO pairs and actual broker fills are both zero.
+broker connections, ThetaData calls or trades occur.
+
+Databento access was verified on 2026-10-19 using the existing protected local
+credential. The earlier environment-only credential check missed it. Through
+the authenticated historical API, EQUS.SIP and EQUS.ALL returned
+`dataset_not_found`; this is an observed access result, not a claim that the
+provider cannot supply those products. EQUS.MINI is available from 2023-03-28
+and provides a derived BBO from a venue subset, not official consolidated NBBO.
+Individual historical venue feeds are also available. The local same-day
+100-event pilot expands to 2,444 concrete quote/depth requests. Free metadata
+checks priced sampled requests above zero; no chargeable downloads were made.
+The user explicitly confirmed a **$0 cap on new downloads**. No new data have
+replaced the existing cached estimates. Verified NBBO pairs and actual broker
+fills remain zero. Raw receipts, request plans and credentials stay local;
+the public feed includes only allowlisted access/pricing metadata.
 
 The dashboard shows these findings inside execution evidence. Its 90 sleeve
 scenarios retain the legacy costs as sensitivities: neither the conditional
 supported-order means nor the available-venue touch spread is substituted for
 the missing full-population, size-dependent, multi-session execution costs.
+
+### Adaptive sizing experiment (2026-10-20)
+
+`_system/scripts/short_adaptive_sizing.py` tests fixed $25k/$50k/$100k,
+cost-filtered sizing and conditional gross-edge-plus-cost sizing on $10m NAV.
+The 56 eligible events before 2023 initialize an expanding fit; all 226 eligible
+events from 2023-01-03 to 2026-10-13 remain in the test population. Only earlier
+sessions supply training labels. Entry quotes, prior venue dollar volume,
+price and split multiple are entry-time features. The protocol is fixed before
+the first run and published inside `dashboard/data/short_adaptive_sizing.json`.
+This is retrospective walk-forward research designed after previous inspection
+of the sample, not an untouched or prospective validation cohort.
+
+Admissions never inspect the future cover book or realized test return.
+Candidate orders must fit the decision book within 3% below the midpoint.
+The response book 100ms later can give partial or zero IOC fills. Missing cover
+depth is retained using declared residual-price sensitivities, with its share
+fraction and trade count disclosed. Additional impact is 0/25/50 bps per side
+for bull/base/bear; unsupported cover shares are priced 2/5/10% above the worst
+available ask. These are assumptions, not calibrated fill or impact estimates.
+All policies share three-name, issuer and entry squeeze-reserve constraints.
+Same-session modeled closes have zero settled borrow and proceeds-interest
+accrual; delayed real completions would change financing.
+
+The first base run takes five adaptive trades, all $25k targets, and earns
+$13,348 versus $30,693 on 32 fixed-$25k trades. It does not establish a return
+uplift from fitting gross edge. The adaptive sample has zero observed drawdown
+and undefined Calmar; five winners cannot establish a squeeze-tail estimate.
+One adaptive cover includes modeled residual shares. Results, financing/risk
+limits and all three cases are in `adaptive_sizing_2026-10-20.md`.
+
+The shared month-block bootstrap now keeps every boundary-month session. The
+prior routine dropped the first and last month, which could remove a real tail
+loss and reverse the apparent result in a sparse sleeve. A regression test
+ensures those losses remain eligible for resampling. Resampling still cannot
+invent losses absent from five profitable trades or refit the policy.
+
+```text
+python _system/scripts/short_adaptive_sizing.py --source-root /path/to/licensed/cache/repo --local-out /path/to/local/adaptive_sizing/20261020_v1 --out dashboard/data/short_adaptive_sizing.json --report _system/data/reverse_splits/adaptive_sizing_2026-10-20.md
+```
+
+No additional downloads occur. Individual decisions, training counts, forecasts
+and fills stay local. Only aggregate performance and the protocol publish.
+This first test is same-day; multi-session cover costs remain unmeasured.

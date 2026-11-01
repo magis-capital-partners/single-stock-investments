@@ -1844,7 +1844,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "89fe5c34dbf17a5c84138ca800b6d0a57cfb04bcf6a49519f822987fb6ccc62a",
+    "model_hash": "ead8160ca7381242b6070ca8645d55de501dd00e355c6246beffec3e990c4ec4",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_reinvestment_dcf@1.0",
@@ -1855,6 +1855,154 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "KEWL",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-23",
+    "model_as_of": "2026-07-23",
+    "quote": {
+      "value": 59.33,
+      "as_of": "2026-07-23",
+      "source_url": "Yahoo KEWL close 2026-07-23",
+      "currency": null
+    },
+    "forecast_hash": "23bd297fbe71f69e0a9795361d42c685bbf2cacce530bdb7bfd3717fd2e681c5",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "current_operating_claim",
+        "method": "owner_cash_reinvestment_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "method": "unit_nav_and_milestone_option",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "realization_reserve",
+        "method": "realization_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "current_operating_claim",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "current_operating_claim",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "current_operating_claim",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "realization_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:reserve_gross"
+      },
+      {
+        "component_id": "realization_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:reserve_gross"
+      },
+      {
+        "component_id": "realization_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:reserve_gross"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "shares_m",
+        "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+        "locator": "1,126,284 shares outstanding as of 12/31/2025",
+        "as_of": "2025-12-31",
+        "source_id": "d2f896f0042a558425569e38adad2c0572c9b5a7ac68f348cfba3d072872045d"
+      },
+      {
+        "node_id": "ssi_royalty_ref_m",
+        "ref": "KEWL/third-party-analyses/references.md",
+        "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+        "as_of": "2024-05-01",
+        "source_id": "8ebbe16679d3d350a13a2c92499a5649f8c6592273802b85d955441d92453bcf"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "6f6324d1175bb6b1004ad505db0bc144e73191edd2d3463e7622353d44d8f7b3"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

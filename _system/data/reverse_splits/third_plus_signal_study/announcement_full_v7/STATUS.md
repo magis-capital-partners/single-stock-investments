@@ -1,0 +1,3 @@
+# Invalidated publication candidate
+
+Superseded by announcement_full_v8 before publication. The final outlier audit found an older completed split being used to classify later warrant-update datelines as new split events, and an explicit changed effective time not joining its earlier schedule. The replacement binds date roles to the current date occurrence and links explicit schedule revisions in both the candidate universe and prior split history. It also recognizes source-defined synthetic repurchases that include a reverse split before the exact ratio is published. The v7 financial figures are invalidated.

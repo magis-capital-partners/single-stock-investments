@@ -1,6 +1,6 @@
 # SMCI — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-07-12
+**Date:** 2026-10-25
 **Reports processed:** 1
 **Human review:** 0
 
@@ -8,7 +8,7 @@
 
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
-| Hindenburg Research | short | 2024-01-01 | publisher_report | auto_signal | campaign_active | `_system/reference/activist-reports/hindenburg/hindenburg_2024-01-01_smci.html` |
+| Spruce Point Capital | short | 2023-01-10 | publisher_report | auto_signal | campaign_active | `_system/reference/activist-reports/spruce_point/spruce_point_2023-01-10_super-micro-computer-inc.html` |
 ## [HUMAN REVIEW]
 
 - Confirm activist 13D intent vs passive 13G before stance changes.

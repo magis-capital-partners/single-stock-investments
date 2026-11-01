@@ -1,0 +1,258 @@
+{
+  "schema": "third_plus_fundamental_filters.protocol.v3",
+  "registered_at": "2026-10-24T21:06:46.425Z",
+  "parent_reconciliation": "ec2fa7ac33ffbd84ca4d7a40a74bed25d8a394269a66278e15c7bb27d502db1c",
+  "population": 210,
+  "base_rule": "Third or later documented reverse split AND saved S7 rally veto; missing history excluded.",
+  "status": "registered_before_new_replays",
+  "arms": [
+    {
+      "id": "third_plus_only",
+      "requires": [],
+      "label": "Third-plus only",
+      "reference": true
+    },
+    {
+      "id": "saved",
+      "requires": [
+        "S7"
+      ],
+      "label": "Third-plus + rally veto",
+      "reference": true
+    },
+    {
+      "id": "legacy_score60",
+      "requires": [
+        "S7",
+        "score60"
+      ],
+      "label": "Existing score ≥60"
+    },
+    {
+      "id": "burn",
+      "requires": [
+        "S7",
+        "burn"
+      ],
+      "label": "Negative operating cash flow"
+    },
+    {
+      "id": "runway",
+      "requires": [
+        "S7",
+        "reported_runway"
+      ],
+      "label": "Reported runway <6 months"
+    },
+    {
+      "id": "dilution",
+      "requires": [
+        "S7",
+        "S4"
+      ],
+      "label": "Share growth ≥25%"
+    },
+    {
+      "id": "operating_loss",
+      "requires": [
+        "S7",
+        "operating_loss"
+      ],
+      "label": "Operating loss"
+    },
+    {
+      "id": "revenue15",
+      "requires": [
+        "S7",
+        "revenue15"
+      ],
+      "label": "Revenue decline ≥15%"
+    },
+    {
+      "id": "margin8",
+      "requires": [
+        "S7",
+        "margin8"
+      ],
+      "label": "Operating margin decline ≥8pp"
+    },
+    {
+      "id": "accrual10",
+      "requires": [
+        "S7",
+        "accrual10"
+      ],
+      "label": "Accrual ratio ≥10%"
+    },
+    {
+      "id": "profit_no_cash",
+      "requires": [
+        "S7",
+        "profit_no_cash"
+      ],
+      "label": "Profit without operating cash"
+    },
+    {
+      "id": "negative_equity",
+      "requires": [
+        "S7",
+        "negative_equity"
+      ],
+      "label": "Negative equity"
+    },
+    {
+      "id": "debt_distress",
+      "requires": [
+        "S7",
+        "debt_distress"
+      ],
+      "label": "Framework debt-maturity distress"
+    },
+    {
+      "id": "rapid_repeat",
+      "requires": [
+        "S7",
+        "S3"
+      ],
+      "label": "Previous split within 180 days"
+    },
+    {
+      "id": "weak_close",
+      "requires": [
+        "S7",
+        "S5"
+      ],
+      "label": "Weak split-day close"
+    },
+    {
+      "id": "price_weakness",
+      "requires": [
+        "S7",
+        "S6"
+      ],
+      "label": "Prior 20-session return ≤−20%"
+    },
+    {
+      "id": "burn_dilution",
+      "requires": [
+        "S7",
+        "burn",
+        "S4"
+      ],
+      "label": "Cash burn + dilution"
+    },
+    {
+      "id": "runway_dilution",
+      "requires": [
+        "S7",
+        "reported_runway",
+        "S4"
+      ],
+      "label": "Short reported runway + dilution"
+    },
+    {
+      "id": "loss_dilution",
+      "requires": [
+        "S7",
+        "operating_loss",
+        "S4"
+      ],
+      "label": "Operating loss + dilution"
+    },
+    {
+      "id": "runway_dilution_loss",
+      "requires": [
+        "S7",
+        "reported_runway",
+        "S4",
+        "operating_loss"
+      ],
+      "label": "Short runway + dilution + operating loss"
+    },
+    {
+      "id": "runway_dilution_revenue",
+      "requires": [
+        "S7",
+        "reported_runway",
+        "S4",
+        "revenue15"
+      ],
+      "label": "Short runway + dilution + revenue decline"
+    }
+  ],
+  "primary_tests": 19,
+  "threshold_policy": "Fixed thresholds inherited from the framework or prior study. No threshold grid. All 19 current incremental claims receive Holm correction; prior historical exploration remains disclosed.",
+  "feature_rules": {
+    "burn": "TTM total CFO <0",
+    "reported_runway": "Reported cash / negative TTM CFO <0.5 years; not financing-adjusted",
+    "dilution": "Split-adjusted common-share growth >=25% over 150–240 days; proven bounds retained as bounds",
+    "operating_loss": "TTM operating income <0",
+    "revenue15": "Same-tag TTM revenue YoY growth <=-15%",
+    "margin8": "TTM operating-margin YoY change <=-8 percentage points",
+    "accrual10": "(TTM NI - TTM CFO) / average exact current and year-ago assets >=10%; no last-asset fallback",
+    "profit_no_cash": "TTM NI>0 and TTM total CFO<0",
+    "negative_equity": "Reported stockholders equity<0",
+    "debt_distress": "Dated operating profile, negative total CFO, TTM and reconstructed-quarter reported runways <=1 year, operating loss, explicit next-12-month debt maturity>cash",
+    "legacy_score60": "Unmodified prior source-bound score>=60; diagnostic comparator, not a rebuilt score"
+  },
+  "source_policy": "Original as-of filings and companyfacts; same currency; no future-public data, current SIC backfill, inferred zero debt, weighted EPS share substitutions or invented financing reviews. Banks/lenders/funds with dated profiles disable inappropriate cash/accrual lenses; unknown applicability remains explicit research limitation.",
+  "primary": {
+    "horizon": 20,
+    "cost": "base",
+    "cap": 0.01,
+    "nav": 1000000,
+    "maximumNames": 3,
+    "ssrMode": "strict",
+    "causalCarry": true,
+    "target": 25000
+  },
+  "sensitivities": {
+    "horizons": [
+      10,
+      20
+    ],
+    "capacity": [
+      0.001,
+      0.05
+    ],
+    "costs": [
+      "lower_cost",
+      "stress"
+    ],
+    "full_target": "$25k without account/volume cap, strict SSR; hypothetical fills, not capacity proof",
+    "passive_SSR_proxy": "Separate sensitivity with unverified capture; never verified execution",
+    "maturity": "Common 20-session maturity exclusion for both horizons"
+  },
+  "validation": [
+    "Reproduce frozen legacy h10 and h20 full-size baselines and frozen strict S7 result.",
+    "Compare each addition with saved S7 baseline and same-feature-covered S7 control.",
+    "Issuer-cluster and six-month calendar-block uncertainty; 4,000 draws and Holm over 19 claims.",
+    "All entry-year cohorts; issuer concentration, leave-best-one/five subtraction, and removal replays for declared focus arms.",
+    "Quarterly walk-forward selection using only fully closed, returned-loan training labels and a 20-session embargo; minimum 30 issuers, otherwise saved screen.",
+    "10-session replication, 0.1%/1%/5% participation, 20%/50%/150% APR cost cases, full-target and SSR sensitivities.",
+    "At least 30 selected issuers, positive matched increments with corrected evidence, no worse drawdown, positive concentration sensitivities, no unresolved position/loan, no risk-breach sessions, and positive stress results for research candidacy.",
+    "All history is already explored development data. No untouched historical holdout or live profitability claim."
+  ],
+  "focus_arms": [
+    "saved",
+    "runway",
+    "dilution",
+    "burn_dilution",
+    "runway_dilution",
+    "loss_dilution",
+    "runway_dilution_loss"
+  ],
+  "unavailable_live_gates": [
+    "Financing-adjusted available cash",
+    "Independently verified completed issuance and saleable common float",
+    "Timestamped borrow quantity/APR and actual fills",
+    "Valuation, catalyst, contrary evidence and falsifiers from six-lens underwriting"
+  ],
+  "source_references": [
+    "https://www.davidhbailey.com/dhbpapers/backtest-prob.pdf",
+    "https://www.sec.gov/investor/pubs/regsho.htm"
+  ],
+  "new_market_data_usd": 0,
+  "broker_authority": "none",
+  "sealed_holdout_access": false
+}

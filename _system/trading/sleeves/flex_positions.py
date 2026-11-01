@@ -50,6 +50,9 @@ def parse_flex_positions(path: Path | str, *, account_id: str = "") -> list[dict
             "costUsd": cost_local * fx,
             "name": node.attrib.get("description") or node.attrib.get("symbol") or "",
             "orderRef": "",
+            "originatingTransactionID": node.attrib.get("originatingTransactionID") or "",
+            "openTradeID": node.attrib.get("openTradeID") or "",
+            "model": node.attrib.get("model") or "",
             "reportDate": node.attrib.get("reportDate") or "",
             "openDateTime": (node.attrib.get("openDateTime") or "").strip(),
             # Option coordinates. Flex carries these on every OpenPosition and

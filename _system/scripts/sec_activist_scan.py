@@ -20,6 +20,7 @@ from activist_common import (
     now_iso,
     rel,
     save_ticker_index,
+    subject_cik_matches_ticker,
     ticker_meta,
     upsert_report,
 )
@@ -253,6 +254,12 @@ def _entry_from_analysis(
     xml_facts: dict | None = None,
 ) -> dict | None:
     form = normalize_form(form)
+    # A Schedule 13D lives on the filer's submission list and on the subject's.
+    # Scanning the filer's CIK (Franklin under BEN, or a company_tickers hit
+    # that sticks SATS on Strive) is not evidence the subject is that holding.
+    issuer_cik = (xml_facts or {}).get("issuer_cik")
+    if issuer_cik and not subject_cik_matches_ticker(issuer_cik, ticker):
+        return None
     issuer_name = (ticker_meta(ticker) or {}).get("company") or ""
     analysis = analyze_sec_filing(form, text, xml_facts=xml_facts, issuer_name=issuer_name)
     if not should_index_filing(analysis["filing_class"], include_passive=False):

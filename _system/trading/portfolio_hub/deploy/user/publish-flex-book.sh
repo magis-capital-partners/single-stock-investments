@@ -37,6 +37,30 @@ log "using $POSITIONS"
 set -a; . /home/spx/.config/portfolio-hub/secrets.env; set +a
 cd "$REPO" || exit 1
 
+# Build a single evidence registry before ANY owner book is published. Reading
+# the cached files is mandatory; a supplemental HTTPS refresh is optional.
+REALIZED_STATE=/home/spx/portfolio-hub/sleeve-realized
+export SLEEVE_LS_UNIVERSE_ROOT="$RUNS"
+if [ -n "${SLEEVE_CLOSED_LOTS_QUERY_ID:-}" ]; then
+  if systemctl is-active --quiet ls-algo-daily.service ls-algo-eod-retry.service ||
+     systemctl --user is-active --quiet ls-algo-daily.service ls-algo-eod-retry.service; then
+    log "closed-lot refresh deferred: primary EOD producer is still active"
+  else
+    IBKR_FLEX_TOKEN_FILE=/home/spx/.config/ls-algo/.env \
+      "$PY" -m _system.trading.sleeves.realized_cli --state "$REALIZED_STATE" --account "$ACCOUNT" refresh-detail \
+        --positions "$POSITIONS" --query-id "$SLEEVE_CLOSED_LOTS_QUERY_ID"
+    log "closed-lot refresh exit=$?"
+  fi
+fi
+"$PY" -m _system.trading.sleeves.realized_cli --state "$REALIZED_STATE" --account "$ACCOUNT" sync \
+  --positions "$POSITIONS" --stale-hours "$STALE_HOURS"
+if [ "$?" -ne 0 ]; then
+  log "ownership preparation failed; retaining all previously verified owner books"
+  exit 1
+fi
+export SLEEVE_OWNERSHIP_REGISTRY="$REALIZED_STATE/ownership-current.json"
+export SLEEVE_OWNERSHIP_REQUIRED=1
+
 # The CLI refuses a file older than --stale-hours itself. Republishing a frozen
 # book as current is the failure this guard exists for; it is not an
 # optimisation.
@@ -70,6 +94,18 @@ if [ -n "${SLEEVE_INGEST_TOKEN:-}" ]; then
   log "sleeve-sync exit=$?"
 else
   log "sleeve-sync skipped: SLEEVE_INGEST_TOKEN not set"
+fi
+
+# Permanent realized history consumes the SAME archived reports. It has its own
+# failure status and never changes broker truth or an existing owner's holdings.
+# A missing/mismatched trade file preserves the previously published generation.
+if [ -n "${SLEEVE_INGEST_TOKEN:-}" ]; then
+  "$PY" -m _system.trading.sleeves.realized_cli --state "$REALIZED_STATE" --account "$ACCOUNT" publish
+  realized_rc=$?
+  log "realized-history exit=$realized_rc"
+  if [ "$realized_rc" -ne 0 ]; then
+    log "realized history retained its last valid generation; retry on the next daily run"
+  fi
 fi
 
 exit $rc

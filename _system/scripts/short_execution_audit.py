@@ -279,7 +279,27 @@ def collect_nbbo(plan, folder, *, key=None, session=None, max_requests=20):
     return {"status":"bounded_collection_complete","requests":used,"windows":len(receipts),"complete_windows":sum(r['complete'] for r in receipts),"nbbo_verified_pairs":0}
 
 
-def build(root, outdir, *, collect=False):
+def databento_access(receipt, verified_events):
+    """Publish only allowlisted metadata from the authenticated, zero-download check."""
+    if receipt.get('provider')!='Databento' or receipt.get('authenticated') is not True:
+        raise ValueError('Databento authentication receipt is not verified')
+    if (receipt.get('sip_status')!='dataset_not_found' or receipt.get('all_feeds_bundle_status')!='dataset_not_found'
+            or receipt.get('mini_is_official_nbbo') is not False):
+        raise ValueError('Databento dataset access changed; review the published interpretation')
+    if receipt.get('downloads')!=0 or receipt.get('charged_usd')!=0:
+        raise ValueError('Databento receipt does not match the zero-download budget')
+    return {"provider":"Databento","status":"authenticated_sip_not_retrievable","authenticated":True,
+            "checked_as_of":receipt['as_of'],"sip_status":receipt['sip_status'],
+            "all_feeds_bundle_status":receipt['all_feeds_bundle_status'],"mini_start":receipt['mini_start'],
+            "mini_is_official_nbbo":False,"new_download_budget_usd":0,"downloads":0,"charged_usd":0,
+            "nbbo_verified_pairs":verified_events,
+            "note":"Databento access verified. EQUS.SIP and EQUS.ALL returned dataset_not_found through the authenticated historical API. Available EQUS.MINI is a derived venue-subset BBO from 2023-03-28, not official NBBO. New downloads are capped at $0 by request. The sampled quote/depth requests have positive usage prices, so none were downloaded. Existing cached-data estimates are unchanged.",
+            "sample_usage_quotes":[{k:r[k] for k in ('dataset','schema','date','quoted_usd')} for r in receipt.get('sample_quotes',[]) if 'quoted_usd' in r]}
+
+
+def build(root, outdir, *, collect=False, databento_receipt=None):
+    if collect and databento_receipt is not None:
+        raise ValueError('Publish the Databento check separately from optional NBBO collection')
     local=root/'_system/data/reverse_splits/local';qroot=local/f'execution_research/{RUN}__quotes_v1'
     proot=local/f'portfolio_research/{RUN}__portfolio_v1';source=local/f'expansion/expansion_v2/runs/{RUN}'
     outdir.mkdir(parents=True,exist_ok=True);write(outdir/'protocol.json',PROTOCOL)
@@ -294,6 +314,8 @@ def build(root, outdir, *, collect=False):
     plan=pilot_and_plan(targets,source);write(outdir/'acquisition_plan.local.json',plan);write(outdir/'matched_quotes.local.json',rows)
     access=collect_nbbo(plan,outdir/'nbbo') if collect else {"status":"not_requested","requests":0,"nbbo_verified_pairs":0}
     nbbo=compare_nbbo(targets,outdir/'nbbo');access['nbbo_verified_pairs']=nbbo['verified_events']
+    if databento_receipt is not None:
+        access=databento_access(read(databento_receipt),nbbo['verified_events'])
     result={"schema_version":"short_execution_audit.v1","as_of":"2026-10-19","research_only":True,"authority":"none","aggregate_only":True,
             "protocol":PROTOCOL,"quote_comparisons":quotes,"size_audits":audits,"access":access,"nbbo":nbbo,
             "coverage":{"target_events":len(targets),"paths_hash_verified":verified,"pilot_events":len({p['event_id'] for p in plan if p['pilot']}),
@@ -305,7 +327,7 @@ def build(root, outdir, *, collect=False):
                       "Different size rows have different surviving samples. Common-support rows hold the same events fixed but select a liquid subset with hindsight.",
                       "Static books do not establish smart-router access, successful fills, replenishment, cancellations, price impact or borrow approval.",
                       "Auction-to-continuous timing is separate from spread/depth. Multi-session exits and stops need additional dated quote paths.",
-                      "No real trades were submitted. New licensed NBBO data require configured existing access; no purchase or subscription upgrade is performed."],
+                      "No real trades were submitted. New chargeable quote downloads require a budget; no purchase or subscription upgrade is performed."],
             "sources":[{"file":name,"sha256":sha(path)} for name,path in [('targets.local.json',qroot/'targets.local.json'),('observations.local.json',qroot/'observations.local.json'),('books.local.json',proot/'books.local.json'),('paths.local.json',proot/'paths.local.json'),('prices.sqlite',source/'prices.sqlite')]]}
     return result
 
@@ -341,6 +363,7 @@ def report(doc):
     lines+=['','## Remaining work','',f"NBBO access: {doc['access']['status']}. Verified NBBO events: {doc['coverage']['confirmed_nbbo_pairs']}. Actual broker fills: 0.",
             f"Prepared {doc['coverage']['planned_windows']} windows, including {doc['coverage']['pilot_windows']} for the deterministic 100-event pilot.",
             'Multi-session exit costs remain unmeasured; no same-day spread estimate is relabeled as a measured multi-session cost.','']
+    if doc['access'].get('note'):lines += [doc['access']['note'],'']
     lines += ['- '+x for x in doc['limits']]
     return '\n'.join(lines)+'\n'
 
@@ -348,7 +371,8 @@ def report(doc):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source-root',type=Path,required=True);p.add_argument('--local-out',type=Path,required=True)
     p.add_argument('--out',type=Path,required=True);p.add_argument('--report',type=Path,required=True);p.add_argument('--collect-nbbo',action='store_true')
-    args=p.parse_args();doc=build(args.source_root,args.local_out,collect=args.collect_nbbo);write(args.out,doc)
+    p.add_argument('--databento-access-receipt',type=Path)
+    args=p.parse_args();doc=build(args.source_root,args.local_out,collect=args.collect_nbbo,databento_receipt=args.databento_access_receipt);write(args.out,doc)
     args.report.parent.mkdir(parents=True,exist_ok=True);args.report.write_text(report(doc),encoding='utf-8')
     print(json.dumps(doc['coverage']));print(json.dumps(doc['access']))
 

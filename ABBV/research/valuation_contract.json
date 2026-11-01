@@ -3634,7 +3634,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "fa83cc913a6b9227dd27cb563bbea677a5a3b5c8c6ee8bf5b2c01f9fea924cec",
+    "model_hash": "9b7e64cfcfc96db4e4cc85c06710d90f78cfddc6a02563b0e8e972fc5dab6e42",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -3644,6 +3644,181 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "ABBV",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-21",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 249.91,
+      "as_of": "2026-07-21",
+      "source_url": "Yahoo Finance ABBV close 2026-07-09",
+      "currency": null
+    },
+    "forecast_hash": "03667f94a8c641a207544240040aac7f773f8614719d133d6293a414cd954bc6",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "immunology_owner_cash_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 154.9991,
+          "base": 189.9989,
+          "high": 219.9987
+        }
+      },
+      {
+        "component_id": "other_franchises",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 35.0002,
+          "base": 55.0003,
+          "high": 72.0004
+        }
+      },
+      {
+        "component_id": "pipeline_options",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "downside_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "pipeline_options",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "pipeline_options",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "immunology_revenue_m",
+        "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+        "locator": "Skyrizi ~$17.6B (+50%), Rinvoq ~$7.5B (+39%), Humira ~$3.1B (-49%) FY2025 product table",
+        "as_of": "2025-12-31",
+        "source_id": "88cccdefbfb6586060fe2b0f34cf60af136ea5cfe1a494569abbd2c34fa3c204"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+        "locator": "Weighted average diluted shares 1,773M FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "bc616683a57caaabc99f707798e22cfe6ad73a29e279d57c611a67b072dd7374"
+      },
+      {
+        "node_id": "consolidated_owner_cash_m",
+        "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+        "locator": "Operating cash flow $19.03B less capital spending $1.21B",
+        "as_of": "2025-12-31",
+        "source_id": "e086dd74878adaa8a3fb42788c65c1859c30c791e2930fd2a7148c269201f6f0"
+      },
+      {
+        "node_id": "other_revenue_m",
+        "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+        "locator": "Total net revenues $61.16B less immunology ~$28.2B",
+        "as_of": "2025-12-31",
+        "source_id": "fa90f2ad05341d9445fd0f838d4d9155261fccc7e3aa6fb7f4fdb963d1cfae8d"
+      },
+      {
+        "node_id": "consolidated_revenue_m",
+        "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+        "locator": "Net revenues $61.16B (+8.6% YoY) FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "c89fcd9559ec96999b1e636a80b2af359735fa00e780add252a4d3be47cea4e6"
+      },
+      {
+        "node_id": "rd_expense_m",
+        "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+        "locator": "R&D expense disclosed in FY2025 income statement (approximate)",
+        "as_of": "2025-12-31",
+        "source_id": "a84e5b5deecae6e344168048b0ca8f61a51ddb4b8c4043774a7aef29bcc7ee70"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "45b65b8711c2af1524b78e461bc2f8740c2df8c04980dffbaf3ac2b41f062e3b"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

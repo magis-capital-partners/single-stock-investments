@@ -1,0 +1,95 @@
+name: Market Close
+
+on:
+  schedule:
+    - cron: "13,43 13,16 * * 1-5"
+      timezone: America/New_York
+    - cron: "19 18 * * 1-5"
+      timezone: America/New_York
+  repository_dispatch:
+    types: [heal-market-close]
+
+permissions:
+  contents: write
+concurrency:
+  group: market-close
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts
+            _system/portfolio/registry.json
+            _system/reference/market-data
+            _system/data/vol_metrics_move_outage_backfill.csv
+            dashboard/data
+            .github/actions/commit-main
+            .github/actions/preserve-private-dashboard
+            .github/actions/checkout-vault
+          fetch-depth: 1
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - id: session
+        name: Check completed exchange session
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          sys.path.insert(0, '_system/scripts')
+          from market_sessions import stage_due
+          state = stage_due()
+          print(json.dumps(state))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f"due={str(state['due']).lower()}\n")
+          PY
+      - if: steps.session.outputs.due == 'true'
+        name: Install market model dependencies
+        run: pip install -r _system/scripts/requirements-criticality.txt
+      - if: steps.session.outputs.due == 'true'
+        name: Refresh available close observations
+        run: |
+          python _system/scripts/build_spx_surface.py
+          python _system/scripts/build_vol_metrics.py
+          python _system/scripts/build_capitulation_daily.py --workers 6
+      - if: steps.session.outputs.due == 'true'
+        name: Publish initial close marks
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore(risk): publish completed-session close marks"
+          git_add: >-
+            dashboard/data/spx_surface_latest.json dashboard/data/spx_surface_history.jsonl
+            dashboard/data/vol_metrics_latest.json dashboard/data/vol_metrics_history.jsonl
+            dashboard/data/vol_volume_residual.json dashboard/data/capitulation_daily.json
+            dashboard/data/capitulation_daily_history.jsonl dashboard/data/capitulation_daily_state.json
+      - if: steps.session.outputs.due == 'true'
+        name: Signal initial close publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api "repos/${{ github.repository }}/dispatches" -f event_type=market-risk-source-ready
+      - if: steps.session.outputs.due == 'true'
+        name: Reconcile breadth and criticality
+        run: |
+          python _system/scripts/build_technical_signals.py --workers 12
+          python _system/scripts/build_criticality_signals.py --workers 4
+      - if: steps.session.outputs.due == 'true'
+        name: Publish completed-session breadth
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore(risk): reconcile close breadth and criticality"
+          git_add: >-
+            dashboard/data/technical_signals.json dashboard/data/technical_summary.json
+            dashboard/data/criticality_summary.json
+            _system/reference/market-data/fundamentals/index_float_adv.json

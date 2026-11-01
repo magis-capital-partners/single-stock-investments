@@ -40,6 +40,7 @@ DRIVE_API_STEPS = frozenset(
 
 # Each entry is argv after `python` (script path relative to repo root + args).
 PROFILES: dict[str, list[list[str]]] = {
+    "biotech-strategy": [["_system/scripts/build_biotech_strategy.py", "--record-paper"]],
     "minimal": [
         ["_system/scripts/build_dashboard_data.py"],
     ],
@@ -50,6 +51,7 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
+        ["_system/scripts/build_biotech_strategy.py", "--record-paper"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_index_membership.py"],
         ["_system/scripts/build_insights.py"],
@@ -92,6 +94,9 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/fetch_respiratory_panel.py"],
         ["_system/scripts/build_qdel_respiratory_model.py"],
         ["_system/scripts/build_fico_watch.py"],
+        # Before KPI trends so the nightly monolith and the shards pick up
+        # issuer operating series. A blocked source keeps the last file.
+        ["_system/scripts/fetch_operating_kpis.py"],
         ["_system/scripts/build_kpi_trends.py"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_superinvestor_insights.py"],
@@ -103,8 +108,10 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
+        ["_system/scripts/build_biotech_strategy.py", "--record-paper"],
         ["_system/scripts/build_research_memory.py"],
         # Backfill compact agent-context cards for the whole universe.
+        ["_system/scripts/refresh_core_compounders.py", "--write", "--propose"],
         ["_system/scripts/build_thesis_card.py", "--all"],
         # Valuation authority is owned by the Power Zone Universe workflow
         # (run_security_decision_pipeline) and the activist slice by the
@@ -120,6 +127,8 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/fetch_crypto_panel.py", "--skip-snowball"],
         ["_system/scripts/build_hk_snowball_model.py"],
         ["_system/scripts/refresh_energy_model.py", "--optional"],
+        ["_system/scripts/refresh_commodity_models.py", "--optional"],
+        ["_system/scripts/build_compounder_roster.py"],
         ["_system/scripts/scaffold_industry_kpi_ledgers.py", "--write"],
         ["_system/scripts/resolve_linkages.py", "--update-ledgers"],
         [
@@ -132,6 +141,7 @@ PROFILES: dict[str, list[list[str]]] = {
         # and before lint, so the ledger lint sees this file.
         ["_system/scripts/build_fico_watch.py"],
         ["_system/scripts/lint_kpi_ledger.py"],
+        ["_system/scripts/refresh_core_compounders.py", "--write"],
         ["_system/scripts/build_world_model_snapshot.py", "--skip-resolve", "--skip-snowball"],
         [
             "_system/scripts/apply_world_model_context.py",
@@ -176,6 +186,7 @@ EXTERNAL_STEP_POLICY: dict[str, tuple[int, int]] = {
     "_system/scripts/sync_pdf_store_google_drive.py": (2, 20 * 60),
     "_system/scripts/audit_drive_pdf_store.py": (3, 10 * 60),
     "_system/scripts/fetch_respiratory_panel.py": (3, 5 * 60),
+    "_system/scripts/fetch_operating_kpis.py": (2, 15 * 60),
     "_system/scripts/fetch_theme_panel.py": (3, 5 * 60),
     "_system/scripts/fetch_crypto_panel.py": (3, 5 * 60),
     "_system/scripts/refresh_cvr_universe.py": (2, 15 * 60),
@@ -287,6 +298,10 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             # re-joins them so the Inbox shows the latest file per desk.
             out.append(["_system/scripts/check_desk_briefs.py", "--warn-only"])
             out.append(["_system/scripts/build_desk_briefs.py"])
+            # Warn-only: a quiet discovery list or a catalog pointer with an old
+            # stamp would otherwise fail intake-full. The strict command is what
+            # a desk run uses. Activism calls the same script for activist_feed.
+            out.append(["_system/scripts/check_desk_feed_age.py", "--desk", "special_situations", "--warn-only"])
         out.append(step)
     return out
 

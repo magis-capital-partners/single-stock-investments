@@ -64,6 +64,24 @@ class Budget:
         )
 
 
+def sync_blocked(budget: Budget, *, reserve: int = 0) -> str | None:
+    """Warning when a sync must wait for the daily quota, otherwise None.
+
+    The defer thresholds stay 70,000 rows written and 3,500,000 rows read.
+    ``reserve`` is the caller's own expected writes, so a sync that would
+    cross 70,000 still waits. An unavailable analytics reading is not a
+    deferral; the caller decides that case.
+    """
+    if not budget.available:
+        return None
+    if budget.over or budget.rows_written + reserve > WRITE_THRESHOLD:
+        return (
+            "Database sync deferred by the shared free-tier guard; "
+            "the dated file capture is preserved. " + budget.describe()
+        )
+    return None
+
+
 def _post(url: str, headers: dict, body: bytes) -> tuple[int, str]:
     request = urllib.request.Request(url, data=body, headers=headers, method="POST")
     try:

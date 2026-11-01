@@ -53,7 +53,32 @@ def list_drive_pdfs(service, drive_id: str) -> list[dict]:
             return files
 
 
+def list_drive_folders(service, drive_id: str) -> list[dict]:
+    files: list[dict] = []
+    page_token = None
+    while True:
+        res = execute_with_retry(
+            service.files().list(
+                corpora="drive",
+                driveId=drive_id,
+                includeItemsFromAllDrives=True,
+                supportsAllDrives=True,
+                q="mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+                fields="nextPageToken,files(id,name,mimeType,parents)",
+                pageSize=1000,
+                pageToken=page_token,
+            )
+        )
+        files.extend(res.get("files") or [])
+        page_token = res.get("nextPageToken")
+        if not page_token:
+            return files
+
+
 def build_audit(root_id: str | None = None) -> dict:
+    from drive_store_common import build_folder_paths
+    from licensed_drive_common import item_is_private
+
     registry = load_json(REGISTRY_PATH)
     config = load_json(CONFIG_PATH)
     service = drive_service(readonly=True)
@@ -63,11 +88,22 @@ def build_audit(root_id: str | None = None) -> dict:
     registry_doc_ids = {doc.get("document_id") for doc in registry_docs if doc.get("document_id")}
 
     files: list[dict] = []
+    folders: list[dict] = []
     for configured_root_id in root_ids:
         drive_id = drive_id_for_root(service, configured_root_id)
         files.extend(list_drive_pdfs(service, drive_id))
+        folders.extend(list_drive_folders(service, drive_id))
 
-    by_file_id = {f["id"]: f for f in files}
+    folder_paths = build_folder_paths(folders, root_ids)
+    private_count = 0
+    public_files: list[dict] = []
+    for file in files:
+        if item_is_private(file, folder_paths):
+            private_count += 1
+            continue
+        public_files.append(file)
+
+    by_file_id = {f["id"]: f for f in public_files}
     by_sha: defaultdict[str, list[dict]] = defaultdict(list)
     no_sha: list[dict] = []
     orphans: list[dict] = []
@@ -86,6 +122,7 @@ def build_audit(root_id: str | None = None) -> dict:
     return {
         "summary": {
             "drive_pdf_count": len(by_file_id),
+            "private_folder_pdfs_excluded": private_count,
             "registry_uploaded_count": len(registry_file_ids),
             "duplicate_sha_count": len(duplicate_sha),
             "missing_sha_app_property_count": len(no_sha),

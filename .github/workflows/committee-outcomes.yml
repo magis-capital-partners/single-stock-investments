@@ -14,10 +14,43 @@ jobs:
   observe:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          filter: blob:none
+          # CHECKOUT_PATTERNS in _system/scripts/loop_checkout_sparse.py; the
+          # contract test keeps the three loops and that list identical.
+          sparse-checkout: |
+            /*
+            !/*/
+            /.github/
+            /_eval/
+            /_system/
+            !/_system/reference/activist-reports/
+            !/_system/reference/investment-wisdom/
+            /*/research/
+            /dashboard/private-assets.json
+          sparse-checkout-cone-mode: false
+      - name: Materialize cited sources and registered feeds
+        # epistemic_loop_controller.py is shared with the other two loops, so
+        # this lane sees the same inputs they do.
+        run: |
+          set -euo pipefail
+          python3 _system/scripts/loop_checkout_sparse.py > "$RUNNER_TEMP/loop-inputs.txt"
+          git sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/loop-inputs.txt"
+          echo "added $(wc -l < "$RUNNER_TEMP/loop-inputs.txt") patterns; $(git ls-files -t | grep -c '^H') files on disk"
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+        with:
+          # Forecasts and total-return inputs live in this repo and on the
+          # price vendor. The vault checkout only hydrates private snapshots
+          # for the publication guard.
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -40,6 +73,7 @@ jobs:
       - name: Commit forecasts, observations, and monitoring
         uses: ./.github/actions/commit-main
         with:
+          preserve-company-cache: "false"
           message: "chore(epistemic): refresh committee outcome loop"
           git_add: >-
             _system/research/committee_forecasts.jsonl

@@ -17,7 +17,7 @@ The market prices CrowdStrike as a premium-growth compounder after the July 2024
 - Base return: pending
 
 ## Key assumptions (stable)
-- Price today: **$257.57** (source: Yahoo CRWD close 2026-10-23)
+- Price today: **$227.39** (source: Yahoo CRWD close 2026-10-16)
 - Normalized owner earnings: **$1,310M** (source: us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001535527-26-000010; form 10-K)
 - Cash: **$4,716M** (source: us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001535527-26-000025; form 10-Q)
 - Debt: **$746M** (source: us-gaap:LongTermDebtNoncurrent; accession 0001535527-26-000025; form 10-Q)
@@ -106,11 +106,11 @@ Documents in folder: **74** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-03-03 | `investor-documents/sec-edgar/8-K_20260303_rpt20260303_acc0001535527_26_000007
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CRWD/research/deep_dive_2026-10-12.md (sha256 sha256:7886703fb879d0b1...)
+- deep_dive: CRWD/research/deep_dive_2026-10-12.md (sha256 sha256:600180db96433806...)
 - filing_digest: CRWD/research/evidence/filing_digest.md (sha256 sha256:55b38946be22a976...)
 - adversarial: CRWD/research/adversarial_2026-10-12.md (sha256 sha256:2c873eb14f7ba454...)
-- valuation: CRWD/research/valuation.json (sha256 sha256:26c58297767a13f3...)
-- thesis_card: CRWD/research/thesis_card.json (sha256 sha256:f496d726484cb9d8...)
+- valuation: CRWD/research/valuation.json (sha256 sha256:dc2876f4e184b349...)
+- thesis_card: CRWD/research/thesis_card.json (sha256 sha256:1beef57696c69eb9...)
 - cross_check: CRWD/research/cross_check_third_party_2026-10-12.md (sha256 sha256:bef5ef8e4f391dc4...)
 
 ## Excluded from this pack
