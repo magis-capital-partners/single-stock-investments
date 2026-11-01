@@ -3,7 +3,8 @@ on:
   schedule:
     - cron: '15 14 * * 1-5'
     - cron: '15 23 * * 1-5'
-  workflow_dispatch:
+  repository_dispatch:
+    types: [refresh-public-fund-holdings]
   push:
     branches: [main]
     paths:
