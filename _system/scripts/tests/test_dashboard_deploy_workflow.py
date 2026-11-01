@@ -44,6 +44,7 @@ def test_deployment_materializes_only_the_pinned_checkpoint():
     )
     assert "investor_history_checkpoint.py materialize" in script
     assert "--public-receipt dashboard/data/holdings/archive_receipt.json" in script
+    assert "--historical-filers _system/reference/investors/historical_filers.json" in script
     assert "sparse-checkout add /dashboard-private/investor-history/" not in script
 
 

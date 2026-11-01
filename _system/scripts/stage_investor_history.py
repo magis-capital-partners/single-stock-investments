@@ -12,7 +12,7 @@ import investor_history as history
 import investor_universe
 import investor_corpus
 from holdings_asset_bundles import pack_assets, validate_site_budget
-from investor_history_checkpoint import restore
+from investor_history_checkpoint import merge_historical, restore
 from vault_paths import research_vault_root
 
 
@@ -81,7 +81,23 @@ def stage(site, *, vault=None, receipt=None, cache=None):
             "Pinned investor archive is missing; refusing an incomplete deployment"
         )
     universe = json.loads((cache / "universe.json").read_text(encoding="utf-8"))
+    historical = investor_universe.historical_filers()
+    universe = investor_universe.with_declared_filer_history(universe, historical)
     universe = investor_universe.reconcile_public_identities(universe)
+    owners = history.cik_map(universe["managers"])
+    historical_added = 0
+    for record in historical:
+        owner = owners.get(str(int(record["primary_cik"])))
+        if owner:
+            historical_added += merge_historical(
+                vault / "dashboard-private/investor-history",
+                cache,
+                identity=record["checkpoint_identity"],
+                manager_id=owner,
+                cik=record["cik"],
+                first_quarter=record["first_quarter"],
+                last_quarter=record["last_quarter"],
+            )
     # The private universe retains non-filers and unresolved document identities.
     # Only the known SEC owners have public filings; identity labels never join books.
     disclosures = json.loads((cache / "disclosures.json").read_text(encoding="utf-8"))
@@ -137,6 +153,7 @@ def stage(site, *, vault=None, receipt=None, cache=None):
         "identity": identity,
         "letter_corpus_refreshed": refreshed,
         "letter_documents_reprocessed": letter_count,
+        "historical_filings_added": historical_added,
         "filings": coverage["filings"],
         "total_site_files": total_site_files,
         **packaging,

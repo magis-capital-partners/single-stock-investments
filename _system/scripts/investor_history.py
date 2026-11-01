@@ -943,6 +943,7 @@ def export(db, managers, data=DATA):
                 "filings": [
                     {
                         "accession": f["accession"],
+                        "cik": f["cik"],
                         "form": f["form"],
                         "filed_at": f["filed_at"],
                         "source_url": f["source_url"],

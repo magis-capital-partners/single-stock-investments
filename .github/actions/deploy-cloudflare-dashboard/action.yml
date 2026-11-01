@@ -127,7 +127,8 @@ runs:
         if [ -f dashboard/data/holdings/archive_receipt.json ]; then
           python _system/scripts/investor_history_checkpoint.py materialize \
             --archive "$RESEARCH_VAULT_ROOT/dashboard-private/investor-history" \
-            --public-receipt dashboard/data/holdings/archive_receipt.json
+            --public-receipt dashboard/data/holdings/archive_receipt.json \
+            --historical-filers _system/reference/investors/historical_filers.json
         fi
         python _system/scripts/stage_investor_history.py
         python _system/scripts/validate_portfolio_private_boundary.py _cf_project/site

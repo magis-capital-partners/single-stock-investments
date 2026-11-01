@@ -27,7 +27,7 @@ from thirteenf_legacy import parse_legacy_document
 
 @pytest.mark.parametrize("broad_checkout", [False, True])
 def test_pinned_materialization_fetches_one_checkpoint_and_preserves_other_inputs(
-    tmp_path, broad_checkout
+    tmp_path, broad_checkout, monkeypatch
 ):
     if not shutil.which("git"):
         pytest.skip("Git is required for sparse checkout integration")
@@ -91,6 +91,30 @@ def test_pinned_materialization_fetches_one_checkpoint_and_preserves_other_input
             json.loads((destination / "universe.json").read_text())["revision"]
             == revision
         )
+
+    real_run = subprocess.run
+    failures = []
+
+    def interrupted_once(args, **kwargs):
+        if "--show-toplevel" in args and not failures:
+            failures.append(True)
+            raise subprocess.CalledProcessError(128, args, stderr="fatal: early EOF")
+        return real_run(args, **kwargs)
+
+    with monkeypatch.context() as retry:
+        retry.setattr(checkpoint.subprocess, "run", interrupted_once)
+        retry.setattr(checkpoint.time, "sleep", lambda _seconds: None)
+        checkpoint.materialize(
+            parts,
+            identity=second["identity"],
+            additional_identities=[first["identity"]],
+        )
+    assert failures == [True]
+    assert (parts / first["identity"] / "manifest.json").is_file()
+    assert (parts / second["identity"] / "manifest.json").is_file()
+    assert {p.relative_to(parts).as_posix() for p in (parts / "objects").glob("*")} == {
+        p["name"] for m in (first, second) for p in m["parts"]
+    }
 
 
 @pytest.mark.parametrize("conflicting_filer", [False, True])
@@ -261,6 +285,9 @@ def test_archived_alias_is_reconciled_after_source_corpus_rotation():
 def test_pinned_old_identity_keeps_all_filing_quarters_and_separate_letter_vehicle(
     tmp_path, monkeypatch
 ):
+    # This fixture isolates brand reconciliation; historical supplements have
+    # their own cold-restore integration test.
+    monkeypatch.setattr(universe, "FILER_HISTORY", tmp_path / "fixture-histories.json")
     roster = tmp_path / "roster.json"
     archive.write_json(
         roster,

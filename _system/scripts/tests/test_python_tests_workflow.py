@@ -57,6 +57,7 @@ def test_investor_identity_references_survive_the_reference_corpus_exclusion(tmp
     required = (
         "_system/reference/investors/public_roster.json",
         "_system/reference/investors/manager_aliases.json",
+        "_system/reference/investors/historical_filers.json",
     )
     excluded = "_system/reference/unrelated-corpus/large.json"
     for relative in (*required, excluded):

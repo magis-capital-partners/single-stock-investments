@@ -36,6 +36,44 @@ from vault_paths import letters_root
 
 ROSTER = ROOT / "_system/reference/investors/public_roster.json"
 ALIASES = ROOT / "_system/reference/investors/manager_aliases.json"
+FILER_HISTORY = ROOT / "_system/reference/investors/historical_filers.json"
+
+
+def historical_filers(path=None):
+    path = Path(path) if path is not None else FILER_HISTORY
+    return (
+        json.loads(path.read_text(encoding="utf-8"))["filers"] if path.exists() else []
+    )
+
+
+def with_declared_filer_history(universe, sources=None):
+    """Apply reviewed historical identifiers without guessing or merging owners."""
+    sources = historical_filers() if sources is None else sources
+    managers = {m["manager_id"]: m for m in universe["managers"]}
+    owners = cik_map(list(managers.values()))
+    for source in sources:
+        owner = owners.get(str(int(source["primary_cik"])))
+        if owner is None:
+            continue
+        former = str(int(source["cik"]))
+        if former in owners and owners[former] != owner:
+            raise ValueError("Historical filer already belongs to another manager")
+        manager = managers[owner]
+        entry = {
+            k: v
+            for k, v in source.items()
+            if k not in {"primary_cik", "checkpoint_identity"}
+        }
+        previous = manager.get("cik_history", [])
+        history = [
+            r
+            for r in previous
+            if str(int(r.get("cik") if isinstance(r, dict) else r)) != former
+        ]
+        managers[owner] = {**manager, "cik_history": [*history, entry]}
+        owners[former] = owner
+    return {**universe, "managers": list(managers.values())}
+
 
 LEGAL_WORDS = {
     "llc",
@@ -406,7 +444,7 @@ def compile_universe(
     resolve_public=False,
 ):
     document = json.loads(registry_path.read_text(encoding="utf-8"))
-    public = document["managers"]
+    public = with_declared_filer_history(document)["managers"]
     catalog = catalog if catalog is not None else filer_catalog()
     aliases = (
         json.loads(aliases_path.read_text(encoding="utf-8"))
