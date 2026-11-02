@@ -337,7 +337,7 @@ class ActivistPhaseTests(unittest.TestCase):
             steps,
             lambda s: str(s.get("uses", "")).endswith("commit-main")
             and "always()" in str(s.get("if"))
-            and "steps.checkout_full.outcome == 'success'" in str(s.get("if")),
+            and "steps.checkout_workspace.outcome == 'success'" in str(s.get("if")),
         )
         self.assertGreater(commit, sec, "commit the SEC phase's progress right after it")
         fresh = steps[step_index(steps, lambda s: "check_activist_freshness.py" in step_text(s))]
