@@ -65,8 +65,13 @@ def requested_keywords(gaps):
                 'omit', 'from', 'with', 'that', 'these', 'this', 'have', 'need', 'needed'}
     for gap in gaps[:12]:
         detail = str(gap.get('detail') or '')[:8000]
-        search = re.split(r'search terms\s*:', detail, maxsplit=1, flags=re.I)[-1]
-        quoted = re.findall(r"['\u2018\u2019\"\u201c\u201d]([^'\u2018\u2019\"\u201c\u201d\n]{2,120})['\u2018\u2019\"\u201c\u201d]", search)
+        search = re.split(r'\bsearch(?:\s+terms)?\s*:', detail, maxsplit=1, flags=re.I)[-1]
+        # Possessives such as "Copart's" are not opening quotation marks.
+        # Match complete quoted phrases without letting a possessive consume
+        # the first real search term and invert every subsequent quote pair.
+        pairs = re.findall(r'(?<!\w)["\u201c]([^\n]{2,120}?)["\u201d](?!\w)'
+                           r"|(?<!\w)['\u2018]([^\n]{2,120}?)['\u2019](?!\w)", search)
+        quoted = [left or right for left, right in pairs]
         terms = [' '.join(t.lower().split()) for t in quoted
                  if re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", t)]
         if not terms:
@@ -85,7 +90,7 @@ def requested_keywords(gaps):
     return terms
 
 
-def document_record(url, raw, focus_keywords=(), *, form=None):
+def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=False):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = raw.decode('utf-8', errors='replace')
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
@@ -113,11 +118,11 @@ def document_record(url, raw, focus_keywords=(), *, form=None):
         if len(contexts) >= 30:
             break
     body = text_of(source)
-    if form == '10-Q' and 500 <= len(body) <= 350000 and sum(w in body.lower() for w in words) >= 3:
-        # A bounded complete interim report avoids serial gaps caused by notes
-        # or contractual footnotes falling just outside selected text windows.
+    if (form == '10-Q' or prefer_complete) and 500 <= len(body) <= 350000 and sum(w in body.lower() for w in words) >= 3:
+        # Complete bounded reports/agreements retain contractual footnotes
+        # that could otherwise fall outside selected search windows.
         return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),
-                'contexts':[body],'coverage':'complete_quarterly_filing'}
+                'contexts':[body],'coverage':'complete_quarterly_filing' if form == '10-Q' else 'complete_requested_primary_document'}
     budget = 350000 if focus else 150000
     def add_context(text):
         nonlocal size
@@ -384,6 +389,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
         except (BasisGap, ContractError):
             continue
     documents, errors = copy.deepcopy(data.get('primary_documents') or []), []
+    formal_sources = []
     if focus_keywords and documents:
         from valuation_earnings import primary_document
         for index, document in enumerate(documents):
@@ -417,14 +423,35 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     continue
                 url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
                 try:
-                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url), focus_keywords, form=form)
+                    raw = filing_bytes(root, ticker, recent['accessionNumber'][i], client, url)
+                    document = document_record(url, raw, focus_keywords, form=form)
                     document.update(form=form, filed=recent['filingDate'][i], period=(recent.get('reportDate') or ['']*len(recent['form']))[i])
                     documents.append(document)
+                    formal_sources.append({'source_url': url, 'raw': raw, 'filed': document['filed'], 'form': form})
                     chosen.add(form)
                 except (OSError, ValueError) as exc:
                     errors.append({'source': url, 'error': type(exc).__name__})
                 if len(chosen) >= 2:
                     break
+            if focus_keywords:
+                from underwriting_primary_references import collect_requested_documents
+                additional, source_errors = collect_requested_documents(submission, cik, as_of, formal_sources,
+                    focus_keywords, lambda url: client.get_bytes(url, timeout=40))
+                existing = {d['id']: d for d in documents}
+                for document in additional:
+                    if document['id'] in existing:
+                        prior = existing[document['id']]
+                        if prior['content_hash'] != document['content_hash']:
+                            errors.append({'source': 'requested_primary_disclosure', 'source_url': document['source_url'],
+                                           'error': 'A primary disclosure changed'})
+                        elif document.get('coverage') == 'complete_requested_primary_document':
+                            # Preserve an already verified financial period;
+                            # the same raw filing may also disclose a deal.
+                            prior.update(contexts=document['contexts'], coverage=document['coverage'])
+                        continue
+                    documents.append(document)
+                    existing[document['id']] = document
+                errors.extend(source_errors)
         except (OSError, ValueError) as exc:
             errors.append({'source': 'sec_submissions', 'error': type(exc).__name__})
     foreign_us_listing = '.' not in quote['symbol'] and any(d.get('form') in ('20-F', '6-K') for d in documents+observations)
@@ -482,6 +509,10 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
 def evidence_readiness(packet, *, require_documents=False):
     """Facts/documents readiness is checked before admitting any judgment call."""
     gaps = []
+    for error in packet.get('collection_errors') or []:
+        if error.get('source') in ('requested_primary_reference', 'requested_primary_disclosure'):
+            gaps.append({'code': 'requested_primary_document_unavailable',
+                         'detail': 'Retry requested primary disclosure: '+str(error.get('source_url') or '')})
     day = date.fromisoformat(packet['as_of'])
     financial = date.fromisoformat(packet['financial_period'])
     if not 0 <= (day-financial).days <= 550:
