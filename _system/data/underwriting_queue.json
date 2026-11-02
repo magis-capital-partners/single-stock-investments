@@ -1,6 +1,6 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-01",
+  "as_of": "2026-11-02",
   "summary": {
     "companies": 866,
     "statuses": {
@@ -8,61 +8,34 @@
       "reviewed": 1
     },
     "blocker_companies": {
-      "new_financial_report_after_model": 354,
-      "holding_company_component_forecast_missing": 2,
-      "new_earnings_disclosure_unresolved": 26,
       "realization_timing_missing": 21,
       "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 133,
       "positive_normalized_owner_cash_not_established": 110,
       "pre_listing_share_basis_unverified": 100,
+      "annual_operating_cash_flow_missing": 44,
       "annual_diluted_share_count_missing": 50,
       "annual_capex_missing": 72,
-      "annual_operating_cash_flow_missing": 44,
+      "new_financial_report_after_model": 354,
       "source_share_basis_unverified": 56,
       "newer_balance_sheet_inputs_available": 215,
+      "new_earnings_disclosure_unresolved": 26,
       "financial_inputs_expired_or_undated": 19,
-      "listing_calendar_or_completed_close_unverified": 23,
       "corporate_action_history_unverified": 24,
+      "listing_calendar_or_completed_close_unverified": 23,
       "unique_shareholder_irr_unavailable": 1,
       "completed_session_quote_missing": 5,
       "method_specific_forecast_missing": 30,
       "annual_financial_inputs_expired": 10,
       "quote_issuer_mismatch": 2,
       "annual_period_or_currency_reconciliation_missing": 3,
+      "holding_company_component_forecast_missing": 2,
       "limited_liability_equity_waterfall_missing": 1,
       "underwriting_revision_required": 8
     },
     "requires_human_review": false
   },
   "companies": [
-    {
-      "ticker": "V",
-      "company": "Visa Inc.",
-      "status": "needs_underwriting",
-      "current_model_basis": "automatic_operating_first_pass",
-      "blockers": [
-        "new_financial_report_after_model"
-      ],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
-    {
-      "ticker": "BRK.B",
-      "company": "Berkshire Hathaway",
-      "status": "needs_underwriting",
-      "current_model_basis": "issuer_valuation",
-      "blockers": [
-        "holding_company_component_forecast_missing",
-        "new_earnings_disclosure_unresolved"
-      ],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
     {
       "ticker": "FRMO",
       "company": "FRMO Corporation",
@@ -5849,17 +5822,6 @@
       "unresolved_findings": []
     },
     {
-      "ticker": "MCO",
-      "company": "Moody's Corporation",
-      "status": "needs_underwriting",
-      "current_model_basis": "automatic_operating_first_pass",
-      "blockers": [],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
-    {
       "ticker": "MDT",
       "company": "Medtronic",
       "status": "needs_underwriting",
@@ -11577,26 +11539,6 @@
       "unresolved_findings": []
     },
     {
-      "ticker": "CPRT",
-      "company": "Copart",
-      "status": "needs_underwriting",
-      "current_model_basis": "issuer_valuation",
-      "blockers": [
-        "new_financial_report_after_model",
-        "newer_balance_sheet_inputs_available",
-        "underwriting_revision_required"
-      ],
-      "last_attempt": "2026-10-31T02:08:40.440677+00:00",
-      "retry_after": "2026-10-31",
-      "underwriting_gaps": [
-        {
-          "code": "StageBlocked",
-          "detail": "author_or_challenger_unresolved: Primary disclosure contexts expanded for your evidence request."
-        }
-      ],
-      "unresolved_findings": []
-    },
-    {
       "ticker": "BKNG",
       "company": "Booking Holdings",
       "status": "needs_underwriting",
@@ -11659,6 +11601,79 @@
       "last_attempt": "2026-11-01T04:37:54.409028+00:00",
       "retry_after": null,
       "underwriting_gaps": [],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "V",
+      "company": "Visa Inc.",
+      "status": "needs_underwriting",
+      "current_model_basis": "automatic_operating_first_pass",
+      "blockers": [
+        "new_financial_report_after_model"
+      ],
+      "last_attempt": "2026-11-02T05:21:43.299149+00:00",
+      "retry_after": "2026-11-03",
+      "underwriting_gaps": [
+        {
+          "code": "ContractError",
+          "detail": "Sourced primary financials and a verified share count are required"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "CPRT",
+      "company": "Copart",
+      "status": "needs_underwriting",
+      "current_model_basis": "issuer_valuation",
+      "blockers": [
+        "new_financial_report_after_model",
+        "newer_balance_sheet_inputs_available",
+        "underwriting_revision_required"
+      ],
+      "last_attempt": "2026-11-02T05:30:30.971593+00:00",
+      "retry_after": "2026-11-03",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "primary_evidence_gap: [{\"code\": \"material_acv_target_financial_evidence_missing\", \"detail\": \"The CURRENT packet still contains no ACV financial statements. Copart's doc_9b8366946fd8b140, Note 19, discloses an approximately USD 1.9 billion cash acquisition expected to close by calendar year-end 2026, excluded from July 31 consolidated accounts. Retrieve ACV's latest annual and interim primary reports available by 2026-10-30: consolidated balance sheets, income statements, cash flows and financing notes. Search 'restricted cash', 'finance receivables', 'borrowings', 'securitization', 'guarantees' and 'commitments'. Establish acquired usable cash, operating cash consumption, financial assets, matching obligations and funding restrictions. These material claims cannot be bounded using Copart's existing auction earnings or by assigning ACV zero proceeds.\"}, {\"code\": \"acv_transaction_consideration_and_funding_reconciliation_missing\", \"detail\": \"Copart's expanded disclosure provides approximate equity consideration and general closing conditions; Note 19 expressly says the acquisition's financial statement impact cannot reasonably be estimated. Retrieve the executed merger agreement and associated primary tran"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "BRK.B",
+      "company": "Berkshire Hathaway",
+      "status": "needs_underwriting",
+      "current_model_basis": "issuer_valuation",
+      "blockers": [
+        "holding_company_component_forecast_missing",
+        "new_earnings_disclosure_unresolved"
+      ],
+      "last_attempt": "2026-11-02T05:42:40.897298+00:00",
+      "retry_after": "2026-11-03",
+      "underwriting_gaps": [
+        {
+          "code": "ContractError",
+          "detail": "Sourced primary financials and a verified share count are required"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "MCO",
+      "company": "Moody's Corporation",
+      "status": "needs_underwriting",
+      "current_model_basis": "automatic_operating_first_pass",
+      "blockers": [],
+      "last_attempt": "2026-11-02T05:51:05.161976+00:00",
+      "retry_after": "2026-11-03",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "author_or_challenger_unresolved: Primary disclosure contexts expanded; resolve prior criticism against the CURRENT packet."
+        }
+      ],
       "unresolved_findings": []
     }
   ]
