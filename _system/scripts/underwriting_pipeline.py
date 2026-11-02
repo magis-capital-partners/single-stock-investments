@@ -101,6 +101,8 @@ def receipt_status(root, ticker, audit, as_of):
 
 
 def build_queue(root=ROOT, as_of=None, states=None):
+    from coverage_inputs import ensure_registered_coverage
+    ensure_registered_coverage(root)
     from refresh_shared_forecasts import universe
     as_of, states = as_of or today(), states or {}
     universe_rows = universe(root)
