@@ -10,8 +10,8 @@
 
 | Field | Value |
 |-------|-------|
-| evidence_hash | `cef89f34b0c4713b1899b0f3d883703232bc26f7c3a348be85708975742b0400` | <!-- pragma: allowlist secret -->
-| epistemic_input_sha | `444d036a1f77851845e9b59b281c85ae1eb76f6c` |
+| evidence_hash | `f4ab06cd94beaa5d174588de6fe9ae327d5d8235faf7dbad0ba89c233e4027a0` | <!-- pragma: allowlist secret -->
+| epistemic_input_sha | `f45df0ae59501ca2bb8dce6cbcbd6f7a88c2cc0a` |
 | component_fingerprint | `4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480` |
 | contract_hash | `50c7e6ea066142ed07e03bc9c82bc3f22c92acefe0c9a691f3bd452233fc7fc9` |
 
