@@ -39,9 +39,9 @@ re_pass: false
 
 | # | Claim in dive | Dive cites | Filing value | Match? | Severity |
 |---|---------------|------------|--------------|--------|----------|
-| 1 | Latest revenue (filing) | — | **$41.52B** vs prior $37.90B (+9.6% YoY) | spot-check dive | — |
-| — | Stockholders' equity (filing) | — | **59142.0** | spot-check dive | — |
-| — | Net income (filing) | — | **7457.0** | spot-check dive | — |
+| 1 | Latest revenue (filing) | — | **$41525000.00B** vs prior $37895000.00B (+9.6% YoY) | spot-check dive | — |
+| — | Stockholders' equity (filing) | — | **59142000000.0** | spot-check dive | — |
+| — | Net income (filing) | — | **7457000000.0** | spot-check dive | — |
 | — | EPS basic (filing) | — | **7.85** | spot-check dive | — |
 
 ---

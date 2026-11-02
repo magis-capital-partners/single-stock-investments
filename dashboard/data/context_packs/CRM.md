@@ -17,7 +17,7 @@ The market may be treating Salesforce as a mature, low-growth CRM vendor while A
 - Base return: pending
 
 ## Key assumptions (stable)
-- Price today: **$238.53** (source: Yahoo CRM close 2026-10-13)
+- Price today: **$226.18** (source: Yahoo CRM close 2026-11-02)
 - Normalized owner earnings: **$14,402M** (source: us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001108524-26-000060; form 10-K)
 - Cash: **$8,935M** (source: us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001108524-26-000127; form 10-Q)
 - Debt: **$39,280M** (source: us-gaap:LongTermDebtNoncurrent; accession 0001108524-26-000127; form 10-Q)
@@ -49,69 +49,69 @@ The market may be treating Salesforce as a mature, low-growth CRM vendor while A
 ## Filing digest excerpt (semi-stable)
 # Filing digest — CRM
 
-**Generated:** 2026-10-13  
+**Generated:** 2026-11-02  
 **Agent:** Marvin (`build_filing_evidence.py`)  
 **Inventory:** `CRM/research/evidence/document_inventory.json`  
 
-Documents in folder: **87** (all listed below; Tier 1–3 extracted or keyword-scanned).
+Documents in folder: **88** (all listed below; Tier 1–3 extracted or keyword-scanned).
 
 ## Document inventory
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
-| full | 10-K | 2024-03-06 | `investor-documents/sec-edgar/10-K_20240306_rpt20240131_acc0001108524_24_000005.htm` | 464379 |
-| full | 10-K | 2025-03-05 | `investor-documents/sec-edgar/10-K_20250305_rpt20250131_acc0001108524_25_000006.htm` | 461897 |
-| full | 10-K | 2026-03-02 | `investor-documents/sec-edgar/10-K_20260302_rpt20260131_acc0001108524_26_000060.htm` | 484550 |
+| full | 10-K | 2024-03-06 | `investor-documents/sec-edgar/10-K_20240306_rpt20240131_acc0001108524_24_000005.htm` | 505873 |
+| full | 10-K | 2025-03-05 | `investor-documents/sec-edgar/10-K_20250305_rpt20250131_acc0001108524_25_000006.htm` | 502968 |
+| full | 10-K | 2026-03-02 | `investor-documents/sec-edgar/10-K_20260302_rpt20260131_acc0001108524_26_000060.htm` | 525872 |
 | partial | 10-Q | 2023-08-31 | `investor-documents/sec-edgar/10-Q_20230831_rpt20230731_acc0001108524_23_000040.htm` | 30057 |
 | partial | 10-Q | 2023-11-30 | `investor-documents/sec-edgar/10-Q_20231130_rpt20231031_acc0001108524_23_000048.htm` | 30057 |
-| full | 10-Q | 2024-05-30 | `investor-documents/sec-edgar/10-Q_20240530_rpt20240430_acc0001108524_24_000009.htm` | 332768 |
+| full | 10-Q | 2024-05-30 | `investor-documents/sec-edgar/10-Q_20240530_rpt20240430_acc0001108524_24_000009.htm` | 354276 |
 | partial | 10-Q | 2024-08-29 | `investor-documents/sec-edgar/10-Q_20240829_rpt20240731_acc0001108524_24_000022.htm` | 30057 |
 | partial | 10-Q | 2024-12-04 | `investor-documents/sec-edgar/10-Q_20241204_rpt20241031_acc0001108524_24_000034.htm` | 30057 |
-| full | 10-Q | 2025-05-29 | `investor-documents/sec-edgar/10-Q_20250529_rpt20250430_acc0001108524_25_000030.htm` | 320812 |
+| full | 10-Q | 2025-05-29 | `investor-documents/sec-edgar/10-Q_20250529_rpt20250430_acc0001108524_25_000030.htm` | 341222 |
 | partial | 10-Q | 2025-09-04 | `investor-documents/sec-edgar/10-Q_20250904_rpt20250731_acc0001108524_25_000088.htm` | 30057 |
 | partial | 10-Q | 2025-12-04 | `investor-documents/sec-edgar/10-Q_20251204_rpt20251031_acc0001108524_25_000238.htm` | 30057 |
-| full | 10-Q | 2026-05-28 | `investor-documents/sec-edgar/10-Q_20260528_rpt20260430_acc0001108524_26_000127.htm` | 339429 |
-| scan | proxy | 2024-05-16 | `investor-documents/sec-edgar/DEF 14A_20240516_rpt20240627_acc0001193125_24_140549.htm` | 8055 |
+| full | 10-Q | 2026-05-28 | `investor-documents/sec-edgar/10-Q_20260528_rpt20260430_acc0001108524_26_000127.htm` | 361440 |
+| scan | proxy | 2024-05-16 | `investor-documents/sec-edgar/DEF 14A_20240516_rpt20240627_acc0001193125_24_140549.htm` | 8056 |
 | scan | proxy | 2025-04-24 | `investor-documents/sec-edgar/DEF 14A_20250424_rpt20250605_acc0001108524_25_000009.htm` | 8056 |
-| full | proxy | 2026-04-16 | `investor-documents/sec-edgar/DEF 14A_20260416_rpt20260528_acc0001108524_26_000085.htm` | 642401 |
-| scan | 8-K | 2024-07-01 | `investor-documents/sec-edgar/8-K_20240701_rpt20240627_acc0001108524_24_000014.htm` | 8054 |
-| scan | 8-K | 2024-08-28 | `investor-documents/sec-edgar/8-K_20240828_rpt20240828_acc0001108524_24_000020.htm` | 6098 |
-| scan | 8-K | 2024-09-05 | `investor-documents/sec-edgar/8-K_20240905_rpt20240905_acc0001108524_24_000024.htm` | 3833 |
-| scan | 8-K | 2024-11-05 | `investor-documents/sec-edgar/8-K_20241105_rpt20241031_acc0001193125_24_251243.htm` | 6789 |
-| scan | 8-K | 2024-12-03 | `investor-documents/sec-edgar/8-K_20241203_rpt20241203_acc0001108524_24_000033.htm` | 3868 |
-| scan | 8-K | 2024-12-10 | `investor-documents/sec-edgar/8-K_20241210_rpt20241205_acc0001108524_24_000036.htm` | 4495 |
-| scan | 8-K | 2025-02-05 | `investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001193125_25_020881.htm` | 7712 |
-| scan | 8-K | 2025-02-26 | `investor-documents/sec-edgar/8-K_20250226_rpt20250226_acc0001108524_25_000002.htm` | 3887 |
-| scan | 8-K | 2025-05-27 | `investor-documents/sec-edgar/8-K_20250527_rpt20250527_acc0001193125_25_126271.htm` | 3553 |
-| scan | 8-K | 2025-05-28 | `investor-documents/sec-edgar/8-K_20250528_rpt20250528_acc0001108524_25_000027.htm` | 3851 |
-| scan | 8-K | 2025-06-09 | `investor-documents/sec-edgar/8-K_20250609_rpt20250605_acc0001108524_25_000033.htm` | 5711 |
+| full | proxy | 2026-04-16 | `investor-documents/sec-edgar/DEF 14A_20260416_rpt20260528_acc0001108524_26_000085.htm` | 644739 |
+| scan | 8-K | 2024-07-01 | `investor-documents/sec-edgar/8-K_20240701_rpt20240627_acc0001108524_24_000014.htm` | 8055 |
+| scan | 8-K | 2024-08-28 | `investor-documents/sec-edgar/8-K_20240828_rpt20240828_acc0001108524_24_000020.htm` | 6123 |
+| scan | 8-K | 2024-09-05 | `investor-documents/sec-edgar/8-K_20240905_rpt20240905_acc0001108524_24_000024.htm` | 3858 |
+| scan | 8-K | 2024-11-05 | `investor-documents/sec-edgar/8-K_20241105_rpt20241031_acc0001193125_24_251243.htm` | 6814 |
+| scan | 8-K | 2024-12-03 | `investor-documents/sec-edgar/8-K_20241203_rpt20241203_acc0001108524_24_000033.htm` | 3893 |
+| scan | 8-K | 2024-12-10 | `investor-documents/sec-edgar/8-K_20241210_rpt20241205_acc0001108524_24_000036.htm` | 4520 |
+| scan | 8-K | 2025-02-05 | `investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001193125_25_020881.htm` | 7737 |
+| scan | 8-K | 2025-02-26 | `investor-documents/sec-edgar/8-K_20250226_rpt20250226_acc0001108524_25_000002.htm` | 3912 |
+| scan | 8-K | 2025-05-27 | `investor-documents/sec-edgar/8-K_20250527_rpt20250527_acc0001193125_25_126271.htm` | 3578 |
+| scan | 8-K | 2025-05-28 | `investor-documents/sec-edgar/8-K_20250528_rpt20250528_acc0001108524_25_000027.htm` | 3876 |
+| scan | 8-K | 2025-06-09 | `investor-documents/sec-edgar/8-K_20250609_rpt20250605_acc0001108524_25_000033.htm` | 5736 |
 | scan | 8-K | 2025-06-24 | `investor-documents/sec-edgar/8-K_20250624_rpt20250620_acc0001193125_25_145772.htm` | 8056 |
-| scan | 8-K | 2025-07-09 | `investor-documents/sec-edgar/8-K_20250709_rpt20250709_acc0001108524_25_000040.htm` | 4836 |
-| scan | 8-K | 2025-09-03 | `investor-documents/sec-edgar/8-K_20250903_rpt20250903_acc0001108524_25_000083.htm` | 5025 |
-| scan | 8-K | 2025-10-16 | `investor-documents/sec-edgar/8-K_20251016_rpt20251015_acc0001108524_25_000168.htm` | 6026 |
-| scan | 8-K | 2025-11-18 | `investor-documents/sec-edgar/8-K_20251118_rpt20251118_acc0001108524_25_000207.htm` | 5522 |
-| scan | 8-K | 2025-12-03 | `investor-documents/sec-edgar/8-K_20251203_rpt20251203_acc0001108524_25_000234.htm` | 3867 |
-| scan | 8-K | 2026-02-25 | `investor-documents/sec-edgar/8-K_20260225_rpt20260225_acc0001108524_26_000056.htm` | 3889 |
-| scan | 8-K | 2026-03-06 | `investor-documents/sec-edgar/8-K_20260306_rpt20260306_acc0001108524_26_000062.htm` | 3958 |
+| scan | 8-K | 2025-07-09 | `investor-documents/sec-edgar/8-K_20250709_rpt20250709_acc0001108524_25_000040.htm` | 4861 |
+| scan | 8-K | 2025-09-03 | `investor-documents/sec-edgar/8-K_20250903_rpt20250903_acc0001108524_25_000083.htm` | 5050 |
+| scan | 8-K | 2025-10-16 | `investor-documents/sec-edgar/8-K_20251016_rpt20251015_acc0001108524_25_000168.htm` | 6051 |
+| scan | 8-K | 2025-11-18 | `investor-documents/sec-edgar/8-K_20251118_rpt20251118_acc0001108524_25_000207.htm` | 5547 |
+| scan | 8-K | 2025-12-03 | `investor-documents/sec-edgar/8-K_20251203_rpt20251203_acc0001108524_25_000234.htm` | 3892 |
+| scan | 8-K | 2026-02-25 | `investor-documents/sec-edgar/8-K_20260225_rpt20260225_acc0001108524_26_000056.htm` | 3914 |
+| scan | 8-K | 2026-03-06 | `investor-documents/sec-edgar/8-K_20260306_rpt20260306_acc0001108524_26_000062.htm` | 3983 |
 | scan | 8-K | 2026-03-12 | `investor-documents/sec-edgar/8-K_20260312_rpt20260311_acc0001193125_26_104282.htm` | 8056 |
-| scan | 8-K | 2026-03-13 | `investor-documents/sec-edgar/8-K_20260313_rpt20260313_acc0001193125_26_106356.htm` | 8054 |
-| scan | 8-K | 2026-03-16 | `investor-documents/sec-edgar/8-K_20260316_rpt20260316_acc0001193125_26_107403.htm` | 3655 |
-| scan | 8-K | 2026-05-27 | `investor-documents/sec-edgar/8-K_20260527_rpt20260527_acc0001108524_26_000125.htm` | 3890 |
-| scan | 8-K | 2026-06-01 | `investor-documents/sec-edgar/8-K_20260601_rpt20260528_acc0001108524_26_000131.htm` | 6613 |
-| scan | 8-K | 2026-06-02 | `investor-documents/sec-edgar/8-K_20260602_rpt20260527_acc0001108524_26_000138.htm` | 4880 |
-| scan | 8-K | 2023-08-30 | `third-party-analyses/activist_reports/long/8-K_20230830_acc0001108524_23_000037.htm` | 3869 |
-| scan | 8-K | 2023-11-29 | `third-party-analyses/activist_reports/long/8-K_20231129_acc0001108524_23_000046.htm` | 3880 |
-| scan | 8-K | 2024-02-28 | `third-party-analyses/activist_reports/long/8-K_20240228_acc0001108524_24_000002.htm` | 5267 |
-| scan | 8-K | 2024-05-29 | `third-party-analyses/activist_reports/long/8-K_20240529_acc0001108524_24_000007.htm` | 3850 |
-| scan | 8-K | 2024-07-01 | `third-party-analyses/activist_reports/long/8-K_20240701_acc0001108524_24_000014.htm` | 8054 |
+| scan | 8-K | 2026-03-13 | `investor-documents/sec-edgar/8-K_20260313_rpt20260313_acc0001193125_26_106356.htm` | 8055 |
+| scan | 8-K | 2026-03-16 | `investor-documents/sec-edgar/8-K_20260316_rpt20260316_acc0001193125_26_107403.htm` | 3680 |
+| scan | 8-K | 2026-05-27 | `investor-documents/sec-edgar/8-K_20260527_rpt20260527_acc0001108524_26_000125.htm` | 3915 |
+| scan | 8-K | 2026-06-01 | `investor-documents/sec-edgar/8-K_20260601_rpt20260528_acc0001108524_26_000131.htm` | 6638 |
+| scan | 8-K | 2026-06-02 | `investor-documents/sec-edgar/8-K_20260602_rpt20260527_acc0001108524_26_000138.htm` | 4905 |
+| scan | 8-K | 2023-08-30 | `third-party-analyses/activist_reports/long/8-K_20230830_acc0001108524_23_000037.htm` | 3894 |
+| scan | 8-K | 2023-11-29 | `third-party-analyses/activist_reports/long/8-K_20231129_acc0001108524_23_000046.htm` | 3905 |
+| scan | 8-K | 2024-02-28 | `third-party-analyses/activist_reports/long/8-K_20240228_acc0001108524_24_000002.htm` | 5292 |
+| scan | 8-K | 2024-05-29 | `third-party-analyses/activist_reports/long/8-K_20240529_acc0001108524_24_000007.htm` | 3875 |
+| scan | 8-K | 2024-07-01 | `third-party-analyses/activist_reports/long/8-K_20240701_acc0001108524_24_000014.htm` | 8055 |
 | scan | 8-K | 2024-08-28 | `third-party-analyses/activist_reports/long/8-K_20240828_acc0001108524_24_
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CRM/research/deep_dive_2026-09-12.md (sha256 sha256:257fea8f3429712a...)
-- filing_digest: CRM/research/evidence/filing_digest.md (sha256 sha256:ddff157bc4dc9ce5...)
-- adversarial: CRM/research/adversarial_2026-09-12.md (sha256 sha256:b990ad2bebc5eaca...)
-- valuation: CRM/research/valuation.json (sha256 sha256:bdf860851a2426fa...)
-- thesis_card: CRM/research/thesis_card.json (sha256 sha256:fd03941b34275d17...)
+- deep_dive: CRM/research/deep_dive_2026-09-12.md (sha256 sha256:6a0632cef725ebfe...)
+- filing_digest: CRM/research/evidence/filing_digest.md (sha256 sha256:4552c98bf38984c0...)
+- adversarial: CRM/research/adversarial_2026-09-12.md (sha256 sha256:e67ecda36a5792bc...)
+- valuation: CRM/research/valuation.json (sha256 sha256:04b5991ec363e899...)
+- thesis_card: CRM/research/thesis_card.json (sha256 sha256:e2b77e1679a00772...)
 - cross_check: CRM/research/cross_check_third_party_2026-09-12.md (sha256 sha256:ceeb9fe8b0e7f5b9...)
 
 ## Excluded from this pack
