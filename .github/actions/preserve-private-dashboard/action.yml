@@ -77,7 +77,11 @@ runs:
           if [ "$PRESERVE_COMPANY_CACHE" != "true" ]; then
             exclusions+=(':(exclude)dashboard-private/company-source-backfill-v2')
           fi
-          git -C "$vault" add --force -- dashboard-private "${exclusions[@]}"
+          # Publication-only checkouts name the previous object hashes. A rebuild
+          # writes new hashes beside them. Those new files sit outside the
+          # sparse rules, and git refuses the add unless --sparse is set.
+          # Skip-worktree objects that were not checked out stay in the index.
+          git -C "$vault" add --sparse --force -- dashboard-private "${exclusions[@]}"
           if ! git -C "$vault" diff --cached --quiet -- dashboard-private; then
             if [ -n "$(git -C "$vault" diff --cached --name-only -- . ':!dashboard-private')" ]; then
               echo "::error::Unrelated vault files are staged; publish those before preserving dashboard snapshots."

@@ -138,6 +138,46 @@ def test_publication_only_is_opt_in_and_the_three_loops_use_it():
         assert str(step["with"]["publication-only"]).lower() == "true"
 
 
+def test_sparse_vault_add_keeps_objects_that_were_not_checked_out(tmp_path):
+    """Buyback run 41433311840 refreshed private shards, then commit-main
+    refused to stage the new object hashes. --sparse stages those files and
+    leaves the hashes that were not checked out in the index."""
+    action = (ROOT / ".github/actions/preserve-private-dashboard/action.yml").read_text(encoding="utf-8")
+    assert 'git -C "$vault" add --sparse --force -- dashboard-private' in action
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    _git(origin, "init", "-q", "-b", "main")
+    _git(origin, "config", "user.email", "t@example.com")
+    _git(origin, "config", "user.name", "t")
+    kept = origin / "dashboard-private/objects/bbb"
+    kept.parent.mkdir(parents=True)
+    kept.write_text("kept", encoding="utf-8")
+    (origin / "dashboard-private/objects/aaa").write_text("old", encoding="utf-8")
+    (origin / "dashboard-private/manifest.json").write_text("{}\n", encoding="utf-8")
+    _git(origin, "add", "-A")
+    _git(origin, "commit", "-q", "-m", "fixture")
+    work = tmp_path / "work"
+    _git(origin, "clone", "-q", "--sparse", str(origin), str(work))
+    _git(work, "sparse-checkout", "init", "--no-cone")
+    _git(
+        work,
+        "sparse-checkout",
+        "set",
+        "--no-cone",
+        "--stdin",
+        input_text="/dashboard-private/manifest.json\n/dashboard-private/objects/aaa\n",
+    )
+    (work / "dashboard-private/objects/ccc").write_text("new", encoding="utf-8")
+    (work / "dashboard-private/manifest.json").write_text('{"ok":1}\n', encoding="utf-8")
+    _git(work, "add", "--sparse", "--force", "--", "dashboard-private")
+    staged = _git(work, "diff", "--cached", "--name-status")
+    assert "A\tdashboard-private/objects/ccc" in staged
+    assert "M\tdashboard-private/manifest.json" in staged
+    assert "dashboard-private/objects/bbb" not in staged
+    assert _git(work, "ls-files", "-v", "dashboard-private/objects/bbb").startswith("S ")
+
+
 def test_publication_checkout_materializes_named_objects_and_leaves_the_archive(tmp_path):
     origin = tmp_path / "origin"
     origin.mkdir()
