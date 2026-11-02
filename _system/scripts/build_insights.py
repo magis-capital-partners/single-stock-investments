@@ -3641,16 +3641,16 @@ def build_source_health(
                 else (
                     "degraded"
                     if (registry_summary.get("pending_upload_count") or 0)
-                    or (drive_audit_summary.get("duplicate_sha_count") or 0)
+                    or ((drive_audit_summary or {}).get("duplicate_sha_count") or 0)
                     else "ok"
                 )
             ),
-            "records": registry_summary.get("document_count", 0),
-            "items": registry_summary.get("uploaded_count", 0),
-            "pending_uploads": registry_summary.get("pending_upload_count", 0),
-            "drive_pdfs": drive_audit_summary.get("drive_pdf_count"),
-            "orphans": drive_audit_summary.get("orphan_drive_pdf_count"),
-            "duplicate_sha_groups": drive_audit_summary.get("duplicate_sha_count"),
+            "records": (registry_summary or {}).get("document_count", 0),
+            "items": (registry_summary or {}).get("uploaded_count", 0),
+            "pending_uploads": (registry_summary or {}).get("pending_upload_count", 0),
+            "drive_pdfs": (drive_audit_summary or {}).get("drive_pdf_count"),
+            "orphans": (drive_audit_summary or {}).get("orphan_drive_pdf_count"),
+            "duplicate_sha_groups": (drive_audit_summary or {}).get("duplicate_sha_count"),
             "as_of": normalize_date((registry_doc or {}).get("generated_at")) if isinstance(registry_doc, dict) else None,
             "path": relative_path(DOCUMENT_REGISTRY_PATH),
             "notes": "Google Drive canonical PDF store; orphan count is unmanaged legacy PDFs retained under canonical folders.",
