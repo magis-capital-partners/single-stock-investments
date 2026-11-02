@@ -10,6 +10,7 @@ Profiles:
   dashboard    — deploy rebuild checkout (base paths only)
   thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
   buyback-radar — buyback snapshots, consumer shards, and the two books it patches
+  activist     — Data Pipeline activist job (downloads trees plus third-party analyses)
 
 Base paths (_system, .github, and for most profiles the whole dashboard
 tree) are set by ci_checkout_workspace.sh. This script emits the extra
@@ -163,6 +164,28 @@ def paths_for_profile(profile: str) -> list[str]:
             "dashboard/data/special_situations.json",
             "dashboard/data/short_alpha.json",
         ]
+
+    if profile == "activist":
+        # The scan reads and writes third-party-analyses/ (reports, indexes,
+        # short_reports, inventory) and research/activist_reconcile.md. The
+        # rebuild step runs build_dashboard_data on the same trees the
+        # downloads job keeps. Report refs point here or into _system, never
+        # into the filing PDFs, which stay out.
+        for ticker in holdings:
+            paths.extend(
+                [
+                    f"{ticker}/README.md",
+                    f"{ticker}/research",
+                    f"{ticker}/third-party-analyses",
+                    f"{ticker}/.onboard_status.json",
+                    f"{ticker}/INDEX.csv",
+                    f"{ticker}/_download_log.txt",
+                    f"{ticker}/investor-documents/DOWNLOAD_MANIFEST.json",
+                    f"{ticker}/investor-documents/TRANSCRIPT_MANIFEST.json",
+                    f"{ticker}/investor-documents/research-notes",
+                ]
+            )
+        return paths
 
     if profile == "drive":
         # README makes the ticker directory exist for normalize_ticker.

@@ -4,9 +4,10 @@ name: Data Pipeline
 
 on:
   # No workflow_dispatch: test_llm_workflow_governance.py bans a manual run.
-  # On-demand buyback repair stays repository_dispatch type heal-buyback-radar.
+  # On-demand buyback repair stays repository_dispatch type heal-buyback-radar;
+  # heal-activist re-runs only the activist job.
   repository_dispatch:
-    types: [heal-technicals, heal-warrants, heal-separations, heal-reverse-splits, heal-buyback-radar]
+    types: [heal-technicals, heal-warrants, heal-separations, heal-reverse-splits, heal-buyback-radar, heal-activist]
   # Off the hour and off :30: top-of-hour crons queue for hours on GitHub's
   # scheduler. Odd minutes keep the same cadence and the same ET windows.
   schedule:
@@ -91,6 +92,7 @@ jobs:
             "dispatch:heal-warrants") warrant_discover=true ;;
             "dispatch:heal-separations") separation_discover=true ;;
             "dispatch:heal-reverse-splits") reverse_splits=true ;;
+            "dispatch:heal-activist") activist=true ;;
             "7 3 * * *") intake_full=true ;;
             "17 2 * * 1-5") technicals=true ;;
             "11 6 * * *") activist=true ;;
@@ -331,6 +333,12 @@ jobs:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+      # The activist checkout has the research and third-party trees but not
+      # the filing PDFs. Keep the document registry and the pdf counts on the
+      # prior rows, as downloads and drive do. Job-wide so a rebuild inside
+      # ci_push_main.sh after a rebase conflict sees it too.
+      DASHBOARD_PRESERVE_DOCUMENT_REGISTRY: "1"
+      DASHBOARD_PRESERVE_INFRA_ALWAYS: "1"
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         timeout-minutes: 8
@@ -350,13 +358,27 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - id: checkout_full
-        name: Checkout workspace (full)
+      # The full tree is ~57 GB, 41 of it filing PDFs this job never opens.
+      # Run 41473899301 spent 15 minutes on it and then timed out cloning the
+      # whole vault, so no scan ran.
+      - id: checkout_workspace
+        name: Checkout activist workspace
         timeout-minutes: 20
-        run: bash _system/scripts/ci_checkout_workspace.sh full
+        run: bash _system/scripts/ci_checkout_workspace.sh activist
+      # Publication objects for hydration and commit-main, plus the four vault
+      # inputs the scan and rebuild read: the letter index (letter_drive_links),
+      # the Drive import manifest (validation), the HK index (third-party
+      # inventory) and underwriting packets (valuation receipts).
       - name: Checkout research vault
         timeout-minutes: 5
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
+          extra-paths: |
+            /superinvestor-letters/letters_index.json
+            /superinvestor-letters/drive_import_manifest.json
+            /investment-wisdom/hk_ticker_index.json
+            /valuation-underwriting/packets/
       - uses: actions/setup-python@v5
         timeout-minutes: 5
         with:
@@ -378,8 +400,10 @@ jobs:
       - name: Commit SEC phase progress
         timeout-minutes: 8
         # Never on a failed/partial checkout: `git add -A` there could stage
-        # files that simply were not checked out.
-        if: always() && steps.checkout_full.outcome == 'success'
+        # files that simply were not checked out. On the finished sparse
+        # checkout, commit-main stages with `git add --sparse`, which leaves
+        # skip-worktree paths in the index instead of deleting them.
+        if: always() && steps.checkout_workspace.outcome == 'success'
         uses: ./.github/actions/commit-main
         with:
           message: "chore: activist scan sync $(date -u +%Y-%m-%d) (sec phase)"
@@ -400,9 +424,8 @@ jobs:
         run: timeout --kill-after=60s 25m python _system/scripts/scan_activist_sources.py --phase discovery --min-interval-days 6.5
       - name: Commit fetch-phase progress
         timeout-minutes: 8
-        # Never on a failed/partial checkout: `git add -A` there could stage
-        # files that simply were not checked out.
-        if: always() && steps.checkout_full.outcome == 'success'
+        # Same rule as the SEC phase commit.
+        if: always() && steps.checkout_workspace.outcome == 'success'
         uses: ./.github/actions/commit-main
         with:
           message: "chore: activist scan sync $(date -u +%Y-%m-%d) (sites, wires, discovery)"
@@ -447,6 +470,14 @@ jobs:
         with:
           profile: activist
           validate: "true"
+          # rebuild-data clones the vault again. Without these it would take
+          # the whole vault, which is what timed out.
+          vault-publication-only: "true"
+          vault-extra-paths: |
+            /superinvestor-letters/letters_index.json
+            /superinvestor-letters/drive_import_manifest.json
+            /investment-wisdom/hk_ticker_index.json
+            /valuation-underwriting/packets/
       - name: Commit artifacts
         timeout-minutes: 8
         uses: ./.github/actions/commit-main

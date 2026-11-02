@@ -172,9 +172,26 @@ def drive_api_configured() -> bool:
     return bool(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
 
 
+DOCUMENT_REGISTRY_STEP = "_system/scripts/build_document_registry.py"
+
+
+def document_registry_preserved() -> bool:
+    """Same switch build_dashboard_data honours. On a checkout without the
+    filing PDFs a rebuild would drop every document it cannot see."""
+    return os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") == "1"
+
+
 def should_skip_step(step: list[str]) -> bool:
     script = step[0] if step else ""
+    if script == DOCUMENT_REGISTRY_STEP and document_registry_preserved():
+        return True
     return script in DRIVE_API_STEPS and not drive_api_configured()
+
+
+def skip_reason(step: list[str]) -> str:
+    if step and step[0] == DOCUMENT_REGISTRY_STEP and document_registry_preserved():
+        return "DASHBOARD_PRESERVE_DOCUMENT_REGISTRY=1"
+    return "no GOOGLE_APPLICATION_CREDENTIALS"
 
 
 # External sources. (attempts, per-attempt timeout seconds). A hung Drive read
@@ -320,7 +337,7 @@ def run_profile(profile: str, *, dry_run: bool = False) -> int:
     try:
         for step in steps:
             if should_skip_step(step):
-                print(f"~ skip (no GOOGLE_APPLICATION_CREDENTIALS): {' '.join(step)}", flush=True)
+                print(f"~ skip ({skip_reason(step)}): {' '.join(step)}", flush=True)
                 continue
             if dry_run:
                 attempts, timeout = step_policy(step[0])
