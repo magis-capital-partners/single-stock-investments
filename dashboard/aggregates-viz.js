@@ -6,7 +6,7 @@
   const show=(v,unit='')=>!number(v)?'—':unit==='USD'?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',notation:'compact',maximumFractionDigits:1}).format(v):(unit==='$'?'$':'')+v.toLocaleString('en-US',{maximumFractionDigits:2})+(unit==='%'?'%':unit==='x'?'x':'');
   const PEERS={aggregates_focused:'Aggregates focused',integrated_materials:'Integrated materials',contractors_asphalt:'Contractors / asphalt',cement:'Cement',lime:'Lime'};
   const COLUMNS={
-    ev:['EV / EBITDA','x'],fcf:['FCF yield','%'],price_growth:['Price growth','%'],volume:['Organic volume','%'],profit:['Cash GP / ton','$'],profit_change:['Cash GP / ton change','$'],leverage:['Net debt / EBITDA','x'],
+    ev:['EV / FY EBITDA','x'],fcf:['FCF yield · FY','%'],price_growth:['Price growth','%'],volume:['Organic volume','%'],profit:['Cash GP / ton','$'],profit_change:['Cash GP / ton change','$'],leverage:['Net debt / FY EBITDA','x'],
     shipments:['Shipments · M tons',''],price:['Price / ton','$'],cost:['Cash cost / ton','$'],spread:['Price less cost change','$'],segment_margin:['Segment EBITDA margin','%'],incremental:['Incremental margin','%'],
     reserves:['Reserves · M tons',''],life:['Reserve life · years',''],permitted:['Permitted life · years',''],quarries:['Active quarries',''],terminals:['Terminals / yards',''],
     cash_conversion:['FCF conversion','%'],capex:['Capex / revenue','%'],roic:['ROIC · average capital','%'],maintenance:['Maintenance capex','USD'],growth_capex:['Growth capex','USD'],backlog:['Contracting backlog','USD'],acquisitions:['Acquisition intensity','%']
@@ -16,7 +16,8 @@
   function period(row,kind){return row.operating_latest?.[kind] || null;}
   function value(row,key,kind='FY'){
     const p=period(row,kind),m=p?.metrics||{},op=k=>m[k]?.value??null;
-    const financial=kind==='FY'&&row.financial_status==='verified';
+    // Corporate financials retain their explicit FY basis as operations change period.
+    const financial=row.financial_status==='verified';
     return ({ev:financial?row.ev_ebitda:null,fcf:financial?row.fcf_yield_pct:null,price_growth:p?.changes?.price_per_ton?.growth_pct??null,volume:op('organic_volume_growth_pct'),profit:op('cash_gp_per_ton'),profit_change:p?.changes?.cash_gp_per_ton?.delta??null,
       leverage:financial?row.net_debt_ebitda:null,shipments:op('shipments_million_tons'),price:op('price_per_ton'),cost:op('cash_cost_per_ton'),spread:p?.price_cost_spread_change??null,segment_margin:p?.segment_ebitda_margin_pct??null,incremental:p?.incremental_margin_pct??null,
       reserves:op('reserves_million_tons'),life:op('reserve_life_years'),permitted:op('permitted_reserve_life_years'),quarries:op('quarries'),terminals:op('terminals'),backlog:op('backlog_usd'),cash_conversion:financial?row.fcf_conversion_pct:null,capex:financial?row.capex_pct_revenue:null,roic:financial?row.roic_average_pct:null,maintenance:op('maintenance_capex_usd'),growth_capex:op('growth_capex_usd'),acquisitions:financial&&row.cfo_usd>0&&number(row.acquisitions_usd)?100*row.acquisitions_usd/row.cfo_usd:null})[key]??null;

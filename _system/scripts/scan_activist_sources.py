@@ -14,6 +14,8 @@ import json
 import os
 import signal
 import time
+import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -180,9 +182,22 @@ def save_state(state: dict, path: Path = STATE_PATH) -> None:
     leave a truncated file that throws the whole rotation history away."""
     state["updated_at"] = now_iso()
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(f".{path.name}.tmp")
-    tmp.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    os.replace(tmp, path)
+    with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',dir=path.parent,
+                                     prefix=f'.{path.name}.',suffix='.tmp',delete=False) as handle:
+        handle.write(json.dumps(state,indent=2,sort_keys=True)+'\n')
+        tmp=Path(handle.name)
+    try:
+        # Virus scanning and sync clients briefly hold destination files on
+        # Windows. Unique temporary files also avoid checkpoint-name collisions.
+        for attempt in range(7):
+            try:
+                os.replace(tmp,path)
+                break
+            except PermissionError:
+                if attempt==6:raise
+                time.sleep(.1*2**attempt)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def rotation_order(keys: list[str], last_attempted: dict[str, str]) -> list[str]:
@@ -195,7 +210,7 @@ def _progress(phase: str, done: int, total: int, hits: int, budget: Budget) -> N
 
 
 def _run_rotation(phase_name: str, keys: list[str], state: dict, budget: Budget, work,
-                  *, checkpoint=None) -> list[dict]:
+                  *, checkpoint=None, workers: int = 1) -> list[dict]:
     """Attempt ``keys`` stalest-first until the budget runs out (sec and sites phases).
 
     * ``last_attempted`` orders the rotation, so a key that keeps failing goes
@@ -215,6 +230,44 @@ def _run_rotation(phase_name: str, keys: list[str], state: dict, budget: Budget,
     order = rotation_order(
         keys, {key: last_attempted.get(key) or last_scanned.get(key) or "" for key in keys}
     )
+    if workers > 1 and not budget.exhausted():
+        # Each ticker owns its own files. Futures run only the network/parser
+        # work; this thread alone updates and checkpoints rotation state.
+        original_work = work
+        def safe_work(key):
+            try:
+                return (original_work(key), None)
+            except Exception as exc:
+                return (None, exc)
+        with ThreadPoolExecutor(max_workers=min(workers, 4)) as pool:
+            pending = {}
+            keys_iter = iter(order)
+            def next_result(key):
+                if key not in pending:
+                    pending[key] = pool.submit(safe_work, key)
+                found, error = pending.pop(key).result()
+                # Keep at most workers requests in flight, never enqueue an
+                # entire universe beyond the remaining execution budget.
+                if not budget.exhausted():
+                    following = next(keys_iter, None)
+                    if following is not None:
+                        pending[following] = pool.submit(safe_work, following)
+                if error is not None:
+                    raise error
+                return found
+            for _ in range(min(workers, 4)):
+                key = next(keys_iter, None)
+                if key is not None:
+                    pending[key] = pool.submit(safe_work, key)
+            # Drain already-started work even when the budget expires, so a
+            # successful download always has a persisted coverage checkpoint.
+            class DrainBudget:
+                def exhausted(self):
+                    return not pending
+                def elapsed(self):
+                    return budget.elapsed()
+            return _run_rotation(phase_name, order, state, DrainBudget(), next_result,
+                                 checkpoint=checkpoint)
     hits: list[dict] = []
     attempted = scanned = failed = 0
     for key in order:
@@ -262,12 +315,18 @@ def _run_rotation(phase_name: str, keys: list[str], state: dict, budget: Budget,
 
 def run_sec_phase(tickers: list[str], state: dict, budget: Budget, *, dry_run: bool = False,
                   include_passive: bool = False, reindex_local: bool = False,
-                  fetch_xml: bool = False, checkpoint=None) -> list[dict]:
+                  fetch_xml: bool = False, checkpoint=None, workers: int = 1) -> list[dict]:
     """SEC activist filings per ticker, stalest first, until the budget runs out."""
 
     def work(ticker: str) -> list[dict]:
+        # Successful coverage already includes the issuer's older filings.
+        # Re-fetch only the subsequent filing window, with one overlap day;
+        # reindex-local remains the explicit historical parser-repair route.
+        last=((state.get('sec') or {}).get('last_scanned') or {}).get(ticker)
+        since=(date.fromisoformat(last[:10])-timedelta(days=1)).isoformat() if last else '2018-01-01'
         found = scan_ticker_sec(
             ticker,
+            min_date=since,
             dry_run=dry_run,
             include_passive=include_passive,
             reindex_local=reindex_local,
@@ -278,7 +337,7 @@ def run_sec_phase(tickers: list[str], state: dict, budget: Budget, *, dry_run: b
             hit["ticker"] = ticker
         return found
 
-    return _run_rotation("sec", tickers, state, budget, work, checkpoint=checkpoint)
+    return _run_rotation("sec", tickers, state, budget, work, checkpoint=checkpoint, workers=workers)
 
 
 def run_sites_phase(tickers: list[str], state: dict, budget: Budget, *,
@@ -569,6 +628,8 @@ def main(argv: list[str] | None = None) -> int:
         help="discovery: skip when the last completed pass is younger than this (weekly: 6.5)",
     )
     parser.add_argument("--state", default=str(STATE_PATH), help="Phase coverage/rotation state file")
+    parser.add_argument("--workers", type=int, choices=range(1, 5), default=1,
+                        help="Concurrent SEC ticker reads (shared request throttle; default 1)")
     args = parser.parse_args(argv)
 
     tickers = [t.upper() for t in args.ticker] if args.ticker else portfolio_tickers()
@@ -590,6 +651,7 @@ def main(argv: list[str] | None = None) -> int:
                 tickers, state, Budget(args.budget_min), dry_run=args.dry_run,
                 include_passive=args.include_passive, reindex_local=args.reindex_local,
                 fetch_xml=args.reindex_fetch_xml, checkpoint=persist_state,
+                workers=args.workers,
             )
         finally:
             persist_state()
@@ -626,6 +688,7 @@ def main(argv: list[str] | None = None) -> int:
                 tickers, state, Budget(args.budget_min), dry_run=args.dry_run,
                 include_passive=args.include_passive, reindex_local=args.reindex_local,
                 fetch_xml=args.reindex_fetch_xml,
+                workers=args.workers,
             ))
         if not args.sec_only and not args.wire_only and not args.skip_site:
             fetched.extend(

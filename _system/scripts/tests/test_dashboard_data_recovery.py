@@ -254,3 +254,36 @@ def test_published_financial_history_is_bounded_without_mutating_source_facts():
     limited=bounded_facts(raw,2020)
     assert [r['val'] for r in limited['facts']['us-gaap']['Revenues']['units']['USD']]==[2,3]
     assert len(raw['facts']['us-gaap']['Revenues']['units']['USD'])==3
+    limited['facts']['us-gaap']['Revenues']['units']['USD'][0]['val']=99
+    assert rows[1]['val']==2
+
+
+def test_reviewed_share_total_withholds_invalid_class_counts():
+    from aggregates_pipeline import reviewed_share_totals
+    a=dict(tag='dei:EntityCommonStockSharesOutstanding',scope='us-gaap:CommonClassAMember',end='2026-08-05',value=10)
+    for value in (0,-2,float('inf'),True):
+        b=dict(a,scope='us-gaap:CommonClassBMember',value=value)
+        assert reviewed_share_totals([a,b],'ROAD')==[]
+
+
+def test_inline_supplement_keeps_eps_out_of_share_units(tmp_path,monkeypatch):
+    import aggregates_pipeline as pipeline
+    import buyback_facts
+    submission={'filings':{'recent':{
+        'form':['10-Q'],'accessionNumber':['0001628280-26-054661'],
+        'primaryDocument':['road-20260630.htm'],'filingDate':['2026-08-06'],
+        'reportDate':['2026-06-30']}}}
+    monkeypatch.setattr(pipeline,'request',lambda url,*args:json.dumps(submission) if '/submissions/' in url else '<html>primary filing</html>')
+    base=dict(end='2026-06-30',start=None,scope='entity')
+    rows=[dict(base,tag='us-gaap:EarningsPerShareDiluted',unit='iso4217:USD/xbrli:shares',value=2),
+          dict(base,tag='us-gaap:CashAndCashEquivalentsAtCarryingValue',unit='iso4217:USD',value=99),
+          dict(base,tag='dei:EntityCommonStockSharesOutstanding',scope='us-gaap:CommonClassAMember',unit='xbrli:shares',value=10),
+          dict(base,tag='dei:EntityCommonStockSharesOutstanding',scope='us-gaap:CommonClassBMember',unit='xbrli:shares',value=2)]
+    monkeypatch.setattr(buyback_facts,'parse_filing_facts',lambda *args,**kwargs:rows)
+    original={'facts':{}}
+    saved=pipeline.supplement_filing_facts(original,'ROAD',tmp_path)
+    assert 'EarningsPerShareDiluted' not in saved['facts']['us-gaap']
+    assert saved['facts']['us-gaap']['CashAndCashEquivalentsAtCarryingValue']['units']['USD'][0]['val']==99
+    count=saved['facts']['dei']['EntityCommonStockSharesOutstanding']['units']['shares'][0]
+    assert count['val']==12 and len(count['inputs'])==2
+    assert original=={'facts':{}}
