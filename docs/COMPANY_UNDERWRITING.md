@@ -141,6 +141,13 @@ operating forecasts to review. Forecast data never increases authority by itself
 
 ## Progress and usage
 
+The local controller selects one company per invocation and requests a GitHub
+build pinned to that exact ticker with a limit of one. It preserves private audit
+receipts before dispatching. The gradual compounder follow-up uses the canonical
+core-compounder roster and waits for an approved company's merge, repricing and
+live publication before starting the next company. Evidence retries retain their
+findings and rotate fairly within the existing call budgets.
+
 The policy contains a 16-name pilot spanning operating businesses, a cyclical
 with captive finance, a loss-making balance-sheet business, a bank, holding
 companies, royalties, international listings and a fund. A fair attempt order

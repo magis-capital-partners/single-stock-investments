@@ -790,6 +790,17 @@ def enrich_metrics(
     }
 
 
+def cached_market_cap(row: dict, today: datetime | None = None) -> float | None:
+    """Dated USD provider capitalization when SEC shares are unavailable."""
+    if row.get('currency')!='USD' or not row.get('market_cap_as_of'):return None
+    try:
+        stamp=datetime.fromisoformat(row['market_cap_as_of'].replace('Z','+00:00'))
+        age=((today or datetime.now(timezone.utc))-stamp).total_seconds()/86400
+        cap=float(row.get('issuer_market_cap') or 0)
+        return cap if 0<=age<=7 and cap>0 else None
+    except (TypeError,ValueError):return None
+
+
 def build_rows() -> list[dict]:
     holdings, watchlist = load_registry_sets()
     seeds = load_seed_rows()
@@ -797,6 +808,8 @@ def build_rows() -> list[dict]:
 
     disk_cache = load_cik_cache()
     facts_by_ticker = load_382_facts()
+    from index_market_inputs import load_index_float_adv_cache
+    market_cache=load_index_float_adv_cache()
     # An empty ticker map is a transient SEC failure, not a repo with no
     # companies in it. Say so: the previous behaviour was to fall through to 89
     # EDGAR calls, get throttled, and publish a thinner screener as if nothing
@@ -837,6 +850,12 @@ def build_rows() -> list[dict]:
         mcap = None
         if price is not None and shares and shares > 0:
             mcap = price * shares
+        if mcap is None:
+            cached=market_cache.get(ticker) or {}
+            mcap=cached_market_cap(cached)
+            if mcap is not None:
+                row['market_cap_source']={'provider':cached.get('source'),'as_of':cached['market_cap_as_of'],
+                                          'url':f'https://finance.yahoo.com/quote/{ticker}/','basis':'Provider issuer market capitalization in USD'}
 
         cap_bucket = cap_bucket_from_mcap(mcap) or seed.get("cap_tier_seed") or None
         metrics = enrich_metrics(sec, price, mcap)

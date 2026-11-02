@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import math
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -72,6 +72,17 @@ def load_fundamentals_cache() -> dict[str, dict]:
     return merged
 
 
+def current_usd_snapshot(row: dict, now: datetime | None = None) -> bool:
+    if row.get('currency') != 'USD' or not row.get('market_cap_as_of'):
+        return False
+    try:
+        stamp = datetime.fromisoformat(row['market_cap_as_of'].replace('Z', '+00:00'))
+        age = ((now or datetime.now(timezone.utc))-stamp).total_seconds()/86400
+        return 0 <= age <= 7
+    except (TypeError, ValueError):
+        return False
+
+
 def market_inputs_for_ticker(
     ticker: str,
     *,
@@ -119,6 +130,21 @@ def market_inputs_for_ticker(
             mcap = None
 
     cache = (fundamentals_cache or {}).get(ticker.upper()) or {}
+    current_market = current_usd_snapshot(cache)
+    if current_market:
+        for key in ('issuer_market_cap', 'price', 'shares_outstanding'):
+            try:
+                value = float(cache.get(key))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(value) or value <= 0:
+                continue
+            if key == 'issuer_market_cap':
+                mcap = value
+            elif key == 'price':
+                price = value
+            else:
+                shares = value
     if mcap is None and cache.get("issuer_market_cap"):
         try:
             mcap = float(cache["issuer_market_cap"])
@@ -140,6 +166,9 @@ def market_inputs_for_ticker(
     # caps absent. Keep quote/shares together and retain their actual clock.
     mcap_source = "valuation_or_price_x_shares" if mcap is not None else None
     mcap_as_of = inputs.get("price_as_of")
+    if current_market and cache.get('issuer_market_cap') == mcap:
+        mcap_source = cache.get('source')
+        mcap_as_of = cache.get('market_cap_as_of')
     cache_currency = cache.get("currency")
     usd_listing = cache_currency == "USD" or (meta.get("market") == "US" and cache_currency in (None,"USD"))
     quote_day = str(cache.get("as_of") or "")[:10]

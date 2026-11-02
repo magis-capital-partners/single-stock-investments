@@ -36,20 +36,27 @@ def surface_coverage(surface: str, doc: dict) -> dict | None:
               "nol": ("gross_nol_usd", "market_cap_usd")}.get(surface)
     if fields and isinstance(rows, list):
         rows = [r for r in rows if isinstance(r, dict)]
-        missing = {key: sum(not present(r.get(key)) for r in rows) for key in fields}
-        complete = sum(all(present(r.get(k)) for k in fields) for r in rows)
+        def row_missing(row):
+            gaps = [key for key in fields if not present(row.get(key))]
+            if surface == 'rock':
+                gaps += row.get('operating_coverage', {}).get('required_missing') or []
+            return list(dict.fromkeys(gaps))
+        missing = {key: 0 for key in fields}
+        missing.update(Counter(key for row in rows for key in row_missing(row)))
+        complete = sum(not row_missing(row) for row in rows)
         if surface == "rock":
-            # Operating metrics use a separate source contract. Do not pretend a
-            # financial-data count also establishes operating-data completeness.
             missing["operating_required"] = sum(bool(r.get("operating_coverage", {}).get("required_missing")) for r in rows)
-        out = result(len(rows), complete, missing, "Required comparison fields: " + ", ".join(fields),
+        definition = "Required comparison fields: " + ", ".join(fields)
+        if surface == 'rock':
+            definition += "; including the declared required operating observations"
+        out = result(len(rows), complete, missing, definition,
                      "Reconcile source filings, units and periods; retain explicit reasons for undisclosed metrics.")
         out["backlog"] = [{"entity": r.get("ticker") or r.get("company") or "Unresolved issuer",
-                           "missing": [k for k in fields if not present(r.get(k))],
+                           "missing": row_missing(r),
                            "reason": r.get("evidence_gaps") or r.get("missing_reason") or "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
                            "source": r.get("source_url") or r.get("source_ref"),
                            "checked_at": r.get("source_checked_at") or doc.get("built_at") or doc.get("generated_at")}
-                          for r in rows if any(not present(r.get(k)) for k in fields)]
+                          for r in rows if row_missing(r)]
         return out
     if surface == "darwin":
         u=doc.get("universe") or {}

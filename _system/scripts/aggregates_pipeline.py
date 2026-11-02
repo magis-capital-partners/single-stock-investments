@@ -22,7 +22,9 @@ REGISTRY={
  'CRH':{'cik':'0000849395','currency':'USD','shares_per_listing_unit':1,'listing_unit_valid_from':'2023-09-25'},
  'AMRZ':{'cik':'0002035989','currency':'USD','shares_per_listing_unit':1,'listing_unit_valid_from':'2025-06-23'},
  'GVA':{'cik':'0000861459','currency':'USD','shares_per_listing_unit':1},
- 'ROAD':{'cik':'0001718227','currency':'USD','shares_per_listing_unit':1},
+ 'ROAD':{'cik':'0001718227','currency':'USD','shares_per_listing_unit':1,
+         'identity_source_url':'https://www.sec.gov/Archives/edgar/data/1718227/000162828026054661/road-20260630.htm',
+         'identity_locator':'Note 9: common classes have equal economic rights; cover counts must share one date'},
  'EXP':{'cik':'0000918646','currency':'USD','shares_per_listing_unit':1},
  'USLM':{'cik':'0000082020','currency':'USD','shares_per_listing_unit':1},
  'CX':{'cik':'0001076378','currency':'USD','shares_per_listing_unit':None,'reason':'IFRS/ADS mapping requires verified ordinary-share and listing-unit reconciliation'},
@@ -80,6 +82,78 @@ def request(url, cache, offline=False):
     except OSError:
         if path.exists():return gzip.decompress(path.read_bytes()).decode('utf-8',errors='replace')
         raise
+
+
+def bounded_facts(facts,earliest_year):
+    """Bound the published history, retaining the full cached SEC response."""
+    cutoff=f'{earliest_year}-01-01'
+    return {**facts,'facts':{namespace:{tag:{**block,'units':{
+        unit:[dict(row) for row in rows if str(row.get('end') or '')>=cutoff]
+        for unit,rows in block.get('units',{}).items()}}
+        for tag,block in tags.items()} for namespace,tags in facts.get('facts',{}).items()}}
+
+
+def reviewed_share_totals(rows,ticker):
+    """ROAD's two economically identical classes, explicitly reviewed in Note 9."""
+    from math import isfinite
+    if ticker!='ROAD':return []
+    groups={}
+    for row in rows:
+        if row['tag']!='dei:EntityCommonStockSharesOutstanding' or row.get('start'):continue
+        if row['scope'] not in {'us-gaap:CommonClassAMember','us-gaap:CommonClassBMember'}:continue
+        groups.setdefault(row['end'],{}).setdefault(row['scope'],[]).append(row)
+    result=[]
+    for end,classes in groups.items():
+        if len(classes)!=2 or any(len({r['value'] for r in part})!=1 for part in classes.values()):continue
+        inputs=[part[0] for part in classes.values()]
+        if any(type(row.get('value')) not in (int, float) or not isfinite(row['value']) or row['value'] <= 0 for row in inputs):
+            continue
+        result.append({**inputs[0],'scope':'entity','value':sum(r['value'] for r in inputs),
+                       'status':'derived','inputs':inputs,'locator':'10-Q cover Class A + Class B; Note 9 identical economic rights'})
+    return result
+
+
+def supplement_filing_facts(facts,ticker,cache,offline=False):
+    """Fill companyfacts omissions from the latest primary inline filings.
+
+    A companyfacts observation wins for the same concept/period. Conflicting
+    inline duplicates are excluded instead of letting a note's scale overwrite
+    a consolidated statement. Class-specific counts remain separate.
+    """
+    from buyback_facts import parse_filing_facts
+    config=REGISTRY[ticker]
+    submissions=json.loads(request(f"https://data.sec.gov/submissions/CIK{config['cik']}.json",cache,offline))
+    recent=submissions.get('filings',{}).get('recent',{})
+    result=json.loads(json.dumps(facts))
+    chosen=[]
+    for i,form in enumerate(recent.get('form',[])):
+        if form in {'10-K','10-Q','20-F','40-F'} and form not in [recent['form'][j] for j in chosen]:chosen.append(i)
+        if len(chosen)>=2:break
+    for i in chosen:
+        accession=recent['accessionNumber'][i]
+        url=f"https://www.sec.gov/Archives/edgar/data/{int(config['cik'])}/{accession.replace('-','')}/{recent['primaryDocument'][i]}"
+        raw=parse_filing_facts(request(url,cache,offline),accession=accession,filed=recent['filingDate'][i],url=url)
+        raw.extend(reviewed_share_totals(raw,ticker))
+        grouped={}
+        for row in raw:
+            if row['scope']!='entity' or not row.get('end') or ':' not in row['tag']:continue
+            namespace,tag=row['tag'].split(':',1)
+            if namespace not in {'us-gaap','ifrs-full','dei'}:continue
+            unit_text = str(row['unit']).strip()
+            unit = ('shares' if re.fullmatch(r'(?:[A-Za-z_][\w.-]*:)?shares', unit_text) else
+                    'USD' if re.fullmatch(r'(?:[A-Za-z_][\w.-]*:)?USD', unit_text) else None)
+            if unit is not None:grouped.setdefault((namespace,tag,unit,row.get('start'),row['end']),[]).append(row)
+        for (namespace,tag,unit,start,end),rows in grouped.items():
+            if len({r['value'] for r in rows})!=1:continue
+            target=result.setdefault('facts',{}).setdefault(namespace,{}).setdefault(tag,{'units':{}})['units'].setdefault(unit,[])
+            if any(r.get('start')==start and r['end']==end for r in target):continue
+            entry={'val':rows[0]['value'],'end':end,'filed':recent['filingDate'][i],'accn':accession,'form':recent['form'][i]}
+            if rows[0].get('inputs'):
+                entry.update(inputs=rows[0]['inputs'],locator=rows[0]['locator'],status='derived')
+            if start:entry['start']=start
+            target.append(entry)
+    return result
+
 
 
 def discover(ticker,root,cache,offline=False,limit=32):
@@ -192,7 +266,12 @@ def run(root, *, offline=False, refresh_operating=False, write=True):
         error=[];sec={};quote=None;prices=[]
         try:
             facts=json.loads(request(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{config['cik']}.json",cache,offline))
-            sec=builder.screen_ticker(config['cik'],facts=facts)
+            if ticker == 'ROAD':
+                try:
+                    facts = supplement_filing_facts(facts, ticker, cache, offline)
+                except (OSError, ValueError, KeyError, IndexError) as exc:
+                    error.append('Inline filing supplement: '+str(exc))
+            sec=builder.screen_ticker(config['cik'],facts=bounded_facts(facts,datetime.now().year-6))
         except (ValueError,OSError) as e:error.append('Financial facts: '+str(e))
         if not sec.get('financial_history'):
             local=local_companyfacts(ticker,root,cache)

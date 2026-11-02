@@ -87,7 +87,11 @@ def balance_at(observations, end):
         result['debt_basis']='noncurrent plus current debt; short-term borrowings scope unresolved' if 'short_term_borrowings_usd' in result else 'noncurrent plus current debt'
         current_is_total=found['current_debt_usd'].get('locator')=='us-gaap:DebtCurrent'
         if result.get('short_term_borrowings_usd',0)!=0 and not current_is_total:
-            result['total_debt_usd']=None
+            if found['current_debt_usd'].get('locator')=='us-gaap:LongTermDebtCurrent' and found['noncurrent_debt_usd'].get('locator')=='us-gaap:LongTermDebtNoncurrent':
+                result['total_debt_usd']+=result['short_term_borrowings_usd']
+                result['debt_basis']='noncurrent long-term debt + current long-term portion + separate short-term borrowings'
+            else:
+                result['total_debt_usd']=None
     else:
         result['total_debt_usd']=None
         result['debt_basis']='incomplete debt scope'
