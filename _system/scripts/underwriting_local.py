@@ -59,12 +59,14 @@ def clone_vault(home):
     git(vault, 'fetch', '-q', 'origin', 'main')
     # Never reset the private working tree: unpublished paid receipts must
     # survive a push failure. Only import the remote worker's shared ledger.
-    exists = subprocess.run(['git', 'cat-file', '-e', 'origin/main:valuation-underwriting/runtime/ledger.jsonl'],
-                            cwd=vault, capture_output=True, check=False, timeout=30)
-    if exists.returncode == 0:
-        path = vault/'valuation-underwriting/runtime/ledger.jsonl'
+    ledger_name = 'valuation-underwriting/runtime/ledger.jsonl'
+    # cat-file -e can lazily fetch the blob in a partial clone. Inspect the
+    # tree first, then import the bytes through the normal bounded Git read.
+    names = git(vault, 'ls-tree', '--name-only', 'origin/main', '--', ledger_name).decode().splitlines()
+    if ledger_name in names:
+        path = vault/ledger_name
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(git(vault, 'show', 'origin/main:valuation-underwriting/runtime/ledger.jsonl'))
+        path.write_bytes(git(vault, 'show', 'origin/main:'+ledger_name))
     return vault
 
 
@@ -210,13 +212,14 @@ def run_once(home, source=ROOT, tickers=None, launch=False):
         root = data_root(source, home, vault)
         require(all(stage_model(root, stage)['provider'] == 'codex-local' for stage in ('author', 'challenger')),
                 'The local worker requires the signed-in Codex policy on main')
-        result = run_batch(root, work=home/'work', vault=vault, tickers=tickers, phase='author', launch=launch)
+        result = run_batch(root, work=home/'work', vault=vault, tickers=tickers, limit=1, phase='author', launch=launch)
         write(home/'last-run.json', result)
         if launch:
             publish_runtime(vault, home)
             # Only a successful private push can make a handoff visible to CI.
             if result['selected']:
-                payload = {'event_type': 'valuation-underwriting-run', 'client_payload': {'limit': 3}}
+                payload = {'event_type': 'valuation-underwriting-run',
+                           'client_payload': {'tickers': result['selected'][0], 'limit': 1}}
                 subprocess.run(['gh', 'api', 'repos/'+OPS+'/dispatches', '--method', 'POST', '--input', '-'],
                                input=json.dumps(payload).encode(), check=True, timeout=60)
         return result

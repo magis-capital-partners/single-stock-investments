@@ -4,8 +4,87 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from underwriting_local import local_lock, publish_runtime
+
+
+def test_slow_remote_ledger_probe_does_not_prevent_audit_import(tmp_path, monkeypatch):
+    import underwriting_local as local
+    vault = tmp_path / 'vault'
+    (vault / '.git').mkdir(parents=True)
+    name = 'valuation-underwriting/runtime/ledger.jsonl'
+    ledger = b'{"run_id":"preserved-remote-charge"}\n'
+    calls = []
+    def git(directory, *args, **kwargs):
+        calls.append(args)
+        if args == ('remote', 'get-url', 'origin'):
+            return ('https://github.com/' + local.VAULT + '.git\n').encode()
+        if args[0] == 'ls-tree':
+            return (name + '\n').encode()
+        if args[0] == 'show':
+            return ledger
+        return b''
+    def slow_probe(args, **kwargs):
+        raise subprocess.TimeoutExpired(args, 30)
+    monkeypatch.setattr(local, 'git', git)
+    monkeypatch.setattr(local.subprocess, 'run', slow_probe)
+    assert local.clone_vault(tmp_path) == vault
+    assert (vault / name).read_bytes() == ledger
+    assert ('show', 'origin/main:' + name) in calls
+
+
+def test_failed_remote_ledger_read_preserves_previous_charges(tmp_path, monkeypatch):
+    import underwriting_local as local
+    vault = tmp_path / 'vault'
+    (vault / '.git').mkdir(parents=True)
+    name = 'valuation-underwriting/runtime/ledger.jsonl'
+    ledger = vault / name
+    ledger.parent.mkdir(parents=True)
+    ledger.write_bytes(b'{"run_id":"previous-charge"}\n')
+    def git(directory, *args, **kwargs):
+        if args[0] == 'remote':
+            return ('https://github.com/' + local.VAULT + '.git\n').encode()
+        if args[0] == 'ls-tree':
+            return (name + '\n').encode()
+        if args[0] == 'show':
+            raise subprocess.TimeoutExpired(args, 180)
+        return b''
+    monkeypatch.setattr(local, 'git', git)
+    monkeypatch.setattr(local.subprocess, 'run', lambda *a, **k: subprocess.CompletedProcess(a, 0))
+    with pytest.raises(subprocess.TimeoutExpired):
+        local.clone_vault(tmp_path)
+    assert ledger.read_bytes() == b'{"run_id":"previous-charge"}\n'
+
+
+def test_local_run_publishes_private_proof_before_single_company_dispatch(tmp_path, monkeypatch):
+    import underwriting_local as local
+    import underwriting_codex
+    monkeypatch.setenv('RESEARCH_VAULT_ROOT', str(tmp_path / 'vault'))
+    monkeypatch.setenv('UNDERWRITING_ARCHIVE_ROOT', str(tmp_path / 'source'))
+    (tmp_path / 'runtime-owner.json').write_text(json.dumps(
+        {'repository': local.OPS, 'purpose': 'local-codex-underwriting'}))
+    result = {'selected': ['V'], 'approved': ['V'], 'completed': [], 'blocked': []}
+    batch_options, publication = {}, []
+    monkeypatch.setattr(underwriting_codex, 'preflight', lambda: {})
+    monkeypatch.setattr(local, 'clone_vault', lambda home: home / 'vault')
+    monkeypatch.setattr(local, 'data_root', lambda *args: tmp_path)
+    monkeypatch.setattr(local, 'stage_model', lambda *args: {'provider': 'codex-local'})
+    def batch(*args, **kwargs):
+        batch_options.update(kwargs)
+        return result
+    monkeypatch.setattr(local, 'run_batch', batch)
+    monkeypatch.setattr(local, 'publish_runtime', lambda *args: publication.append('private-proof-pushed'))
+    def dispatch(args, **kwargs):
+        publication.append(json.loads(kwargs['input']))
+        return subprocess.CompletedProcess(args, 0)
+    monkeypatch.setattr(local.subprocess, 'run', dispatch)
+    assert local.run_once(tmp_path, tickers=['V'], launch=True) == result
+    assert batch_options['limit'] == 1
+    assert publication == ['private-proof-pushed', {
+        'event_type': 'valuation-underwriting-run',
+        'client_payload': {'tickers': 'V', 'limit': 1}}]
 
 
 def test_local_runtime_publishes_only_its_owned_private_json(tmp_path,monkeypatch):
