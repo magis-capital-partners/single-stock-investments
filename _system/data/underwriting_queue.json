@@ -1,6 +1,6 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-01",
+  "as_of": "2026-11-02",
   "summary": {
     "companies": 866,
     "statuses": {
@@ -8,17 +8,17 @@
       "reviewed": 1
     },
     "blocker_companies": {
-      "new_financial_report_after_model": 354,
-      "holding_company_component_forecast_missing": 2,
       "new_earnings_disclosure_unresolved": 26,
+      "holding_company_component_forecast_missing": 2,
       "realization_timing_missing": 21,
       "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 133,
       "positive_normalized_owner_cash_not_established": 110,
       "pre_listing_share_basis_unverified": 100,
-      "annual_diluted_share_count_missing": 50,
       "annual_capex_missing": 72,
+      "annual_diluted_share_count_missing": 50,
       "annual_operating_cash_flow_missing": 44,
+      "new_financial_report_after_model": 354,
       "source_share_basis_unverified": 56,
       "newer_balance_sheet_inputs_available": 215,
       "financial_inputs_expired_or_undated": 19,
@@ -36,19 +36,6 @@
     "requires_human_review": false
   },
   "companies": [
-    {
-      "ticker": "V",
-      "company": "Visa Inc.",
-      "status": "needs_underwriting",
-      "current_model_basis": "automatic_operating_first_pass",
-      "blockers": [
-        "new_financial_report_after_model"
-      ],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
     {
       "ticker": "BRK.B",
       "company": "Berkshire Hathaway",
@@ -11659,6 +11646,24 @@
       "last_attempt": "2026-11-01T04:37:54.409028+00:00",
       "retry_after": null,
       "underwriting_gaps": [],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "V",
+      "company": "Visa Inc.",
+      "status": "needs_underwriting",
+      "current_model_basis": "automatic_operating_first_pass",
+      "blockers": [
+        "new_financial_report_after_model"
+      ],
+      "last_attempt": "2026-11-02T05:21:43.299149+00:00",
+      "retry_after": "2026-11-03",
+      "underwriting_gaps": [
+        {
+          "code": "ContractError",
+          "detail": "Sourced primary financials and a verified share count are required"
+        }
+      ],
       "unresolved_findings": []
     }
   ]
