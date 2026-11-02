@@ -171,6 +171,7 @@ def paths_for_profile(profile: str) -> list[str]:
         # rebuild step runs build_dashboard_data on the same trees the
         # downloads job keeps. Report refs point here or into _system, never
         # into the filing PDFs, which stay out.
+        paths.append(".gitattributes")
         for ticker in holdings:
             paths.extend(
                 [
