@@ -194,6 +194,45 @@ RULES: dict[tuple[str, str], dict[str, Any]] = {
             "and stakes are counted. That wider band is not the registered threshold."
         ),
     },
+    ("AMZN", "multi"): {
+        "suffix": "multilens-base-irr",
+        "component_id": "core_engine",
+        "metric": "base IRR at the review price",
+        "metric_id": "base_irr_pct",
+        "comparator": "gte",
+        "threshold": 15,
+        "unit": "percent",
+        "must_contain": "base irr 4.2",
+        "severity": 4,
+        "claim_type": "inference",
+        "rule": (
+            "Fire when the base IRR at the review price is at least 15% per year. "
+            "The 2026-10-29 Q3'26 call holds AMZN as a core compounder with no new "
+            "money because the base IRR is 4.2% at $243.79, below the 15% hurdle "
+            "(15% price about $130). A hit means that hurdle reason failed. The "
+            "probability column scores the same event: base IRR still below 15% at "
+            "review. research/AMZN_Q3_2026_update.md carries the arithmetic."
+        ),
+    },
+    ("INTC", "multi"): {
+        "suffix": "multilens-base-irr",
+        "component_id": "monitoring",
+        "metric": "base IRR at the review price",
+        "metric_id": "base_irr_pct",
+        "comparator": "gte",
+        "threshold": 15,
+        "unit": "percent",
+        "must_contain": "base irr -9.9",
+        "severity": 4,
+        "claim_type": "inference",
+        "rule": (
+            "Fire when the base IRR at the review price is at least 15% per year. "
+            "The 2026-10-29 Q3'26 call passes INTC because the base IRR is -9.9% at "
+            "$92.07, below the 15% hurdle (base-case 15% price about $16, bull about "
+            "$52). A hit means that hurdle reason failed. INTC is not on the core "
+            "compounder list. research/INTC_Q3_2026_update.md carries the arithmetic."
+        ),
+    },
 }
 
 # Cited returns for the additive lens card. None means the call did not state one.
@@ -242,6 +281,32 @@ CARD_IRR: dict[str, dict[str, Any]] = {
             "Bear -17.0% and bull 10.1% are that same engine. The next-day rank uses a different price."
         ),
     },
+    "AMZN": {
+        "base_irr_pct": 4.2,
+        "label": "case-log cited post-Q3'26 base IRR at the $243.79 close",
+        "claim_type": "inference",
+        "note": (
+            "The 2026-10-29 Q3'26 update call holds AMZN as a core compounder with no "
+            "new money: base IRR 4.2% at the $243.79 close (bear -9.8%, bull 14.5%), "
+            "owner cash $4.82 with capex normalised at 12% of revenue, 13%/9% growth, "
+            "25x exit; base-case 15% price about $130. The arithmetic is in "
+            "research/AMZN_Q3_2026_update.md and research/q3_2026_irr_calc.py. This "
+            "additive card does not replace the canonical thesis card."
+        ),
+    },
+    "INTC": {
+        "base_irr_pct": -9.9,
+        "label": "case-log cited base IRR at the $92.07 close",
+        "claim_type": "inference",
+        "note": (
+            "The 2026-10-29 Q3'26 call passes INTC (not a compounder at this price): "
+            "base IRR -9.9% at the $92.07 close (bear -29.7%, bull +5.9%), base-case "
+            "15% price about $16. INTC is not on the core compounder list. The "
+            "arithmetic is in research/INTC_Q3_2026_update.md and "
+            "research/q3_2026_irr_calc.py. This additive card does not replace the "
+            "canonical thesis card."
+        ),
+    },
 }
 
 EVIDENCE_NOT_SEPARATE_SPECS = [
@@ -249,6 +314,8 @@ EVIDENCE_NOT_SEPARATE_SPECS = [
     "NU deposit-versus-wholesale funding, Brazil's credit regulator, Kaspi, and normalised Selic stay in the evidence notes. The Stahl spec registers the credit-spread split only.",
     "1211.HK excess payables (about RMB143bn, buy zone HK$32.2) stay in the call text. The registered threshold is HK$48.3.",
     "GOOGL capex normalisation and the about-$140 cash-adjusted band stay in the call text. The registered threshold is $118.",
+    "AMZN advertising slowdown, AWS margin and backlog red lines, and the balance-sheet watch items stay in research/AMZN_Q3_2026_update.md. The registered test is the base IRR versus the 15% hurdle.",
+    "INTC 14A anchor-customer, foundry-breakeven, and gross-margin red lines stay in research/INTC_Q3_2026_update.md. The registered test is the base IRR versus the 15% hurdle.",
 ]
 
 
@@ -270,8 +337,30 @@ def parse_case_log(text: str) -> list[dict[str, str]]:
             "call": cells[4],
             "reason": cells[5],
             "review_date": cells[6],
+            "probability": cells[8] if len(cells) > 8 else "",
+            "brier": cells[9] if len(cells) > 9 else "",
         })
     return rows
+
+
+def parse_probability(cell: str) -> float | None:
+    """Return the stated probability a call is right, 0..1, or None.
+
+    The calibration column (CASE_LOG.md, PRINCIPLES.md Section G) states the
+    probability a call is right on its own terms at the review date, e.g.
+    ``60% (base IRR still < 15% at review price)``. Rows written before the
+    column existed read ``not stated`` and return None.
+    """
+    text = (cell or "").strip()
+    if not text or text.lower().startswith("not stated"):
+        return None
+    match = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*%", text)
+    if match:
+        return float(match.group(1)) / 100.0
+    match = re.match(r"(0(?:\.[0-9]+)?|1(?:\.0+)?)\b", text)
+    if match:
+        return float(match.group(1))
+    return None
 
 
 def repo_ticker(cell: str) -> str | None:
@@ -286,6 +375,10 @@ def repo_ticker(cell: str) -> str | None:
         return "FRMI"
     if text.startswith("GOOGL"):
         return "GOOGL"
+    if text.startswith("AMZN"):
+        return "AMZN"
+    if text.startswith("INTC"):
+        return "INTC"
     return None
 
 
@@ -380,7 +473,14 @@ def plan_calls(rows: list[dict[str, str]], as_of: str) -> tuple[list[dict[str, A
         if review <= as_of_date:
             unmapped.append({**row, "reason_unmapped": f"review date {review.isoformat()} is already due on {as_of}"})
             continue
-        planned.append({**row, "ticker": ticker, "lens_key": key, "rule": rule, "review": review.isoformat()})
+        planned.append({
+            **row,
+            "ticker": ticker,
+            "lens_key": key,
+            "rule": rule,
+            "review": review.isoformat(),
+            "probability_value": parse_probability(row.get("probability", "")),
+        })
     return planned, unmapped
 
 
@@ -431,6 +531,25 @@ def build_spec(call: dict[str, Any], *, root: Path, as_of: str, case_log_rel: st
         power_zone = "predictable_cash_flow"
     cutoff = f"{call['date']}T12:00:00Z"
     registered = f"{as_of}T18:00:00Z"
+    # The calibration column states the probability a call is right. The
+    # falsifier fires when the call is wrong on its own terms, so the fire
+    # probability is one minus that. Recording it keeps the spec diagnostic:
+    # v3 calibration eligibility still needs an independent human review and
+    # the economic-impact fields (falsifier_specs.calibration_eligibility), so
+    # the stated probability is carried, not promoted.
+    prob_right = call.get("probability_value")
+    probability_fires = None if prob_right is None else round(1.0 - prob_right, 4)
+    if prob_right is None:
+        prob_sentence = (
+            "Probability was not stated, so this spec is diagnostic and is not Brier-scored."
+        )
+    else:
+        prob_sentence = (
+            f"Stated probability the call is right at review: {prob_right:.0%}. "
+            f"Probability this falsifier fires (the call is wrong on its own terms) = "
+            f"{probability_fires}. Recorded as diagnostic; calibration promotion needs an "
+            "independent human review."
+        )
     spec = {
         "spec_schema_version": "3.0",
         "spec_id": _spec_id(ticker, rule["suffix"], review),
@@ -482,7 +601,7 @@ def build_spec(call: dict[str, Any], *, root: Path, as_of: str, case_log_rel: st
             },
             "outcome_unavailable_at_registration": True,
         },
-        "probability_fires": None,
+        "probability_fires": probability_fires,
         "calibration_eligible": False,
         "severity": rule["severity"],
         "derived_from": f"{call['call']} ({call['lens']})",
@@ -491,7 +610,7 @@ def build_spec(call: dict[str, Any], *, root: Path, as_of: str, case_log_rel: st
             f"Reason: {call['reason']} "
             f"Source: {case_log_rel}. "
             f"Registered test: {rule['rule']} "
-            "Probability was not stated, so this spec is diagnostic and is not Brier-scored."
+            + prob_sentence
         ),
         "untestable": False,
         "supersedes_spec_id": None,
@@ -505,6 +624,26 @@ def build_spec(call: dict[str, Any], *, root: Path, as_of: str, case_log_rel: st
             "ticker_cell": call["ticker_cell"],
         },
     }
+    if prob_right is not None:
+        spec["probability_basis"] = {
+            "stated_probability_call_right": prob_right,
+            "stated_text": call.get("probability", ""),
+            "probability_fires_derivation": (
+                "probability_fires = 1 - stated_probability_call_right; the falsifier "
+                "fires when the call is wrong on its own terms."
+            ),
+            "calibration_status": "recorded_not_yet_eligible",
+            "calibration_note": (
+                "Diagnostic until a human promotes it. v3 calibration eligibility needs "
+                "forecast_role=primary, an independent review record, and the economic-impact "
+                "fields (see falsifier_specs.calibration_eligibility). Recording the probability "
+                "does not promote it."
+            ),
+            "brier_basis": (
+                "At review, Brier = (stated_probability_call_right - outcome_right)^2, with "
+                "outcome_right = 1 if the call held, i.e. this falsifier missed."
+            ),
+        }
     if typed_blocker:
         spec["typed_blocker"] = typed_blocker
     return spec
@@ -686,7 +825,10 @@ def _proposals(calls: list[dict[str, Any]], rank_rows: list[dict[str, Any]],
             case_log_rel,
         )
     by_ticker = {row["ticker"]: row for row in rank_rows}
+    call_tickers = {call["ticker"] for call in calls}
     for ticker in ("B3SA3.SA", "GOOGL"):
+        if ticker not in call_tickers:
+            continue
         row = by_ticker.get(ticker)
         if not row:
             continue
@@ -705,10 +847,15 @@ def _proposals(calls: list[dict[str, Any]], rank_rows: list[dict[str, Any]],
 
 def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log_text: str,
                 irr_csv_text: str, irr_md_text: str, core_tickers: list[str],
-                registration_commit: str, submit_proposals: bool) -> dict[str, Any]:
-    case_date = calls[0]["date"] if calls else as_of
+                registration_commit: str, submit_proposals: bool,
+                rank_as_of: str | None = None) -> dict[str, Any]:
+    rank_as_of = rank_as_of or as_of
+    # The case-log snapshot is named for the latest call it registers (#1365
+    # named its batch CASE_LOG_2026-10-28.md). Newly written specs reference
+    # this snapshot; specs already on main keep the snapshot they named.
+    case_date = max((call["date"] for call in calls), default=as_of)
     case_log_rel = f"{REL_DIR.as_posix()}/CASE_LOG_{case_date}.md"
-    rank_stem = f"core_irr_rank_{as_of}"
+    rank_stem = f"core_irr_rank_{rank_as_of}"
     rank_csv_rel = f"{REL_DIR.as_posix()}/{rank_stem}.csv"
     rank_md_rel = f"{REL_DIR.as_posix()}/{rank_stem}.md"
     rank_json_rel = f"{REL_DIR.as_posix()}/{rank_stem}.json"
@@ -721,7 +868,7 @@ def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log
     missing_from_rank = [ticker for ticker in core_tickers if ticker not in ranked]
     rank_doc = {
         "schema_version": "fundamental_analyst.core_irr_rank.v1",
-        "as_of": as_of,
+        "as_of": rank_as_of,
         "hurdle_pct_per_year": 15,
         "claim_legend": {
             "fact": "Recorded in the source file. Not re-pulled and not a filing extract.",
@@ -735,6 +882,7 @@ def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log
     _write_if_absent(root / rank_json_rel, json.dumps(rank_doc, indent=2, ensure_ascii=False) + "\n")
 
     written_specs = []
+    written_calls = []
     skipped_specs = []
     errors = []
     by_ticker: dict[str, list[dict[str, Any]]] = {}
@@ -763,6 +911,7 @@ def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log
             sidecar_path.parent.mkdir(parents=True, exist_ok=True)
             sidecar_path.write_text(json.dumps(sidecar, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             written_specs.append(spec["spec_id"])
+            written_calls.append(call)
         price = parse_price(call["price_cell"])
         if price:
             value, currency = price
@@ -811,7 +960,11 @@ def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log
 
     proposal_ids = []
     if submit_proposals and not errors:
-        for proposal in _proposals(calls, rank_rows, case_log_rel, rank_json_rel, as_of):
+        # Only propose for calls whose spec was newly written this run, so a
+        # later Friday does not re-submit a call already registered. Already
+        # present specs are idempotent elsewhere; the proposal path is the one
+        # place a new as_of would mint a duplicate.
+        for proposal in _proposals(written_calls, rank_rows, case_log_rel, rank_json_rel, as_of):
             submitted = submit(
                 proposal,
                 inbox=root / "_system/data/agent_proposals/inbox.jsonl",
@@ -837,7 +990,8 @@ def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log
 
 
 def run(case_log: Path, irr_csv: Path, irr_md: Path, core_list: Path, *,
-        root: Path = ROOT, as_of: str = AS_OF_DEFAULT, submit_proposals: bool = True) -> dict[str, Any]:
+        root: Path = ROOT, as_of: str = AS_OF_DEFAULT, submit_proposals: bool = True,
+        rank_as_of: str | None = None) -> dict[str, Any]:
     rows = parse_case_log(case_log.read_text(encoding="utf-8"))
     planned, unmapped = plan_calls(rows, as_of)
     if unmapped:
@@ -852,6 +1006,7 @@ def run(case_log: Path, irr_csv: Path, irr_md: Path, core_list: Path, *,
         core_tickers=parse_core_list(core_list.read_text(encoding="utf-8")),
         registration_commit=_git_head(root),
         submit_proposals=submit_proposals,
+        rank_as_of=rank_as_of,
     )
     if result["errors"]:
         raise SystemExit("fundamental analyst refresh failed: " + json.dumps(result["errors"], ensure_ascii=False))
@@ -865,12 +1020,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--irr-md", type=Path, required=True)
     parser.add_argument("--core-list", type=Path, required=True)
     parser.add_argument("--as-of", default=AS_OF_DEFAULT)
+    parser.add_argument("--rank-as-of", default=None,
+                        help="Date of the IRR rank snapshot to reference when it is "
+                             "unchanged (defaults to --as-of). Reuses an existing "
+                             "dated rank instead of re-issuing identical numbers.")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--skip-proposals", action="store_true")
     args = parser.parse_args(argv)
     result = run(
         args.case_log, args.irr_csv, args.irr_md, args.core_list,
         root=args.root, as_of=args.as_of, submit_proposals=not args.skip_proposals,
+        rank_as_of=args.rank_as_of,
     )
     print(json.dumps({
         "spec_ids_written": result["spec_ids_written"],
