@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import copy
 import re
+from urllib.parse import urlencode
 
 from underwriting_contract import digest, require
 
@@ -91,6 +92,7 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
             continue
         for point in concept.get('units',{}).get(currency,[]):
             if (point.get('form') not in ('10-K','10-Q','20-F','40-F','6-K') or point.get('filed','') > as_of
+                    or point.get('end','9999') > as_of
                     or point.get('end','') < str(int(as_of[:4])-2)+'-01-01'):
                 continue
             row = _observation({'field':tag,'value':point['val'],'period':point['end'],'start':point.get('start'),
@@ -108,6 +110,54 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
     return target
 
 
+def discover_historical_targets(packet, requested, as_of, client, parent_cik=None):
+    """Resolve primary legal names when an acquired issuer left the ticker list.
+
+    Search supplies candidate CIKs only. SEC submissions must independently
+    confirm the exact legal name and one reported ticker before collection.
+    """
+    names = []
+    pattern = (r'\b([A-Z][A-Za-z0-9&.\'-]*(?:\s+[A-Z][A-Za-z0-9&.\'-]*){0,7}\s+'
+               r'(?:Inc\.?|Corporation|Corp\.?|Limited|Ltd\.?|PLC|plc))(?=[\s,;(]|$)')
+    for doc in packet.get('documents') or []:
+        for context in doc.get('contexts') or []:
+            for name in re.findall(pattern, context):
+                tokens = name_tokens(name)
+                if (tokens and tokens != name_tokens(packet.get('company') or '')
+                        and re.search(r'\b'+re.escape(tokens[0])+r'\b', requested, re.I)
+                        and acquisition_mentioned(packet, name) and tokens not in [name_tokens(n) for n in names]):
+                    names.append(name)
+    identities, seen = [], set()
+    for name in names[:2]:
+        query = 'https://efts.sec.gov/LATEST/search-index?' + urlencode({
+            'q': '"'+name+'"', 'forms': '10-K,10-Q', 'dateRange': 'custom',
+            'startdt': str(int(as_of[:4])-3)+'-01-01', 'enddt': as_of, 'from': 0, 'size': 20})
+        result = client.get_json(query, timeout=30)
+        ciks = []
+        for hit in (result.get('hits') or {}).get('hits') or []:
+            source = hit.get('_source') or {}
+            if not source.get('file_date') or source['file_date'] > as_of:
+                continue
+            for cik in source.get('ciks') or []:
+                if (str(cik).isdigit() and int(cik) not in ciks
+                        and (not str(parent_cik).isdigit() or int(cik) != int(parent_cik))):
+                    ciks.append(int(cik))
+        for cik in ciks[:4]:
+            url = f'https://data.sec.gov/submissions/CIK{cik:010d}.json'
+            issuer = client.get_json(url, timeout=30)
+            tickers = issuer.get('tickers') or []
+            if (str(issuer.get('cik') or '').isdigit() and int(issuer['cik']) == cik and cik not in seen
+                    and name_tokens(issuer.get('name') or '') == name_tokens(name)
+                    and acquisition_mentioned(packet, issuer['name']) and len(tickers) == 1
+                    and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', tickers[0])
+                    and tickers[0] != packet['ticker']):
+                identities.append({'ticker': tickers[0], 'cik_str': cik, 'title': issuer['name'],
+                                   'identity_discovery': {'method': 'primary_legal_name_and_sec_submissions',
+                                                          'search_url': query, 'source_url': url, 'legal_name': name}})
+                seen.add(cik)
+    return identities
+
+
 def augment_requested_targets(root, packet, gaps, as_of, client=None):
     from sec_client import SecClient
     from underwriting_evidence import requested_keywords, source_fingerprint
@@ -117,14 +167,27 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
     if not re.search(r'acquisit|acquir|merger',requested):
         return packet
     identities = client.get_json('https://www.sec.gov/files/company_tickers.json',timeout=30)
+    parent_cik = (((read(root/'_system/portfolio/registry.json').get('holdings') or {})
+                   .get(packet['ticker']) or {}).get('download') or {}).get('cik')
     candidates = []
     for identity in identities.values():
         tokens = name_tokens(identity.get('title') or '')
-        if (tokens and re.search(r'\b'+re.escape(tokens[0])+r'\b',requested) and identity.get('ticker') != packet['ticker']
+        if (tokens and str(identity.get('cik_str')).isdigit()
+                and (not str(parent_cik).isdigit() or int(identity['cik_str']) != int(parent_cik))
+                and re.search(r'\b'+re.escape(tokens[0])+r'\b',requested) and identity.get('ticker') != packet['ticker']
                 and acquisition_mentioned(packet,identity['title'])):
             candidates.append(identity)
+    if not candidates:
+        candidates = discover_historical_targets(packet, requested, as_of, client, parent_cik)
+    unique = {}
+    for identity in candidates:
+        unique.setdefault(str(int(identity['cik_str'])), identity)
+    candidates = list(unique.values())
     for identity in candidates[:2]:
         target = collect_target(root,identity['ticker'],identity['cik_str'],as_of,packet['currency'],requested_keywords(gaps),client)
+        if identity.get('identity_discovery'):
+            target['identity_discovery'] = identity['identity_discovery']
+            target['packet_hash'] = digest({k:v for k,v in target.items() if k != 'packet_hash'})
         packet = merge_related_packet(packet,target)
         path = root/'_system/reference/market-data/valuation_related_evidence'/(target['ticker']+'.json')
         write(path,target)

@@ -44,6 +44,19 @@ def test_note_numbers_in_gap_details_become_explicit_retrieval_terms():
     assert {'note 9','note 15','maturity','collateral'} <= set(terms)
 
 
+def test_possessives_do_not_consume_actual_transaction_search_terms():
+    terms = requested_keywords([{'code': 'transaction_terms', 'detail':
+        "Copart's disclosure omits the target's funding. Search 'merger consideration', "
+        "'equity awards', 'indebtedness', 'financing' and 'closing conditions'."}])
+    assert {'merger consideration', 'equity awards', 'indebtedness', 'financing', 'closing conditions'} <= set(terms)
+    assert not any('disclosure omits' in term for term in terms)
+
+
+def test_quoted_search_phrases_can_contain_a_possessive():
+    assert "owner's earnings" in requested_keywords([{'code': 'cash', 'detail':
+        'Search terms: "owner\'s earnings", \'cash flow\'.'}])
+
+
 def test_new_disclosure_requests_retain_earlier_debt_and_settlement_sections():
     from underwriting_evidence import merge_evidence_requests
     old = [{'code':'debt','detail':'Retrieve Note 9, Debt.'}, {'code':'settlement','detail':'Retrieve Note 15, Settlement.'}]
@@ -62,6 +75,64 @@ def related_packet():
     p['documents'] = [{'id':'target_doc','source_url':'https://www.sec.gov/target','content_hash':'b'*64,'contexts':['Target balance sheet.']}]
     p['packet_hash'] = digest({k:v for k,v in p.items() if k != 'packet_hash'})
     return p
+
+
+def test_a_delisted_target_is_resolved_from_primary_legal_name_and_sec_submissions(tmp_path, monkeypatch):
+    import underwriting_related_evidence as related
+    p = packet()
+    p['documents'] = [{'id': 'closing', 'source_url': 'https://www.sec.gov/parent', 'content_hash': 'c'*64,
+                      'contexts': ['The parent completed its acquisition of ACV Auctions Inc. (ACV).']}]
+    target = related_packet()
+    target.update(ticker='ACVA', cik='1637873', company='ACV Auctions Inc.')
+    calls = []
+    class Client:
+        def get_json(self, url, **kwargs):
+            calls.append(url)
+            if url.endswith('company_tickers.json'):
+                return {}  # The acquired issuer is absent from the current list.
+            if 'efts.sec.gov' in url:
+                return {'hits': {'hits': [{'_source': {'ciks': ['0001637873'], 'file_date': '2026-08-01'}}]}}
+            if 'CIK0001637873.json' in url:
+                return {'cik': '1637873', 'name': 'ACV Auctions Inc.', 'tickers': ['ACVA']}
+            pytest.fail('Unexpected source: '+url)
+    monkeypatch.setattr(related, 'collect_target', lambda *args, **kwargs: target)
+    merged = related.augment_requested_targets(tmp_path, p,
+        [{'code': 'acv_target', 'detail': 'Retrieve ACV target primary financials for the acquisition.'}],
+        '2026-11-02', Client())
+    assert merged['related_issuers']['ACVA']['cik'] == '1637873'
+    assert any('efts.sec.gov' in url for url in calls)
+
+
+@pytest.mark.parametrize('name,tickers', [('Unrelated Corporation', ['WRONG']), ('ACV Auctions Inc.', ['A', 'B'])])
+def test_sec_search_does_not_authorize_an_unrelated_issuer_or_ambiguous_listing(name, tickers):
+    from underwriting_related_evidence import discover_historical_targets
+    p = packet()
+    p['documents'] = [{'contexts': ['The parent acquired ACV Auctions Inc.']}]
+    class Client:
+        def get_json(self, url, **kwargs):
+            if 'efts.sec.gov' in url:
+                return {'hits': {'hits': [{'_source': {'ciks': ['123'], 'file_date': '2026-01-01'}}]}}
+            return {'cik': '123', 'name': name, 'tickers': tickers}
+    assert discover_historical_targets(p, 'acquire ACV financials', '2026-11-02', Client()) == []
+
+
+def test_a_parent_share_class_alias_cannot_become_an_acquisition_target(tmp_path, monkeypatch):
+    import json
+    import underwriting_related_evidence as related
+    p = packet()
+    p['company'] = 'Parent Company Inc.'
+    p['documents'] = [{'contexts': ['Parent Company Inc. completed an acquisition.']}]
+    path = tmp_path / '_system/portfolio/registry.json'
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({'holdings': {'TEST': {'download': {'cik': '123'}}}}))
+    class Client:
+        def get_json(self, url, **kwargs):
+            assert url.endswith('company_tickers.json')
+            return {'0': {'title': 'Parent Company Inc.', 'ticker': 'TEST-A', 'cik_str': 123}}
+    monkeypatch.setattr(related, 'collect_target', lambda *a, **k: pytest.fail('Parent collected as target'))
+    result = related.augment_requested_targets(tmp_path, p,
+        [{'detail': 'Retrieve Parent acquisition funding.'}], '2026-11-02', Client())
+    assert not result.get('related_issuers')
 
 
 def test_acquisition_evidence_preserves_entity_period_and_excludes_target_share_basis():
