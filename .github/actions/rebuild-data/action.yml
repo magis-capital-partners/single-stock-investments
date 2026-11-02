@@ -9,6 +9,14 @@ inputs:
     description: Run validate_dashboard_data.py
     required: false
     default: "false"
+  vault-publication-only:
+    description: Forwarded to checkout-vault. true checks out private snapshot objects instead of the whole vault.
+    required: false
+    default: "false"
+  vault-extra-paths:
+    description: Forwarded to checkout-vault extra-paths.
+    required: false
+    default: ""
 
 outputs:
   failed_source:
@@ -24,6 +32,9 @@ runs:
     - name: Checkout research vault (when configured)
       if: env.RESEARCH_VAULT_CLONE_TOKEN != '' && inputs.profile != 'none'
       uses: ./.github/actions/checkout-vault
+      with:
+        publication-only: ${{ inputs.vault-publication-only }}
+        extra-paths: ${{ inputs.vault-extra-paths }}
 
     - name: Install rebuild dependencies
       # Full profiles run the Power Zone decision pipeline, which needs numpy.

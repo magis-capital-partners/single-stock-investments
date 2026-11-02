@@ -22,6 +22,10 @@ inputs:
     description: Checkout only the private snapshot objects named by dashboard/private-assets.json, plus the migration journal and manifest. Omits letters, transcripts, investor history, the company-research cache, and the extraction archive.
     required: false
     default: "false"
+  extra-paths:
+    description: Additional non-cone sparse-checkout patterns, one per line. Applied after publication-only materialization. Use with publication-only so the rest of the vault stays out.
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -87,6 +91,18 @@ runs:
             sys.exit(1)
         PY
         echo "VAULT_PUBLICATION_ONLY=true" >> "$GITHUB_ENV"
+
+    - name: Add extra vault paths
+      if: inputs.extra-paths != ''
+      shell: bash
+      env:
+        VAULT_EXTRA_PATHS: ${{ inputs.extra-paths }}
+      run: |
+        set -euo pipefail
+        printf '%s\n' "$VAULT_EXTRA_PATHS" | sed '/^[[:space:]]*$/d' > "$RUNNER_TEMP/vault-extra-paths.txt"
+        if [ -s "$RUNNER_TEMP/vault-extra-paths.txt" ]; then
+          git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-extra-paths.txt"
+        fi
 
     - name: Export RESEARCH_VAULT_ROOT
       shell: bash

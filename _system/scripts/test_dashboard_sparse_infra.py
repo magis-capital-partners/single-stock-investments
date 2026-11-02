@@ -45,6 +45,29 @@ class SparseInfraGuardTests(unittest.TestCase):
         self.assertTrue(rows[0]["research_dir"])
         self.assertEqual(rows[0]["completeness"], 90)
 
+    def test_preserve_infra_always_keeps_a_thinned_count(self):
+        rows = [{
+            "ticker": "AAPL",
+            "pdf_count": 2,
+            "recent_files": [{"name": "manifest.json"}],
+            "valuation_decision": {"status": "missing"},
+        }]
+        prior = {
+            "AAPL": {
+                "pdf_count": 40,
+                "recent_files": [{"name": "filing.pdf"}],
+                "valuation_decision": {"status": "ready", "irr": 0.1},
+            }
+        }
+        with mock.patch.dict(os.environ, {"DASHBOARD_PRESERVE_INFRA_ALWAYS": "1"}):
+            restored = bdd.preserve_infra_from_prior(rows, prior)
+        self.assertEqual(restored, 1)
+        self.assertEqual(rows[0]["pdf_count"], 40)
+        self.assertEqual(rows[0]["recent_files"], [{"name": "filing.pdf"}])
+        # Valuation is not an infra column. A missing live value is still
+        # filled from the prior; a present one would be left alone.
+        self.assertEqual(rows[0]["valuation_decision"]["status"], "ready")
+
     def test_refuse_infra_collapse(self):
         payload = {
             "summary": {

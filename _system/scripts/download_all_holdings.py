@@ -204,17 +204,36 @@ def daily_refresh(holdings: dict, *, build_indexes: bool = True) -> None:
         raise SystemExit(f"Dashboard rebuild failed ({completed.returncode})")
 
 
-def select_batch(holdings: dict, batch_size: int, cursor_path: Path) -> list[str]:
-    """Return the next deterministic issuer batch and persist the resume cursor."""
+def _batch_offset(holdings: dict, cursor_path: Path) -> tuple[list[str], int]:
     tickers = sorted(holdings)
-    if not tickers or batch_size <= 0:
-        return tickers
+    if not tickers:
+        return [], 0
     try:
         state = json.loads(cursor_path.read_text(encoding="utf-8"))
         offset = int(state.get("next_offset", 0)) % len(tickers)
     except (OSError, ValueError, json.JSONDecodeError):
         offset = 0
-    batch = [tickers[(offset + i) % len(tickers)] for i in range(min(batch_size, len(tickers)))]
+    return tickers, offset
+
+
+def planned_batch(holdings: dict, batch_size: int, cursor_path: Path) -> list[str]:
+    """Next issuer batch. Does not advance the resume cursor.
+
+    The workflow materializes these trees before harvest. select_batch then
+    persists the same batch, so the cursor must not move twice.
+    """
+    tickers, offset = _batch_offset(holdings, cursor_path)
+    if not tickers or batch_size <= 0:
+        return tickers
+    return [tickers[(offset + i) % len(tickers)] for i in range(min(batch_size, len(tickers)))]
+
+
+def select_batch(holdings: dict, batch_size: int, cursor_path: Path) -> list[str]:
+    """Return the next deterministic issuer batch and persist the resume cursor."""
+    tickers, offset = _batch_offset(holdings, cursor_path)
+    batch = planned_batch(holdings, batch_size, cursor_path)
+    if not tickers or batch_size <= 0:
+        return batch
     cursor_path.parent.mkdir(parents=True, exist_ok=True)
     cursor_path.write_text(
         json.dumps(
