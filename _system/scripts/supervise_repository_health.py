@@ -86,6 +86,7 @@ P3_LANE_HEALERS = {
     "data-pipeline-separation-discover": {"event_type": "heal-separations"},
     "data-pipeline-buyback-radar": {"event_type": "heal-buyback-radar"},
     "data-pipeline-reverse-splits": {"event_type": "heal-reverse-splits"},
+    "data-pipeline-activist": {"event_type": "heal-activist"},
     "podcasts": {"workflow": "podcast-refresh.yml",
                  "fields": {"backfill": "false", "whisper_batch": "0"}},
     "ls-algo": {"event_type": "sync-ls-algo-universe"},
