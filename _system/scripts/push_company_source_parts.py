@@ -56,7 +56,11 @@ def publish(vault: Path, limit=200_000_000):
             for name in ('RESEARCH_VAULT_CLONE_TOKEN', 'GITHUB_TOKEN', 'GH_TOKEN'):
                 if os.environ.get(name):
                     detail = detail.replace(os.environ[name], '[redacted]')
-            print(f'Archive Git failure (exit {exc.returncode}, free bytes {shutil.disk_usage(root).free}): {detail}',
+            try:
+                free = shutil.disk_usage(root).free
+            except OSError:
+                free = 'unavailable'
+            print(f'Archive Git failure (exit {exc.returncode}, free bytes {free}): {detail}',
                   file=sys.stderr, flush=True)
             raise
 

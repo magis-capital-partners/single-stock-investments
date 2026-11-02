@@ -183,7 +183,8 @@ def test_archive_parts_are_pushed_in_batches_before_manifest(tmp_path):
     assert len(json.loads(git(remote, "show", "main:dashboard-private/company-source-backfill-v2/manifest.json"))["parts"]) == 2
 
 
-def test_archive_staging_failure_reports_captured_git_diagnostic(tmp_path, monkeypatch, capsys):
+@pytest.mark.parametrize('disk_available', [True, False])
+def test_archive_staging_failure_reports_captured_git_diagnostic(tmp_path, monkeypatch, capsys, disk_available):
     folder = tmp_path / 'dashboard-private/company-source-backfill-v2'
     folder.mkdir(parents=True)
     raw = b'immutable source'
@@ -197,6 +198,10 @@ def test_archive_staging_failure_reports_captured_git_diagnostic(tmp_path, monke
         return b''
 
     monkeypatch.setattr(subprocess, 'check_output', fake_git)
+    if not disk_available:
+        def unavailable(*args):
+            raise OSError('storage information unavailable')
+        monkeypatch.setattr('push_company_source_parts.shutil.disk_usage', unavailable)
     with pytest.raises(subprocess.CalledProcessError):
         publish(tmp_path)
     assert 'fatal: fixture object write failed' in capsys.readouterr().err
