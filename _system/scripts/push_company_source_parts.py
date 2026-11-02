@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -43,9 +44,21 @@ def publish(vault: Path, limit=200_000_000):
         paths.append(path)
 
     def git(root, *args):
-        return subprocess.check_output(["git", "-C", str(root), "-c", "gc.auto=0", "-c", "maintenance.auto=false",
-            "-c", "user.name=github-actions[bot]", "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
-            *args], stderr=subprocess.STDOUT).decode().strip()
+        try:
+            return subprocess.check_output(["git", "-C", str(root), "-c", "gc.auto=0", "-c", "maintenance.auto=false",
+                "-c", "user.name=github-actions[bot]", "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
+                *args], stderr=subprocess.STDOUT).decode().strip()
+        except subprocess.CalledProcessError as exc:
+            # check_output captures Git's only explanation; a traceback prints
+            # the arguments and exit code but drops this essential diagnostic.
+            detail = (exc.output or b'').decode('utf-8', errors='replace')[-4000:]
+            detail = re.sub(r'https://[^/\s@]+@', 'https://[redacted]@', detail)
+            for name in ('RESEARCH_VAULT_CLONE_TOKEN', 'GITHUB_TOKEN', 'GH_TOKEN'):
+                if os.environ.get(name):
+                    detail = detail.replace(os.environ[name], '[redacted]')
+            print(f'Archive Git failure (exit {exc.returncode}, free bytes {shutil.disk_usage(root).free}): {detail}',
+                  file=sys.stderr, flush=True)
+            raise
 
     git(vault, "fetch", "origin", "main")
     remote_files = set(git(vault, "ls-tree", "--name-only", "origin/main:" + relative.as_posix()).splitlines())
