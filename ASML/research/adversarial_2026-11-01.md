@@ -39,10 +39,10 @@ re_pass: false
 
 | # | Claim in dive | Dive cites | Filing value | Match? | Severity |
 |---|---------------|------------|--------------|--------|----------|
-| 1 | Latest revenue (filing) | — | **$28.26B** vs prior $32.67B (-13.5% YoY) | spot-check dive | — |
-| — | Stockholders' equity (filing) | — | **18476.8** | spot-check dive | — |
-| — | Net income (filing) | — | **7839.0** | spot-check dive | — |
-| — | EPS basic (filing) | — | **19.91** | spot-check dive | — |
+| 1 | Latest revenue (filing) | — | **$32667300.00B** vs prior $28262900.00B (+15.6% YoY) | spot-check dive | — |
+| — | Stockholders' equity (filing) | — | **19612200000.0** | spot-check dive | — |
+| — | Net income (filing) | — | **9609400000.0** | spot-check dive | — |
+| — | EPS basic (filing) | — | **24.73** | spot-check dive | — |
 
 ---
 
@@ -53,9 +53,6 @@ re_pass: false
 | Returns statement | n/a | -13.2% | — |
 | Classification IRR | n/a | -13.4% | — |
 | Valuation bridge base | n/a | -13.2% | — |
-
-**Lint notes:**
-- ASML/research: adversarial date adversarial_2026-09-29.md != dive 2026-11-01
 
 ---
 
