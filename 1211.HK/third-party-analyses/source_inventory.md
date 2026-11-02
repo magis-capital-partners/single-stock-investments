@@ -1,12 +1,10 @@
-# 1211.HK third-party source inventory
+# 1211.HK — Third-party source inventory
 
-**Date:** 2026-10-28
-**Sources:** 1 total (0 approved, 1 pending, 0 context)
+**Date:** 2026-11-02
+**Sources:** 0 total (0 approved, 0 pending, 0 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| monsoon_pabrai_byd | Monsoon Pabrai, BYD (undated; read 28 October 2026) | https://monsoonpabrai.com/blog/blog-posts/byd | pending | Context only. Her view, not Mohnish Pabrai's. Not in the base annual return. **[PENDING APPROVAL]** |
+| (none) | — | — | — | Primary filings only |
 
-Horizon Kinetics scan: not indexed (`hk_indexed`: false). HK commentary stays context tier and does not feed the base case.
-
-Cross-check: `1211.HK/research/cross_check_third_party_2026-10-28.md`
+Cross-check required: `1211.HK/research/cross_check_third_party_2026-11-02.md`
