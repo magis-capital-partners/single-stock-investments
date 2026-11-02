@@ -2,23 +2,26 @@
 
 The tracked tree is about 53 GiB, and 41 GiB of that is investor-document
 PDFs and HTML. The private research vault is about 19 GiB more. buyback-radar,
-downloads, drive, and company-source-backfill were still checking out one or
-both of those wholes. These tests pin the narrowed paths each job actually
-reads and writes.
+downloads, drive, activist, and company-source-backfill were still checking
+out one or both of those wholes. These tests pin the narrowed paths each job
+actually reads and writes.
 """
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+from unittest import mock
 
 import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
+import ci_rebuild_profile  # noqa: E402
 from ci_sparse_checkout_paths import paths_for_profile  # noqa: E402
 from download_all_holdings import planned_batch, select_batch  # noqa: E402
 from build_company_research import preserve_unscanned_records  # noqa: E402
@@ -32,6 +35,13 @@ VAULT_EXTRAS = [
     "/superinvestor-letters/insights.json",
     "/podcasts/insights.json",
     "/videos/insights.json",
+]
+
+ACTIVIST_VAULT_EXTRAS = [
+    "/superinvestor-letters/letters_index.json",
+    "/superinvestor-letters/drive_import_manifest.json",
+    "/investment-wisdom/hk_ticker_index.json",
+    "/valuation-underwriting/packets/",
 ]
 
 
@@ -211,3 +221,141 @@ def test_archive_sparse_pattern_does_not_check_out_letters(tmp_path: Path):
     assert (work / "superinvestor-letters/insights.json").is_file()
     assert not (work / "superinvestor-letters/fund/letter.txt").exists()
     assert not (work / "podcasts/insights.json").exists()
+
+
+def _covered(rel: str, entries: set[str]) -> bool:
+    return any(rel == entry or rel.startswith(entry + "/") for entry in entries)
+
+
+def test_activist_checks_out_its_trees_and_a_narrow_vault():
+    """Run 41473899301 spent 15 minutes on the full tree, then timed out
+    cloning the whole vault, so every scan step was skipped."""
+    job = _job("activist")
+    text = _run(job)
+    assert "ci_checkout_workspace.sh full" not in text
+    assert "ci_checkout_workspace.sh activist" in text
+    assert "free-disk-space" in _steps(job)[0]["uses"]
+    shell = (ROOT / "_system/scripts/ci_checkout_workspace.sh").read_text(encoding="utf-8")
+    arm = re.search(r"(?m)^  ([a-z|-]*\bactivist\b[a-z|-]*)\)$", shell)
+    assert arm and "downloads" in arm.group(1), "activist must share the research-tree arm"
+    assert job["env"]["DASHBOARD_PRESERVE_DOCUMENT_REGISTRY"] == "1"
+    assert job["env"]["DASHBOARD_PRESERVE_INFRA_ALWAYS"] == "1"
+
+    vault = _vault_steps(job)
+    assert len(vault) == 1
+    rebuild = next(step for step in _steps(job) if str(step.get("uses") or "").endswith("rebuild-data"))
+    for chosen, extras in (
+        (vault[0]["with"]["publication-only"], vault[0]["with"]["extra-paths"]),
+        (rebuild["with"]["vault-publication-only"], rebuild["with"]["vault-extra-paths"]),
+    ):
+        assert chosen == "true"
+        assert extras.split() == ACTIVIST_VAULT_EXTRAS
+        # Named files only. A whole letters or wisdom tree is what timed out.
+        for line in extras.split():
+            assert line not in {"/superinvestor-letters/", "/investment-wisdom/", "/podcasts/", "/videos/"}
+
+
+def test_activist_paths_hold_what_the_scan_reads_and_writes_and_no_filings():
+    paths = paths_for_profile("activist")
+    holdings = json.loads((ROOT / "_system/portfolio/registry.json").read_text(encoding="utf-8"))["holdings"]
+    for ticker in holdings:
+        for sub in ("research", "third-party-analyses", "README.md"):
+            assert f"{ticker}/{sub}" in paths, (ticker, sub)
+    allowed = ("DOWNLOAD_MANIFEST.json", "TRANSCRIPT_MANIFEST.json", "research-notes")
+    for path in paths:
+        if "investor-documents" in path:
+            assert path.endswith(allowed), path
+
+    # Every file an activist index points at must be in the checkout, or the
+    # verify and triage steps would see a report as missing.
+    entries = set(paths) | {"_system", "dashboard", ".github"}
+    refs = 0
+    for ticker in holdings:
+        index = ROOT / ticker / "third-party-analyses" / "activist_reports_index.json"
+        if not index.is_file():
+            continue
+        for report in json.loads(index.read_text(encoding="utf-8")).get("reports") or []:
+            for key in ("local_file", "local_pdf", "canonical_file"):
+                rel = report.get(key)
+                if isinstance(rel, str) and rel and not rel.startswith("http"):
+                    refs += 1
+                    assert _covered(rel, entries), (ticker, key, rel)
+    print(f"activist index refs checked: {refs}")
+
+
+def test_sparse_add_leaves_files_outside_the_checkout_in_the_index(tmp_path: Path):
+    """commit-main stages `git add --sparse -A`. On the activist checkout that
+    must stage scan output and never delete the filing PDFs left out."""
+    action = (ROOT / ".github/actions/commit-main/action.yml").read_text(encoding="utf-8")
+    assert "git add --sparse ${{ inputs.git_add }}" in action
+    for step in _steps(_job("activist")):
+        if str(step.get("uses") or "").endswith("commit-main"):
+            assert "git_add" not in (step.get("with") or {}), step.get("name")
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    subprocess.run(["git", "-C", str(origin), "init", "-q", "-b", "main"], check=True)
+    subprocess.run(["git", "-C", str(origin), "config", "user.email", "t@example.com"], check=True)
+    subprocess.run(["git", "-C", str(origin), "config", "user.name", "t"], check=True)
+    files = {
+        "AAA/investor-documents/sec-edgar/10-K.pdf": "filing",
+        "AAA/third-party-analyses/activist_reports_index.json": "{}\n",
+        "AAA/research/thesis.md": "thesis\n",
+        "_system/data/activist_scan_state.json": "{}\n",
+    }
+    for relative, content in files.items():
+        path = origin / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+    subprocess.run(["git", "-C", str(origin), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(origin), "commit", "-q", "-m", "fixture"], check=True)
+    work = tmp_path / "work"
+    subprocess.run(["git", "clone", "-q", "--no-checkout", str(origin), str(work)], check=True)
+    subprocess.run(["git", "-C", str(work), "sparse-checkout", "init", "--no-cone"], check=True)
+    subprocess.run(
+        ["git", "-C", str(work), "sparse-checkout", "set", "--stdin"],
+        input="_system\nAAA/research\nAAA/third-party-analyses\n",
+        text=True,
+        check=True,
+    )
+    subprocess.run(["git", "-C", str(work), "checkout", "-q", "main"], check=True)
+    assert not (work / "AAA/investor-documents/sec-edgar/10-K.pdf").exists()
+
+    (work / "AAA/third-party-analyses/activist_reports_index.json").write_text('{"reports": []}\n', encoding="utf-8")
+    (work / "AAA/third-party-analyses/activist_reports/long").mkdir(parents=True)
+    (work / "AAA/third-party-analyses/activist_reports/long/13D.htm").write_text("13D", encoding="utf-8")
+    (work / "_system/data/activist_scan_state.json").write_text('{"sec": {}}\n', encoding="utf-8")
+    subprocess.run(["git", "-C", str(work), "add", "--sparse", "-A"], check=True)
+    staged = subprocess.run(
+        ["git", "-C", str(work), "diff", "--cached", "--name-status"],
+        check=True, capture_output=True, text=True,
+    ).stdout
+    assert "M\tAAA/third-party-analyses/activist_reports_index.json" in staged
+    assert "A\tAAA/third-party-analyses/activist_reports/long/13D.htm" in staged
+    assert "M\t_system/data/activist_scan_state.json" in staged
+    assert "investor-documents" not in staged
+    listed = subprocess.run(
+        ["git", "-C", str(work), "ls-files", "-v", "AAA/investor-documents/sec-edgar/10-K.pdf"],
+        check=True, capture_output=True, text=True,
+    ).stdout
+    assert listed.startswith("S ")
+
+
+def test_activist_rebuild_keeps_the_document_registry_when_asked():
+    registry = ["_system/scripts/build_document_registry.py"]
+    assert registry in ci_rebuild_profile.PROFILES["activist"]
+    with mock.patch.dict(os.environ, {"DASHBOARD_PRESERVE_DOCUMENT_REGISTRY": "1"}):
+        assert ci_rebuild_profile.should_skip_step(registry)
+        assert "PRESERVE_DOCUMENT_REGISTRY" in ci_rebuild_profile.skip_reason(registry)
+        assert not ci_rebuild_profile.should_skip_step(["_system/scripts/build_activist_feed.py"])
+    with mock.patch.dict(os.environ, {}, clear=False):
+        os.environ.pop("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY", None)
+        assert not ci_rebuild_profile.should_skip_step(registry)
+
+
+def test_heal_activist_runs_only_the_activist_job():
+    triggers = DATA.get("on") or DATA.get(True)
+    assert "heal-activist" in triggers["repository_dispatch"]["types"]
+    assert "workflow_dispatch" not in triggers
+    decide = _run(_job("decide"))
+    assert '"dispatch:heal-activist") activist=true ;;' in decide
