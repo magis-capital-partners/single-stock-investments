@@ -21,7 +21,15 @@ LOOPS = {
     "falsifier-resolution.yml": "resolve-and-validate",
     "committee-outcomes.yml": "observe",
 }
-PUBLICATION_CALLERS = set(LOOPS) | {"vault-publication-checkout.yml", "research-quality.yml"}
+PUBLICATION_CALLERS = set(LOOPS) | {
+    "vault-publication-checkout.yml",
+    "research-quality.yml",
+    # Data Pipeline jobs that do not read the letter corpus. Drive adds
+    # vic-research and the insight indexes through extra-paths. The company
+    # source lane adds only its archive the same way.
+    "data-pipeline.yml",
+    "company-source-backfill.yml",
+}
 
 
 def _git(repo: Path, *args: str, input_text: str | None = None) -> str:
@@ -97,7 +105,7 @@ def test_publication_only_is_opt_in_and_the_three_loops_use_it():
     preserve = next(step for step in commit["runs"]["steps"] if str(step.get("uses", "")).endswith("preserve-private-dashboard"))
     assert preserve["with"]["preserve-company-cache"] == "${{ inputs.preserve-company-cache }}"
 
-    opted = []
+    opted = set()
     for path in sorted(WORKFLOWS.glob("*.yml")):
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
         for job_name, job in (document.get("jobs") or {}).items():
@@ -107,14 +115,14 @@ def test_publication_only_is_opt_in_and_the_three_loops_use_it():
                 uses = str(step.get("uses") or "")
                 chosen = (step.get("with") or {}).get("publication-only")
                 if uses.endswith("checkout-vault") and str(chosen).lower() == "true":
-                    opted.append(path.name)
+                    opted.add(path.name)
                 if uses.endswith("commit-main"):
                     cache = (step.get("with") or {}).get("preserve-company-cache")
                     if path.name in LOOPS and job_name == LOOPS[path.name]:
                         assert str(cache).lower() == "false", path.name
                     elif cache is not None:
                         raise AssertionError(f"{path.name}:{job_name} sets preserve-company-cache")
-    assert opted == sorted(PUBLICATION_CALLERS)
+    assert opted == PUBLICATION_CALLERS
     quality = yaml.safe_load((WORKFLOWS / "research-quality.yml").read_text(encoding="utf-8"))
     # Only validation of already published data may use the scoped snapshot.
     # Keep research-producing jobs on their existing evidence boundary.

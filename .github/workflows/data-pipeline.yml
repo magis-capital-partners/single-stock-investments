@@ -492,6 +492,12 @@ jobs:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+      # Research trees are present; the 41 GiB filing tree is not. Keep pdf
+      # counts and recent-file lists on the prior dashboard row. Valuation
+      # still rebuilds from research/valuation.json. intake-full remains the
+      # full-tree dashboard rebuild.
+      DASHBOARD_PRESERVE_DOCUMENT_REGISTRY: "1"
+      DASHBOARD_PRESERVE_INFRA_ALWAYS: "1"
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -509,10 +515,31 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full)
-        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout downloads workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh downloads
+      - name: Checkout this run's document batch
+        if: needs.decide.outputs.download_mode == 'full'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, "_system/scripts")
+          from portfolio_registry import load_registry
+          from download_all_holdings import planned_batch
+          holdings = (load_registry().get("holdings") or {})
+          batch = planned_batch(holdings, 8, Path("_system/data/download_cursor.json"))
+          destination = Path("${{ runner.temp }}") / "download-batch-patterns.txt"
+          destination.write_text("".join(f"{ticker}/\n" for ticker in batch), encoding="utf-8")
+          print("document batch:", " ".join(batch))
+          PY
+          if [ -s "${{ runner.temp }}/download-batch-patterns.txt" ]; then
+            git sparse-checkout add --skip-checks --stdin < "${{ runner.temp }}/download-batch-patterns.txt"
+          fi
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -530,8 +557,26 @@ jobs:
           if [ "$DOWNLOAD_MODE" = "light" ]; then
             python _system/scripts/download_all_holdings.py --light --skip-indexes
           else
-            python _system/scripts/download_all_holdings.py --batch-size 8 --skip-aggregate-harvest
+            # The global index walks every ticker. On this checkout only the
+            # harvested batch has its filings, so the batch is indexed below.
+            python _system/scripts/download_all_holdings.py --batch-size 8 --skip-aggregate-harvest --skip-indexes
           fi
+      - name: Rebuild indexes for the harvested batch
+        if: needs.decide.outputs.download_mode == 'full'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+          cursor = Path("_system/data/download_cursor.json")
+          batch = []
+          if cursor.is_file():
+              batch = json.loads(cursor.read_text(encoding="utf-8")).get("last_batch") or []
+          for ticker in batch:
+              subprocess.check_call([sys.executable, "_system/scripts/build_folder_indexes.py", "--ticker", ticker])
+          PY
       - name: Commit and push workspace
         uses: ./.github/actions/commit-main
         with:
@@ -555,6 +600,10 @@ jobs:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+      # Same infra preserve as downloads. The insights rebuild reads letter,
+      # podcast, and video indexes, not the raw vault corpora.
+      DASHBOARD_PRESERVE_DOCUMENT_REGISTRY: "1"
+      DASHBOARD_PRESERVE_INFRA_ALWAYS: "1"
     steps:
       - name: Check Google credentials secret
         id: google_creds
@@ -585,8 +634,8 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full)
-        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout drive workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh drive
       - uses: actions/setup-python@v5
         if: steps.google_creds.outputs.configured == 'true'
         with:
@@ -597,6 +646,13 @@ jobs:
       - name: Checkout research vault
         if: steps.google_creds.outputs.configured == 'true'
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
+          extra-paths: |
+            /vic-research/
+            /superinvestor-letters/insights.json
+            /podcasts/insights.json
+            /videos/insights.json
       - name: Configure Google credentials
         if: steps.google_creds.outputs.configured == 'true'
         env:
@@ -678,6 +734,12 @@ jobs:
         with:
           profile: insights
           validate: "true"
+          vault-publication-only: "true"
+          vault-extra-paths: |
+            /vic-research/
+            /superinvestor-letters/insights.json
+            /podcasts/insights.json
+            /videos/insights.json
       - name: Commit imported documents
         if: >
           always() &&
@@ -1167,6 +1229,18 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
+      # The full single-stock tree is 53 GiB and the vault is ~19 GiB. This
+      # job reads _system plus the buyback books and shards. The vault checkout
+      # only hydrates private ticker and agent shards before commit-main
+      # redacts them again.
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -1175,10 +1249,12 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full)
-        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout buyback workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh buyback-radar
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

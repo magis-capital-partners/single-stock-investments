@@ -4,9 +4,12 @@
 Profiles:
   news         — portfolio news ingest (holdings news JSON only)
   marvin-pick  — marvin_pick_ticker metadata (holdings research md/json)
+  downloads    — same research trees as marvin-pick; document batches are added later
+  drive        — ticker research, third-party analyses, and Drive intake folders
   two-phase-watch — INV Accelsius cooling watch (eight ticker trees + INV shard)
   dashboard    — deploy rebuild checkout (base paths only)
   thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
+  buyback-radar — buyback snapshots, consumer shards, and the two books it patches
 
 Base paths (_system, .github, and for most profiles the whole dashboard
 tree) are set by ci_checkout_workspace.sh. This script emits the extra
@@ -35,6 +38,45 @@ def load_holdings() -> list[str]:
     return sorted((reg.get("holdings") or {}).keys())
 
 
+def tracked_company_dirs() -> list[str]:
+    """Top-level company trees in git, not holdings only.
+
+    Drive intake accepts a PDF for any ticker folder in the repo. Listing
+    those trees from git avoids checking out the filing PDFs under them.
+    """
+    import subprocess
+
+    result = subprocess.run(
+        ["git", "ls-tree", "--name-only", "-d", "HEAD"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise SystemExit(result.stderr.strip() or "git ls-tree failed")
+    skip = {
+        ".claude",
+        ".cursor",
+        ".github",
+        ".vscode",
+        "_eval",
+        "_external",
+        "_system",
+        "contracts",
+        "dashboard",
+        "docs",
+        "ops-watchdog",
+        "outputs",
+        "tests",
+    }
+    return sorted(
+        name
+        for name in result.stdout.splitlines()
+        if name and name not in skip and not name.startswith(".")
+    )
+
+
 def paths_for_profile(profile: str) -> list[str]:
     holdings = load_holdings()
     paths: list[str] = []
@@ -44,7 +86,7 @@ def paths_for_profile(profile: str) -> list[str]:
             paths.append(f"{ticker}/research/news")
         return paths
 
-    if profile == "marvin-pick":
+    if profile in {"marvin-pick", "downloads"}:
         for ticker in holdings:
             paths.extend(
                 [
@@ -101,6 +143,43 @@ def paths_for_profile(profile: str) -> list[str]:
             "dashboard/data/index_membership.json",
             "dashboard/data/holdings",
         ]
+
+    if profile == "buyback-radar":
+        # ci_checkout_workspace.sh passes "listed", so this is the whole
+        # checkout plus .github. No ticker filings and no activist-report tree.
+        return [
+            "_system/scripts",
+            "_system/portfolio",
+            "_system/data/buyback_radar",
+            "_system/reference/market-data/fundamentals",
+            ".gitattributes",
+            "dashboard/private-assets.json",
+            "dashboard/data/buyback_radar.json",
+            "dashboard/data/buyback_companies.json",
+            "dashboard/data/buyback_manifest.json",
+            "dashboard/data/buyback_snapshots",
+            "dashboard/data/tickers",
+            "dashboard/data/agent_shards",
+            "dashboard/data/special_situations.json",
+            "dashboard/data/short_alpha.json",
+        ]
+
+    if profile == "drive":
+        # README makes the ticker directory exist for normalize_ticker.
+        # research/ and third-party-analyses/ are what import and the insights
+        # rebuild read. drive-intake/ is the company-PDF destination.
+        # investor-documents/*.pdf and *.htm stay out: that tree is 41 GiB.
+        paths = []
+        for ticker in tracked_company_dirs():
+            paths.extend(
+                [
+                    f"{ticker}/README.md",
+                    f"{ticker}/research",
+                    f"{ticker}/third-party-analyses",
+                    f"{ticker}/investor-documents/drive-intake",
+                ]
+            )
+        return paths
 
     raise SystemExit(f"Unknown sparse profile: {profile}")
 

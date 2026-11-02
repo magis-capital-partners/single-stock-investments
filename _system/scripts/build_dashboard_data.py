@@ -392,7 +392,15 @@ def _valuation_field_missing(key: str, value) -> bool:
 
 
 def preserve_infra_from_prior(rows: list[dict], prior_by_ticker: dict[str, dict]) -> int:
-    """Fill infra/valuation fields hidden by sparse checkout from the prior dashboard."""
+    """Fill infra/valuation fields hidden by sparse checkout from the prior dashboard.
+
+    DASHBOARD_PRESERVE_INFRA_ALWAYS=1 copies every populated infra column from
+    the prior row. Data Pipeline downloads and drive use it: their checkout has
+    research trees but not the 41 GiB filing tree, so a partial pdf count or
+    recent-file list would otherwise publish as if filings had disappeared.
+    Valuation columns still update from the research trees.
+    """
+    force_infra = os.environ.get("DASHBOARD_PRESERVE_INFRA_ALWAYS") == "1"
     restored = 0
     for row in rows:
         prior = prior_by_ticker.get(row["ticker"])
@@ -402,10 +410,16 @@ def preserve_infra_from_prior(rows: list[dict], prior_by_ticker: dict[str, dict]
         for key in _INFRA_PRESERVE_KEYS:
             current_value = row.get(key)
             prior_value = prior.get(key)
+            populated = prior_value not in (None, False, 0, "", [], {})
+            if force_infra and populated:
+                if current_value != prior_value:
+                    row[key] = prior[key]
+                    changed = True
+                continue
             missing_now = current_value in (None, False, 0, "", [], {})
             if key == "completeness":
                 missing_now = float(current_value or 0) < float(prior_value or 0)
-            if missing_now and prior_value not in (None, False, 0, "", [], {}):
+            if missing_now and populated:
                 row[key] = prior[key]
                 changed = True
         for key in _VALUATION_PRESERVE_KEYS:

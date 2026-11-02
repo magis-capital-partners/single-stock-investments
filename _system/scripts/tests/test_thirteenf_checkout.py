@@ -90,7 +90,7 @@ def test_thirteen_f_job_uses_the_dedicated_sparse_profile():
 
 def test_thirteen_f_arm_asks_for_listed_files_not_the_dashboard_tree():
     shell = SHELL.read_text(encoding="utf-8")
-    arm = re.search(r"(?ms)^  thirteen-f\)\n(.*?\n    ;;\n)", shell)
+    arm = re.search(r"(?ms)^  thirteen-f(?:\|buyback-radar)?\)\n(.*?\n    ;;\n)", shell)
     assert arm, "ci_checkout_workspace.sh has no thirteen-f profile"
     body = arm.group(1)
     assert "apply_sparse_paths files-only" in body
@@ -103,6 +103,7 @@ def test_thirteen_f_arm_asks_for_listed_files_not_the_dashboard_tree():
     assert 'echo "_system"' in source
     assert 'echo ".github"' in source
     assert '!= "files-only"' in source
+    assert '!= "listed"' in source
     assert 'echo "dashboard"' in source
     # Other profiles still take the whole dashboard tree.
     assert re.search(r"(?m)^    apply_sparse_paths$", shell)

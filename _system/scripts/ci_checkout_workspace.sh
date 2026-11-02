@@ -15,7 +15,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/ci_resolve_checkout_ref.sh"
 
-PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f}"
+PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f|buyback-radar|downloads|drive}"
 REF_INPUT="${2:-}"
 FETCH_DEPTH="${3:-}"
 
@@ -59,9 +59,13 @@ apply_sparse_paths() {
   local paths_file
   paths_file=$(mktemp)
   {
-    echo "_system"
+    # "listed" is the caller's complete path list. files-only still takes
+    # all of _system and only the dashboard files the profile names.
+    if [ "$include_dashboard" != "listed" ]; then
+      echo "_system"
+    fi
     echo ".github"
-    if [ "$include_dashboard" != "files-only" ]; then
+    if [ "$include_dashboard" != "files-only" ] && [ "$include_dashboard" != "listed" ]; then
       echo "dashboard"
     fi
     python3 "$SCRIPT_DIR/ci_sparse_checkout_paths.py" "$PROFILE"
@@ -122,7 +126,7 @@ case "$PROFILE" in
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     ;;
-  news|marvin-pick|marvin-forecast|dashboard|two-phase-watch)
+  news|marvin-pick|marvin-forecast|dashboard|two-phase-watch|downloads|drive)
     git sparse-checkout init --no-cone
     # Seed with base dirs so fetch can resolve scripts before path list runs.
     git sparse-checkout set _system .github dashboard Makefile
@@ -138,6 +142,16 @@ case "$PROFILE" in
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     apply_sparse_paths files-only
+    git read-tree -mu HEAD
+    ;;
+  buyback-radar)
+    git sparse-checkout init --no-cone
+    # Do not seed _system. That tree is 4 GiB, mostly activist PDFs this job
+    # never opens. The path script names the directories it does read.
+    git sparse-checkout set .github
+    git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
+    checkout_ref
+    apply_sparse_paths listed
     git read-tree -mu HEAD
     ;;
   *)

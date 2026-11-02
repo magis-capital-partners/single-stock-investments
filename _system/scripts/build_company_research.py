@@ -49,6 +49,25 @@ SHARED_MODELS = {
 COMPANY_DATA_FOLDERS = {'fundamentals', 'operating_kpis', 'valuation_fundamentals', 'valuation_quotes', 'compounders', 'insider', 'returns', 'equity'}
 
 
+def preserve_unscanned_records(records: dict, previous: dict, absent: set[str]) -> int:
+    """Keep prior records whose collections were not in this checkout.
+
+    A narrowed vault checkout must not relabel those records last_known.
+    A collection that was actually scanned is not in ``absent``.
+    """
+    if not absent:
+        return 0
+    kept = 0
+    for key, old in previous.items():
+        if key in records or not isinstance(old, dict):
+            continue
+        origins = {origin for origin in (old.get("origins") or []) if isinstance(origin, str)}
+        if origins and origins <= absent:
+            records[key] = dict(old)
+            kept += 1
+    return kept
+
+
 def market_data_owner(path: Path, companies: dict) -> list[str]:
     """Only known ticker-file conventions establish ownership of numeric data."""
     if path.parent.name not in COMPANY_DATA_FOLDERS:
@@ -497,6 +516,16 @@ class Builder:
         for collection in VAULT_COLLECTIONS:
             folder = self.vault / collection
             if not folder.is_dir():
+                # Only the narrowed company-source checkout sets this. A full
+                # vault that is simply missing a collection keeps the old
+                # last_known path, so a deleted corpus can still age out.
+                if os.environ.get("COMPANY_SOURCE_ABSENT_COLLECTIONS_ARE_UNSCANNED") == "1":
+                    self.receipt(
+                        "vault:" + collection,
+                        0,
+                        "absent",
+                        "Collection is not in this checkout",
+                    )
                 continue
             count = 0
             try:
@@ -840,6 +869,14 @@ class Builder:
         return self.publish()
 
     def publish(self):
+        absent = {row["collection"] for row in self.receipts if row.get("status") == "absent"}
+        if absent:
+            kept = preserve_unscanned_records(
+                self.index.records,
+                self.previous.get("records") or {},
+                absent,
+            )
+            print(f"Kept {kept} records from vault collections that were not checked out", flush=True)
         # A recovered Git original can acquire a Drive revision identity when
         # exact-byte copies merge. Do not resurrect its old empty placeholder
         # under the former ID; preserve genuinely different historical bodies.
