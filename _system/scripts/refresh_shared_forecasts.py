@@ -385,6 +385,9 @@ def audit_snapshot(forecast):
 
 
 def run(root=ROOT, as_of=None, collect=False, workers=6, prices_only=False):
+    from coverage_inputs import ensure_registered_coverage
+    ensure_registered_coverage(root)
+    _universe.cache_clear()
     as_of = as_of or datetime.now(timezone.utc).date().isoformat()
     rows = universe(root)
     if not rows:

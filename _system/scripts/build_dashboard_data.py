@@ -3759,6 +3759,97 @@ def load_prior_rows() -> dict[str, dict]:
             file=sys.stderr,
         )
     return merged
+def sync_registered_coverage_inputs() -> list[str]:
+    """Add registered listings absent from a restored coverage snapshot.
+
+    Rebuild only new rows through the usual row builder. Existing rows and
+    detail files remain untouched, so a sparse underwriting/quote checkout
+    cannot erase research while bringing its coverage inputs up to date.
+    """
+    import copy
+    from atomic_io import write_json_if_changed, write_text_if_changed
+    from build_dashboard_shards import shard_filename, slim_ticker_row
+
+    def restored(path):
+        value = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(value, dict) or value.get("private_snapshot"):
+            raise ValueError("Restore authorized private coverage inputs: " + str(path))
+        return value
+
+    core_path = DATA_DIR / "core.json"
+    core = restored(core_path)
+    prior = core.get("tickers")
+    if not isinstance(prior, list) or not prior:
+        raise ValueError("Restore nonempty authorized coverage before adding listings")
+    registry = restored(REGISTRY_PATH)
+    holdings = registry.get("holdings") or {}
+    known = {row["ticker"] for row in prior}
+    if len(known) != len(prior):
+        raise ValueError("Duplicate coverage listing identity")
+    missing = sorted(set(holdings) - known)
+    if not missing:
+        return []
+    if any(not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,30}", t) for t in missing):
+        raise ValueError("Unsafe registered listing identity")
+    classifications = load_classification()
+    parsed_holdings = parse_holdings()
+    bundle = restored(OUTPUT) if OUTPUT.is_file() else None
+    bundle_rows = {row["ticker"]: row for row in (bundle or {}).get("tickers") or []}
+    additions = []
+    new_details = []
+    for ticker in missing:
+        path = DATA_DIR / "tickers" / shard_filename(ticker)
+        if path.is_file():
+            row = restored(path)
+            if ticker in bundle_rows and bundle_rows[ticker] != row:
+                raise ValueError("Conflicting coverage details require a full rebuild: " + ticker)
+        else:
+            row = bundle_rows.get(ticker)
+            if row is None:
+                row = build_ticker_row(ticker, parsed_holdings, classifications,
+                                       watchlist=registry.get("watchlist") or {})
+            new_details.append((path, row))
+        if row.get("ticker") != ticker:
+            raise ValueError("Coverage detail listing identity disagrees with registry: " + ticker)
+        additions.append(row)
+    payload = copy.deepcopy(core)
+    payload["tickers"] = prior + additions
+    # All three publication guards remain in force. No prior detail is rebuilt
+    # or pruned by this operation; the only changed coverage rows are additions.
+    baseline = {row["ticker"]: row for row in prior}
+    summary = payload.setdefault("summary", {})
+    summary["ticker_count"] = len(payload["tickers"])
+    for key, field in (("total_pdfs", "pdf_count"), ("with_readme", "readme"),
+                       ("with_research", "research_dir"), ("with_property_register", "properties")):
+        if key in summary:
+            summary[key] += sum(int(row.get(field) or 0) if field == "pdf_count" else bool(row.get(field))
+                                for row in additions)
+    if "avg_completeness" in summary:
+        summary["avg_completeness"] = round(sum(float(r.get("completeness") or 0) for r in payload["tickers"])
+                                            / len(payload["tickers"]))
+    markets = {row.get("market") for row in payload["tickers"] if row.get("market")}
+    if "markets" in summary:
+        summary["markets"] = sort_markets(markets)
+    if "market_filters" in summary:
+        summary["market_filters"] = sort_market_filters(markets)
+    refuse_infra_collapse(payload, baseline)
+    refuse_research_collapse(payload, baseline)
+    refuse_valuation_collapse(payload, baseline)
+    if bundle is not None:
+        bundle_known = {row["ticker"] for row in bundle.get("tickers") or []}
+        bundle.setdefault("tickers", []).extend(row for row in additions if row["ticker"] not in bundle_known)
+        bundle.setdefault("summary", {})["ticker_count"] = len(bundle["tickers"])
+        bundle["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    payload["tickers"] = prior + [slim_ticker_row(row) for row in additions]
+    payload["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for path, row in new_details:
+        write_json_if_changed(path, row, indent=None)
+    if bundle is not None:
+        write_json_if_changed(OUTPUT, bundle, indent=None)
+    write_text_if_changed(core_path, json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
+    return missing
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     short_alpha = build_short_alpha()
@@ -3907,4 +3998,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["--coverage-additions-only"]:
+        print(json.dumps({"added_registered_listings": sync_registered_coverage_inputs()}))
+    else:
+        main()
