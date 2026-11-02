@@ -1,6 +1,6 @@
 # Filing digest — CRH
 
-**Generated:** 2026-10-14  
+**Generated:** 2026-11-02  
 **Agent:** Marvin (`build_filing_evidence.py`)  
 **Inventory:** `CRH/research/evidence/document_inventory.json`  
 
@@ -14,45 +14,45 @@ Documents in folder: **51** (all listed below; Tier 1–3 extracted or keyword-s
 | partial | 424B | 2025-01-07 | `investor-documents/sec-edgar/424B5_20250107_rpt_acc0001193125_25_002930.htm` | 30057 |
 | partial | 424B | 2025-10-06 | `investor-documents/sec-edgar/424B5_20251006_rpt_acc0001193125_25_230993.htm` | 30057 |
 | full | 424B | 2025-10-07 | `investor-documents/sec-edgar/424B5_20251007_rpt_acc0001193125_25_233453.htm` | 298181 |
-| partial | 10-K | 2024-03-15 | `investor-documents/sec-edgar/10-K-A_20240315_rpt20231231_acc0001628280_24_011326.htm` | 30057 |
-| full | 10-K | 2024-02-29 | `investor-documents/sec-edgar/10-K_20240229_rpt20231231_acc0001628280_24_007773.htm` | 597850 |
-| full | 10-K | 2025-02-26 | `investor-documents/sec-edgar/10-K_20250226_rpt20241231_acc0001628280_25_008179.htm` | 602811 |
-| full | 10-K | 2026-02-18 | `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm` | 593782 |
+| partial | 10-K | 2024-03-15 | `investor-documents/sec-edgar/10-K-A_20240315_rpt20231231_acc0001628280_24_011326.htm` | 30058 |
+| full | 10-K | 2024-02-29 | `investor-documents/sec-edgar/10-K_20240229_rpt20231231_acc0001628280_24_007773.htm` | 620094 |
+| full | 10-K | 2025-02-26 | `investor-documents/sec-edgar/10-K_20250226_rpt20241231_acc0001628280_25_008179.htm` | 622515 |
+| full | 10-K | 2026-02-18 | `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm` | 611147 |
 | partial | 20-F | 2021-03-12 | `investor-documents/sec-edgar/20-F_20210312_rpt20201231_acc0001193125_21_078969.htm` | 30057 |
 | partial | 20-F | 2022-03-11 | `investor-documents/sec-edgar/20-F_20220311_rpt20211231_acc0001193125_22_072901.htm` | 30059 |
-| full | 20-F | 2023-03-10 | `investor-documents/sec-edgar/20-F_20230310_rpt20221231_acc0001628280_23_007435.htm` | 1185514 |
-| full | 10-Q | 2024-05-10 | `investor-documents/sec-edgar/10-Q_20240510_rpt20240331_acc0001628280_24_022452.htm` | 189681 |
+| full | 20-F | 2023-03-10 | `investor-documents/sec-edgar/20-F_20230310_rpt20221231_acc0001628280_23_007435.htm` | 1196523 |
+| full | 10-Q | 2024-05-10 | `investor-documents/sec-edgar/10-Q_20240510_rpt20240331_acc0001628280_24_022452.htm` | 221743 |
 | scan | 10-Q | 2024-08-08 | `investor-documents/sec-edgar/10-Q_20240808_rpt20240630_acc0001628280_24_035823.htm` | 8056 |
 | scan | 10-Q | 2024-11-07 | `investor-documents/sec-edgar/10-Q_20241107_rpt20240930_acc0001628280_24_045944.htm` | 8056 |
-| full | 10-Q | 2025-05-05 | `investor-documents/sec-edgar/10-Q_20250505_rpt20250331_acc0001628280_25_022195.htm` | 185744 |
+| full | 10-Q | 2025-05-05 | `investor-documents/sec-edgar/10-Q_20250505_rpt20250331_acc0001628280_25_022195.htm` | 217248 |
 | scan | 10-Q | 2025-08-06 | `investor-documents/sec-edgar/10-Q_20250806_rpt20250630_acc0001628280_25_038362.htm` | 8056 |
-| scan | 10-Q | 2025-11-05 | `investor-documents/sec-edgar/10-Q_20251105_rpt20250930_acc0001628280_25_049574.htm` | 8055 |
-| full | 10-Q | 2026-04-30 | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm` | 189342 |
-| scan | proxy | 2025-03-28 | `investor-documents/sec-edgar/DEF 14A_20250328_rpt20241231_acc0001628280_25_015342.htm` | 8056 |
-| full | proxy | 2026-03-27 | `investor-documents/sec-edgar/DEF 14A_20260327_rpt20260327_acc0001628280_26_021560.htm` | 529500 |
-| scan | 8-K | 2024-12-26 | `investor-documents/sec-edgar/8-K_20241226_rpt20241226_acc0001628280_24_052436.htm` | 3447 |
-| scan | 8-K | 2024-12-30 | `investor-documents/sec-edgar/8-K_20241230_rpt20241230_acc0001628280_24_052576.htm` | 3313 |
+| scan | 10-Q | 2025-11-05 | `investor-documents/sec-edgar/10-Q_20251105_rpt20250930_acc0001628280_25_049574.htm` | 8056 |
+| full | 10-Q | 2026-04-30 | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm` | 222059 |
+| scan | proxy | 2025-03-28 | `investor-documents/sec-edgar/DEF 14A_20250328_rpt20241231_acc0001628280_25_015342.htm` | 8055 |
+| full | proxy | 2026-03-27 | `investor-documents/sec-edgar/DEF 14A_20260327_rpt20260327_acc0001628280_26_021560.htm` | 533177 |
+| scan | 8-K | 2024-12-26 | `investor-documents/sec-edgar/8-K_20241226_rpt20241226_acc0001628280_24_052436.htm` | 3472 |
+| scan | 8-K | 2024-12-30 | `investor-documents/sec-edgar/8-K_20241230_rpt20241230_acc0001628280_24_052576.htm` | 3338 |
 | scan | 8-K | 2025-01-10 | `investor-documents/sec-edgar/8-K_20250110_rpt20250109_acc0001193125_25_004088.htm` | 8055 |
-| scan | 8-K | 2025-02-26 | `investor-documents/sec-edgar/8-K_20250226_rpt20250226_acc0001628280_25_008174.htm` | 4774 |
-| scan | 8-K | 2025-02-28 | `investor-documents/sec-edgar/8-K_20250228_rpt20250228_acc0001628280_25_009105.htm` | 7286 |
-| scan | 8-K | 2025-04-17 | `investor-documents/sec-edgar/8-K_20250417_rpt20250417_acc0001628280_25_018116.htm` | 8056 |
-| scan | 8-K | 2025-05-05 | `investor-documents/sec-edgar/8-K_20250505_rpt20250505_acc0001628280_25_022191.htm` | 4767 |
+| scan | 8-K | 2025-02-26 | `investor-documents/sec-edgar/8-K_20250226_rpt20250226_acc0001628280_25_008174.htm` | 4799 |
+| scan | 8-K | 2025-02-28 | `investor-documents/sec-edgar/8-K_20250228_rpt20250228_acc0001628280_25_009105.htm` | 7311 |
+| scan | 8-K | 2025-04-17 | `investor-documents/sec-edgar/8-K_20250417_rpt20250417_acc0001628280_25_018116.htm` | 8055 |
+| scan | 8-K | 2025-05-05 | `investor-documents/sec-edgar/8-K_20250505_rpt20250505_acc0001628280_25_022191.htm` | 4792 |
 | scan | 8-K | 2025-05-09 | `investor-documents/sec-edgar/8-K_20250509_rpt20250509_acc0001628280_25_024227.htm` | 8056 |
-| scan | 8-K | 2025-07-29 | `investor-documents/sec-edgar/8-K_20250729_rpt20250729_acc0001628280_25_036321.htm` | 3996 |
-| scan | 8-K | 2025-08-06 | `investor-documents/sec-edgar/8-K_20250806_rpt20250806_acc0001628280_25_038359.htm` | 4749 |
-| scan | 8-K | 2025-09-09 | `investor-documents/sec-edgar/8-K_20250909_rpt20250909_acc0000849395_25_000005.htm` | 5772 |
-| scan | 8-K | 2025-09-30 | `investor-documents/sec-edgar/8-K_20250930_rpt20250930_acc0001193125_25_224165.htm` | 5284 |
-| scan | 8-K | 2025-10-09 | `investor-documents/sec-edgar/8-K_20251009_rpt20251009_acc0001193125_25_235823.htm` | 7591 |
-| scan | 8-K | 2025-11-05 | `investor-documents/sec-edgar/8-K_20251105_rpt20251105_acc0001628280_25_049547.htm` | 5676 |
-| scan | 8-K | 2025-12-05 | `investor-documents/sec-edgar/8-K_20251205_rpt20251201_acc0001193125_25_309854.htm` | 4522 |
-| scan | 8-K | 2026-02-18 | `investor-documents/sec-edgar/8-K_20260218_rpt20260218_acc0001628280_26_009032.htm` | 5677 |
-| scan | 8-K | 2026-03-04 | `investor-documents/sec-edgar/8-K_20260304_rpt20260304_acc0001628280_26_014635.htm` | 4512 |
-| scan | 8-K | 2026-04-30 | `investor-documents/sec-edgar/8-K_20260430_rpt20260430_acc0001628280_26_028554.htm` | 5306 |
-| scan | 8-K | 2026-05-01 | `investor-documents/sec-edgar/8-K_20260501_rpt20260428_acc0001628280_26_029318.htm` | 4556 |
+| scan | 8-K | 2025-07-29 | `investor-documents/sec-edgar/8-K_20250729_rpt20250729_acc0001628280_25_036321.htm` | 4021 |
+| scan | 8-K | 2025-08-06 | `investor-documents/sec-edgar/8-K_20250806_rpt20250806_acc0001628280_25_038359.htm` | 4774 |
+| scan | 8-K | 2025-09-09 | `investor-documents/sec-edgar/8-K_20250909_rpt20250909_acc0000849395_25_000005.htm` | 5797 |
+| scan | 8-K | 2025-09-30 | `investor-documents/sec-edgar/8-K_20250930_rpt20250930_acc0001193125_25_224165.htm` | 5309 |
+| scan | 8-K | 2025-10-09 | `investor-documents/sec-edgar/8-K_20251009_rpt20251009_acc0001193125_25_235823.htm` | 7616 |
+| scan | 8-K | 2025-11-05 | `investor-documents/sec-edgar/8-K_20251105_rpt20251105_acc0001628280_25_049547.htm` | 5701 |
+| scan | 8-K | 2025-12-05 | `investor-documents/sec-edgar/8-K_20251205_rpt20251201_acc0001193125_25_309854.htm` | 4547 |
+| scan | 8-K | 2026-02-18 | `investor-documents/sec-edgar/8-K_20260218_rpt20260218_acc0001628280_26_009032.htm` | 5702 |
+| scan | 8-K | 2026-03-04 | `investor-documents/sec-edgar/8-K_20260304_rpt20260304_acc0001628280_26_014635.htm` | 4537 |
+| scan | 8-K | 2026-04-30 | `investor-documents/sec-edgar/8-K_20260430_rpt20260430_acc0001628280_26_028554.htm` | 5331 |
+| scan | 8-K | 2026-05-01 | `investor-documents/sec-edgar/8-K_20260501_rpt20260428_acc0001628280_26_029318.htm` | 4581 |
 | scan | 8-K | 2026-05-07 | `investor-documents/sec-edgar/8-K_20260507_rpt20260507_acc0001628280_26_032325.htm` | 8055 |
-| scan | 8-K | 2026-05-15 | `investor-documents/sec-edgar/8-K_20260515_rpt20260515_acc0001628280_26_035552.htm` | 8055 |
-| scan | 8-K | 2026-05-21 | `investor-documents/sec-edgar/8-K_20260521_rpt20260521_acc0001628280_26_037252.htm` | 5034 |
-| scan | 8-K | 2026-06-16 | `investor-documents/sec-edgar/8-K_20260616_rpt20260616_acc0001628280_26_043417.htm` | 6347 |
+| scan | 8-K | 2026-05-15 | `investor-documents/sec-edgar/8-K_20260515_rpt20260515_acc0001628280_26_035552.htm` | 8056 |
+| scan | 8-K | 2026-05-21 | `investor-documents/sec-edgar/8-K_20260521_rpt20260521_acc0001628280_26_037252.htm` | 5059 |
+| scan | 8-K | 2026-06-16 | `investor-documents/sec-edgar/8-K_20260616_rpt20260616_acc0001628280_26_043417.htm` | 6372 |
 | scan | 8-K | 2026-06-22 | `investor-documents/sec-edgar/8-K_20260622_rpt20260621_acc0001193125_26_276686.htm` | 8056 |
 | scan | 8-K | 2026-07-17 | `investor-documents/sec-edgar/8-K_20260717_rpt20260717_acc0001628280_26_048660.htm` | 8056 |
 | inventory | other | 2025-03-14 | `investor-documents/sec-edgar/PRE 14A_20250314_rpt20241231_acc0001628280_25_012727.htm` | 0 |
@@ -104,269 +104,269 @@ Documents in folder: **51** (all listed below; Tier 1–3 extracted or keyword-s
 
 ### `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm`
 **Keyword snippets (related party, financials, segments):**
-- RevenueFromContractWithCustomerExcludingAssessedTax: 28,754
-- RevenueFromContractWithCustomerExcludingAssessedTax: 26,699
-- RevenueFromContractWithCustomerExcludingAssessedTax: 26,156
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,693
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,873
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,793
-- RevenueFromContractWithCustomerExcludingAssessedTax: 37,447
-- RevenueFromContractWithCustomerExcludingAssessedTax: 35,572
-- RevenueFromContractWithCustomerExcludingAssessedTax: 34,949
-- OperatingLeaseRightOfUseAsset: 1,471
-- OperatingLeaseRightOfUseAsset: 1,274
-- OperatingLeaseLiabilityCurrent: 286
-- OperatingLeaseLiabilityCurrent: 265
-- OperatingLeaseLiabilityNoncurrent: 1,232
-- OperatingLeaseLiabilityNoncurrent: 1,074
-- StockholdersEquity: 24,004
-- StockholdersEquity: 21,607
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 25,048
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22,466
-- LiabilitiesAndStockholdersEquity: 58,329
-- LiabilitiesAndStockholdersEquity: 50,613
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 292
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 262
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 293
-- IncreaseDecreaseInOperatingLeaseLiability: 310
-- IncreaseDecreaseInOperatingLeaseLiability: 287
-- IncreaseDecreaseInOperatingLeaseLiability: 276
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 50
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 44
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 302
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 297
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 443
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 787
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22,495
+- RevenueFromContractWithCustomerExcludingAssessedTax: 28754000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 26699000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 26156000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8693000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8873000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8793000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 37447000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 35572000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 34949000000.0
+- OperatingLeaseRightOfUseAsset: 1471000000.0
+- OperatingLeaseRightOfUseAsset: 1274000000.0
+- OperatingLeaseLiabilityCurrent: 286000000.0
+- OperatingLeaseLiabilityCurrent: 265000000.0
+- OperatingLeaseLiabilityNoncurrent: 1232000000.0
+- OperatingLeaseLiabilityNoncurrent: 1074000000.0
+- StockholdersEquity: 24004000000.0
+- StockholdersEquity: 21607000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 25048000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22466000000.0
+- LiabilitiesAndStockholdersEquity: 58329000000.0
+- LiabilitiesAndStockholdersEquity: 50613000000.0
+- ShareBasedCompensation: 143000000.0
+- ShareBasedCompensation: 125000000.0
+- ShareBasedCompensation: 123000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 292000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 262000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 293000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -310000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -287000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -276000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 50000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 44000000.0
+- FinanceLeasePrincipalPayments: 131000000.0
+- FinanceLeasePrincipalPayments: 57000000.0
+- FinanceLeasePrincipalPayments: 26000000.0
 
 ### `investor-documents/sec-edgar/10-K_20250226_rpt20241231_acc0001628280_25_008179.htm`
 **Keyword snippets (related party, financials, segments):**
-- RevenueFromContractWithCustomerExcludingAssessedTax: 26,699
-- RevenueFromContractWithCustomerExcludingAssessedTax: 26,156
-- RevenueFromContractWithCustomerExcludingAssessedTax: 24,519
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,873
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,793
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,204
-- RevenueFromContractWithCustomerExcludingAssessedTax: 35,572
-- RevenueFromContractWithCustomerExcludingAssessedTax: 34,949
-- RevenueFromContractWithCustomerExcludingAssessedTax: 32,723
-- OperatingLeaseRightOfUseAsset: 1,274
-- OperatingLeaseRightOfUseAsset: 1,292
-- OperatingLeaseLiabilityCurrent: 265
-- OperatingLeaseLiabilityCurrent: 255
-- OperatingLeaseLiabilityNoncurrent: 1,074
-- OperatingLeaseLiabilityNoncurrent: 1,125
-- StockholdersEquity: 21,607
-- StockholdersEquity: 20,854
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22,466
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21,288
-- LiabilitiesAndStockholdersEquity: 50,613
-- LiabilitiesAndStockholdersEquity: 47,469
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 262
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 293
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 273
-- IncreaseDecreaseInOperatingLeaseLiability: 287
-- IncreaseDecreaseInOperatingLeaseLiability: 276
-- IncreaseDecreaseInOperatingLeaseLiability: 269
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 44
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 36
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 309
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 195
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 458
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 425
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 20,466
+- RevenueFromContractWithCustomerExcludingAssessedTax: 26699000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 26156000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 24519000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8873000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8793000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8204000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 35572000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 34949000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 32723000000.0
+- OperatingLeaseRightOfUseAsset: 1274000000.0
+- OperatingLeaseRightOfUseAsset: 1292000000.0
+- OperatingLeaseLiabilityCurrent: 265000000.0
+- OperatingLeaseLiabilityCurrent: 255000000.0
+- OperatingLeaseLiabilityNoncurrent: 1074000000.0
+- OperatingLeaseLiabilityNoncurrent: 1125000000.0
+- StockholdersEquity: 21607000000.0
+- StockholdersEquity: 20854000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22466000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21288000000.0
+- LiabilitiesAndStockholdersEquity: 50613000000.0
+- LiabilitiesAndStockholdersEquity: 47469000000.0
+- ShareBasedCompensation: 125000000.0
+- ShareBasedCompensation: 123000000.0
+- ShareBasedCompensation: 101000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 262000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 293000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 273000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -287000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -276000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -269000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 44000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 36000000.0
+- FinanceLeasePrincipalPayments: 57000000.0
+- FinanceLeasePrincipalPayments: 26000000.0
+- FinanceLeasePrincipalPayments: 28000000.0
 
 ### `investor-documents/sec-edgar/10-K_20240229_rpt20231231_acc0001628280_24_007773.htm`
 **Keyword snippets (related party, financials, segments):**
-- RevenueFromContractWithCustomerExcludingAssessedTax: 26,156
-- RevenueFromContractWithCustomerExcludingAssessedTax: 24,519
-- RevenueFromContractWithCustomerExcludingAssessedTax: 22,187
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,793
-- RevenueFromContractWithCustomerExcludingAssessedTax: 8,204
-- RevenueFromContractWithCustomerExcludingAssessedTax: 7,019
-- RevenueFromContractWithCustomerExcludingAssessedTax: 34,949
-- RevenueFromContractWithCustomerExcludingAssessedTax: 32,723
-- RevenueFromContractWithCustomerExcludingAssessedTax: 29,206
-- OperatingLeaseRightOfUseAsset: 1,292
-- OperatingLeaseRightOfUseAsset: 1,175
-- OperatingLeaseLiabilityCurrent: 255
-- OperatingLeaseLiabilityCurrent: 238
-- OperatingLeaseLiabilityNoncurrent: 1,125
-- OperatingLeaseLiabilityNoncurrent: 1,000
-- StockholdersEquity: 20,854
-- StockholdersEquity: 22,157
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21,288
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22,732
-- LiabilitiesAndStockholdersEquity: 47,469
-- LiabilitiesAndStockholdersEquity: 45,319
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 293
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 273
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 318
-- IncreaseDecreaseInOperatingLeaseLiability: 276
-- IncreaseDecreaseInOperatingLeaseLiability: 269
-- IncreaseDecreaseInOperatingLeaseLiability: 299
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 44
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 36
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 32
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 333
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 386
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 7,937
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 344
+- RevenueFromContractWithCustomerExcludingAssessedTax: 26156000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 24519000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 22187000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8793000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 8204000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 7019000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 34949000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 32723000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 29206000000.0
+- OperatingLeaseRightOfUseAsset: 1292000000.0
+- OperatingLeaseRightOfUseAsset: 1175000000.0
+- OperatingLeaseLiabilityCurrent: 255000000.0
+- OperatingLeaseLiabilityCurrent: 238000000.0
+- OperatingLeaseLiabilityNoncurrent: 1125000000.0
+- OperatingLeaseLiabilityNoncurrent: 1000000000.0
+- StockholdersEquity: 20854000000.0
+- StockholdersEquity: 22157000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21288000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22732000000.0
+- LiabilitiesAndStockholdersEquity: 47469000000.0
+- LiabilitiesAndStockholdersEquity: 45319000000.0
+- ShareBasedCompensation: 123000000.0
+- ShareBasedCompensation: 101000000.0
+- ShareBasedCompensation: 110000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 293000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 273000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 318000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -276000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -269000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -299000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 44000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 36000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 32000000.0
+- FinanceLeasePrincipalPayments: 26000000.0
+- FinanceLeasePrincipalPayments: 28000000.0
 
 ### `investor-documents/sec-edgar/20-F_20230310_rpt20221231_acc0001628280_23_007435.htm`
 **Keyword snippets (related party, financials, segments):**
-- Revenue: 32,723
-- Revenue: 29,206
-- Revenue: 25,888
-- NoncurrentLeaseLiabilities: 1,059
-- NoncurrentLeaseLiabilities: 1,374
-- CurrentLeaseLiabilities: 260
-- CurrentLeaseLiabilities: 297
-- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 249
-- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 264
-- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 258
-- CashOutflowForLeases: 297
-- CashOutflowForLeases: 328
-- CashOutflowForLeases: 326
-- LeaseInterestPaidClassifiedAsOperatingActivities: 48
-- LeaseInterestPaidClassifiedAsOperatingActivities: 64
-- LeaseInterestPaidClassifiedAsOperatingActivities: 68
-- PropertyPlantAndEquipmentExcludingLeasedRightOfUseAssets: 17,663
-- NumberOfOperatingSegments: three
-- PercentageOfExternalGroupRevenue: 10
-- RevenueFromContractsWithCustomers: -
-- RevenueFromContractsWithCustomers: 801
-- RevenueFromContractsWithCustomers: 706
-- RevenueFromContractsWithCustomers: 632
-- RevenueFromContractsWithCustomers: 238
-- RevenueFromContractsWithCustomers: 4,003
-- RevenueFromContractsWithCustomers: 4,241
-- RevenueFromContractsWithCustomers: 220
-- RevenueFromContractsWithCustomers: 3,979
-- RevenueFromContractsWithCustomers: 4,199
-- RevenueFromContractsWithCustomers: 161
-- RevenueFromContractsWithCustomers: 3,157
-- RevenueFromContractsWithCustomers: 3,318
-- RevenueFromContractsWithCustomers: 1,074
-- RevenueFromContractsWithCustomers: 5,219
-- RevenueFromContractsWithCustomers: 6,293
+- Revenue: 32723000000.0
+- Revenue: 29206000000.0
+- Revenue: 25888000000.0
+- NoncurrentLeaseLiabilities: 1059000000.0
+- NoncurrentLeaseLiabilities: 1374000000.0
+- CurrentLeaseLiabilities: 260000000.0
+- CurrentLeaseLiabilities: 297000000.0
+- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 249000000.0
+- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 264000000.0
+- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 258000000.0
+- CashOutflowForLeases: 297000000.0
+- CashOutflowForLeases: 328000000.0
+- CashOutflowForLeases: 326000000.0
+- LeaseInterestPaidClassifiedAsOperatingActivities: 48000000.0
+- LeaseInterestPaidClassifiedAsOperatingActivities: 64000000.0
+- LeaseInterestPaidClassifiedAsOperatingActivities: 68000000.0
+- PropertyPlantAndEquipmentExcludingLeasedRightOfUseAssets: 17663000000.0
+- PercentageOfExternalGroupRevenue: 0.1
+- RevenueFromContractsWithCustomers: 0.0
+- RevenueFromContractsWithCustomers: 801000000.0
+- RevenueFromContractsWithCustomers: 706000000.0
+- RevenueFromContractsWithCustomers: 632000000.0
+- RevenueFromContractsWithCustomers: 238000000.0
+- RevenueFromContractsWithCustomers: 4003000000.0
+- RevenueFromContractsWithCustomers: 4241000000.0
+- RevenueFromContractsWithCustomers: 220000000.0
+- RevenueFromContractsWithCustomers: 3979000000.0
+- RevenueFromContractsWithCustomers: 4199000000.0
+- RevenueFromContractsWithCustomers: 161000000.0
+- RevenueFromContractsWithCustomers: 3157000000.0
+- RevenueFromContractsWithCustomers: 3318000000.0
+- RevenueFromContractsWithCustomers: 1074000000.0
+- RevenueFromContractsWithCustomers: 5219000000.0
+- RevenueFromContractsWithCustomers: 6293000000.0
+- RevenueFromContractsWithCustomers: 1073000000.0
 
 ### `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm`
 **Keyword snippets (related party, financials, segments):**
-- RevenueFromContractWithCustomerExcludingAssessedTax: 6,234
-- RevenueFromContractWithCustomerExcludingAssessedTax: 5,612
-- RevenueFromContractWithCustomerExcludingAssessedTax: 1,136
-- RevenueFromContractWithCustomerExcludingAssessedTax: 1,144
-- RevenueFromContractWithCustomerExcludingAssessedTax: 7,370
-- RevenueFromContractWithCustomerExcludingAssessedTax: 6,756
-- OperatingLeaseRightOfUseAsset: 1,274
-- OperatingLeaseRightOfUseAsset: 1,471
-- OperatingLeaseRightOfUseAsset: 1,272
-- OperatingLeaseLiabilityCurrent: 247
-- OperatingLeaseLiabilityCurrent: 286
-- OperatingLeaseLiabilityNoncurrent: 1,066
-- OperatingLeaseLiabilityNoncurrent: 1,232
-- OperatingLeaseLiabilityNoncurrent: 1,075
-- StockholdersEquity: 23,071
-- StockholdersEquity: 24,004
-- StockholdersEquity: 21,119
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 24,123
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 25,048
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21,978
-- LiabilitiesAndStockholdersEquity: 58,167
-- LiabilitiesAndStockholdersEquity: 58,329
-- LiabilitiesAndStockholdersEquity: 51,921
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 83
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 59
-- IncreaseDecreaseInOperatingLeaseLiability: 86
-- IncreaseDecreaseInOperatingLeaseLiability: 78
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: &#8211;
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 9
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 286
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 2,016
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 397
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 257
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 25,593
+- RevenueFromContractWithCustomerExcludingAssessedTax: 6234000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 5612000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 1136000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 1144000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 7370000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 6756000000.0
+- OperatingLeaseRightOfUseAsset: 1274000000.0
+- OperatingLeaseRightOfUseAsset: 1471000000.0
+- OperatingLeaseRightOfUseAsset: 1272000000.0
+- OperatingLeaseLiabilityCurrent: 247000000.0
+- OperatingLeaseLiabilityCurrent: 286000000.0
+- OperatingLeaseLiabilityNoncurrent: 1066000000.0
+- OperatingLeaseLiabilityNoncurrent: 1232000000.0
+- OperatingLeaseLiabilityNoncurrent: 1075000000.0
+- StockholdersEquity: 23071000000.0
+- StockholdersEquity: 24004000000.0
+- StockholdersEquity: 21119000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 24123000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 25048000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21978000000.0
+- LiabilitiesAndStockholdersEquity: 58167000000.0
+- LiabilitiesAndStockholdersEquity: 58329000000.0
+- LiabilitiesAndStockholdersEquity: 51921000000.0
+- ShareBasedCompensation: 29000000.0
+- ShareBasedCompensation: 32000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 83000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 59000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -86000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -78000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 0.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 9000000.0
+- FinanceLeasePrincipalPayments: 37000000.0
+- FinanceLeasePrincipalPayments: 21000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 286000000.0
 
 ### `investor-documents/sec-edgar/10-Q_20250505_rpt20250331_acc0001628280_25_022195.htm`
 **Keyword snippets (related party, financials, segments):**
-- RevenueFromContractWithCustomerExcludingAssessedTax: 5,612
-- RevenueFromContractWithCustomerExcludingAssessedTax: 5,368
-- RevenueFromContractWithCustomerExcludingAssessedTax: 1,144
-- RevenueFromContractWithCustomerExcludingAssessedTax: 1,165
-- RevenueFromContractWithCustomerExcludingAssessedTax: 6,756
-- RevenueFromContractWithCustomerExcludingAssessedTax: 6,533
-- OperatingLeaseRightOfUseAsset: 1,272
-- OperatingLeaseRightOfUseAsset: 1,274
-- OperatingLeaseRightOfUseAsset: 1,285
-- OperatingLeaseLiabilityCurrent: 247
-- OperatingLeaseLiabilityCurrent: 265
-- OperatingLeaseLiabilityCurrent: 255
-- OperatingLeaseLiabilityNoncurrent: 1,075
-- OperatingLeaseLiabilityNoncurrent: 1,074
-- OperatingLeaseLiabilityNoncurrent: 1,120
-- StockholdersEquity: 21,119
-- StockholdersEquity: 21,607
-- StockholdersEquity: 20,015
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21,978
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22,466
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 20,416
-- LiabilitiesAndStockholdersEquity: 51,921
-- LiabilitiesAndStockholdersEquity: 50,613
-- LiabilitiesAndStockholdersEquity: 46,333
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 59
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 75
-- IncreaseDecreaseInOperatingLeaseLiability: 78
-- IncreaseDecreaseInOperatingLeaseLiability: 75
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 9
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 6
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 290
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 2,137
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 422
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1,005
+- RevenueFromContractWithCustomerExcludingAssessedTax: 5612000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 5368000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 1144000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 1165000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 6756000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 6533000000.0
+- OperatingLeaseRightOfUseAsset: 1272000000.0
+- OperatingLeaseRightOfUseAsset: 1274000000.0
+- OperatingLeaseRightOfUseAsset: 1285000000.0
+- OperatingLeaseLiabilityCurrent: 247000000.0
+- OperatingLeaseLiabilityCurrent: 265000000.0
+- OperatingLeaseLiabilityCurrent: 255000000.0
+- OperatingLeaseLiabilityNoncurrent: 1075000000.0
+- OperatingLeaseLiabilityNoncurrent: 1074000000.0
+- OperatingLeaseLiabilityNoncurrent: 1120000000.0
+- StockholdersEquity: 21119000000.0
+- StockholdersEquity: 21607000000.0
+- StockholdersEquity: 20015000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21978000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22466000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 20416000000.0
+- LiabilitiesAndStockholdersEquity: 51921000000.0
+- LiabilitiesAndStockholdersEquity: 50613000000.0
+- LiabilitiesAndStockholdersEquity: 46333000000.0
+- ShareBasedCompensation: 32000000.0
+- ShareBasedCompensation: 30000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 59000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 75000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -78000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -75000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 9000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 6000000.0
+- FinanceLeasePrincipalPayments: 21000000.0
+- FinanceLeasePrincipalPayments: 9000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1000000.0
 
 ### `investor-documents/sec-edgar/10-Q_20240510_rpt20240331_acc0001628280_24_022452.htm`
 **Keyword snippets (related party, financials, segments):**
-- RevenueFromContractWithCustomerExcludingAssessedTax: 5,368
-- RevenueFromContractWithCustomerExcludingAssessedTax: 5,338
-- RevenueFromContractWithCustomerExcludingAssessedTax: 1,165
-- RevenueFromContractWithCustomerExcludingAssessedTax: 1,089
-- RevenueFromContractWithCustomerExcludingAssessedTax: 6,533
-- RevenueFromContractWithCustomerExcludingAssessedTax: 6,427
-- OperatingLeaseRightOfUseAsset: 1,285
-- OperatingLeaseRightOfUseAsset: 1,292
-- OperatingLeaseRightOfUseAsset: 1,192
-- OperatingLeaseLiabilityCurrent: 255
-- OperatingLeaseLiabilityCurrent: 235
-- OperatingLeaseLiabilityNoncurrent: 1,120
-- OperatingLeaseLiabilityNoncurrent: 1,125
-- OperatingLeaseLiabilityNoncurrent: 1,021
-- StockholdersEquity: 20,015
-- StockholdersEquity: 20,854
-- StockholdersEquity: 21,255
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 20,416
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21,288
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21,837
-- LiabilitiesAndStockholdersEquity: 46,333
-- LiabilitiesAndStockholdersEquity: 47,469
-- LiabilitiesAndStockholdersEquity: 45,107
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 75
-- OperatingLeaseRightOfUseAssetAmortizationExpense: 69
-- IncreaseDecreaseInOperatingLeaseLiability: 75
-- IncreaseDecreaseInOperatingLeaseLiability: 70
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 6
-- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 8
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 296
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 2,199
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 454
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 616
-- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 22,918
+- RevenueFromContractWithCustomerExcludingAssessedTax: 5368000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 5338000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 1165000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 1089000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 6533000000.0
+- RevenueFromContractWithCustomerExcludingAssessedTax: 6427000000.0
+- OperatingLeaseRightOfUseAsset: 1285000000.0
+- OperatingLeaseRightOfUseAsset: 1292000000.0
+- OperatingLeaseRightOfUseAsset: 1192000000.0
+- OperatingLeaseLiabilityCurrent: 255000000.0
+- OperatingLeaseLiabilityCurrent: 235000000.0
+- OperatingLeaseLiabilityNoncurrent: 1120000000.0
+- OperatingLeaseLiabilityNoncurrent: 1125000000.0
+- OperatingLeaseLiabilityNoncurrent: 1021000000.0
+- StockholdersEquity: 20015000000.0
+- StockholdersEquity: 20854000000.0
+- StockholdersEquity: 21255000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 20416000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21288000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 21837000000.0
+- LiabilitiesAndStockholdersEquity: 46333000000.0
+- LiabilitiesAndStockholdersEquity: 47469000000.0
+- LiabilitiesAndStockholdersEquity: 45107000000.0
+- ShareBasedCompensation: 30000000.0
+- ShareBasedCompensation: 31000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 75000000.0
+- OperatingLeaseRightOfUseAssetAmortizationExpense: 69000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -75000000.0
+- IncreaseDecreaseInOperatingLeaseLiability: -70000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 6000000.0
+- ProceedsFromEquityMethodInvestmentDividendsOrDistributionsReturnOfCapital: 8000000.0
+- FinanceLeasePrincipalPayments: 9000000.0
+- FinanceLeasePrincipalPayments: 6000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 1000000.0
+- StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest: 296000000.0
 
 ### `investor-documents/sec-edgar/DEF 14A_20260327_rpt20260327_acc0001628280_26_021560.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -477,26 +477,24 @@ Documents in folder: **51** (all listed below; Tier 1–3 extracted or keyword-s
 
 ### `investor-documents/sec-edgar/20-F_20220311_rpt20211231_acc0001193125_22_072901.htm`
 **Keyword snippets (related party, financials, segments):**
-- Revenue: 30,981
-- Revenue: 27,587
-- Revenue: 28,132
-- NoncurrentLeaseLiabilities: 1,374
-- NoncurrentLeaseLiabilities: 1,339
-- CurrentLeaseLiabilities: 297
-- CurrentLeaseLiabilities: 296
-- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 264
-- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 258
-- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 356
-- CashOutflowForLeases: 328
-- CashOutflowForLeases: 326
-- CashOutflowForLeases: 433
-- LeaseInterestPaidClassifiedAsOperatingActivities: 64
-- LeaseInterestPaidClassifiedAsOperatingActivities: 68
-- LeaseInterestPaidClassifiedAsOperatingActivities: 77
-- PropertyPlantAndEquipmentExcludingLeasedRightOfUseAssets: 17,938
-- NumberOfOperatingSegments: three
-- PercentageOfExternalGroupRevenue: 10
-- RevenueFromContractsWithCustomers: 706
+- DividendsProposedOrDeclaredBeforeFinancialStatementsAuthorisedForIssueButNotRecognisedAsDistributionToOwnersPerShare: 0.93
+- Revenue: 30981000000.0
+- Revenue: 27587000000.0
+- Revenue: 28132000000.0
+- NoncurrentLeaseLiabilities: 1374000000.0
+- NoncurrentLeaseLiabilities: 1339000000.0
+- CurrentLeaseLiabilities: 297000000.0
+- CurrentLeaseLiabilities: 296000000.0
+- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 264000000.0
+- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 258000000.0
+- PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities: 356000000.0
+- CashOutflowForLeases: 328000000.0
+- CashOutflowForLeases: 326000000.0
+- CashOutflowForLeases: 433000000.0
+- LeaseInterestPaidClassifiedAsOperatingActivities: 64000000.0
+- LeaseInterestPaidClassifiedAsOperatingActivities: 68000000.0
+- LeaseInterestPaidClassifiedAsOperatingActivities: 77000000.0
+- PropertyPlantAndEquipmentExcludingLeasedRightOfUseAssets: 17938000000.0
 
 ### `investor-documents/sec-edgar/20-F_20210312_rpt20201231_acc0001193125_21_078969.htm`
 **Keyword snippets (related party, financials, segments):**
