@@ -9,6 +9,7 @@ reads and writes.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -64,6 +65,21 @@ def test_buyback_downloads_and_drive_no_longer_check_out_the_full_tree():
     assert "superinvestor-letters/" not in drive_vault["extra-paths"].replace(
         "/superinvestor-letters/insights.json", ""
     )
+
+
+def test_buyback_seeds_the_path_script_before_the_narrow_checkout():
+    """Run 41431614985 failed here. The listed profile does not check out
+    _system first, so the script that emits the path list has to be seeded
+    on its own. Seeding all of _system would download the activist PDFs."""
+    shell = (ROOT / "_system/scripts/ci_checkout_workspace.sh").read_text(encoding="utf-8")
+    arm = re.search(r"(?ms)^  buyback-radar\)\n(.*?\n    ;;\n)", shell)
+    assert arm, "ci_checkout_workspace.sh has no buyback-radar profile"
+    body = arm.group(1)
+    seed = body.index("_system/scripts/ci_sparse_checkout_paths.py")
+    apply = body.index("apply_sparse_paths listed")
+    assert seed < apply
+    assert "sparse-checkout set _system .github" not in body
+    assert "apply_sparse_paths files-only" not in body
 
 
 def test_buyback_frees_disk_before_checkout_and_lists_every_committed_path():

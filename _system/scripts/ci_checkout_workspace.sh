@@ -146,9 +146,11 @@ case "$PROFILE" in
     ;;
   buyback-radar)
     git sparse-checkout init --no-cone
-    # Do not seed _system. That tree is 4 GiB, mostly activist PDFs this job
-    # never opens. The path script names the directories it does read.
-    git sparse-checkout set .github
+    # The path script has to be on disk before it can name the rest of the
+    # checkout. Seeding all of _system would download the activist PDFs first.
+    git sparse-checkout set \
+      .github \
+      _system/scripts/ci_sparse_checkout_paths.py
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     apply_sparse_paths listed
