@@ -87,7 +87,17 @@ def data_root(source, home, vault):
             retained[path.name] = value
     workflow = yaml.safe_load((source/'.github/workflows/valuation-underwriting.yml').read_text(encoding='utf-8'))
     checkout = next(s for s in workflow['jobs']['underwrite']['steps'] if s.get('uses') == 'actions/checkout@v4')
-    for pattern in checkout['with']['sparse-checkout'].splitlines():
+    patterns = checkout['with']['sparse-checkout'].splitlines()
+    # The installed launcher may still carry the previous sparse path list on
+    # its first self-update. Materialize the current trusted workflow's inputs
+    # before globbing them; never alter a normal project checkout.
+    if source.resolve() == (home/'source').resolve() and (source/'.git').exists():
+        owner = read(home/'runtime-owner.json')
+        require(owner.get('repository') == OPS and owner.get('purpose') == 'local-codex-underwriting',
+                'Only the owned runtime source may materialize worker inputs')
+        git(source, 'sparse-checkout', 'add', '--stdin',
+            data=('\n'.join(patterns)+'\n').encode())
+    for pattern in patterns:
         for name in glob.glob(str(source/pattern.strip('/'))):
             path = Path(name)
             target = root/path.relative_to(source)

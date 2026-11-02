@@ -149,3 +149,50 @@ def test_isolated_data_uses_the_clean_source_archive_for_exact_accessions(tmp_pa
         return 'TEST/investor-documents/sec-edgar/10K_acc0000123456_26_000001.htm\n' if args[1]=='ls-tree' else b'Exact archived primary filing'
     monkeypatch.setattr(evidence.subprocess,'check_output',read)
     assert evidence.filing_bytes(tmp_path/'data','TEST','0000123456-26-000001',None,'https://issuer.test/filing') == b'Exact archived primary filing'
+
+
+@pytest.mark.parametrize('owned_source', [True, False])
+def test_first_updated_worker_materializes_new_trusted_workflow_inputs(tmp_path, owned_source):
+    """The installed launcher can still have the previous sparse path list."""
+    import underwriting_local as local
+    source = tmp_path / ('source' if owned_source else 'normal-project')
+    source.mkdir()
+    def git(*args):
+        return subprocess.check_output(['git', '-c', 'submodule.recurse=false', *args], cwd=source,
+                                       stderr=subprocess.DEVNULL, text=True).strip()
+    git('init', '-q', '-b', 'main')
+    git('config', 'user.name', 'Fixture')
+    git('config', 'user.email', 'fixture@example.test')
+    (tmp_path / 'runtime-owner.json').write_text(json.dumps(
+        {'repository': local.OPS, 'purpose': 'local-codex-underwriting'}))
+    files = {
+        '_system/reference/new_primary_input.json': '{"fixture":true}',
+        '_system/scripts/marker.py': 'pass\n',
+        'dashboard/private-assets.json': '{"assets":{},"repository_assets":{}}',
+        '.github/workflows/valuation-underwriting.yml': '''jobs:
+  underwrite:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/reference/new_primary_input.json
+            /dashboard/private-assets.json
+''',
+    }
+    for name, value in files.items():
+        path = source / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(value, encoding='utf-8')
+    git('add', '.')
+    git('commit', '-qm', 'Trusted worker with a new required input')
+    git('sparse-checkout', 'set', '--no-cone', '/_system/scripts/', '/dashboard/', '/.github/')
+    assert not (source / '_system/reference/new_primary_input.json').exists()
+    root = local.data_root(source, tmp_path, tmp_path / 'vault')
+    collected = root / '_system/reference/new_primary_input.json'
+    if owned_source:
+        assert json.loads(collected.read_text()) == {'fixture': True}
+    else:
+        assert not collected.exists()
+        assert not (source / '_system/reference/new_primary_input.json').exists()
+    assert git('status', '--porcelain') == ''
