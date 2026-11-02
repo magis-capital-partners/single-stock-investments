@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from build_company_research import Builder
 from company_source_cache import pack, restore
 from push_company_source_parts import publish
-from resolve_vault_manifest_conflict import reconcile, resolve
+from resolve_vault_manifest_conflict import merge_journal, reconcile, resolve
 
 COMPANIES = {"CME": {"company": "CME Group Inc.", "market": "US"}}
 ROOT = Path(__file__).resolve().parents[3]
@@ -109,6 +109,33 @@ def test_receipt_conflicts_keep_independent_additions_and_newer_upstream():
         {"private_sha256": "new", "public_sha256": "old-public"},
         {"private_sha256": "different", "public_sha256": "different-public"},
     ) == {"private_sha256": "new", "public_sha256": "old-public"}
+
+
+def test_journal_conflicts_keep_both_appends_in_upstream_order():
+    upstream = '{"path":"a"}\n{"path":"b"}\n'
+    incoming = '{"path":"b"}\n{"path":"c"}\n'
+    assert merge_journal(upstream, incoming) == '{"path":"a"}\n{"path":"b"}\n{"path":"c"}\n'
+    assert merge_journal("", "") == ""
+
+
+def test_receipt_resolver_accepts_the_journal_beside_the_manifest(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_git(argv, **kwargs):
+        calls.append(argv)
+        if argv[3:5] == ["diff", "--name-only"]:
+            return b"dashboard-private/manifest.json\ndashboard-private/migration-journal.jsonl\n"
+        if argv[3] == "show" and argv[4].endswith("manifest.json"):
+            stage = {"1": {"assets": {}}, "2": {"assets": {"a": 1}}, "3": {"assets": {"b": 2}}}
+            return json.dumps(stage[argv[4][1]]).encode()
+        if argv[3] == "show" and "migration-journal" in argv[4]:
+            return b'{"path":"up"}\n' if argv[4].startswith(":2:") else b'{"path":"in"}\n'
+        return b""
+
+    monkeypatch.setattr(subprocess, "check_output", fake_git)
+    resolve(tmp_path)
+    assert (tmp_path / "dashboard-private/migration-journal.jsonl").read_text(encoding="utf-8") == '{"path":"up"}\n{"path":"in"}\n'
+    assert any(call[3:5] == ["add", "--sparse"] for call in calls)
 
 
 def test_receipt_resolver_refuses_source_content_conflicts(tmp_path, monkeypatch):

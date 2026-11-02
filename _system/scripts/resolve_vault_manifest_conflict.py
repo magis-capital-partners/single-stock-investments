@@ -32,16 +32,44 @@ def reconcile(base, upstream, incoming):
     return upstream
 
 
+MANIFEST = "dashboard-private/manifest.json"
+JOURNAL = "dashboard-private/migration-journal.jsonl"
+# These two files are the shared index. Object hashes are unique paths and do
+# not conflict. Anything else is source or archive content.
+RECEIPT_PATHS = {MANIFEST, JOURNAL}
+
+
+def merge_journal(upstream: str, incoming: str) -> str:
+    """Append-only union. Upstream order wins. Incoming lines not already present follow."""
+    lines: list[str] = []
+    seen: set[str] = set()
+    for text in (upstream, incoming):
+        for line in text.splitlines():
+            if line and line not in seen:
+                seen.add(line)
+                lines.append(line)
+    return ("\n".join(lines) + "\n") if lines else ""
+
+
 def resolve(vault):
     def git(*args):
         return subprocess.check_output(["git", "-C", str(vault), *args])
-    path = "dashboard-private/manifest.json"
-    conflicts = git("diff", "--name-only", "--diff-filter=U").decode().splitlines()
-    if conflicts != [path]:
+    conflicts = [path for path in git("diff", "--name-only", "--diff-filter=U").decode().splitlines() if path]
+    if any(path not in RECEIPT_PATHS for path in conflicts):
         raise RuntimeError("Vault conflict includes source data; refusing automatic resolution")
-    versions = [json.loads(git("show", f":{stage}:{path}")) for stage in (1, 2, 3)]
-    (Path(vault) / path).write_text(json.dumps(reconcile(*versions), sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
-    git("add", "--", path)
+    if MANIFEST in conflicts:
+        versions = [json.loads(git("show", f":{stage}:{MANIFEST}")) for stage in (1, 2, 3)]
+        target = Path(vault) / MANIFEST
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(reconcile(*versions), sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+        git("add", "--sparse", "--", MANIFEST)
+    if JOURNAL in conflicts:
+        upstream = git("show", f":2:{JOURNAL}").decode()
+        incoming = git("show", f":3:{JOURNAL}").decode()
+        target = Path(vault) / JOURNAL
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(merge_journal(upstream, incoming), encoding="utf-8")
+        git("add", "--sparse", "--", JOURNAL)
 
 
 if __name__ == "__main__":
