@@ -5,12 +5,12 @@ Profiles:
   news         — portfolio news ingest (holdings news JSON only)
   marvin-pick  — marvin_pick_ticker metadata (holdings research md/json)
   downloads    — same research trees as marvin-pick; document batches are added later
-  drive        — ticker research, third-party analyses, and Drive intake folders
+  drive        — ticker research, third-party analyses, Drive intake folders, desk-brief inputs
   two-phase-watch — INV Accelsius cooling watch (eight ticker trees + INV shard)
   dashboard    — deploy rebuild checkout (base paths only)
   thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
   buyback-radar — buyback snapshots, consumer shards, and the two books it patches
-  activist     — Data Pipeline activist job (downloads trees plus third-party analyses)
+  activist     — Data Pipeline activist job (downloads trees, third-party analyses, desk-brief inputs)
 
 Base paths (_system, .github, and for most profiles the whole dashboard
 tree) are set by ci_checkout_workspace.sh. This script emits the extra
@@ -27,6 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
+DESK_BRIEFS_DIR = ROOT / "_system" / "data" / "desk_briefs"
 
 # Soft cap for the dashboard profile (must stay tiny — SPX-scale explosion caused 5h checkouts).
 BASE_PROFILE_PATH_CAP = 200
@@ -76,6 +77,33 @@ def tracked_company_dirs() -> list[str]:
         for name in result.stdout.splitlines()
         if name and name not in skip and not name.startswith(".")
     )
+
+
+def desk_brief_inputs() -> list[str]:
+    """Every inputs_read path a committed desk brief cites, as an anchored pattern.
+
+    Any rebuild that runs build_dashboard_data also runs check_desk_briefs,
+    which rejects a brief whose cited path is missing from the worktree.
+    Briefs cite root files (AGENT_INDEX.md) and ticker files outside the
+    profile's own trees. Patterns are anchored with a leading "/" so a root
+    file name does not match the same name in every directory.
+    """
+    paths: set[str] = set()
+    for brief in sorted(DESK_BRIEFS_DIR.glob("*/*.json")):
+        try:
+            payload = json.loads(brief.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict):
+            continue
+        for entry in payload.get("inputs_read") or []:
+            rel = entry.get("path") if isinstance(entry, dict) else None
+            if not isinstance(rel, str) or not rel or rel.startswith(("/", "\\")):
+                continue
+            if "\\" in rel or ":" in rel or ".." in Path(rel).parts:
+                continue
+            paths.add("/" + re.sub(r"([*?\[])", r"\\\1", rel.rstrip("/")))
+    return sorted(paths)
 
 
 def paths_for_profile(profile: str) -> list[str]:
@@ -186,6 +214,7 @@ def paths_for_profile(profile: str) -> list[str]:
                     f"{ticker}/investor-documents/research-notes",
                 ]
             )
+        paths.extend(desk_brief_inputs())
         return paths
 
     if profile == "drive":
@@ -203,6 +232,7 @@ def paths_for_profile(profile: str) -> list[str]:
                     f"{ticker}/investor-documents/drive-intake",
                 ]
             )
+        paths.extend(desk_brief_inputs())
         return paths
 
     raise SystemExit(f"Unknown sparse profile: {profile}")
