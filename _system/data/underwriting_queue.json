@@ -1,6 +1,6 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-02",
+  "as_of": "2026-11-03",
   "summary": {
     "companies": 873,
     "statuses": {
@@ -9,21 +9,21 @@
     },
     "blocker_companies": {
       "realization_timing_missing": 18,
-      "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 133,
+      "parent_cashflow_attribution_missing": 40,
       "positive_normalized_owner_cash_not_established": 110,
       "pre_listing_share_basis_unverified": 101,
       "completed_session_quote_missing": 28,
-      "annual_operating_cash_flow_missing": 44,
-      "annual_diluted_share_count_missing": 50,
       "annual_capex_missing": 72,
+      "annual_diluted_share_count_missing": 50,
+      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 367,
       "source_share_basis_unverified": 56,
       "newer_balance_sheet_inputs_available": 216,
       "new_earnings_disclosure_unresolved": 27,
       "financial_inputs_expired_or_undated": 22,
-      "listing_calendar_or_completed_close_unverified": 23,
       "corporate_action_history_unverified": 25,
+      "listing_calendar_or_completed_close_unverified": 23,
       "unique_shareholder_irr_unavailable": 1,
       "method_specific_forecast_missing": 32,
       "annual_financial_inputs_expired": 10,
@@ -11744,26 +11744,6 @@
       "unresolved_findings": []
     },
     {
-      "ticker": "CPRT",
-      "company": "Copart",
-      "status": "needs_underwriting",
-      "current_model_basis": "issuer_valuation",
-      "blockers": [
-        "new_financial_report_after_model",
-        "newer_balance_sheet_inputs_available",
-        "underwriting_revision_required"
-      ],
-      "last_attempt": "2026-11-02T05:30:30.971593+00:00",
-      "retry_after": "2026-11-03",
-      "underwriting_gaps": [
-        {
-          "code": "StageBlocked",
-          "detail": "primary_evidence_gap: [{\"code\": \"material_acv_target_financial_evidence_missing\", \"detail\": \"The CURRENT packet still contains no ACV financial statements. Copart's doc_9b8366946fd8b140, Note 19, discloses an approximately USD 1.9 billion cash acquisition expected to close by calendar year-end 2026, excluded from July 31 consolidated accounts. Retrieve ACV's latest annual and interim primary reports available by 2026-10-30: consolidated balance sheets, income statements, cash flows and financing notes. Search 'restricted cash', 'finance receivables', 'borrowings', 'securitization', 'guarantees' and 'commitments'. Establish acquired usable cash, operating cash consumption, financial assets, matching obligations and funding restrictions. These material claims cannot be bounded using Copart's existing auction earnings or by assigning ACV zero proceeds.\"}, {\"code\": \"acv_transaction_consideration_and_funding_reconciliation_missing\", \"detail\": \"Copart's expanded disclosure provides approximate equity consideration and general closing conditions; Note 19 expressly says the acquisition's financial statement impact cannot reasonably be estimated. Retrieve the executed merger agreement and associated primary tran"
-        }
-      ],
-      "unresolved_findings": []
-    },
-    {
       "ticker": "BRK.B",
       "company": "Berkshire Hathaway",
       "status": "needs_underwriting",
@@ -11838,6 +11818,26 @@
         {
           "code": "StageBlocked",
           "detail": "model_call_daily_repo_limit"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "CPRT",
+      "company": "Copart",
+      "status": "needs_underwriting",
+      "current_model_basis": "issuer_valuation",
+      "blockers": [
+        "new_financial_report_after_model",
+        "newer_balance_sheet_inputs_available",
+        "underwriting_revision_required"
+      ],
+      "last_attempt": "2026-11-03T05:05:46.612303+00:00",
+      "retry_after": "2026-11-04",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "author_or_challenger_unresolved: Provider stage failed to return valid JSON: Local Codex stage did not finish without tools: failed []"
         }
       ],
       "unresolved_findings": []
