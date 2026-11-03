@@ -262,3 +262,57 @@ def test_unchanged_archive_reuses_verified_parts_and_repairs_corruption(tmp_path
     part=next(archive.glob('*.zip'));part.write_bytes(b'corrupted archive')
     pack(cache,archive);restore(archive,tmp_path/'restored')
     assert (tmp_path/'restored/git/aa.json').read_bytes()==(cache/'git/aa.json').read_bytes()
+
+
+def test_release_reuses_parts_and_keeps_unarchived_bookkeeping(tmp_path):
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    original=b'{"text":"complete original, including all source context"}'
+    (cache/'git/aa.json').write_bytes(original)
+    (cache/'work.sqlite').write_bytes(b'worker bookkeeping')
+    archive=tmp_path/'archive';pack(cache,archive)
+    previous=(archive/'manifest.json').read_bytes()
+    result=pack(cache,archive,release_packed_inputs=True)
+    assert result['released_files']==1 and result['released_input_bytes']==len(original)
+    assert not (cache/'git/aa.json').exists()
+    assert (cache/'work.sqlite').read_bytes()==b'worker bookkeeping'
+    assert (archive/'manifest.json').read_bytes()==previous
+    restore(archive,tmp_path/'restored')
+    assert (tmp_path/'restored/git/aa.json').read_bytes()==original
+
+
+def test_release_checks_all_archived_bytes_before_deleting_any_source(tmp_path):
+    import hashlib
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    for name in ('aa','bb'):(cache/'git'/(name+'.json')).write_text(name+' full original')
+    archive=tmp_path/'archive';pack(cache,archive)
+    manifest=json.loads((archive/'manifest.json').read_text())
+    # A checksum-valid old part with dishonest input metadata must not authorize
+    # source deletion. Put it last to catch incremental, partial cleanup too.
+    last=manifest['parts'][-1]
+    with zipfile.ZipFile(archive/last['file']) as z:name=z.namelist()[0]
+    forged=archive/'forged.zip'
+    with zipfile.ZipFile(forged,'w') as z:z.writestr(name,b'different bytes')
+    sha=hashlib.sha256(forged.read_bytes()).hexdigest()
+    forged.replace(archive/(sha+'.zip'))
+    last.update(file=sha+'.zip',sha256=sha)
+    (archive/'manifest.json').write_text(json.dumps(manifest))
+    with pytest.raises(ValueError,match='content differs'):
+        pack(cache,archive,release_packed_inputs=True)
+    for name in ('aa','bb'):assert (cache/'git'/(name+'.json')).read_text()==name+' full original'
+
+
+def test_release_refuses_an_archive_inside_its_cache(tmp_path):
+    cache=tmp_path/'cache';cache.mkdir();(cache/'matches.json').write_text('verified source')
+    with pytest.raises(ValueError,match='outside'):
+        pack(cache,cache/'archive',release_packed_inputs=True)
+    assert (cache/'matches.json').read_text()=='verified source'
+
+
+def test_release_refuses_a_linked_source_root(tmp_path):
+    cache=tmp_path/'cache';cache.mkdir()
+    external=tmp_path/'external';external.mkdir();(external/'aa.json').write_text('private original')
+    try:(cache/'git').symlink_to(external,target_is_directory=True)
+    except OSError:pytest.skip('Directory links unavailable for this Windows account')
+    with pytest.raises(ValueError,match='linked source roots'):
+        pack(cache,tmp_path/'archive',release_packed_inputs=True)
+    assert (external/'aa.json').read_text()=='private original'
