@@ -96,7 +96,12 @@ def load_valuation(ticker: str) -> dict | None:
     p = ROOT / ticker / "research" / "valuation.json"
     if not p.exists():
         return None
-    return json.loads(p.read_text(encoding="utf-8"))
+    value = json.loads(p.read_text(encoding="utf-8"))
+    context = p.with_name('context_overlay.json')
+    if value.get('underwriting') and context.is_file():
+        # Reporting copy only; the sealed model on disk remains untouched.
+        value['context_overlay'] = json.loads(context.read_text(encoding='utf-8'))
+    return value
 
 
 def filing_digest_path(ticker: str) -> str | None:

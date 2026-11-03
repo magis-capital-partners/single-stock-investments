@@ -88,6 +88,59 @@ def test_overlay_defaults_context_only():
     assert built["themes"][0]["indicators"][0]["in_base_irr"] is False
 
 
+def test_sealed_model_context_refresh_does_not_edit_model(tmp_path, monkeypatch):
+    monkeypatch.setattr(overlay, 'ROOT', tmp_path)
+    research=tmp_path/'SEALED/research';research.mkdir(parents=True)
+    model={'underwriting':{'contract_hash':'frozen'},'inputs':{'source':'sealed evidence'}}
+    path=research/'valuation.json';path.write_text(json.dumps(model),encoding='utf-8')
+    before=path.read_bytes()
+    manifest={'as_of':overlay.TODAY,'themes':{'context':{'label':'Context','series':{'signal':{'latest':1,'source':'verified panel'}}}}}
+    overlay.apply_ticker('SEALED',['context'],manifest)
+    assert path.read_bytes()==before
+    context=json.loads((research/'context_overlay.json').read_text(encoding='utf-8'))
+    assert context['themes'][0]['indicators'][0]['source']=='verified panel'
+
+
+def test_sealed_inline_context_is_moved_only_with_exact_builder_binding(tmp_path, monkeypatch):
+    from underwriting_contract import digest
+    monkeypatch.setattr(overlay, 'ROOT', tmp_path)
+    research=tmp_path/'SEALED/research';research.mkdir(parents=True)
+    sealed={'underwriting':{'contract_hash':'frozen'},'inputs':{'source':'sealed evidence'}}
+    prior={'themes':[{'indicators':[{'id':'signal','in_base_irr':True}]}]}
+    path=research/'valuation.json';path.write_text(json.dumps({**sealed,'context_overlay':prior}),encoding='utf-8')
+    receipt={'stages':{'builder':{'provider':'deterministic','status':'finished','model_hash':digest(sealed)}}}
+    (research/'underwriting_receipt.json').write_text(json.dumps(receipt),encoding='utf-8')
+    manifest={'as_of':overlay.TODAY,'themes':{'context':{'label':'Context','series':{'signal':{'latest':1}}}}}
+    overlay.apply_ticker('SEALED',['context'],manifest)
+    assert json.loads(path.read_text(encoding='utf-8'))==sealed
+    assert json.loads((research/'context_overlay.json').read_text(encoding='utf-8'))['themes'][0]['indicators'][0]['in_base_irr'] is True
+    # A different sealed input is a real replay failure; never "repair" it by
+    # dropping annotations or changing the compiler receipt.
+    changed={**sealed,'inputs':{'source':'unexpected change'},'context_overlay':prior}
+    path.write_text(json.dumps(changed),encoding='utf-8');before=path.read_bytes()
+    overlay.apply_ticker('SEALED',['context'],manifest)
+    assert path.read_bytes()==before
+
+
+def test_sealed_sidecar_context_remains_reportable_and_linted(tmp_path, monkeypatch):
+    import refresh_deep_dive_v2 as report
+    import lint_context_overlay as lint
+    monkeypatch.setattr(overlay,'ROOT',tmp_path)
+    monkeypatch.setattr(report,'ROOT',tmp_path)
+    monkeypatch.setattr(lint,'ROOT',tmp_path)
+    monkeypatch.setattr(lint,'THEMES_MANIFEST',tmp_path/'absent-panel.json')
+    research=tmp_path/'SEALED/research';research.mkdir(parents=True)
+    path=research/'valuation.json'
+    path.write_text(json.dumps({'underwriting':{'contract_hash':'frozen'}}),encoding='utf-8')
+    before=path.read_bytes()
+    manifest={'as_of':overlay.TODAY,'themes':{'context':{'label':'Context','series':{'signal':{'latest':1,'source':'verified panel'}}}}}
+    overlay.apply_ticker('SEALED',['context'],manifest)
+    expected=json.loads((research/'context_overlay.json').read_text(encoding='utf-8'))
+    assert report.load_valuation('SEALED')['context_overlay']==expected
+    assert lint.lint_valuation_overlay('SEALED')==[]
+    assert path.read_bytes()==before
+
+
 def test_theme_map_loads():
     tmap = overlay.theme_map()
     assert "TPL" in tmap

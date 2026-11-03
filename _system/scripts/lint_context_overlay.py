@@ -31,7 +31,7 @@ def lint_valuation_overlay(ticker: str) -> list[str]:
     if not vp.exists():
         return [f"{ticker}: no valuation.json"]
     val = load_json(vp)
-    overlay = val.get("context_overlay")
+    overlay = (load_json(vp.with_name('context_overlay.json')) if val.get('underwriting') else {}) or val.get("context_overlay")
     if not overlay:
         return [f"{ticker}: missing context_overlay"]
     if "Lawrence base IRR" not in (overlay.get("disclaimer") or ""):
