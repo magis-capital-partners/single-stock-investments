@@ -44,6 +44,48 @@ def test_note_numbers_in_gap_details_become_explicit_retrieval_terms():
     assert {'note 9','note 15','maturity','collateral'} <= set(terms)
 
 
+def test_requested_credit_sections_survive_quoted_numbers_and_search_punctuation():
+    terms = requested_keywords([{'code': 'missing_revolver_terms', 'detail':
+        'Retrieve Sections 4.02 (Conditions to All Credit Extensions) and 8.02 '
+        '(Remedies upon Event of Default). Search terms: “4.02,” “each Credit Extension,” '
+        '“no Default,” “8.02,” and “Non-Investment Grade Covenant Period.”'}])
+    assert {'section 4.02', 'section 8.02', 'each credit extension', 'no default',
+            'non-investment grade covenant period'} <= set(terms)
+
+
+def test_unquoted_section_lists_and_subsections_retrieve_the_containing_sections():
+    terms = requested_keywords([{'detail':
+        'Retrieve Sections 4.02(a), 8.02 and 8.03, plus Section 2.08(b). '
+        'Reported cash of 257.4 million is not a section reference.'}])
+    assert {'section 4.02', 'section 8.02', 'section 8.03', 'section 2.08'} <= set(terms)
+    assert 'section 257.4' not in terms
+
+
+def test_numbered_html_paragraphs_retain_complete_requested_credit_clauses():
+    from underwriting_evidence import text_of
+    draw = ('4.02 Conditions to All Credit Extensions. '
+            + 'The conditions to each borrowing are contractual requirements. ' * 90
+            + 'No Default shall exist after giving effect to the requested extension.')
+    remedies = ('8.02 Remedies upon Event of Default. '
+                + 'The remedies upon a continuing default are specified here. ' * 90
+                + 'All unpaid principal shall automatically become immediately due and payable.')
+    draw_html = (draw.replace('4.02 ', '4.02<FONT>&nbsp;&nbsp;</FONT><U>', 1)
+                 .replace('Extensions.', 'Extensions</U>.', 1))
+    raw = ('<html><p>Cash, debt, credit, capital and assets.</p>'
+           '<table><tr><td>4.02 Conditions to All Credit Extensions</td><td>76</td></tr>'
+           '<tr><td>8.02 Remedies upon Event of Default</td><td>97</td></tr></table>'
+           + '<p>Unrelated introductory disclosure. </p>' * 1200
+           + '<p>' + draw_html + '</p>'
+           + '<p>4.03 Other Provisions. Unrelated subsequent clause.</p>'
+           + '<p>Unrelated intervening disclosure. </p>' * 1200
+           + '<p>' + remedies + '</p>'
+           + '<p>8.03 Application of Funds. Subsequent clause.</p></html>').encode()
+    doc = document_record('https://issuer.test/agreement', raw, ['section 4.02', 'section 8.02'])
+    assert any(text_of(draw_html) in context for context in doc['contexts'])
+    assert any(remedies in context for context in doc['contexts'])
+    assert text_of(draw_html) in text_of(raw.decode())
+
+
 def test_possessives_do_not_consume_actual_transaction_search_terms():
     terms = requested_keywords([{'code': 'transaction_terms', 'detail':
         "Copart's disclosure omits the target's funding. Search 'merger consideration', "

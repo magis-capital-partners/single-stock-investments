@@ -71,14 +71,24 @@ def requested_keywords(gaps):
         # the first real search term and invert every subsequent quote pair.
         pairs = re.findall(r'(?<!\w)["\u201c]([^\n]{2,120}?)["\u201d](?!\w)'
                            r"|(?<!\w)['\u2018]([^\n]{2,120}?)['\u2019](?!\w)", search)
-        quoted = [left or right for left, right in pairs]
-        terms = [' '.join(t.lower().split()) for t in quoted
-                 if re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", t)]
+        quoted = [' '.join((left or right).lower().split()).strip(' ,;:.') for left, right in pairs]
+        number = r'\d{1,3}\.\d{1,3}'
+        reference = number+r'(?:\([a-z0-9]+\))*'
+        terms = []
+        for term in quoted:
+            section = re.fullmatch(r'(?:section\s+)?('+number+r')(?:\([a-z0-9]+\))*', term)
+            if section:
+                terms.append('section '+section[1])
+            elif re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", term):
+                terms.append(term)
         if not terms:
             terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
                      if w.lower() not in excluded]
         notes = ['note '+n for n in re.findall(r'\bNote\s+(\d{1,2})\b', detail, re.I)]
-        terms = notes+terms
+        section_lists = re.findall(r'\bSections?\s+('+reference
+            +r'(?:(?:,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)'+reference+r')*)', detail, re.I)
+        sections = ['section '+n for group in section_lists for n in re.findall(number, group)]
+        terms = notes+sections+terms
         groups.append(list(dict.fromkeys(terms))[:12])
     terms = []
     for index in range(12):
@@ -149,9 +159,29 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
     # rather than the dense contents page that can win keyword-window scoring.
     # Add complete bounded passages before the general retrieval windows.
     priority_spans = []
+    # Some agreements label sections as "4.02 Title" in a paragraph, without
+    # the word SECTION. HTML block boundaries distinguish these headings from
+    # inline references and provide the following section's exact boundary.
+    headings, cursor = [], 0
+    section_requested = any(re.fullmatch(r'section\s+\d+\.\d+', phrase) for phrase in focus)
+    blocks = re.finditer(r'<(p|h[1-6])\b[^>]*>(.*?)</\1>', source, re.I | re.S) if section_requested else ()
+    for block in blocks:
+        text = text_of(block[2])
+        heading = re.match(r'(?:SECTION\s+)?(\d{1,3}\.\d{1,3})\.?\s+[A-Za-z]', text, re.I)
+        if heading:
+            start = body.find(text, cursor)
+            if start >= 0:
+                headings.append((heading[1], start))
+                cursor = start+len(text)
     for phrase in focus:
         section = re.fullmatch(r'section\s+(\d+\.\d+)',phrase)
         if section:
+            for index, (number, start) in enumerate(headings):
+                if number == section[1]:
+                    end = headings[index+1][1] if index+1 < len(headings) else len(body)
+                    passage = body[start:end]
+                    if 40 <= len(passage.split()) and len(passage) <= 30000:
+                        priority_spans.append((start,end))
             heading = r'\bSECTION\s+'+re.escape(section[1])+r'\s*\.'
             for match in re.finditer(heading,body):
                 following = re.search(r'\bSECTION\s+\d+\.\d+\s*\.',body[match.end():])
