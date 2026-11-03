@@ -26,6 +26,10 @@ inputs:
     description: Additional non-cone sparse-checkout patterns, one per line. Applied after publication-only materialization. Use with publication-only so the rest of the vault stays out.
     required: false
     default: ""
+  source-archive-current:
+    description: Add only immutable source parts referenced by the current archive manifest. Requires publication-only and the archive manifest in extra-paths; keeps historical parts out of the worker without deleting them from Git.
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -102,6 +106,24 @@ runs:
         printf '%s\n' "$VAULT_EXTRA_PATHS" | sed '/^[[:space:]]*$/d' > "$RUNNER_TEMP/vault-extra-paths.txt"
         if [ -s "$RUNNER_TEMP/vault-extra-paths.txt" ]; then
           git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-extra-paths.txt"
+        fi
+
+    - name: Materialize current source archive parts
+      if: inputs.source-archive-current == 'true'
+      shell: bash
+      env:
+        PUBLICATION_ONLY: ${{ inputs.publication-only }}
+      run: |
+        set -euo pipefail
+        if [ "$PUBLICATION_ONLY" != "true" ]; then
+          echo "::error::Current source archive selection requires publication-only checkout."
+          exit 1
+        fi
+        python3 _system/scripts/vault_source_archive_sparse.py \
+          _external/research-vault/dashboard-private/company-source-backfill-v2/manifest.json \
+          > "$RUNNER_TEMP/vault-source-part-patterns.txt"
+        if [ -s "$RUNNER_TEMP/vault-source-part-patterns.txt" ]; then
+          git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-source-part-patterns.txt"
         fi
 
     - name: Export RESEARCH_VAULT_ROOT
