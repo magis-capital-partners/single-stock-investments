@@ -14,6 +14,53 @@ from urllib.parse import quote, urlsplit
 from .policy import ROOT, NY, closing, sessions, stamp
 
 
+SNAPSHOT_SCRIPT = "const F=require('./_system/scripts/third_plus_signal/features.cjs');let s='';process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>{let x=JSON.parse(s);console.log(JSON.stringify(F.financialSnapshot(x.raw,x.at)))});"
+
+
+class FinancialSnapshotError(ValueError):
+    """The shared extractor rejected one issuer's companyfacts; other issuers are unaffected."""
+
+
+class HelperUnavailable(RuntimeError):
+    """Node or the shared extractor cannot run at all, so every issuer would fail."""
+
+
+def stderr_tail(text, root=ROOT, limit=600):
+    text = (text or '').replace(str(root) + '/', '')
+    lines = [x.strip() for x in text.splitlines() if x.strip() and 'ExperimentalWarning' not in x and '--trace-warnings' not in x]
+    error = next((i for i, x in enumerate(lines) if re.match(r'[A-Za-z]*Error\b', x)), None)
+    if error is None:
+        return ' | '.join(lines[-6:])[-limit:] or 'no diagnostic output'
+    frame = next((x for x in lines[error+1:] if x.startswith('at ')), None)
+    return ' | '.join([lines[error]] + ([frame] if frame else []))[:limit]
+
+
+def run_snapshot(raw, at, root=ROOT, timeout=30):
+    try:
+        result = subprocess.run(['node', '-e', SNAPSHOT_SCRIPT], input=json.dumps({'raw': raw, 'at': at}),
+                                cwd=root, text=True, capture_output=True, check=True, timeout=timeout)
+    except FileNotFoundError as exc:
+        raise HelperUnavailable('Node is not installed or not on PATH') from exc
+    except subprocess.CalledProcessError as exc:
+        raise FinancialSnapshotError(f'financialSnapshot exited {exc.returncode}: {stderr_tail(exc.stderr, root)}') from exc
+    except subprocess.TimeoutExpired as exc:
+        raise FinancialSnapshotError(f'financialSnapshot exceeded {timeout}s') from exc
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise FinancialSnapshotError('financialSnapshot returned non-JSON output') from exc
+
+
+def preflight_snapshot(at, root=ROOT):
+    """Prove Node and the extractor's whole require chain load before blaming any one filing."""
+    try:
+        out = run_snapshot(None, at, root)
+    except FinancialSnapshotError as exc:
+        raise HelperUnavailable('Shared financial extractor cannot run: ' + str(exc)) from exc
+    if out != {'status': 'missing_companyfacts'}:
+        raise HelperUnavailable('Shared financial extractor returned an unexpected preflight result')
+
+
 def receipt(raw, url, locator, at):
     return {'url': url, 'sha256': hashlib.sha256(raw).hexdigest(), 'locator': locator, 'retrieved_at': at.isoformat()}
 
@@ -38,6 +85,7 @@ class PublicSources:
                                  load_config().section('edgar')['user_agent'], maximum=maximum,
                                  validator=public_url)
         self.errors = []
+        self.helper_ready = False
 
     def get(self, url):
         if not self.network:
@@ -55,11 +103,12 @@ class PublicSources:
         doc = json.loads(raw)
         if int(doc.get('cik', -1)) != int(cik):
             raise ValueError('SEC companyfacts issuer mismatch')
+        if not self.helper_ready:
+            preflight_snapshot(self.now.isoformat())
+            self.helper_ready = True
         # Use precisely the financial extractor that supplied the historical signals.
-        script = "const F=require('./_system/scripts/third_plus_signal/features.cjs');let s='';process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>{let x=JSON.parse(s);console.log(JSON.stringify(F.financialSnapshot(x.raw,x.at)))});"
-        result = subprocess.run(['node', '-e', script], input=json.dumps({'raw': doc, 'at': self.now.isoformat()}),
-                                cwd=ROOT, text=True, capture_output=True, check=True, timeout=30)
-        return json.loads(result.stdout), receipt(raw, url, 'facts: shared point-in-time financialSnapshot', self.now)
+        snapshot = run_snapshot(doc, self.now.isoformat())
+        return snapshot, receipt(raw, url, 'facts: shared point-in-time financialSnapshot', self.now)
 
     def prices(self, ticker):
         if not re.fullmatch(r'[A-Z0-9][A-Z0-9.^=_-]{0,19}', ticker):
