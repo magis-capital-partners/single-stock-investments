@@ -57,8 +57,11 @@ jobs:
           # only other vault tree this job reads and writes. Letters, podcasts,
           # videos, and the loose research cache stay out.
           publication-only: 'true'
+          # Historic parts remain immutable in Git. Materialize only the current
+          # manifest's inputs so packing does not carry every older snapshot.
+          source-archive-current: 'true'
           extra-paths: |
-            /dashboard-private/company-source-backfill-v2/
+            /dashboard-private/company-source-backfill-v2/manifest.json
       - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth legacy-doc mobi
       - name: Install scan language data
         if: env.PUBLICATION_REPAIR != 'true'
@@ -134,4 +137,4 @@ jobs:
         if: ${{ always() && steps.parts.outcome == 'success' }}
         with:
           message: Preserve resumable company source backfill
-          git_add: --force dashboard-private/company-source-backfill-v2
+          git_add: --sparse --force dashboard-private/company-source-backfill-v2
