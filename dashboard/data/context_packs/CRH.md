@@ -17,7 +17,7 @@ The stock may trade as a passive infrastructure beneficiary while owner cash is 
 - Base return: pending
 
 ## Key assumptions (stable)
-- Price today: **$78.905** (source: Yahoo CRH close 2026-10-14)
+- Price today: **$90.81** (source: Yahoo CRH close 2026-10-30)
 - Normalized owner earnings: **$2,912M** (source: us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-26-009043; form 10-K)
 - Cash: **$3,240M** (source: us-gaap:CashAndCashEquivalentsAtCarryingValue; accession 0001628280-26-028556; form 10-Q)
 - Debt: **$16,071M** (source: us-gaap:LongTermDebtNoncurrent; accession 0001628280-26-028556; form 10-Q)
@@ -48,7 +48,7 @@ The stock may trade as a passive infrastructure beneficiary while owner cash is 
 ## Filing digest excerpt (semi-stable)
 # Filing digest — CRH
 
-**Generated:** 2026-10-14  
+**Generated:** 2026-11-02  
 **Agent:** Marvin (`build_filing_evidence.py`)  
 **Inventory:** `CRH/research/evidence/document_inventory.json`  
 
@@ -62,55 +62,55 @@ Documents in folder: **51** (all listed below; Tier 1–3 extracted or keyword-s
 | partial | 424B | 2025-01-07 | `investor-documents/sec-edgar/424B5_20250107_rpt_acc0001193125_25_002930.htm` | 30057 |
 | partial | 424B | 2025-10-06 | `investor-documents/sec-edgar/424B5_20251006_rpt_acc0001193125_25_230993.htm` | 30057 |
 | full | 424B | 2025-10-07 | `investor-documents/sec-edgar/424B5_20251007_rpt_acc0001193125_25_233453.htm` | 298181 |
-| partial | 10-K | 2024-03-15 | `investor-documents/sec-edgar/10-K-A_20240315_rpt20231231_acc0001628280_24_011326.htm` | 30057 |
-| full | 10-K | 2024-02-29 | `investor-documents/sec-edgar/10-K_20240229_rpt20231231_acc0001628280_24_007773.htm` | 597850 |
-| full | 10-K | 2025-02-26 | `investor-documents/sec-edgar/10-K_20250226_rpt20241231_acc0001628280_25_008179.htm` | 602811 |
-| full | 10-K | 2026-02-18 | `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm` | 593782 |
+| partial | 10-K | 2024-03-15 | `investor-documents/sec-edgar/10-K-A_20240315_rpt20231231_acc0001628280_24_011326.htm` | 30058 |
+| full | 10-K | 2024-02-29 | `investor-documents/sec-edgar/10-K_20240229_rpt20231231_acc0001628280_24_007773.htm` | 620094 |
+| full | 10-K | 2025-02-26 | `investor-documents/sec-edgar/10-K_20250226_rpt20241231_acc0001628280_25_008179.htm` | 622515 |
+| full | 10-K | 2026-02-18 | `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm` | 611147 |
 | partial | 20-F | 2021-03-12 | `investor-documents/sec-edgar/20-F_20210312_rpt20201231_acc0001193125_21_078969.htm` | 30057 |
 | partial | 20-F | 2022-03-11 | `investor-documents/sec-edgar/20-F_20220311_rpt20211231_acc0001193125_22_072901.htm` | 30059 |
-| full | 20-F | 2023-03-10 | `investor-documents/sec-edgar/20-F_20230310_rpt20221231_acc0001628280_23_007435.htm` | 1185514 |
-| full | 10-Q | 2024-05-10 | `investor-documents/sec-edgar/10-Q_20240510_rpt20240331_acc0001628280_24_022452.htm` | 189681 |
+| full | 20-F | 2023-03-10 | `investor-documents/sec-edgar/20-F_20230310_rpt20221231_acc0001628280_23_007435.htm` | 1196523 |
+| full | 10-Q | 2024-05-10 | `investor-documents/sec-edgar/10-Q_20240510_rpt20240331_acc0001628280_24_022452.htm` | 221743 |
 | scan | 10-Q | 2024-08-08 | `investor-documents/sec-edgar/10-Q_20240808_rpt20240630_acc0001628280_24_035823.htm` | 8056 |
 | scan | 10-Q | 2024-11-07 | `investor-documents/sec-edgar/10-Q_20241107_rpt20240930_acc0001628280_24_045944.htm` | 8056 |
-| full | 10-Q | 2025-05-05 | `investor-documents/sec-edgar/10-Q_20250505_rpt20250331_acc0001628280_25_022195.htm` | 185744 |
+| full | 10-Q | 2025-05-05 | `investor-documents/sec-edgar/10-Q_20250505_rpt20250331_acc0001628280_25_022195.htm` | 217248 |
 | scan | 10-Q | 2025-08-06 | `investor-documents/sec-edgar/10-Q_20250806_rpt20250630_acc0001628280_25_038362.htm` | 8056 |
-| scan | 10-Q | 2025-11-05 | `investor-documents/sec-edgar/10-Q_20251105_rpt20250930_acc0001628280_25_049574.htm` | 8055 |
-| full | 10-Q | 2026-04-30 | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm` | 189342 |
-| scan | proxy | 2025-03-28 | `investor-documents/sec-edgar/DEF 14A_20250328_rpt20241231_acc0001628280_25_015342.htm` | 8056 |
-| full | proxy | 2026-03-27 | `investor-documents/sec-edgar/DEF 14A_20260327_rpt20260327_acc0001628280_26_021560.htm` | 529500 |
-| scan | 8-K | 2024-12-26 | `investor-documents/sec-edgar/8-K_20241226_rpt20241226_acc0001628280_24_052436.htm` | 3447 |
-| scan | 8-K | 2024-12-30 | `investor-documents/sec-edgar/8-K_20241230_rpt20241230_acc0001628280_24_052576.htm` | 3313 |
+| scan | 10-Q | 2025-11-05 | `investor-documents/sec-edgar/10-Q_20251105_rpt20250930_acc0001628280_25_049574.htm` | 8056 |
+| full | 10-Q | 2026-04-30 | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm` | 222059 |
+| scan | proxy | 2025-03-28 | `investor-documents/sec-edgar/DEF 14A_20250328_rpt20241231_acc0001628280_25_015342.htm` | 8055 |
+| full | proxy | 2026-03-27 | `investor-documents/sec-edgar/DEF 14A_20260327_rpt20260327_acc0001628280_26_021560.htm` | 533177 |
+| scan | 8-K | 2024-12-26 | `investor-documents/sec-edgar/8-K_20241226_rpt20241226_acc0001628280_24_052436.htm` | 3472 |
+| scan | 8-K | 2024-12-30 | `investor-documents/sec-edgar/8-K_20241230_rpt20241230_acc0001628280_24_052576.htm` | 3338 |
 | scan | 8-K | 2025-01-10 | `investor-documents/sec-edgar/8-K_20250110_rpt20250109_acc0001193125_25_004088.htm` | 8055 |
-| scan | 8-K | 2025-02-26 | `investor-documents/sec-edgar/8-K_20250226_rpt20250226_acc0001628280_25_008174.htm` | 4774 |
-| scan | 8-K | 2025-02-28 | `investor-documents/sec-edgar/8-K_20250228_rpt20250228_acc0001628280_25_009105.htm` | 7286 |
-| scan | 8-K | 2025-04-17 | `investor-documents/sec-edgar/8-K_20250417_rpt20250417_acc0001628280_25_018116.htm` | 8056 |
-| scan | 8-K | 2025-05-05 | `investor-documents/sec-edgar/8-K_20250505_rpt20250505_acc0001628280_25_022191.htm` | 4767 |
+| scan | 8-K | 2025-02-26 | `investor-documents/sec-edgar/8-K_20250226_rpt20250226_acc0001628280_25_008174.htm` | 4799 |
+| scan | 8-K | 2025-02-28 | `investor-documents/sec-edgar/8-K_20250228_rpt20250228_acc0001628280_25_009105.htm` | 7311 |
+| scan | 8-K | 2025-04-17 | `investor-documents/sec-edgar/8-K_20250417_rpt20250417_acc0001628280_25_018116.htm` | 8055 |
+| scan | 8-K | 2025-05-05 | `investor-documents/sec-edgar/8-K_20250505_rpt20250505_acc0001628280_25_022191.htm` | 4792 |
 | scan | 8-K | 2025-05-09 | `investor-documents/sec-edgar/8-K_20250509_rpt20250509_acc0001628280_25_024227.htm` | 8056 |
-| scan | 8-K | 2025-07-29 | `investor-documents/sec-edgar/8-K_20250729_rpt20250729_acc0001628280_25_036321.htm` | 3996 |
-| scan | 8-K | 2025-08-06 | `investor-documents/sec-edgar/8-K_20250806_rpt20250806_acc0001628280_25_038359.htm` | 4749 |
-| scan | 8-K | 2025-09-09 | `investor-documents/sec-edgar/8-K_20250909_rpt20250909_acc0000849395_25_000005.htm` | 5772 |
-| scan | 8-K | 2025-09-30 | `investor-documents/sec-edgar/8-K_20250930_rpt20250930_acc0001193125_25_224165.htm` | 5284 |
-| scan | 8-K | 2025-10-09 | `investor-documents/sec-edgar/8-K_20251009_rpt20251009_acc0001193125_25_235823.htm` | 7591 |
-| scan | 8-K | 2025-11-05 | `investor-documents/sec-edgar/8-K_20251105_rpt20251105_acc0001628280_25_049547.htm` | 5676 |
-| scan | 8-K | 2025-12-05 | `investor-documents/sec-edgar/8-K_20251205_rpt20251201_acc0001193125_25_309854.htm` | 4522 |
-| scan | 8-K | 2026-02-18 | `investor-documents/sec-edgar/8-K_20260218_rpt20260218_acc0001628280_26_009032.htm` | 5677 |
-| scan | 8-K | 2026-03-04 | `investor-documents/sec-edgar/8-K_20260304_rpt20260304_acc0001628280_26_014635.htm` | 4512 |
-| scan | 8-K | 2026-04-30 | `investor-documents/sec-edgar/8-K_20260430_rpt20260430_acc0001628280_26_028554.htm` | 5306 |
-| scan | 8-K | 2026-05-01 | `investor-documents/sec-edgar/8-K_20260501_rpt20260428_acc0001628280_26_029318.htm` | 4556 |
+| scan | 8-K | 2025-07-29 | `investor-documents/sec-edgar/8-K_20250729_rpt20250729_acc0001628280_25_036321.htm` | 4021 |
+| scan | 8-K | 2025-08-06 | `investor-documents/sec-edgar/8-K_20250806_rpt20250806_acc0001628280_25_038359.htm` | 4774 |
+| scan | 8-K | 2025-09-09 | `investor-documents/sec-edgar/8-K_20250909_rpt20250909_acc0000849395_25_000005.htm` | 5797 |
+| scan | 8-K | 2025-09-30 | `investor-documents/sec-edgar/8-K_20250930_rpt20250930_acc0001193125_25_224165.htm` | 5309 |
+| scan | 8-K | 2025-10-09 | `investor-documents/sec-edgar/8-K_20251009_rpt20251009_acc0001193125_25_235823.htm` | 7616 |
+| scan | 8-K | 2025-11-05 | `investor-documents/sec-edgar/8-K_20251105_rpt20251105_acc0001628280_25_049547.htm` | 5701 |
+| scan | 8-K | 2025-12-05 | `investor-documents/sec-edgar/8-K_20251205_rpt20251201_acc0001193125_25_309854.htm` | 4547 |
+| scan | 8-K | 2026-02-18 | `investor-documents/sec-edgar/8-K_20260218_rpt20260218_acc0001628280_26_009032.htm` | 5702 |
+| scan | 8-K | 2026-03-04 | `investor-documents/sec-edgar/8-K_20260304_rpt20260304_acc0001628280_26_014635.htm` | 4537 |
+| scan | 8-K | 2026-04-30 | `investor-documents/sec-edgar/8-K_20260430_rpt20260430_acc0001628280_26_028554.htm` | 5331 |
+| scan | 8-K | 2026-05-01 | `investor-documents/sec-edgar/8-K_20260501_rpt20260428_acc0001628280_26_029318.htm` | 4581 |
 | scan | 8-K | 2026-05-07 | `investor-documents/sec-edgar/8-K_20260507_rpt20260507_acc0001628280_26_032325.htm` | 8055 |
-| scan | 8-K | 2026-05-15 | `investor-documents/sec-edgar/8-K_20260515_rpt20260515_acc0001628280_26_035552.htm` | 8055 |
-| scan | 8-K | 2026-05-21 | `investor-documents/sec-edgar/8-K_20260521_rpt20260521_acc0001628280_26_037252.htm` | 5034 |
-| scan | 8-K | 2026-06-16 | `investor-documents/sec-edgar/8-K_20260616_rpt20260616_acc0001628280_26_043417.htm` | 6347 |
+| scan | 8-K | 2026-05-15 | `investor-documents/sec-edgar/8-K_20260515_rpt20260515_acc0001628280_26_035552.htm` | 8056 |
+| scan | 8-K | 2026-05-21 | `investor-documents/sec-edgar/8-K_20260521_rpt20260521_acc0001628280_26_037252.htm` | 5059 |
+| scan | 8-K | 2026-06-16 | `investor-documents/sec-edgar/8-K_20260616_rpt20260616_acc0001628280_26_043417.htm` | 6372 |
 | scan | 8-K | 2026-06-22 | `investor-documents/sec-edgar/8-K_20260622_rpt20260621_acc0001193125_26_276686.htm` | 8056 |
 | scan | 8-K | 2026-07-17 | `investor-documents/sec-edgar/8-K_20260717_rpt20260717_acc0001628280_26_048660.htm` | 8056 |
 | inventory | other | 2025-03-14 | `investor-documents/sec-edgar/PRE 14A_20250314_rpt20241231_acc0001628280_25_012727.htm` | 0
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CRH/research/deep_dive_2026-10-06.md (sha256 sha256:420fedf1f2168de1...)
-- filing_digest: CRH/research/evidence/filing_digest.md (sha256 sha256:667db70b737f409f...)
-- adversarial: CRH/research/adversarial_2026-10-06.md (sha256 sha256:a149ce58e5fa7693...)
-- valuation: CRH/research/valuation.json (sha256 sha256:f0112830e096f727...)
-- thesis_card: CRH/research/thesis_card.json (sha256 sha256:af37d60c77fdb7f0...)
+- deep_dive: CRH/research/deep_dive_2026-10-06.md (sha256 sha256:8cdb4034a3db816e...)
+- filing_digest: CRH/research/evidence/filing_digest.md (sha256 sha256:e16c69d7b16ae434...)
+- adversarial: CRH/research/adversarial_2026-10-06.md (sha256 sha256:7f7b9eb3b906285f...)
+- valuation: CRH/research/valuation.json (sha256 sha256:87e99f0f48a83037...)
+- thesis_card: CRH/research/thesis_card.json (sha256 sha256:b4ed4affbed3dee5...)
 - cross_check: CRH/research/cross_check_third_party_2026-10-06.md (sha256 sha256:6b7079f81c49d5ec...)
 
 ## Excluded from this pack
