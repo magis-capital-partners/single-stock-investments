@@ -2,8 +2,9 @@
 """Inject thematic context indicators into tagged holdings' valuation.json.
 
 Reads themes/manifest.json (fetch_theme_panel.py) + holdings_themes.json, then
-writes a `context_overlay` block into each tagged ticker's valuation.json and a
-human-readable snippet under research/evidence/ for deep-dive citation.
+writes context into each tagged ticker's valuation.json, or a separate
+context_overlay.json for sealed underwriting models, and a human-readable
+snippet under research/evidence/ for deep-dive citation.
 
   python3 _system/scripts/apply_context_overlay.py            # all tagged tickers
   python3 _system/scripts/apply_context_overlay.py TPL LB     # subset
@@ -161,12 +162,27 @@ def apply_ticker(ticker: str, theme_ids: list[str], manifest: dict) -> str:
     if not vp.exists():
         return f"skip {ticker} (no valuation.json)"
     val = json.loads(vp.read_text(encoding="utf-8"))
-    existing = val.get("context_overlay") or {}
+    sealed = bool(val.get('underwriting'))
+    sidecar = vp.with_name('context_overlay.json')
+    existing = (load_json(sidecar) if sealed else {}) or val.get("context_overlay") or {}
     overlay = build_overlay(ticker, theme_ids, manifest, existing)
     if overlay is None:
         return f"skip {ticker} (no theme data in manifest)"
-    val["context_overlay"] = overlay
-    write_json_if_changed(vp, val)
+    if sealed:
+        write_json_if_changed(sidecar, overlay)
+        if 'context_overlay' in val:
+            # Repair only this historical annotation, and only if removing it
+            # restores the exact approved builder output. Real model drift must
+            # keep failing the independent frozen-contract replay.
+            from underwriting_contract import digest
+            clean = {k:v for k,v in val.items() if k != 'context_overlay'}
+            builder = (load_json(vp.with_name('underwriting_receipt.json')).get('stages') or {}).get('builder') or {}
+            if (builder.get('provider') == 'deterministic' and builder.get('status') == 'finished'
+                    and builder.get('model_hash') == digest(clean)):
+                write_json_if_changed(vp, clean)
+    else:
+        val["context_overlay"] = overlay
+        write_json_if_changed(vp, val)
     snippet = write_snippet(ticker, overlay)
     n = sum(len(t["indicators"]) for t in overlay["themes"])
     return f"OK {ticker}: {n} indicator(s) across {len(overlay['themes'])} theme(s) -> {snippet.relative_to(ROOT)}"

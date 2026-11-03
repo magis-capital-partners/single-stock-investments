@@ -15,7 +15,12 @@ PUBLICATION_FOLDERS={'records','relationships','published-text','words'}
 PUBLICATION_ROOT_FILES={'matches.json','index.json'}
 
 
-def pack(cache,destination):
+def pack(cache,destination,release_packed_inputs=False):
+    if release_packed_inputs:
+        if not cache.is_dir() or cache.is_symlink() or any((cache/name).is_symlink() for name in FOLDERS+ROOT_FILES):
+            raise ValueError('Release requires an existing cache without linked source roots')
+        if destination.resolve().is_relative_to(cache.resolve()):
+            raise ValueError('The archive must be outside the released cache')
     destination.mkdir(parents=True,exist_ok=True)
     files=[];size=0;pending=[]
     manifest=destination/'manifest.json'
@@ -66,7 +71,7 @@ def pack(cache,destination):
     with ThreadPoolExecutor(max_workers=4) as pool:
         def flush():
             nonlocal files,size
-            if files:pending.append(pool.submit(create_part,files))
+            if files:pending.append((files,pool.submit(create_part,files)))
             files=[];size=0
         for bucket in sorted(buckets):
             for path,length in sorted(buckets[bucket]):
@@ -74,13 +79,38 @@ def pack(cache,destination):
                 if length>90_000_000:raise ValueError('Oversized extraction cache entry')
                 files.append(path);size+=length
             flush()
-        parts=[job.result() for job in pending]
+        parts=[job.result() for _,job in pending]
     temporary=manifest.with_suffix('.'+str(os.getpid())+'.tmp')
     temporary.write_text(json.dumps({'schema_version':1,'parts':parts},indent=2)+'\n',encoding='utf-8')
     temporary.replace(manifest)
+    result={'parts':len(parts),'files':sum(p['files'] for p in parts)}
+    if release_packed_inputs:
+        # Verify every source against the finished archive before deleting any
+        # packed input. Never remove the cache tree or unarchived bookkeeping.
+        # The source corpus and Git's new compressed objects otherwise coexist
+        # on the runner, exhausting disk even with bounded upload batches.
+        cache_root=cache.resolve()
+        for part,(group,_) in zip(parts,pending):
+            archive_path=destination/part['file']
+            if archive_path.resolve().parent!=destination.resolve():
+                raise ValueError('Invalid archive path for cache release')
+            if hashlib.sha256(archive_path.read_bytes()).hexdigest()!=part['sha256']:
+                raise ValueError('Private cache checksum mismatch; packed inputs retained')
+            with zipfile.ZipFile(archive_path) as z:
+                names=[p.relative_to(cache).as_posix() for p in group]
+                if z.namelist()!=names:
+                    raise ValueError('Archive coverage changed; packed inputs retained')
+                for path,name in zip(group,names):
+                    if path.is_symlink() or not path.resolve().is_relative_to(cache_root):
+                        raise ValueError('Unsafe cache release path')
+                    if path.read_bytes()!=z.read(name):
+                        raise ValueError('Archive content differs; packed inputs retained')
+        for path,_ in paths:
+            path.unlink()
+        result.update(released_files=len(paths),released_input_bytes=sum(length for _,length in paths))
     # Old immutable parts may belong to another publication; leave retention to
     # the private vault owner. Only manifest-listed parts are restored.
-    return {'parts':len(parts),'files':sum(p['files'] for p in parts)}
+    return result
 
 
 def restore(source,cache,publication_only=False):
@@ -109,6 +139,8 @@ if __name__=='__main__':
     parser.add_argument('--cache',type=Path,required=True)
     parser.add_argument('--archive',type=Path,required=True)
     parser.add_argument('--publication-only',action='store_true',help='Restore verified publication records, full text and search tokens only')
+    parser.add_argument('--release-packed-inputs',action='store_true',help='After packing, verify and delete only archived cache files to leave room for Git upload objects')
     args=parser.parse_args()
     if args.publication_only and args.action!='restore':parser.error('--publication-only is a restore option')
-    print(pack(args.cache,args.archive) if args.action=='pack' else restore(args.archive,args.cache,args.publication_only))
+    if args.release_packed_inputs and args.action!='pack':parser.error('--release-packed-inputs is a pack option')
+    print(pack(args.cache,args.archive,args.release_packed_inputs) if args.action=='pack' else restore(args.archive,args.cache,args.publication_only))

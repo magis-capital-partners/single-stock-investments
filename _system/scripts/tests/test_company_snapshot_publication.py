@@ -1,6 +1,7 @@
 import hashlib
 import json
 from pathlib import Path
+import shlex
 import subprocess
 import sys
 
@@ -205,6 +206,49 @@ def test_archive_staging_failure_reports_captured_git_diagnostic(tmp_path, monke
     with pytest.raises(subprocess.CalledProcessError):
         publish(tmp_path)
     assert 'fatal: fixture object write failed' in capsys.readouterr().err
+
+
+def test_worker_pack_leaves_room_for_archive_git_objects(tmp_path, monkeypatch):
+    """Replay the worker's pack -> upload boundary with a bounded disk budget."""
+    worker = tmp_path / 'worker'
+    cache = worker / '_private/company-research/cache'
+    (cache / 'git').mkdir(parents=True)
+    original = b'Complete primary research evidence.\n' * 5000
+    (cache / 'git/aa.json').write_bytes(original)
+    (cache / 'matches.json').write_text('{"version":"verified-current-identities"}')
+    (cache / 'work.sqlite').write_bytes(b'Keep unpacked worker bookkeeping')
+    vault = worker / '_external/research-vault'
+    archive = vault / 'dashboard-private/company-source-backfill-v2'
+    sentinel = worker / 'outside-cache.txt'
+    sentinel.write_text('Never delete unrelated worker or vault files')
+    workflow = yaml.safe_load((ROOT / '.github/workflows/company-source-backfill.yml').read_text())
+    command = shlex.split(next(s['run'] for s in workflow['jobs']['backfill']['steps'] if s.get('id') == 'archive'))
+    args = [sys.executable, str(ROOT / command[1]),
+            *(arg.replace('$RESEARCH_VAULT_ROOT', str(vault)) for arg in command[2:])]
+    subprocess.run(args, cwd=worker, check=True, capture_output=True)
+    capacity = len(original) // 2
+    staged = []
+
+    def bounded_git(argv, **kwargs):
+        if 'add' in argv and '--sparse' in argv:
+            extracted = sum(p.stat().st_size for p in cache.rglob('*') if p.is_file())
+            compressed = sum(p.stat().st_size for p in archive.glob('*.zip'))
+            if extracted + 2 * compressed > capacity:
+                raise subprocess.CalledProcessError(128, argv,
+                    output=b'fatal: unable to write loose object file: No space left on device\n')
+            staged[:] = argv[argv.index('--') + 1:]
+        if 'diff' in argv and '--cached' in argv:
+            return '\n'.join(staged).encode()
+        return b''
+
+    monkeypatch.setattr(subprocess, 'check_output', bounded_git)
+    assert publish(vault)['parts_uploaded'] > 0
+    restored = tmp_path / 'restored'
+    restore(archive, restored)
+    assert (restored / 'git/aa.json').read_bytes() == original
+    assert json.loads((restored / 'matches.json').read_text())['version'] == 'verified-current-identities'
+    assert (cache / 'work.sqlite').read_bytes() == b'Keep unpacked worker bookkeeping'
+    assert sentinel.read_text() == 'Never delete unrelated worker or vault files'
 
 
 def test_deployment_uses_snapshot_and_backfill_refreshes_before_batched_publication():

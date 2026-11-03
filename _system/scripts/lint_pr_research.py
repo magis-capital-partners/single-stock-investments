@@ -408,7 +408,7 @@ def _lint_tickers(tickers: list[str], paths: list[str], base: str, base_trees: B
                     val = json.loads(val_path.read_text(encoding="utf-8"))
                 except json.JSONDecodeError:
                     val = {}
-            if val.get("context_overlay"):
+            if val.get("context_overlay") or val_path.with_name('context_overlay.json').is_file():
                 lint(ticker, "lint_context_overlay.py", [ticker])
             if val.get("insider_signal"):
                 lint(ticker, "lint_insider_signal.py", [ticker])
