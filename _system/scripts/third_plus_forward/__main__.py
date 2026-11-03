@@ -4,13 +4,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from . import journal as J
 from .engine import base_record, observations, register, trade_diagnostics
 from .policy import ROOT, STATE, canonical, code_receipts, entry_clock, freeze, sha, stamp, utcnow, write
 from .publish import aggregate, export_csv, publish
-from .sources import PublicSources, discover, input_snapshot
+from .sources import FinancialSnapshotError, PublicSources, discover, input_snapshot
 
 
 def borrow_rows(root):
@@ -42,6 +43,8 @@ def monitor(root=ROOT, directory=STATE, work=None, maximum=30, network=True, now
     client = provider or PublicSources(work, now, maximum, network)
     borrowing, borrow_at = borrow_rows(root)
     errors = []
+    skipped = []
+    attempts = 0
     # Continue observing all previously enrolled companies after their events leave discovery's date window.
     existing = J.records(J.load(path))
     known = {c['event_id']: c for c in candidates}
@@ -67,7 +70,15 @@ def monitor(root=ROOT, directory=STATE, work=None, maximum=30, network=True, now
             enrolled = all(J.enrollment(rows, candidate['event_id'], p['policy']['id']) for p in frozen['policies'])
             bars, price_source, actions = client.prices(candidate['ticker'])
             if not enrolled:
-                financial, financial_source = client.financials(candidate['cik'])
+                attempts += 1
+                try:
+                    financial, financial_source = client.financials(candidate['cik'])
+                except FinancialSnapshotError as exc:
+                    # Not registered, so the next run retries it; an unknown burn signal must not be frozen in.
+                    skipped.append({'event_id': candidate['event_id'], 'ticker': candidate['ticker'],
+                                    'issuer_id': 'cik/'+str(candidate['cik']), 'status': 'skipped_financials_unavailable',
+                                    'detail': str(exc)})
+                    continue
                 snapshot = input_snapshot(candidate, financial, bars, now)
                 snapshot['source_receipts'] = [s for s in [candidate['source'], financial_source, price_source] if s]
                 at = entry_clock(candidate['effective_day'], candidate['action_known_at'])
@@ -96,15 +107,40 @@ def monitor(root=ROOT, directory=STATE, work=None, maximum=30, network=True, now
     status = {'as_of': now.isoformat(), 'mode': 'research_observation_only', 'production_authority': 'none',
               'leads': leads, 'discovered_candidates': len(candidates), 'input_receipt': input_receipt,
               'borrow_as_of': borrow_at, 'requests': client.client.requests if hasattr(client, 'client') else 0,
-              'network_enabled': network, 'errors': errors + client.errors,
+              'network_enabled': network, 'errors': errors + skipped + client.errors,
               'coverage_complete': False,
               'coverage_note': 'Uses the existing bounded disclosure discovery pipeline; uncovered issuers and late discoveries remain possible.',
               'prospective_outcomes_note': 'New observations need future sessions. No historical trade has been relabeled prospective.',
               'source_code': code_receipts(), 'source_code_hash_basis': 'UTF-8 source bytes with LF line endings'}
     write(directory/'status.json', status)
     doc = publish(directory, publication_root, now)
-    return {'candidates': len(candidates), 'leads': len(leads), 'enrollments': doc['ledger']['enrollments'],
-            'requests': status['requests'], 'errors': len(status['errors']), 'production_authority': 'none'}
+    result = {'candidates': len(candidates), 'leads': len(leads), 'enrollments': doc['ledger']['enrollments'],
+              'requests': status['requests'], 'errors': len(status['errors']), 'production_authority': 'none'}
+    if skipped:
+        result['skipped'] = skipped
+    if attempts > 1 and len(skipped) == attempts:
+        raise MonitorFailed(f'Financial snapshots failed for all {attempts} candidates', result)
+    return result
+
+
+class MonitorFailed(RuntimeError):
+    def __init__(self, message, result):
+        super().__init__(message)
+        self.result = result
+
+
+def report_skips(result, summary_path=None):
+    """Surface skipped names as workflow warnings and in the step summary; never only in a JSON count."""
+    skipped = result.get('skipped', [])
+    for s in skipped:
+        print(f"::warning title=third_plus_forward skipped {s['ticker']}::{s['event_id']}: {s['detail']}", flush=True)
+    if summary_path and skipped:
+        lines = ['### Third-plus forward monitor: names skipped this run', '',
+                 'Financial snapshot unavailable; not registered, retried next run.', '',
+                 '| Ticker | Event | Detail |', '|---|---|---|']
+        lines += [f"| {s['ticker']} | `{s['event_id']}` | {s['detail'].replace('|', '/')} |" for s in skipped]
+        with open(summary_path, 'a', encoding='utf-8') as f:
+            f.write('\n'.join(lines) + '\n')
 
 
 def private_path(value):
@@ -153,7 +189,12 @@ def main():
     if args.command == 'freeze':
         result = freeze(args.state, now)
     elif args.command == 'monitor':
-        result = monitor(args.source_root, args.state, args.work, args.max_requests, not args.offline, now)
+        try:
+            result = monitor(args.source_root, args.state, args.work, args.max_requests, not args.offline, now)
+        except MonitorFailed as exc:
+            report_skips(exc.result, os.environ.get('GITHUB_STEP_SUMMARY'))
+            raise
+        report_skips(result, os.environ.get('GITHUB_STEP_SUMMARY'))
     elif args.command == 'import':
         if not args.file or not args.source_document:
             parser.error('import requires --file and --source-document')

@@ -1,9 +1,13 @@
 """Offline prospective-registration and complete position-lifecycle tests."""
 from __future__ import annotations
 
+import contextlib
 import copy
+import fnmatch
 import hashlib
+import io
 import json
+import subprocess
 import tempfile
 import unittest
 from datetime import timedelta
@@ -14,7 +18,8 @@ from _system.scripts.third_plus_forward import policy as P
 from _system.scripts.third_plus_forward.engine import base_record, register, reservations, trade_diagnostics
 from _system.scripts.third_plus_forward.sources import input_snapshot, public_url
 from _system.scripts.third_plus_forward.publish import project, publish
-from _system.scripts.third_plus_forward.__main__ import import_evidence, private_path, monitor
+from _system.scripts.third_plus_forward import sources as S
+from _system.scripts.third_plus_forward.__main__ import MonitorFailed, import_evidence, private_path, monitor, report_skips
 
 
 class ForwardTests(unittest.TestCase):
@@ -360,6 +365,82 @@ class ForwardTests(unittest.TestCase):
                                      order_id='uncertain', requested_shares=100, limit_price=10, status='uncertain')
         self.add(cancelled, uncertain)
         self.assertEqual(len(reservations(J.load(self.path), self.policy['policy']['id'], P.stamp('2026-10-29T12:00:00Z'))[0]), 1)
+
+    def companyfacts(self, cik, malformed=False):
+        cash = 'not-a-fact-list' if malformed else [{'end': '2026-06-30', 'val': 1000, 'filed': '2026-08-10', 'accn': 'a'+cik}]
+        return {'cik': int(cik), 'facts': {'us-gaap': {
+            'CashAndCashEquivalentsAtCarryingValue': {'units': {'USD': cash}},
+            'NetCashProvidedByUsedInOperatingActivities': {'units': {'USD': [
+                {'start': '2025-07-01', 'end': '2026-06-30', 'val': -500, 'filed': '2026-08-10', 'accn': 'a'+cik}]}}}}}
+
+    def run_three_names(self, malformed):
+        root = self.directory/'inputs'
+        data = root/'_system/data/reverse_splits'; data.mkdir(parents=True)
+        names = {'11': 'GOOD', '22': 'BAD', '33': 'FINE'}
+        (data/'events.jsonl').write_text(''.join(json.dumps(
+            {'ticker': t, 'cik': c, 'company': t+' Inc', 'ex_date': '2026-10-27', 'split_from': 10, 'split_to': 1,
+             'prior_rs_count': 2, 'accept_time': '2026-10-26T20:00:00Z'})+'\n' for c, t in names.items()))
+        docs = {c: json.dumps(self.companyfacts(c, c in malformed)).encode() for c in names}
+        source = self.source
+
+        class Provider(S.PublicSources):
+            # Real financials() and Node extractor; only the network fetch is replaced.
+            def __init__(self, now):
+                self.now, self.network, self.errors, self.helper_ready = now, True, [], False
+            def get(self, url):
+                return docs[str(int(url.split('CIK')[1][:10]))]
+            def prices(self, ticker):
+                days = P.sessions('2026-10-20', '2026-10-27')
+                return [{'day': day, 'open': 10, 'high': 12, 'low': 8, 'close': 8.5, 'volume': 1000} for day in days], source, []
+        return root, monitor(root, self.directory, now=self.now, provider=Provider(self.now), publication_root=root)
+
+    def test_one_malformed_filing_is_skipped_visibly_while_other_names_register(self):
+        summary = self.directory/'summary.md'
+        root, result = self.run_three_names({'22'})
+        self.assertEqual(result['enrollments'], 4)
+        self.assertEqual([s['ticker'] for s in result['skipped']], ['BAD'])
+        self.assertEqual(result['skipped'][0]['status'], 'skipped_financials_unavailable')
+        self.assertIn('financialSnapshot exited 1', result['skipped'][0]['detail'])
+        self.assertIn('TypeError', result['skipped'][0]['detail'])
+        registered = {r['record']['event_id'] for r in J.load(self.path) if r['record']['kind'] == 'candidate'}
+        self.assertEqual(registered, {'third-plus/11/2026-10-27', 'third-plus/33/2026-10-27'})
+        status = json.loads((self.directory/'status.json').read_text())
+        self.assertIn('third-plus/22/2026-10-27', [e['event_id'] for e in status['errors']])
+        publication = json.loads((root/'dashboard/data/third_plus_forward.json').read_text())
+        self.assertIn('BAD', [e.get('ticker') for e in publication['source_status']['errors']])
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            report_skips(result, summary)
+        self.assertIn('::warning title=third_plus_forward skipped BAD::', out.getvalue())
+        self.assertIn('| BAD | `third-plus/22/2026-10-27` |', summary.read_text())
+
+    def test_every_snapshot_failing_fails_the_monitor_after_recording_the_skips(self):
+        with self.assertRaises(MonitorFailed) as caught:
+            self.run_three_names({'11', '22', '33'})
+        self.assertEqual(len(caught.exception.result['skipped']), 3)
+        status = json.loads((self.directory/'status.json').read_text())
+        self.assertEqual(sum(e['status'] == 'skipped_financials_unavailable' for e in status['errors']), 3)
+
+    def test_unloadable_extractor_is_systemic_not_a_per_name_skip(self):
+        partial = self.directory/'partial'
+        for rel in ['_system/scripts/third_plus_signal/features.cjs', '_system/scripts/short_framework/adapters.cjs']:
+            (partial/rel).parent.mkdir(parents=True, exist_ok=True)
+            (partial/rel).write_bytes((P.ROOT/rel).read_bytes())
+        with self.assertRaisesRegex(S.HelperUnavailable, 'short-framework-engine'):
+            S.preflight_snapshot(self.now.isoformat(), partial)
+        S.preflight_snapshot(self.now.isoformat())
+
+    def test_production_sparse_checkout_contains_the_extractor_require_chain(self):
+        chain = subprocess.run(['node', '-e', "const M=require('module'),p=require('path'),o=M._load,s=new Set();"
+                                "M._load=function(r,q,i){const f=M._resolveFilename(r,q,i);if(p.isAbsolute(f))s.add(p.relative(process.cwd(),f).split(p.sep).join('/'));return o.apply(this,arguments)};"
+                                "require('./_system/scripts/third_plus_signal/features.cjs');console.log(JSON.stringify([...s]))"],
+                               cwd=P.ROOT, text=True, capture_output=True, check=True).stdout
+        workflow = (P.ROOT/'.github/workflows/reverse-split-borrow-history.yml').read_text(encoding='utf-8')
+        block = workflow.split('sparse-checkout: |', 1)[1].split('sparse-checkout-cone-mode', 1)[0]
+        patterns = [x.strip() for x in block.splitlines() if x.strip()]
+        covered = lambda f: any(f.startswith(x.strip('/')+'/') if x.endswith('/') else fnmatch.fnmatch('/'+f, x) for x in patterns)
+        missing = [f for f in json.loads(chain) if not covered(f)]
+        self.assertEqual(missing, [])
 
 
 if __name__ == '__main__':
