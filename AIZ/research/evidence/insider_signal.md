@@ -15,8 +15,8 @@
 
 **Routine / planned sales (context):**
 
-- Biju Nair: 3931 @ $302.4649 on 2026-08-06
 - MEIER KEITH: 25000 @ $254.31 on 2026-05-15
+- Biju Nair: 3931 @ $302.4649 on 2026-08-06
 - Lonergan Robert: 7000 @ $262.7097 on 2026-06-22
 
 Source: `_system/reference/market-data/insider/AIZ_transactions.csv`.

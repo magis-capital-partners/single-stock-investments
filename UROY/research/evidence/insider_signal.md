@@ -2,19 +2,19 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 4.19 (moderate) · **Bull case support:** moderate
+**ICS:** 4.17 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
 | Bear | 20% | 20% |
 | Base | 55% | 55% |
-| Bull | 25% | 26% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| MELBYE SCOTT | 2026-07-30 | 5850 | $3.1298 | $18309.33 | 1.086 |
-| MELBYE SCOTT | 2026-07-30 | 4000 | $3.12 | $12480.0 | 0.98 |
-| MELBYE SCOTT | 2026-07-30 | 4000 | $3.125 | $12500.0 | 0.98 |
+| MELBYE SCOTT | 2026-07-30 | 5850 | $3.1298 | $18309.33 | 1.079 |
+| MELBYE SCOTT | 2026-07-30 | 4000 | $3.12 | $12480.0 | 0.973 |
+| MELBYE SCOTT | 2026-07-30 | 4000 | $3.125 | $12500.0 | 0.973 |
 
 **Narrative hooks:**
 

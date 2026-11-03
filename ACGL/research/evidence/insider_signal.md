@@ -17,8 +17,8 @@
 **Routine / planned sales (context):**
 
 - Papadopoulo Nicolas: 21930 @ $96.3093 on 2026-03-10
-- Morin Francois: 11010 @ $99.3214 on 2026-08-18
 - Posner Brian S: 3000 @ $19.66 on 2026-06-03
+- Posner Brian S: 2000 @ $17.1415 on 2026-05-11
 
 Source: `_system/reference/market-data/insider/ACGL_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
