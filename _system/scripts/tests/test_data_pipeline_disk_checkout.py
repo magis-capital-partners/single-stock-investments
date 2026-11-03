@@ -145,6 +145,93 @@ def test_drive_checkout_is_research_and_intake_not_filing_pdfs():
     assert _job("drive")["env"]["DASHBOARD_PRESERVE_INFRA_ALWAYS"] == "1"
 
 
+def test_rebuild_checkouts_hold_every_path_a_desk_brief_cites():
+    """Run 41540991704: the drive rebuild failed check_desk_briefs because the
+    activism brief cites AGENT_INDEX.md, a root file the drive checkout left
+    out. Both narrowed jobs that run build_dashboard_data need these paths."""
+    cited: set[str] = set()
+    for brief in (ROOT / "_system/data/desk_briefs").glob("*/*.json"):
+        payload = json.loads(brief.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            continue
+        for entry in payload.get("inputs_read") or []:
+            if isinstance(entry, dict) and isinstance(entry.get("path"), str):
+                cited.add(entry["path"])
+    assert "AGENT_INDEX.md" in cited
+    for profile in ("drive", "activist"):
+        entries = {path.lstrip("/") for path in paths_for_profile(profile)} | {"_system", "dashboard", ".github"}
+        for rel in sorted(cited):
+            assert _covered(rel, entries), (profile, rel)
+        assert "/AGENT_INDEX.md" in paths_for_profile(profile), profile
+
+
+def test_desk_brief_input_patterns_are_anchored_and_literal(tmp_path: Path):
+    import ci_sparse_checkout_paths
+
+    desk = tmp_path / "activism"
+    desk.mkdir()
+    (desk / "2026-10-30.json").write_text(
+        json.dumps(
+            {
+                "inputs_read": [
+                    {"path": "AGENT_INDEX.md"},
+                    {"path": "AAA/research/latest.json"},
+                    {"path": "BBB/research/odd[1]*.md"},
+                    {"path": "../outside.md"},
+                    {"path": "/abs.md"},
+                    {"path": "C:/x.md"},
+                    "not-a-dict",
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    (desk / "broken.json").write_text("{", encoding="utf-8")
+    with mock.patch.object(ci_sparse_checkout_paths, "DESK_BRIEFS_DIR", tmp_path):
+        patterns = ci_sparse_checkout_paths.desk_brief_inputs()
+    assert patterns == [
+        "/AAA/research/latest.json",
+        "/AGENT_INDEX.md",
+        "/BBB/research/odd\\[1]\\*.md",
+    ]
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    subprocess.run(["git", "-C", str(origin), "init", "-q", "-b", "main"], check=True)
+    subprocess.run(["git", "-C", str(origin), "config", "user.email", "t@example.com"], check=True)
+    subprocess.run(["git", "-C", str(origin), "config", "user.name", "t"], check=True)
+    files = {
+        "AGENT_INDEX.md": "index\n",
+        "AAA/AGENT_INDEX.md": "nested\n",
+        "AAA/research/latest.json": "{}\n",
+        "AAA/investor-documents/sec-edgar/10-K.pdf": "filing",
+        "BBB/research/odd[1]*.md": "odd\n",
+        "BBB/research/odd1x.md": "glob would match this\n",
+    }
+    for relative, content in files.items():
+        path = origin / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+    subprocess.run(["git", "-C", str(origin), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(origin), "commit", "-q", "-m", "fixture"], check=True)
+    work = tmp_path / "work"
+    subprocess.run(["git", "clone", "-q", "--no-checkout", str(origin), str(work)], check=True)
+    subprocess.run(["git", "-C", str(work), "sparse-checkout", "init", "--no-cone"], check=True)
+    subprocess.run(
+        ["git", "-C", str(work), "sparse-checkout", "set", "--stdin"],
+        input="\n".join(patterns) + "\n",
+        text=True,
+        check=True,
+    )
+    subprocess.run(["git", "-C", str(work), "checkout", "-q", "main"], check=True)
+    assert (work / "AGENT_INDEX.md").is_file()
+    assert (work / "AAA/research/latest.json").is_file()
+    assert (work / "BBB/research/odd[1]*.md").is_file()
+    assert not (work / "AAA/AGENT_INDEX.md").exists()
+    assert not (work / "BBB/research/odd1x.md").exists()
+    assert not (work / "AAA/investor-documents/sec-edgar/10-K.pdf").exists()
+
+
 def test_company_source_backfill_checks_out_only_its_archive():
     steps = BACKFILL["jobs"]["backfill"]["steps"]
     assert "free-disk-space" in steps[0]["uses"]
