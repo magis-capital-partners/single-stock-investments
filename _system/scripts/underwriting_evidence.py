@@ -90,9 +90,24 @@ def requested_keywords(gaps):
     return terms
 
 
+def primary_text(raw):
+    declared = re.search(br'charset\s*=\s*["\']?\s*([A-Za-z0-9._-]+)',raw[:20000],re.I)
+    if declared:
+        encoding = declared[1].decode('ascii').lower()
+        require(encoding in ('utf-8','utf8','windows-1252','cp1252','iso-8859-1','shift_jis','euc-jp','gb18030'),
+                'Unreconciled primary document encoding')
+        return raw.decode(encoding)
+    try:
+        return raw.decode('utf-8')
+    except UnicodeDecodeError:
+        # Older SEC exhibits use Windows quote bytes without declaring a
+        # charset. Do not replace their definition delimiters with U+FFFD.
+        return raw.decode('cp1252')
+
+
 def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=False):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
-    source = raw.decode('utf-8', errors='replace')
+    source = primary_text(raw)
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
              'revenue', 'credit', 'receivables', 'segment', 'net income', 'financing')
     focus = tuple(' '.join(w.lower().split()) for w in focus_keywords
@@ -130,9 +145,32 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
             contexts.append(text)
             seen.add(text)
             size += len(text)
-    # Note requests need the disclosure, not a table-of-contents hit or a small
-    # keyword window. Keep bounded complete sections with original source text.
-    note_spans = []
+    # Explicit contractual requests need operative clauses and definitions,
+    # rather than the dense contents page that can win keyword-window scoring.
+    # Add complete bounded passages before the general retrieval windows.
+    priority_spans = []
+    for phrase in focus:
+        section = re.fullmatch(r'section\s+(\d+\.\d+)',phrase)
+        if section:
+            heading = r'\bSECTION\s+'+re.escape(section[1])+r'\s*\.'
+            for match in re.finditer(heading,body):
+                following = re.search(r'\bSECTION\s+\d+\.\d+\s*\.',body[match.end():])
+                end = match.end()+following.start() if following else len(body)
+                passage = body[match.start():end]
+                # Contents entries are short lists, not substantive sections.
+                if 40 <= len(passage.split()) and len(passage) <= 30000:
+                    priority_spans.append((match.start(),end))
+        definition = r'["“]\s*'+re.escape(phrase)+r'\s*["”]\s+(?:means|has the meaning)\b'
+        for match in re.finditer(definition,body,re.I):
+            remainder = body[match.end():]
+            stops = [m.start() for pattern in (
+                r'["“][^"“”]{1,120}["”]\s+(?:means|has the meaning)\b',
+                r'\bSECTION\s+\d+\.\d+\s*\.')
+                if (m := re.search(pattern,remainder,re.I))]
+            end = match.end()+min(stops) if stops else len(body)
+            if end-match.start() <= 15000:
+                priority_spans.append((match.start(),end))
+    # Note requests likewise need full original disclosures.
     for phrase in focus:
         if not re.fullmatch(r'note \d{1,2}', phrase):
             continue
@@ -140,9 +178,9 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
         matches = list(re.finditer(r'\bNote\s+'+number+r'\b\s*[.:-]?', body, re.I))
         matches.sort(key=lambda m: (bool(re.search(r'[.:-]',m.group())), bool(re.match(r'\s*[A-Z]',body[m.end():m.end()+20])),m.start()),reverse=True)
         for match in matches[:2]:
-            note_spans.append((max(0,match.start()-200),min(len(body),match.start()+22000)))
+            priority_spans.append((max(0,match.start()-200),min(len(body),match.start()+22000)))
     merged = []
-    for start,end in sorted(note_spans):
+    for start,end in sorted(priority_spans):
         if merged and start <= merged[-1][1]:
             merged[-1] = (merged[-1][0],max(end,merged[-1][1]))
         else:

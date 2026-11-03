@@ -120,4 +120,5 @@ def test_source_manifest_patterns_are_exact_and_keep_the_existing_selection():
     step = next(s for s in action['runs']['steps'] if s.get('name') == 'Materialize current source archive parts')
     assert 'sparse-checkout add' in step['run']
     assert 'sparse-checkout set' not in step['run']
-    assert step['if'] == "inputs.source-archive-current == 'true'"
+    assert "inputs.source-archive-current == 'true'" in step['if']
+    assert "inputs.include-source-archive == 'true'" in step['if']
