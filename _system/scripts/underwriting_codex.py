@@ -14,6 +14,21 @@ from underwriting_contract import digest, require
 
 DISABLED = ('shell_tool', 'apps', 'plugins', 'hooks', 'multi_agent', 'browser_use',
             'browser_use_external', 'computer_use', 'image_generation', 'view_image', 'sleep_tool')
+MAX_INPUT_CHARACTERS = 1_048_576
+
+
+def input_characters(prompt, newline=None):
+    # Windows text-mode stdin expands LF to CRLF. Count surrogate pairs
+    # conservatively as well; never admit more than the native turn/start cap.
+    separator = os.linesep if newline is None else newline
+    return len(prompt.encode('utf-16-le'))//2 + prompt.count('\n')*(len(separator)-1)
+
+
+def validate_input(prompt):
+    count = input_characters(prompt)
+    require(count <= MAX_INPUT_CHARACTERS,
+            f'local_input_too_large: {count} characters exceeds {MAX_INPUT_CHARACTERS}; complete evidence retained')
+    return {'input_characters':count, 'maximum_input_characters':MAX_INPUT_CHARACTERS}
 
 
 def executable():
@@ -66,6 +81,8 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
     from underwriting_pipeline import write
     require(model == 'gpt-6.1-sol' and effort == 'high' and stage in ('author', 'challenger'),
             'Local underwriting requires GPT-6.1 Sol High and a judgment role')
+    prompt = prompt_path.read_text(encoding='utf-8')
+    input_admission = validate_input(prompt)
     # No controller secrets, Cursor key, GitHub credential or API-key override
     # enter the model process. It reuses the existing signed-in Codex account.
     permitted = {'PATH', 'SystemRoot', 'SYSTEMROOT', 'WINDIR', 'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH',
@@ -73,7 +90,8 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
     env = {k: v for k, v in os.environ.items() if k in permitted}
     receipt = {'schema_version': 'underwriting-call/1', 'provider': 'codex-local', 'stage': stage,
                'model': model, 'reasoning_effort': effort, 'status': 'starting',
-               'started_at': datetime.now(timezone.utc).isoformat(), 'tools_disabled': True}
+               'started_at': datetime.now(timezone.utc).isoformat(), 'tools_disabled': True,
+               'input_admission':input_admission}
     write(receipt_path, receipt)
     with tempfile.TemporaryDirectory(prefix='ssi-codex-underwriting-') as temporary:
         directory = Path(temporary)
@@ -83,7 +101,7 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
         args = command(executable(), directory, answer)
         timed_out = False
         try:
-            result = run(args, input=prompt_path.read_text(encoding='utf-8'), capture_output=True,
+            result = run(args, input=prompt, capture_output=True,
                          encoding='utf-8', errors='replace', env=env, timeout=timeout, check=False)
             stdout, stderr, code = result.stdout, result.stderr, result.returncode
         except subprocess.TimeoutExpired as exc:

@@ -19,6 +19,70 @@ from underwriting_pipeline import (
 from underwriting_transport import pack, render, unpack
 
 
+def test_transport_fits_repeated_primary_passages_without_removing_a_character():
+    # Separate windows can overlap without either containing the other. Source
+    # quotations and observation order must survive deduplication exactly.
+    sentences = ['Contract clause '+str(i)+': '+('complete primary text ' * 7)+'. ' for i in range(1600)]
+    payload = {'packet': {'documents': [
+        {'id':'doc_'+str(i), 'contexts':[''.join(sentences[i*80:i*80+650])]} for i in range(12)],
+        'observations':[{'id':'obs_'+str(i),'value':i,'unit':'USD','period':'2026-06-30'} for i in range(1000)]}}
+    assert len(json.dumps(payload)) > 1_048_576
+    envelope = pack(payload)
+    assert unpack(envelope) == payload
+    assert len(render(payload)) < 1_000_000
+
+
+def test_transport_reserved_source_keys_and_missing_values_are_literal():
+    payload = {'$s': 0, '$o': [0, []], '$text': ['original'], 'data': [
+        {'field':'one','value':None}, {'field':'two'}, {'field':'three','value':False}],
+        'text': ('日本語 — source sentence. ' * 50), 'literal_refs':['@0','@@7','@mail','@999999999']}
+    assert unpack(pack(payload)) == payload
+
+
+def test_oversize_input_is_held_before_any_budget_admission_or_session(tmp_path,monkeypatch):
+    import underwriting_pipeline as pipeline
+    from test_underwriting_pipeline import company_root
+    company_root(tmp_path)
+    # No repeated passages that can be factored out losslessly.
+    import random
+    text=''.join(random.Random(9).choices('abcdefghijklmnopqrstuvwxyz0123456789',k=1_100_000))
+    monkeypatch.setattr(pipeline,'evaluate',lambda **kw:pytest.fail('Oversize input reached model admission'))
+    state={}
+    with pytest.raises(pipeline.StageBlocked,match='local_input_too_large'):
+        pipeline.call_stage(tmp_path,tmp_path/'work','TEST','author',{'evidence':text},state,
+                            execute=lambda *args:pytest.fail('Oversize input started a model session'))
+    assert not (tmp_path/'work/ledger.jsonl').exists()
+    assert not state.get('stage_attempts')
+
+
+def test_requested_agreement_clauses_are_not_replaced_by_contents_mentions():
+    from underwriting_evidence import document_record
+    focus=['EBITDA','Total Debt','Section 4.02','Section 2.08','Section 2.20']
+    toc='TABLE OF CONTENTS EBITDA Total Debt SECTION 2.08. Commitments 32 SECTION 2.20. Extension 41 SECTION 4.02. Each Credit Event 70 SECTION 4.03. Other 71 '
+    padding='General company background and administrative information. '*500
+    body=toc+padding+' “EBITDA” means the OPERATIVE_EBITDA definition. '+('Definition details. '*50)
+    body+=' “Total Debt” means the OPERATIVE_DEBT definition. '+('Definition details. '*50)
+    body+=' “Next Definition” means other terms. '+padding
+    for number,marker in [('2.08','OPERATIVE_TERMINATION'),('2.20','OPERATIVE_EXTENSION'),('4.02','OPERATIVE_DRAWS')]:
+        body+=' SECTION '+number+'. Operative contractual heading. '+marker+' '+('Applicable contractual conditions and definitions. '*55)
+        body+=' SECTION '+number+'1. Next contractual heading. '+padding
+    doc=document_record('https://issuer.test/credit-agreement',('<html>'+body+'</html>').encode('utf-8'),focus)
+    frozen='\n'.join(doc['contexts'])
+    assert all(marker in frozen for marker in ['OPERATIVE_EBITDA','OPERATIVE_DEBT','OPERATIVE_TERMINATION','OPERATIVE_EXTENSION','OPERATIVE_DRAWS'])
+
+
+def test_windows_encoded_quoted_definitions_keep_original_punctuation():
+    from underwriting_evidence import document_record
+    raw=('<html>Cash debt assets. '+('Contents EBITDA Total Debt. '*400)+
+         ' “ EBITDA ” means the ORIGINAL_PRIMARY_DEFINITION. '+('Definition details. '*40)+
+         ' “ Total Debt ” means the ORIGINAL_PRIMARY_DEBT. '+('Definition details. '*40)+
+         ' “ Other ” means other terms.</html>').encode('cp1252')
+    doc=document_record('https://issuer.test/credit-agreement',raw,['EBITDA','Total Debt'])
+    text=' '.join(doc['contexts'])
+    assert '“ EBITDA ” means' in text and '“ Total Debt ” means' in text
+    assert '\ufffd' not in text
+
+
 @pytest.mark.parametrize('extra', [None, {}, {'zero': 0, 'negative': -3, 'text': '日本語 € \"quotes\"', 'list': [None, False]}])
 def test_transport_is_lossless_even_with_missing_fields_and_unicode(extra):
     p = packet()

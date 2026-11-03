@@ -87,6 +87,41 @@ def test_object_patterns_follow_the_manifest_and_reject_a_bad_id():
         raise AssertionError("bad object id was accepted")
 
 
+def test_default_archive_reader_keeps_corpora_and_omits_historical_parts(tmp_path):
+    from vault_source_archive_sparse import part_patterns
+    action=_action()
+    patterns=_patterns("publication-only != 'true'")
+    exclusion='!/dashboard-private/company-source-backfill-v2/*'
+    assert exclusion in patterns
+    step=next(s for s in action['runs']['steps'] if s.get('name')=='Materialize current source archive parts')
+    assert "inputs.include-source-archive == 'true'" in step['if']
+    assert 'manifest.json' in step['run'] and 'sparse-checkout add' in step['run']
+    vault=tmp_path/'vault';vault.mkdir()
+    _git(vault,'init','-q','-b','main')
+    _git(vault,'config','user.email','fixture@example.invalid')
+    _git(vault,'config','user.name','Fixture')
+    prefix='dashboard-private/company-source-backfill-v2'
+    folder=vault/prefix;folder.mkdir(parents=True)
+    current='a'*64+'.zip'; historical='b'*64+'.zip'
+    (folder/current).write_bytes(b'current immutable input')
+    (folder/historical).write_bytes(b'historical immutable input')
+    manifest={'parts':[{'file':current,'sha256':'a'*64}]}
+    (folder/'manifest.json').write_text(json.dumps(manifest),encoding='utf-8')
+    (vault/'superinvestor-letters').mkdir()
+    (vault/'superinvestor-letters/letter.md').write_text('Keep the full corpus')
+    _git(vault,'add','-A');_git(vault,'commit','-q','-m','fixture')
+    _git(vault,'sparse-checkout','set','--no-cone','--stdin',input_text='/*\n'+exclusion+'\n')
+    assert not (folder/current).exists() and not (folder/historical).exists()
+    selected=['/'+prefix+'/manifest.json',*part_patterns(manifest)]
+    _git(vault,'sparse-checkout','add','--stdin',input_text='\n'.join(selected)+'\n')
+    assert (folder/current).read_bytes()==b'current immutable input'
+    assert not (folder/historical).exists()
+    assert (vault/'superinvestor-letters/letter.md').read_text()=='Keep the full corpus'
+    assert _git(vault,'ls-files','-v',prefix+'/'+historical).startswith('S ')
+    _git(vault,'add','--sparse','--force','--','dashboard-private')
+    assert not _git(vault,'diff','--cached','--name-status').strip()
+
+
 def test_publication_only_is_opt_in_and_the_three_loops_use_it():
     action = _action()
     assert action["inputs"]["publication-only"]["default"] == "false"

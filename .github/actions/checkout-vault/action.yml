@@ -11,7 +11,7 @@ inputs:
     required: false
     default: "true"
   include-source-archive:
-    description: Include the complete extraction archive. Test fixtures can omit it while retaining all originals and dashboard snapshots.
+    description: Include every part of the current extraction archive. Historical unreferenced parts stay in Git. Test fixtures can omit the archive while retaining originals and dashboard snapshots.
     required: false
     default: "true"
   include-investor-history:
@@ -27,7 +27,7 @@ inputs:
     required: false
     default: ""
   source-archive-current:
-    description: Add only immutable source parts referenced by the current archive manifest. Requires publication-only and the archive manifest in extra-paths; keeps historical parts out of the worker without deleting them from Git.
+    description: Include current source archive parts in a publication-only checkout. Full vault readers already select the current manifest by default; historical parts stay in Git.
     required: false
     default: "false"
 
@@ -52,13 +52,14 @@ runs:
         path: _external/research-vault
         token: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
         fetch-depth: 1
-        filter: ${{ (inputs.publication-only == 'true' || inputs.include-source-archive == 'false' || inputs.include-investor-history != 'true') && 'blob:none' || '' }}
+        filter: blob:none
         sparse-checkout: |
           ${{ inputs.publication-only == 'true' && '/dashboard-private/migration-journal.jsonl' || '' }}
           ${{ inputs.publication-only == 'true' && '/dashboard-private/manifest.json' || '' }}
           ${{ inputs.publication-only == 'true' && '/dashboard-private/.gitattributes' || '' }}
-          ${{ inputs.publication-only != 'true' && (inputs.include-source-archive == 'false' || inputs.include-investor-history != 'true') && '/*' || '' }}
-          ${{ inputs.publication-only != 'true' && inputs.include-source-archive == 'false' && '!/dashboard-private/company-source-backfill-v2/' || '' }}
+          ${{ inputs.publication-only != 'true' && '/*' || '' }}
+          ${{ inputs.publication-only != 'true' && inputs.include-source-archive != 'true' && inputs.source-archive-current != 'true' && '!/dashboard-private/company-source-backfill-v2/' || '' }}
+          ${{ inputs.publication-only != 'true' && (inputs.include-source-archive == 'true' || inputs.source-archive-current == 'true') && '!/dashboard-private/company-source-backfill-v2/*' || '' }}
           ${{ inputs.publication-only != 'true' && inputs.include-investor-history != 'true' && '!/dashboard-private/investor-history/' || '' }}
         sparse-checkout-cone-mode: false
 
@@ -109,15 +110,23 @@ runs:
         fi
 
     - name: Materialize current source archive parts
-      if: inputs.source-archive-current == 'true'
+      if: inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true')
       shell: bash
       env:
-        PUBLICATION_ONLY: ${{ inputs.publication-only }}
+        EXPLICIT_ARCHIVE: ${{ inputs.source-archive-current }}
       run: |
         set -euo pipefail
-        if [ "$PUBLICATION_ONLY" != "true" ]; then
-          echo "::error::Current source archive selection requires publication-only checkout."
-          exit 1
+        git -C _external/research-vault sparse-checkout add --skip-checks -- /dashboard-private/company-source-backfill-v2/manifest.json
+        if [ ! -f _external/research-vault/dashboard-private/company-source-backfill-v2/manifest.json ]; then
+          if [ "$EXPLICIT_ARCHIVE" = "true" ]; then
+            echo "::error::The explicitly requested source archive manifest is missing."
+            exit 1
+          fi
+          echo "No private source archive has been preserved yet."
+          exit 0
+        fi
+        if [ ! -f _system/scripts/vault_source_archive_sparse.py ]; then
+          git sparse-checkout add --skip-checks -- /_system/scripts/vault_source_archive_sparse.py
         fi
         python3 _system/scripts/vault_source_archive_sparse.py \
           _external/research-vault/dashboard-private/company-source-backfill-v2/manifest.json \

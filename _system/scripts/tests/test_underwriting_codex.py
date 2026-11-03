@@ -22,6 +22,24 @@ def test_tool_free_local_command_uses_the_exact_model_and_keeps_user_auth():
     assert '--dangerously-bypass-approvals-and-sandbox' not in args
 
 
+def test_input_admission_counts_windows_stdin_and_unicode_without_starting_a_session():
+    assert codex.input_characters('first\nsecond',newline='\r\n')==13
+    assert codex.input_characters('日本語🙂',newline='\n')==5
+    assert codex.validate_input('a'*codex.MAX_INPUT_CHARACTERS)['input_characters']==codex.MAX_INPUT_CHARACTERS
+    with pytest.raises(ValueError,match='local_input_too_large'):
+        codex.validate_input('a'*(codex.MAX_INPUT_CHARACTERS+1))
+
+
+def test_direct_native_execution_checks_size_before_creating_a_receipt(tmp_path):
+    prompt=tmp_path/'prompt.txt'
+    prompt.write_text('a'*(codex.MAX_INPUT_CHARACTERS+1),encoding='utf-8')
+    with pytest.raises(ValueError,match='local_input_too_large'):
+        codex.execute_stage(model='gpt-6.1-sol',effort='high',stage='author',prompt_path=prompt,
+            output_path=tmp_path/'output.json',receipt_path=tmp_path/'receipt.json',
+            run=lambda *a,**kw:pytest.fail('Oversize prompt launched a native session'))
+    assert not (tmp_path/'receipt.json').exists()
+
+
 def test_local_receipt_retains_the_real_session_and_excludes_controller_secrets(tmp_path,monkeypatch):
     monkeypatch.setattr(codex,'executable',lambda:'codex')
     monkeypatch.setenv('CURSOR_API_KEY','cursor-secret')
