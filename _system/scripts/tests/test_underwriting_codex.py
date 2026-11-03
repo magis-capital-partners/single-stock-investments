@@ -66,3 +66,27 @@ def test_failed_local_session_retains_provider_failure_in_its_receipt(tmp_path,m
                             output_path=tmp_path/'out.json',receipt_path=tmp_path/'receipt.json',run=run)
     saved=json.loads((tmp_path/'receipt.json').read_text(encoding='utf-8'))
     assert saved['process_exit_code']==1 and saved['failure_events'][0]['type']=='turn.failed'
+
+
+@pytest.mark.parametrize('timeout', [False, True])
+def test_private_native_diagnostics_survive_failure_without_a_json_error_event(tmp_path,monkeypatch,timeout):
+    monkeypatch.setattr(codex,'executable',lambda:'codex')
+    prompt=tmp_path/'prompt.txt'
+    prompt.write_text('Evidence',encoding='utf-8')
+    stdout='{"type":"thread.started","thread_id":"failed-native-session"}\n'
+    stderr='Native failure visible only on stderr: fixture diagnostic\n'
+    def run(args,**kw):
+        if timeout:
+            raise subprocess.TimeoutExpired(args,20,output=stdout.encode(),stderr=stderr.encode())
+        return subprocess.CompletedProcess(args,1,stdout,stderr)
+    receipt=tmp_path/'receipt.json'
+    with pytest.raises(ValueError):
+        codex.execute_stage(model='gpt-6.1-sol',effort='high',stage='author',prompt_path=prompt,
+                            output_path=tmp_path/'out.json',receipt_path=receipt,run=run)
+    saved=json.loads(receipt.read_text(encoding='utf-8'))
+    diagnostics=json.loads((receipt.parent/saved['diagnostics']['file']).read_text(encoding='utf-8'))
+    assert diagnostics['stdout']==stdout and diagnostics['stderr']==stderr
+    assert diagnostics['timed_out'] is timeout
+    assert saved['diagnostics']['sha256']==codex.digest(diagnostics)
+    assert saved['usage'] is None and saved['agent_id']=='failed-native-session'
+    assert not (tmp_path/'out.json').exists()

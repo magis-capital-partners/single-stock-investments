@@ -85,9 +85,20 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
         try:
             result = run(args, input=prompt_path.read_text(encoding='utf-8'), capture_output=True,
                          encoding='utf-8', errors='replace', env=env, timeout=timeout, check=False)
-            stdout, code = result.stdout, result.returncode
+            stdout, stderr, code = result.stdout, result.stderr, result.returncode
         except subprocess.TimeoutExpired as exc:
-            stdout, code, timed_out = exc.stdout, -1, True
+            stdout, stderr, code, timed_out = exc.stdout, exc.stderr, -1, True
+        def decoded(value):
+            return value.decode('utf-8', errors='replace') if isinstance(value, bytes) else value or ''
+        # Ephemeral sessions remove their scratch directory. Preserve both
+        # native streams privately before validation or cleanup: an exit 1 can
+        # contain only thread.started on stdout and its real error on stderr.
+        # A hash of parsed events cannot recover that lost failure explanation.
+        diagnostics = {'stdout': decoded(stdout), 'stderr': decoded(stderr),
+                       'process_exit_code': code, 'timed_out': timed_out}
+        diagnostic_path = receipt_path.with_name(receipt_path.stem+'.diagnostics.json')
+        write(diagnostic_path, diagnostics)
+        receipt['diagnostics'] = {'file': diagnostic_path.name, 'sha256': digest(diagnostics)}
         rows = events(stdout)
         receipt['agent_id'] = next((r.get('thread_id') for r in rows if r.get('type') == 'thread.started'), None)
         receipt['run_id'] = receipt['agent_id']  # Exactly one prompt per ephemeral CLI session.
@@ -104,7 +115,8 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
         receipt['finished_at'] = datetime.now(timezone.utc).isoformat()
         write(receipt_path, receipt)
         require(receipt['status'] == 'finished', 'Local Codex stage did not finish without tools: '+receipt['status']
-                +' '+json.dumps(receipt.get('failure_events') or [],ensure_ascii=False)[:1500])
+                +' '+json.dumps(receipt.get('failure_events') or [],ensure_ascii=False)[:1500]
+                +' (private diagnostics: '+diagnostic_path.name+')')
         text = answer.read_text(encoding='utf-8')
         require(len(text) <= 500_000, 'Oversized local stage JSON')
         text = re.sub(r'^```(?:json)?\s*\n([\s\S]*)\n```$', r'\1', text.strip())
