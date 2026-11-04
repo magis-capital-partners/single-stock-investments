@@ -1,0 +1,469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">2</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Pelthos Therapeutics Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.0001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">171126204</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Todd C. Davis<br>Ligand Pharmaceuticals Incorporated,
+								7111 Fairway Drive, Suite 302<br>Palm Beach Gardens,
+								FL,
+								33418<br>(858) 550-7500</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">10/30/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">171126204</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Ligand Pharmaceuticals Incorporated</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">5,189,177.10</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">5,189,177.10</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">5,189,177.10</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">49.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) Consists of 1,500,000 shares of Common Stock, 3,427,868.1 shares of Common Stock underlying 34,278.681 shares of Series A Convertible Preferred Stock, par value $0.0001 per share (the "Series A Preferred Stock"), and 261,309 shares of Common Stock underlying the Senior Secured Convertible Note (the "Convertible Note"). The Reporting Person may not convert any of the Series A Preferred Stock or the Convertible Note to the extent that, after giving effect to such conversion, the Reporting Person together with its affiliates would beneficially own in excess of 49.9% of the shares of Common Stock outstanding immediately after giving effect to such conversion. The amounts reported do not include the Series B Preferred Stock or the Warrants to be acquired by the Reporting Person in the Concurrent Financing or any shares of Common Stock issuable in the Mergers, each as described in Items 3 and 4, none of which has been issued to or acquired by the Reporting Person as of the date of this Amendment No. 2 and each of which remains subject to the closing conditions described herein. The Warrants will not be exercisable until the Initial Exercise Date (as defined in Item 4).</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.0001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Pelthos Therapeutics Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">4020 STIRRUP CREEK DRIVE, SUITE 110, DURHAM, 
+				NORTH CAROLINA
+			, 27703.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">Explanatory Note. This Amendment No. 2 ("Amendment No. 2") amends and supplements the statement on Schedule 13D originally filed with the Securities and Exchange Commission (the "SEC") on July 3, 2025 (the "Original Schedule 13D"), as amended and supplemented by Amendment No. 1 filed with the SEC on November 10, 2025 ("Amendment No. 1" and, together with the Original Schedule 13D and this Amendment No. 2, the "Schedule 13D"), relating to the common stock, par value $0.0001 per share (the "Common Stock"), of Pelthos Therapeutics Inc. (the "Issuer" or "Pelthos"). Capitalized terms used but not defined in this Amendment No. 2 have the meanings ascribed to them in the Schedule 13D. Except as specifically amended and supplemented by this Amendment No. 2, the Schedule 13D remains in full force and effect. This Amendment No. 2 is being filed to report the Issuer's entry into the Merger Agreement, the Securities Purchase Agreement and the related transactions described below.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of Ligand is 7111 Fairway Drive, Suite 302, Palm Beach Gardens, Florida 33418.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 3 of the Schedule 13D is hereby supplemented as follows:
+
+On October 30, 2026, Ligand Pharmaceuticals Incorporated ("Ligand" or the "Reporting Person") entered into the Securities Purchase Agreement (as defined in Item 4), pursuant to which Ligand has agreed to purchase 33,750 shares of the Issuer's Series B Convertible Preferred Stock, par value $0.0001 per share, each with a stated value of $1,000 (the "Series B Preferred Stock"), together with warrants to purchase 291,688 shares of Common Stock (the "Warrants"), for an aggregate purchase price of $33,750,000.00 (the "Ligand Investment"). The Ligand Investment is part of a private placement of Series B Preferred Stock by the Issuer (the "Concurrent Financing," also referred to in the Issuer's filings as the "PIPE Financing").
+
+A portion of Ligand's purchase price will be satisfied by the transfer to the Issuer of a bridge promissory note issued to Ligand by Castle Creek Biosciences, Inc. ("Merger Partner") in the principal amount of $3,675,000.00 (the "Ligand Bridge Note"), and the remaining $30,075,000.00 is expected to be paid in cash at the closing of the Concurrent Financing.
+
+The source of funds for the purchase of the Ligand Bridge Note and the cash portion of the Ligand Investment is, or is expected to be, Ligand's general working capital.
+
+The Concurrent Financing is expected to be consummated immediately prior to the effective time of the First Merger (as defined in Item 4) and is conditioned upon, among other things, the satisfaction or waiver of all conditions to the closing of the Mergers (as defined in Item 4), the approval of the listing on the NYSE American of the shares of Common Stock issuable upon conversion of the Series B Preferred Stock and upon exercise of the Warrants, and the Issuer having received at the closing at least $57.5 million (in cash or cancellation of bridge promissory notes issued by Merger Partner) from the investors in the Concurrent Financing. </div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 of the Schedule 13D is hereby supplemented as follows:
+
+The Merger Agreement. On October 30, 2026, the Issuer entered into an Agreement and Plan of Merger (the "Merger Agreement") by and among the Issuer, Credit Card Merger Sub, Inc., a Delaware corporation and a wholly owned subsidiary of the Issuer ("Merger Sub"), Credit Card Merger Sub II, LLC, a Delaware limited liability company and a wholly owned subsidiary of the Issuer ("Merger Sub II"), Merger Partner, and Paragon Biosciences, LLC, as the securityholder representative (the "Securityholder Representative"). Pursuant to the Merger Agreement, and subject to the satisfaction or waiver of the conditions set forth therein, (i) Merger Sub will merge with and into Merger Partner, with Merger Partner continuing as the surviving corporation and a wholly owned subsidiary of the Issuer (the "First Merger"), and (ii) immediately thereafter, the surviving corporation will merge with and into Merger Sub II, with Merger Sub II continuing as the surviving company and a wholly owned subsidiary of the Issuer (the "Second Merger" and, together with the First Merger, the "Mergers"). The Mergers, taken together, are intended to qualify as a "reorganization" within the meaning of Section 368(a) of the Internal Revenue Code of 1986, as amended.
+
+Merger Consideration. Under the Merger Agreement, the securityholders of Merger Partner will receive, in the aggregate, their allocable share of 5,200,000 shares of Common Stock (the "Castle Creek Merger Shares"), which, based on the capitalization of the Issuer as of the date of the Merger Agreement, are expected to represent approximately 32.5% of the Common Stock of the Issuer on a fully diluted basis immediately following the First Merger and before giving effect to the Concurrent Financing (with the Issuer's securityholders immediately prior to the First Merger expected to own approximately 67.5%), in each case excluding any Contingent Shares (as defined below), together with contingent consideration consisting of cash milestone payments, contingent shares of Common Stock issuable upon FDA approval of Merger Partner's product candidate D-Fi (the "Contingent Shares"), and 80% of the net proceeds of any sale of a priority review voucher granted in connection with the approval of D-Fi, in each case as and to the extent provided in the Merger Agreement.
+
+Conditions; Termination. The consummation of the Mergers is subject to customary closing conditions, including, among other things, approval of the Merger Agreement by the requisite stockholders of Merger Partner, approval of the Share Issuances (as defined below) by the requisite stockholders of the Issuer, the effectiveness of a registration statement on Form S-4 to be filed by the Issuer and the lapse of 20 calendar days following the mailing of an information statement to the Issuer's stockholders, the expiration or termination of the waiting period under the Hart-Scott-Rodino Antitrust Improvements Act of 1976, as amended, approval of the listing on the NYSE American of the shares of Common Stock to be issued in the Share Issuances, and the Concurrent Financing having been consummated or being consummated concurrently with or immediately prior to the closing. The Merger Agreement may be terminated by either party under specified circumstances, including if the First Merger has not been consummated by February 1, 2027 (subject to automatic extension to March 31, 2027 in certain circumstances where the Form S-4 has not become effective in time and all other conditions have been satisfied).
+
+Board of Directors. Pursuant to the Merger Agreement, immediately following the effective time of the First Merger, the Issuer's board of directors is expected to increase in size from eight to ten directors, consisting of the eight members of the board as of the closing and two directors designated by Merger Partner. Todd C. Davis, the Chief Executive Officer and a director of Ligand, and Richard Baxter, Senior Vice President, Investment Operations of Ligand, continue to serve as directors of the Issuer. As directors of the Issuer, Messrs. Davis and Baxter may have the ability to affect and influence control of the Issuer.
+
+The Securities Purchase Agreement. Concurrently with the execution of the Merger Agreement, Ligand and the other investors party thereto entered into a Securities Purchase Agreement (the "Securities Purchase Agreement") with the Issuer, pursuant to which, among other things, Ligand has agreed to purchase the Series B Preferred Stock and the Warrants described in Item 3 at a closing expected to occur immediately prior to the effective time of the First Merger. The Issuer intends to use the proceeds of the Concurrent Financing to repay certain indebtedness of Merger Partner and for working capital and general corporate purposes.
+
+Relationship with Merger Partner. Ligand is party to an existing royalty financing arrangement with Merger Partner and its subsidiary, Castle Creek Biosciences, LLC, including a Pledge and Security Agreement and a Purchase and Sale Agreement, each dated as of February 24, 2025, which the Issuer's financing arrangements, as amended in connection with the Mergers, permit to remain in place following the Mergers. In connection with the Issuer's Amended and Restated Venture Loan and Security Agreement with Horizon Technology Finance Corporation entered into on October 30, 2026, the parties thereto will enter into an amended and restated intercreditor agreement with Ligand with respect to such royalty financing arrangement. Ligand also holds the Ligand Bridge Note described in Item 3, which will be credited against Ligand's purchase price in the Concurrent Financing.
+
+Series B Preferred Stock. In connection with the Concurrent Financing, the Issuer will file a Certificate of Designation of Series B Convertible Preferred Stock (the "Series B Certificate of Designation") with the Secretary of State of the State of Nevada. Based on the description of the Series B Certificate of Designation in the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026 (the "Form 8-K"), each share of Series B Preferred Stock will have a stated value of $1,000 and will be convertible, at the option of the holder at any time on or after the initial issuance date, into a number of shares of Common Stock equal to the stated value (plus any declared and unpaid dividends and other amounts owed) divided by a conversion price of $19.67, subject to proportional adjustment for stock splits, stock dividends, recapitalizations and similar events. Holders of Series B Preferred Stock will be entitled to participate in dividends and distributions on the Common Stock on an as-converted basis and will vote together with the holders of Common Stock (and with the holders of Series A Preferred Stock on an as-converted basis) as a single class, in an amount equal to the number of shares of Common Stock that would be issuable upon conversion as if the conversion price were $16.54 (the "Series B Voting Conversion Price"), in each case subject to a beneficial ownership limitation (the "Maximum Percentage"), which, in the case of Ligand, is 49.99%. The Issuer may, with the prior written consent of the Series B Required Holders (as defined in the Securities Purchase Agreement) and subject to NYSE American rules, reduce the conversion price for any period of time deemed appropriate by the board of directors of the Issuer.
+
+Warrants. Each Warrant will entitle the holder to purchase shares of Common Stock at an exercise price of $0.0001 per share, subject to adjustment, at any time and from time to time on or after the initial exercise date specified in the Warrant, which is expected to be the date that is 180 days after the closing of the Mergers and the Concurrent Financing (the "Initial Exercise Date"), until 5:00 p.m., New York time, on the tenth anniversary of the original issue date of the Warrant. The Warrants may be exercised for cash or on a "cashless" basis; provided that, if a registration statement covering the issuance of the underlying shares is not effective at the time of exercise, the Warrants may be exercised only on a cashless basis. A holder may not exercise any portion of a Warrant to the extent that, after giving effect to such exercise, the holder, together with its attribution parties, would beneficially own in excess of the Maximum Percentage specified in the Warrant of the Common Stock outstanding immediately after giving effect to such exercise. The Maximum Percentage applicable to Ligand's Warrants is 49.99%. A holder may increase or decrease the Maximum Percentage by written notice to the Issuer to any percentage not in excess of 9.99%, provided that any increase will not be effective until the 61st day after such notice is delivered. Shares of Common Stock issuable upon exercise of a Warrant in excess of the Maximum Percentage are not deemed to be beneficially owned by the holder for purposes of Section 13(d) of the Securities Exchange Act of 1934, as amended (the "Exchange Act").
+
+Pelthos Stockholder Written Consent. In connection with the Mergers and the Concurrent Financing, on October 30, 2026, Ligand, together with certain other stockholders of the Issuer, executed a written consent of stockholders of the Issuer (the "Public Company Written Consent") approving the issuance of Common Stock in the First Merger and the Concurrent Financing pursuant to Sections 710 through 713 of the NYSE American Company Guide (the "Share Issuances"). As disclosed by the Issuer, on October 30, 2026, the Issuer's stockholders and the Required Holders (as defined in the Certificate of Designations of Rights and Preferences of the Series A Preferred Stock) also approved an amendment to the Certificate of Designations of Rights and Preferences of the Series A Preferred Stock (the "Series A Amendment"), which modifies the provisions relating to the Issuer's failure to timely deliver shares of Common Stock upon conversion of the Series A Preferred Stock and the Issuer's obligations upon the occurrence of a fundamental transaction. As disclosed by the Issuer, no further approval of the Issuer's stockholders is required to approve the Share Issuances or the Mergers.
+
+Series A Consent and Waiver. In connection with the Mergers and the Concurrent Financing, Ligand, together with the other holders of Series A Preferred Stock party thereto, executed a written consent and waiver (the "Series A Consent and Waiver") pursuant to which such holders, among other things, waived certain participation rights and Fundamental Transaction provisions applicable to the Series A Preferred Stock in connection with the Mergers and the Concurrent Financing, consented to the filing of the Series B Certificate of Designation and the issuance of the Series B Preferred Stock, and approved the Series A Amendment.
+
+Series A SPA Waiver. In connection with the Mergers and the Concurrent Financing, on October 30, 2026, Ligand entered into a Waiver of and Consent under Securities Purchase Agreement dated April 16, 2025 with the Issuer and LNHC, Inc. (the "Series A SPA Waiver"), relating to the securities purchase agreement pursuant to which the Series A Preferred Stock was issued. Pursuant to the Series A SPA Waiver, Ligand irrevocably waived, in each case solely in connection with the Mergers and the Concurrent Financing, (i) compliance with the participation rights set forth in Section 4(o) of such securities purchase agreement and any other provisions and covenants thereof applicable solely to such transactions and (ii) compliance with Section 4(a) of the Certificate of Designations of Rights and Preferences of the Series A Preferred Stock and any other provisions and covenants thereof applicable solely to such transactions. Ligand also consented to the filing of the Series B Certificate of Designation and the certificate of designation of the Issuer's Series D Convertible Preferred Stock and the issuance of such preferred stock in connection with the Concurrent Financing, and to the Series A Amendment. The Series A SPA Waiver becomes effective upon the execution of waivers in identical form by each of the other Major Buyers and Required Holders (each as defined in such securities purchase agreement) and, upon effectiveness, is binding on all holders of securities issued under such securities purchase agreement.
+
+Notes Amendment. Concurrently with the execution of the Merger Agreement, the Issuer entered into a First Amendment and Waiver to Senior Secured Convertible Notes, each identical in form (collectively, the "Notes Amendment"), with each of certain holders (including Ligand, in its capacity as a holder of the Convertible Note) of the Issuer's Senior Secured Convertible Notes issued on November 6, 2025 (the "Convertible Notes"), which became effective upon its execution by holders representing at least 65% of the aggregate principal amount of the Convertible Notes then outstanding. Because the Notes Amendment was approved by such holders, it is binding upon all existing and future holders of the Convertible Notes. Pursuant to the Notes Amendment, among other things, the definition of "Permitted Senior Indebtedness" was amended to increase the amount permitted for credit facilities with one or more financial institutions from $50.0 million to $80.0 million and to permit an asset-based loan facility of up to $10.0 million secured solely by accounts receivable, inventory and related assets, certain modifications were made to the definition of "Change of Control" and to the provisions relating to the Issuer's failure to timely deliver shares of Common Stock upon conversion, and the covenants in the Convertible Notes with respect to change of control, transactions with affiliates, indebtedness, liens and restrictions on transfers of assets were waived to permit the transactions contemplated by the Mergers and the Concurrent Financing, including Merger Partner's existing royalty financing with Ligand and the contingent consideration payable under the Merger Agreement. In addition, such holders waived any defaults or events of default arising from, and consented to, the consummation of such transactions. Except as described above, the Notes Amendment does not change the principal amount, interest rate, maturity date or conversion price of the Convertible Notes, which otherwise remain in full force and effect.
+
+Standing Waiver. Ligand, together with the other holders party thereto, entered into a Standing Waiver and Consent with the Issuer and LNHC, Inc. (the "Standing Waiver"), pursuant to which, upon certain failures by the Issuer to timely deliver shares of Common Stock upon conversion of the Series A Preferred Stock or the Convertible Notes, the buy-in provisions of the Certificate of Designations of Rights and Preferences of the Series A Preferred Stock or of the applicable Convertible Note, as the case may be, will apply in lieu of the buy-in provisions of the securities purchase agreements pursuant to which the Series A Preferred Stock and the Convertible Notes were issued.
+
+Foregoing descriptions; reservation of rights. The foregoing descriptions of the Merger Agreement, the Securities Purchase Agreement, the Series B Certificate of Designation, the Warrants, the Public Company Written Consent, the Series A Amendment, the Series A Consent and Waiver, the Series A SPA Waiver, the Notes Amendment and the Standing Waiver do not purport to be complete and are qualified in their entirety by reference to the full text of such documents, which are filed as exhibits to, or incorporated by reference in, this Schedule 13D as described in Item 7.
+
+Ligand acquired and holds its securities of the Issuer for investment purposes and intends to review its investment on a continuing basis. Depending on various factors, Ligand may take such actions with respect to its investment in the Issuer as it deems appropriate, including those actions set forth in subsections (a) through (j) of Item 4 of Schedule 13D. Except as set forth in this Schedule 13D, and as may occur as a result of or in connection with the Mergers and the Concurrent Financing (including the issuance of securities of the Issuer, the acquisition of Merger Partner and the change in the size and composition of the Issuer's board of directors described above), Ligand does not currently have any plans or proposals that relate to or would result in any of the matters listed in Items 4(a) through (j) of Schedule 13D, although Ligand reserves the right to formulate such plans or proposals, and to take such actions, at any time.
+</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Items 5(a)-(e) of the Schedule 13D are hereby amended and restated as follows:
+
+Ligand beneficially owns, in the aggregate, 1,500,000 shares of Common Stock, constituting approximately 38.2% of the Common Stock outstanding. Ligand beneficially owns 34,278.681 shares of Series A Preferred Stock (convertible into 3,427,868.1 shares of Common Stock), constituting approximately 66.6% of the Series A Preferred Stock outstanding, and the Convertible Note in the principal amount of $9.0 million (convertible into 261,309 shares of Common Stock), constituting 50.0% of the Convertible Notes outstanding. The aggregate percentages reported herein are based upon 3,931,829 shares of Common Stock outstanding and 51,479 shares of Series A Preferred Stock outstanding, in each case as of the close of business on the business day immediately prior to the date of the Merger Agreement, as set forth in the Merger Agreement, and $18.0 million aggregate principal amount of Convertible Notes outstanding, based on information provided by the Issuer. The Reporting Person may not convert any of the Series A Preferred Stock or the Convertible Note to the extent that, after giving effect to such conversion, the Reporting Person together with its affiliates would beneficially own in excess of 49.9% of the shares of Common Stock outstanding immediately after giving effect to such conversion. The Series B Preferred Stock and the Warrants have not been issued to or acquired by Ligand as of the date of this Amendment No. 2, remain subject to the closing conditions described in Items 3 and 4, and are therefore not reflected above. Upon the closing of the Mergers and the Concurrent Financing, Ligand's beneficial ownership is expected to change, and Ligand intends to file a further amendment to this Schedule 13D as and when required.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Ligand has sole voting and sole dispositive power with respect to all of the shares of Common Stock and Series A Preferred Stock that it beneficially owns. Holders of Series A Preferred Stock are entitled to receive notice of and vote at all stockholder meetings alongside holders of Common Stock, voting together as a single class; provided, that Ligand will be deemed to have waived any voting rights such that the aggregate voting rights of any Common Stock beneficially owned by Ligand and/or any of its affiliates, collectively, on any record date shall not exceed 49.9%. As a result, Ligand's ownership of Series A Preferred Stock and Common Stock does not represent more than 49.9% of the aggregate voting power of the Issuer.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as described in this Schedule 13D (including Ligand's entry into the Securities Purchase Agreement on October 30, 2026, as described in Items 3 and 4), Ligand has not effected any transactions in the Common Stock or other equity securities of the Issuer during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">No person other than Ligand is known to have the right to receive, or the power to direct the receipt of, dividends from, or the proceeds from the sale of, the shares of Common Stock beneficially owned by Ligand.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the Schedule 13D is hereby supplemented as follows:
+
+The information set forth in Items 3 and 4 above regarding the Merger Agreement, the Securities Purchase Agreement, Ligand's relationship with Merger Partner, the Series B Certificate of Designation, the Warrants, the Public Company Written Consent, the Series A Amendment, the Series A Consent and Waiver, the Series A SPA Waiver, the Notes Amendment and the Standing Waiver is incorporated herein by reference.
+
+Lock-Up Agreement. Concurrently with the execution of the Merger Agreement and the Securities Purchase Agreement, Ligand entered into a lock-up agreement with the Issuer (the "Lock-Up Agreement"), pursuant to which Ligand has agreed not to, except in limited circumstances, offer, pledge, sell, contract to sell, sell any option or contract to purchase, purchase any option or contract to sell, grant any option, right or warrant to purchase, lend, or otherwise transfer or dispose of, directly or indirectly, any shares of Series B Preferred Stock purchased in the Concurrent Financing or shares of Common Stock issuable upon conversion thereof, or enter into any swap, short sale, hedge or other arrangement that transfers the economic consequences of ownership of such securities, during the period commencing at the closing and ending on the earlier of (x) the date that is 180 days after the closing date and (y) the date of any waiver, termination or release of the lock-up agreements executed by certain other investors in the Concurrent Financing, subject to certain exceptions set forth in the Lock-Up Agreement. The Lock-Up Agreement does not apply to shares of Common Stock or other securities of the Issuer owned by Ligand prior to the date of the Securities Purchase Agreement. If, during such period, the Issuer releases or waives any of the lock-up restrictions with respect to any other investor in the Concurrent Financing on terms more favorable to such investor than those in the Lock-Up Agreement, the same terms will automatically apply to Ligand.
+
+Registration Rights Agreement. At the closing of the Concurrent Financing, the Issuer will enter into a registration rights agreement (the "Registration Rights Agreement") with Ligand and the other investors in the Concurrent Financing, pursuant to which Ligand will be entitled to certain resale registration rights with respect to the shares of Common Stock issuable upon conversion of the Series B Preferred Stock and upon exercise of the Warrants. Pursuant to the Registration Rights Agreement, the Issuer will be required to file a resale registration statement with the SEC by the later of the 30th calendar day after the closing date of the Concurrent Financing and 15 calendar days after the due date (including any extensions) of the Issuer's next periodic report required under Section 13 of the Exchange Act, to use its reasonable best efforts to cause such registration statement to be declared effective by the earlier of (A) the 90th calendar day after the closing date (or the 120th calendar day if subject to a full review by the SEC) and (B) the 5th business day after the Issuer is notified by the SEC that such registration statement will not be reviewed or will not be subject to further review, and to keep such registration statement effective until the earliest of the date on which all registrable securities may be sold without restriction under Rule 144, the date on which all registrable securities have been sold and the fifth anniversary of the closing date.
+
+No Group. Ligand has not agreed with any other investor in the Concurrent Financing or any securityholder of Merger Partner to act together for the purpose of acquiring, holding, voting or disposing of securities of the Issuer, and Ligand disclaims membership in any "group" within the meaning of Section 13(d)(3) of the Exchange Act with any such person.
+
+The foregoing descriptions do not purport to be complete and are qualified in their entirety by reference to the full text of the applicable agreements, which are filed as exhibits to, or incorporated by reference in, this Schedule 13D as described in Item 7.
+</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 7 of the Schedule 13D is hereby supplemented by adding the following exhibits:
+
+Exhibit    Description
+14           Agreement and Plan of Merger, dated as of October 30, 2026, by and among Pelthos Therapeutics Inc., Credit Card Merger Sub, Inc., Credit Card Merger Sub II, LLC, Castle Creek Biosciences, Inc. and Paragon Biosciences, LLC (incorporated by reference to Exhibit 2.1 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+15           Securities Purchase Agreement, dated as of October 30, 2026, by and among Pelthos Therapeutics Inc. and the investors party thereto, including the Form of Warrant to Purchase Common Stock attached as Exhibit D thereto (incorporated by reference to Exhibit 10.1 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+16           Form of Certificate of Designation of Series B Convertible Preferred Stock of Pelthos Therapeutics Inc. (incorporated by reference to Exhibit 3.1 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+17           Form of First Amendment and Waiver to Senior Secured Convertible Notes, by and between Pelthos Therapeutics Inc. and the holder party thereto. (incorporated by reference to Exhibit 10.7 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+18           Form of Registration Rights Agreement, by and among Pelthos Therapeutics Inc. and the investors party thereto (incorporated by reference to Exhibit 10.5 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+19            Lock-Up Agreement, dated as of October 30, 2026, by and between Ligand Pharmaceuticals Incorporated and Pelthos Therapeutics Inc. (incorporated by reference to Exhibit 10.4 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+20            Written Consent of a Majority of Stockholders of Pelthos Therapeutics Inc. in Lieu of a Special Meeting, dated October 30, 2026 (the Public Company Written Consent) (filed herewith).
+
+21            Written Consent and Waiver of Series A Convertible Preferred Stockholders of Pelthos Therapeutics Inc. in Lieu of a Special Meeting, dated October 30, 2026 (filed herewith).
+
+22           Standing Waiver and Consent of (1) Securities Purchase Agreement dated April 16, 2025 and (2) Securities Purchase Agreement dated November 6, 2025, dated as of October 30, 2026, by and among Pelthos Therapeutics Inc., LNHC, Inc. and the holders party thereto (filed herewith).
+
+23           Form of PIPE Warrant (incorporated by reference to Exhibit 4.2 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+24           Form of Amendment to Certificate of Designation of Series A Convertible Preferred Stock of Pelthos Therapeutics Inc. (incorporated by reference to Exhibit 3.2 to the Issuer's Current Report on Form 8-K filed with the SEC on October 30, 2026).
+
+25           Waiver of and Consent under Securities Purchase Agreement dated April 16, 2025, dated as of October 30, 2026, by and among Pelthos Therapeutics Inc., LNHC, Inc. and Ligand Pharmaceuticals Incorporated (filed herewith).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Ligand Pharmaceuticals Incorporated</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">By: /s/ Octavio Espinoza</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Octavio Espinoza, Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">11/03/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/4Hm4_A/YF/FN/IItR/mj-xvIyqf86as/SYYi2wQSbS0hJX/SGNYRA/TS/cuBHJ7cS4"></script></body></html>
