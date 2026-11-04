@@ -1,7 +1,7 @@
 {
   "schema_version": "magis.core_compounder_monitor.v1",
-  "as_of": "2026-10-27",
-  "config_version": "2026-10-26.1",
+  "as_of": "2026-11-01",
+  "config_version": "2026-10-29.1",
   "research_only": true,
   "capital_actionable": false,
   "tickers": {
@@ -4357,6 +4357,73 @@
         }
       },
       "sequence": 2
+    },
+    "ASML": {
+      "conditions": {
+        "model_stale": false,
+        "what_missing": "83e6b3f23c1a22271cb69f20dfa961d9a0ccb02baa2a79e79aeed930bb6c67ec"
+      },
+      "condition_sources": {
+        "buy_zone:zone_1": {
+          "ref": "ASML/research/pricing_analysis.json",
+          "as_of": "2026-11-01",
+          "claim_type": "inference"
+        },
+        "buy_zone:zone_2": {
+          "ref": "ASML/research/pricing_analysis.json",
+          "as_of": "2026-11-01",
+          "claim_type": "inference"
+        },
+        "buy_zone:zone_3": {
+          "ref": "ASML/research/pricing_analysis.json",
+          "as_of": "2026-11-01",
+          "claim_type": "inference"
+        },
+        "model_stale": {
+          "ref": "ASML/research/valuation_workbench.json",
+          "as_of": "2026-11-01",
+          "claim_type": "inference"
+        },
+        "what_missing": {
+          "ref": "ASML/research/valuation_contract.json",
+          "as_of": "2026-08-31",
+          "claim_type": "inference"
+        }
+      },
+      "condition_details": {},
+      "model": {
+        "ticker": "ASML",
+        "as_of": "2026-08-31",
+        "method": "proof_first_automated",
+        "inputs": {
+          "price": 1565.9,
+          "price_as_of": "2026-10-30",
+          "price_source": "Yahoo ASML close 2026-10-30",
+          "fcf_per_share": null,
+          "fcf_source": null,
+          "normalization_note": null
+        },
+        "scenarios": {}
+      },
+      "base_irr_pct": null,
+      "irr_anchor": {
+        "value": null,
+        "model": {
+          "ticker": "ASML",
+          "as_of": "2026-08-31",
+          "method": "proof_first_automated",
+          "inputs": {
+            "price": 1565.9,
+            "price_as_of": "2026-10-30",
+            "price_source": "Yahoo ASML close 2026-10-30",
+            "fcf_per_share": null,
+            "fcf_source": null,
+            "normalization_note": null
+          },
+          "scenarios": {}
+        }
+      },
+      "sequence": 0
     }
   },
   "views": {
@@ -16513,202 +16580,224 @@
       "operating_conflicts": [],
       "proposal_id": "tci-7c009857614942a93dc6",
       "proposal_status": "pending_human_review"
+    },
+    "ASML": {
+      "ticker": "ASML",
+      "as_of": "2026-11-01",
+      "research_only": true,
+      "capital_actionable": false,
+      "model_level": "screening_grade",
+      "tci_return_bridge": {
+        "schema_version": "1.0",
+        "unit": "percent_per_year",
+        "method": "dated_forward_cashflow_schedule_per_share@1.0",
+        "status": "gap",
+        "research_only": true,
+        "capital_actionable": false,
+        "horizon_years": 7,
+        "persona_horizon_note": "Hohn's 4-year lens scores business fit; the contract uses the existing 7-year cash-flow horizon, with a separate 10-year sensitivity.",
+        "model_as_of": "2026-08-31",
+        "price": 1565.9,
+        "price_as_of": "2026-10-30",
+        "sources": [
+          {
+            "ref": "ASML/research/valuation.json#inputs.price",
+            "locator": "Yahoo ASML close 2026-10-30",
+            "as_of": "2026-08-31",
+            "claim_type": "inference",
+            "status": "assumption"
+          }
+        ],
+        "normalization_note": null,
+        "claim_type": "inference",
+        "scenarios": {},
+        "sensitivity_10yr": {},
+        "gaps": [
+          "GAP: method is not a per-share full cash-flow model; retain its approved NAV/issuer-specific method."
+        ]
+      },
+      "quality_assessment": {
+        "status": "pending_human_review",
+        "criteria": [
+          {
+            "criterion": "moat_barrier",
+            "rating": null,
+            "value": null,
+            "sources": [],
+            "claim_type": "opinion",
+            "status": "gap"
+          },
+          {
+            "criterion": "real_pricing_power",
+            "rating": null,
+            "value": null,
+            "sources": [],
+            "claim_type": "opinion",
+            "status": "gap"
+          },
+          {
+            "criterion": "capex_revenue_pct",
+            "rating": null,
+            "value": null,
+            "sources": [],
+            "claim_type": "opinion",
+            "status": "gap"
+          },
+          {
+            "criterion": "capex_da_pct",
+            "rating": null,
+            "value": null,
+            "sources": [],
+            "claim_type": "opinion",
+            "status": "gap"
+          },
+          {
+            "criterion": "incremental_roic_pct",
+            "rating": null,
+            "value": null,
+            "sources": [],
+            "claim_type": "opinion",
+            "status": "gap"
+          },
+          {
+            "criterion": "capital_allocation",
+            "rating": null,
+            "value": null,
+            "sources": [],
+            "claim_type": "opinion",
+            "status": "gap"
+          },
+          {
+            "criterion": "governance",
+            "rating": null,
+            "value": null,
+            "sources": [],
+            "claim_type": "opinion",
+            "status": "gap"
+          }
+        ],
+        "classification_moat": "unproven",
+        "locked_fact_count": 6,
+        "rule": "Unmeasured quality is unscored; every qualitative rating requires evidence and review."
+      },
+      "buy_zones": {
+        "schema_version": "1.0",
+        "config_version": "2026-10-29.1",
+        "status": "withheld",
+        "research_only": true,
+        "capital_actionable": false,
+        "model_level": "screening_grade",
+        "blockers": [
+          "The valuation workbench is evidence-blocked; hurdle prices are withheld until proof is decision-grade."
+        ],
+        "zones": [],
+        "deepest_active_zone": null,
+        "royalty_corroboration": {
+          "status": "unavailable",
+          "signal": null,
+          "role": "corroborating_only"
+        }
+      },
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required",
+      "kpi_coverage": [],
+      "what_missing": [
+        {
+          "id": "open_question",
+          "text": "Independent review of v3 falsifier draft `asml-opbiz-oe-2026fy` (owner-earnings leg).",
+          "source": {
+            "ref": "ASML/research/thesis_card.json",
+            "as_of": "2026-08-31",
+            "claim_type": "inference"
+          },
+          "status": "open"
+        },
+        {
+          "id": "open_question",
+          "text": "Stance and sizing authority remain in `human_decision.json` only.",
+          "source": {
+            "ref": "ASML/research/thesis_card.json",
+            "as_of": "2026-08-31",
+            "claim_type": "inference"
+          },
+          "status": "open"
+        },
+        {
+          "id": "open_question",
+          "text": "Price as of 2026-07-20; refresh market inputs on next mechanical run.",
+          "source": {
+            "ref": "ASML/research/thesis_card.json",
+            "as_of": "2026-08-31",
+            "claim_type": "inference"
+          },
+          "status": "open"
+        },
+        {
+          "id": "falsifier_gap",
+          "text": "Typed moat-impairment falsifiers are missing.",
+          "source": {
+            "ref": "ASML/research/valuation_contract.json",
+            "as_of": "2026-08-31",
+            "claim_type": "inference"
+          },
+          "status": "open"
+        },
+        {
+          "id": "tracked_investor_13f_gap",
+          "text": "Tracked lens-investor history must be reconciled; existing specialist signals do not establish Hohn coverage.",
+          "source": {
+            "ref": "_system/lenses/personas.json",
+            "as_of": null,
+            "claim_type": "inference"
+          },
+          "status": "open"
+        },
+        {
+          "id": "bear_reconciliation",
+          "text": "---\nfiling: pass\nconsistency: pass\ndisclosure: pass\nshort: no_hit\nthird_party: n/a\nblock_final: false\nblocking_issues: []\nre_pass: false\n---\n\n# ASML — Adversarial review\n\n**Date:** 2026-11-01  \n**Agent:** Milly (batch pass)  \n**Dive reviewed:** `ASML/research/deep_dive_2026-11-01.md`  \n**Valuation reviewed:** `ASML/research/valuation.json`  \n**Filings used:** `ASML/research/evidence/filing_facts_2026-11-01.json`\n\n**Goal:** Truth-seeking QA. Not bearish for its own sake.\n\n---\n\n## Summary verdict\n\n| Area | Status | One line |\n|------|--------|----------|\n| Filing reconciliation | pass | filing_f",
+          "source": {
+            "ref": "ASML/research/adversarial_2026-11-01.md",
+            "as_of": "2026-11-01",
+            "claim_type": "opinion"
+          },
+          "status": "open"
+        }
+      ],
+      "freshness": {
+        "status": "current",
+        "as_of": "2026-11-01",
+        "dates": {
+          "model_as_of": "2026-08-31",
+          "latest_fact_as_of": "2025-12-31",
+          "oldest_fact_as_of": "2025-12-31",
+          "price_as_of": "2026-10-30",
+          "forecast_as_of": "2026-08-31",
+          "calculation_as_of": "2026-10-30",
+          "financial_period": "2025-12-31",
+          "assumptions_as_of": "2026-08-31",
+          "share_basis_as_of": null
+        },
+        "age_days": {
+          "model_as_of": 62,
+          "latest_fact_as_of": 305,
+          "price_as_of": 2
+        },
+        "review_threshold_days": {
+          "model_as_of": 365,
+          "latest_fact_as_of": 548,
+          "price_as_of": 7
+        },
+        "warnings": [],
+        "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
+      },
+      "reported_after_model": [],
+      "canonical_base_irr_pct": null,
+      "operating_conflicts": [],
+      "proposal_id": "tci-314b78f34ff9a586ad55",
+      "proposal_status": "pending_human_review"
     }
   },
   "pending_events": [
     {
-      "ticker": "AENA.MC",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "218b8b65f6488e4d108bdc337e5314be4dc5c9a572703a0c0c368f5ebdadc2e0",
-      "after": "85681f90226d77ed2cc1bb2ba6a3e1ef295e3ba7a0b84467cb214101a9201074",
-      "as_of": "2026-10-25",
-      "claim_type": "inference",
-      "source": {
-        "ref": "AENA.MC/research/valuation_contract.json",
-        "as_of": "2026-10-24",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "1bd25162b73f947869d12de4"
-    },
-    {
-      "ticker": "FER",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "4fd7ea12d59ad902a208b2e7953261025ce5d72e4bf0ea44e3c44f2829162fbc",
-      "after": "d18892a0da29a17f626616bfc5a93f6b2929dc1b03bf4a98e0e95df7cf7bc91a",
-      "as_of": "2026-10-25",
-      "claim_type": "inference",
-      "source": {
-        "ref": "FER/research/valuation_contract.json",
-        "as_of": "2026-10-24",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "e54d4f22cdeb3063ab631299"
-    },
-    {
-      "ticker": "WCN",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "c7aba7285f77c023d20de6b51dd072e3b0a0556bd11f9311bea9be631732082f",
-      "after": "e8d4ea37b293492728621950e2fe542f72497e58a5a6e1ac3c02d981549b0be3",
-      "as_of": "2026-10-25",
-      "claim_type": "inference",
-      "source": {
-        "ref": "WCN/research/valuation_contract.json",
-        "as_of": "2026-10-24",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "4a476d0e0854b253182ff3ab"
-    },
-    {
-      "ticker": "MKL",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "c499f224fe090ae967482924284a1830649175cd39d59db80c8b1551c864e331",
-      "after": "39dedd3c35912406e5df270a34a688856ef956af3faee1d4f2ddb8ebb5b06dfc",
-      "as_of": "2026-10-25",
-      "claim_type": "inference",
-      "source": {
-        "ref": "MKL/research/valuation_contract.json",
-        "as_of": "2026-10-24",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "e38ad6efd79d157e757d7583"
-    },
-    {
-      "ticker": "DRR.AX",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "53f1239e75b9a2ee036f9c4ac26d323e3d4d0ec68e7f57a3c30a25e24345debf",
-      "after": "421ceafe510977a656587317db148d0ca0bdbb99b88ca986f382db41e38d039b",
-      "as_of": "2026-10-25",
-      "claim_type": "inference",
-      "source": {
-        "ref": "DRR.AX/research/valuation_contract.json",
-        "as_of": "2026-06-02",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "ebbe098181babf5e5b7a5fb7"
-    },
-    {
-      "ticker": "CSU",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "718720400284c183f724eeab8e12982cf12a6024c1a70f7d60c0cf4a4dc470e5",
-      "after": "559fe8ffe6e0b096601fd63e5aaa7b886ced93f143663b2655440dc233f94693",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CSU/research/valuation_contract.json",
-        "as_of": "2026-07-21",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "06765b0580dc55127ea4ab00"
-    },
-    {
-      "ticker": "SPGI",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "8fc9261e1b4a8b9894f760ae85a9ac0d070cf9c22348bc59739ad4ff622cb3bc",
-      "after": "2f502c2ed6f8a96c5e0a7290dd58ae3fa7382e6a6fb25a03ee526a0c36300fb6",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "SPGI/research/valuation_contract.json",
-        "as_of": "2026-07-20",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "72e54eb6822a520bd29c04e4"
-    },
-    {
-      "ticker": "CME",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "99dd2abb84c09b7725c1ee4608f55052473e59ad5d14d9e819dccf63342b7a1c",
-      "after": "762758c6c16e8ef5bc4836aa64d10019354c352f92d1af6ab43a25aa1e362fe6",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CME/research/valuation_contract.json",
-        "as_of": "2026-06-03",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "9a31acfb13c0289d8ad620be"
-    },
-    {
-      "ticker": "ICE",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "736d3957f9e0c7b222ecaa82027ecf122b8eb776c596a2450102da2bd40b001f",
-      "after": "2ddc141aa05c3c1b9ca32101dd38259b523cf2e5d95f221788187147ee309f9e",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "ICE/research/valuation_contract.json",
-        "as_of": "2026-07-20",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "786ec5094215f63165109f34"
-    },
-    {
-      "ticker": "FNV",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "faeb616173a68839c849b7f14915e034d9df9b26827b06932dbf8e0e7b05df9a",
-      "after": "a1b7697062ee4f1d73e763bd19ef87305b5b71dbc573b0b9c8e4f413c6b3e723",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "FNV/research/valuation_contract.json",
-        "as_of": "2026-07-23",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "1a4c52b80a734c8a38d62209"
-    },
-    {
-      "ticker": "CPRT",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "fa67dbc357b81d8333a9fba814a87280cedc70c00e3d90a44bed74c90c816ee2",
-      "after": "3105490fb56940d47a06d5f39fef48ad9d7b1c1a0fd0aa8672976b24269bef39",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CPRT/research/valuation_contract.json",
-        "as_of": "2026-07-20",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "3f05145d93dd805789d36493"
-    },
-    {
-      "ticker": "BN",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "3488e3dc285895127e16d8725c1cca640265eaa0c3303b83583f0e0063f1c46e",
-      "after": "5bcccc3e03186aae5a516f7defa882be233197e7e266c67b7cd79a6e3c02c396",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "BN/research/valuation_contract.json",
-        "as_of": "2026-09-17",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "af49df8be1b417b8c77050bd"
-    },
-    {
       "ticker": "TPL",
       "lane": "what_missing",
       "condition": "what_missing",
@@ -17077,488 +17166,7 @@
       "event_id": "47b487c4c341129821d6c4f4"
     }
   ],
-  "events_this_run": [
-    {
-      "ticker": "CSU",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "718720400284c183f724eeab8e12982cf12a6024c1a70f7d60c0cf4a4dc470e5",
-      "after": "559fe8ffe6e0b096601fd63e5aaa7b886ced93f143663b2655440dc233f94693",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CSU/research/valuation_contract.json",
-        "as_of": "2026-07-21",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "06765b0580dc55127ea4ab00"
-    },
-    {
-      "ticker": "SPGI",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "8fc9261e1b4a8b9894f760ae85a9ac0d070cf9c22348bc59739ad4ff622cb3bc",
-      "after": "2f502c2ed6f8a96c5e0a7290dd58ae3fa7382e6a6fb25a03ee526a0c36300fb6",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "SPGI/research/valuation_contract.json",
-        "as_of": "2026-07-20",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "72e54eb6822a520bd29c04e4"
-    },
-    {
-      "ticker": "CME",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "99dd2abb84c09b7725c1ee4608f55052473e59ad5d14d9e819dccf63342b7a1c",
-      "after": "762758c6c16e8ef5bc4836aa64d10019354c352f92d1af6ab43a25aa1e362fe6",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CME/research/valuation_contract.json",
-        "as_of": "2026-06-03",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "9a31acfb13c0289d8ad620be"
-    },
-    {
-      "ticker": "ICE",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "736d3957f9e0c7b222ecaa82027ecf122b8eb776c596a2450102da2bd40b001f",
-      "after": "2ddc141aa05c3c1b9ca32101dd38259b523cf2e5d95f221788187147ee309f9e",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "ICE/research/valuation_contract.json",
-        "as_of": "2026-07-20",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "786ec5094215f63165109f34"
-    },
-    {
-      "ticker": "FNV",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "faeb616173a68839c849b7f14915e034d9df9b26827b06932dbf8e0e7b05df9a",
-      "after": "a1b7697062ee4f1d73e763bd19ef87305b5b71dbc573b0b9c8e4f413c6b3e723",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "FNV/research/valuation_contract.json",
-        "as_of": "2026-07-23",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "1a4c52b80a734c8a38d62209"
-    },
-    {
-      "ticker": "CPRT",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "fa67dbc357b81d8333a9fba814a87280cedc70c00e3d90a44bed74c90c816ee2",
-      "after": "3105490fb56940d47a06d5f39fef48ad9d7b1c1a0fd0aa8672976b24269bef39",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CPRT/research/valuation_contract.json",
-        "as_of": "2026-07-20",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "3f05145d93dd805789d36493"
-    },
-    {
-      "ticker": "BN",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "3488e3dc285895127e16d8725c1cca640265eaa0c3303b83583f0e0063f1c46e",
-      "after": "5bcccc3e03186aae5a516f7defa882be233197e7e266c67b7cd79a6e3c02c396",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "BN/research/valuation_contract.json",
-        "as_of": "2026-09-17",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "af49df8be1b417b8c77050bd"
-    },
-    {
-      "ticker": "TPL",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "60d76baf303aff1a1560e7c0c8b095e1a83d7c7f4f960ca17bfcb9a3a628314a",
-      "after": "bccef147c07d45b35d8e14e2815dc90e0bdb983feece7fd5be9edb04e831ea41",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "TPL/research/valuation_contract.json",
-        "as_of": "2026-07-15",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "29cf05102766fa7b9013fcd9"
-    },
-    {
-      "ticker": "TOI.V",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "ec05546e2ba3f736890cfb0f5aba051f1c45e6c1c6a956ee04050e6e63ea4cfe",
-      "after": "33b3472eec6b1644365e3d0ada54ef5b383f6a3a7c6fd72e64c1497d2fd47589",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "TOI.V/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "2794aa375b4962150f674127"
-    },
-    {
-      "ticker": "LIFCO.ST",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "088e00ef2d2ecafcd59b8d53225a81736779ac25378e4da19d4057fa4f5d4dbb",
-      "after": "9674eeb34378cb94ba05ee7750bad6163d8929a932100f08490f53cb5969e055",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "LIFCO.ST/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "bfb669fffad572c5a85e5a6f"
-    },
-    {
-      "ticker": "WPM",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "dedf38fc2b57be7bc1fdf4d6273a468a2f0be66d2ea39c9a809a498f4664484d",
-      "after": "f09740334287c0e0791f52c1ec2322b154ae0c8a5e6f5bc3a93f9bdbd191f394",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "WPM/research/valuation_contract.json",
-        "as_of": "2026-06-08",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "e528b6aa49e9d941e10f2a2d"
-    },
-    {
-      "ticker": "RGLD",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "488eb10edabb402f92289a4b562fcb22ded652d464421539bc5b6f738cb4babd",
-      "after": "a9ffe6354cad95ffe8178eed4e8a868111170f3f76ac9df450c1675b6eb3aa9e",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "RGLD/research/valuation_contract.json",
-        "as_of": "2026-07-21",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "135d700f18395e5aaede6699"
-    },
-    {
-      "ticker": "PSK.TO",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "46aadec0c04eadec5f643ce381aa9184f4644c58f1ac0a4b9fb2996973dbab63",
-      "after": "89d379c8d998d3ff09a67489a2db64499e749946879fd21f1ba9c040f2784905",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "PSK.TO/research/valuation_contract.json",
-        "as_of": "2026-07-21",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "21df446815a57ea88bc79d71"
-    },
-    {
-      "ticker": "MIAX",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "ba974afe680faa08e4db578873bbb6ebec1b6108fd96f78bea6e47261fd9301c",
-      "after": "da7d42faddba7178a576f5e42d4d10fd0a422b550a7d7c6f594e5bd160ae8c19",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "MIAX/research/valuation_contract.json",
-        "as_of": "2026-06-03",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "bacd166f667187f8c9d0879b"
-    },
-    {
-      "ticker": "TEQ.ST",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "be0ff88601a9910ead6b4911b728bbb0a8d9bbfe866de6d26c5f1eff74a7dc4b",
-      "after": "6355359aaa6fb06e023f2511ebdf76ddb01a212c3605f827290de4b12de767bf",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "TEQ.ST/research/valuation_contract.json",
-        "as_of": "2026-08-31",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "8a58ee26c4694f4eff520eec"
-    },
-    {
-      "ticker": "FRMO",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "0506abb2e54c51e4ff2220e1aa2f1e3aeca51e1eb97c8688d7c6e29bbe6011bf",
-      "after": "293e991a73aa8ac788d21a7d4d8d1744e42d202d4982031e38ecf9ce2528e84a",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "FRMO/research/valuation_contract.json",
-        "as_of": "2026-07-21",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "da1acea942ac446bce516502"
-    },
-    {
-      "ticker": "RMS.PA",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "26c0035f45ab9f81147198d1b779e8266de849c299888dcbf59983b9e47dc953",
-      "after": "ef5f85054d1768bcfc62e99d8b6bd9f8fa5bfec82f686c789bf2defded240171",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "RMS.PA/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "9174704e3b4329c047ff18ae"
-    },
-    {
-      "ticker": "COST",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "e052b7f25222bfed1c08cd7162bbad55045305304f281f26c9279ff7f895f313",
-      "after": "dbf3ac4206d2a94828a6aad1e270cc6854eae55d4336bbc6347fabd936f5635c",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "COST/research/valuation_contract.json",
-        "as_of": "2026-07-20",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "0eb82e470f71f7ba9d91a096"
-    },
-    {
-      "ticker": "GOOGL",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "ffe325e6f70893f982aa0e5a7a1bd06921def93a91b51a5b35125a445b59ed42",
-      "after": "e234451a323a354673a1240a5eb359190547463ae2887f69838db687bcef7ef7",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "GOOGL/research/valuation_contract.json",
-        "as_of": "2026-07-24",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "e9145f28ceade5d325941a74"
-    },
-    {
-      "ticker": "RACE",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "3ac37bcc645e6c49253f511c8c5bec28f1bf9a4214d360e436e003fcd81879dd",
-      "after": "2318d5633711832c4306a7798d846b577aaf3936d42635a636473583818b61b0",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "RACE/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "2546496cad68f73e4b7593fa"
-    },
-    {
-      "ticker": "AMZN",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "2d1c3da3beb9ca0846ce21767bbfedc8152b43ddabd2f9b7722d866f9efc860f",
-      "after": "3cc9fdaa3b09649eb1066edb9c76a6fb3c1ee81007ebfa9d46fbb9efd4aaa2ae",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "AMZN/research/valuation_contract.json",
-        "as_of": "2026-07-28",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "ec2b33fe11adb49b93647774"
-    },
-    {
-      "ticker": "CP",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "2810e374425322a36b6f3f6ff28e29982bbfc55207fcc6a9c60d8a00bdb34439",
-      "after": "a576a08bab8517669ea90fc0751b4dff5159e1222a1b2d59b5319d8d2925fb6c",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CP/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "7f25051958041a4c426696ca"
-    },
-    {
-      "ticker": "LSEG",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "f780bf2a24a90091ad3fbe723a153ae32c2d0996cf6a310a0ee542a2f72db311",
-      "after": "4812c860c6ac68d5b4df46808d474f253b5fa35a832e1a3b2852d90a395e9adb",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "LSEG/research/valuation_contract.json",
-        "as_of": "2026-09-01",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "0ef6920132ee080a736c90a7"
-    },
-    {
-      "ticker": "DB1.DE",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "22ad82f813f8a7e6c1d1839983c852e90fb7a5918336cea05a5a732701efaab0",
-      "after": "59ad289f6f4a937e94cc8eb0b21de22f01c8e156186fe09a4b47530fb5ccbcb8",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "DB1.DE/research/valuation_contract.json",
-        "as_of": "2026-06-11",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "d78338a0c63fde4d8a75070b"
-    },
-    {
-      "ticker": "CBOE",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "cf7a4d12f1b9d39d8ab481a87f55623f280793f64c2a7f6252df371ee6e3b9b8",
-      "after": "086d9fe0cca53e5e4512f69f29769d8c7fdd024b45f00151cc807e0d0070799c",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "CBOE/research/valuation_contract.json",
-        "as_of": "2026-06-03",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "e4615e7bf96c9c2d2cd5673b"
-    },
-    {
-      "ticker": "AENA.MC",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "85681f90226d77ed2cc1bb2ba6a3e1ef295e3ba7a0b84467cb214101a9201074",
-      "after": "081ce26c4af91cedc63c8218bd9b9de8689a113bd9a56472e9add48028c7233e",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "AENA.MC/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "fe98715386c588920dbc9c66"
-    },
-    {
-      "ticker": "FER",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "d18892a0da29a17f626616bfc5a93f6b2929dc1b03bf4a98e0e95df7cf7bc91a",
-      "after": "9378f2bea6f96abdf2d891d064f9e79091acc5fcd3ee0427dcbb15b2c7a0975f",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "FER/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "ef0e66f8edf8319f7f9c1b87"
-    },
-    {
-      "ticker": "WCN",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "e8d4ea37b293492728621950e2fe542f72497e58a5a6e1ac3c02d981549b0be3",
-      "after": "086de3ba200444b0c3f823de001dd133b1a16487a3b99ef7adab7cfebf043e0d",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "WCN/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "925c713502e5bab0ed1664ba"
-    },
-    {
-      "ticker": "MKL",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "39dedd3c35912406e5df270a34a688856ef956af3faee1d4f2ddb8ebb5b06dfc",
-      "after": "350cc42563cea2a2e9a019b41b1f073bffd7f506aad535f081651b12ce808822",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "MKL/research/valuation_contract.json",
-        "as_of": "2026-10-26",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "0bedc23a1ce5b292fe6e6452"
-    },
-    {
-      "ticker": "DRR.AX",
-      "lane": "what_missing",
-      "condition": "what_missing",
-      "before": "421ceafe510977a656587317db148d0ca0bdbb99b88ca986f382db41e38d039b",
-      "after": "84692a678b02525df968f5d3bd1cb2ed0279294682412f4cf8fab0179df06324",
-      "as_of": "2026-10-27",
-      "claim_type": "inference",
-      "source": {
-        "ref": "DRR.AX/research/valuation_contract.json",
-        "as_of": "2026-06-02",
-        "claim_type": "inference"
-      },
-      "details": null,
-      "event_id": "47b487c4c341129821d6c4f4"
-    }
-  ],
+  "events_this_run": [],
   "event_history": [
     {
       "ticker": "CSU",
