@@ -29,6 +29,11 @@ candidates.json input format (one file per desk run):
   ],                                                 # counterfactual_flag optional; else derived from the snapshot row
   "baseline": {"n": 20, "exclude": []}               # optional; default n=20, seeded from run_date
 }
+  universe mode: "baseline": {"mode": "universe", "n": 20}  draws from universe.json names (Drew's book + compounders)
+  minus that run's flagged and held names, limited to names with a usable stored row; optional "universe_file".
+Snapshot cadence: the digest stores snapshots Mon/Wed/Fri only. A window whose end session has no stored close is
+graded at the first stored close for that ticker's own exchange after it (numbers record end_as_of_used and
+sessions_elapsed); it turns no_data only if no close arrives within MAX_EXTRA_SESSIONS (10) further sessions.
 Idempotent per run_date+ticker+flag: an existing row with the same key gets the test fields added in
 place (never duplicated, existing values never changed). Prints the number of flag rows registered.
 """
@@ -36,6 +41,7 @@ import argparse, datetime as dt, hashlib, json, os, random, re, statistics, sys,
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC_VERSION_DEFAULT = "1.0"
+MAX_EXTRA_SESSIONS = 10  # Mon/Wed/Fri snapshots: wait up to 10 further sessions for a stored close
 
 NYSE_HOLIDAYS = {
     "2026-01-01", "2026-01-19", "2026-02-16", "2026-04-03", "2026-05-25", "2026-06-19", "2026-07-03",
@@ -135,19 +141,131 @@ def add_sessions(day, n, cal):
     return d.isoformat()
 
 
+def sessions_between(a, b, cal):
+    """Number of sessions in (a, b] on calendar cal."""
+    d, n, end = pdate(a), 0, pdate(b)
+    while d < end:
+        d += dt.timedelta(days=1)
+        if is_session(d, cal):
+            n += 1
+    return n
+
+
 def cal_for(ticker):
     return "weekday_approx" if is_non_us(ticker) else "nyse"
 
 
+# ------------------------------------------------------------------ exchange closes
+# Session-complete rule: a stored row counts as a close only when the snapshot that carries it was generated
+# after that row's own exchange closed on the row's as_of date (+ CLOSE_BUFFER_MIN). Exchange comes from the
+# row's own symbol (row["exchange"] if present, else the yahoo symbol in row["source"], else the ticker);
+# a US row is never judged complete by another market's rows and vice versa.
+CLOSE_BUFFER_MIN = 20
+EXCHANGE_CLOSE = {  # suffix -> (IANA zone, local close HH:MM). "US" = NYSE/Nasdaq/Cboe.
+    "US": ("America/New_York", "16:00"), "T": ("Asia/Tokyo", "15:30"), "HK": ("Asia/Hong_Kong", "16:10"),
+    "L": ("Europe/London", "16:35"), "PA": ("Europe/Paris", "17:35"), "AS": ("Europe/Amsterdam", "17:35"),
+    "DE": ("Europe/Berlin", "17:35"), "F": ("Europe/Berlin", "17:35"), "MC": ("Europe/Madrid", "17:35"),
+    "MI": ("Europe/Rome", "17:35"), "SW": ("Europe/Zurich", "17:30"), "ST": ("Europe/Stockholm", "17:30"),
+    "CO": ("Europe/Copenhagen", "17:00"), "HE": ("Europe/Helsinki", "18:30"), "OL": ("Europe/Oslo", "16:25"),
+    "WA": ("Europe/Warsaw", "17:05"), "TO": ("America/Toronto", "16:00"), "V": ("America/Toronto", "16:00"),
+    "CN": ("America/Toronto", "16:00"), "NE": ("America/Toronto", "16:00"), "SA": ("America/Sao_Paulo", "18:00"),
+    "MX": ("America/Mexico_City", "15:00"), "AX": ("Australia/Sydney", "16:10"), "NZ": ("Pacific/Auckland", "16:45"),
+    "KL": ("Asia/Kuala_Lumpur", "17:00"), "SI": ("Asia/Singapore", "17:16"), "NS": ("Asia/Kolkata", "15:30"),
+    "BO": ("Asia/Kolkata", "15:30"), "KS": ("Asia/Seoul", "15:30"), "TW": ("Asia/Taipei", "13:30"),
+    "SS": ("Asia/Shanghai", "15:00"), "SZ": ("Asia/Shanghai", "15:00"), "JK": ("Asia/Jakarta", "16:00"),
+    "BK": ("Asia/Bangkok", "16:30"), "JO": ("Africa/Johannesburg", "17:00"), "IR": ("Europe/Dublin", "16:30"),
+    "BR": ("Europe/Brussels", "17:35"), "LS": ("Europe/Lisbon", "16:35"), "VI": ("Europe/Vienna", "17:35"),
+}
+# fixed UTC offsets used only if the zoneinfo database is unavailable (standard time; conservative = later close)
+_FALLBACK_OFFSET_H = {"America/New_York": -5, "America/Toronto": -5, "America/Sao_Paulo": -3, "America/Mexico_City": -6,
+                      "Europe/London": 0, "Europe/Dublin": 0, "Europe/Lisbon": 0, "Europe/Helsinki": 2,
+                      "Asia/Tokyo": 9, "Asia/Hong_Kong": 8, "Asia/Kuala_Lumpur": 8, "Asia/Singapore": 8,
+                      "Asia/Shanghai": 8, "Asia/Taipei": 8, "Asia/Seoul": 9, "Asia/Kolkata": 5.5, "Asia/Jakarta": 7,
+                      "Asia/Bangkok": 7, "Australia/Sydney": 10, "Pacific/Auckland": 12, "Africa/Johannesburg": 2}
+
+
+def row_symbol(row, ticker=None):
+    src = (row or {}).get("source") or ""
+    if isinstance(src, str) and ":" in src:
+        return src.split(":", 1)[1].strip()
+    return ticker or (row or {}).get("ticker") or ""
+
+
+def exchange_of(row=None, ticker=None):
+    """Exchange code for a row: explicit row['exchange'], else the suffix of its own data symbol, else 'US'."""
+    if row and row.get("exchange"):
+        return str(row["exchange"]).upper()
+    sym = row_symbol(row, ticker).upper()
+    if "." in sym:
+        suf = sym.rsplit(".", 1)[1]
+        if suf in EXCHANGE_CLOSE:
+            return suf
+        if len(suf) == 1:  # share-class suffix (BF.B, HEI.A) on a US line
+            return "US"
+        return suf  # unknown exchange: no close time -> never treated as complete by inference
+    return "US"
+
+
+def close_utc(exch, as_of):
+    """UTC datetime of the exchange's regular close on as_of (+ buffer); None if exchange unknown."""
+    if exch not in EXCHANGE_CLOSE:
+        return None
+    zone, hhmm = EXCHANGE_CLOSE[exch]
+    h, m = (int(x) for x in hhmm.split(":"))
+    local = dt.datetime.combine(pdate(as_of), dt.time(h, m))
+    try:
+        from zoneinfo import ZoneInfo
+        aware = local.replace(tzinfo=ZoneInfo(zone))
+    except Exception:
+        aware = local.replace(tzinfo=dt.timezone(dt.timedelta(hours=_FALLBACK_OFFSET_H.get(zone, -10))))
+    return aware.astimezone(dt.timezone.utc) + dt.timedelta(minutes=CLOSE_BUFFER_MIN)
+
+
+def parse_utc(ts):
+    if not ts or not isinstance(ts, str):
+        return None
+    try:
+        d = dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return d if d.tzinfo else d.replace(tzinfo=dt.timezone.utc)
+
+
+def row_session_complete(row, exch, generated_at, snap_date):
+    """True only if this row's as_of is a completed close on its own exchange at snapshot build time.
+    Explicit markers win (partial_session / session_complete). Without generated_at, only rows with
+    as_of before the snapshot's file date count (a same-day row may have been built mid-session)."""
+    a = row.get("as_of")
+    if not a:
+        return False
+    if row.get("partial_session") is True or row.get("session_complete") is False:
+        return False
+    if row.get("session_complete") is True:
+        return True
+    gen = parse_utc(generated_at)
+    if gen is None:
+        return a < snap_date
+    c = close_utc(exch, a)
+    if c is None:  # unknown exchange: require the snapshot to be built a full day after as_of (UTC)
+        return gen.date() > pdate(a) + dt.timedelta(days=1)
+    return gen >= c
+
+
 # ------------------------------------------------------------------------ snapshots
 class Tape:
-    """Point-in-time index of stored rows: (ticker, as_of) -> (row, snapshot_date). Earliest snapshot wins."""
+    """Point-in-time index of stored rows: (ticker, as_of) -> (row, snapshot_date). Earliest snapshot whose row is a
+    completed close wins. Rows built before their own exchange closed (and anything under partial_session_rows)
+    are never indexed, so they can neither be read as a close nor move any calendar's frontier."""
 
     def __init__(self, eval_dir):
         self.dir = os.path.join(eval_dir, "tape_snapshots")
         self.snaps = {}
         self.by_key = {}
         self.by_asof = {}
+        self.frontier = {}      # exchange -> latest completed-close as_of stored for that exchange
+        self.exch = {}          # ticker -> exchange (from its own stored rows)
+        self.skipped_partial = []  # (snapshot, ticker, as_of, exchange)
+        self.tdates = {}        # ticker -> sorted completed-close as_of dates stored
         if os.path.isdir(self.dir):
             for fn in sorted(os.listdir(self.dir)):
                 if not re.match(r"\d{4}-\d{2}-\d{2}\.json$", fn):
@@ -156,19 +274,71 @@ class Tape:
                 data = load_json(os.path.join(self.dir, fn), {})
                 rows = data.get("rows", {}) or {}
                 self.snaps[snap_date] = data
+                gen = data.get("generated_at")
                 for t, r in rows.items():
                     a = r.get("as_of")
                     if not a:
                         continue
+                    ex = exchange_of(r, t)
+                    self.exch.setdefault(t, ex)
+                    if not row_session_complete(r, ex, gen, snap_date):
+                        self.skipped_partial.append((snap_date, t, a, ex))
+                        continue
+                    if a > self.frontier.get(ex, ""):
+                        self.frontier[ex] = a
                     if (t, a) not in self.by_key:
                         self.by_key[(t, a)] = (r, snap_date)
                         self.by_asof.setdefault(a, []).append((t, r))
+                        self.tdates.setdefault(t, []).append(a)
+        for v in self.tdates.values():
+            v.sort()
+
+    def exchange_for(self, ticker):
+        return self.exch.get(ticker) or exchange_of(None, ticker)
+
+    def window_ready(self, ticker, dates):
+        """Strict check kept only to decide whether an EARLIER no_data was premature (2026-11-02 fix); grading itself
+        now goes through resolve(). (ready, detail). Ready only when the ticker's own exchange has a stored completed close on/after the last
+        needed session, and every needed session either has the ticker's completed row or is strictly behind that
+        exchange's frontier (a later close is stored, so the missing row can no longer arrive as a fresh close)."""
+        ex = self.exchange_for(ticker)
+        fr = self.frontier.get(ex)
+        need = max(dates)
+        det = {"exchange": ex, "exchange_frontier": fr, "needed_through": need}
+        if not fr or fr < need:
+            return False, det
+        for d in dates:
+            if self.row(ticker, d) is None and not fr > d:
+                return False, det
+        return True, det
+
+    def resolve(self, ticker, target, cal=None, max_extra=MAX_EXTRA_SESSIONS):
+        """Stored close to grade a session against (Mon/Wed/Fri snapshots leave sessions unstored).
+        status: exact (row at target) | substituted (first stored completed close for the ticker on its own
+        exchange after target, within max_extra sessions) | pending (none yet, and the exchange frontier has not
+        passed target + max_extra sessions) | no_close (frontier passed that limit without a close for the ticker)."""
+        cal = cal or cal_for(ticker)
+        ex = self.exchange_for(ticker)
+        fr = self.frontier.get(ex)
+        limit = add_sessions(target, max_extra, cal)
+        out = {"target": target, "exchange": ex, "exchange_frontier": fr, "limit": limit}
+        r = self.row(ticker, target)
+        if r is not None:
+            out.update(status="exact", as_of=target, row=r, extra_sessions=0)
+            return out
+        for d in self.tdates.get(ticker, []):
+            if target < d <= limit:
+                out.update(status="substituted", as_of=d, row=self.row(ticker, d),
+                           extra_sessions=sessions_between(target, d, cal))
+                return out
+        out.update(status="no_close" if (fr and fr > limit) else "pending", as_of=None, row=None, extra_sessions=None)
+        return out
+
+    def dates_between(self, ticker, lo, hi):
+        return [d for d in self.tdates.get(ticker, []) if lo <= d <= hi]
 
     def latest_snapshot(self):
         return max(self.snaps) if self.snaps else None
-
-    def max_asof(self):
-        return max(self.by_asof) if self.by_asof else None
 
     def row(self, ticker, as_of):
         v = self.by_key.get((ticker, as_of))
@@ -416,6 +586,37 @@ def baseline_pool(run_date, tape, log_rows, exclude, retro):
     return pool, "retro_proxy_prior_flagged_with_end_row"
 
 
+def universe_names(eval_dir, bl):
+    """Ticker list from universe.json (all_names, else longs/shorts/options/compounders)."""
+    p = bl.get("universe_file") or os.path.join(eval_dir, "universe.json")
+    u = load_json(p, None)
+    if not u:
+        return None, p, None
+    names = [a["ticker"] for a in u.get("all_names", [])]
+    if not names:
+        names = [x["ticker"] for x in u.get("longs", []) + u.get("shorts", [])]
+        names += [x["underlying"] for x in u.get("short_options", [])]
+        names += [x["ticker"] for x in (u.get("compounders") or {}).get("tickers", [])]
+    return sorted(set(names)), p, u.get("built")
+
+
+def universe_baseline_pool(run_date, tape, names, exclude):
+    """Universe names minus flagged/held, restricted to names with a usable stored row (same-day snapshot if
+    present, else any completed close on/before run_date) so the baseline can actually be graded."""
+    snap = tape.snap_rows(run_date)
+    pool = []
+    for t in names:
+        if t in exclude or t == "SPY":
+            continue
+        if snap:
+            r = snap.get(t)
+            if r and r.get("data_quality", "ready") == "ready" and r.get("as_of"):
+                pool.append(t)
+        elif any(d <= run_date for d in tape.tdates.get(t, [])):
+            pool.append(t)
+    return sorted(pool), ("universe_same_day_snapshot" if snap else "universe_stored_rows")
+
+
 def register(eval_dir, cand, retro=False, today=None, spec_version=SPEC_VERSION_DEFAULT, quiet=False):
     today = today or dt.date.today().isoformat()
     log_path = os.path.join(eval_dir, "run_log.jsonl")
@@ -494,8 +695,16 @@ def register(eval_dir, cand, retro=False, today=None, spec_version=SPEC_VERSION_
     existing_bl = [r for r in rows if r.get("run_date") == rd and r.get("cohort") == "baseline"]
     bl_added = 0
     pool_method = None
+    uni_meta = None
     if not existing_bl and n_bl > 0:
-        pool, pool_method = baseline_pool(rd, tape, rows, excl, retro)
+        if bl.get("mode") == "universe":
+            names, upath, ubuilt = universe_names(eval_dir, bl)
+            if names is None:
+                raise SystemExit(f"baseline mode 'universe' but no universe file at {upath}")
+            pool, pool_method = universe_baseline_pool(rd, tape, names, excl)
+            uni_meta = {"universe_file": os.path.basename(upath), "universe_built": ubuilt, "universe_names": len(names)}
+        else:
+            pool, pool_method = baseline_pool(rd, tape, rows, excl, retro)
         seed = baseline_seed(rd)
         sample = random.Random(seed).sample(pool, min(n_bl, len(pool))) if pool else []
         for t in sorted(sample):
@@ -504,6 +713,8 @@ def register(eval_dir, cand, retro=False, today=None, spec_version=SPEC_VERSION_
                  "baseline_tests": BASELINE_TESTS, "verdict": None, "verdict_by": None, "graded_on": None, "grade": None,
                  "test_spec_version": spec_version, "registered_on": today, "registered_retro": bool(retro),
                  "flag_kind": "baseline", "test_id": "BASELINE"}
+            if uni_meta:
+                r.update(uni_meta)
             snaprow = tape.snap_rows(rd).get(t)
             if snaprow:
                 base, how = snaprow["as_of"], "snapshot_row"
@@ -546,25 +757,52 @@ def backfill_retro(eval_dir, today=None, spec_version=SPEC_VERSION_DEFAULT):
 
 
 # ------------------------------------------------------------------------- grading
-def window_closed(end_as_of, tape, today):
-    mx = tape.max_asof()
-    if mx and mx >= end_as_of:
-        return True
-    return pdate(today) >= pdate(end_as_of) + dt.timedelta(days=4)
+def needed_sessions(r, test=None, cal=None):
+    """Session as_of dates whose stored rows a test reads (before any no_data verdict is allowed)."""
+    test = test or r.get("test_id")
+    cal = cal or r.get("calendar") or cal_for(r["ticker"])
+    if test in ("TA-BRK-3S", "TA-BRKLOST-3S"):
+        return [add_sessions(r["base_as_of"], k, cal) for k in (1, 2, 3)]
+    out = [r["window_end_as_of"]]
+    if test == "TA-Z-5D" and r.get("persistence_as_of"):
+        out.append(r["persistence_as_of"])
+    return out
 
 
-def five_session_return(t, base, end, n, tape):
-    """Return dict with ret_pct, method, bench_pct, bench_method, or reasons for missing data."""
+def _res_info(res):
+    return {k: v for k, v in res.items() if k != "row"}
+
+
+def _closes_ret(r0, r1):
+    c0, c1 = get(r0, "latest.close") if r0 else None, get(r1, "latest.close") if r1 else None
+    if c0 and c1:
+        return round((c1 / c0 - 1) * 100, 4)
+    return None
+
+
+def five_session_return(t, base, end, n, tape, cal=None):
+    """Return dict with ret_pct, bench_pct, excess_return_pct (or missing / pending). The window end is resolved
+    with Tape.resolve: if the end session was not stored (Mon/Wed/Fri snapshots), the first stored close after it
+    is used and sessions_elapsed records the sessions actually spanned."""
+    cal = cal or cal_for(t)
     out = {}
-    b, e = tape.row(t, base), tape.row(t, end)
-    if e is None:
-        out["missing"] = f"no stored row for {t} with as_of {end}"
+    res = tape.resolve(t, end, cal)
+    out["end_resolution"] = _res_info(res)
+    if res["status"] == "pending":
+        out["pending"] = True
         return out
-    if b is not None and get(b, "latest.close") and get(e, "latest.close"):
+    if res["status"] == "no_close":
+        out["missing"] = f"no stored close for {t} on/after {end} within {MAX_EXTRA_SESSIONS} further sessions"
+        return out
+    used, e, extra = res["as_of"], res["row"], res["extra_sessions"]
+    exact = extra == 0
+    out["end_as_of_used"], out["sessions_elapsed"] = used, n + extra
+    b = tape.row(t, base)
+    rc = _closes_ret(b, e)
+    if rc is not None:
         out["base_close"], out["end_close"] = get(b, "latest.close"), get(e, "latest.close")
-        out["ret_pct"] = round((out["end_close"] / out["base_close"] - 1) * 100, 4)
-        out["ret_method"] = "stored_closes"
-    elif n == 5 and get(e, "measures.return_5d_pct") is not None:
+        out["ret_pct"], out["ret_method"] = rc, "stored_closes"
+    elif exact and n == 5 and get(e, "measures.return_5d_pct") is not None:
         out["ret_pct"] = get(e, "measures.return_5d_pct")
         out["ret_method"] = "stored_return_5d_pct_at_end_row"
         out["end_close"] = get(e, "latest.close")
@@ -573,32 +811,37 @@ def five_session_return(t, base, end, n, tape):
         return out
     bench = e.get("benchmark") or "SPY"
     out["benchmark"] = bench
-    if bench == "SPY":
-        sb, se = tape.row("SPY", base), tape.row("SPY", end)
-        if sb and se and get(sb, "latest.close") and get(se, "latest.close"):
-            out["bench_pct"] = round((get(se, "latest.close") / get(sb, "latest.close") - 1) * 100, 4)
-            out["bench_method"] = "SPY_row_closes"
-        elif n == 5:
-            v, k = tape.implied_spy_5d(end)
-            if v is not None:
-                out["bench_pct"], out["bench_method"], out["bench_rows_used"] = v, "implied_spy_median_market_move_over_beta", k
-    elif n == 5:
+    bc = _closes_ret(tape.row(bench, base), tape.row(bench, used))
+    if bc is not None:
+        out["bench_pct"], out["bench_method"] = bc, ("SPY_row_closes" if bench == "SPY" else "benchmark_row_closes")
+    elif exact and n == 5 and bench == "SPY":
+        v, k = tape.implied_spy_5d(used)
+        if v is not None:
+            out["bench_pct"], out["bench_method"], out["bench_rows_used"] = v, "implied_spy_median_market_move_over_beta", k
+    elif exact and n == 5:
         beta, mm = get(e, "context.beta_252d"), get(e, "context.market_move_5d_pct")
         if beta is not None and mm is not None and abs(beta) >= 0.5:
             out["bench_pct"], out["bench_method"] = round(mm / beta, 4), "own_benchmark_market_move_over_beta"
     if "bench_pct" not in out:
-        out["missing"] = f"no stored benchmark move for {bench} {base}->{end}"
+        out["missing"] = f"no stored benchmark move for {bench} {base}->{used}"
     else:
         out["excess_return_pct"] = round(out["ret_pct"] - out["bench_pct"], 4)
     return out
 
 
 def persistence(row, kind, det, tape):
+    """Next-session follow-through, read at the first stored close on/after persistence_as_of.
+    Returns (None, {...pending}) while that close can still arrive."""
     t = row["ticker"]
-    nx = tape.row(t, row["persistence_as_of"])
-    if nx is None:
-        return "no_data", {"missing": f"no stored row for {t} with as_of {row['persistence_as_of']}"}
-    num = {"as_of": nx.get("as_of")}
+    cal = row.get("calendar") or cal_for(t)
+    res = tape.resolve(t, row["persistence_as_of"], cal)
+    if res["status"] == "pending":
+        return None, {"pending": True, "resolution": _res_info(res)}
+    if res["status"] == "no_close":
+        return "no_data", {"missing": f"no stored close for {t} on/after {row['persistence_as_of']} within {MAX_EXTRA_SESSIONS} further sessions",
+                           "resolution": _res_info(res)}
+    nx = res["row"]
+    num = {"as_of": nx.get("as_of"), "sessions_elapsed": 1 + res["extra_sessions"], "resolution": _res_info(res)}
     ok = None
     if kind == "capitulation":
         st = get(nx, "capitulation.state")
@@ -635,13 +878,18 @@ def grade_tape_test(row, test, kind, det, tape, spec_tests):
     cal = row.get("calendar") or cal_for(t)
     num = {"base_as_of": base, "window_end_as_of": row["window_end_as_of"], "calendar": cal}
     if test in ("TA-BRK-3S", "TA-BRKLOST-3S"):
+        s1, s3 = add_sessions(base, 1, cal), add_sessions(base, 3, cal)
+        r3 = tape.resolve(t, s3, cal)
+        num["end_resolution"] = _res_info(r3)
+        if r3["status"] == "pending":
+            return None, num
+        if r3["status"] == "no_close":
+            num["missing"] = f"no stored close for {t} on/after {s3} within {MAX_EXTRA_SESSIONS} further sessions"
+            return "no_data", num
+        num["end_as_of_used"], num["sessions_elapsed"] = r3["as_of"], 3 + r3["extra_sessions"]
         res = []
-        for k in (1, 2, 3):
-            a = add_sessions(base, k, cal)
+        for a in tape.dates_between(t, s1, r3["as_of"]):  # every stored close from session 1 to the resolved end
             r = tape.row(t, a)
-            if r is None:
-                num["missing"] = f"no stored row for {t} with as_of {a}"
-                return "no_data", num
             p = field_value(r, "price_vs_50d_pct")
             m = breakout_met(r)
             res.append({"as_of": a, "price_vs_50d_pct": p, "breakout_rule_met": m, "close": get(r, "latest.close")})
@@ -653,8 +901,10 @@ def grade_tape_test(row, test, kind, det, tape, spec_tests):
         if any(x["breakout_rule_met"] is None for x in res):
             return "no_data", num
         return ("pass" if not any(x["breakout_rule_met"] for x in res) else "fail"), num
-    rr = five_session_return(t, base, row["window_end_as_of"], n, tape)
+    rr = five_session_return(t, base, row["window_end_as_of"], n, tape, cal)
     num.update(rr)
+    if rr.get("pending"):
+        return None, num
     if test in ("TA-CAP-5D", "TA-RSI-OS-5D", "TA-RSI-OB-5D"):
         if "excess_return_pct" not in rr:
             return "no_data", num
@@ -664,7 +914,10 @@ def grade_tape_test(row, test, kind, det, tape, spec_tests):
         if "ret_pct" not in rr:
             return "no_data", num
         pg, pn = persistence(row, kind, det, tape)
+        if pg is None:
+            return None, num
         num["persistence_component"] = pg
+        num["persistence_sessions_elapsed"] = pn.get("sessions_elapsed")
         num["return_sign_x_direction"] = (1 if rr["ret_pct"] > 0 else -1 if rr["ret_pct"] < 0 else 0) * det.get("direction", 0)
         if pg == "no_data":
             return "no_data", num
@@ -715,6 +968,19 @@ def grade_index(row, det, ann, today):
     return None, num
 
 
+def _reopen(r, field, numbers_field, on_field, reason, today, stats):
+    """Move a premature no_data verdict aside (kept under <field>_superseded) so the row can be graded once its
+    window can no longer fill. Only ever applied to no_data; pass/fail/held/faded are never touched."""
+    r.setdefault(field + "_superseded", []).append({
+        "grade": r.get(field), "graded_on": r.get(on_field), "numbers": r.get(numbers_field),
+        "reopened_on": today, "reason": reason})
+    r[field] = None
+    r.pop(numbers_field, None)
+    r.pop(on_field, None)
+    stats["reopened_premature_no_data"].append({"run_date": r.get("run_date"), "ticker": r.get("ticker"),
+                                                 "cohort": r.get("cohort", "flag"), "field": field})
+
+
 def daily(eval_dir, today=None):
     today = today or dt.date.today().isoformat()
     spec = load_json(os.path.join(eval_dir, "grading_spec.json"), {})
@@ -723,40 +989,65 @@ def daily(eval_dir, today=None):
     rows = read_log(log_path)
     tape = Tape(eval_dir)
     ann = load_json(os.path.join(eval_dir, "index_announcements.json"), {}) or {}
-    stats = {"test_graded": 0, "persistence_graded": 0, "baseline_graded": 0, "legacy_grade_filled": 0, "pending": 0}
+    stats = {"test_graded": 0, "persistence_graded": 0, "baseline_graded": 0, "legacy_grade_filled": 0, "pending": 0,
+             "partial_session_rows_ignored": len(tape.skipped_partial), "exchange_frontiers": dict(sorted(tape.frontier.items())),
+             "reopened_premature_no_data": []}
     for r in rows:
         tid = r.get("test_id")
         if not tid:
             continue
         kind, det = r.get("flag_kind"), r.get("flag_details") or {}
+        t = r["ticker"]
+        cal = r.get("calendar") or cal_for(t)
         if r.get("cohort") == "baseline":
-            if r.get("baseline_grades") is not None:
+            if not r.get("window_end_as_of"):
                 continue
-            if not window_closed(r["window_end_as_of"], tape, today):
-                stats["pending"] += 1
+            ready5, rd = tape.window_ready(t, [r["window_end_as_of"]])
+            bg = r.get("baseline_grades")
+            if bg is not None and not ready5 and bg and all(v == "no_data" for v in bg.values()):
+                r.setdefault("baseline_grades_superseded", []).append({
+                    "grades": bg, "graded_on": r.get("baseline_graded_on"), "reopened_on": today,
+                    "reason": "window could still fill (own-exchange close not yet stored)", "window_check": rd})
+                r["baseline_grades"] = None
+                r.pop("baseline_numbers", None)
+                r.pop("baseline_graded_on", None)
+                stats["reopened_premature_no_data"].append({"run_date": r.get("run_date"), "ticker": t,
+                                                             "cohort": "baseline", "field": "baseline_grades"})
+                bg = None
+            if bg is not None:
                 continue
             g, nums = {}, {}
-            rr = five_session_return(r["ticker"], r["base_as_of"], r["window_end_as_of"], 5, tape)
+            rr = five_session_return(t, r["base_as_of"], r["window_end_as_of"], 5, tape, cal)
+            if rr.get("pending"):
+                stats["pending"] += 1
+                continue
             nums["return_5s"] = rr
             for tst in ("TA-CAP-5D", "TA-RSI-OS-5D"):
                 g[tst] = "no_data" if "excess_return_pct" not in rr else ("pass" if rr["excess_return_pct"] > 0 else "fail")
             g["TA-RSI-OB-5D"] = "no_data" if "excess_return_pct" not in rr else ("pass" if rr["excess_return_pct"] < 0 else "fail")
             g["TA-Z-5D-up"] = "no_data" if "ret_pct" not in rr else ("pass" if rr["ret_pct"] > 0 else "fail")
             g["TA-Z-5D-down"] = "no_data" if "ret_pct" not in rr else ("pass" if rr["ret_pct"] < 0 else "fail")
-            cal = r.get("calendar") or cal_for(r["ticker"])
-            end3 = add_sessions(r["base_as_of"], 3, cal)
-            if window_closed(end3, tape, today):
-                pr = {"window_end_as_of": end3, "base_as_of": r["base_as_of"], "test_window_sessions": 3, "ticker": r["ticker"], "calendar": cal}
-                gb, nb = grade_tape_test(pr, "TA-BRK-3S", "breakout", {}, tape, spec_tests)
+            d3 = add_sessions(r["base_as_of"], 3, cal)
+            pr = {"window_end_as_of": d3, "base_as_of": r["base_as_of"], "test_window_sessions": 3, "ticker": t, "calendar": cal}
+            gb, nb = grade_tape_test(pr, "TA-BRK-3S", "breakout", {}, tape, spec_tests)
+            if gb is not None:
                 g["TA-BRK-3S"], nums["breakout_3s"] = gb, nb
             r["baseline_grades"] = g
             r["baseline_numbers"] = nums
             r["baseline_graded_on"] = today
             stats["baseline_graded"] += 1
             continue
+        tape_kind = kind in KIND_TEST and not kind.startswith("index")
         # secondary: persistence (1 session)
-        if kind in KIND_TEST and not kind.startswith("index") and r.get("persistence_grade") is None and r.get("persistence_as_of"):
-            if window_closed(r["persistence_as_of"], tape, today):
+        if tape_kind and r.get("persistence_as_of"):
+            pready, pdet = tape.window_ready(t, [r["persistence_as_of"]])
+            if r.get("persistence_grade") == "no_data" and not pready:
+                _reopen(r, "persistence_grade", "persistence_numbers", "persistence_graded_on",
+                        "window could still fill (own-exchange close not yet stored)", today, stats)
+                if r.get("grade") == "no_data" and r.get("grade_note") == "filled by grade.py --daily from persistence_grade":
+                    r.setdefault("grade_superseded", []).append({"grade": r["grade"], "graded_on": r.get("graded_on"), "reopened_on": today})
+                    r["grade"], r["graded_on"] = None, None
+            if r.get("persistence_grade") is None:
                 pg, pn = persistence(r, kind, det, tape)
                 if pg:
                     r["persistence_grade"], r["persistence_numbers"], r["persistence_graded_on"] = pg, pn, today
@@ -766,18 +1057,26 @@ def daily(eval_dir, today=None):
                         r.setdefault("grade_note", "filled by grade.py --daily from persistence_grade")
                         stats["legacy_grade_filled"] += 1
         # primary test
-        if r.get("test_grade") is not None:
-            continue
         if tid.startswith("TA-IDX"):
+            if r.get("test_grade") is not None:
+                continue
             g, nums = grade_index(r, det, ann, today)
             if g is None:
                 stats["pending"] += 1
                 continue
         else:
-            if not r.get("window_end_as_of") or not window_closed(r["window_end_as_of"], tape, today):
-                stats["pending"] += 1
+            if not r.get("window_end_as_of") or not r.get("base_as_of"):
+                continue
+            ready, wdet = tape.window_ready(t, needed_sessions(r, tid, cal))
+            if r.get("test_grade") == "no_data" and not ready:
+                _reopen(r, "test_grade", "test_numbers", "test_graded_on",
+                        "window could still fill (own-exchange close not yet stored)", today, stats)
+            if r.get("test_grade") is not None:
                 continue
             g, nums = grade_tape_test(r, tid, kind, det, tape, spec_tests)
+            if g is None:
+                stats["pending"] += 1
+                continue
         if g is None:
             continue
         r["test_grade"], r["test_numbers"], r["test_graded_on"] = g, nums, today

@@ -1,0 +1,194 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "tape_index",
+  "as_of": "2026-11-04",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-11-04T09:27:05Z"
+    },
+    {
+      "path": "dashboard/data/capitulation_daily.json",
+      "generated_at": "2026-11-04T09:28:36.656217+00:00"
+    },
+    {
+      "path": "dashboard/data/index_membership.json",
+      "generated_at": "2026-11-04T10:06:14Z"
+    },
+    {
+      "path": "dashboard/data/portfolio_news.json",
+      "generated_at": "2026-11-04T07:35:17.004520+00:00"
+    },
+    {
+      "path": "dashboard/data/desk_briefs.json",
+      "generated_at": "2026-11-02T13:27:46Z"
+    }
+  ],
+  "items": [
+    {
+      "ticker": "MIAX",
+      "headline": "Miami International's CMF rose to 0.232 (from 0.099), past the 0.10 line, while the stored trend is still lagging_downtrend (RSI 65.6, 6.3% under the 50-day).",
+      "one_number": "CMF 0.232",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MIAX cap=normal (prior normal) rsi14=65.6 cmf=0.232 rvol=0.95 dir=lagging_downtrend p50=-6.28% close=33.86",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-Z-5D: CMF still >0.10 next session and a positive 5-session return.",
+      "handoff": null
+    },
+    {
+      "ticker": "BN",
+      "headline": "Brookfield's RSI reached 78.8 (from 67.9) as the capitulation state went from stress_building back to normal; counter-trend overbought (mixed_repair, TAPE-01).",
+      "one_number": "RSI 78.8",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BN cap=normal (prior stress_building) rsi14=78.8 cmf=0.221 rvol=1.06 dir=mixed_repair p50=6.52% close=40.64",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-RSI-OB-5D: passes if BN trails SPY over 5 sessions.",
+      "handoff": null
+    },
+    {
+      "ticker": "TPL",
+      "headline": "Texas Pacific Land moved from normal into stress_building with CMF -0.110 (from -0.100) and RSI 31.0.",
+      "one_number": "CMF -0.110",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z TPL cap=stress_building (prior normal) rsi14=31.0 cmf=-0.11 rvol=1.48 dir=lagging_downtrend p50=-5.51% close=332.0",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-CAP-5D: passes if TPL beats SPY over 5 sessions.",
+      "handoff": null
+    },
+    {
+      "ticker": "APLD",
+      "headline": "Index feed scores Applied Digital a Russell 1000 deletion_risk 5.52% under the breakpoint for the Dec 11 recon. Feed candidate only, no provider announcement.",
+      "one_number": "R1000 deletion_risk -5.52%",
+      "lane": "index",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z APLD cap=stress_building (prior stress_building) rsi14=42.5 cmf=-0.043 rvol=0.94 dir=lagging_downtrend p50=-24.71% close=17.81",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-04T10:06:14Z APLD russell_1000 status=deletion_risk dist=-5.52% (prior member); russell_2000 inclusion_candidate",
+          "url": null,
+          "as_of": "2026-11-04",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-IDX-EVENT: graded on FTSE Russell prelim lists Nov 13 through Dec 11.",
+      "handoff": null
+    },
+    {
+      "ticker": "PBT",
+      "headline": "PBT moved to capitulation_candidate with RSI 15.6; close 27.93 vs 31.62 on Oct 30 (about -11.7% over two sessions, no gap over 10%) as WTI fell 7.4% on Nov 2.",
+      "one_number": "RSI 15.6",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z PBT cap=capitulation_candidate (prior stress_building) rsi14=15.6 cmf=-0.134 rvol=1.68 dir=pullback_in_uptrend p50=-16.87% close=27.93",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "CNBC 2026-11-02: WTI futures -7.4% to $96.46 on US-Iran diplomacy",
+          "url": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html",
+          "as_of": "2026-11-02",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-CAP-5D: passes if PBT beats SPY over 5 sessions.",
+      "handoff": null
+    },
+    {
+      "ticker": "RACE",
+      "headline": "Ferrari met the breakout rule after Q3 guidance raise: leading_uptrend, 3.0% above the 50-day, rvol 2.98, CMF 0.177. RSI 71.2 not posted separately (TAPE-02).",
+      "one_number": "rvol 2.98 (breakout)",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z RACE cap=normal (prior normal) rsi14=71.2 cmf=0.177 rvol=2.98 dir=leading_uptrend p50=3.03% close=414.77",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
+      "handoff": null
+    },
+    {
+      "ticker": "BRK.B",
+      "headline": "Berkshire met the stored breakout rule: leading_uptrend, 7.7% above the 50-day, rvol 1.21, CMF 0.105 (from 0.036).",
+      "one_number": "rvol 1.21 (breakout)",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BRK.B cap=normal (prior normal) rsi14=75.7 cmf=0.105 rvol=1.21 dir=leading_uptrend p50=7.67% close=557.07",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
+      "handoff": null
+    },
+    {
+      "ticker": "MSCI",
+      "headline": "MSCI met the stored breakout rule with stretch_z 2.11: leading_uptrend, 12.3% above the 50-day, rvol 1.10, CMF 0.219.",
+      "one_number": "rvol 1.10 (breakout)",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MSCI cap=normal (prior normal) rsi14=77.6 cmf=0.219 rvol=1.1 dir=leading_uptrend p50=12.26% close=639.78",
+          "url": null,
+          "as_of": "2026-11-03",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
+      "handoff": null
+    }
+  ],
+  "notes": "SPY and QQQ stress_building (RSI 38.9 / 32.8). Universe names in capitulation states 27 to 25, mostly panic easing to stress_building. Held: AENA.MC, LSEG (mid-session rows); TBBK sp600 and AAOI R2000 feed candidates (index feed shows no S&P membership for TBBK and no memberships or exchange for AAOI; see the Nov 2 exchange-field proposal). SNDK 8-for-1 split: record Nov 9, split-adjusted Nov 20. Not in tape feed: JMIA, MBGL, SPCX, LMN, LIFCO.ST.",
+  "screens_empty": [],
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}
