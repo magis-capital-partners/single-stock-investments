@@ -1,6 +1,6 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-03",
+  "as_of": "2026-11-04",
   "summary": {
     "companies": 873,
     "statuses": {
@@ -9,15 +9,15 @@
     },
     "blocker_companies": {
       "realization_timing_missing": 18,
-      "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
+      "parent_cashflow_attribution_missing": 40,
       "positive_normalized_owner_cash_not_established": 109,
       "pre_listing_share_basis_unverified": 102,
       "completed_session_quote_missing": 28,
       "corporate_action_history_unverified": 25,
       "annual_diluted_share_count_missing": 50,
-      "annual_capex_missing": 72,
       "annual_operating_cash_flow_missing": 44,
+      "annual_capex_missing": 72,
       "new_financial_report_after_model": 388,
       "source_share_basis_unverified": 56,
       "newer_balance_sheet_inputs_available": 216,
@@ -2674,19 +2674,6 @@
       "blockers": [
         "new_financial_report_after_model",
         "newer_balance_sheet_inputs_available"
-      ],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
-    {
-      "ticker": "CBOE",
-      "company": "Cboe Global Markets",
-      "status": "needs_underwriting",
-      "current_model_basis": "legacy_issuer_cashflow_forecast",
-      "blockers": [
-        "new_financial_report_after_model"
       ],
       "last_attempt": null,
       "retry_after": null,
@@ -11889,6 +11876,24 @@
         {
           "code": "StageBlocked",
           "detail": "local_input_too_large: 1455580 characters exceeds 1048576; complete evidence retained"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "CBOE",
+      "company": "Cboe Global Markets",
+      "status": "needs_underwriting",
+      "current_model_basis": "legacy_issuer_cashflow_forecast",
+      "blockers": [
+        "new_financial_report_after_model"
+      ],
+      "last_attempt": "2026-11-04T07:15:20.730885+00:00",
+      "retry_after": "2026-11-05",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "primary_evidence_gap: [{\"code\": \"new_spx_license_payment_terms_missing\", \"detail\": \"Current packet document doc_f0f7d5a0de3c1cd2 confirms exclusive SPX rights through 2051 and aggregate minimum licensing fees of $14.6 million for 2027, excluding variable fees. It does not disclose the September 28, 2026 agreement's effective date, variable royalty schedule, resets or termination economics. Nine-month royalty and other costs of $240.3 million largely precede the agreement and cannot bound this material future expense. Retrieve the September 29, 2026 Form 8-K, Exhibits 10.1\\u201310.3, incorporated in the latest 10-Q: Master License Agreement and Orders 1-1 and 2-1. Search 'effective date', 'royalty', 'license fee', 'minimum', 'adjustment' and 'termination'; include provisions identifying superseded terms and any disclosed payment changes or management quantification.\"}]"
         }
       ],
       "unresolved_findings": []
