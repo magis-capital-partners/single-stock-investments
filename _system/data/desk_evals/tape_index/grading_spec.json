@@ -1,180 +1,366 @@
 {
-  "spec_version": "1.0",
-  "pre_registered_on": "2026-10-30",
-  "desk": "Technical Analyst (tape_index)",
-  "lens": "/workspace/shared/magis/lenses/forced-flow-tape.md (FLOW-01..07, TAPE-01..06; aliases F1-F7, M1-M6)",
-  "principles": [
-    "Grades use only stored fields and stored closes already in eval/tape_snapshots/<date>.json, plus index provider announcements recorded in eval/index_announcements.json.",
-    "The desk never computes a new indicator; the grader only reads stored fields and compares them to the fixed thresholds below.",
-    "A test is attached to a flag at registration and never changed afterwards; spec changes get a new spec_version and apply only to rows registered after the change.",
-    "Rows registered after the outcome window had already started are marked registered_retro: true and reported separately from live pre-registered calls."
+ "spec_version": "1.0",
+ "pre_registered_on": "2026-10-30",
+ "desk": "Technical Analyst (tape_index)",
+ "lens": "/workspace/shared/magis/lenses/forced-flow-tape.md (FLOW-01..07, TAPE-01..06; aliases F1-F7, M1-M6)",
+ "principles": [
+  "Grades use only stored fields and stored closes already in eval/tape_snapshots/<date>.json, plus index provider announcements recorded in eval/index_announcements.json.",
+  "The desk never computes a new indicator; the grader only reads stored fields and compares them to the fixed thresholds below.",
+  "A test is attached to a flag at registration and never changed afterwards; spec changes get a new spec_version and apply only to rows registered after the change.",
+  "Rows registered after the outcome window had already started are marked registered_retro: true and reported separately from live pre-registered calls."
+ ],
+ "thresholds": {
+  "rsi14_deeply_oversold": 25,
+  "rsi14_approaching": 35,
+  "rsi14_overbought": 70,
+  "abs_stretch_z": 2.0,
+  "abs_trend_z": 1.25,
+  "abs_cmf": 0.1,
+  "breakout": "setup.direction == leading_uptrend AND setup.indicators.price_vs_50d_pct > 0 AND setup.indicators.relative_volume_20d > 1 AND setup.indicators.chaikin_money_flow_20d >= 0.10",
+  "capitulation_states": [
+   "stress_building",
+   "panic",
+   "capitulation_candidate",
+   "washed_out"
   ],
-  "thresholds": {
-    "rsi14_deeply_oversold": 25, "rsi14_approaching": 35, "rsi14_overbought": 70,
-    "abs_stretch_z": 2.0, "abs_trend_z": 1.25, "abs_cmf": 0.10,
-    "breakout": "setup.direction == leading_uptrend AND setup.indicators.price_vs_50d_pct > 0 AND setup.indicators.relative_volume_20d > 1 AND setup.indicators.chaikin_money_flow_20d >= 0.10",
-    "capitulation_states": ["stress_building", "panic", "capitulation_candidate", "washed_out"],
-    "holds": "gap > 10% (TAPE-06), thin dollar volume (FLOW-06), self-contradictory or stale row (FLOW-06), HKHC standing hold"
-  },
-  "stored_fields": {
-    "close": "latest.close",
-    "as_of": "as_of (row level; the session the row describes)",
-    "rsi14": "setup.indicators.rsi_14",
-    "stretch_z": "scores.stretch_z",
-    "trend_z": "scores.trend_z",
-    "cmf": "setup.indicators.chaikin_money_flow_20d",
-    "rvol": "setup.indicators.relative_volume_20d",
-    "price_vs_50d_pct": "setup.indicators.price_vs_50d_pct",
-    "trend_state": "setup.direction",
-    "capitulation_state": "capitulation.state",
-    "return_5d_pct": "measures.return_5d_pct (stored close-to-close return over the 5 sessions ending at as_of)",
-    "benchmark_move_5d": "context.market_move_5d_pct / context.beta_252d (stored beta-scaled benchmark move; see benchmark.fallback)"
-  },
-  "sessions": {
-    "definition": "A session is a trading day. The base session is the row as_of the desk read when it posted (row as_of in tape_snapshots/<run_date>.json, else the 'technical_summary as_of' date in the source string, else the trading day before run_date, marked base_as_of_inferred). Session k is the k-th trading day after the base.",
-    "calendar_us": "NYSE trading days (weekdays minus NYSE holidays hard-coded in grade.py for 2026-2027).",
-    "calendar_non_us": "Weekdays (approximation; recorded as calendar=weekday_approx in the numbers).",
-    "lookup": "A session's numbers come from the first stored snapshot row whose as_of equals that session (point-in-time: earliest snapshot wins). A stale row (as_of earlier than the session) never stands in for the session."
-  },
-  "benchmark": {
-    "primary": "SPY row (rows['SPY']) in the same tape_snapshots, close-to-close over the same base and end sessions.",
-    "fallback": "No SPY row is stored in tape_snapshots as of 2026-10-30. Until one is, the grader backs the stored 5-session SPY move out of the same end snapshot: median over SPY-benchmarked rows with as_of == end session and |beta_252d| >= 0.5 of context.market_move_5d_pct / context.beta_252d (requires >= 10 rows). On 2026-10-29/30 snapshots this is tight (IQR < 0.01 pct-pt), so it is the stored SPY move, not a new indicator. Only usable for 5-session windows.",
-    "non_us": "Rows whose stored benchmark is not SPY (e.g. 9984.T vs 1321.T, SAF.PA vs IEUR, .TO vs XIC.TO) are compared with their own stored benchmark move (that row's market_move_5d_pct / beta_252d, |beta| >= 0.5), else no_data. Reason: different session calendars make a same-window SPY comparison impossible from stored fields.",
-    "fix_requested": "Ask the snapshot routine owner to store the SPY row (and ideally a seeded random 20 of the full technical_summary) in every tape snapshot; the grader picks it up automatically."
-  },
-  "tests": [
-    {
-      "id": "TA-CAP-5D",
-      "applies_to": {"flag_kinds": ["capitulation"], "rule_ids": ["FLOW-05", "TAPE-05", "TAPE-01"]},
-      "window_sessions": 5,
-      "pass_condition": {
-        "plain": "Pass if the name's close-to-close return from the base session to session 5 beats SPY's return over the same sessions.",
-        "machine": {"metric": "excess_return_pct", "op": ">", "threshold": 0.0}
-      },
-      "benchmark": "SPY (see benchmark)",
-      "persistence": {"plain": "Next session: capitulation.state still in the capitulation set, and if the flag quoted RSI / stretch_z / trend_z / CMF, that field is still beyond the same threshold.", "secondary": true}
-    },
-    {
-      "id": "TA-RSI-OS-5D",
-      "applies_to": {"flag_kinds": ["rsi_oversold"], "rule_ids": ["FLOW-05", "TAPE-01"]},
-      "window_sessions": 5,
-      "pass_condition": {
-        "plain": "RSI14 < 35 (incl. < 25) flags pass if the 5-session close-to-close return beats SPY's over the same sessions.",
-        "machine": {"metric": "excess_return_pct", "op": ">", "threshold": 0.0}
-      },
-      "benchmark": "SPY (see benchmark)",
-      "persistence": {"plain": "Next session rsi_14 still below the band flagged (25 if the flag value was < 25, else 35).", "secondary": true}
-    },
-    {
-      "id": "TA-RSI-OB-5D",
-      "applies_to": {"flag_kinds": ["rsi_overbought"], "rule_ids": ["FLOW-05", "TAPE-01", "TAPE-02", "TAPE-03"]},
-      "window_sessions": 5,
-      "pass_condition": {
-        "plain": "RSI14 > 70 flags pass if the 5-session close-to-close return trails SPY's over the same sessions.",
-        "machine": {"metric": "excess_return_pct", "op": "<", "threshold": 0.0}
-      },
-      "benchmark": "SPY (see benchmark)",
-      "persistence": {"plain": "Next session rsi_14 still > 70.", "secondary": true}
-    },
-    {
-      "id": "TA-BRK-3S",
-      "applies_to": {"flag_kinds": ["breakout"], "rule_ids": ["FLOW-05", "TAPE-04"]},
-      "window_sessions": 3,
-      "pass_condition": {
-        "plain": "Breakout flags pass if the close stays above the stored 50-day average (price_vs_50d_pct > 0) on each of the next 3 sessions' snapshots.",
-        "machine": {"metric": "price_vs_50d_pct", "op": ">", "threshold": 0.0, "each_session": [1, 2, 3]}
-      },
-      "benchmark": "SPY context only (recorded, not used for pass/fail)",
-      "persistence": {"plain": "Next session the full breakout rule is still met.", "secondary": true}
-    },
-    {
-      "id": "TA-BRKLOST-3S",
-      "applies_to": {"flag_kinds": ["breakout_lost"], "rule_ids": ["FLOW-05", "TAPE-04"]},
-      "window_sessions": 3,
-      "pass_condition": {
-        "plain": "'Breakout lost' flags pass if the breakout rule is not met again on any of the next 3 sessions.",
-        "machine": {"metric": "breakout_rule_met", "op": "==", "threshold": false, "each_session": [1, 2, 3]}
-      },
-      "benchmark": "none",
-      "persistence": {"plain": "Next session breakout rule still not met.", "secondary": true},
-      "note": "Added (not in the suggested defaults) because run_log has 'breakout lost' rows (DDOG 10-13, SHOP 10-14)."
-    },
-    {
-      "id": "TA-Z-5D",
-      "applies_to": {"flag_kinds": ["z_stretch", "z_trend", "cmf"], "rule_ids": ["FLOW-05", "TAPE-04"]},
-      "window_sessions": 5,
-      "pass_condition": {
-        "plain": "stretch_z / trend_z / CMF flags pass if (a) next session the same field is still beyond its threshold with the same sign AND (b) the sign of the 5-session close-to-close return agrees with the flag's direction (sign of the flagged value).",
-        "machine": {"all_of": [{"metric": "persistence", "op": "==", "threshold": "held"}, {"metric": "return_sign_x_direction", "op": ">", "threshold": 0}]}
-      },
-      "benchmark": "SPY excess return recorded alongside (not used for pass/fail)",
-      "persistence": {"plain": "Next session |field| still beyond threshold with the same sign (also component (a) of the pass).", "secondary": true},
-      "note": "Direction agreement follows the suggested default (continuation reading). Both raw return and excess return are stored so a mean-reversion reading can be scored later without regrading."
-    },
-    {
-      "id": "TA-IDX-EVENT",
-      "applies_to": {"flag_kinds": ["index_add", "index_delete", "index_migration"], "rule_ids": ["FLOW-01", "FLOW-02", "FLOW-03", "FLOW-04"]},
-      "window_sessions": null,
-      "deadline_by_family": {"russell": "2026-12-11", "sp_dji_us": "2026-12-19", "nasdaq_100": "2026-12-19"},
-      "pass_condition": {
-        "plain": "Pass if the provider announces the predicted add / delete / migration for that exact index by the case deadline (FTSE Russell recon effective Dec 11 2026; S&P DJI quarterly rebalance Dec 19 2026). Fail (false flag) if the window closes without one. Pending until eval/index_announcements.json checked_through >= deadline.",
-        "machine": {"metric": "matching_announcement", "op": "exists_by", "threshold": "deadline"}
-      },
-      "benchmark": "none",
-      "persistence": null
-    },
-    {
-      "id": "TA-IDX-NEG",
-      "applies_to": {"flag_kinds": ["index_watch_removed"], "rule_ids": ["FLOW-01", "FLOW-04"]},
-      "window_sessions": null,
-      "pass_condition": {
-        "plain": "A 'watch removed' call passes if no add to that index is announced by the next review deadline; fails if one is.",
-        "machine": {"metric": "matching_announcement", "op": "absent_by", "threshold": "deadline"}
-      },
-      "benchmark": "none",
-      "persistence": null
-    },
-    {
-      "id": "TA-IDX-REPORT",
-      "applies_to": {"flag_kinds": ["index_report"], "rule_ids": ["FLOW-04"]},
-      "window_sessions": null,
-      "pass_condition": {
-        "plain": "A flag reporting an already-announced event passes if a provider announcement for that ticker, exact index and action exists (FLOW-04 exact-index test); fails if announcements are checked through the run date and none matches.",
-        "machine": {"metric": "matching_announcement", "op": "exists_by", "threshold": "run_date"}
-      },
-      "benchmark": "none",
-      "persistence": null
+  "holds": "gap > 10% (TAPE-06), thin dollar volume (FLOW-06), self-contradictory or stale row (FLOW-06), HKHC standing hold"
+ },
+ "stored_fields": {
+  "close": "latest.close",
+  "as_of": "as_of (row level; the session the row describes)",
+  "rsi14": "setup.indicators.rsi_14",
+  "stretch_z": "scores.stretch_z",
+  "trend_z": "scores.trend_z",
+  "cmf": "setup.indicators.chaikin_money_flow_20d",
+  "rvol": "setup.indicators.relative_volume_20d",
+  "price_vs_50d_pct": "setup.indicators.price_vs_50d_pct",
+  "trend_state": "setup.direction",
+  "capitulation_state": "capitulation.state",
+  "return_5d_pct": "measures.return_5d_pct (stored close-to-close return over the 5 sessions ending at as_of)",
+  "benchmark_move_5d": "context.market_move_5d_pct / context.beta_252d (stored beta-scaled benchmark move; see benchmark.fallback)"
+ },
+ "sessions": {
+  "definition": "A session is a trading day. The base session is the row as_of the desk read when it posted (row as_of in tape_snapshots/<run_date>.json, else the 'technical_summary as_of' date in the source string, else the trading day before run_date, marked base_as_of_inferred). Session k is the k-th trading day after the base.",
+  "calendar_us": "NYSE trading days (weekdays minus NYSE holidays hard-coded in grade.py for 2026-2027).",
+  "calendar_non_us": "Weekdays (approximation; recorded as calendar=weekday_approx in the numbers).",
+  "lookup": "A session's numbers come from the first stored snapshot row whose as_of equals that session (point-in-time: earliest snapshot wins). A stale row (as_of earlier than the session) never stands in for the session."
+ },
+ "benchmark": {
+  "primary": "SPY row (rows['SPY']) in the same tape_snapshots, close-to-close over the same base and end sessions.",
+  "fallback": "No SPY row is stored in tape_snapshots as of 2026-10-30. Until one is, the grader backs the stored 5-session SPY move out of the same end snapshot: median over SPY-benchmarked rows with as_of == end session and |beta_252d| >= 0.5 of context.market_move_5d_pct / context.beta_252d (requires >= 10 rows). On 2026-10-29/30 snapshots this is tight (IQR < 0.01 pct-pt), so it is the stored SPY move, not a new indicator. Only usable for 5-session windows.",
+  "non_us": "Rows whose stored benchmark is not SPY (e.g. 9984.T vs 1321.T, SAF.PA vs IEUR, .TO vs XIC.TO) are compared with their own stored benchmark move (that row's market_move_5d_pct / beta_252d, |beta| >= 0.5), else no_data. Reason: different session calendars make a same-window SPY comparison impossible from stored fields.",
+  "fix_requested": "Ask the snapshot routine owner to store the SPY row (and ideally a seeded random 20 of the full technical_summary) in every tape snapshot; the grader picks it up automatically."
+ },
+ "tests": [
+  {
+   "id": "TA-CAP-5D",
+   "applies_to": {
+    "flag_kinds": [
+     "capitulation"
+    ],
+    "rule_ids": [
+     "FLOW-05",
+     "TAPE-05",
+     "TAPE-01"
+    ]
+   },
+   "window_sessions": 5,
+   "pass_condition": {
+    "plain": "Pass if the name's close-to-close return from the base session to session 5 beats SPY's return over the same sessions.",
+    "machine": {
+     "metric": "excess_return_pct",
+     "op": ">",
+     "threshold": 0.0
     }
+   },
+   "benchmark": "SPY (see benchmark)",
+   "persistence": {
+    "plain": "Next session: capitulation.state still in the capitulation set, and if the flag quoted RSI / stretch_z / trend_z / CMF, that field is still beyond the same threshold.",
+    "secondary": true
+   }
+  },
+  {
+   "id": "TA-RSI-OS-5D",
+   "applies_to": {
+    "flag_kinds": [
+     "rsi_oversold"
+    ],
+    "rule_ids": [
+     "FLOW-05",
+     "TAPE-01"
+    ]
+   },
+   "window_sessions": 5,
+   "pass_condition": {
+    "plain": "RSI14 < 35 (incl. < 25) flags pass if the 5-session close-to-close return beats SPY's over the same sessions.",
+    "machine": {
+     "metric": "excess_return_pct",
+     "op": ">",
+     "threshold": 0.0
+    }
+   },
+   "benchmark": "SPY (see benchmark)",
+   "persistence": {
+    "plain": "Next session rsi_14 still below the band flagged (25 if the flag value was < 25, else 35).",
+    "secondary": true
+   }
+  },
+  {
+   "id": "TA-RSI-OB-5D",
+   "applies_to": {
+    "flag_kinds": [
+     "rsi_overbought"
+    ],
+    "rule_ids": [
+     "FLOW-05",
+     "TAPE-01",
+     "TAPE-02",
+     "TAPE-03"
+    ]
+   },
+   "window_sessions": 5,
+   "pass_condition": {
+    "plain": "RSI14 > 70 flags pass if the 5-session close-to-close return trails SPY's over the same sessions.",
+    "machine": {
+     "metric": "excess_return_pct",
+     "op": "<",
+     "threshold": 0.0
+    }
+   },
+   "benchmark": "SPY (see benchmark)",
+   "persistence": {
+    "plain": "Next session rsi_14 still > 70.",
+    "secondary": true
+   }
+  },
+  {
+   "id": "TA-BRK-3S",
+   "applies_to": {
+    "flag_kinds": [
+     "breakout"
+    ],
+    "rule_ids": [
+     "FLOW-05",
+     "TAPE-04"
+    ]
+   },
+   "window_sessions": 3,
+   "pass_condition": {
+    "plain": "Breakout flags pass if the close stays above the stored 50-day average (price_vs_50d_pct > 0) on each of the next 3 sessions' snapshots.",
+    "machine": {
+     "metric": "price_vs_50d_pct",
+     "op": ">",
+     "threshold": 0.0,
+     "each_session": [
+      1,
+      2,
+      3
+     ]
+    }
+   },
+   "benchmark": "SPY context only (recorded, not used for pass/fail)",
+   "persistence": {
+    "plain": "Next session the full breakout rule is still met.",
+    "secondary": true
+   }
+  },
+  {
+   "id": "TA-BRKLOST-3S",
+   "applies_to": {
+    "flag_kinds": [
+     "breakout_lost"
+    ],
+    "rule_ids": [
+     "FLOW-05",
+     "TAPE-04"
+    ]
+   },
+   "window_sessions": 3,
+   "pass_condition": {
+    "plain": "'Breakout lost' flags pass if the breakout rule is not met again on any of the next 3 sessions.",
+    "machine": {
+     "metric": "breakout_rule_met",
+     "op": "==",
+     "threshold": false,
+     "each_session": [
+      1,
+      2,
+      3
+     ]
+    }
+   },
+   "benchmark": "none",
+   "persistence": {
+    "plain": "Next session breakout rule still not met.",
+    "secondary": true
+   },
+   "note": "Added (not in the suggested defaults) because run_log has 'breakout lost' rows (DDOG 10-13, SHOP 10-14)."
+  },
+  {
+   "id": "TA-Z-5D",
+   "applies_to": {
+    "flag_kinds": [
+     "z_stretch",
+     "z_trend",
+     "cmf"
+    ],
+    "rule_ids": [
+     "FLOW-05",
+     "TAPE-04"
+    ]
+   },
+   "window_sessions": 5,
+   "pass_condition": {
+    "plain": "stretch_z / trend_z / CMF flags pass if (a) next session the same field is still beyond its threshold with the same sign AND (b) the sign of the 5-session close-to-close return agrees with the flag's direction (sign of the flagged value).",
+    "machine": {
+     "all_of": [
+      {
+       "metric": "persistence",
+       "op": "==",
+       "threshold": "held"
+      },
+      {
+       "metric": "return_sign_x_direction",
+       "op": ">",
+       "threshold": 0
+      }
+     ]
+    }
+   },
+   "benchmark": "SPY excess return recorded alongside (not used for pass/fail)",
+   "persistence": {
+    "plain": "Next session |field| still beyond threshold with the same sign (also component (a) of the pass).",
+    "secondary": true
+   },
+   "note": "Direction agreement follows the suggested default (continuation reading). Both raw return and excess return are stored so a mean-reversion reading can be scored later without regrading."
+  },
+  {
+   "id": "TA-IDX-EVENT",
+   "applies_to": {
+    "flag_kinds": [
+     "index_add",
+     "index_delete",
+     "index_migration"
+    ],
+    "rule_ids": [
+     "FLOW-01",
+     "FLOW-02",
+     "FLOW-03",
+     "FLOW-04"
+    ]
+   },
+   "window_sessions": null,
+   "deadline_by_family": {
+    "russell": "2026-12-11",
+    "sp_dji_us": "2026-12-19",
+    "nasdaq_100": "2026-12-19"
+   },
+   "pass_condition": {
+    "plain": "Pass if the provider announces the predicted add / delete / migration for that exact index by the case deadline (FTSE Russell recon effective Dec 11 2026; S&P DJI quarterly rebalance Dec 19 2026). Fail (false flag) if the window closes without one. Pending until eval/index_announcements.json checked_through >= deadline.",
+    "machine": {
+     "metric": "matching_announcement",
+     "op": "exists_by",
+     "threshold": "deadline"
+    }
+   },
+   "benchmark": "none",
+   "persistence": null
+  },
+  {
+   "id": "TA-IDX-NEG",
+   "applies_to": {
+    "flag_kinds": [
+     "index_watch_removed"
+    ],
+    "rule_ids": [
+     "FLOW-01",
+     "FLOW-04"
+    ]
+   },
+   "window_sessions": null,
+   "pass_condition": {
+    "plain": "A 'watch removed' call passes if no add to that index is announced by the next review deadline; fails if one is.",
+    "machine": {
+     "metric": "matching_announcement",
+     "op": "absent_by",
+     "threshold": "deadline"
+    }
+   },
+   "benchmark": "none",
+   "persistence": null
+  },
+  {
+   "id": "TA-IDX-REPORT",
+   "applies_to": {
+    "flag_kinds": [
+     "index_report"
+    ],
+    "rule_ids": [
+     "FLOW-04"
+    ]
+   },
+   "window_sessions": null,
+   "pass_condition": {
+    "plain": "A flag reporting an already-announced event passes if a provider announcement for that ticker, exact index and action exists (FLOW-04 exact-index test); fails if announcements are checked through the run date and none matches.",
+    "machine": {
+     "metric": "matching_announcement",
+     "op": "exists_by",
+     "threshold": "run_date"
+    }
+   },
+   "benchmark": "none",
+   "persistence": null
+  }
+ ],
+ "held_names": {
+  "plain": "Held names (TAPE-06 gaps, FLOW-06 thin/self-contradictory/stale, HKHC) get the same test as the flag they would have been (counterfactual). The counterfactual kind is the kind of the logged flag text if the held row is in run_log; otherwise it is read from the held-date snapshot row by the fixed thresholds in this order: capitulation state, RSI < 35, RSI > 70, breakout rule, |stretch_z| > 2, |trend_z| > 1.25, |CMF| > 0.10. No snapshot row means no_data.",
+  "cohort": "held"
+ },
+ "baseline": {
+  "plain": "For each run date, a seeded random sample of 20 names from that day's tape snapshot rows, excluding names flagged or held that day and SPY, graded with every return/breakout test over the same window, so each pass rate has a chance comparison.",
+  "n": 20,
+  "seed": "int(sha256('ta-baseline|' + run_date).hexdigest()[:12], 16)",
+  "pool": "tape_snapshots/<run_date>.json rows with data_quality == 'ready'. Retro proxy when that snapshot does not exist: names logged in run_log on or before run_date (not flagged that day) that have a stored row at the window's end session.",
+  "tests_graded": [
+   "TA-CAP-5D",
+   "TA-RSI-OS-5D",
+   "TA-RSI-OB-5D",
+   "TA-BRK-3S",
+   "TA-Z-5D-up",
+   "TA-Z-5D-down"
   ],
-  "held_names": {
-    "plain": "Held names (TAPE-06 gaps, FLOW-06 thin/self-contradictory/stale, HKHC) get the same test as the flag they would have been (counterfactual). The counterfactual kind is the kind of the logged flag text if the held row is in run_log; otherwise it is read from the held-date snapshot row by the fixed thresholds in this order: capitulation state, RSI < 35, RSI > 70, breakout rule, |stretch_z| > 2, |trend_z| > 1.25, |CMF| > 0.10. No snapshot row means no_data.",
-    "cohort": "held"
+  "z_baseline_note": "Baseline for TA-Z-5D uses only component (b) (return sign vs direction), for each direction; flags must also persist, so this baseline is a lower bar.",
+  "known_bias": "Snapshots hold only names the desk has flagged at some point (117-128 rows), not the full technical_summary, so the pool skews to high-volatility names."
+ },
+ "grading": {
+  "primary_fields": "test_grade (pass | fail | no_data), test_graded_on, test_numbers",
+  "secondary_fields": "persistence_grade (held | faded | no_data), persistence_graded_on, persistence_numbers",
+  "legacy_fields": "grade / graded_on keep their existing meaning (next-snapshot persistence held/faded/no_data, used by the weekly scorecard). --daily fills them from persistence_grade only when they are null and never overwrites them. drew_verdict / verdict / verdict_by are never touched.",
+  "no_data": "Written when the window has closed (a later snapshot exists or 4 calendar days passed after the end session) and a needed snapshot row, close or benchmark is missing.",
+  "never_regrade": "A row whose test_grade (or persistence_grade) is already set is skipped."
+ },
+ "report": {
+  "groups": "per rule id (lens_rules, else lens_rules_inferred; F/M aliases mapped) and per flag kind; live (registered_retro false) and retro reported separately",
+  "metrics": "graded n, pass rate, baseline pass rate (same tests, same run dates), held counterfactual pass rate, persistence held/faded",
+  "under_review_candidate": "rule with graded n >= 20 and pass rate <= baseline pass rate (computed on live, and separately on live+retro; never applied automatically - proposal to Drew only)"
+ },
+ "adjustments_from_suggested_defaults": [
+  "SPY benchmark: no SPY row is stored yet; fallback backs the stored SPY 5-session move out of context.market_move_5d_pct / beta_252d in the same snapshot (documented above).",
+  "Non-US names use their own stored benchmark (different session calendars).",
+  "Added TA-BRKLOST-3S for 'breakout lost' rows, TA-IDX-NEG for 'watch removed' rows, TA-IDX-REPORT for already-announced events (MRNA, RX.V).",
+  "When a base close is not stored (rows before 2026-10-29) the 5-session return falls back to the stored measures.return_5d_pct on the end-session row, which is the same close-to-close return by definition."
+ ],
+ "amendments": [
+  {
+   "date": "2026-11-02",
+   "id": "A1-mwf-cadence",
+   "change": "Snapshots are stored Mon/Wed/Fri (08:12 ET) only. A test whose window-end (or persistence / 3-session end) session has no stored close is graded at the first stored completed close for that ticker on its own exchange after it; test_numbers record end_as_of_used, end_resolution and sessions_elapsed. no_data only when that exchange's stored closes pass the end session + 10 sessions without a close for the ticker. 3-session tests check every stored close from session 1 to the resolved end. Pass conditions unchanged.",
+   "applies_to": "rows graded on or after 2026-11-02; earlier grades are never regraded"
   },
-  "baseline": {
-    "plain": "For each run date, a seeded random sample of 20 names from that day's tape snapshot rows, excluding names flagged or held that day and SPY, graded with every return/breakout test over the same window, so each pass rate has a chance comparison.",
-    "n": 20,
-    "seed": "int(sha256('ta-baseline|' + run_date).hexdigest()[:12], 16)",
-    "pool": "tape_snapshots/<run_date>.json rows with data_quality == 'ready'. Retro proxy when that snapshot does not exist: names logged in run_log on or before run_date (not flagged that day) that have a stored row at the window's end session.",
-    "tests_graded": ["TA-CAP-5D", "TA-RSI-OS-5D", "TA-RSI-OB-5D", "TA-BRK-3S", "TA-Z-5D-up", "TA-Z-5D-down"],
-    "z_baseline_note": "Baseline for TA-Z-5D uses only component (b) (return sign vs direction), for each direction; flags must also persist, so this baseline is a lower bar.",
-    "known_bias": "Snapshots hold only names the desk has flagged at some point (117-128 rows), not the full technical_summary, so the pool skews to high-volatility names."
-  },
-  "grading": {
-    "primary_fields": "test_grade (pass | fail | no_data), test_graded_on, test_numbers",
-    "secondary_fields": "persistence_grade (held | faded | no_data), persistence_graded_on, persistence_numbers",
-    "legacy_fields": "grade / graded_on keep their existing meaning (next-snapshot persistence held/faded/no_data, used by the weekly scorecard). --daily fills them from persistence_grade only when they are null and never overwrites them. drew_verdict / verdict / verdict_by are never touched.",
-    "no_data": "Written when the window has closed (a later snapshot exists or 4 calendar days passed after the end session) and a needed snapshot row, close or benchmark is missing.",
-    "never_regrade": "A row whose test_grade (or persistence_grade) is already set is skipped."
-  },
-  "report": {
-    "groups": "per rule id (lens_rules, else lens_rules_inferred; F/M aliases mapped) and per flag kind; live (registered_retro false) and retro reported separately",
-    "metrics": "graded n, pass rate, baseline pass rate (same tests, same run dates), held counterfactual pass rate, persistence held/faded",
-    "under_review_candidate": "rule with graded n >= 20 and pass rate <= baseline pass rate (computed on live, and separately on live+retro; never applied automatically - proposal to Drew only)"
-  },
-  "adjustments_from_suggested_defaults": [
-    "SPY benchmark: no SPY row is stored yet; fallback backs the stored SPY 5-session move out of context.market_move_5d_pct / beta_252d in the same snapshot (documented above).",
-    "Non-US names use their own stored benchmark (different session calendars).",
-    "Added TA-BRKLOST-3S for 'breakout lost' rows, TA-IDX-NEG for 'watch removed' rows, TA-IDX-REPORT for already-announced events (MRNA, RX.V).",
-    "When a base close is not stored (rows before 2026-10-29) the 5-session return falls back to the stored measures.return_5d_pct on the end-session row, which is the same close-to-close return by definition."
-  ]
+  {
+   "date": "2026-11-02",
+   "id": "A2-universe-baseline",
+   "change": "--register accepts baseline {\"mode\": \"universe\"}: the 20-name baseline is drawn (same seed rule) from eval/universe.json names minus that run's flagged and held names, limited to names with a usable stored row."
+  }
+ ]
 }

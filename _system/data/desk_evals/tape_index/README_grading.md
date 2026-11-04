@@ -65,6 +65,35 @@ at the window-end as_of (`bench_method` records which was used). Non-US names (b
 `checked_through` and today reach the deadline (Russell Dec 11 2026, S&P DJI / Nasdaq Dec 19 2026). Update the file
 after each provider notice; never back-date `checked_through`.
 
+## When a window counts as closed (fixed 2026-11-02)
+A stored row is a close only if its snapshot was generated after that row's own exchange closed on the row's
+`as_of` (+20 min). Exchange comes from `row.exchange`, else the yahoo symbol in `row.source` (so `LSEG` -> `LSEG.L`),
+else the ticker suffix; one-letter share-class suffixes (BF.B, HEI.A) are US. Snapshots without `generated_at`
+only count rows with `as_of` before the file date. Rows under `partial_session_rows`, or marked
+`partial_session: true` / `session_complete: false`, are ignored. Each exchange has its own frontier (latest stored
+completed close); a US row waits for a US close and never inherits closure from overseas rows.
+A test is graded only when its exchange's frontier reaches the last session it needs, and a missing row turns into
+`no_data` only once that exchange's frontier is strictly past the missing session. The old "today >= end + 4 days"
+fallback is gone. If an earlier run wrote `no_data` while the window could still fill, `--daily` moves it to
+`<field>_superseded` (old grade, date, numbers, reason) and re-grades later; pass/fail/held/faded are never touched.
+
+## Mon/Wed/Fri snapshots (2026-11-02)
+The digest now runs Mon/Wed/Fri at 08:12 ET, so each snapshot holds the previous session's closes: Tue, Thu and Fri
+closes are stored; Mon and Wed closes are not. When a window ends on an unstored session, `--daily` grades it at
+the first stored completed close for that ticker on its own exchange after the end (`end_as_of_used`,
+`sessions_elapsed`, `end_resolution.status = substituted`). Exact matches show `status = exact`. A row stays
+pending until such a close exists; it becomes `no_data` (`status = no_close`) only once that exchange's stored
+closes run past the end session + 10 sessions (`MAX_EXTRA_SESSIONS`). The 1-session persistence check and the
+3-session breakout tests use the same rule; breakout tests read every stored close from session 1 to the
+resolved end. Implied-SPY and own-benchmark fallbacks only apply to exact 5-session windows; otherwise the SPY
+(or benchmark) row closes at the base and the used end are required.
+
+## Universe-mode baseline
+`"baseline": {"mode": "universe", "n": 20}` in candidates.json samples from `universe.json` (`all_names`) minus
+that run's flagged and held names and SPY, limited to names with a usable stored row (same-day snapshot if
+present). Rows record `baseline_pool`, `baseline_pool_size`, `universe_file`, `universe_built`.
+`universe.json` and `flow_calendar.json` are PRIVATE (Drew's book): never sync them to the repo.
+
 ## Report
 Per rule id and per flag kind, split live / retro / all: registered, graded n, pass rate, date-matched baseline pass rate
 (each run_date's baseline counted once), held counterfactual pass rate, persistence held/faded.

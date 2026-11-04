@@ -1,6 +1,6 @@
 {
   "schema_version": "desk_briefs.v1",
-  "generated_at": "2026-11-02T13:27:46Z",
+  "generated_at": "2026-11-04T13:42:28Z",
   "caption": "Ranked output from the Magis desk bots, one brief per desk per day, filed by pull request and checked by schema. A brief is research only: it carries no authority, sizes nothing, and never enters a base IRR. The one number on each row is the dashboard's or the filing's, not the bot's.",
   "desks": [
     {
@@ -9,7 +9,7 @@
       "owner": "drew",
       "author": "grok-drew-special-situations",
       "as_of": "2026-10-29",
-      "age_hours": 109.5,
+      "age_hours": 157.7,
       "stale": false,
       "path": "_system/data/desk_briefs/special_situations/2026-10-29.json",
       "items": [
@@ -142,7 +142,7 @@
       "owner": "drew",
       "author": "grok-drew-activism",
       "as_of": "2026-10-30",
-      "age_hours": 85.5,
+      "age_hours": 133.7,
       "stale": false,
       "path": "_system/data/desk_briefs/activism/2026-10-30.json",
       "items": [
@@ -282,8 +282,8 @@
       "owner": "drew",
       "author": "codex-core-compounders",
       "as_of": "2026-10-27",
-      "age_hours": 157.5,
-      "stale": false,
+      "age_hours": 205.7,
+      "stale": true,
       "path": "_system/data/desk_briefs/fundamentals/2026-10-27.json",
       "items": [
         {
@@ -496,7 +496,7 @@
       "owner": "drew",
       "author": "grok-drew-nol-tax-assets",
       "as_of": "2026-10-30",
-      "age_hours": 85.5,
+      "age_hours": 133.7,
       "stale": false,
       "path": "_system/data/desk_briefs/nol_tax_assets/2026-10-30.json",
       "items": [
@@ -737,314 +737,184 @@
       "desk_label": "Index, forced flow and tape",
       "owner": "drew",
       "author": "grok-drew-tape-index",
-      "as_of": "2026-11-02",
-      "age_hours": 13.5,
+      "as_of": "2026-11-04",
+      "age_hours": 13.7,
       "stale": false,
-      "path": "_system/data/desk_briefs/tape_index/2026-11-02.json",
+      "path": "_system/data/desk_briefs/tape_index/2026-11-04.json",
       "items": [
         {
-          "ticker": "GOOGL",
-          "headline": "Alphabet stayed capitulation_candidate with RSI 14.1; the Oct 29 -11.7% gap held through Oct 30, lifting TAPE-06. RSI extreme with downtrend (TAPE-01).",
-          "one_number": "RSI 14.1",
+          "ticker": "MIAX",
+          "headline": "Miami International's CMF rose to 0.232 (from 0.099), past the 0.10 line, while the stored trend is still lagging_downtrend (RSI 65.6, 6.3% under the 50-day).",
+          "one_number": "CMF 0.232",
+          "lane": "tape",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MIAX cap=normal (prior normal) rsi14=65.6 cmf=0.232 rvol=0.95 dir=lagging_downtrend p50=-6.28% close=33.86",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "TA-Z-5D: CMF still >0.10 next session and a positive 5-session return.",
+          "handoff": null
+        },
+        {
+          "ticker": "BN",
+          "headline": "Brookfield's RSI reached 78.8 (from 67.9) as the capitulation state went from stress_building back to normal; counter-trend overbought (mixed_repair, TAPE-01).",
+          "one_number": "RSI 78.8",
+          "lane": "tape",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BN cap=normal (prior stress_building) rsi14=78.8 cmf=0.221 rvol=1.06 dir=mixed_repair p50=6.52% close=40.64",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "TA-RSI-OB-5D: passes if BN trails SPY over 5 sessions.",
+          "handoff": null
+        },
+        {
+          "ticker": "TPL",
+          "headline": "Texas Pacific Land moved from normal into stress_building with CMF -0.110 (from -0.100) and RSI 31.0.",
+          "one_number": "CMF -0.110",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GOOGL cap=capitulation_candidate (prior capitulation_candidate) rsi14=14.1 rvol=2.12 cmf=-0.143 dir=lagging_downtrend gap=-0.95%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GOOGL stretch_z=-2.412 trend_z=-1.998 p50=-17.46% close=279.84 (prior 283.82) as_of 2026-10-30",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z TPL cap=stress_building (prior normal) rsi14=31.0 cmf=-0.11 rvol=1.48 dir=lagging_downtrend p50=-5.51% close=332.0",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "Fundamentals owns the Q3 read; tape timing only.",
-          "handoff": "fundamentals"
+          "next": "TA-CAP-5D: passes if TPL beats SPY over 5 sessions.",
+          "handoff": null
         },
         {
-          "ticker": "FDX",
-          "headline": "FedEx met the stored breakout rule (leading_uptrend, above the 50-day, rvol 2.17, CMF 0.23); no separate overbought flag under TAPE-02.",
-          "one_number": "rvol 2.17 (breakout)",
-          "lane": "tape",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FDX cap=normal (prior normal) rsi14=73.5 rvol=2.17 cmf=0.227 dir=leading_uptrend gap=0.12%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FDX stretch_z=0.007 trend_z=0.039 p50=3.08% close=313.28 (prior 307.82) as_of 2026-10-30",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Special Situations owns the name; 3-session breakout test.",
-          "handoff": "special_situations"
-        },
-        {
-          "ticker": "CBOE",
-          "headline": "Cboe met the breakout rule on 2.0x volume, up from RSI 54.9 to 66.2.",
-          "one_number": "rvol 2.01 (breakout)",
-          "lane": "tape",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CBOE cap=normal (prior normal) rsi14=66.2 rvol=2.01 cmf=0.171 dir=leading_uptrend gap=2.78%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CBOE stretch_z=1.346 trend_z=1.032 p50=13.93% close=335.53 (prior 314.25) as_of 2026-10-30",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Fundamentals owns the name.",
-          "handoff": "fundamentals"
-        },
-        {
-          "ticker": "CP",
-          "headline": "Canadian Pacific met the breakout rule (CMF 0.13, rvol 1.66), just 1.2% above its 50-day.",
-          "one_number": "CMF 0.13 (breakout)",
-          "lane": "tape",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CP cap=normal (prior normal) rsi14=65.4 rvol=1.66 cmf=0.132 dir=leading_uptrend gap=0.18%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CP stretch_z=0.225 trend_z=0.288 p50=1.18% close=89.68 (prior 88.37) as_of 2026-10-30",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Fundamentals owns the name.",
-          "handoff": "fundamentals"
-        },
-        {
-          "ticker": "OKTA",
-          "headline": "S&P DJI moves OKTA to the S&P 500 Nov 4. Blank exchange field made the feed mark OKTA ineligible and miss the S&P 400 membership.",
-          "one_number": "S&P 500 add eff. Nov 4",
+          "ticker": "APLD",
+          "headline": "Index feed scores Applied Digital a Russell 1000 deletion_risk 5.52% under the breakpoint for the Dec 11 recon. Feed candidate only, no provider announcement.",
+          "one_number": "R1000 deletion_risk -5.52%",
           "lane": "index",
           "evidence": [
             {
-              "kind": "provider",
-              "ref": "S&P DJI 2026-10-30: OKTA replaces KVUE in S&P 500 eff. Nov 4 open (KMB acquiring KVUE); GKOS replaces OKTA in S&P 400",
-              "url": "https://www.spglobal.com/spdji/en/documents/indexnews/announcements/20261030-1485650/1485650_kvue-ramp546.pdf"
-            },
-            {
               "kind": "dashboard",
-              "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z OKTA sp500 status=ineligible gating=exchange (blank) current_memberships=[]",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z APLD cap=stress_building (prior stress_building) rsi14=42.5 cmf=-0.043 rvol=0.94 dir=lagging_downtrend p50=-24.71% close=17.81",
               "url": null
             },
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z OKTA cap=normal (prior normal) rsi14=41.5 rvol=1.69 cmf=-0.046 dir=leading_uptrend gap=-1.29%",
+              "ref": "dashboard/data/index_membership.json gen 2026-11-04T10:06:14Z APLD russell_1000 status=deletion_risk dist=-5.52% (prior member); russell_2000 inclusion_candidate",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "400-to-500 migration nets part of the demand (FLOW-01). Data-correction proposal filed.",
+          "next": "TA-IDX-EVENT: graded on FTSE Russell prelim lists Nov 13 through Dec 11.",
           "handoff": null
         },
         {
-          "ticker": "KVUE",
-          "headline": "Kenvue leaves the S&P 500 on Nov 4 because Kimberly-Clark is acquiring it; a deal-driven deletion, not a forced-seller setup. Stored rvol 3.64 on Oct 30.",
-          "one_number": "S&P 500 deletion eff. Nov 4",
-          "lane": "index",
-          "evidence": [
-            {
-              "kind": "provider",
-              "ref": "S&P DJI 2026-10-30: OKTA replaces KVUE in S&P 500 eff. Nov 4 open (KMB acquiring KVUE); GKOS replaces OKTA in S&P 400",
-              "url": "https://www.spglobal.com/spdji/en/documents/indexnews/announcements/20261030-1485650/1485650_kvue-ramp546.pdf"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z KVUE sp500 status=n_a gating=exchange (blank) current_memberships=[]",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z KVUE cap=normal (prior normal) rsi14=69.6 rvol=3.64 cmf=0.215 dir=leading_uptrend gap=2.2%",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Deal-driven; weight by spread, not index flow.",
-          "handoff": null
-        },
-        {
-          "ticker": "CAT",
-          "headline": "Caterpillar stayed capitulation_candidate with RSI 16.5 and stretch_z -2.64; the Oct 29 -10.8% gap held, lifting the TAPE-06 hold.",
-          "one_number": "RSI 16.5",
+          "ticker": "PBT",
+          "headline": "PBT moved to capitulation_candidate with RSI 15.6; close 27.93 vs 31.62 on Oct 30 (about -11.7% over two sessions, no gap over 10%) as WTI fell 7.4% on Nov 2.",
+          "one_number": "RSI 15.6",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CAT cap=capitulation_candidate (prior capitulation_candidate) rsi14=16.5 rvol=1.75 cmf=-0.089 dir=lagging_downtrend gap=-3.1%",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z PBT cap=capitulation_candidate (prior stress_building) rsi14=15.6 cmf=-0.134 rvol=1.68 dir=pullback_in_uptrend p50=-16.87% close=27.93",
               "url": null
             },
             {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CAT stretch_z=-2.637 trend_z=-2.364 p50=-20.32% close=622.75 (prior 647.39) as_of 2026-10-30",
-              "url": null
+              "kind": "news",
+              "ref": "CNBC 2026-11-02: WTI futures -7.4% to $96.46 on US-Iran diplomacy",
+              "url": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html"
             }
           ],
           "confidence": "provider",
-          "next": "5-session test vs SPY.",
+          "next": "TA-CAP-5D: passes if PBT beats SPY over 5 sessions.",
           "handoff": null
         },
         {
-          "ticker": "NOW",
-          "headline": "ServiceNow stayed capitulation_candidate for a second session on 2.2x volume; the Oct 29 -19.5% gap held at the Oct 30 close.",
-          "one_number": "rvol 2.22",
-          "lane": "capitulation",
+          "ticker": "RACE",
+          "headline": "Ferrari met the breakout rule after Q3 guidance raise: leading_uptrend, 3.0% above the 50-day, rvol 2.98, CMF 0.177. RSI 71.2 not posted separately (TAPE-02).",
+          "one_number": "rvol 2.98 (breakout)",
+          "lane": "tape",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z NOW cap=capitulation_candidate (prior capitulation_candidate) rsi14=30.2 rvol=2.22 cmf=-0.197 dir=lagging_downtrend gap=-0.49%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z NOW stretch_z=-1.582 trend_z=-0.647 p50=-24.2% close=105.12 (prior 109.67) as_of 2026-10-30",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z RACE cap=normal (prior normal) rsi14=71.2 cmf=0.177 rvol=2.98 dir=leading_uptrend p50=3.03% close=414.77",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "5-session test vs SPY.",
+          "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
           "handoff": null
         },
         {
-          "ticker": "FFIV",
-          "headline": "F5 held capitulation_candidate for a third session; rvol 3.06 qualifies for the TAPE-05 note, RSI 15.7 with the downtrend.",
-          "one_number": "rvol 3.06 (day 3)",
-          "lane": "capitulation",
+          "ticker": "BRK.B",
+          "headline": "Berkshire met the stored breakout rule: leading_uptrend, 7.7% above the 50-day, rvol 1.21, CMF 0.105 (from 0.036).",
+          "one_number": "rvol 1.21 (breakout)",
+          "lane": "tape",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FFIV cap=capitulation_candidate (prior capitulation_candidate) rsi14=15.7 rvol=3.06 cmf=-0.228 dir=lagging_downtrend gap=-2.44%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FFIV stretch_z=-2.44 trend_z=-1.88 p50=-21.07% close=338.34 (prior 363.46) as_of 2026-10-30",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BRK.B cap=normal (prior normal) rsi14=75.7 cmf=0.105 rvol=1.21 dir=leading_uptrend p50=7.67% close=557.07",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "5-session test vs SPY.",
+          "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
           "handoff": null
         },
         {
-          "ticker": "META",
-          "headline": "Meta moved stress_building to panic with RSI 17.6 and CMF -0.25 after its Q3 print.",
-          "one_number": "RSI 17.6",
-          "lane": "capitulation",
+          "ticker": "MSCI",
+          "headline": "MSCI met the stored breakout rule with stretch_z 2.11: leading_uptrend, 12.3% above the 50-day, rvol 1.10, CMF 0.219.",
+          "one_number": "rvol 1.10 (breakout)",
+          "lane": "tape",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z META cap=panic (prior stress_building) rsi14=17.6 rvol=1.12 cmf=-0.25 dir=mixed_repair gap=-1.6%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z META stretch_z=-1.116 trend_z=-0.428 p50=-8.18% close=614.99 (prior 624.52) as_of 2026-10-30",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MSCI cap=normal (prior normal) rsi14=77.6 cmf=0.219 rvol=1.1 dir=leading_uptrend p50=12.26% close=639.78",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "5-session test vs SPY.",
-          "handoff": null
-        },
-        {
-          "ticker": "BAC",
-          "headline": "Bank of America jumped normal to panic with RSI 20.7 and stretch_z -2.20; SCHW (RSI 22.3) moved the same way.",
-          "one_number": "RSI 20.7",
-          "lane": "capitulation",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z BAC cap=panic (prior normal) rsi14=20.7 rvol=1.06 cmf=0.005 dir=lagging_downtrend gap=-0.22%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z BAC stretch_z=-2.196 trend_z=-1.984 p50=-11.29% close=50.01 (prior 51.14) as_of 2026-10-30",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "5-session test vs SPY.",
-          "handoff": null
-        },
-        {
-          "ticker": "GLD",
-          "headline": "Gold ETF moved panic to capitulation_candidate with stretch_z -2.42; SLV, GDX, GDXJ and WPM are also capitulation_candidate.",
-          "one_number": "stretch_z -2.42",
-          "lane": "capitulation",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GLD cap=capitulation_candidate (prior panic) rsi14=26.5 rvol=2.03 cmf=0.03 dir=lagging_downtrend gap=-1.93%",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GLD stretch_z=-2.416 trend_z=-1.459 p50=-8.91% close=355.78 (prior 368.57) as_of 2026-10-30",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "5-session test vs SPY.",
+          "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
           "handoff": null
         }
       ],
       "inputs_read": [
         {
           "path": "dashboard/data/technical_summary.json",
-          "generated_at": "2026-11-02T10:34:41Z",
-          "age_hours_at_read": 13.4,
+          "generated_at": "2026-11-04T09:27:05Z",
+          "age_hours_at_read": 14.5,
           "exists": true
         },
         {
           "path": "dashboard/data/capitulation_daily.json",
-          "generated_at": "2026-11-02T10:36:47.522136+00:00",
-          "age_hours_at_read": 13.4,
+          "generated_at": "2026-11-04T09:28:36.656217+00:00",
+          "age_hours_at_read": 14.5,
           "exists": true
         },
         {
           "path": "dashboard/data/index_membership.json",
-          "generated_at": "2026-10-29T16:11:20Z",
-          "age_hours_at_read": 103.8,
+          "generated_at": "2026-11-04T10:06:14Z",
+          "age_hours_at_read": 13.9,
           "exists": true
         },
         {
           "path": "dashboard/data/portfolio_news.json",
-          "generated_at": "2026-11-02T07:14:32.105586+00:00",
-          "age_hours_at_read": 16.8,
+          "generated_at": "2026-11-04T07:35:17.004520+00:00",
+          "age_hours_at_read": 16.4,
           "exists": true
         },
         {
           "path": "dashboard/data/desk_briefs.json",
-          "generated_at": "2026-10-30T12:21:24Z",
-          "age_hours_at_read": 83.6,
-          "exists": true
-        },
-        {
-          "path": "_system/portfolio/registry.json",
-          "generated_at": "2026-10-29T19:27:21Z",
-          "age_hours_at_read": 100.5,
+          "generated_at": "2026-11-02T13:27:46Z",
+          "age_hours_at_read": 58.5,
           "exists": true
         }
       ],
       "screens_empty": [],
-      "notes": "SPY panic (RSI 34.3); QQQ/XLK/SOXX capitulation_candidate; feed capitulation_candidate 8 to 53, panic 35 to 133. Also posted: FTNT RSI 19.1 (gap held), GPN breakout rvol 8.67. Held TAPE-06 (gap>10%): INTC, RDDT, DELL, HPQ, RBLX, AMD, AEHR. Held thin: FRMO, LIF.TO, SUM. Brazil cluster XP/NU/B3SA3.SA held (prop-e4cf81d09cfaeff1 pending); HKHC. Index feed unchanged (gen 2026-10-29); candidates only; it misses most deletions. HLT moves to Nasdaq Nov 5; feed has no Nasdaq-100 coverage."
+      "notes": "SPY and QQQ stress_building (RSI 38.9 / 32.8). Universe names in capitulation states 27 to 25, mostly panic easing to stress_building. Held: AENA.MC, LSEG (mid-session rows); TBBK sp600 and AAOI R2000 feed candidates (index feed shows no S&P membership for TBBK and no memberships or exchange for AAOI; see the Nov 2 exchange-field proposal). SNDK 8-for-1 split: record Nov 9, split-adjusted Nov 20. Not in tape feed: JMIA, MBGL, SPCX, LMN, LIFCO.ST."
     }
   ],
   "items_flat": [
@@ -1243,7 +1113,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "MIAX",
@@ -1264,7 +1134,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "TEQ.ST",
@@ -1285,7 +1155,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "FRMO",
@@ -1306,7 +1176,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "RMS.PA",
@@ -1327,7 +1197,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "GOOGL",
@@ -1348,7 +1218,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "RACE",
@@ -1369,7 +1239,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "AMZN",
@@ -1390,7 +1260,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "CP",
@@ -1411,7 +1281,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "LSEG",
@@ -1432,7 +1302,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "DB1.DE",
@@ -1453,7 +1323,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "CBOE",
@@ -1474,7 +1344,7 @@
       "owner": "drew",
       "as_of": "2026-10-27",
       "author": "codex-core-compounders",
-      "stale": false
+      "stale": true
     },
     {
       "ticker": "unresolved",
@@ -1739,324 +1609,180 @@
       "stale": false
     },
     {
-      "ticker": "GOOGL",
-      "headline": "Alphabet stayed capitulation_candidate with RSI 14.1; the Oct 29 -11.7% gap held through Oct 30, lifting TAPE-06. RSI extreme with downtrend (TAPE-01).",
-      "one_number": "RSI 14.1",
+      "ticker": "MIAX",
+      "headline": "Miami International's CMF rose to 0.232 (from 0.099), past the 0.10 line, while the stored trend is still lagging_downtrend (RSI 65.6, 6.3% under the 50-day).",
+      "one_number": "CMF 0.232",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MIAX cap=normal (prior normal) rsi14=65.6 cmf=0.232 rvol=0.95 dir=lagging_downtrend p50=-6.28% close=33.86",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-Z-5D: CMF still >0.10 next session and a positive 5-session return.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-11-04",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "BN",
+      "headline": "Brookfield's RSI reached 78.8 (from 67.9) as the capitulation state went from stress_building back to normal; counter-trend overbought (mixed_repair, TAPE-01).",
+      "one_number": "RSI 78.8",
+      "lane": "tape",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BN cap=normal (prior stress_building) rsi14=78.8 cmf=0.221 rvol=1.06 dir=mixed_repair p50=6.52% close=40.64",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-RSI-OB-5D: passes if BN trails SPY over 5 sessions.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-11-04",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "TPL",
+      "headline": "Texas Pacific Land moved from normal into stress_building with CMF -0.110 (from -0.100) and RSI 31.0.",
+      "one_number": "CMF -0.110",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GOOGL cap=capitulation_candidate (prior capitulation_candidate) rsi14=14.1 rvol=2.12 cmf=-0.143 dir=lagging_downtrend gap=-0.95%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GOOGL stretch_z=-2.412 trend_z=-1.998 p50=-17.46% close=279.84 (prior 283.82) as_of 2026-10-30",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z TPL cap=stress_building (prior normal) rsi14=31.0 cmf=-0.11 rvol=1.48 dir=lagging_downtrend p50=-5.51% close=332.0",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "Fundamentals owns the Q3 read; tape timing only.",
-      "handoff": "fundamentals",
+      "next": "TA-CAP-5D: passes if TPL beats SPY over 5 sessions.",
+      "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-02",
+      "as_of": "2026-11-04",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "FDX",
-      "headline": "FedEx met the stored breakout rule (leading_uptrend, above the 50-day, rvol 2.17, CMF 0.23); no separate overbought flag under TAPE-02.",
-      "one_number": "rvol 2.17 (breakout)",
-      "lane": "tape",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FDX cap=normal (prior normal) rsi14=73.5 rvol=2.17 cmf=0.227 dir=leading_uptrend gap=0.12%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FDX stretch_z=0.007 trend_z=0.039 p50=3.08% close=313.28 (prior 307.82) as_of 2026-10-30",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Special Situations owns the name; 3-session breakout test.",
-      "handoff": "special_situations",
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-02",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "CBOE",
-      "headline": "Cboe met the breakout rule on 2.0x volume, up from RSI 54.9 to 66.2.",
-      "one_number": "rvol 2.01 (breakout)",
-      "lane": "tape",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CBOE cap=normal (prior normal) rsi14=66.2 rvol=2.01 cmf=0.171 dir=leading_uptrend gap=2.78%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CBOE stretch_z=1.346 trend_z=1.032 p50=13.93% close=335.53 (prior 314.25) as_of 2026-10-30",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Fundamentals owns the name.",
-      "handoff": "fundamentals",
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-02",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "CP",
-      "headline": "Canadian Pacific met the breakout rule (CMF 0.13, rvol 1.66), just 1.2% above its 50-day.",
-      "one_number": "CMF 0.13 (breakout)",
-      "lane": "tape",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CP cap=normal (prior normal) rsi14=65.4 rvol=1.66 cmf=0.132 dir=leading_uptrend gap=0.18%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CP stretch_z=0.225 trend_z=0.288 p50=1.18% close=89.68 (prior 88.37) as_of 2026-10-30",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Fundamentals owns the name.",
-      "handoff": "fundamentals",
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-02",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "OKTA",
-      "headline": "S&P DJI moves OKTA to the S&P 500 Nov 4. Blank exchange field made the feed mark OKTA ineligible and miss the S&P 400 membership.",
-      "one_number": "S&P 500 add eff. Nov 4",
+      "ticker": "APLD",
+      "headline": "Index feed scores Applied Digital a Russell 1000 deletion_risk 5.52% under the breakpoint for the Dec 11 recon. Feed candidate only, no provider announcement.",
+      "one_number": "R1000 deletion_risk -5.52%",
       "lane": "index",
       "evidence": [
         {
-          "kind": "provider",
-          "ref": "S&P DJI 2026-10-30: OKTA replaces KVUE in S&P 500 eff. Nov 4 open (KMB acquiring KVUE); GKOS replaces OKTA in S&P 400",
-          "url": "https://www.spglobal.com/spdji/en/documents/indexnews/announcements/20261030-1485650/1485650_kvue-ramp546.pdf"
-        },
-        {
           "kind": "dashboard",
-          "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z OKTA sp500 status=ineligible gating=exchange (blank) current_memberships=[]",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z APLD cap=stress_building (prior stress_building) rsi14=42.5 cmf=-0.043 rvol=0.94 dir=lagging_downtrend p50=-24.71% close=17.81",
           "url": null
         },
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z OKTA cap=normal (prior normal) rsi14=41.5 rvol=1.69 cmf=-0.046 dir=leading_uptrend gap=-1.29%",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-04T10:06:14Z APLD russell_1000 status=deletion_risk dist=-5.52% (prior member); russell_2000 inclusion_candidate",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "400-to-500 migration nets part of the demand (FLOW-01). Data-correction proposal filed.",
+      "next": "TA-IDX-EVENT: graded on FTSE Russell prelim lists Nov 13 through Dec 11.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-02",
+      "as_of": "2026-11-04",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "KVUE",
-      "headline": "Kenvue leaves the S&P 500 on Nov 4 because Kimberly-Clark is acquiring it; a deal-driven deletion, not a forced-seller setup. Stored rvol 3.64 on Oct 30.",
-      "one_number": "S&P 500 deletion eff. Nov 4",
-      "lane": "index",
-      "evidence": [
-        {
-          "kind": "provider",
-          "ref": "S&P DJI 2026-10-30: OKTA replaces KVUE in S&P 500 eff. Nov 4 open (KMB acquiring KVUE); GKOS replaces OKTA in S&P 400",
-          "url": "https://www.spglobal.com/spdji/en/documents/indexnews/announcements/20261030-1485650/1485650_kvue-ramp546.pdf"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/index_membership.json gen 2026-10-29T16:11:20Z KVUE sp500 status=n_a gating=exchange (blank) current_memberships=[]",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z KVUE cap=normal (prior normal) rsi14=69.6 rvol=3.64 cmf=0.215 dir=leading_uptrend gap=2.2%",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Deal-driven; weight by spread, not index flow.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-02",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "CAT",
-      "headline": "Caterpillar stayed capitulation_candidate with RSI 16.5 and stretch_z -2.64; the Oct 29 -10.8% gap held, lifting the TAPE-06 hold.",
-      "one_number": "RSI 16.5",
+      "ticker": "PBT",
+      "headline": "PBT moved to capitulation_candidate with RSI 15.6; close 27.93 vs 31.62 on Oct 30 (about -11.7% over two sessions, no gap over 10%) as WTI fell 7.4% on Nov 2.",
+      "one_number": "RSI 15.6",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CAT cap=capitulation_candidate (prior capitulation_candidate) rsi14=16.5 rvol=1.75 cmf=-0.089 dir=lagging_downtrend gap=-3.1%",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z PBT cap=capitulation_candidate (prior stress_building) rsi14=15.6 cmf=-0.134 rvol=1.68 dir=pullback_in_uptrend p50=-16.87% close=27.93",
           "url": null
         },
         {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z CAT stretch_z=-2.637 trend_z=-2.364 p50=-20.32% close=622.75 (prior 647.39) as_of 2026-10-30",
-          "url": null
+          "kind": "news",
+          "ref": "CNBC 2026-11-02: WTI futures -7.4% to $96.46 on US-Iran diplomacy",
+          "url": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html"
         }
       ],
       "confidence": "provider",
-      "next": "5-session test vs SPY.",
+      "next": "TA-CAP-5D: passes if PBT beats SPY over 5 sessions.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-02",
+      "as_of": "2026-11-04",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "NOW",
-      "headline": "ServiceNow stayed capitulation_candidate for a second session on 2.2x volume; the Oct 29 -19.5% gap held at the Oct 30 close.",
-      "one_number": "rvol 2.22",
-      "lane": "capitulation",
+      "ticker": "RACE",
+      "headline": "Ferrari met the breakout rule after Q3 guidance raise: leading_uptrend, 3.0% above the 50-day, rvol 2.98, CMF 0.177. RSI 71.2 not posted separately (TAPE-02).",
+      "one_number": "rvol 2.98 (breakout)",
+      "lane": "tape",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z NOW cap=capitulation_candidate (prior capitulation_candidate) rsi14=30.2 rvol=2.22 cmf=-0.197 dir=lagging_downtrend gap=-0.49%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z NOW stretch_z=-1.582 trend_z=-0.647 p50=-24.2% close=105.12 (prior 109.67) as_of 2026-10-30",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z RACE cap=normal (prior normal) rsi14=71.2 cmf=0.177 rvol=2.98 dir=leading_uptrend p50=3.03% close=414.77",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "5-session test vs SPY.",
+      "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-02",
+      "as_of": "2026-11-04",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "FFIV",
-      "headline": "F5 held capitulation_candidate for a third session; rvol 3.06 qualifies for the TAPE-05 note, RSI 15.7 with the downtrend.",
-      "one_number": "rvol 3.06 (day 3)",
-      "lane": "capitulation",
+      "ticker": "BRK.B",
+      "headline": "Berkshire met the stored breakout rule: leading_uptrend, 7.7% above the 50-day, rvol 1.21, CMF 0.105 (from 0.036).",
+      "one_number": "rvol 1.21 (breakout)",
+      "lane": "tape",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FFIV cap=capitulation_candidate (prior capitulation_candidate) rsi14=15.7 rvol=3.06 cmf=-0.228 dir=lagging_downtrend gap=-2.44%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z FFIV stretch_z=-2.44 trend_z=-1.88 p50=-21.07% close=338.34 (prior 363.46) as_of 2026-10-30",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BRK.B cap=normal (prior normal) rsi14=75.7 cmf=0.105 rvol=1.21 dir=leading_uptrend p50=7.67% close=557.07",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "5-session test vs SPY.",
+      "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-02",
+      "as_of": "2026-11-04",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "META",
-      "headline": "Meta moved stress_building to panic with RSI 17.6 and CMF -0.25 after its Q3 print.",
-      "one_number": "RSI 17.6",
-      "lane": "capitulation",
+      "ticker": "MSCI",
+      "headline": "MSCI met the stored breakout rule with stretch_z 2.11: leading_uptrend, 12.3% above the 50-day, rvol 1.10, CMF 0.219.",
+      "one_number": "rvol 1.10 (breakout)",
+      "lane": "tape",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z META cap=panic (prior stress_building) rsi14=17.6 rvol=1.12 cmf=-0.25 dir=mixed_repair gap=-1.6%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z META stretch_z=-1.116 trend_z=-0.428 p50=-8.18% close=614.99 (prior 624.52) as_of 2026-10-30",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MSCI cap=normal (prior normal) rsi14=77.6 cmf=0.219 rvol=1.1 dir=leading_uptrend p50=12.26% close=639.78",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "5-session test vs SPY.",
+      "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-02",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "BAC",
-      "headline": "Bank of America jumped normal to panic with RSI 20.7 and stretch_z -2.20; SCHW (RSI 22.3) moved the same way.",
-      "one_number": "RSI 20.7",
-      "lane": "capitulation",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z BAC cap=panic (prior normal) rsi14=20.7 rvol=1.06 cmf=0.005 dir=lagging_downtrend gap=-0.22%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z BAC stretch_z=-2.196 trend_z=-1.984 p50=-11.29% close=50.01 (prior 51.14) as_of 2026-10-30",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "5-session test vs SPY.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-02",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "GLD",
-      "headline": "Gold ETF moved panic to capitulation_candidate with stretch_z -2.42; SLV, GDX, GDXJ and WPM are also capitulation_candidate.",
-      "one_number": "stretch_z -2.42",
-      "lane": "capitulation",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GLD cap=capitulation_candidate (prior panic) rsi14=26.5 rvol=2.03 cmf=0.03 dir=lagging_downtrend gap=-1.93%",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-02T10:34:41Z GLD stretch_z=-2.416 trend_z=-1.459 p50=-8.91% close=355.78 (prior 368.57) as_of 2026-10-30",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "5-session test vs SPY.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-02",
+      "as_of": "2026-11-04",
       "author": "grok-drew-tape-index",
       "stale": false
     }
@@ -2076,23 +1802,25 @@
   },
   "counts": {
     "briefs": 5,
-    "items": 42,
-    "files": 27,
+    "items": 38,
+    "files": 28,
     "by_desk": {
       "special_situations": 4,
       "activism": 2,
       "fundamentals": 12,
       "nol_tax_assets": 12,
-      "tape_index": 12
+      "tape_index": 8
     },
     "by_owner": {
-      "drew": 42
+      "drew": 38
     }
   },
   "health": {
-    "status": "healthy",
+    "status": "degraded",
     "structural_errors": [],
-    "problems": [],
+    "problems": [
+      "fundamentals brief is 9 days old (2026-10-27)"
+    ],
     "warnings": [
       "_system/data/desk_briefs/activism/2026-10-29.json: items[0].evidence[2] (MGM): filing without a URL",
       "_system/data/desk_briefs/activism/2026-10-30.json: inputs_read[2] (AGENT_INDEX.md) carries no stamp",
@@ -2132,7 +1860,7 @@
       "_system/data/desk_briefs/tape_index/2026-10-29.json: inputs_read[5] (_system/data/desk_briefs/schema.json) carries no stamp"
     ],
     "stale_days": 7,
-    "checked_at": "2026-11-02T13:27:46Z"
+    "checked_at": "2026-11-04T13:42:28Z"
   },
   "research_only": true,
   "in_base_irr": false,
@@ -2140,13 +1868,13 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "dashboard-desk-briefs",
-    "generated_at": "2026-11-02T13:27:46Z",
-    "as_of": "2026-11-02",
-    "content_sha256": "sha256:1db3da482cc50dafa6da344125013add6f857904306ceb809f628b0d4a4f3864",
-    "row_count": 42,
+    "generated_at": "2026-11-04T13:42:28Z",
+    "as_of": "2026-11-04",
+    "content_sha256": "sha256:5b5811c16d1fc382c98b2ae55ec47f5d39ebcd578ae6c30550accddc9c804c3f",
+    "row_count": 38,
     "upstream_inputs": [],
     "health": {
-      "status": "healthy",
+      "status": "degraded",
       "structural_errors": 0
     }
   }
