@@ -16,6 +16,9 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/research-quality.yml"
+      - "_system/scripts/ci_checkout_workspace.sh"
+      - "_system/scripts/ci_resolve_checkout_ref.sh"
+      - "_system/scripts/ci_sparse_checkout_paths.py"
       - "**/research/valuation.json"
       - "**/research/valuation_fact_ledger.json"
       - "_system/scripts/scan_fact_ledger_currency.py"
@@ -291,6 +294,14 @@ jobs:
             // every push that reaches here. Over-running one cheap job beats
             // missing the push that ships a mislabeled-currency fact.
             const has = predicate => names.some(predicate);
+            // A change to how these jobs check out the tree has to run them,
+            // or a broken profile first shows up on the next schedule.
+            const checkoutWiring = has(name => [
+              '.github/workflows/research-quality.yml',
+              '_system/scripts/ci_checkout_workspace.sh',
+              '_system/scripts/ci_resolve_checkout_ref.sh',
+              '_system/scripts/ci_sparse_checkout_paths.py',
+            ].includes(name));
             const promptSync = has(name =>
               name === '_system/prompts/cloud_marvin_runbook.md' ||
               name === '_system/scripts/check_cloud_marvin_sync.py' ||
@@ -328,7 +339,7 @@ jobs:
             );
             // Currency labels are asserted in both valuation.json and the fact
             // ledger, and the scanner itself is the only thing that checks them.
-            const factCurrency = isPush || has(name =>
+            const factCurrency = isPush || checkoutWiring || has(name =>
               /(^|\/)research\/valuation(_fact_ledger)?\.json$/.test(name) ||
               name === '_system/scripts/scan_fact_ledger_currency.py' ||
               name === '_system/scripts/test_scan_fact_ledger_currency.py'
@@ -340,11 +351,11 @@ jobs:
             // calibration under _system/research (E2/E3), run receipts (P4)
             // and the reviews tree P4 scans -- must classify true too, or a
             // PR changing only them skips the suite that judges them.
-            const graphInvariants = isPush || has(name =>
+            const graphInvariants = isPush || checkoutWiring || has(name =>
               /^_system\/graph\//.test(name) ||
               /^_system\/scripts\/(graph_|test_graph_)[^/]+\.py$/.test(name) ||
               /^_system\/scripts\/(falsifier_specs|falsifier_evidence_adapters|resolve_falsifiers|promote_falsifier_drafts|epistemic_loop_controller|deliver_routed_memory|check_falsifier_history|lint_falsifier_specs|validate_calibration_consumption|validate_invariant_subset|supervise_repository_health|test_epistemic_integrity|test_epistemic_loop_controller|test_memory_delivery|test_validate_invariant_subset|test_repository_health_supervisor)\.py$/.test(name) ||
-              // The evidence-integrity sweep shares this job (same full
+              // The evidence-integrity sweep shares this job (same
               // checkout) and must trigger on its own sources and baseline.
               /^_system\/scripts\/(test_)?check_evidence_integrity\.py$/.test(name) ||
               /^_system\/scripts\/(test_)?build_filing_evidence\.py$/.test(name) ||
@@ -532,22 +543,8 @@ jobs:
     # go straight to main.
     if: needs.changes.outputs.fact_currency == 'true'
     runs-on: ubuntu-latest
-    # Full-tree checkout of this repo is about 200k files. 30 minutes cancelled
-    # this job during "Checkout workspace (full)" on AMZN PR #1144
-    # (run 37996092550, 2026-10-09). GitHub reports a job timeout as cancelled,
-    # and the automerge gate treated that as a failed Research quality check.
-    # Match graph-invariants at 90. The checkout step's own limit fails a hang
-    # as a step failure instead of cancelling the whole job.
-    timeout-minutes: 90
+    timeout-minutes: 30
     steps:
-      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -556,15 +553,15 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full)
-        # Full tree: the scan resolves each row's `source.ref` to the evidence file
-        # it names (`{TICKER}/research/evidence/sec_companyfacts.json`), so a sparse
-        # profile would turn real rows into silent "locator does not resolve".
-        # The 2026-10-09 run was still inside this step at the old 30-minute
-        # job limit (~28 minutes elapsed). 45 leaves room without waiting out
-        # the whole 90-minute job on a hung checkout.
-        timeout-minutes: 45
-        run: bash _system/scripts/ci_checkout_workspace.sh full "$CHECKOUT_SHA"
+      - name: Checkout workspace (currency scan inputs)
+        # The full tree (~53 GiB) timed out here after 45 minutes (run
+        # 41710891780). The scan reads every valuation.json and fact ledger and
+        # the source each row names. Every tracked *sec_companyfacts.json is in
+        # the profile, so a row's `source.ref` resolves exactly as on a full
+        # tree and never turns into a silent "locator does not resolve".
+        # About 0.8 GiB.
+        timeout-minutes: 15
+        run: bash _system/scripts/ci_checkout_workspace.sh fact_currency "$CHECKOUT_SHA"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -600,9 +597,7 @@ jobs:
     # often as with PRs.
     if: needs.changes.outputs.graph_invariants == 'true'
     runs-on: ubuntu-latest
-    # Full-tree checkout of this repo is about 200k files. 30 minutes was
-    # cancelling the job before invariants finished, which failed the merge gate.
-    timeout-minutes: 90
+    timeout-minutes: 45
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -620,11 +615,16 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full)
-        # Full tree: graph_build streams every ticker's contract and fact
-        # ledger, and E5 existence-checks the source paths beliefs cite, so a
-        # sparse profile would turn real beliefs into silent "source missing".
-        run: bash _system/scripts/ci_checkout_workspace.sh full "$CHECKOUT_SHA"
+      - name: Checkout workspace (graph inputs)
+        # The full tree (~53 GiB) ran this runner out of disk (run 41795979498).
+        # The profile keeps every top-level file and folder, every research
+        # tree, _system, docs and the P6 feeds; it leaves out the filing
+        # archives and activist PDFs, which the job only touches where a fact
+        # or belief cites one file. graph_build then names those cited files and
+        # they are checked out too, so E5 sees the same sources as on a full
+        # tree instead of a silent "source missing". About 4 GiB.
+        timeout-minutes: 20
+        run: bash _system/scripts/ci_checkout_workspace.sh graph_invariants "$CHECKOUT_SHA"
       - name: Deepen commit history for lane freshness (commits only, no blobs)
         # graph_build projects Lane/Commit from `git log -n 400`; on the
         # depth-1 checkout above every lane would read NO-COMMIT and fail P3
@@ -712,9 +712,9 @@ jobs:
         working-directory: _system/scripts
         run: python -m unittest -v test_check_evidence_integrity test_build_filing_evidence
       - name: Evidence integrity sweep (ratchet; fails only on regression)
-        # Shares this job because it needs the same full tree: the sweep reads
-        # every ticker's contract, route, ledger, queue and automation state
-        # and is meaningless on a sparse checkout.
+        # Shares this job because it reads the same research trees: every
+        # ticker's contract, route, ledger, queue and automation state. A
+        # profile without the research trees would make it meaningless.
         #
         # Ratchet, not a hard gate. 124 tickers were trapped when the baseline
         # was recorded; failing the build on that count would freeze the

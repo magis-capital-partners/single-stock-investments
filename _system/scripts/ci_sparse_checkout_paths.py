@@ -11,6 +11,9 @@ Profiles:
   thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
   buyback-radar — buyback snapshots, consumer shards, and the two books it patches
   activist     — Data Pipeline activist job (downloads trees, third-party analyses, desk-brief inputs)
+  fact_currency — Research quality currency scan (valuation models, fact ledgers, companyfacts)
+  graph_invariants — Research quality graph job (every tree it reads; no filing archives)
+  graph_invariants_sources — cited sources graph_build would find missing (second pass)
 
 Base paths (_system, .github, and for most profiles the whole dashboard
 tree) are set by ci_checkout_workspace.sh. This script emits the extra
@@ -77,6 +80,128 @@ def tracked_company_dirs() -> list[str]:
         for name in result.stdout.splitlines()
         if name and name not in skip and not name.startswith(".")
     )
+
+
+def anchored(rel: str) -> str:
+    """A tracked path as a literal, root-anchored sparse pattern."""
+    return "/" + re.sub(r"([*?\[\\])", r"\\\1", rel.rstrip("/"))
+
+
+def tracked_files() -> list[str]:
+    """Every file at HEAD. Trees are fetched even under --filter=blob:none."""
+    import subprocess
+
+    result = subprocess.run(
+        ["git", "ls-tree", "-r", "-z", "--name-only", "HEAD"],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise SystemExit(result.stderr.decode("utf-8", "replace").strip() or "git ls-tree failed")
+    return [name for name in result.stdout.decode("utf-8").split("\0") if name]
+
+
+def tracked_dirs(files: list[str]) -> set[str]:
+    dirs: set[str] = set()
+    for name in files:
+        parts = name.split("/")[:-1]
+        for depth in range(1, len(parts) + 1):
+            dirs.add("/".join(parts[:depth]))
+    return dirs
+
+
+def literal_patterns(rels, files: set[str], dirs: set[str]) -> list[str]:
+    """Anchored patterns for tracked files and whole tracked folders; others dropped."""
+    patterns = []
+    for rel in sorted(set(rels)):
+        if rel in files:
+            patterns.append(anchored(rel))
+        elif rel in dirs:
+            patterns.append(anchored(rel) + "/**")
+    return patterns
+
+
+def _json_strings(node) -> list[str]:
+    if isinstance(node, str):
+        return [node]
+    if isinstance(node, dict):
+        return [s for value in node.values() for s in _json_strings(value)]
+    if isinstance(node, list):
+        return [s for value in node for s in _json_strings(value)]
+    return []
+
+
+def graph_invariants_paths() -> list[str]:
+    """Everything the graph-invariants job reads, without the filing archives.
+
+    The job lists every top-level folder, reads every ticker's research tree,
+    all of _system, the root docs, and the P6 feeds graph_sources.json names.
+    The filing trees (investor-documents and the like, ~44 GiB) are read only
+    where a fact or belief cites one file, and graph_invariants_sources adds
+    those after this pass. Top-level files of every folder stay, so the set
+    of folders the checks iterate is the same as on a full checkout.
+    """
+    files = tracked_files()
+    # Non-cone matching takes the last pattern that matches each path, and a
+    # folder that matches "!/*/*/" hides its files from a bare "/_system/".
+    # The "/**" forms match the files themselves.
+    patterns = [
+        "/*",
+        "!/*/",
+        "/*/*",
+        "!/*/*/",
+        "/*/research/**",
+        "/_system/**",
+        # Activist PDFs (~2 GiB). Nothing in the job opens them.
+        "!/_system/reference/activist-reports/**",
+        "/.github/**",
+        "/docs/**",
+    ]
+    has_top_file: set[str] = set()
+    for name in files:
+        parts = name.split("/")
+        if len(parts) == 2 or (len(parts) > 2 and parts[1] == "research"):
+            has_top_file.add(parts[0])
+    # A folder holding only subfolders would vanish from the listing; one of
+    # its files keeps it there.
+    keep_folder: dict[str, str] = {}
+    for name in files:
+        top = name.split("/", 1)[0]
+        if "/" in name and top not in has_top_file:
+            keep_folder.setdefault(top, name)
+    patterns.extend(anchored(name) for _, name in sorted(keep_folder.items()))
+    # P6 feed paths and any other repo path the graph config names.
+    config_path = ROOT / "_system" / "graph" / "graph_sources.json"
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"cannot read {config_path}: {exc}")
+    named = [value.strip().rstrip("/") for value in _json_strings(config)]
+    patterns.extend(literal_patterns(named, set(files), tracked_dirs(files)))
+    return patterns
+
+
+def graph_invariants_sources() -> list[str]:
+    """Cited source paths that are tracked but not in the worktree.
+
+    E5 checks that each source a fact or belief cites exists on disk, and
+    graph_build is what decides which paths those are. Asking it, rather than
+    keeping a second parser here, means the checkout and the check cannot
+    disagree about what is cited.
+    """
+    sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+    import graph_build
+
+    builder = graph_build.GraphBuilder(ROOT)
+    builder.build()
+    files = tracked_files()
+    missing = [
+        os.path.normpath(str(node.get("path") or "")).replace("\\", "/")
+        for node in builder.nodes.values()
+        if node.get("type") == "Source" and node.get("status") == "missing"
+    ]
+    return literal_patterns(missing, set(files), tracked_dirs(files))
 
 
 def desk_brief_inputs() -> list[str]:
@@ -234,6 +359,24 @@ def paths_for_profile(profile: str) -> list[str]:
             )
         paths.extend(desk_brief_inputs())
         return paths
+
+    if profile == "fact_currency":
+        # ci_checkout_workspace.sh passes "listed". The scanner globs these two
+        # files per ticker and opens every source ref ending in
+        # sec_companyfacts.json; the unanchored last pattern takes every
+        # tracked file a ref like that can name.
+        return [
+            "/_system/scripts/",
+            "/*/research/valuation.json",
+            "/*/research/valuation_fact_ledger.json",
+            "*sec_companyfacts.json",
+        ]
+
+    if profile == "graph_invariants":
+        return graph_invariants_paths()
+
+    if profile == "graph_invariants_sources":
+        return graph_invariants_sources()
 
     raise SystemExit(f"Unknown sparse profile: {profile}")
 

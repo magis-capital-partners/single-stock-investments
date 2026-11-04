@@ -235,3 +235,215 @@ def test_no_usable_previous_run_falls_back_to_the_last_commit(tmp_path):
     assert base == "HEAD~1"
     base, _ = run_history_selection(tmp_path / "unknown", "f" * 40)
     assert base == "HEAD~1"
+
+
+def checkout_run(job: str) -> str:
+    steps = load()["jobs"][job]["steps"]
+    return next(str(s["run"]) for s in steps if "ci_checkout_workspace.sh" in str(s.get("run", "")))
+
+
+def test_scheduled_jobs_no_longer_check_out_the_full_tree():
+    """The ~53 GiB tree timed out fact-ledger-currency after 45 minutes (run
+    41710891780) and ran graph-invariants out of disk (run 41795979498)."""
+    assert "ci_checkout_workspace.sh fact_currency " in checkout_run("fact-ledger-currency")
+    assert "ci_checkout_workspace.sh graph_invariants " in checkout_run("graph-invariants")
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert "ci_checkout_workspace.sh full" not in text
+    for job in ("fact-ledger-currency", "graph-invariants"):
+        step = next(s for s in load()["jobs"][job]["steps"] if "ci_checkout_workspace.sh" in str(s.get("run", "")))
+        assert step.get("timeout-minutes"), job
+
+
+def test_graph_invariants_keeps_the_lane_history_deepen():
+    steps = load()["jobs"]["graph-invariants"]["steps"]
+    names = [str(s.get("name", "")) for s in steps]
+    checkout = next(i for i, n in enumerate(names) if n.startswith("Checkout workspace"))
+    deepen = next(i for i, n in enumerate(names) if n.startswith("Deepen commit history"))
+    assert checkout < deepen
+    assert "--deepen=400" in steps[deepen]["run"]
+
+
+def test_a_pr_changing_the_checkout_wiring_runs_both_checkout_jobs(tmp_path):
+    for name in (
+        ".github/workflows/research-quality.yml",
+        "_system/scripts/ci_checkout_workspace.sh",
+        "_system/scripts/ci_resolve_checkout_ref.sh",
+        "_system/scripts/ci_sparse_checkout_paths.py",
+    ):
+        outputs = classify(tmp_path, "pull_request", [name])
+        assert outputs["fact_currency"] == "true", name
+        assert outputs["graph_invariants"] == "true", name
+        assert name in triggers()["pull_request"]["paths"], name
+        assert name in triggers()["push"]["paths"], name
+
+
+CHECKOUT_SCRIPTS = (
+    "ci_checkout_workspace.sh",
+    "ci_resolve_checkout_ref.sh",
+    "ci_sparse_checkout_paths.py",
+)
+
+# Stands in for graph_build in the fixture repo: every fact-ledger ref is a
+# Source node, missing when it is not on disk, as in the real builder.
+FAKE_GRAPH_BUILD = '''
+import json
+from pathlib import Path
+
+
+class GraphBuilder:
+    def __init__(self, root):
+        self.root = Path(root)
+        self.nodes = {}
+
+    def build(self):
+        for ledger in sorted(self.root.glob("*/research/valuation_fact_ledger.json")):
+            for fact in json.loads(ledger.read_text(encoding="utf-8"))["facts"]:
+                ref = fact["source"]["ref"]
+                exists = (self.root / ref).exists()
+                self.nodes["source:" + ref] = {"type": "Source", "path": ref,
+                                               "status": "present" if exists else "missing"}
+'''
+
+
+def run_profile(tmp_path: Path, profile: str, files: dict[str, str]) -> set[str]:
+    """Run ci_checkout_workspace.sh against a fixture origin; return the worktree files."""
+    git = shutil.which("git")
+    if not git or not shutil.which("bash"):
+        pytest.skip("needs bash and git")
+    env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@x",
+           "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@x"}
+    for key in ("GITHUB_WORKSPACE", "GITHUB_EVENT_NAME", "GITHUB_REF", "GITHUB_REF_NAME", "GITHUB_HEAD_REF"):
+        env.pop(key, None)
+    origin = tmp_path / "origin"
+    files = dict(files)
+    for name in CHECKOUT_SCRIPTS:
+        files[f"_system/scripts/{name}"] = (ROOT / "_system" / "scripts" / name).read_text(encoding="utf-8")
+    files["_system/scripts/graph_build.py"] = FAKE_GRAPH_BUILD
+    for rel, content in files.items():
+        path = origin / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+
+    def run(cwd: Path, *args: str, stdin: str | None = None) -> str:
+        proc = subprocess.run([git, *args], cwd=cwd, env=env, input=stdin,
+                              capture_output=True, text=True, check=False)
+        assert proc.returncode == 0, (args, proc.stderr)
+        return proc.stdout
+
+    run(origin, "init", "-q", "-b", "main")
+    run(origin, "config", "uploadpack.allowFilter", "true")
+    run(origin, "config", "uploadpack.allowAnySHA1InWant", "true")
+    run(origin, "add", "-A")
+    run(origin, "commit", "-q", "-m", "fixture")
+    sha = run(origin, "rev-parse", "HEAD").strip()
+
+    # The workflow's bootstrap: actions/checkout of the three checkout scripts.
+    work = tmp_path / "work"
+    work.mkdir()
+    run(work, "init", "-q")
+    run(work, "remote", "add", "origin", origin.as_uri())
+    run(work, "sparse-checkout", "init", "--no-cone")
+    run(work, "sparse-checkout", "set", "--stdin",
+        stdin="".join(f"/_system/scripts/{name}\n" for name in CHECKOUT_SCRIPTS))
+    run(work, "fetch", "-q", "--depth=1", "--filter=blob:none", "origin", sha)
+    run(work, "checkout", "-q", "--detach", "FETCH_HEAD")
+
+    proc = subprocess.run(["bash", "_system/scripts/ci_checkout_workspace.sh", profile, sha],
+                          cwd=work, env=env, capture_output=True, text=True, check=False)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    return {
+        path.relative_to(work).as_posix()
+        for path in work.rglob("*")
+        if path.is_file() and ".git" not in path.relative_to(work).parts
+    }
+
+
+def test_fact_currency_checks_out_what_the_scan_opens(tmp_path):
+    present = run_profile(tmp_path, "fact_currency", {
+        "AAA/research/valuation.json": "{}",
+        "AAA/research/valuation_fact_ledger.json": "{}",
+        "AAA/research/evidence/sec_companyfacts.json": "{}",
+        "BBB/research/evidence/archive/old_sec_companyfacts.json": "{}",
+        "AAA/research/thesis.md": "t",
+        "AAA/research/evidence/filing_digest.md": "d",
+        "AAA/investor-documents/sec-edgar/10-K.htm": "filing",
+        "_system/scripts/scan_fact_ledger_currency.py": "",
+        "_system/data/big.json": "{}",
+        ".github/workflows/w.yml": "on: push",
+    })
+    for rel in (
+        "AAA/research/valuation.json",
+        "AAA/research/valuation_fact_ledger.json",
+        "AAA/research/evidence/sec_companyfacts.json",
+        # Any ref ending in sec_companyfacts.json is one the scanner resolves.
+        "BBB/research/evidence/archive/old_sec_companyfacts.json",
+        "_system/scripts/scan_fact_ledger_currency.py",
+        ".github/workflows/w.yml",
+    ):
+        assert rel in present, rel
+    for rel in (
+        "AAA/research/thesis.md",
+        "AAA/research/evidence/filing_digest.md",
+        "AAA/investor-documents/sec-edgar/10-K.htm",
+        "_system/data/big.json",
+    ):
+        assert rel not in present, rel
+
+
+def test_graph_invariants_checks_out_its_trees_and_only_the_cited_filings(tmp_path):
+    cited = "AAA/investor-documents/sec-edgar/10-K [2025] *final*.htm"
+    ledger = {"facts": [
+        {"locked": True, "source": {"ref": cited}},
+        {"locked": True, "source": {"ref": "AAA/research/evidence/sec_companyfacts.json"}},
+        {"locked": True, "source": {"ref": "AAA/investor-documents/never-committed.pdf"}},
+    ]}
+    sources = {"feeds": [{"path": "dashboard/data/insights/podcasts.json"}, {"path": "dashboard/data/tickers"}]}
+    present = run_profile(tmp_path, "graph_invariants", {
+        "README.md": "root doc",
+        "AAA/README.md": "a",
+        "AAA/research/valuation_fact_ledger.json": json.dumps(ledger),
+        "AAA/research/evidence/sec_companyfacts.json": "{}",
+        "AAA/research/evidence/_text/10-K.txt": "text",
+        cited: "cited filing",
+        "AAA/investor-documents/sec-edgar/10-Q.htm": "uncited filing",
+        "AAA/third-party-analyses/report.pdf": "pdf",
+        "AAA/official-reports/annual.pdf": "pdf",
+        # A folder with no top-level file still has to be listed.
+        "BBB/sub/only.txt": "only",
+        "_system/scripts/x.py": "",
+        "_system/memory/MEMORY.md": "beliefs",
+        "_system/graph/graph_sources.json": json.dumps(sources),
+        "_system/reference/activist-reports/AAA/report.pdf": "pdf",
+        "_system/reference/investment-wisdom/INDEX.md": "wisdom",
+        "dashboard/index.html": "html",
+        "dashboard/data/insights/podcasts.json": "{}",
+        "dashboard/data/tickers/AAA.json": "{}",
+        "dashboard/data/aggregates/big.json": "{}",
+        "docs/RETIRED.md": "retired",
+        ".github/workflows/w.yml": "on: push",
+    })
+    for rel in (
+        "README.md",
+        "AAA/README.md",
+        "AAA/research/valuation_fact_ledger.json",
+        "AAA/research/evidence/_text/10-K.txt",
+        cited,
+        "BBB/sub/only.txt",
+        "_system/scripts/x.py",
+        "_system/memory/MEMORY.md",
+        "_system/reference/investment-wisdom/INDEX.md",
+        "dashboard/index.html",
+        "dashboard/data/insights/podcasts.json",
+        "dashboard/data/tickers/AAA.json",
+        "docs/RETIRED.md",
+        ".github/workflows/w.yml",
+    ):
+        assert rel in present, rel
+    for rel in (
+        "AAA/investor-documents/sec-edgar/10-Q.htm",
+        "AAA/third-party-analyses/report.pdf",
+        "AAA/official-reports/annual.pdf",
+        "_system/reference/activist-reports/AAA/report.pdf",
+        "dashboard/data/aggregates/big.json",
+    ):
+        assert rel not in present, rel
