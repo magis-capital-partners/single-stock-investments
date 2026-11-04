@@ -2,18 +2,18 @@
   "schema_version": "1.0",
   "draft_id": "290e1242482eb2878775b1a4",
   "work_id": "290e1242482eb2878775b1a4",
-  "input_sha": "f45df0ae59501ca2bb8dce6cbcbd6f7a88c2cc0a",
+  "input_sha": "250160c851caf579683a07b81483e5d70eeea89a",
   "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
   "contract_hash": "50c7e6ea066142ed07e03bc9c82bc3f22c92acefe0c9a691f3bd452233fc7fc9",
   "status": "awaiting_review",
   "author_receipt": {
-    "authored_at": "2026-11-02T10:55:00Z",
+    "authored_at": "2026-11-04T17:34:00Z",
     "author": "marvin-cloud-agent",
     "model_id": "composer-2.5",
-    "prompt_version": "cloud_marvin_runbook_2026-11-02",
+    "prompt_version": "cloud_marvin_runbook_2026-11-04",
     "analysis_run_id": "epistemic_author_forecast:290e1242482eb2878775b1a4",
-    "evidence_hash": "f4ab06cd94beaa5d174588de6fe9ae327d5d8235faf7dbad0ba89c233e4027a0",  // pragma: allowlist secret
-    "epistemic_input_sha": "f45df0ae59501ca2bb8dce6cbcbd6f7a88c2cc0a",
+    "evidence_hash": "64732688ca53afbee89a5b9899929e7a0bce01b562ac93549593ad38e2054d36",  // pragma: allowlist secret
+    "epistemic_input_sha": "250160c851caf579683a07b81483e5d70eeea89a",
     "contract_hash": "50c7e6ea066142ed07e03bc9c82bc3f22c92acefe0c9a691f3bd452233fc7fc9",
     "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
     "source_preflight": {
@@ -38,8 +38,8 @@
       "resolve_spec_fy2025_adapter": "fact_ledger",
       "resolve_spec_fy2025_blocker": null,
       "resolve_spec_fy2026_blocker": "period_end_mismatch",
-      "verified_at": "2026-11-02T10:56:00Z",
-      "method": "falsifier_evidence_adapters.resolve_spec with measurement_period_end=2025-12-31 fiscal_year=2025; FY2026 correctly unobservable at registration"
+      "verified_at": "2026-11-04T17:34:00Z",
+      "method": "falsifier_evidence_adapters.resolve_spec with replay measurement_period_end=2025-12-31 fiscal_year=2025; forward FY2026 target unobservable at registration (2026-11-04)"
     },
     "calibration_release_hash": null,
     "route": "quality_reinvestment",
@@ -47,33 +47,33 @@
     "calibration_response": "not_applicable",
     "calibration_note": "Epistemic loop health_state=COLLECTING; calibration_status=insufficient_outcomes; release_hash=null. Calibration cannot change this analysis.",
     "rejection_remediation": [
-      "source_recipe_incompatible: remediated — observation_plan.source_adapter=fact_ledger with source_hint normalized_owner_earnings_m; sec_companyfacts_ttm accepts only 10-Q/10-K and returns ttm_period_inputs_missing for ASML 20-F EUR rows.",
-      "unit_mismatch: remediated — canonical_unit and source_unit are USD millions; ledger field normalized_owner_earnings_m carries evidenced EUR/USD fx_conversion from FY2025 20-F companyfacts.",
-      "historical_replay_not_adapter_verified: remediated — resolve_spec(FY2025) via fact_ledger reproduces 13,024.816 USD millions matching observation_plan.historical_replay.replay_value."
+      "source_recipe_incompatible: remediated \u2014 observation_plan.source_adapter=fact_ledger with source_hint normalized_owner_earnings_m; sec_companyfacts_ttm accepts only 10-Q/10-K and returns ttm_period_inputs_missing for ASML 20-F EUR rows.",
+      "unit_mismatch: remediated \u2014 canonical_unit and source_unit are USD millions; ledger field normalized_owner_earnings_m carries evidenced EUR/USD fx_conversion from FY2025 20-F companyfacts.",
+      "historical_replay_not_adapter_verified: remediated \u2014 resolve_spec(FY2025) via fact_ledger reproduces 13,024.816 USD millions matching observation_plan.historical_replay.replay_value."
     ],
     "epistemic_work_receipt": {
       "work_id": "290e1242482eb2878775b1a4",
       "task_type": "author_forecast",
       "disposition": "success",
-      "published_input_sha": "f45df0ae59501ca2bb8dce6cbcbd6f7a88c2cc0a"
+      "published_input_sha": "250160c851caf579683a07b81483e5d70eeea89a"
     }
   },
   "review_receipt": null,
   "rejection_reasons": [],
   "spec": {
     "spec_id": "asml-opbiz-oe-2026fy-v5",
-    "spec_revision": 18,
+    "spec_revision": 19,
     "spec_schema_version": "3.0",
     "forecast_class": "ex_ante",
     "forecast_role": "primary",
-    "authored_at": "2026-11-02T10:55:00Z",
-    "information_cutoff_at": "2026-11-02T10:55:00Z",
-    "registered_at": "2026-11-02T10:55:00Z",
+    "authored_at": "2026-11-04T17:34:00Z",
+    "information_cutoff_at": "2026-11-04T17:34:00Z",
+    "registered_at": "2026-11-04T17:34:00Z",
     "registration_commit": "pending",
     "analysis_run_id": "epistemic_author_forecast:290e1242482eb2878775b1a4",
     "author": "marvin-cloud-agent",
     "model_id": "composer-2.5",
-    "prompt_version": "cloud_marvin_runbook_2026-11-02",
+    "prompt_version": "cloud_marvin_runbook_2026-11-04",
     "contract_hash": "50c7e6ea066142ed07e03bc9c82bc3f22c92acefe0c9a691f3bd452233fc7fc9",
     "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
     "method_id": "owner_earnings_reinvestment_dcf",
