@@ -162,9 +162,9 @@ case "$PROFILE" in
     # (run 41710891780). The path script reads only the graph config here.
     git sparse-checkout init --no-cone
     git sparse-checkout set \
-      .github \
-      _system/scripts/ci_sparse_checkout_paths.py \
-      _system/graph/graph_sources.json
+      /.github/ \
+      /_system/scripts/ci_sparse_checkout_paths.py \
+      /_system/graph/graph_sources.json
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     apply_sparse_paths listed
