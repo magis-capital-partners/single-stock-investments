@@ -15,7 +15,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/ci_resolve_checkout_ref.sh"
 
-PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f|buyback-radar|downloads|drive|activist}"
+PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f|buyback-radar|downloads|drive|activist|fact_currency|graph_invariants}"
 REF_INPUT="${2:-}"
 FETCH_DEPTH="${3:-}"
 
@@ -155,6 +155,31 @@ case "$PROFILE" in
     checkout_ref
     apply_sparse_paths listed
     git read-tree -mu HEAD
+    ;;
+  fact_currency|graph_invariants)
+    # Research quality. A full checkout (~53 GiB, 44 of it filing archives)
+    # ran the runner out of disk (run 41795979498) or past the step limit
+    # (run 41710891780). The path script reads only the graph config here.
+    git sparse-checkout init --no-cone
+    git sparse-checkout set \
+      .github \
+      _system/scripts/ci_sparse_checkout_paths.py \
+      _system/graph/graph_sources.json
+    git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
+    checkout_ref
+    apply_sparse_paths listed
+    git read-tree -mu HEAD
+    if [ "$PROFILE" = "graph_invariants" ]; then
+      # E5 checks that every cited source exists. graph_build names the cited
+      # filings that are tracked but outside the profile; check those out too.
+      sources=$(mktemp)
+      python3 "$SCRIPT_DIR/ci_sparse_checkout_paths.py" graph_invariants_sources >"$sources"
+      echo "Cited sources outside the profile: $(grep -c . "$sources" || true)"
+      if [ -s "$sources" ]; then
+        git sparse-checkout add --stdin <"$sources"
+      fi
+      rm -f "$sources"
+    fi
     ;;
   *)
     echo "Unknown checkout profile: $PROFILE" >&2
