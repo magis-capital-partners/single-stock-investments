@@ -4,11 +4,11 @@
   "stages": {
     "identity": {
       "status": "complete",
-      "at": "2026-07-29T20:34:01.975012Z"
+      "at": "2026-11-04T10:04:03.584734Z"
     },
     "collection": {
       "status": "partial",
-      "at": "2026-07-29T20:34:03.804882Z",
+      "at": "2026-11-04T10:04:04.024014Z",
       "results": [
         {
           "returncode": 1,
@@ -17,7 +17,7 @@
         },
         {
           "returncode": 0,
-          "stdout": "2026-07-29T16:34:02.819111 Starting download for DIA\n2026-07-29T16:34:03.007200 SEC filings downloaded: 0\n2026-07-29T16:34:03.007200 IR PDF URLs found: 0\n2026-07-29T16:34:03.007200 Done DIA. SEC=0 IR=0/0\n",
+          "stdout": "2026-11-04T10:04:03.781469 Starting download for DIA\n2026-11-04T10:04:03.940755 SEC filings downloaded: 0\n2026-11-04T10:04:03.940860 IR PDF URLs found: 0\n2026-11-04T10:04:03.941202 Done DIA. SEC=0 IR=0/0\n",
           "stderr": ""
         },
         {
@@ -29,26 +29,47 @@
     },
     "model_compile": {
       "status": "evidence_blocked",
-      "at": "2026-07-29T20:34:03.806888Z",
-      "method_id": "owner_earnings_reinvestment_dcf",
-      "input_errors": [
-        "normalized_owner_earnings_m: missing locked fact",
-        "shares_outstanding: missing locked fact",
-        "cash_m: missing locked fact",
-        "debt_m: missing locked fact"
-      ]
+      "at": "2026-11-04T10:04:04.026365Z",
+      "method_id": null,
+      "input_errors": []
     },
     "decision_contract": {
       "status": "complete",
-      "at": "2026-07-29T20:34:04.540108Z",
+      "at": "2026-11-04T10:04:04.856379Z",
       "result": {
         "returncode": 0,
-        "stdout": "universe: scope=all tickers=1\n[1/6] routes: 1 processed, 0 errors\n[2/6] contracts: 1 ready, 0 model scaffolds, 0 missing, 0 errors\n[3/6] workbenches: 1 built, 0 skipped, 0 errors\n[4/6] pricing: 0 priced, 0 errors\n[5/6] committees: 0 initialized, 0 blocked, 0 evidence tasks\n[6/6] dashboard: skipped\nsummary: _system/reviews/pending/power_zone_security_run_2026-07-29_dia.json\n",
+        "stdout": "[1/8] universe tiers: T1=40 T2=12 T3=821\nuniverse: scope=all tickers=1\n[2/8] routes: 1 processed, 0 errors\n[3/8] contracts: 1 ready, 0 model scaffolds, 0 missing, 0 errors\n[4/8] workbenches: 1 built, 0 skipped, 0 errors\n[5/8] pricing: 0 priced, 0 errors\n[6/8] committees: 0 initialized, 0 blocked, 0 evidence tasks, 1 outside Tier 1\n[7/8] Tier 1 readiness: 40 names, 4 research blocked, 0 need model depth, 0 committee ready\n[8/8] dashboard: skipped\nsummary: _system/data/runs/power_zone_security_run_2026-11-04_dia.json\n",
         "stderr": ""
       }
+    },
+    "ssi_report": {
+      "status": "complete",
+      "at": "2026-11-04T10:04:05.120514Z",
+      "results": [
+        {
+          "returncode": 0,
+          "stdout": "[ok] DIA/research/evidence/ssi_evidence_pack_2026-11-04.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DIA/research/evidence/ssi_claims_2026-11-04.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DIA/research/evidence/ssi_verified_claims_2026-11-04.json\n[ok] DIA/research/evidence/ssi_time_zero_2026-11-04.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DIA/research/ssi_report_2026-11-04.md (gate: see ssi_report_gate_2026-11-04.json)\n",
+          "stderr": ""
+        }
+      ]
     }
   },
-  "updated_at": "2026-07-29T20:34:04.540108Z",
+  "updated_at": "2026-11-04T10:04:04.856362Z",
   "full_rerun": true,
   "status": "evidence_blocked"
 }

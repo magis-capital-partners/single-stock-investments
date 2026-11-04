@@ -45,13 +45,12 @@
   },
   "method_route": {
     "schema_version": "2.0",
-    "status": "routed",
+    "status": "default_needs_review",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 16.0,
+    "score": 0.0,
     "reasons": [
-      "archetype=compounder",
-      "explicit reviewed profile"
+      "No decisive classification was supplied; owner-earnings is the conservative operating default."
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -72,7 +71,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marks_credit_cycle",
+      "moi",
       "pabrai",
       "stahl"
     ],
@@ -95,11 +96,8 @@
         "reasons": []
       },
       "quality_reinvestment": {
-        "score": 16.0,
-        "reasons": [
-          "archetype=compounder",
-          "explicit reviewed profile"
-        ]
+        "score": 0.0,
+        "reasons": []
       },
       "capital_cycle": {
         "score": 0.0,
@@ -124,12 +122,12 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "DIA",
-    "as_of": "2026-07-29",
+    "as_of": "2026-11-04",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "compounder",
+      "archetype": "unknown",
       "moat": "unproven",
       "dhando": "pending",
       "stance": "watch",
@@ -162,8 +160,8 @@
         }
       ]
     },
-    "input_hash": "48eac31e9ace75639e8004f3b0441218217e7e12151ed783d69e36a60e75352b",
-    "generated_at": "2026-07-29T20:34:04.498266+00:00"
+    "input_hash": "f0912f071f74979e6aff35234102d1bffb0a3b308837fd17a0725f3fda84e6cb",
+    "generated_at": "2026-11-04T10:04:04.732517+00:00"
   },
   "market": {
     "price_per_share": 517.94,
@@ -287,7 +285,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "c945879805940f5c880d64c7e60ab15b5b2a390b4ffecfcd6fcc1efdaad38e33",
+    "model_hash": "64643ddbaec5d9b90d791fc39f81e19995199d98687c443be48ed36f01014b11",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
@@ -295,9 +293,9 @@
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
   "shared_forecast": {
     "schema_version": "1.0",
-    "method_version": "shared-valuation-forecast/1.1",
+    "method_version": "shared-valuation-forecast/1.3",
     "ticker": "DIA",
-    "status": "model_gap",
+    "status": "sync_gap",
     "research_only": true,
     "requires_human_review": false,
     "capital_actionable": false,
@@ -306,10 +304,9 @@
     "quote": {
       "value": 517.94,
       "as_of": "2026-07-20",
-      "source_url": "Yahoo DIA close 2026-07-20",
-      "currency": null
+      "source_url": "Yahoo DIA close 2026-07-20"
     },
-    "forecast_hash": "1ebec4edf252b32e9bffb71121e06ed60c7272e51bfeb72f3d9e1a8c68cd6a39",
+    "forecast_hash": null,
     "forward_irr_pct": {
       "low": null,
       "base": null,
@@ -335,17 +332,31 @@
     "components": [],
     "gaps": [
       {
-        "code": "issuer_forecast_missing"
+        "code": "listing_calendar_or_completed_close_unverified"
+      },
+      {
+        "code": "corporate_action_history_unverified"
       }
     ],
     "warnings": [],
     "source_refs": [],
-    "next_action": "automatic_model_refresh",
+    "next_action": "automatic_source_refresh",
     "reconciliation": {
       "passed": false
     },
     "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
-    "calculation_id": "5caf1c062d8546cda6d111fc43ae1d71187b040c208fa73e0d2d8359e0df6174"
+    "financial_period": null,
+    "market_sync": {
+      "status": "updating",
+      "price_as_of": "2026-07-20",
+      "financial_period": null,
+      "model_as_of": "2026-07-20",
+      "price_policy": "latest_completed_exchange_session",
+      "basis_id": null,
+      "latest_report": {}
+    },
+    "assumptions_as_of": "2026-07-20",
+    "calculation_id": "27d4a3a6d910f5c1055f93afa5ab1beebe371ffc523a6d0e3c507811b3bef421"
   },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": false,
