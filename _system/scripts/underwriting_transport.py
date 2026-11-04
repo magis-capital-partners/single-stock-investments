@@ -125,7 +125,7 @@ def _content_segments(text):
     return parts
 
 
-def _pack_dense(payload, segments):
+def _pack_dense(payload, segments, minimum_shared_length=30):
     schemas, whole, counts = Counter(), Counter(), Counter()
     markers = {'$s', '$o', '$text'}
     def count(value):
@@ -148,7 +148,7 @@ def _pack_dense(payload, segments):
             strings.append(text)
         return '@'+str(string_ids[text])
     def shared(text):
-        return counts[text] >= 2 and len(text) > 30
+        return counts[text] >= 2 and len(text) > minimum_shared_length
     def convert(value):
         if isinstance(value, dict):
             keys = tuple(value)
@@ -180,7 +180,12 @@ def _pack_dense(payload, segments):
 
 
 def pack(payload):
-    return min((_pack_dense(payload,_segments), _pack_dense(payload,_content_segments)),key=lambda e:len(encoded(e)))
+    # Primary document IDs and dates are short but repeat across many facts.
+    # Keep the original layouts: reference overhead can outweigh their savings
+    # on small packets. Every candidate has the same verified decoded payload.
+    return min((_pack_dense(payload, segments, threshold)
+                for threshold in (30, 8) for segments in (_segments, _content_segments)),
+               key=lambda e:len(encoded(e)))
 
 
 def unpack(envelope):

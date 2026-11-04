@@ -105,6 +105,48 @@ def test_transport_reduces_repeated_source_metadata_without_replacing_facts():
     assert unpack(pack(payload))['packet']['observations'] == observations
 
 
+def test_short_primary_identifiers_and_dates_fit_without_losing_evidence():
+    from underwriting_codex import validate_input
+    observations = [
+        {'id': 'obs_'+str(i), 'document_id': 'doc_0123456789abcdef',
+         'period': '2026-06-30', 'start': '2026-01-01', 'filed': '2026-08-01',
+         'source_kind': 'primary_company_facts', 'field': 'OperatingCashFlow',
+         'value': i, 'unit': 'USD', 'source_url': 'https://issuer.test/source'}
+        for i in range(1500)]
+    # Unique source text cannot be discarded to make room for provenance.
+    # The previous layout exceeds the actual native limit on this packet.
+    payload = {'evidence': 'Z'*850_000+' 日本語 😃 @0\r\n',
+               'packet': {'observations': observations}}
+    original_hash = digest(payload)
+    assert len(json.dumps(payload)) > 1_048_576
+    assert unpack(pack(payload)) == payload
+    validate_input(render(payload))
+    assert digest(payload) == original_hash
+
+
+def test_saved_paid_author_is_reused_before_rendering_or_model_admission(tmp_path, monkeypatch):
+    import underwriting_pipeline as pipeline
+    import underwriting_transport as transport
+    from test_underwriting_pipeline import company_root
+    company_root(tmp_path)
+    payload = {'packet': packet(), 'revision_feedback': None}
+    identity = pipeline.stage_hash(tmp_path, 'author', payload)
+    cache = tmp_path/'work/cache/TEST'/identity
+    answer = contract(payload['packet'])
+    receipt = {'status': 'finished', 'input_hash': identity, 'agent_id': 'paid-author'}
+    write(cache/'output.json', answer)
+    write(cache/'receipt.json', receipt)
+    receipt_bytes = (cache/'receipt.json').read_bytes()
+    monkeypatch.setattr(transport, 'render', lambda *args: pytest.fail('Paid input was rendered again'))
+    monkeypatch.setattr(pipeline, 'evaluate', lambda **kwargs: pytest.fail('Paid input reached admission'))
+    state = {}
+    result, reused = pipeline.call_stage(tmp_path, tmp_path/'work', 'TEST', 'author', payload, state,
+        execute=lambda *args: pytest.fail('Paid author was repeated'))
+    assert result == answer and reused == receipt and state == {}
+    assert (cache/'receipt.json').read_bytes() == receipt_bytes
+    assert not (tmp_path/'work/ledger.jsonl').exists()
+
+
 def test_deterministic_assembly_needs_no_provider_and_rejects_a_forged_receipt():
     p, c = packet(), contract()
     model, compiler = compiled_build(p, c, review(c))
