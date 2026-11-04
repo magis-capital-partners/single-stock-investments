@@ -1,4 +1,4 @@
-# ANET — Insider conviction (2026-10-13)
+# ANET — Insider conviction (2026-11-03)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- Ullal Jayshree: 18656 @ $217.0958 on 2026-10-09 (10b5-1)
-- Ullal Jayshree: 18656 @ $217.0958 on 2026-10-09 (10b5-1)
-- Ullal Jayshree: 93241 @ $217.0958 on 2026-10-09 (10b5-1)
+- BECHTOLSHEIM ANDREAS: 13617 @ $167.506 on 2026-10-30 (10b5-1)
+- BECHTOLSHEIM ANDREAS: 27061 @ $168.4776 on 2026-10-30 (10b5-1)
+- BECHTOLSHEIM ANDREAS: 11845 @ $169.3737 on 2026-10-30 (10b5-1)
 
 Source: `_system/reference/market-data/insider/ANET_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

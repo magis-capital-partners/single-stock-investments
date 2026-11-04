@@ -242,10 +242,10 @@
 | DIA | no_hit | — | — | No activist index hits |
 | DIS | no_hit | — | — | No activist index hits |
 | DJT | no_hit | — | — | No activist index hits |
-| DKNG | no_hit | — | — | No activist index hits |
+| DKNG | indexed | L0/S1 | 2025-10-03 | 0 long, 1 short indexed; 0 short feed-eligible |
 | DLR | no_hit | — | — | No activist index hits |
-| DLTR | no_hit | — | — | No activist index hits |
-| DMLP | no_hit | — | — | No activist index hits |
+| DLTR | indexed | L15/S0 | 2026-06-25 | 15 long, 0 short indexed; 0 short feed-eligible |
+| DMLP | indexed | L3/S0 | 2024-12-23 | 3 long, 0 short indexed; 0 short feed-eligible |
 | DNN | no_hit | — | — | No activist index hits |
 | DNP.WA | no_hit | — | — | No activist index hits |
 | DOC | no_hit | — | — | No activist index hits |

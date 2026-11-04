@@ -238,14 +238,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-04.
 | DIA | DIA/ | DIA | US | 2026-10-25 | 2026-11-04 | unknown | watch |
 | DIS | DIS/ | Walt Disney Company (The) | US | 2026-10-25 | 2026-11-04 | unknown | watch |
 | DJT | DJT/ | DJT | US | 2026-10-25 | 2026-11-04 | unknown | watch |
-| DKNG | DKNG/ | DKNG | US | 2026-10-25 | 2026-11-04 | unknown | watch |
-| DLR | DLR/ | Digital Realty | US | 2026-10-25 | 2026-11-04 | unknown | watch |
-| DLTR | DLTR/ | Dollar Tree | US | 2026-07-29 | 2026-11-04 | unknown | watch |
-| DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-11-04 | unknown | watch |
-| DNN | DNN/ | DNN | US | 2026-07-29 | 2026-11-04 | unknown | watch |
-| DNP.WA | DNP.WA/ | Dino Polska S.A. | EU | 2026-07-27 | 2026-11-04 | compounder | watch |
-| DOC | DOC/ | Healthpeak Properties | US | 2026-07-29 | 2026-11-04 | unknown | watch |
-| DOV | DOV/ | Dover Corporation | US | 2026-07-29 | 2026-11-04 | unknown | watch |
+| DKNG | DKNG/ | DKNG | US | 2026-11-04 | 2026-11-04 | unknown | watch |
+| DLR | DLR/ | Digital Realty | US | 2026-11-04 | 2026-11-04 | unknown | watch |
+| DLTR | DLTR/ | Dollar Tree | US | 2026-11-04 | 2026-11-04 | unknown | watch |
+| DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-11-04 | 2026-11-04 | unknown | watch |
+| DNN | DNN/ | DNN | US | 2026-11-04 | 2026-11-04 | unknown | watch |
+| DNP.WA | DNP.WA/ | Dino Polska S.A. | EU | 2026-11-04 | 2026-11-04 | compounder | watch |
+| DOC | DOC/ | Healthpeak Properties | US | 2026-11-04 | 2026-11-04 | unknown | watch |
+| DOV | DOV/ | Dover Corporation | US | 2026-11-04 | 2026-11-04 | unknown | watch |
 | DOW | DOW/ | Dow Inc. | US | 2026-07-29 | 2026-11-04 | unknown | watch |
 | DPZ | DPZ/ | Domino's | US | 2026-07-29 | 2026-11-04 | unknown | watch |
 | DRI | DRI/ | Darden Restaurants | US | 2026-07-29 | 2026-11-04 | unknown | watch |
