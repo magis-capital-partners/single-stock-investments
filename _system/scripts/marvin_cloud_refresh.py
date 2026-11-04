@@ -260,9 +260,12 @@ def main() -> int:
             [PY, str(SCRIPTS / "extract_theme_facts.py"), ticker],
             optional=True,
         )
+        theme_panel_cmd = [PY, str(SCRIPTS / "fetch_theme_panel.py")]
+        if os.environ.get("MARVIN_THEME_OFFLINE", "").strip().lower() in {"1", "true", "yes"}:
+            theme_panel_cmd.append("--offline")
         run(
             "thematic indicator panels",
-            [PY, str(SCRIPTS / "fetch_theme_panel.py")],
+            theme_panel_cmd,
             optional=True,
         )
         run(
