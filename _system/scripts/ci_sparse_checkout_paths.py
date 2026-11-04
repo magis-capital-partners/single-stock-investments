@@ -102,6 +102,26 @@ def tracked_files() -> list[str]:
     return [name for name in result.stdout.decode("utf-8").split("\0") if name]
 
 
+def tracked_dirs(files: list[str]) -> set[str]:
+    dirs: set[str] = set()
+    for name in files:
+        parts = name.split("/")[:-1]
+        for depth in range(1, len(parts) + 1):
+            dirs.add("/".join(parts[:depth]))
+    return dirs
+
+
+def literal_patterns(rels, files: set[str], dirs: set[str]) -> list[str]:
+    """Anchored patterns for tracked files and whole tracked folders; others dropped."""
+    patterns = []
+    for rel in sorted(set(rels)):
+        if rel in files:
+            patterns.append(anchored(rel))
+        elif rel in dirs:
+            patterns.append(anchored(rel) + "/**")
+    return patterns
+
+
 def _json_strings(node) -> list[str]:
     if isinstance(node, str):
         return [node]
@@ -123,17 +143,20 @@ def graph_invariants_paths() -> list[str]:
     of folders the checks iterate is the same as on a full checkout.
     """
     files = tracked_files()
+    # Non-cone matching takes the last pattern that matches each path, and a
+    # folder that matches "!/*/*/" hides its files from a bare "/_system/".
+    # The "/**" forms match the files themselves.
     patterns = [
         "/*",
         "!/*/",
         "/*/*",
         "!/*/*/",
-        "/*/research/",
-        "/_system/",
+        "/*/research/**",
+        "/_system/**",
         # Activist PDFs (~2 GiB). Nothing in the job opens them.
-        "!/_system/reference/activist-reports/",
-        "/.github/",
-        "/docs/",
+        "!/_system/reference/activist-reports/**",
+        "/.github/**",
+        "/docs/**",
     ]
     has_top_file: set[str] = set()
     for name in files:
@@ -149,19 +172,13 @@ def graph_invariants_paths() -> list[str]:
             keep_folder.setdefault(top, name)
     patterns.extend(anchored(name) for _, name in sorted(keep_folder.items()))
     # P6 feed paths and any other repo path the graph config names.
-    tracked = set(files)
-    prefixes = {name.rsplit("/", 1)[0] for name in files if "/" in name}
     config_path = ROOT / "_system" / "graph" / "graph_sources.json"
     try:
         config = json.loads(config_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise SystemExit(f"cannot read {config_path}: {exc}")
-    named = set()
-    for value in _json_strings(config):
-        rel = value.strip().rstrip("/")
-        if rel in tracked or rel in prefixes:
-            named.add(rel)
-    patterns.extend(anchored(rel) for rel in sorted(named))
+    named = [value.strip().rstrip("/") for value in _json_strings(config)]
+    patterns.extend(literal_patterns(named, set(files), tracked_dirs(files)))
     return patterns
 
 
@@ -179,16 +196,12 @@ def graph_invariants_sources() -> list[str]:
     builder = graph_build.GraphBuilder(ROOT)
     builder.build()
     files = tracked_files()
-    tracked = set(files)
-    dirs = {name.rsplit("/", 1)[0] for name in files if "/" in name}
-    missing: set[str] = set()
-    for node in builder.nodes.values():
-        if node.get("type") != "Source" or node.get("status") != "missing":
-            continue
-        rel = os.path.normpath(str(node.get("path") or "")).replace("\\", "/")
-        if rel in tracked or rel in dirs:
-            missing.add(rel)
-    return [anchored(rel) for rel in sorted(missing)]
+    missing = [
+        os.path.normpath(str(node.get("path") or "")).replace("\\", "/")
+        for node in builder.nodes.values()
+        if node.get("type") == "Source" and node.get("status") == "missing"
+    ]
+    return literal_patterns(missing, set(files), tracked_dirs(files))
 
 
 def desk_brief_inputs() -> list[str]:
