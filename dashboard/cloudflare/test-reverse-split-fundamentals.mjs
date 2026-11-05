@@ -8,6 +8,7 @@ import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
 import {readSnapshotAPI} from './reverse-split-live/read-snapshot.mjs';
 import {publishFinancialCoverage} from './reverse-split-live/financials-harvest.mjs';
 import {needsStartupReconciliation} from './reverse-split-live/watch.mjs';
+import {captureReadSnapshot,publishReadSnapshot,trackCard} from './reverse-split-live/snapshot-publish.mjs';
 const now='2026-11-05T17:00:00Z',cik='123';
 const fact=(metric,value,start=null,end='2026-06-30',extra={})=>({metric,value,start,end,currency:'USD',cik,form:'6-K',filed:'2026-08-15',published_at:'2026-08-15T12:00:00Z',observed_at:now,source_url:'https://www.sec.gov/Archives/edgar/data/123/000000012326000001/report.htm',source_sha256:'a'.repeat(64),locator:'Consolidated financial statements, row '+metric,kind:'html_table',confidence:'verified',scope:'consolidated',...extra});
 const annual=(end='2026-06-30')=>[fact('net_income',-15,'2025-07-01',end),fact('cfo',-10,'2025-07-01',end),fact('cash',5,null,end),fact('total_assets',100,null,end),fact('stockholders_equity',-5,null,end),fact('long_term_debt',0,null,end),fact('current_debt',0,null,end)];
@@ -59,6 +60,13 @@ test('snapshot history pagination reaches beyond the first page and paused runti
   const {db,env}=setup(t);for(let i=0;i<5;i++){const id='qa-'+i,payload={id,policy_id:'p',state:'retrospective',enrolled_at:now};db.prepare('INSERT INTO rs_execution_tracks VALUES(?,?,?,?,?,?,?)').run(id,id,'p','QA','retrospective',now,JSON.stringify(payload));}
   let after='',ids=[];for(let i=0;i<4;i++){const r=await readSnapshotAPI(new URL('https://internal/shadow/executable/tracks?limit=2&after='+after),env),b=await r.json();ids.push(...b.tracks.map(r=>r.id));if(!b.next_cursor)break;after=b.next_cursor;}assert.equal(new Set(ids).size,5);
   await env.EVIDENCE.put('collector-dashboard/shadow.json',JSON.stringify({runtime:{status:'running'},status:'tracking'}));db.prepare('INSERT INTO rs_state VALUES(?,?,?)').run('shadow_runtime',JSON.stringify({status:'paused_budget',heartbeat_at:new Date().toISOString()}),now);const r=await readSnapshotAPI(new URL('https://internal/shadow'),env);assert.equal((await r.json()).status,'paused_budget');
+});
+test('compact policy cards keep full fills and bounded audit pages available in the separate detail',async t=>{
+  const {db,env}=setup(t),track={id:'qa-fills',event_id:'qa',policy_id:'p',cik:'123',ticker:'QA',state:'open',enrolled_at:now,updated_at:now,entry_shares:1,fills:[{side:'short',shares:1,price:10}],decision_snapshot:{score:70,sources:[{large:'evidence'}]}};
+  db.prepare('INSERT INTO rs_shadow_tracks VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').run(track.id,'qa','p','123','QA',now,now,now,'open','qa',now,JSON.stringify(track));
+  for(let i=0;i<105;i++)db.prepare('INSERT INTO rs_shadow_records VALUES(?,?,?,?,?,?)').run(String(i).padStart(3,'0'),track.id,'qa','mark',now,JSON.stringify({reason:'qa'}));
+  const card=trackCard(track);assert.equal(card.fills,undefined);assert.equal(card.decision_snapshot.sources,undefined);await publishReadSnapshot(env,db,captureReadSnapshot(db));
+  const first=await(await readSnapshotAPI(new URL('https://internal/shadow/tracks/qa-fills'),env)).json();assert.equal(first.track.fills.length,1);assert.equal(first.records.length,100);assert.ok(first.next_cursor);const second=await(await readSnapshotAPI(new URL('https://internal/shadow/tracks/qa-fills?before='+first.next_cursor),env)).json();assert.equal(second.records.length,5);assert.equal(second.next_cursor,null);
 });
 test('reviews require a verified owner, current source version and captured document; retries are idempotent',async t=>{
   const {db,env}=setup(t),source={sha256:'a'.repeat(64),url:'https://www.sec.gov/Archives/edgar/data/123/a/report.htm',published_at:'2026-08-15T12:00:00Z',form:'6-K',filed:'2026-08-15'},profile={version:'v1',sources:[source]};await env.EVIDENCE.put('financials/profiles/123/latest.json',JSON.stringify(profile));
