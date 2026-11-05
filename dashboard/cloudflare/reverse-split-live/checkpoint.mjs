@@ -10,7 +10,7 @@ function cleanup(dir){const target=realpathSync(dir),parent=realpathSync(tmpdir(
 export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>make(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>({meta:{changes:Number(db.prepare(sql).run(...args).changes)}})});return {prepare:sql=>make(sql),batch:async statements=>{db.exec('BEGIN');try{const rows=[];for(const s of statements)rows.push(await s.run());db.exec('COMMIT');return rows;}catch(e){db.exec('ROLLBACK');throw e;}}};}
 
 export async function openCheckpoint(env){
-  const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt;
+  const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,publicationTask=null,latestSnapshot=null;
   try{
     receipt=JSON.parse((await remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").first())?.value||'null');
     if(receipt){const object=await env.EVIDENCE.get(`collector-state/slot${receipt.slot}.sqlite`);if(!object)throw new Error('Committed collector checkpoint is unavailable');const bytes=new Uint8Array(await object.arrayBuffer());if(await sha(bytes)!==receipt.sha256)throw new Error('Collector checkpoint checksum mismatch; original evidence preserved');writeFileSync(file,bytes);}
@@ -28,8 +28,17 @@ export async function openCheckpoint(env){
     else await remote.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_checkpoint',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(JSON.stringify(next),at).run();
     receipt=next;
   }
+  async function publishSnapshot(snapshot){
+    await publishReadSnapshot(env,db,snapshot);
+    if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(snapshot.at).run();env.snapshotActivated=true;}
+    env.publicationHealth={status:'published',snapshot_at:snapshot.at};
+  }
+  function queueSnapshot(snapshot){
+    latestSnapshot=snapshot;
+    if(!publicationTask)publicationTask=(async()=>{while(latestSnapshot){const current=latestSnapshot;latestSnapshot=null;await publishSnapshot(current);}})().catch(e=>{env.publicationHealth={status:'retry_pending',error:e.message};console.error(JSON.stringify({event:'snapshot_publication_retry',error:e.message}));}).finally(()=>{publicationTask=null;});
+  }
   return {
-    async save({publicationMode='d1'}={}){
+    async save({publicationMode='d1',backgroundViews=false}={}){
       for(const p of env.pending.splice(0))await env.DB.prepare("UPDATE rs_jobs SET state='pending',token=NULL WHERE id=? AND token=? AND state='queued'").bind(p.id,p.token).run();
       const at=new Date().toISOString(),jobs=db.prepare('SELECT state,count(*) AS count,min(created_at) AS oldest FROM rs_jobs GROUP BY state').all();
       db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_job_counts',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(JSON.stringify(jobs),at);
@@ -38,8 +47,7 @@ export async function openCheckpoint(env){
         const snapshot=captureReadSnapshot(db),slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
         await env.EVIDENCE.put(`collector-state/slot${slot}.sqlite`,bytes,{httpMetadata:{contentType:'application/vnd.sqlite3'}});
         await commitPointer(next,at);
-        await publishReadSnapshot(env,db,snapshot);
-        if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(at).run();env.snapshotActivated=true;}
+        if(backgroundViews)queueSnapshot(snapshot);else await publishSnapshot(snapshot);
         return next;
       }
       const publications=[];
@@ -81,6 +89,7 @@ export async function openCheckpoint(env){
       return next;
     },
     changedSince(at){return Boolean(db.prepare('SELECT id FROM rs_events WHERE analyzed_at>? LIMIT 1').get(at));},
+    async flush(){if(publicationTask)await publicationTask;},
     close(){db.close();cleanup(dir);},
   };
 }

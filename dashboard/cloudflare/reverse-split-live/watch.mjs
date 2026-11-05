@@ -13,12 +13,12 @@ export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70
 export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false}={}){
   const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={},flexTask=null,financialTask=null,leaseTimer,leaseError,renewing=Promise.resolve();
   const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
-  const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,ticks,jobs,error,maximum_minutes:maximumMs/60000,broker_connections:0,market_data:env.market?.health||null};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);lastHeartbeat=Date.now();};
+  const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,ticks,jobs,error,maximum_minutes:maximumMs/60000,broker_connections:0,market_data:env.market?.health||null,publication:env.publicationHealth||null};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);lastHeartbeat=Date.now();};
   async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<researchWriteBudget(day,env.EXECUTION_REGISTRATION_DAY);}
   const renewLease=()=>{renewing=renewing.then(async()=>{const next=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(next,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=next;}).catch(e=>{leaseError=e;stopping=true;});return renewing;};
   async function save(){
     const current=await remote.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first();if(current?.value?.split(':').at(-1)!==token||Number(current.value.split(':')[0])<=Date.now())throw new Error('Collector lease lost; stopping before publication');
-    await checkpoint.save({publicationMode:env.PUBLICATION_MODE});lastSaved=Date.now();
+    await checkpoint.save({publicationMode:env.PUBLICATION_MODE,backgroundViews:true});lastSaved=Date.now();
     await remote.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind('collector_usage:'+budgetDay,JSON.stringify({rows_read:Number(baseline.rows_read||0)+env.usage.rows_read,rows_written:Number(baseline.rows_written||0)+env.usage.rows_written}),now()).run();
   }
   try{
@@ -73,7 +73,7 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
     env.assertCollectorLease();await heartbeat('handoff');await save();return {ticks,jobs,started_at:new Date(started).toISOString(),finished_at:now(),mode:'continuous_shadow'};
   }finally{
     process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);env.onShadowDecision=null;
-    try{if(flexTask)await flexTask;if(financialTask)await financialTask;if(checkpoint){try{await save();}finally{checkpoint.close();}}}finally{
+    try{if(flexTask)await flexTask;if(financialTask)await financialTask;if(checkpoint){try{await save();await checkpoint.flush();}finally{checkpoint.close();}}}finally{
     clearInterval(leaseTimer);await renewing;delete env.assertCollectorLease;delete env.collectorLeaseOwner;env.DB=remote;await remote.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key='collector_lease' AND value=?").bind(now(),lease||'').run();
     }
   }
