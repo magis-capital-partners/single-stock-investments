@@ -164,8 +164,12 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
     # from inline references and provide the following section's exact boundary.
     headings, cursor = [], 0
     section_requested = any(re.fullmatch(r'section\s+\d+\.\d+', phrase) for phrase in focus)
-    blocks = re.finditer(r'<(p|h[1-6]|div)\b[^>]*>(.*?)</\1>', source, re.I | re.S) if section_requested else ()
+    # Page containers can enclose every paragraph. Inspect their children too;
+    # consuming an outer div would hide the actual numbered headings.
+    blocks = re.finditer(r'(?=<(p|h[1-6]|div)\b[^>]*>(.*?)</\1>)', source, re.I | re.S) if section_requested else ()
     for block in blocks:
+        if re.search(r'<(?:p|h[1-6]|div)\b', block[2], re.I):
+            continue  # A container is not itself a section heading.
         text = text_of(block[2])
         heading = re.match(r'(?:SECTION\s+)?(\d{1,3}\.\d{1,3})\.?\s+[A-Za-z]', text, re.I)
         if heading:
