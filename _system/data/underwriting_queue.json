@@ -1,6 +1,6 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-04",
+  "as_of": "2026-11-05",
   "summary": {
     "companies": 873,
     "statuses": {
@@ -8,15 +8,15 @@
       "reviewed": 1
     },
     "blocker_companies": {
-      "issuer_forecast_missing": 133,
       "parent_cashflow_attribution_missing": 40,
-      "positive_normalized_owner_cash_not_established": 109,
+      "issuer_forecast_missing": 133,
       "pre_listing_share_basis_unverified": 101,
+      "positive_normalized_owner_cash_not_established": 109,
       "realization_timing_missing": 18,
       "completed_session_quote_missing": 28,
+      "annual_diluted_share_count_missing": 50,
       "annual_operating_cash_flow_missing": 44,
       "annual_capex_missing": 72,
-      "annual_diluted_share_count_missing": 50,
       "new_financial_report_after_model": 413,
       "source_share_basis_unverified": 56,
       "newer_balance_sheet_inputs_available": 219,
@@ -11649,24 +11649,6 @@
       "unresolved_findings": []
     },
     {
-      "ticker": "MCO",
-      "company": "Moody's Corporation",
-      "status": "needs_underwriting",
-      "current_model_basis": "automatic_operating_first_pass",
-      "blockers": [
-        "underwriting_revision_required"
-      ],
-      "last_attempt": "2026-11-04T10:16:52.068814+00:00",
-      "retry_after": "2026-11-05",
-      "underwriting_gaps": [
-        {
-          "code": "StageBlocked",
-          "detail": "local_input_too_large: 1113793 characters exceeds 1048576; complete evidence retained"
-        }
-      ],
-      "unresolved_findings": []
-    },
-    {
       "ticker": "MSCI",
       "company": "MSCI Inc.",
       "status": "needs_underwriting",
@@ -12048,6 +12030,24 @@
         {
           "code": "ContractError",
           "detail": "Sourced primary financials and a verified share count are required"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "MCO",
+      "company": "Moody's Corporation",
+      "status": "needs_underwriting",
+      "current_model_basis": "automatic_operating_first_pass",
+      "blockers": [
+        "underwriting_revision_required"
+      ],
+      "last_attempt": "2026-11-05T06:17:21.670589+00:00",
+      "retry_after": "2026-11-06",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "primary_evidence_gap: [{\"code\": \"missing_operative_committed_facility_access_conditions\", \"detail\": \"The expanded contexts in doc_521cb0600121b763 still omit operative Section 4.02 (Each Credit Event, page 67), the USD notice deadlines in Section 2.03 (page 36), Section 2.06 (Funding of Borrowings, page 41), Section 2.08 (commitment termination/reduction, page 44), and Section 2.20 (extensions, page 59). Retrieve these provisions from that frozen incorporated credit agreement; search 'Each Credit Event', 'no Default', 'representations and warranties', 'ABR Borrowing', 'Funding of Borrowings', 'Termination, Reduction and Increase of Commitments', and 'Extension of Maturity Date'. The supplied borrowing passage covers Euro/Yen/GBP requests but does not establish timely USD funding. These contractual facts are needed to execute committed borrowing versus failed access during a joint operating and funding squeeze. Current covenant compliance alone does not establish stressed draw eligibility. Count commercial paper and its revolving backstop once, and assume no extension beyond May 6, 2029 without operative support.\"}]"
         }
       ],
       "unresolved_findings": []
