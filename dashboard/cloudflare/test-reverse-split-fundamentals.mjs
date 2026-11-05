@@ -7,9 +7,11 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
 import {readSnapshotAPI} from './reverse-split-live/read-snapshot.mjs';
 import {publishFinancialCoverage} from './reverse-split-live/financials-harvest.mjs';
+import {needsStartupReconciliation} from './reverse-split-live/watch.mjs';
 const now='2026-11-05T17:00:00Z',cik='123';
 const fact=(metric,value,start=null,end='2026-06-30',extra={})=>({metric,value,start,end,currency:'USD',cik,form:'6-K',filed:'2026-08-15',published_at:'2026-08-15T12:00:00Z',observed_at:now,source_url:'https://www.sec.gov/Archives/edgar/data/123/000000012326000001/report.htm',source_sha256:'a'.repeat(64),locator:'Consolidated financial statements, row '+metric,kind:'html_table',confidence:'verified',scope:'consolidated',...extra});
 const annual=(end='2026-06-30')=>[fact('net_income',-15,'2025-07-01',end),fact('cfo',-10,'2025-07-01',end),fact('cash',5,null,end),fact('total_assets',100,null,end),fact('stockholders_equity',-5,null,end),fact('long_term_debt',0,null,end),fact('current_debt',0,null,end)];
+test('a long research pause queues filing reconciliation while ordinary handoffs do not',()=>{assert.equal(needsStartupReconciliation('2026-11-05T14:11:00Z',Date.parse(now)),true);assert.equal(needsStartupReconciliation('2026-11-05T16:55:00Z',Date.parse(now)),false);assert.equal(needsStartupReconciliation(null,Date.parse(now)),false);});
 test('verified filing inputs recover a score without inventing absent debt or historical entry clocks',()=>{
   const p=buildFinancialProfile({cik,company:'Example Research Ltd',companyfacts:{cik,facts:{}},facts:annual(),as_of:now});
   assert.equal(p.policy_financials.signal_count,3);assert.equal(p.policy_financials.score,68.8);

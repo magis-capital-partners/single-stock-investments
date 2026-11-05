@@ -2,7 +2,7 @@
 import {openCheckpoint} from './checkpoint.mjs';
 import {scheduled,dispatch,consume,enqueue,sourceURL,recordEvent} from './worker.mjs';
 import {initializeShadow,shadowTick,putState,digest} from './shadow-service.mjs';
-import {classifyAnnouncement} from './core.mjs';
+import {classifyAnnouncement,etDay} from './core.mjs';
 import {pollIBKRBorrow} from './borrow-service.mjs';
 import {initializeExecution,executionTick} from './execution-service.mjs';
 import {initializeValidation,validationTick} from './validation-service.mjs';
@@ -10,6 +10,7 @@ import {pollFlexBorrow} from './flex-borrow.mjs';
 import {installFinancialImport,importFinancialProfiles} from './financials-import.mjs';
 const now=()=>new Date().toISOString();
 export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
+export const needsStartupReconciliation=(last,at=Date.now())=>Number.isFinite(Date.parse(last))&&at-Date.parse(last)>15*60000;
 export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false}={}){
   const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={},flexTask=null,financialTask=null,leaseTimer,leaseError,renewing=Promise.resolve();
   const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
@@ -27,6 +28,8 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
     if(!claimed)return {skipped:true,reason:'Another collector owns the bounded lease'};
     leaseTimer=setInterval(renewLease,120000);env.collectorLeaseOwner=token;env.assertCollectorLease=()=>{if(leaseError)throw leaseError;if(Date.now()>=Number(lease.split(':')[0]))throw new Error('Collector lease expired');};
     checkpoint=await openCheckpoint(env);env.PUBLICATION_MODE='r2';env.FAST_MONITOR=true;env.EXPECTED_CADENCE_SECONDS=String(interval);installFinancialImport(env);await initializeShadow(env);await initializeExecution(env);await initializeValidation(env);await budget();
+    const lastTick=(await env.DB.prepare("SELECT value FROM rs_state WHERE key='last_completed_tick'").first())?.value;
+    if(needsStartupReconciliation(lastTick))await enqueue(env,'reconcile',{day:etDay(now())},1,'startup-gap:'+etDay(now())+':'+lastTick);
     env.onShadowDecision=async event=>{
       const enrolled=await env.DB.prepare("SELECT state,payload FROM rs_shadow_tracks WHERE event_id=? UNION ALL SELECT state,payload FROM rs_execution_tracks WHERE event_id=?").bind(event.id,event.id).all();
       if(enrolled.results.length&&enrolled.results.every(r=>r.state==='retrospective'&&!JSON.parse(r.payload).entry_shares))return;
