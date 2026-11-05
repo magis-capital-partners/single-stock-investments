@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Kalathur Rajesh | 2026-08-21 | 2829 | $177.0 | $500733.0 | 2.854 |
+| Kalathur Rajesh | 2026-08-21 | 2829 | $177.0 | $500733.0 | 2.83 |
 | Kalathur Rajesh | 2026-03-10 | 2671 | $185.3 | $494936.3 | 2.531 |
-| Clarke Teresa Hillary | 2026-10-20 | 42 | $183.2 | $7694.4 | 1.645 |
+| Clarke Teresa Hillary | 2026-10-20 | 42 | $183.2 | $7694.4 | 1.631 |
 | Clarke Teresa Hillary | 2026-07-13 | 46 | $167.52 | $7705.92 | 0.849 |
 | Clarke Teresa Hillary | 2026-04-28 | 43 | $177.08 | $7614.44 | 0.842 |
 

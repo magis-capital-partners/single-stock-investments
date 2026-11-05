@@ -1,4 +1,4 @@
-# AJG — Insider conviction (2026-09-17)
+# AJG — Insider conviction (2026-11-04)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- GALLAGHER J PATRICK JR: 27450 @ $230.312 on 2026-03-02
-- HOWELL DOUGLAS K: 5000 @ $258.0485 on 2025-12-22
-- CARY RICHARD C: 1000 @ $252.8583 on 2026-09-15
+- HOWELL DOUGLAS K: 17130 @ $275.0 on 2026-11-02
+- HOWELL DOUGLAS K: 13374 @ $275.303 on 2026-11-02
+- HOWELL DOUGLAS K: 492 @ $275.912 on 2026-11-02
 
 Source: `_system/reference/market-data/insider/AJG_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
