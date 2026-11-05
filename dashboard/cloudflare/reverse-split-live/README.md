@@ -178,8 +178,8 @@ Only IBKR borrow data is used. `borrow-service.mjs` reads IBKR's existing public
 FTP file, validates its declared row count, clock and checksum, and archives
 matching rows privately. Every resolved event ticker receives a record,
 including absent symbols, missing fields and failed daily coverage. All names
-are captured at startup, on a new company, daily, and hourly from 08:00 through
-17:59 ET. Active names refresh every five minutes. Runner handoffs preserve
+are captured daily overnight, after 08:35 and after 16:15 ET. New or newly active
+names refresh immediately; active names refresh every five minutes. Runner handoffs preserve
 the cadence state. Missing rates are never treated as zero, quotes expire
 after 30 minutes for entry, and a newer missing/unavailable observation
 supersedes an earlier valid indication. Public FTP is indicative, unauthenticated
@@ -226,7 +226,7 @@ Complete reconciled paper net P&L requires a CLOSED position and a dated
 `cost_reconciliation` evidence record for its exact `policy_id`, with
 `covers_fills_through` covering the last fill, `basis: estimated|documented`,
 and explicit finite `costs` for commissions, borrow, regulatory, locate,
-dividends, cash_settlement and buyin. Signed adjustments can be documented;
+dividends, cash_settlement, buyin and short_proceeds_interest. Interest credits are negative costs; extra or nonnumeric cost fields are rejected. Signed adjustments can be documented;
 an absent cost is not zero. Actual broker P&L stays null because no real fills
 exist. Original baseline P&L remains separate. The annual-rate cutoff table
 uses the rate known at entry (10/25/50/100/200% and no cutoff), never the best
