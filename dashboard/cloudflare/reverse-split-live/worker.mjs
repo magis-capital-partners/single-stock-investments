@@ -1,4 +1,5 @@
 import {POLICY,DAY,etDay,iso,dateOnlyAvailable,plain,parseFeed,classifyAnnouncement,scoreFundamentals,screen} from './core.mjs';
+import {shadowAPI} from './shadow-api.mjs';
 
 const stamp=()=>new Date().toISOString(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const json=(value,status=200)=>Response.json(value,{status,headers:{'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
@@ -6,10 +7,10 @@ const log=(event,fields={})=>console.log(JSON.stringify({event,...fields}));
 export const SOURCES=[
   ...['8-K','6-K','10-Q','10-K','20-F','40-F'].map(form=>({id:'sec-'+form,kind:'sec',form,url:`https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=${form}&owner=exclude&count=100&output=atom`})),
   {id:'prnewswire',kind:'news',url:'https://www.prnewswire.com/rss/news-releases-list.rss'},
-  {id:'globenewswire',kind:'news',url:'https://www.globenewswire.com/RssFeed/subjectcode/13-Change%20in%20Share%20Capital/feedTitle/GlobeNewswire%20-%20Change%20in%20Share%20Capital'},
+  {id:'globenewswire',kind:'news',url:'https://rss.globenewswire.com/RssFeed/subjectcode/13-Change%20in%20Share%20Capital/feedTitle/GlobeNewswire%20-%20Change%20in%20Share%20Capital'},
 ];
 const SEC_HOSTS=new Set(['www.sec.gov','data.sec.gov','efts.sec.gov']);
-const NEWS_HOSTS=new Set(['www.prnewswire.com','www.globenewswire.com']);
+const NEWS_HOSTS=new Set(['www.prnewswire.com','www.globenewswire.com','rss.globenewswire.com']);
 export function sourceURL(value){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.port||(!SEC_HOSTS.has(u.hostname)&&!NEWS_HOSTS.has(u.hostname)))throw new Error('Unsupported source URL');return u;}
 export async function sha(value){const bytes=typeof value==='string'?new TextEncoder().encode(value):value;return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');}
 export async function boundedBody(response,maximum){
@@ -34,7 +35,7 @@ export async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}=
   if(remaining<=0)throw new Error('Collector source deadline reached; work will retry');
   const response=await fetch(url,{redirect:'manual',headers:{'user-agent':env.SEC_USER_AGENT,'accept':'application/atom+xml, application/rss+xml, application/json, text/html, text/plain, */*'},signal:AbortSignal.timeout(Math.min(18000,remaining))});
   if(response.status>=300&&response.status<400){await response.body?.cancel();if(redirects>=3)throw new Error('Source redirect limit');const next=new URL(response.headers.get('location'),url);sourceURL(next);return limitedFetch(env,next.href,{maximum,redirects:redirects+1});}
-  if(!response.ok){await response.body?.cancel();if(sec&&[403,429].includes(response.status))await state(env,'sec_cooldown',Date.now()+Math.min(3600000,Math.max(300000,Number(response.headers.get('retry-after')||0)*1000)));throw new Error(`Source returned HTTP ${response.status}`);}
+  if(!response.ok){await response.body?.cancel();if(response.status===403&&url.hostname==='www.globenewswire.com'&&redirects<3){const alternate=new URL(url);alternate.hostname='rss.globenewswire.com';return limitedFetch(env,alternate.href,{maximum,redirects:redirects+1});}if(sec&&[403,429].includes(response.status))await state(env,'sec_cooldown',Date.now()+Math.min(3600000,Math.max(300000,Number(response.headers.get('retry-after')||0)*1000)));throw new Error(`Source returned HTTP ${response.status}`);}
   return {bytes:await boundedBody(response,maximum),content_type:response.headers.get('content-type')||'',url:url.href};
 }
 async function archive(env,doc){const hash=await sha(doc.bytes),key='documents/'+hash;await env.EVIDENCE.put(key,doc.bytes,{httpMetadata:{contentType:doc.content_type},customMetadata:{source_url:doc.url,captured_at:stamp()}});await env.DB.prepare('INSERT OR IGNORE INTO rs_documents(sha256,url,object_key,captured_at,bytes,content_type) VALUES(?,?,?,?,?,?)').bind(hash,doc.url,key,stamp(),doc.bytes.length,doc.content_type).run();return {hash,key,text:new TextDecoder().decode(doc.bytes)};}
@@ -55,7 +56,8 @@ async function addFilings(env,items,priority){
 }
 async function poll(env,source){
   await env.DB.prepare('INSERT OR IGNORE INTO rs_sources(id,kind,url) VALUES(?,?,?)').bind(source.id,source.kind,source.url).run();
-  const saved=await env.DB.prepare('SELECT * FROM rs_sources WHERE id=?').bind(source.id).first();
+  let saved=await env.DB.prepare('SELECT * FROM rs_sources WHERE id=?').bind(source.id).first();
+  if(saved.url!==source.url){await env.DB.prepare("UPDATE rs_sources SET url=?,next_attempt=0,failures=0,status='new',error=NULL WHERE id=?").bind(source.url,source.id).run();saved={...saved,url:source.url,next_attempt:0,failures:0};}
   if(saved.next_attempt>Date.now())return;
   try{
     let count=0,complete=false,newest=null,oldest=null;
@@ -116,15 +118,16 @@ export async function recordEvent(env,event,{refresh=false}={}){
   await env.DB.prepare("INSERT INTO rs_events(id,cik,ticker,company,effective_date,published_at,first_seen_at,payload) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET effective_date=excluded.effective_date,payload=excluded.payload,revision=rs_events.revision+1").bind(event.id,event.cik||null,event.ticker||null,event.company||null,event.effective_date,event.published_at,event.first_seen_at,JSON.stringify(event)).run();
   let f={score:null,status:'issuer_identity_unresolved',signals:{},evidence:[]},prior=[],metadataError=null;
   if(event.cik){try{const {row,submissions}=await issuer(env,event.cik);event.company ||= row.company;event.ticker ||= row.ticker;event.multiple_securities=(submissions.tickers||[]).length>1;f=await financials(env,event.cik,now,refresh);prior=(await env.DB.prepare('SELECT payload FROM rs_history WHERE cik=? AND effective_date<?').bind(event.cik,etDay(now)).all()).results.map(r=>JSON.parse(r.payload));await enqueue(env,'history',{cik:event.cik},3,'history:'+event.cik+':'+etDay(now));}catch(e){metadataError=e.message;f={...f,status:'financial_source_unavailable',error:e.message};}}
-  const decision=screen(event,f,prior,now);if(event.multiple_securities){decision.result='needs_review';decision.checks.security={state:'unknown',reason:'Multiple issuer securities require instrument reconciliation'};}
-  const payload={...event,financials:f,...decision,analyzed_at:now,metadata_error:metadataError,latency_seconds:Math.max(0,(Date.parse(now)-Date.parse(event.first_seen_at))/1000),source_delay_seconds:event.published_at?Math.max(0,(Date.parse(event.first_seen_at)-Date.parse(event.published_at))/1000):null};
-  const id=await sha(event.id+':'+now+':'+JSON.stringify(payload));
+  const completed=stamp(),decision=screen(event,f,prior,completed);if(event.multiple_securities){decision.result='needs_review';decision.checks.security={state:'unknown',reason:'Multiple issuer securities require instrument reconciliation'};}
+  const payload={...event,financials:f,...decision,analyzed_at:completed,metadata_error:metadataError,latency_seconds:Math.max(0,(Date.parse(completed)-Date.parse(event.first_seen_at))/1000),source_delay_seconds:event.published_at?Math.max(0,(Date.parse(event.first_seen_at)-Date.parse(event.published_at))/1000):null};
+  const id=await sha(event.id+':'+completed+':'+JSON.stringify(payload));
   await env.DB.batch([
-    env.DB.prepare('UPDATE rs_events SET ticker=?,company=?,analyzed_at=?,result=?,score=?,ordinal_min=?,payload=? WHERE id=?').bind(event.ticker||null,event.company||null,now,decision.result,f.score,decision.ordinal_min,JSON.stringify(payload),event.id),
-    env.DB.prepare('INSERT OR IGNORE INTO rs_decisions(id,event_id,recorded_at,policy,payload) VALUES(?,?,?,?,?)').bind(id,event.id,now,POLICY.id,JSON.stringify(payload)),
+    env.DB.prepare('UPDATE rs_events SET ticker=?,company=?,analyzed_at=?,result=?,score=?,ordinal_min=?,payload=? WHERE id=?').bind(event.ticker||null,event.company||null,completed,decision.result,f.score,decision.ordinal_min,JSON.stringify(payload),event.id),
+    env.DB.prepare('INSERT OR IGNORE INTO rs_decisions(id,event_id,recorded_at,policy,payload) VALUES(?,?,?,?,?)').bind(id,event.id,completed,POLICY.id,JSON.stringify(payload)),
   ]);
   if(decision.result==='passes_screen')await env.DB.prepare('INSERT OR IGNORE INTO rs_alerts(id,event_id,created_at,kind,payload) VALUES(?,?,?,?,?)').bind(POLICY.id+':'+event.id,event.id,now,'research_screen_pass',JSON.stringify({ticker:event.ticker,score:f.score,ordinal_min:decision.ordinal_min,execution_ready:false})).run();
   if(metadataError)await enqueue(env,'rescore',{id:event.id,refresh:true},8,'retry-score:'+event.id+':'+Math.floor(Date.now()/3600000));
+  if(env.onShadowDecision)await env.onShadowDecision(payload);
   return payload;
 }
 function filingText(raw){const docs=[...raw.matchAll(/<DOCUMENT>([\s\S]*?)<\/DOCUMENT>/gi)];if(!docs.length)return raw;return docs.map(x=>x[1]).filter(t=>/<TYPE>\s*(?:8-K|6-K|10-[KQ]|20-F|40-F|EX-99)/i.test(t)).join('\n');}
@@ -195,7 +198,9 @@ export async function consume(batch,env){
 export async function scheduled(event,env){
   if(env.ENABLED!=='true'){await state(env,'service_mode','paused');return;}
   await state(env,'last_tick',stamp());await state(env,'service_mode',env.COLLECTOR_MODE||'research_monitor');
-  for(const source of SOURCES)await poll(env,source);
+  const financialDue=!env.FAST_MONITOR||Date.now()-Number(await state(env,'financial_poll_at')||0)>300000;
+  for(const source of SOURCES.filter(s=>financialDue||['sec-8-K','sec-6-K','prnewswire','globenewswire'].includes(s.id)))await poll(env,source);
+  if(financialDue)await state(env,'financial_poll_at',Date.now());
   if(await state(env,'daily_rescore')!==etDay(Date.now())){for(const e of (await env.DB.prepare("SELECT id FROM rs_events WHERE first_seen_at>=? AND result IN ('passes_screen','needs_review') ORDER BY first_seen_at DESC LIMIT 300").bind(new Date(Date.now()-30*DAY).toISOString()).all()).results)await enqueue(env,'rescore',{id:e.id},6,'daily-rescore:'+etDay(Date.now())+':'+e.id);await state(env,'daily_rescore',etDay(Date.now()));}
   if(event.cron==='17 8 * * *')await enqueue(env,'reconcile',{day:etDay(Date.now())},1,'daily-reconcile:'+etDay(Date.now()));
   await dispatch(env);await state(env,'last_completed_tick',stamp());
@@ -203,6 +208,7 @@ export async function scheduled(event,env){
 export async function readAPI(request,env){
   if(request.method!=='GET')return json({error:'Read-only research service'},405);
   const url=new URL(request.url);
+  if(url.pathname==='/shadow'||url.pathname.startsWith('/shadow/'))return shadowAPI(url,env);
   if(url.pathname==='/events'){
     const limit=Math.max(1,Math.min(100,Number(url.searchParams.get('limit'))||50)),filter=url.searchParams.get('result'),query=(url.searchParams.get('q')||'').slice(0,80).toUpperCase();let cursor=['9999',''];
     if(url.searchParams.has('before')){try{cursor=JSON.parse(atob(url.searchParams.get('before')));if(!Array.isArray(cursor)||cursor.length!==2||cursor.some(x=>typeof x!=='string'))throw new Error();}catch{return json({error:'Invalid announcement cursor'},400);}}

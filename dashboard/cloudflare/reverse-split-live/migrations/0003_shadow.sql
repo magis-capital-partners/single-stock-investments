@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS rs_shadow_policies (id TEXT PRIMARY KEY, registered_at TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS rs_shadow_tracks (id TEXT PRIMARY KEY, event_id TEXT NOT NULL, policy_id TEXT NOT NULL, cik TEXT, ticker TEXT, enrolled_at TEXT NOT NULL, signal_at TEXT, due_at TEXT, state TEXT NOT NULL, reason TEXT NOT NULL, updated_at TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE UNIQUE INDEX IF NOT EXISTS rs_shadow_event_policy ON rs_shadow_tracks(event_id,policy_id);
+CREATE INDEX IF NOT EXISTS rs_shadow_active ON rs_shadow_tracks(state,updated_at);
+CREATE INDEX IF NOT EXISTS rs_shadow_recent ON rs_shadow_tracks(enrolled_at DESC,id);
+CREATE TABLE IF NOT EXISTS rs_shadow_records (id TEXT PRIMARY KEY, track_id TEXT NOT NULL, event_id TEXT NOT NULL, kind TEXT NOT NULL, recorded_at TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_shadow_audit ON rs_shadow_records(track_id,recorded_at,id);
+CREATE TABLE IF NOT EXISTS rs_shadow_quotes (id TEXT PRIMARY KEY, ticker TEXT NOT NULL, quote_at TEXT NOT NULL, observed_at TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_shadow_quote_time ON rs_shadow_quotes(ticker,observed_at);
+CREATE TABLE IF NOT EXISTS rs_shadow_evidence (id TEXT PRIMARY KEY, event_id TEXT NOT NULL, kind TEXT NOT NULL, observed_at TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_shadow_evidence_event ON rs_shadow_evidence(event_id,observed_at);
+CREATE TABLE IF NOT EXISTS rs_shadow_daily (id TEXT PRIMARY KEY, policy_id TEXT NOT NULL, day TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS rs_shadow_enrollments (event_id TEXT PRIMARY KEY, event_at TEXT NOT NULL, processed_at TEXT NOT NULL);

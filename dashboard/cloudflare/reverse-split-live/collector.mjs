@@ -2,9 +2,13 @@
 // The same research engine runs on GitHub-hosted runners or an independent machine.
 // Cloudflare Free serves the dashboard; it does not parse financial filings.
 import {pathToFileURL} from 'node:url';
+import {appendFileSync} from 'node:fs';
 import {parseArgs} from 'node:util';
 import {scheduled,dispatch,consume} from './worker.mjs';
 import {openCheckpoint} from './checkpoint.mjs';
+import {makeMarketData} from './market-data.mjs';
+import {initializeShadow,shadowTick,putState} from './shadow-service.mjs';
+import {watchCollector} from './watch.mjs';
 
 export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,cadence=300,maxJobs=40}={}){
   if(!token||!account||!database||!bucket)throw new Error('Collector requires configured Cloudflare credentials and isolated research resources');
@@ -18,7 +22,7 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
     async put(key,bytes,options={}){await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':options.httpMetadata?.contentType||'application/octet-stream'},body:bytes});},
     async get(key){const r=await fetcher(base+prefix+key.split('/').map(encodeURIComponent).join('/'),{headers,signal:AbortSignal.timeout(45000)});if(r.status===404){await r.body?.cancel();return null;}if(!r.ok){await r.body?.cancel();throw new Error(`Evidence storage HTTP ${r.status}`);}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
   };
-  return {DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',pending,maxJobs,usage};
+  return {DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};
 }
 
 export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){
@@ -34,6 +38,7 @@ export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){
   try{
     if(!withinBudget())return {skipped:true,reason:'Research daily database budget reached; preserving headroom for the existing dashboard'};
     checkpoint=await openCheckpoint(env);
+    if(env.SHADOW_ENABLED==='true'){await initializeShadow(env);env.market ||= makeMarketData({key:process.env.MASSIVE_API_KEY||process.env.POLYGON_API_KEY});env.onShadowDecision=async event=>{await shadowTick(env,{event});};await shadowTick(env);}
     await scheduled({cron:reconcile?'17 8 * * *':'external'},env);
     await checkpoint.save();
     while(Date.now()-now<maximumMs&&counts.jobs<env.maxJobs&&withinBudget()){
@@ -58,8 +63,10 @@ export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){
 }
 
 async function main(){
-  const {values}=parseArgs({options:{watch:{type:'boolean',default:false},interval:{type:'string',default:'300'},'max-jobs':{type:'string',default:'40'},reconcile:{type:'boolean',default:false}}});
-  const cadence=Math.max(60,Number(values.interval)||300),env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:process.env.CLOUDFLARE_ACCOUNT_ID||'e1cac493b315c8fd7398500dd1bfd687',database:process.env.REVERSE_SPLIT_DATABASE_ID||'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:process.env.REVERSE_SPLIT_EVIDENCE_BUCKET||'single-stock-reverse-splits-evidence',cadence,maxJobs:Math.min(150,Math.max(1,Number(values['max-jobs'])||40))});
-  do{const started=Date.now();try{console.log(JSON.stringify(await runOnce(env,{reconcile:values.reconcile||new Date().getUTCHours()===8})));}catch(e){console.error(JSON.stringify({event:'collector_failed',error:e.message}));if(!values.watch)process.exitCode=1;}if(!values.watch)break;await new Promise(resolve=>setTimeout(resolve,Math.max(1000,cadence*1000-(Date.now()-started))));}while(true);
+  const {values}=parseArgs({options:{watch:{type:'boolean',default:false},interval:{type:'string',default:'15'},'run-minutes':{type:'string',default:'300'},'max-jobs':{type:'string',default:'40'},reconcile:{type:'boolean',default:false}}});
+  const cadence=Math.max(15,Number(values.interval)||15),env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:process.env.CLOUDFLARE_ACCOUNT_ID||'e1cac493b315c8fd7398500dd1bfd687',database:process.env.REVERSE_SPLIT_DATABASE_ID||'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:process.env.REVERSE_SPLIT_EVIDENCE_BUCKET||'single-stock-reverse-splits-evidence',cadence:values.watch?cadence:300,maxJobs:Math.min(150,Math.max(1,Number(values['max-jobs'])||40))});
+  env.market=makeMarketData({key:process.env.MASSIVE_API_KEY||process.env.POLYGON_API_KEY});
+  if(values.watch){const result=await watchCollector(env,{interval:cadence,maximumMs:Number(values['run-minutes'])===0?Infinity:Math.min(310,Math.max(1,Number(values['run-minutes'])||300))*60000});if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'continue='+(!result.skipped)+'\n');console.log(JSON.stringify(result));}
+  else try{console.log(JSON.stringify(await runOnce(env,{reconcile:values.reconcile})));}catch(e){console.error(JSON.stringify({event:'collector_failed',error:e.message}));process.exitCode=1;}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
