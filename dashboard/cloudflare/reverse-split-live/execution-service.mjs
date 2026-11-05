@@ -1,4 +1,4 @@
-import {EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy} from './execution-core.mjs';
+import {EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy,completeCosts} from './execution-core.mjs';
 import {signalGate,plannedEntry,plannedExit,sessionAt,quoteGate,at,finite} from './shadow-core.mjs';
 import {digest,putState} from './shadow-service.mjs';
 import {etDay} from './core.mjs';
@@ -39,20 +39,27 @@ export async function enrollExecution(env,event,now=stamp()){
 }
 export async function processExecution(env,t,q,peers,borrowRows,evidence,now=stamp(),actions={records:[],complete:false}){
   const p=EXECUTION_POLICIES.find(x=>x.id===t.policy_id);if(!p)throw new Error('Unknown executable policy');
+  const fractional=evidence.filter(e=>e.kind==='cost_reconciliation'&&e.broker==='IBKR'&&e.scope==='reverse_split'&&e.policy_id===t.policy_id&&at(e.observed_at)<=at(now)&&completeCosts(e.costs)&&e.fractional_settlement?.security_id===t.security_id&&finite(e.fractional_settlement.price)&&e.fractional_settlement.price>0&&Math.abs(e.fractional_settlement.shares-t.remaining_shares)<1e-8&&at(e.covers_fills_through)>=at(e.observed_at)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];
+  if(t.state==='exit_pending'&&t.remaining_shares>0&&t.remaining_shares<1&&!t.action_unresolved&&fractional){
+    const f={side:'cover',method:'fractional_cash_settlement',shares:t.remaining_shares,price:fractional.fractional_settlement.price,at:fractional.observed_at,recorded_at:now,evidence_id:fractional.id,simulated:true,broker_execution_verified:false};t.cover_cost+=f.shares*f.price;t.remaining_shares=0;t.state='closed';t.exit_at=f.at;t.reason='fractional_liability_settled_from_evidence';t.fills.push(f);t.cost_reconciliation=fractional;t.pnl=executionPnl(t);await save(env,t,now);await audit(env,t,'fractional_cash_settlement',now,{fill:f,pnl:t.pnl});return t;
+  }
   if(t.state==='closed'){
     const previousBorrow=JSON.stringify(t.borrow_ledger);accrueBorrow(t,borrowRows,now);
-    const r=evidence.filter(e=>e.kind==='cost_reconciliation'&&e.broker==='IBKR'&&e.scope==='reverse_split'&&e.policy_id===t.policy_id&&at(e.observed_at)<=at(now)&&['commissions','borrow','regulatory','locate','dividends','cash_settlement','buyin'].every(k=>finite(e.costs?.[k]))).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];
+    const r=evidence.filter(e=>e.kind==='cost_reconciliation'&&e.broker==='IBKR'&&e.scope==='reverse_split'&&e.policy_id===t.policy_id&&at(e.observed_at)<=at(now)&&completeCosts(e.costs)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];
     if(r&&t.cost_reconciliation?.id!==r.id){t.cost_reconciliation=r;t.pnl=executionPnl(t);await save(env,t,now);await audit(env,t,'cost_reconciliation',now,{evidence_id:r.id,pnl:t.pnl});}
     else if(JSON.stringify(t.borrow_ledger)!==previousBorrow){t.pnl=executionPnl(t);await save(env,t,now);await audit(env,t,'borrow_reconciliation',now,{borrow_ledger:t.borrow_ledger,pnl:t.pnl});}return t;
   }
   const before=JSON.stringify(t),day=etDay(now);let reason;
   if(t.remaining_shares){
-    for(const a of actions.records.filter(a=>a.execution_date>etDay(t.entry_at)&&a.execution_date<=day)){
+    const ownerActions=evidence.filter(e=>e.kind==='corporate_action'&&e.broker==='IBKR'&&e.scope==='reverse_split'&&e.execution_confirmed===true&&at(e.observed_at)<=at(now)),ownerDays=new Set(ownerActions.map(a=>a.execution_date)),records=[...actions.records.filter(a=>!ownerDays.has(a.execution_date)),...ownerActions];t.action_conflict=false;
+    for(const a of records.filter(a=>a.execution_date>etDay(t.entry_at)&&a.execution_date<=day)){
       const key=[a.execution_date,a.split_from,a.split_to].join(':');if(t.applied_actions.includes(key)||!finite(a.split_from)||!finite(a.split_to)||a.split_from<=0||a.split_to<=0)continue;
       if(a.ticker&&a.ticker!==t.ticker)continue;
+      if(t.applied_actions.some(old=>old.startsWith(a.execution_date+':')&&old!==key)){t.action_conflict=true;continue;}
       const factor=a.split_to/a.split_from;t.remaining_shares*=factor;t.mark_price/=factor;t.applied_actions.push(key);t.last_action_date=a.execution_date;t.book={};await audit(env,t,'corporate_action',now,{...a,remaining_shares:t.remaining_shares,fractional_liability:t.remaining_shares%1!==0});
     }
-    t.action_unresolved=!!(t.effective_date>etDay(t.entry_at)&&day>=t.effective_date&&(!actions.complete||!t.last_action_date));
+    const ownerConfirmed=ownerActions.some(a=>a.execution_date===t.effective_date);
+    t.action_unresolved=t.action_conflict||!!(t.effective_date>etDay(t.entry_at)&&day>=t.effective_date&&((!actions.complete&&!ownerConfirmed)||!t.last_action_date));
     if(t.action_unresolved)reason='corporate_action_unresolved';
     if(t.identity_revision_unresolved){t.action_unresolved=true;reason='security_identity_revision_unresolved';}
     if(at(now)>=at(t.exit_due_at)-p.exit_lead_seconds*1000||t.exit_requested_at){t.state='exit_pending';t.exit_requested_at ||= now;}
@@ -83,7 +90,7 @@ export async function processExecution(env,t,q,peers,borrowRows,evidence,now=sta
     }
   }else if(t.remaining_shares)t.mark_stale=true;
   const daily=t.daily_marks.find(m=>m.day===day);if(daily){daily.borrow_shares=Math.max(daily.borrow_shares,t.remaining_shares);daily.end_shares=t.remaining_shares;}
-  const reconciliation=evidence.filter(e=>e.kind==='cost_reconciliation'&&e.broker==='IBKR'&&e.scope==='reverse_split'&&e.policy_id===t.policy_id&&at(e.observed_at)<=at(now)&&['commissions','borrow','regulatory','locate','dividends','cash_settlement','buyin'].every(k=>finite(e.costs?.[k]))).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];if(reconciliation)t.cost_reconciliation=reconciliation;
+  const reconciliation=evidence.filter(e=>e.kind==='cost_reconciliation'&&e.broker==='IBKR'&&e.scope==='reverse_split'&&e.policy_id===t.policy_id&&at(e.observed_at)<=at(now)&&completeCosts(e.costs)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];if(reconciliation)t.cost_reconciliation=reconciliation;
   const todayRate=borrowRows.filter(r=>r.kind==='indicative'&&r.status==='quoted'&&finite(r.apr)&&r.apr>=0&&etDay(r.as_of)===day&&at(r.observed_at)<=at(now)).sort((a,b)=>at(b.as_of)-at(a.as_of))[0];t.current_borrow_apr=todayRate?.apr??null;t.current_borrow_rate_id=todayRate?.id||null;
   t.reason=reason||'marked';accrueBorrow(t,borrowRows,now);t.pnl=executionPnl(t);t.entry_deterioration_bps=t.entry_shares?10000*(1-t.entry_price/t.arrival_mid):null;
   if(JSON.stringify(t)!==before){await save(env,t,now);const old=JSON.parse(before);if(JSON.stringify(old.borrow_ledger)!==JSON.stringify(t.borrow_ledger))await audit(env,t,'borrow_accrual',now,{borrow_ledger:t.borrow_ledger});if(t.reason!==old.reason)await audit(env,t,'status',now,{state:t.state,reason:t.reason,gates:t.gates});}return t;

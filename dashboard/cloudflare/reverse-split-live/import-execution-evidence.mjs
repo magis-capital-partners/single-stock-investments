@@ -4,14 +4,17 @@ import {readFileSync} from 'node:fs';
 import {remoteEnvironment} from './collector.mjs';
 import {digest} from './shadow-service.mjs';
 import {at,finite,validateEvidence} from './shadow-core.mjs';
+import {completeCosts} from './execution-core.mjs';
 export function validateIBKREvidence(r,now){
   if(!r||r.broker!=='IBKR'||r.scope!=='reverse_split')throw new Error('IBKR reverse-split scope required');
   if(r.kind==='trading_status'){
     if(typeof r.event_id!=='string'||!r.event_id||typeof r.halted!=='boolean'||!r.source_url?.startsWith('https://')||typeof r.reference!=='string'||!r.reference||at(r.observed_at)===null||at(r.observed_at)>at(now)||at(r.valid_until)===null||at(r.valid_until)<=at(r.observed_at))throw new Error('Invalid trading-status evidence');
   }else if(r.kind==='cost_reconciliation'){
     if(typeof r.event_id!=='string'||!r.event_id||!r.policy_id?.startsWith('rs_ibkr_')||!r.source_url?.startsWith('https://')||!r.reference||at(r.observed_at)===null||at(r.observed_at)>at(now)||at(r.covers_fills_through)===null||at(r.covers_fills_through)>at(r.observed_at)||!['estimated','documented'].includes(r.basis))throw new Error('Invalid cost reconciliation');
-    for(const key of ['commissions','borrow','regulatory','locate','dividends','cash_settlement','buyin'])if(!finite(r.costs?.[key]))throw new Error('Every cost component must be explicit');
+    if(!completeCosts(r.costs))throw new Error('Every cost component, including signed short-proceeds interest, must be explicit and numeric');
+    const s=r.fractional_settlement;if(s&&(!finite(s.shares)||s.shares<=0||s.shares>=1||!finite(s.price)||s.price<=0||typeof s.security_id!=='string'||!s.security_id||at(r.covers_fills_through)<at(r.observed_at)))throw new Error('Invalid fractional cash-settlement evidence');
   }else validateEvidence(r,now);
+  if(r.kind==='corporate_action'&&r.execution_confirmed!==true)throw new Error('A corporate action must be confirmed executed');
   if(['locate','margin'].includes(r.kind)&&(!/^[A-Za-z0-9_.:-]{1,100}$/.test(r.allocation_id||'')))throw new Error('A shared IBKR allocation reference is required to prevent double counting');
   return {...r,approval_basis:'owner_supplied_ibkr_document',broker_execution_verified:false};
 }

@@ -9,13 +9,13 @@ export async function pollIBKRBorrow(env,{now=new Date().toISOString(),fetchRows
   const events=(await env.DB.prepare('SELECT DISTINCT id AS event_id,ticker FROM rs_events WHERE ticker IS NOT NULL').all()).results;
   const tickers=[...new Set(events.map(e=>e.ticker))].filter(t=>/^[A-Z][A-Z0-9.-]{0,11}$/.test(t));if(!tickers.length)return;
   const get=async key=>JSON.parse((await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(key).first())?.value||'null');
-  const day=etDay(now),hour=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',hourCycle:'h23'}).format(new Date(now)));
+  const day=etDay(now),phaseAt=value=>{const time=new Intl.DateTimeFormat('en-GB',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(value));return time<'08:35'?'overnight':time<'16:15'?'day':'after_close';},phase=phaseAt(now);
   const last=await get('ibkr_borrow_poll'),active=(await env.DB.prepare("SELECT DISTINCT ticker FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') UNION SELECT DISTINCT ticker FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending')").all()).results.map(r=>r.ticker);
   const activeEvents=new Set((await env.DB.prepare("SELECT DISTINCT event_id FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') UNION SELECT DISTINCT event_id FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending')").all()).results.map(r=>r.event_id));
-  const all=!last||last.day!==day||tickers.some(t=>!last.tickers.includes(t))||(hour>=8&&hour<=17&&at(now)-at(last.at)>=3600000);
-  if(!all&&(!active.length||at(now)-at(last.active_at||last.at)<300000))return;
-  const wanted=all?tickers:tickers.filter(t=>active.includes(t));if(!wanted.length)return;
-  const attempt=await get('ibkr_borrow_attempt');if(attempt&&at(now)-at(attempt)<60000)return;
+  const all=!last||last.day!==day||(last.phase||phaseAt(last.at))!==phase,newNames=tickers.filter(t=>!last?.tickers?.includes(t)),newActive=active.some(t=>!last?.active_tickers?.includes(t));
+  if(!all&&!newNames.length&&!newActive&&(!active.length||at(now)-at(last.active_at||last.at)<300000))return;
+  const wanted=all?tickers:tickers.filter(t=>newNames.includes(t)||active.includes(t));if(!wanted.length)return;
+  const urgent=newNames.length>0||newActive,attempt=await get('ibkr_borrow_attempt');if(attempt&&at(now)-at(attempt)<(urgent?5000:60000))return;
   await putState(env,'ibkr_borrow_attempt',now,now);
   try{
     const result=fetchRows?await fetchRows(wanted):JSON.parse((await run(process.platform==='win32'?'python':'python3',[fileURLToPath(new URL('./public_borrow.py',import.meta.url)),'--tickers',wanted.join(',')],{timeout:25000,maxBuffer:3000000,windowsHide:true})).stdout);
@@ -34,8 +34,8 @@ export async function pollIBKRBorrow(env,{now=new Date().toISOString(),fetchRows
         await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(e.id,e.event_id,e.kind,e.observed_at,JSON.stringify(e)).run();
       }
     }
-    await putState(env,'shadow_borrow_health',{status:at(now)-at(result.as_of)<=1800000?'available':'stale',broker:'IBKR',as_of:result.as_of,observed_at:result.observed_at,universe_size:tickers.length,checked:wanted.length,quoted,missing,scope:all?'complete_resolved_universe':'active_names',locate_approved:false,actual_charges:'awaiting_IBKR_Flex_borrow_fee_details'},now);
-    await putState(env,'ibkr_borrow_poll',{day,at:all?now:last.at,active_at:now,tickers:all?tickers:last.tickers},now);
+    await putState(env,'shadow_borrow_health',{status:at(now)-at(result.as_of)<=1800000?'available':'stale',broker:'IBKR',as_of:result.as_of,observed_at:result.observed_at,universe_size:tickers.length,checked:wanted.length,quoted,missing,scope:all?'complete_resolved_universe':newNames.length?'new_and_active_names':'active_names',locate_approved:false,actual_charges:'awaiting_IBKR_Flex_borrow_fee_details'},now);
+    await putState(env,'ibkr_borrow_poll',{day,phase,at:all?now:last.at,active_at:now,active_tickers:active,tickers:all?tickers:[...new Set([...(last?.tickers||[]),...newNames])]},now);
   }catch{
     for(const ticker of wanted){const id=await digest('unavailable:'+ticker+':'+day+':'+now.slice(0,13));await env.DB.prepare('INSERT OR IGNORE INTO rs_borrow_observations VALUES(?,?,?,?,?,?,?)').bind(id,ticker,day,'coverage',null,now,JSON.stringify({id,ticker,broker:'IBKR',kind:'coverage',day,observed_at:now,status:'source_unavailable',apr:null,available_shares:null,locate_approved:false,actually_charged:false})).run();}
     await putState(env,'shadow_borrow_health',{status:'unavailable',broker:'IBKR',observed_at:now,checked:wanted.length,universe_size:tickers.length,message:'IBKR public file unavailable or failed validation; missing rates are never zero.'},now);

@@ -2,6 +2,8 @@
 import {SHADOW_POLICIES,at,finite,commission,sessions} from './shadow-core.mjs';
 import {etDay,DAY} from './core.mjs';
 export const EXECUTION_VERSION='ibkr_executable_shadow.v1';
+export const COST_FIELDS=Object.freeze(['commissions','borrow','regulatory','locate','dividends','cash_settlement','buyin','short_proceeds_interest']);
+export const completeCosts=c=>!!c&&Object.keys(c).length===COST_FIELDS.length&&COST_FIELDS.every(k=>finite(c[k]));
 export const EXECUTION_POLICIES=Object.freeze(['capacity','executable'].flatMap(lane=>[10,25,50,100].map(bps=>Object.freeze({
   ...SHADOW_POLICIES.find(p=>p.id==='rs_immediate_mini.v1'),id:`rs_ibkr_${lane}_${bps}bps.v1`,label:`IBKR · ${lane} · ${bps} bps`,version:EXECUTION_VERSION,lane,broker:'IBKR',
   target_notional:null,reference_equity:null,name_stress_loss_fraction:null,sleeve_stress_loss_fraction:null,maximum_names:null,
@@ -89,11 +91,11 @@ export function accrueBorrow(t,rows,now){
     let daily=(t.daily_marks||[]).find(m=>m.day===day),carried=false;
     if(!daily&&!sessions.some(s=>s.day===day)){daily=(t.daily_marks||[]).filter(m=>m.day<day).sort((a,b)=>a.day.localeCompare(b.day)).at(-1);carried=!!daily;}
     const chargedShares=carried?(daily?.end_shares??daily?.shares??null):(daily?.borrow_shares??null),mark=daily?.price;
-    const rate=rows.filter(r=>r.kind==='indicative'&&r.status==='quoted'&&finite(r.apr)&&r.apr>=0&&etDay(r.as_of)===day&&at(r.observed_at)<=at(now)).sort((a,b)=>at(b.as_of)-at(a.as_of))[0];
+    const nonSession=!sessions.some(s=>s.day===day),rate=rows.filter(r=>r.kind==='indicative'&&r.status==='quoted'&&finite(r.apr)&&r.apr>=0&&(etDay(r.as_of)===day||(nonSession&&etDay(r.as_of)<day))&&at(r.observed_at)<=at(now)).sort((a,b)=>at(b.as_of)-at(a.as_of))[0];
     const conid=rate?.conid||old?.conid||(!t.applied_actions?.length?t.ibkr_entry_conid:null),proxy=chargedRateProxy(rows,day,conid,now,t.borrow_account_scope);
     if(old&&finite(old.cost)&&(!proxy||JSON.stringify(old.reported_rate_ids)===JSON.stringify(proxy.ids)))continue;
     const apr=proxy?.apr??rate?.apr??old?.apr??null,price=mark??old?.mark_price??null,shares=chargedShares??old?.shares??null;
-    const item={day,shares,mark_price:price,conid:conid||null,apr,rate_id:proxy?null:rate?.id||null,rate_source:proxy?.source||'public_indicative',reported_rate_ids:proxy?.ids||[],reported_account_scope:proxy?.account_scope||null,rate_observed_at:proxy?.observed_at||rate?.observed_at||null,ex_post:!!proxy||(!!rate&&at(rate.observed_at)>at(t.entry_at)),carried_non_session_mark:carried,basis:'modeled_daily_max_shares_IBKR_102pct_rounded_USD_360_not_settled_statement',cost:shares===0?0:finite(apr)&&finite(price)&&finite(shares)?shares*Math.ceil(price*1.02)*apr/360:null,actually_charged:false,new_loan_rate_guaranteed:false};
+    const item={day,shares,mark_price:price,conid:conid||null,apr,rate_id:proxy?null:rate?.id||null,rate_source:proxy?.source||'public_indicative',reported_rate_ids:proxy?.ids||[],reported_account_scope:proxy?.account_scope||null,rate_observed_at:proxy?.observed_at||rate?.observed_at||null,ex_post:!!proxy||(!!rate&&at(rate.observed_at)>at(t.entry_at)),carried_non_session_mark:carried,carried_non_session_rate:!proxy&&!!rate&&etDay(rate.as_of)<day,basis:'modeled_daily_max_shares_IBKR_102pct_rounded_USD_360_not_settled_statement',cost:shares===0?0:finite(apr)&&finite(price)&&finite(shares)?shares*Math.ceil(price*1.02)*apr/360:null,actually_charged:false,new_loan_rate_guaranteed:false};
     if(oldIndex>=0)t.borrow_ledger[oldIndex]=item;else t.borrow_ledger.push(item);
   }
 }
@@ -102,11 +104,11 @@ export function executionPnl(t){
   const gross=!t.remaining_shares?t.entry_proceeds-t.cover_cost:finite(t.mark_price)?t.entry_proceeds-t.cover_cost-t.remaining_shares*t.mark_price:null;
   const known=t.borrow_ledger?.filter(r=>finite(r.cost)).reduce((n,r)=>n+r.cost,0)||0,missing=t.borrow_ledger?.filter(r=>!finite(r.cost)).length||0;
   const pending=(t.remaining_shares>0||t.exit_at)&&!t.borrow_ledger?.some(x=>x.day===etDay(t.exit_at||t.mark_at));
-  const gaps=['account_commission_schedule_unverified','regulatory_fees_unverified','dividend_and_special_distribution_status_unverified','recall_buyin_and_cash_settlement_costs_unverified'];
+  const gaps=['account_commission_schedule_unverified','regulatory_fees_unverified','dividend_and_special_distribution_status_unverified','recall_buyin_and_cash_settlement_costs_unverified','short_proceeds_interest_unverified'];
   if(missing||pending)gaps.push('borrow_daily_cost_incomplete');
   const pendingCost=!pending?0:finite(t.current_borrow_apr)&&finite(t.mark_price)?t.remaining_shares*Math.ceil(1.02*t.mark_price)*t.current_borrow_apr/360:null;
   const reserve=t.remaining_shares>0?commission(t.remaining_shares,t.mark_price,{commission_minimum:1,commission_per_share:.005})+t.remaining_shares*t.mark_price*.001:0;
-  const reconciliation=t.cost_reconciliation,complete=t.state==='closed'&&finite(gross)&&reconciliation&&at(reconciliation.covers_fills_through)>=at(t.fills.at(-1)?.at)?gross-Object.values(reconciliation.costs).reduce((n,x)=>n+x,0):null;
+  const reconciliation=t.cost_reconciliation,complete=t.state==='closed'&&finite(gross)&&reconciliation&&completeCosts(reconciliation.costs)&&at(reconciliation.covers_fills_through)>=at(t.fills.at(-1)?.at)?gross-Object.values(reconciliation.costs).reduce((n,x)=>n+x,0):null;
   const partial=finite(gross)?gross-(t.commissions||0)-known-pendingCost-reserve:null;
   if(pending&&pendingCost===null)gaps.push('current_day_borrow_rate_missing');
   return {gross_pnl:gross,known_borrow_cost:known,missing_borrow_days:missing,pending_borrow_cost_estimate:pendingCost,pending_borrow_rate_id:t.current_borrow_rate_id||null,cover_cost_reserve:reserve,partial_cost_pnl:partial,estimated_net_pnl:missing||(pending&&pendingCost===null)?null:partial,complete_net_pnl:complete,reconciled_cost_basis:complete!==null?reconciliation.basis:null,actual_net_pnl:null,cost_gaps:complete!==null?[]:gaps};

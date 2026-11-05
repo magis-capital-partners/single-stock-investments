@@ -178,8 +178,8 @@ Only IBKR borrow data is used. `borrow-service.mjs` reads IBKR's existing public
 FTP file, validates its declared row count, clock and checksum, and archives
 matching rows privately. Every resolved event ticker receives a record,
 including absent symbols, missing fields and failed daily coverage. All names
-are captured at startup, on a new company, daily, and hourly from 08:00 through
-17:59 ET. Active names refresh every five minutes. Runner handoffs preserve
+are captured daily overnight, after 08:35 and after 16:15 ET. New or newly active
+names refresh immediately; active names refresh every five minutes. Runner handoffs preserve
 the cadence state. Missing rates are never treated as zero, quotes expire
 after 30 minutes for entry, and a newer missing/unavailable observation
 supersedes an earlier valid indication. Public FTP is indicative, unauthenticated
@@ -226,7 +226,7 @@ Complete reconciled paper net P&L requires a CLOSED position and a dated
 `cost_reconciliation` evidence record for its exact `policy_id`, with
 `covers_fills_through` covering the last fill, `basis: estimated|documented`,
 and explicit finite `costs` for commissions, borrow, regulatory, locate,
-dividends, cash_settlement and buyin. Signed adjustments can be documented;
+dividends, cash_settlement, buyin and short_proceeds_interest. Interest credits are negative costs; extra or nonnumeric cost fields are rejected. Signed adjustments can be documented;
 an absent cost is not zero. Actual broker P&L stays null because no real fills
 exist. Original baseline P&L remains separate. The annual-rate cutoff table
 uses the rate known at entry (10/25/50/100/200% and no cutoff), never the best
@@ -270,3 +270,5 @@ The v2 validation plan supersedes and archives the unsampled v1 plan before the 
 Owner-supplied eligibility evidence is imported using a kind/time index, excluding public-inventory rows that the collector already owns locally. This prevents a growing public borrow archive from being repeatedly scanned/re-imported. The new index is isolated to the research database.
 
 Flex loan rows are aggregated as a complete account/conid/day snapshot before deduplication. Their original signed fee amounts and component records are retained in private evidence; only compact daily aggregates enter D1. This prevents a loan removed from a later statement from surviving as an orphaned rate component. The reporting URL returned by IBKR is accepted only if it exactly matches one of its two documented fixed HTTPS reporting endpoints; redirects and arbitrary hosts are rejected.
+
+Confirmed, dated IBKR corporate-action evidence can resolve an unavailable vendor action feed; conflicting applied ratios freeze P&L instead of adjusting twice. Corporate-action imports require `execution_confirmed: true`. A cost reconciliation may include `fractional_settlement: {shares, price, security_id}` to close an exit-pending fractional liability from an explicit cash-price reference. It must match the entire remaining fraction and security and cover the settlement observation time. Principal enters cover cost, additional fees stay in the reconciled cost components, repeated evidence is idempotent, and actual broker P&L remains null. Without that evidence, the fractional liability is retained.
