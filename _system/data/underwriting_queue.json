@@ -10,13 +10,13 @@
     "blocker_companies": {
       "issuer_forecast_missing": 119,
       "parent_cashflow_attribution_missing": 40,
-      "positive_normalized_owner_cash_not_established": 109,
       "pre_listing_share_basis_unverified": 102,
+      "positive_normalized_owner_cash_not_established": 109,
       "realization_timing_missing": 14,
       "completed_session_quote_missing": 91,
       "annual_diluted_share_count_missing": 50,
-      "annual_capex_missing": 72,
       "annual_operating_cash_flow_missing": 44,
+      "annual_capex_missing": 72,
       "new_financial_report_after_model": 401,
       "source_share_basis_unverified": 56,
       "newer_balance_sheet_inputs_available": 217,
@@ -5019,20 +5019,6 @@
         "completed_session_quote_missing",
         "new_financial_report_after_model",
         "source_share_basis_unverified"
-      ],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
-    {
-      "ticker": "RGLD",
-      "company": "Royal Gold Inc.",
-      "status": "needs_underwriting",
-      "current_model_basis": "issuer_valuation",
-      "blockers": [
-        "new_financial_report_after_model",
-        "newer_balance_sheet_inputs_available"
       ],
       "last_attempt": null,
       "retry_after": null,
@@ -12062,6 +12048,25 @@
         {
           "code": "ContractError",
           "detail": "ordinary_shares_require_verified_listing_ratio"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "RGLD",
+      "company": "Royal Gold Inc.",
+      "status": "needs_underwriting",
+      "current_model_basis": "issuer_valuation",
+      "blockers": [
+        "new_financial_report_after_model",
+        "newer_balance_sheet_inputs_available"
+      ],
+      "last_attempt": "2026-11-05T02:09:17.771692+00:00",
+      "retry_after": "2026-11-05",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "evidence_not_ready: [{\"code\": \"latest_primary_document_missing\", \"detail\": \"Retrieve the newly discovered report, including financial tables.\"}, {\"code\": \"report_discovery_failed\", \"detail\": \"Retry primary submissions; old cached reports do not prove freshness.\"}]"
         }
       ],
       "unresolved_findings": []
