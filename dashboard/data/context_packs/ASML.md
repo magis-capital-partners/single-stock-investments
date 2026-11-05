@@ -26,6 +26,15 @@ The market may be paying for a long EUV and High-NA upgrade cycle while underpri
 - Incremental after-tax ROIC: **18.0%** (source: Conservative bounded starting cases pending a longer primary-source capital bridge.)
 - Discount rate: **10.0%** (source: Approved risk bounds for the automated first pass.)
 
+## Core compounder research monitoring
+- Diagnostic 7-year cash-flow IRR: None% per year; status gap. Research only.
+- Buy bands: withheld; model screening_grade.
+- Independent review of v3 falsifier draft `asml-opbiz-oe-2026fy` (owner-earnings leg). (source: ASML/research/thesis_card.json)
+- Stance and sizing authority remain in `human_decision.json` only. (source: ASML/research/thesis_card.json)
+- Price as of 2026-07-20; refresh market inputs on next mechanical run. (source: ASML/research/thesis_card.json)
+- Typed moat-impairment falsifiers are missing. (source: ASML/research/valuation_contract.json)
+- Tracked lens-investor history must be reconciled; existing specialist signals do not establish Hohn coverage. (source: _system/lenses/personas.json)
+
 ## Open questions (stable)
 - Independent review of v3 falsifier draft `asml-opbiz-oe-2026fy` (owner-earnings leg).
 - Stance and sizing authority remain in `human_decision.json` only.
@@ -154,11 +163,11 @@ Documents in folder: **9** (all listed below; Tier 1–3 extracted or keyword-sc
 - RevenueFromContractWithCustomerEx
 
 ## Canonical pointers (open only when needed)
-- deep_dive: ASML/research/deep_dive_2026-11-01.md (sha256 sha256:0b6983fcf41c0c2a...)
+- deep_dive: ASML/research/deep_dive_2026-11-01.md (sha256 sha256:43b166b1e3bb587c...)
 - filing_digest: ASML/research/evidence/filing_digest.md (sha256 sha256:e2494a1304738098...)
 - adversarial: ASML/research/adversarial_2026-11-01.md (sha256 sha256:c0d6e87321d3f2e8...)
-- valuation: ASML/research/valuation.json (sha256 sha256:e0dbf0f58cd8be34...)
-- thesis_card: ASML/research/thesis_card.json (sha256 sha256:3d3d07a8c1ee46b8...)
+- valuation: ASML/research/valuation.json (sha256 sha256:3a86618222921526...)
+- thesis_card: ASML/research/thesis_card.json (sha256 sha256:58a6e68047ca7c62...)
 - cross_check: ASML/research/cross_check_third_party_2026-11-01.md (sha256 sha256:a4e0462a5409baba...)
 
 ## Excluded from this pack
