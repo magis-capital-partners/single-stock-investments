@@ -8,6 +8,17 @@ META = {'cik': '123', 'company': 'Example Research Ltd', 'form': '6-K', 'filed':
 
 
 class FilingExtraction(unittest.TestCase):
+    def test_comparative_currency_columns_do_not_mix_reported_and_translated_amounts(self):
+        raw=b'<h2>Consolidated balance sheets</h2><p>Amounts in thousands</p><table><tr><th></th><th colspan="2">June 30, 2026</th></tr><tr><th></th><th>RMB</th><th>US$</th></tr><tr><td>Total assets</td><td>700</td><td>100</td></tr></table>'
+        rows=extract_document(raw,META)['facts'];self.assertEqual({(r['currency'],r['value']) for r in rows},{('CNY',700000),('USD',100000)})
+    def test_native_pdf_table_and_scanned_evidence_fail_closed(self):
+        try:import pymupdf
+        except ImportError:self.skipTest('PDF reader is installed in the financial collector workflow')
+        doc=pymupdf.open();page=doc.new_page();page.insert_text((40,40),'Consolidated balance sheets. Amounts in thousands of U.S. dollars.')
+        for x in [40,300,480]:page.draw_line((x,80),(x,180))
+        for y in [80,110,145,180]:page.draw_line((40,y),(480,y))
+        page.insert_text((310,100),'June 30, 2026');page.insert_text((50,135),'Total assets');page.insert_text((310,135),'100');page.insert_text((50,170),'Cash and cash equivalents');page.insert_text((310,170),'25')
+        rows=extract_document(doc.tobytes(),META)['facts'];doc.close();self.assertTrue(any(r['metric']=='total_assets' and r['value']==100000 and r['kind']=='pdf_table' for r in rows))
     def test_custom_label_linkbase_and_standalone_instance(self):
         text='''<root xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink"><link:labelLink><link:loc xlink:label="loc1" xlink:href="company.xsd#company_CustomCashFlow"/><link:label xlink:label="lab1">Net cash used in operating activities</link:label><link:labelArc xlink:from="loc1" xlink:to="lab1"/></link:labelLink></root><xbrli:xbrl xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:company="https://company.example" xmlns:iso4217="http://www.xbrl.org/2003/iso4217"><xbrli:context id="c"><xbrli:entity><xbrli:identifier>123</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startDate>2026-01-01</xbrli:startDate><xbrli:endDate>2026-06-30</xbrli:endDate></xbrli:period></xbrli:context><xbrli:unit id="u"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit><company:CustomCashFlow contextRef="c" unitRef="u">1250</company:CustomCashFlow></xbrli:xbrl>'''
         rows=extract_document(text.encode(),META)['facts'];self.assertEqual(len(rows),1);self.assertEqual(rows[0]['metric'],'cfo');self.assertEqual(rows[0]['value'],-1250)

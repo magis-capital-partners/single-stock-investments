@@ -10,6 +10,7 @@ import json
 import math
 import re
 import sys
+from contextlib import redirect_stdout
 import xml.etree.ElementTree as ET
 from datetime import date, datetime
 from html import unescape
@@ -180,8 +181,6 @@ def extract_html(text, meta, labels=None):
         headers=grid[:first_metric]; heading=' '.join(' '.join(r) for r in headers)
         table_context=context+' '+heading
         currency=currency_in(table_context,meta.get('currency_hint')); scale=scale_in(table_context)
-        if not currency:
-            issues.append({'reason':'currency_unresolved','table':number+1}); continue
         ends={}
         width=max(map(len,grid))
         for col in range(1,width):
@@ -208,13 +207,16 @@ def extract_html(text, meta, labels=None):
                 if value is None and row[col] in {'$','US$','RMB',''} and col+1<len(row) and col+1 not in ends: value=numeric(row[col+1]); selected=col+1
                 if value is None: continue
                 colheader=' '.join(r[col] for r in headers if col<len(r))
+                column_currency=currency_in(colheader) or currency
+                if not column_currency:
+                    issues.append({'reason':'currency_unresolved','table':number+1,'column':col+1});continue
                 column_duration=bool(re.search(r'months?|years?|annual',colheader,re.I))
                 start=start_for(end,colheader if column_duration else table_context) if metric in FLOW else None
                 if metric in FLOW and not start:
                     issues.append({'reason':'flow_duration_unresolved','table':number+1,'metric':metric}); continue
                 if metric in {'cfo','net_income','operating_income'} and re.search(r'\b(?:used|loss)\b',row[0],re.I) and not re.search(r'provided.*used|used.*provided|income.*loss|loss.*income|profit.*loss|loss.*profit',row[0],re.I): value=-abs(value)
                 raw_value=str(row[selected]); places=len(raw_value.split('.')[-1].strip(')')) if '.' in raw_value else 0
-                facts.append(make_fact(meta,metric,value*scale,start,end,currency,f'HTML table {number+1}, row {index+1}, column {selected+1}: {row[0]}','html_table',rounding_tolerance=scale*.5*10**(-places),original_label=row[0]))
+                facts.append(make_fact(meta,metric,value*scale,start,end,column_currency,f'HTML table {number+1}, row {index+1}, column {selected+1}: {row[0]}','html_table',rounding_tolerance=scale*.5*10**(-places),original_label=row[0]))
     return facts,candidates,issues
 
 
@@ -323,4 +325,5 @@ def extract_document(raw, meta):
 if __name__=='__main__':
     payload=json.loads(sys.stdin.buffer.read(90_000_001))
     raw=base64.b64decode(payload['base64'],validate=True)
-    print(json.dumps(extract_document(raw,payload['meta']),allow_nan=False))
+    with redirect_stdout(sys.stderr):result=extract_document(raw,payload['meta'])
+    print(json.dumps(result,allow_nan=False))
