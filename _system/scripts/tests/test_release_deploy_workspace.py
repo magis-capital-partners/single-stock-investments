@@ -42,6 +42,9 @@ def fixture(tmp_path):
 @pytest.mark.parametrize('sparse', [False, True])
 def test_release_keeps_staged_hardlinks_and_all_original_git_objects(tmp_path, sparse):
     vault, site, files = fixture(tmp_path)
+    source = vault / 'dashboard-private/company-research-cache/published.json'
+    changed_stat = source.stat()
+    os.utime(source, ns=(changed_stat.st_atime_ns, changed_stat.st_mtime_ns + 2_000_000_000))
     if sparse:
         git(vault, 'sparse-checkout', 'set', '--no-cone', '/*')
     result = release(tmp_path, vault)
@@ -54,6 +57,16 @@ def test_release_keeps_staged_hardlinks_and_all_original_git_objects(tmp_path, s
         if 'company-' not in relative:
             assert (vault / relative).read_bytes() == raw
     assert git(vault, 'status', '--porcelain').strip() == b''
+
+
+def test_release_refuses_modified_tracked_inputs_before_removing_any_cache(tmp_path):
+    vault, site, files = fixture(tmp_path)
+    source = vault / 'dashboard-private/company-research-cache/published.json'
+    source.write_bytes(b'uncommitted source change must survive')
+    with pytest.raises(subprocess.CalledProcessError):
+        release(tmp_path, vault)
+    assert source.read_bytes() == b'uncommitted source change must survive'
+    assert (vault / 'dashboard-private/company-source-backfill-v2/part.zip').exists()
 
 
 def test_release_refuses_a_vault_outside_the_deployment_checkout(tmp_path):

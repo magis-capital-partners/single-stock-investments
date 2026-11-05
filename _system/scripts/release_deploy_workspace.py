@@ -19,6 +19,10 @@ def release(workspace: Path, vault: Path) -> dict:
         return subprocess.run(['git', '-c', 'submodule.recurse=false', '-C', str(vault), *args],
                               capture_output=True, check=True, **kwargs)
     git('rev-parse', '--git-dir')
+    # Staging hardlinks changes ctime without changing source bytes. Refresh
+    # cached stats before excluding those paths, and refuse genuinely dirty
+    # tracked inputs before any recursive cleanup can remove them.
+    git('update-index', '--refresh')
     omitted = ('dashboard-private/company-source-backfill-v2', 'dashboard-private/company-research-cache')
     targets = [vault / relative for relative in omitted]
     if any(path.resolve() != path or not path.resolve().is_relative_to(vault) for path in targets):
