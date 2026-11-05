@@ -1,20 +1,15 @@
 {
   "ticker": "DNP.WA",
-  "as_of": "2026-07-27",
+  "as_of": "2026-11-05",
   "currency": "PLN",
-  "method": "full",
+  "method": "owner_earnings_reinvestment_dcf",
   "lawrence_bucket": "pricing_power",
   "payoff_lens": "operating",
   "valuation_mode": "economic_value",
   "classification_inputs": {
     "archetype": "compounder",
-    "moat": "narrow",
-    "dhando": "partial",
-    "stance": "watch",
-    "cycle": "mid",
-    "moi_bucket": "compounder_mispriced",
-    "payoff_lens": "operating",
-    "investment_sleeve": "-"
+    "valuation_profile": "quality_reinvestment",
+    "method_source": "power_zone_route"
   },
   "inputs": {
     "price": 29.45,
@@ -680,7 +675,8 @@
       "low": -40.9,
       "base": 94.4,
       "high": 228.9
-    }
+    },
+    "as_of": "2026-11-05"
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
@@ -3156,9 +3152,15 @@
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "valuation_methodology": {
-    "mode": "component_economic_value",
-    "horizon_years": 7,
-    "decision_rule": "Use one complete non-overlapping component schedule. Lawrence return remains a separate stance gate."
+    "primary_method": "owner_earnings_reinvestment_dcf",
+    "method_version": "1.0",
+    "automation": "revalidated_existing_approved_proofs",
+    "component_methods": [
+      "midcycle_capacity_value",
+      "net_asset_value",
+      "owner_cash_or_dividend_discount",
+      "owner_earnings_reinvestment_dcf"
+    ]
   },
   "component_valuation": {
     "schema_version": "1.0",
@@ -3827,7 +3829,7 @@
       }
     ]
   },
-  "schema_version": "magis.valuation.v2",
+  "schema_version": "3.0",
   "returns": {
     "base_irr_pct": 21.96,
     "unit": "percent_per_year",
