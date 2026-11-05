@@ -134,6 +134,15 @@ Execution also requires a quote received at or after the planned entry clock, or
 The external watch retries temporary storage/network failures at most three times with 15/30 second backoff. Each retry restores the committed checkpoint and receives only the time remaining in the original bounded run. It does not extend the GitHub job deadline or take over a competing lease. Policy/configuration/credential failures still stop immediately. The data stream remains a single child session across an in-process recovery.
 # IBKR capacity, executable shadow and November 5 validation
 
+Free-plan write conservation: a ten-minute collector lease renews at most once
+every two minutes; the dashboard heartbeat updates once a minute; routine
+source-health rows publish every five minutes. Decisions, fills and checkpoints
+keep their immediate/minute cadence. The immutable first executable-registration
+UTC day has a one-time 70k research row-write budget to cover historical cohort
+enrollment; later UTC days return to 40k. This is below the account's 100k/day
+Free limit and does not reset or conceal consumed usage. The budget remains a
+fail-closed stop; it is not an unlimited production-service guarantee.
+
 The eight `rs_ibkr_{capacity|executable}_{10|25|50|100}bps.v1` cohorts are
 separately registered forward experiments. The original fourteen policies,
 their $1m reference portfolio, fixed 50% borrow assumption and results remain

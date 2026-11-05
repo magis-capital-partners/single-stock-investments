@@ -7,6 +7,8 @@ async function audit(env,t,kind,now,data){const payload=JSON.stringify(data),id=
 async function save(env,t,now){t.updated_at=now;await env.DB.prepare('INSERT INTO rs_execution_tracks VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET ticker=excluded.ticker,state=excluded.state,updated_at=excluded.updated_at,payload=excluded.payload').bind(t.id,t.event_id,t.policy_id,t.ticker,t.state,now,JSON.stringify(t)).run();}
 export async function initializeExecution(env,now=stamp()){
   for(const p of EXECUTION_POLICIES){const old=await env.DB.prepare('SELECT payload FROM rs_execution_policies WHERE id=?').bind(p.id).first();if(old&&JSON.stringify(parse(old))!==JSON.stringify(p))throw new Error('Executable policy changed; register a new version');if(!old)await env.DB.prepare('INSERT INTO rs_execution_policies VALUES(?,?,?)').bind(p.id,now,JSON.stringify(p)).run();}
+  const registered=(await env.DB.prepare('SELECT min(registered_at) AS at FROM rs_execution_policies').first()).at;
+  env.EXECUTION_REGISTRATION_DAY=registered.slice(0,10);
 }
 export async function enrollExecution(env,event,now=stamp()){
   for(const p of EXECUTION_POLICIES){
