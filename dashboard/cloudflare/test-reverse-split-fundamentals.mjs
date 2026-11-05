@@ -6,6 +6,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {readFileSync,readdirSync} from 'node:fs';
 import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
 import {readSnapshotAPI} from './reverse-split-live/read-snapshot.mjs';
+import {publishFinancialCoverage} from './reverse-split-live/financials-harvest.mjs';
 const now='2026-11-05T17:00:00Z',cik='123';
 const fact=(metric,value,start=null,end='2026-06-30',extra={})=>({metric,value,start,end,currency:'USD',cik,form:'6-K',filed:'2026-08-15',published_at:'2026-08-15T12:00:00Z',observed_at:now,source_url:'https://www.sec.gov/Archives/edgar/data/123/000000012326000001/report.htm',source_sha256:'a'.repeat(64),locator:'Consolidated financial statements, row '+metric,kind:'html_table',confidence:'verified',scope:'consolidated',...extra});
 const annual=(end='2026-06-30')=>[fact('net_income',-15,'2025-07-01',end),fact('cfo',-10,'2025-07-01',end),fact('cash',5,null,end),fact('total_assets',100,null,end),fact('stockholders_equity',-5,null,end),fact('long_term_debt',0,null,end),fact('current_debt',0,null,end)];
@@ -43,6 +44,9 @@ test('private snapshot publication keeps full local research running with no eve
 test('losing the collector lease cannot commit a checkpoint or publish a new view',async t=>{
   const {db,env,objects}=setup(t);env.controlDB=env.DB;env.pending=[];env.collectorLeaseOwner='qa-old-owner';db.prepare('INSERT INTO rs_state VALUES(?,?,?)').run('collector_lease',String(Date.now()+600000)+':qa-new-owner',now);
   const checkpoint=await openCheckpoint(env);t.after(()=>checkpoint.close());await assert.rejects(checkpoint.save({publicationMode:'r2'}),/lease lost/);assert.equal(db.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").get(),undefined);assert.equal(objects.has('collector-dashboard/shadow.json'),false);
+});
+test('coverage publication uses the cached cards instead of rereading every issuer on every update',async t=>{
+  const {env}=setup(t),queue={jobs:Object.fromEntries(Array.from({length:200},(_,i)=>[String(i+1),{cik:String(i+1)}]))};let reads=0;env.EVIDENCE.get=async()=>{reads++;return null;};env.financialCoverageCards=new Map([['123',{cik:'123',version:'a'.repeat(64),status:'stale',observed_at:now}]]);const result=await publishFinancialCoverage(env,queue);assert.equal(result.processed,1);assert.equal(result.issuers,200);assert.equal(reads,0);
 });
 test('snapshot history pagination reaches beyond the first page and paused runtime is never tracking',async t=>{
   const {db,env}=setup(t);for(let i=0;i<5;i++){const id='qa-'+i,payload={id,policy_id:'p',state:'retrospective',enrolled_at:now};db.prepare('INSERT INTO rs_execution_tracks VALUES(?,?,?,?,?,?,?)').run(id,id,'p','QA','retrospective',now,JSON.stringify(payload));}

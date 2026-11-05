@@ -27,7 +27,7 @@ export async function financialAPI(request,env){
   if(request.method!=='GET')return json({error:'Method not allowed'},405);
   if(path==='/fundamentals'||path==='/fundamentals/summary'){
     const manifest=await read(env,'financials/manifest-latest.json');if(!manifest)return json({status:'warming',profiles:[],summary:{processed:0}},202);
-    const {profiles,pages,...summary}=manifest;if(path.endsWith('/summary'))return json(summary);
+    const {profiles,pages,cards:allCards,...summary}=manifest;if(path.endsWith('/summary'))return json(summary);
     const offset=Number(url.searchParams.get('after')||0);if(!Number.isInteger(offset)||offset<0||offset>100000)return json({error:'Invalid page'},400);
     const q=(url.searchParams.get('q')||'').toUpperCase().slice(0,100),status=url.searchParams.get('status')||'',cards=manifest.cards||profiles;
     const filtered=cards.filter(r=>(!q||[r.cik,r.ticker,r.company].some(v=>String(v||'').toUpperCase().includes(q)))&&(!status||r.status===status));
