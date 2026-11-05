@@ -184,7 +184,9 @@ def extract_html(text, meta, labels=None):
         first_metric = next((i for i,r in enumerate(grid) if r and metric_for(r[0])),len(grid))
         headers=grid[:first_metric]; heading=' '.join(' '.join(r) for r in headers)
         table_context=context+' '+heading
-        currency=currency_in(table_context,meta.get('currency_hint')); scale=scale_in(table_context)
+        currency=currency_in(table_context); scale=scale_in(table_context)
+        if scale==1 and re.search(r'thousands|millions|billions|[\'’]000|000s',table_context,re.I):
+            issues.append({'reason':'financial_table_scale_requires_review','table':number+1});continue
         ends={}
         width=max(map(len,grid))
         for col in range(1,width):
@@ -307,7 +309,10 @@ def extract_document(raw, meta):
             with pymupdf.open(stream=raw,filetype='pdf') as proof: identity_text=' '.join(proof[n].get_text() for n in range(min(3,proof.page_count)))
         else:identity_text=re.sub(r'<[^>]+>',' ',raw[:100000].decode('utf-8',errors='replace'))
         if not identity or identity not in re.sub(r'[^a-z0-9]','',unescape(identity_text).lower()):
-            return {'schema':VERSION,'facts':[],'candidates':[],'issues':[{'reason':'issuer_IR_document_identity_requires_review'}]}
+            if raw[:5]==b'%PDF-':
+                _,candidates,issues=extract_pdf(raw,meta)
+            else:candidates,issues=[],[]
+            return {'schema':VERSION,'facts':[],'candidates':candidates[:50],'issues':issues[:99]+[{'reason':'issuer_document_identity_requires_review'}]}
     if raw[:5]==b'%PDF-':facts,candidates,issues=extract_pdf(raw,meta)
     else:
         text=raw.decode('utf-8',errors='replace')
