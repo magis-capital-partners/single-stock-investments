@@ -54,3 +54,13 @@ test('collector quote cache keeps full-market and Mini sources separate for the 
   env.market={health:{status:'available'},quote:async(ticker,p)=>{feeds.push(p.quote_feed||'consolidated');throw new Error('Offline fixture');}};
   await shadowTick(env,{now});assert.deepEqual(feeds.sort(),['consolidated','databento_mini']);assert.equal(db.prepare('SELECT sum(json_extract(payload,\'$.entry_shares\')) AS shares FROM rs_shadow_tracks').get().shares,0);
 });
+test('a still-fresh cached quote received before the entry or exit clock cannot create a fill',async t=>{
+  const {db,env}=setup(t);await initializeShadow(env,'2026-11-04T14:00:00Z');await enrollShadow(env,event(),now);
+  const x=JSON.parse(db.prepare('SELECT payload FROM rs_shadow_tracks WHERE policy_id=?').get(mini.id).payload);
+  const q={...row(),id:'before',provider:'databento_mini',coverage:'selected_venues_not_sip_nbbo',consolidated:false,delayed:false,cik:'123',security_id:'qa-identity',type:'CS',currency:'usd',observed_at:'2026-11-04T14:59:59.999Z'};
+  await processShadowTrack(env,x,q,[x],now);assert.equal(x.entry_shares,0);assert.equal(x.reason,'quote_received_before_entry_clock');
+  await processShadowTrack(env,x,{...q,id:'after',observed_at:now},[x],now);assert.equal(x.entry_shares,50);
+  const exit='2026-11-10T20:59:30.000Z',early={...q,id:'early-cover',quote_at:exit,observed_at:'2026-11-10T20:59:29.999Z'};
+  await processShadowTrack(env,x,early,[x],exit);assert.equal(x.remaining_shares,50);assert.equal(x.reason,'waiting_for_post_exit_quote');
+  await processShadowTrack(env,x,{...early,id:'cover',observed_at:exit},[x],exit);assert.equal(x.remaining_shares,0);assert.equal(x.state,'closed');
+});

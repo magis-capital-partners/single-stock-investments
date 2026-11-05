@@ -128,3 +128,5 @@ and `python -m unittest discover -s dashboard/cloudflare/reverse-split-live -p t
 A successful subscription acknowledgement proves access, not a fresh book outside
 trading hours. The first real session must verify quotes, identity and both entry
 and exit audits prospectively.
+
+Execution also requires a quote received at or after the planned entry clock, or at or after the exit request for a cover. A still-fresh cached book received earlier remains a dated observation and cannot generate a fill. Capture time, receipt time and the decision clock are retained separately. This guard applies equally to the original and Mini policies without changing registered parameters.
