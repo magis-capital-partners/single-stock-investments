@@ -1,5 +1,7 @@
 import {POLICY,DAY,etDay,iso,dateOnlyAvailable,plain,parseFeed,classifyAnnouncement,scoreFundamentals,screen} from './core.mjs';
 import {shadowAPI} from './shadow-api.mjs';
+import {financialAPI} from './financials-api.mjs';
+import {readSnapshotAPI} from './read-snapshot.mjs';
 
 const stamp=()=>new Date().toISOString(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const json=(value,status=200)=>Response.json(value,{status,headers:{'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
@@ -100,6 +102,7 @@ async function issuer(env,cik,{refresh=false}={}){
   row=await env.DB.prepare('SELECT * FROM rs_issuers WHERE cik=?').bind(cik).first();return {row,submissions};
 }
 async function financials(env,cik,cutoff,refresh=false){
+  const recovered=env.scoreFinancialProfile?.(cik,cutoff);if(recovered)return recovered;
   const row=await env.DB.prepare('SELECT * FROM rs_issuers WHERE cik=?').bind(cik).first();let raw,hash;
   if(!refresh&&row?.cache_key&&Date.now()-Date.parse(row.facts_captured_at)<6*3600000){const object=await env.EVIDENCE.get(row.cache_key);if(object){raw=await object.json();hash=row.cache_key.split('/').at(-1);}}
   if(!raw){const doc=await archive(env,await limitedFetch(env,`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik.padStart(10,'0')}.json`));raw=JSON.parse(doc.text);if(String(Number(raw.cik))!==cik)throw new Error('Companyfacts issuer identity mismatch');hash=doc.hash;await env.DB.prepare('UPDATE rs_issuers SET cache_key=?,facts_captured_at=? WHERE cik=?').bind(doc.key,stamp(),cik).run();}
@@ -137,7 +140,9 @@ async function filingJob(env,p){
   const downloaded=await limitedFetch(env,p.url),raw=new TextDecoder().decode(downloaded.bytes);
   const bound=/ACCESSION NUMBER:\s*([\d-]+)/i.exec(raw)?.[1];if(bound&&bound!==p.accession)throw new Error('Filing accession mismatch');
   const parsed=classifyAnnouncement(filingText(raw),{published_at:p.published_at||p.first_seen_at,form:p.form});
-  const source=parsed?await archive(env,downloaded):{hash:await sha(downloaded.bytes)};
+  const known=env.onFinancialDisclosure?await env.DB.prepare('SELECT id FROM rs_events WHERE cik=? LIMIT 1').bind(p.cik).first():null;
+  const source=parsed||known?await archive(env,downloaded):{hash:await sha(downloaded.bytes)};
+  if(known&&/^(?:10-[KQ]|20-F|40-F|6-K|8-K)/.test(p.form||''))await env.onFinancialDisclosure({...p,filed:etDay(p.published_at||stamp()),source_sha256:source.hash});
   let event=null;
   if(parsed){const ticker=/<ix:nonNumeric[^>]*name=["']dei:TradingSymbol["'][^>]*>([^<]+)/i.exec(raw)?.[1]?.trim();
     event=await recordEvent(env,{...parsed,id:'sec:'+p.accession,cik:p.cik,ticker:ticker||null,company:/COMPANY CONFORMED NAME:\s*([^\r\n]+)/i.exec(raw)?.[1]?.trim()||null,published_at:p.published_at,first_seen_at:row?.first_seen_at||p.first_seen_at,sources:[{url:p.url,sha256:source.hash,accession:p.accession,form:p.form}],clock_basis:'SEC feed publication; separately recorded first observation'});
@@ -206,8 +211,10 @@ export async function scheduled(event,env){
   await dispatch(env);await state(env,'last_completed_tick',stamp());
 }
 export async function readAPI(request,env){
-  if(request.method!=='GET')return json({error:'Read-only research service'},405);
   const url=new URL(request.url);
+  if(url.pathname==='/fundamentals'||url.pathname.startsWith('/fundamentals/'))return financialAPI(request,env);
+  if(request.method!=='GET')return json({error:'Read-only research service'},405);
+  if((await state(env,'collector_publication'))==='r2'){const snapshot=await readSnapshotAPI(url,env);if(snapshot)return snapshot;}
   if(url.pathname==='/shadow'||url.pathname.startsWith('/shadow/'))return shadowAPI(url,env);
   if(url.pathname==='/events'){
     const limit=Math.max(1,Math.min(100,Number(url.searchParams.get('limit'))||50)),filter=url.searchParams.get('result'),query=(url.searchParams.get('q')||'').slice(0,80).toUpperCase();let cursor=['9999',''];

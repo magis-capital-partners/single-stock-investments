@@ -51,6 +51,12 @@ export function monetaryFacts(raw,cutoff){
     if(!/^[A-Z]{3}$/.test(unit))continue;
     for(const r of rows)if(FORMS.has(r.form)&&r.filed&&r.filed.slice(0,10)<day&&r.end&&r.end<=day&&finite(r.val)&&(FLOWS.has(metric)?Boolean(r.start):!r.start))candidates[metric].push({...r,unit,tag:ns+':'+tag,rank,known_at:r.filed.slice(0,10),source:'sec_companyfacts'});
   }
+  // Optional, source-verified filing facts. The legacy Company Facts path and
+  // numerical formula are unchanged when no evidence layer is supplied.
+  for(const r of raw.verified_metric_facts||[]){
+    if(!Object.hasOwn(candidates,r.metric)||r.confidence!=='verified'||r.scope!=='consolidated'||String(Number(r.cik))!==String(Number(raw.cik))||!finite(r.value)||!/^[A-Z]{3}$/.test(r.currency||'')||!r.filed||r.filed.slice(0,10)>=day||!r.end||r.end>day||(FLOWS.has(r.metric)?!r.start:!!r.start)||!Number.isFinite(Date.parse(r.observed_at))||Date.parse(r.observed_at)>Date.parse(cutoff)||!Number.isFinite(Date.parse(r.published_at))||Date.parse(r.published_at)>Date.parse(cutoff)||!r.source_url?.startsWith('https://')||!/^[a-f0-9]{64}$/.test(r.source_sha256||'')||!r.locator)continue;
+    candidates[r.metric].push({...r,val:r.value,unit:r.currency,tag:r.original_tag||'normalized:'+r.metric,rank:-1,known_at:r.filed,source:'primary_filing_fallback'});
+  }
   for(const rows of Object.values(candidates)){if(!rows.length)continue;const latest=rows.map(r=>r.end).sort().at(-1);for(const unit of new Set(rows.filter(r=>r.end===latest).map(r=>r.unit)))currencies[unit]=(currencies[unit]||0)+1;}
   const currency=Object.keys(currencies).sort((a,b)=>currencies[b]-currencies[a]||a.localeCompare(b))[0]||null,metrics={};
   for(const [k,rs] of Object.entries(candidates)){const unique=new Map();for(const r of rs.sort((a,b)=>a.filed.localeCompare(b.filed)||b.rank-a.rank))if(r.unit===currency)unique.set((r.start||'')+'/'+r.end,r);metrics[k]=[...unique.values()];}
@@ -65,10 +71,10 @@ export function trailingYear(rows,end){
   if(window.length===4&&window.at(-1).end===end&&window.slice(1).every((r,i)=>days(window[i].end,r.start)>=0&&days(window[i].end,r.start)<=3)&&days(window[0].start,end)>=340&&days(window[0].start,end)<=380)return {value:window.reduce((a,r)=>a+r.val,0),evidence:window,method:'four_reported_quarters'};
   return null;
 }
-export function scoreFundamentals(raw,cutoff,expectedCik){
+export function scoreFundamentals(raw,cutoff,expectedCik,{maxAgeDays=200}={}){
   if(!raw||String(Number(raw.cik))!==String(Number(expectedCik)))return {status:'identity_mismatch_or_missing',score:null,signals:{},evidence:[]};
   const {metrics,currency,currency_candidates}=monetaryFacts(raw,cutoff),flowEnds=[...FLOWS].flatMap(k=>metrics[k].map(r=>r.end)),anchor=(flowEnds.length?flowEnds:Object.values(metrics).flatMap(rs=>rs.map(r=>r.end))).sort().at(-1)||null;
-  if(!anchor||days(anchor,etDay(cutoff))<0||days(anchor,etDay(cutoff))>200)return {status:'stale_or_missing_period',score:null,period:anchor,currency,signals:{},evidence:[]};
+  if(!anchor||days(anchor,etDay(cutoff))<0||days(anchor,etDay(cutoff))>maxAgeDays)return {status:'stale_or_missing_period',score:null,period:anchor,currency,signals:{},evidence:[]};
   const flows={},prior={},balances={},evidence=[];
   for(const k of FLOWS){const cur=trailingYear(metrics[k],anchor);if(cur){flows[k]=cur.value;evidence.push(...cur.evidence);}for(const end of [...new Set(metrics[k].filter(r=>days(r.end,anchor)>=350&&days(r.end,anchor)<=380).map(r=>r.end))].sort().reverse()){const old=trailingYear(metrics[k],end);if(old){prior[k]=old.value;evidence.push(...old.evidence);break;}}}
   for(const k of Object.keys(ALIASES).filter(k=>!FLOWS.has(k))){const r=metrics[k].filter(r=>days(r.end,anchor)>=0&&days(r.end,anchor)<=105).sort((a,b)=>b.end.localeCompare(a.end)||b.filed.localeCompare(a.filed))[0];if(r){balances[k]=r.val;evidence.push(r);}}

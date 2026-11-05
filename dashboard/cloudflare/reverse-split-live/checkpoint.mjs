@@ -4,6 +4,7 @@ import {mkdtempSync,readFileSync,writeFileSync,readdirSync,rmSync,realpathSync} 
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
 import {sha} from './worker.mjs';
+import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
 function cleanup(dir){const target=realpathSync(dir),parent=realpathSync(tmpdir()),equal=(a,b)=>process.platform==='win32'?a.toLowerCase()===b.toLowerCase():a===b;if(!equal(dirname(target),parent)||!basename(target).startsWith('reverse-split-'))throw new Error('Unsafe collector temporary directory');rmSync(target,{recursive:true,force:true});}
 
 export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>make(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>({meta:{changes:Number(db.prepare(sql).run(...args).changes)}})});return {prepare:sql=>make(sql),batch:async statements=>{db.exec('BEGIN');try{const rows=[];for(const s of statements)rows.push(await s.run());db.exec('COMMIT');return rows;}catch(e){db.exec('ROLLBACK');throw e;}}};}
@@ -22,10 +23,19 @@ export async function openCheckpoint(env){
     }
   }catch(e){db?.close();cleanup(dir);throw e;}
   return {
-    async save(){
+    async save({publicationMode='d1'}={}){
       for(const p of env.pending.splice(0))await env.DB.prepare("UPDATE rs_jobs SET state='pending',token=NULL WHERE id=? AND token=? AND state='queued'").bind(p.id,p.token).run();
       const at=new Date().toISOString(),jobs=db.prepare('SELECT state,count(*) AS count,min(created_at) AS oldest FROM rs_jobs GROUP BY state').all();
       db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_job_counts',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(JSON.stringify(jobs),at);
+      if(publicationMode==='r2'){
+        // Capture without yielding: every displayed fill belongs to these exact durable bytes.
+        const snapshot=captureReadSnapshot(db),slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
+        await env.EVIDENCE.put(`collector-state/slot${slot}.sqlite`,bytes,{httpMetadata:{contentType:'application/vnd.sqlite3'}});
+        await remote.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_checkpoint',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(JSON.stringify(next),at).run();receipt=next;
+        await publishReadSnapshot(env,db,snapshot);
+        if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(at).run();env.snapshotActivated=true;}
+        return next;
+      }
       const publications=[];
       const backgroundDue=Date.now()-Number(db.prepare("SELECT value FROM rs_state WHERE key='source_publication_at'").get()?.value||0)>=300000;
       async function changed(kind,id,payload,statement){if(kind==='source'&&!backgroundDue)return;const hash=await sha(payload),key='published:'+kind+':'+id,old=db.prepare('SELECT value FROM rs_state WHERE key=?').get(key)?.value;if(old!==hash)publications.push({key,hash,statement});}

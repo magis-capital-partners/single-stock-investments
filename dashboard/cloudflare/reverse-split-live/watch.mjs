@@ -7,24 +7,27 @@ import {pollIBKRBorrow} from './borrow-service.mjs';
 import {initializeExecution,executionTick} from './execution-service.mjs';
 import {initializeValidation,validationTick} from './validation-service.mjs';
 import {pollFlexBorrow} from './flex-borrow.mjs';
+import {installFinancialImport,importFinancialProfiles} from './financials-import.mjs';
 const now=()=>new Date().toISOString();
 export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
 export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false}={}){
-  const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={},flexTask=null;
+  const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={},flexTask=null,financialTask=null;
   const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
   const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,ticks,jobs,error,maximum_minutes:maximumMs/60000,broker_connections:0,market_data:env.market?.health||null};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);lastHeartbeat=Date.now();};
   async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<researchWriteBudget(day,env.EXECUTION_REGISTRATION_DAY);}
   async function save(){
     const current=await remote.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first();if(current?.value!==lease)throw new Error('Collector lease lost; stopping before publication');
-    await checkpoint.save();lastSaved=Date.now();
+    await checkpoint.save({publicationMode:env.PUBLICATION_MODE});lastSaved=Date.now();
     await remote.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind('collector_usage:'+budgetDay,JSON.stringify({rows_read:Number(baseline.rows_read||0)+env.usage.rows_read,rows_written:Number(baseline.rows_written||0)+env.usage.rows_written}),now()).run();
   }
   try{
     await remote.prepare("INSERT OR IGNORE INTO rs_state VALUES('collector_lease','0',?)").bind(now()).run();lease=String(Date.now()+600000)+':'+token;
     const claimed=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND CAST(value AS INTEGER)<=? RETURNING value").bind(lease,now(),Date.now()).first();
     if(!claimed)return {skipped:true,reason:'Another collector owns the bounded lease'};
-    checkpoint=await openCheckpoint(env);env.FAST_MONITOR=true;env.EXPECTED_CADENCE_SECONDS=String(interval);await initializeShadow(env);await initializeExecution(env);await initializeValidation(env);await budget();
+    checkpoint=await openCheckpoint(env);env.PUBLICATION_MODE='r2';env.FAST_MONITOR=true;env.EXPECTED_CADENCE_SECONDS=String(interval);installFinancialImport(env);await initializeShadow(env);await initializeExecution(env);await initializeValidation(env);await budget();
     env.onShadowDecision=async event=>{
+      const enrolled=await env.DB.prepare("SELECT state,payload FROM rs_shadow_tracks WHERE event_id=? UNION ALL SELECT state,payload FROM rs_execution_tracks WHERE event_id=?").bind(event.id,event.id).all();
+      if(enrolled.results.length&&enrolled.results.every(r=>r.state==='retrospective'&&!JSON.parse(r.payload).entry_shares))return;
       await shadowTick(env,{event});await executionTick(env,{event});
       const active=await env.DB.prepare("SELECT id FROM rs_execution_tracks WHERE event_id=? AND (state IN ('armed','partial_entry','open','exit_pending') OR json_extract(payload,'$.entry_shares')>0) UNION ALL SELECT id FROM rs_shadow_tracks WHERE event_id=? AND (state IN ('armed','partial_entry','open','exit_pending') OR json_extract(payload,'$.entry_shares')>0) LIMIT 1").bind(event.id,event.id).first();
       // Repeated untraded historical revisions are routine work. Opportunities
@@ -37,10 +40,12 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
     while(!stopping&&!shouldStop()&&Date.now()-started<maximumMs){
       const cycle=Date.now();
       if(Number(lease.split(':')[0])-Date.now()<480000){const renewed=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(renewed,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=renewed;}
-      if(!await budget()){await heartbeat('paused_budget','Daily research storage budget reached; no new simulated entries.');await sleep(60000);continue;}
+      // Frequent research state is checkpointed to private object storage. The
+      // database allowance never suspends detection, quotes, exits or validation.
+      await budget();
       env.deadline=Date.now()+45000;
       try{
-        if(Date.now()-lastImport>60000){const records=(await remote.prepare("SELECT payload FROM rs_shadow_evidence WHERE kind IN ('locate','margin','ssr','trading_status','cost_reconciliation','corporate_action') AND observed_at>=? ORDER BY observed_at LIMIT 1000").bind(new Date(Date.now()-7*86400000).toISOString()).all()).results;for(const r of records){const e=JSON.parse(r.payload);await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(e.id,e.event_id,e.kind,e.observed_at,r.payload).run();}lastImport=Date.now();}
+        if(Date.now()-lastImport>60000){const records=(await remote.prepare("SELECT payload FROM rs_shadow_evidence WHERE kind IN ('locate','margin','ssr','trading_status','cost_reconciliation','corporate_action') AND observed_at>=? ORDER BY observed_at LIMIT 1000").bind(new Date(Date.now()-7*86400000).toISOString()).all()).results;for(const r of records){const e=JSON.parse(r.payload);await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(e.id,e.event_id,e.kind,e.observed_at,r.payload).run();}if(!financialTask)financialTask=importFinancialProfiles(env).catch(e=>console.error(JSON.stringify({event:'financial_import_retry',error:e.message}))).finally(()=>{financialTask=null;});lastImport=Date.now();}
         // Price and exit work precede filing backlogs. Source polling has a bounded deadline.
         await shadowTick(env);
         await executionTick(env);
@@ -66,7 +71,7 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
     await heartbeat('handoff');await save();return {ticks,jobs,started_at:new Date(started).toISOString(),finished_at:now(),mode:'continuous_shadow'};
   }finally{
     process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);env.onShadowDecision=null;
-    try{if(flexTask)await flexTask;if(checkpoint){try{await save();}finally{checkpoint.close();}}}finally{
+    try{if(flexTask)await flexTask;if(financialTask)await financialTask;if(checkpoint){try{await save();}finally{checkpoint.close();}}}finally{
     env.DB=remote;await remote.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key='collector_lease' AND value=?").bind(now(),lease||'').run();
     }
   }
