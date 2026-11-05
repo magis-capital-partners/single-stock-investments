@@ -8,11 +8,12 @@ import {initializeExecution,executionTick} from './execution-service.mjs';
 import {initializeValidation,validationTick} from './validation-service.mjs';
 import {pollFlexBorrow} from './flex-borrow.mjs';
 const now=()=>new Date().toISOString();
+export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
 export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false}={}){
   const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={};
   const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
   const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,ticks,jobs,error,maximum_minutes:maximumMs/60000,broker_connections:0};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);lastHeartbeat=Date.now();};
-  async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<40000;}
+  async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<researchWriteBudget(day,env.EXECUTION_REGISTRATION_DAY);}
   async function save(){
     const current=await remote.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first();if(current?.value!==lease)throw new Error('Collector lease lost; stopping before publication');
     await checkpoint.save();lastSaved=Date.now();
@@ -29,7 +30,7 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
     await shadowTick(env);await executionTick(env);await pollIBKRBorrow(env);await validationTick(env);await save();
     while(!stopping&&!shouldStop()&&Date.now()-started<maximumMs){
       const cycle=Date.now();
-      const renewed=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(renewed,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=renewed;
+      if(Number(lease.split(':')[0])-Date.now()<480000){const renewed=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(renewed,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=renewed;}
       if(!await budget()){await heartbeat('paused_budget','Daily research storage budget reached; no new simulated entries.');await sleep(60000);continue;}
       env.deadline=Date.now()+45000;
       try{
@@ -49,7 +50,7 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
         let handled=0;
         while(!stopping&&Date.now()-cycle<Math.max(15000,interval*1000)&&Date.now()<env.deadline-2000&&handled<8){if(!env.pending.length)await dispatch(env);const body=env.pending.shift();if(!body)break;await consume({messages:[{body,ack(){}}]},env);jobs++;handled++;}
         if(Date.now()-lastBorrow>60000){await pollIBKRBorrow(env);await pollFlexBorrow(env);lastBorrow=Date.now();}
-        ticks++;if(Date.now()-lastHeartbeat>=30000)await heartbeat('running');
+        ticks++;if(Date.now()-lastHeartbeat>=60000)await heartbeat('running');
         const records=(await env.DB.prepare('SELECT count(*) AS count FROM rs_shadow_records').first()).count;
         if(Date.now()-lastSaved>=60000||records!==lastRecordCount){await save();lastRecordCount=records;}
       }catch(e){await heartbeat('degraded',e.message);if(/lease lost/i.test(e.message))throw e;console.error(JSON.stringify({event:'shadow_cycle_degraded',error:e.message}));}
