@@ -15,10 +15,31 @@ import signal
 import sys
 import threading
 import time
+import uuid
 from datetime import datetime, timezone
 
 DATASET = "EQUS.MINI"
 MAX_SYMBOLS = 128
+
+
+class BookCredits:
+    """Count positive displayed additions before output throttling; not fills."""
+    def __init__(self):
+        self.epoch = uuid.uuid4().hex
+        self.books = {}
+
+    def update(self, row):
+        result = {}
+        for side, price_key, size_key in (("short", "bid", "bid_size"), ("cover", "ask", "ask_size")):
+            key = (row["ticker"], side, row[price_key])
+            if key not in self.books and len(self.books) >= 32768:
+                return None  # bounded memory; unknown additions cannot support fills
+            size = row[size_key]
+            old = self.books.get(key)
+            total = size if old is None else old[1] + max(0, size - old[0])
+            self.books[key] = (size, total)
+            result[side] = total
+        return {**row, "book_epoch": self.epoch, "book_credit": result}
 
 
 def stamp(ns=None):
@@ -53,6 +74,7 @@ def main():
 
     lock, commands, stopping = threading.Lock(), queue.Queue(maxsize=256), threading.Event()
     wanted, mappings, emitted = set(), {}, {}
+    credits = BookCredits()
     key = os.environ.get("DATABENTO_API_KEY", "")
 
     def emit(value):
@@ -90,6 +112,10 @@ def main():
             if value is None:
                 emit({"kind": "invalidate", "ticker": ticker})
                 return
+            value = credits.update(value)
+            if value is None:
+                emit({"kind": "invalidate", "ticker": ticker})
+                return
             # Bounded IPC; this never fabricates a fresh timestamp for an old book.
             if time.monotonic() - emitted.get(ticker, 0) >= .25:
                 emitted[ticker] = time.monotonic()
@@ -118,6 +144,7 @@ def main():
                     continue
             mappings.clear()
             emitted.clear()
+            credits = BookCredits()
             emit({"kind": "health", "status": "connecting", "at": stamp()})
             client = db.Live(heartbeat_interval_s=5)
             client.add_callback(receive)

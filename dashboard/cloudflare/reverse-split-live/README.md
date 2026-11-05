@@ -132,3 +132,122 @@ and exit audits prospectively.
 Execution also requires a quote received at or after the planned entry clock, or at or after the exit request for a cover. A still-fresh cached book received earlier remains a dated observation and cannot generate a fill. Capture time, receipt time and the decision clock are retained separately. This guard applies equally to the original and Mini policies without changing registered parameters.
 
 The external watch retries temporary storage/network failures at most three times with 15/30 second backoff. Each retry restores the committed checkpoint and receives only the time remaining in the original bounded run. It does not extend the GitHub job deadline or take over a competing lease. Policy/configuration/credential failures still stop immediately. The data stream remains a single child session across an in-process recovery.
+# IBKR capacity, executable shadow and November 5 validation
+
+The eight `rs_ibkr_{capacity|executable}_{10|25|50|100}bps.v1` cohorts are
+separately registered forward experiments. The original fourteen policies,
+their $1m reference portfolio, fixed 50% borrow assumption and results remain
+unchanged. No cohort can submit an order, accept a loan, or contact a Gateway.
+
+The original name ceiling is `equity × allowed_loss_fraction / adverse_shock`:
+`1m × .005 / 2 = $2,500`. Raising that ceiling to $25k while retaining the +200%
+shock means accepting a $50k modeled name loss (5% of the reference portfolio);
+$100k notional means $200k (20%). Reducing the assumed shock merely changes the
+model; it does not reduce a stock's possible rise. The new capacity cohorts
+have no fixed dollar, equity, three-name or sleeve stress ceilings. Their
+reported size is conditional on liquidity, price, inventory and eligibility,
+not an approved live allocation or a real maximum loss.
+
+Entry size uses the currently observed selected-venue bid and its displayed
+shares. Positive displayed additions are counted in the Python helper BEFORE
+four-per-second transport throttling. A timestamp change alone adds no shares;
+reconnection does not reset consumed capacity. Each cohort consumes its own
+book credits and cannot reuse another event for the same issuer. This is an
+upper-bound study of observed L1 liquidity, not proof that the whole displayed
+book would remain available to our order. There is no invented deeper book,
+queue priority, trading volume or calibrated causal market-impact model.
+
+The budget is deterioration of the accumulated entry VWAP from the first
+eligible quote's midpoint, including spread and 10 bps modeled slippage. Wide
+spreads can prevent entry even with a generous dollar allocation. There is no
+declared optimal budget yet. After 30 observed entry sessions and 20 issuers,
+the dashboard identifies the smallest tested budget retaining 90% of observed
+conditional notional as a RESEARCH candidate; separate execution-impact
+validation is still required. These thresholds are research design choices.
+
+Only IBKR borrow data is used. `borrow-service.mjs` reads IBKR's existing public
+FTP file, validates its declared row count, clock and checksum, and archives
+matching rows privately. Every resolved event ticker receives a record,
+including absent symbols, missing fields and failed daily coverage. All names
+are captured at startup, on a new company, daily, and hourly from 08:00 through
+17:59 ET. Active names refresh every five minutes. Runner handoffs preserve
+the cadence state. Missing rates are never treated as zero, quotes expire
+after 30 minutes for entry, and a newer missing/unavailable observation
+supersedes an earlier valid indication. Public FTP is indicative, unauthenticated
+inventory data, not an account-specific borrow reservation or approved locate.
+
+The executable lane additionally requires source-dated, unexpired IBKR
+reverse-split evidence for locate quantity/APR, allocated margin notional, SSR
+and halt status. A shared `allocation_id` prevents double counting the same
+locate or margin allocation inside a cohort. Unknown checks block adding;
+covers remain possible and unavailable cover liquidity never erases a short.
+SSR-restricted marketable bid sales are conservatively blocked.
+
+Import owner-supplied evidence with `import-execution-evidence.mjs FILE.json`,
+using a private `ibkr_reverse_split_evidence.v1` envelope and `records` array.
+Every record needs `broker: IBKR`, `scope: reverse_split`, an existing
+`event_id`, `kind`, `observed_at`, `source_url` and `reference`. Locate/margin/SSR
+also use the existing evidence fields and `valid_until`; locate and margin
+need `allocation_id`. `trading_status` needs `halted` and `valid_until`.
+No browser endpoint accepts evidence or orders. A public availability record
+does not meet this contract. Supplied documents are not verified broker fills.
+
+The optional read-only Flex adapter uses only the fixed HTTPS reporting
+`SendRequest` and `GetStatement` endpoints. Configure existing GitHub secrets
+`IBKR_FLEX_BORROW_TOKEN` and `IBKR_FLEX_BORROW_QUERY_ID`. The query must return
+XML, USD stock detail rows, unambiguous ISO/compact dates, and Borrow Fee
+Details (enabled by request at IBKR). Do not rotate another system's token or
+change its query. Unknown report schemas fail closed. Full account statements
+and account numbers are not archived: only matching normalized borrow rows,
+an account-scope hash and the report digest are retained. An actual charged
+rate for a held position is separate evidence, not proof of a new locate or
+an actual charge on a paper position. With no configured token/query, the
+dashboard explicitly reports `not_configured`; no actual rate is invented.
+
+Estimated P&L keeps proceeds, partial covers, ask marks, modeled commissions,
+daily borrow rows and an open-cover fee/slippage reserve. Daily borrow uses
+that day's observed annual fee and modeled maximum outstanding daily shares
+on rounded 102% USD collateral, /360. This is a conservative research accrual,
+not IBKR's final settlement ledger. Missing marks/rates remain missing costs.
+Accruals after entry are labelled ex-post; they never change the entry decision
+or borrow-cutoff eligibility. Split ratios preserve share liabilities and
+fractional remainders; uncertain actions or identity changes freeze P&L.
+
+Complete reconciled paper net P&L requires a CLOSED position and a dated
+`cost_reconciliation` evidence record for its exact `policy_id`, with
+`covers_fills_through` covering the last fill, `basis: estimated|documented`,
+and explicit finite `costs` for commissions, borrow, regulatory, locate,
+dividends, cash_settlement and buyin. Signed adjustments can be documented;
+an absent cost is not zero. Actual broker P&L stays null because no real fills
+exist. Original baseline P&L remains separate. The annual-rate cutoff table
+uses the rate known at entry (10/25/50/100/200% and no cutoff), never the best
+future rate; it does not automatically choose a live trading cutoff.
+
+Validation plan `rs_live_path_2026-11-05.v1` runs in the existing continuous
+GitHub collector on November 5 from **09:25–16:10 America/New_York**
+(14:25–21:10 UTC). AAPL, SPY and IWM are benchmark subscriptions in the SAME
+Databento live Mini session; active reverse-split names are checked separately.
+ETF benchmark identity permission is isolated from common-share entry checks.
+No historical request, paid feed upgrade, replay, NY4, ThetaData, TWS or broker
+socket is used. GitHub can delay/skip scheduled recovery triggers; the runner
+heartbeat and sample coverage expose such gaps and this is not a production
+execution SLA. Standard runner clocks are not precision clock-synchronized.
+
+The report records capture-to-runner receipt, quote age, receipt-to-evaluation,
+exchange-to-capture when available, share units, spreads, clocks and errors.
+Targets: p95 delivery ≤2s, age ≤5s, evaluation delay ≤15s, at least 100 distinct
+regular-session quotes per benchmark and ≤5% failed attempts. Entry still
+requires a quote no older than 15s received AFTER its decision clock. Raw
+samples are archived to private R2 in minute batches; the dashboard receives
+only summaries. A missing session cannot pass. A benchmark pass does not
+validate the first new reverse-split news-to-entry path or execution impact.
+Forward announcement clocks are reported separately as they occur.
+
+Owner-only reads: `/shadow/executable`, `/shadow/executable/tracks`, paginated
+`/shadow/executable/tracks/{id}`, `/shadow/borrow?ticker=...`, and
+`/shadow/validation`. Borrow and audit exports page through the full private
+history, bounded to 10k rows per browser export with an explicit error rather
+than a silently incomplete download. All schemas live only in the isolated
+reverse-split D1/R2 resources. Cloudflare stays Free; heavy calculations stay
+in the external collector. The Gateway registry and SPX execution are untouched.
+

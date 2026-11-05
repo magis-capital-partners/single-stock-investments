@@ -32,17 +32,18 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     child.on('error',()=>{clear('unavailable');health.error='Databento live helper could not start';});
     child.on('exit',code=>{clear(code===2?'not_entitled':'disconnected');health.error=code===2?'Databento live access was rejected or the retry budget was exhausted':'Databento live helper stopped';});
   }
-  async function miniQuote(ticker){
+  async function miniQuote(ticker,benchmark=false){
     if(!/^[A-Z][A-Z0-9.]{0,11}$/.test(ticker||''))throw new Error('Databento raw symbol requires explicit verification');
     if(!key)throw new Error('Databento credential is not configured');
     start();if(!symbols.has(ticker)){if(symbols.size>=128)throw new Error('Databento symbol budget reached');symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}
     const identity=await reference.identity(ticker),row=latest.get(ticker);
-    if(!identity.cik||!identity.security_id||identity.type!=='CS'||identity.currency!=='usd')throw new Error('Databento quote issuer or common-share identity is unresolved');
+    if(!identity.security_id||identity.currency!=='usd'||(!benchmark&&(!identity.cik||identity.type!=='CS')))throw new Error('Databento quote issuer or common-share identity is unresolved');
     if(!row||at(clock())-at(row.quote_at)>15000)throw new Error('Waiting for a fresh Databento Mini quote');
     return {ticker,...identity,provider:'databento_mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',quote_at:row.quote_at,observed_at:row.observed_at,bid:row.bid,ask:row.ask,bid_size:row.bid_size,ask_size:row.ask_size,consolidated:false,delayed:false,size_units:'shares',source_url:'https://databento.com/docs/datasets/equs-mini',raw:row};
   }
   return {
     health,activePolicy:key?'rs_immediate_mini.v1':'rs_immediate.v1',
+    observe(ticker){if(!['AAPL','SPY','IWM'].includes(ticker))return miniQuote(ticker);return miniQuote(ticker,true);},
     async quote(ticker,policy){
       health.nbbo_access=reference.health.quote_access;
       if(policy?.quote_feed==='databento_mini')return miniQuote(ticker);

@@ -38,7 +38,7 @@ jobs:
       - run: npm ci --prefix dashboard/cloudflare
       - run: python -m pip install requests
       - run: node --test dashboard/cloudflare/test-reverse-split*.mjs
-      - run: python -m unittest discover -s dashboard/cloudflare/reverse-split-live -p test_databento_live.py
+      - run: python -m unittest discover -s dashboard/cloudflare/reverse-split-live -p 'test_*.py'
       - name: Apply the isolated research schema and deploy the monitor
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -73,6 +73,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: e1cac493b315c8fd7398500dd1bfd687
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
           DATABENTO_API_KEY: ${{ secrets.DATABENTO_API_KEY }}
+          IBKR_FLEX_BORROW_TOKEN: ${{ secrets.IBKR_FLEX_BORROW_TOKEN }}
+          IBKR_FLEX_BORROW_QUERY_ID: ${{ secrets.IBKR_FLEX_BORROW_QUERY_ID }}
           RECONCILE: ${{ github.event.action == 'reverse-split-reconcile' }}
         run: |
           if [ "$RECONCILE" = 'true' ]; then
