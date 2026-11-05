@@ -37,3 +37,13 @@ class BorrowSourcesTest(unittest.TestCase):
         credits.update({**row, 'bid_size': 20})
         self.assertEqual(credits.update(row)['book_credit']['short'], 180)
         self.assertNotEqual(credits.epoch, BookCredits().epoch)
+
+    def test_large_ytd_report_is_filtered_and_row_identity_survives_later_downloads(self):
+        detail=b'<HardToBorrowDetail symbol="QA" currency="USD" valueDate="20261104" quantity="100" price="10" conid="12345" borrowFeeRate="150" borrowFee="-4.50"/>'
+        raw=b'<FlexQueryResponse><!--'+b'x'*8_000_001+b'--><FlexStatement accountId="QA_PRIVATE" toDate="20261104"><HardToBorrowDetails>'+detail+detail+b'</HardToBorrowDetails></FlexStatement></FlexQueryResponse>'
+        first=normalize(raw,'2026-11-05T12:00:00+00:00',{'QA'})
+        second=normalize(raw.replace(b'<!--',b'<!--different-download-'),'2026-11-06T12:00:00+00:00',{'QA'})
+        self.assertEqual(first['rows'][0]['observation_key'],second['rows'][0]['observation_key'])
+        self.assertNotEqual(first['rows'][0]['observation_key'],first['rows'][1]['observation_key'])
+        self.assertEqual(first['report_to_date'],'2026-11-04')
+        self.assertEqual(normalize(raw,'2026-11-05T12:00:00+00:00',{'OTHER'})['rows'],[])

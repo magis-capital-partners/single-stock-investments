@@ -10,9 +10,9 @@ import {pollFlexBorrow} from './flex-borrow.mjs';
 const now=()=>new Date().toISOString();
 export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
 export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false}={}){
-  const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={};
+  const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={},flexTask=null;
   const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
-  const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,ticks,jobs,error,maximum_minutes:maximumMs/60000,broker_connections:0};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);lastHeartbeat=Date.now();};
+  const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,ticks,jobs,error,maximum_minutes:maximumMs/60000,broker_connections:0,market_data:env.market?.health||null};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);lastHeartbeat=Date.now();};
   async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<researchWriteBudget(day,env.EXECUTION_REGISTRATION_DAY);}
   async function save(){
     const current=await remote.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first();if(current?.value!==lease)throw new Error('Collector lease lost; stopping before publication');
@@ -40,7 +40,7 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
       if(!await budget()){await heartbeat('paused_budget','Daily research storage budget reached; no new simulated entries.');await sleep(60000);continue;}
       env.deadline=Date.now()+45000;
       try{
-        if(Date.now()-lastImport>60000){const records=(await remote.prepare('SELECT payload FROM rs_shadow_evidence WHERE observed_at>=? ORDER BY observed_at LIMIT 1000').bind(new Date(Date.now()-7*86400000).toISOString()).all()).results;for(const r of records){const e=JSON.parse(r.payload);await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(e.id,e.event_id,e.kind,e.observed_at,r.payload).run();}lastImport=Date.now();}
+        if(Date.now()-lastImport>60000){const records=(await remote.prepare("SELECT payload FROM rs_shadow_evidence WHERE kind IN ('locate','margin','ssr','trading_status','cost_reconciliation','corporate_action') AND observed_at>=? ORDER BY observed_at LIMIT 1000").bind(new Date(Date.now()-7*86400000).toISOString()).all()).results;for(const r of records){const e=JSON.parse(r.payload);await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(e.id,e.event_id,e.kind,e.observed_at,r.payload).run();}lastImport=Date.now();}
         // Price and exit work precede filing backlogs. Source polling has a bounded deadline.
         await shadowTick(env);
         await executionTick(env);
@@ -55,17 +55,18 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
         }
         let handled=0;
         while(!stopping&&Date.now()-cycle<Math.max(15000,interval*1000)&&Date.now()<env.deadline-2000&&handled<8){if(!env.pending.length)await dispatch(env);const body=env.pending.shift();if(!body)break;await consume({messages:[{body,ack(){}}]},env);jobs++;handled++;}
-        if(Date.now()-lastBorrow>60000){await pollIBKRBorrow(env);await pollFlexBorrow(env);lastBorrow=Date.now();}
+        if(Date.now()-lastBorrow>60000){await pollIBKRBorrow(env);if(!flexTask)flexTask=pollFlexBorrow(env).catch(()=>{}).finally(()=>{flexTask=null;});lastBorrow=Date.now();}
         ticks++;if(Date.now()-lastHeartbeat>=60000)await heartbeat('running');
         const records=(await env.DB.prepare('SELECT (SELECT count(*) FROM rs_shadow_records)+(SELECT count(*) FROM rs_execution_records) AS count').first()).count;
-        if(Date.now()-lastSaved>=60000||records!==lastRecordCount){await save();lastRecordCount=records;}
+        const active=await env.DB.prepare("SELECT id FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') UNION ALL SELECT id FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') LIMIT 1").first();
+        if(Date.now()-lastSaved>=(active?60000:120000)||records!==lastRecordCount){await save();lastRecordCount=records;}
       }catch(e){await heartbeat('degraded',e.message);if(/lease lost/i.test(e.message))throw e;console.error(JSON.stringify({event:'shadow_cycle_degraded',error:e.message}));}
       await sleep(Math.max(1000,interval*1000-(Date.now()-cycle)));
     }
     await heartbeat('handoff');await save();return {ticks,jobs,started_at:new Date(started).toISOString(),finished_at:now(),mode:'continuous_shadow'};
   }finally{
     process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);env.onShadowDecision=null;
-    try{if(checkpoint){try{await save();}finally{checkpoint.close();}}}finally{
+    try{if(flexTask)await flexTask;if(checkpoint){try{await save();}finally{checkpoint.close();}}}finally{
     env.DB=remote;await remote.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key='collector_lease' AND value=?").bind(now(),lease||'').run();
     }
   }

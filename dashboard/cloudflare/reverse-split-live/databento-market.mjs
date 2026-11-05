@@ -6,7 +6,7 @@ import {at} from './shadow-core.mjs';
 
 export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>new Date().toISOString(),python=process.env.PYTHON||'python'}={}){
   const health={provider:'Databento Equities Mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',status:key?'not_checked':'not_configured',quote_access:'unverified',nbbo_access:'unverified',last_success:null,last_heartbeat:null,error:null,subscriptions:0};
-  const latest=new Map(),symbols=new Set();let child,closed=false,lines;
+  const latest=new Map(),symbols=new Set(),telemetry=[],sampleWindows=new Map();let child,closed=false,lines,dropped=0;
   function clear(status){latest.clear();health.status=status;health.quote_access=status==='not_entitled'?'not_entitled':'unavailable';}
   function accept(row){
     if(row.kind==='health'){
@@ -20,6 +20,10 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     const now=at(clock()),ts=at(row.quote_at),received=at(row.observed_at);
     if(ts===null||received===null||ts>now+2000||received>now+2000||now-ts>15000||now-received>15000||(row.flags&12)||![row.bid,row.ask,row.bid_size,row.ask_size].every(Number.isFinite)||row.bid<=0||row.ask<row.bid||row.bid_size<=0||row.ask_size<=0){latest.delete(row.ticker);return;}
     latest.set(row.ticker,row);health.quote_access='received';health.status='available';health.last_success=clock();health.last_heartbeat=clock();
+    // Record the FIRST receipt in each five-second window, not just the latest
+    // quote at a later poll. Otherwise processing latency would look falsely low.
+    const window=Math.floor(received/5000);
+    if(['AAPL','SPY','IWM'].includes(row.ticker)&&sampleWindows.get(row.ticker)!==window){sampleWindows.set(row.ticker,window);if(telemetry.length<2048)telemetry.push({...row});else dropped++;}
   }
   function start(){
     if(child||closed||!key)return;
@@ -44,6 +48,7 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
   return {
     health,activePolicy:key?'rs_immediate_mini.v1':'rs_immediate.v1',
     observe(ticker){if(!['AAPL','SPY','IWM'].includes(ticker))return miniQuote(ticker);return miniQuote(ticker,true);},
+    drainTelemetry(){const result={samples:telemetry.splice(0),dropped};dropped=0;return result;},
     async quote(ticker,policy){
       health.nbbo_access=reference.health.quote_access;
       if(policy?.quote_feed==='databento_mini')return miniQuote(ticker);

@@ -34,6 +34,7 @@ test('disconnects, invalid books and old clocks invalidate cached Mini quotes',a
   x.send(row());x.send({kind:'invalidate',ticker:'QA'});await assert.rejects(x.market.quote('QA',mini));
   await assert.rejects(x.market.quote('BRK-B',mini),/explicit verification/);
 });
+test('latency samples retain earlier receipts rather than timing only the newest cached book',async t=>{const x=transport(t);await assert.rejects(x.market.quote('AAPL',mini));const early='2026-11-04T14:59:50.000Z';x.send(row({ticker:'AAPL',quote_at:early,observed_at:early}));x.send(row({ticker:'AAPL',quote_at:now,observed_at:now}));x.send(row({ticker:'AAPL',quote_at:now,observed_at:now}));assert.equal((await x.market.quote('AAPL',mini)).quote_at,now);const telemetry=x.market.drainTelemetry();assert.equal(telemetry.samples.length,2);assert.equal(telemetry.samples[0].observed_at,early);assert.equal(x.market.drainTelemetry().samples.length,0);assert.equal(x.launches(),1);});
 test('new Mini registration does not rewrite the original policies or create backward fills',async t=>{
   const {db,env}=setup(t);await initializeShadow(env,'2026-11-04T14:00:00Z');
   const originals=db.prepare("SELECT payload FROM rs_shadow_policies WHERE id NOT LIKE '%_mini.v1' ORDER BY id").all();assert.equal(originals.length,7);assert.ok(originals.every(r=>!JSON.parse(r.payload).quote_feed));
