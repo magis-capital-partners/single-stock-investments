@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
 <link href="strategy-workbench.css" rel="stylesheet">
-<link href="reverse-split-strategy.css?v=20261029-announcement-v1" rel="stylesheet">
+<link href="reverse-split-strategy.css?v=20261104-announcement-v1" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
 <link href="sleeve-realized.css?v=20261027-realized" rel="stylesheet">
@@ -2038,9 +2038,10 @@
 <script src="investor-history.js?v=20261030-global-history"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
+<script src="reverse-split-shadow.js?v=20261104-shadow"></script>
 <script src="reverse-split-live.js?v=20261029-live"></script>
 <script src="reverse-split-research.js?v=20261029-research"></script>
-<script src="reverse-split-strategy.js?v=20261029-announcement-v1"></script>
+<script src="reverse-split-strategy.js?v=20261104-announcement-v1"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261018-buyback"></script>
 <script src="buyback-viz.js?v=20261022-radar"></script>
@@ -2440,7 +2441,7 @@ function parseRouteFromHashString(hash) {
   const researchStrategy = typeof StrategyWorkbench === 'undefined' ? null : StrategyWorkbench.parseRoute(hash);
   if (researchStrategy) return researchStrategy;
   hash = path;
-  const reverseSplitStrategyMatch = /^#\/strategies\/reverse-split(?:\/(overview|trades|research|live|metrics|assumptions|comparisons|screen|provenance))?$/i.exec(hash);
+  const reverseSplitStrategyMatch = /^#\/strategies\/reverse-split(?:\/(overview|trades|research|live|shadow|metrics|assumptions|comparisons|screen|provenance))?$/i.exec(hash);
   if (reverseSplitStrategyMatch) return { view:'reverse-split-strategy', reverseSplitStrategySection:(reverseSplitStrategyMatch[1]||'overview').toLowerCase(), ticker:null, watchlistSub:null };
   const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|realized|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
   if (portfolioMatch) {

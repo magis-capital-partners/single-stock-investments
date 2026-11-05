@@ -1,4 +1,5 @@
 import {POLICY,DAY,etDay,iso,dateOnlyAvailable,plain,parseFeed,classifyAnnouncement,scoreFundamentals,screen} from './core.mjs';
+import {shadowAPI} from './shadow-api.mjs';
 
 const stamp=()=>new Date().toISOString(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const json=(value,status=200)=>Response.json(value,{status,headers:{'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
@@ -9,7 +10,7 @@ export const SOURCES=[
   {id:'globenewswire',kind:'news',url:'https://www.globenewswire.com/RssFeed/subjectcode/13-Change%20in%20Share%20Capital/feedTitle/GlobeNewswire%20-%20Change%20in%20Share%20Capital'},
 ];
 const SEC_HOSTS=new Set(['www.sec.gov','data.sec.gov','efts.sec.gov']);
-const NEWS_HOSTS=new Set(['www.prnewswire.com','www.globenewswire.com']);
+const NEWS_HOSTS=new Set(['www.prnewswire.com','www.globenewswire.com','rss.globenewswire.com']);
 export function sourceURL(value){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.port||(!SEC_HOSTS.has(u.hostname)&&!NEWS_HOSTS.has(u.hostname)))throw new Error('Unsupported source URL');return u;}
 export async function sha(value){const bytes=typeof value==='string'?new TextEncoder().encode(value):value;return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');}
 export async function boundedBody(response,maximum){
@@ -116,15 +117,16 @@ export async function recordEvent(env,event,{refresh=false}={}){
   await env.DB.prepare("INSERT INTO rs_events(id,cik,ticker,company,effective_date,published_at,first_seen_at,payload) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET effective_date=excluded.effective_date,payload=excluded.payload,revision=rs_events.revision+1").bind(event.id,event.cik||null,event.ticker||null,event.company||null,event.effective_date,event.published_at,event.first_seen_at,JSON.stringify(event)).run();
   let f={score:null,status:'issuer_identity_unresolved',signals:{},evidence:[]},prior=[],metadataError=null;
   if(event.cik){try{const {row,submissions}=await issuer(env,event.cik);event.company ||= row.company;event.ticker ||= row.ticker;event.multiple_securities=(submissions.tickers||[]).length>1;f=await financials(env,event.cik,now,refresh);prior=(await env.DB.prepare('SELECT payload FROM rs_history WHERE cik=? AND effective_date<?').bind(event.cik,etDay(now)).all()).results.map(r=>JSON.parse(r.payload));await enqueue(env,'history',{cik:event.cik},3,'history:'+event.cik+':'+etDay(now));}catch(e){metadataError=e.message;f={...f,status:'financial_source_unavailable',error:e.message};}}
-  const decision=screen(event,f,prior,now);if(event.multiple_securities){decision.result='needs_review';decision.checks.security={state:'unknown',reason:'Multiple issuer securities require instrument reconciliation'};}
-  const payload={...event,financials:f,...decision,analyzed_at:now,metadata_error:metadataError,latency_seconds:Math.max(0,(Date.parse(now)-Date.parse(event.first_seen_at))/1000),source_delay_seconds:event.published_at?Math.max(0,(Date.parse(event.first_seen_at)-Date.parse(event.published_at))/1000):null};
-  const id=await sha(event.id+':'+now+':'+JSON.stringify(payload));
+  const completed=stamp(),decision=screen(event,f,prior,completed);if(event.multiple_securities){decision.result='needs_review';decision.checks.security={state:'unknown',reason:'Multiple issuer securities require instrument reconciliation'};}
+  const payload={...event,financials:f,...decision,analyzed_at:completed,metadata_error:metadataError,latency_seconds:Math.max(0,(Date.parse(completed)-Date.parse(event.first_seen_at))/1000),source_delay_seconds:event.published_at?Math.max(0,(Date.parse(event.first_seen_at)-Date.parse(event.published_at))/1000):null};
+  const id=await sha(event.id+':'+completed+':'+JSON.stringify(payload));
   await env.DB.batch([
-    env.DB.prepare('UPDATE rs_events SET ticker=?,company=?,analyzed_at=?,result=?,score=?,ordinal_min=?,payload=? WHERE id=?').bind(event.ticker||null,event.company||null,now,decision.result,f.score,decision.ordinal_min,JSON.stringify(payload),event.id),
-    env.DB.prepare('INSERT OR IGNORE INTO rs_decisions(id,event_id,recorded_at,policy,payload) VALUES(?,?,?,?,?)').bind(id,event.id,now,POLICY.id,JSON.stringify(payload)),
+    env.DB.prepare('UPDATE rs_events SET ticker=?,company=?,analyzed_at=?,result=?,score=?,ordinal_min=?,payload=? WHERE id=?').bind(event.ticker||null,event.company||null,completed,decision.result,f.score,decision.ordinal_min,JSON.stringify(payload),event.id),
+    env.DB.prepare('INSERT OR IGNORE INTO rs_decisions(id,event_id,recorded_at,policy,payload) VALUES(?,?,?,?,?)').bind(id,event.id,completed,POLICY.id,JSON.stringify(payload)),
   ]);
   if(decision.result==='passes_screen')await env.DB.prepare('INSERT OR IGNORE INTO rs_alerts(id,event_id,created_at,kind,payload) VALUES(?,?,?,?,?)').bind(POLICY.id+':'+event.id,event.id,now,'research_screen_pass',JSON.stringify({ticker:event.ticker,score:f.score,ordinal_min:decision.ordinal_min,execution_ready:false})).run();
   if(metadataError)await enqueue(env,'rescore',{id:event.id,refresh:true},8,'retry-score:'+event.id+':'+Math.floor(Date.now()/3600000));
+  if(env.onShadowDecision)await env.onShadowDecision(payload);
   return payload;
 }
 function filingText(raw){const docs=[...raw.matchAll(/<DOCUMENT>([\s\S]*?)<\/DOCUMENT>/gi)];if(!docs.length)return raw;return docs.map(x=>x[1]).filter(t=>/<TYPE>\s*(?:8-K|6-K|10-[KQ]|20-F|40-F|EX-99)/i.test(t)).join('\n');}
@@ -195,7 +197,9 @@ export async function consume(batch,env){
 export async function scheduled(event,env){
   if(env.ENABLED!=='true'){await state(env,'service_mode','paused');return;}
   await state(env,'last_tick',stamp());await state(env,'service_mode',env.COLLECTOR_MODE||'research_monitor');
-  for(const source of SOURCES)await poll(env,source);
+  const financialDue=!env.FAST_MONITOR||Date.now()-Number(await state(env,'financial_poll_at')||0)>300000;
+  for(const source of SOURCES.filter(s=>financialDue||['sec-8-K','sec-6-K','prnewswire','globenewswire'].includes(s.id)))await poll(env,source);
+  if(financialDue)await state(env,'financial_poll_at',Date.now());
   if(await state(env,'daily_rescore')!==etDay(Date.now())){for(const e of (await env.DB.prepare("SELECT id FROM rs_events WHERE first_seen_at>=? AND result IN ('passes_screen','needs_review') ORDER BY first_seen_at DESC LIMIT 300").bind(new Date(Date.now()-30*DAY).toISOString()).all()).results)await enqueue(env,'rescore',{id:e.id},6,'daily-rescore:'+etDay(Date.now())+':'+e.id);await state(env,'daily_rescore',etDay(Date.now()));}
   if(event.cron==='17 8 * * *')await enqueue(env,'reconcile',{day:etDay(Date.now())},1,'daily-reconcile:'+etDay(Date.now()));
   await dispatch(env);await state(env,'last_completed_tick',stamp());
@@ -203,6 +207,7 @@ export async function scheduled(event,env){
 export async function readAPI(request,env){
   if(request.method!=='GET')return json({error:'Read-only research service'},405);
   const url=new URL(request.url);
+  if(url.pathname==='/shadow'||url.pathname.startsWith('/shadow/'))return shadowAPI(url,env);
   if(url.pathname==='/events'){
     const limit=Math.max(1,Math.min(100,Number(url.searchParams.get('limit'))||50)),filter=url.searchParams.get('result'),query=(url.searchParams.get('q')||'').slice(0,80).toUpperCase();let cursor=['9999',''];
     if(url.searchParams.has('before')){try{cursor=JSON.parse(atob(url.searchParams.get('before')));if(!Array.isArray(cursor)||cursor.length!==2||cursor.some(x=>typeof x!=='string'))throw new Error();}catch{return json({error:'Invalid announcement cursor'},400);}}
