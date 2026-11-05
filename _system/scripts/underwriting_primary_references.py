@@ -115,37 +115,58 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
                 parents.append({'source_url': url, 'raw': raw, 'filed': filed})
             except (OSError, ValueError) as exc:
                 errors.append({'source': 'requested_primary_disclosure', 'source_url': url, 'error': str(exc)[:500]})
-    references = {}
     existing = {s['source_url'] for s in parents}
     # Date-only links to earlier reports can sit inside a broad exhibit row.
     # Submissions identifies their role without guessing from a filename or
     # treating an older financial statement as a requested legal agreement.
     recent = (submissions.get('filings') or {}).get('recent') or {}
+    filed_by_document = {}
     for i, form in enumerate(recent.get('form') or []):
-        if form not in ('10-K', '10-Q', '20-F', '40-F', '6-K', '10-K/A', '10-Q/A'):
-            continue
         accessions, names = recent.get('accessionNumber') or [], recent.get('primaryDocument') or []
         if i >= len(accessions) or i >= len(names):
+            continue
+        if not isinstance(accessions[i], str) or not re.fullmatch(r'\d{10}-\d{2}-\d{6}', accessions[i]):
             continue
         url = f'https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accessions[i].replace("-", "")}/{names[i]}'
         validated = archive_url(url, url, cik)
         if validated:
-            existing.add(validated)
-    for parent in parents:
-        for reference in linked_references(parent['raw'], parent['source_url'], cik, focus):
-            if reference['source_url'] in existing:
-                continue
-            reference['referenced_by']['filed'] = parent.get('filed')
-            old = references.get(reference['source_url'])
-            if old is None or reference['_score'] > old['_score']:
-                references[reference['source_url']] = reference
-    for reference in sorted(references.values(), key=lambda row: (-row['_score'], row['source_url']))[:4]:
-        url = reference['source_url']
-        try:
-            doc = document_record(url, fetch(url), focus, prefer_complete=True)
-            doc.update(document_kind='incorporated_primary_document', referenced_by=reference['referenced_by'],
-                       reference_text=reference['reference_text'])
-            documents.append(doc)
-        except (OSError, ValueError) as exc:
-            errors.append({'source': 'requested_primary_reference', 'source_url': url, 'error': str(exc)[:500]})
+            if form in ('10-K', '10-Q', '20-F', '40-F', '6-K', '10-K/A', '10-Q/A'):
+                existing.add(validated)
+            dates = recent.get('filingDate') or []
+            filed = dates[i] if i < len(dates) else None
+            if isinstance(filed, str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', filed) and filed <= as_of:
+                filed_by_document[tuple(urlparse(validated).path.rsplit('/', 2)[-2:])] = filed
+    # An incorporation link can lead to the announcing 8-K, whose exhibit table
+    # contains the executed agreement. Preserve that filing as well as its child.
+    # Four references per layer and two layers bound extra requests to eight;
+    # the existing issuer/destination checks apply at every step.
+    for _ in range(2):
+        references = {}
+        for parent in parents:
+            for reference in linked_references(parent['raw'], parent['source_url'], cik, focus):
+                if reference['source_url'] in existing:
+                    continue
+                reference['referenced_by']['filed'] = parent.get('filed')
+                old = references.get(reference['source_url'])
+                if old is None or reference['_score'] > old['_score']:
+                    references[reference['source_url']] = reference
+        following = []
+        for reference in sorted(references.values(), key=lambda row: (-row['_score'], row['source_url']))[:4]:
+            url = reference['source_url']
+            existing.add(url)
+            try:
+                raw = fetch(url)
+                doc = document_record(url, raw, focus, prefer_complete=True)
+                doc.update(document_kind='incorporated_primary_document', referenced_by=reference['referenced_by'],
+                           reference_text=reference['reference_text'])
+                documents.append(doc)
+                # A later report's date cannot be inherited by the earlier
+                # filing it cites. Use this document's submission, or stay undated.
+                filed = filed_by_document.get(tuple(urlparse(url).path.rsplit('/', 2)[-2:]))
+                following.append({'source_url': url, 'raw': raw, 'filed': filed})
+            except (OSError, ValueError) as exc:
+                errors.append({'source': 'requested_primary_reference', 'source_url': url, 'error': str(exc)[:500]})
+        parents = following
+        if not parents:
+            break
     return documents, errors

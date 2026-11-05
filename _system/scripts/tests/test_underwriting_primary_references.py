@@ -1,4 +1,5 @@
 """Retrieve requested legal disclosures from issuer-bound primary citations."""
+import hashlib
 import sys
 from pathlib import Path
 
@@ -116,3 +117,99 @@ def test_a_requested_source_failure_blocks_judgment_readiness():
     value['collection_errors'] = [{'source': 'requested_primary_reference', 'source_url': AGREEMENT,
                                    'error': 'source unavailable'}]
     assert evidence_readiness(value)['status'] == 'evidence_gap'
+
+
+def test_incorporation_through_an_announcing_filing_reaches_the_operative_exhibit():
+    announcement = AGREEMENT.replace('d824452dex101.htm', 'announcement.htm')
+    raw = f'<a href="{announcement}">Fourth Amendment to Credit Agreement, incorporated by reference to Exhibit 10.1.</a>'.encode()
+    body = b'<table><tr><td>10.1</td><td><a href="d824452dex101.htm">Fourth Amendment to Credit Agreement</a></td></tr></table>'
+    operative = b'<p>Fourth Amendment to Credit Agreement. Conditions to effectiveness and permitted draws.</p>'
+    calls = []
+    def fetch(url):
+        calls.append(url)
+        return {announcement: body, AGREEMENT: operative}[url]
+    docs, errors = collect_requested_documents({}, '1059556', '2026-11-04',
+        [{'source_url': PARENT, 'raw': raw, 'filed': '2026-02-18'}], ['credit', 'effective amendment'], fetch)
+    assert not errors and calls == [announcement, AGREEMENT]
+    by_url = {d['source_url']: d for d in docs}
+    assert set(by_url) == {announcement, AGREEMENT}
+    assert by_url[announcement]['content_hash'] == hashlib.sha256(body).hexdigest()
+    assert by_url[AGREEMENT]['content_hash'] == hashlib.sha256(operative).hexdigest()
+    assert by_url[AGREEMENT]['referenced_by']['source_url'] == announcement
+    assert by_url[AGREEMENT]['referenced_by']['content_hash'] == hashlib.sha256(body).hexdigest()
+    # The date of the later report must not become this undated intermediary's filing date.
+    assert by_url[AGREEMENT]['referenced_by']['filed'] is None
+    assert all('period' not in d and 'filed' not in d for d in docs)
+
+
+def test_nested_reference_failure_is_reported_and_blocks_readiness():
+    from underwriting_evidence import evidence_readiness
+    from test_underwriting_pipeline import packet
+    announcement = AGREEMENT.replace('d824452dex101.htm', 'announcement.htm')
+    def fetch(url):
+        if url == announcement:
+            return b'<a href="d824452dex101.htm">Executed Revolving Credit Agreement</a>'
+        raise OSError('operative agreement unavailable')
+    docs, errors = collect_requested_documents({}, '1059556', '2026-11-04',
+        [{'source_url': PARENT, 'raw': f'<a href="{announcement}">Credit Agreement</a>'.encode()}], ['credit'], fetch)
+    assert [d['source_url'] for d in docs] == [announcement]
+    assert errors == [{'source': 'requested_primary_reference', 'source_url': AGREEMENT,
+                       'error': 'operative agreement unavailable'}]
+    value = packet()
+    value['collection_errors'] = errors
+    assert evidence_readiness(value)['status'] == 'evidence_gap'
+
+
+def test_followup_preserves_initial_sources_and_bounds_cycles_and_depth():
+    base = AGREEMENT.rsplit('/', 1)[0] + '/'
+    initial = [base + f'agreement-{i}.htm' for i in range(4)]
+    nested = [base + f'operative-{i}.htm' for i in range(4)]
+    third = base + 'beyond-depth.htm'
+    parent = ''.join(f'<a href="{url}">Credit Agreement</a>' for url in initial).encode()
+    calls = []
+    def fetch(url):
+        calls.append(url)
+        assert url != third
+        if url in initial:
+            i = initial.index(url)
+            return (f'<a href="{nested[i]}">Executed Credit Agreement</a>'
+                    f'<a href="{PARENT}">Credit Agreement</a>'
+                    '<a href="https://attacker.test/credit.htm">Credit Agreement</a>').encode()
+        return (f'<a href="{initial[0]}">Credit Agreement</a>'
+                f'<a href="{third}">Credit Agreement</a>').encode()
+    docs, errors = collect_requested_documents({}, '1059556', '2026-11-04',
+        [{'source_url': PARENT, 'raw': parent}], ['credit'], fetch)
+    assert not errors
+    assert set(calls) == set(initial + nested) and len(calls) == 8
+    assert {d['source_url'] for d in docs} == set(initial + nested)
+
+
+def test_nested_parent_date_comes_from_its_verified_submission():
+    announcement = AGREEMENT.replace('d824452dex101.htm', 'announcement.htm')
+    submissions = {'filings': {'recent': {'form': ['8-K'], 'filingDate': ['2024-05-07'],
+        'accessionNumber': ['0001193125-24-131945'], 'primaryDocument': ['announcement.htm']}}}
+    def fetch(url):
+        return (b'<a href="d824452dex101.htm">Executed Credit Agreement</a>' if url == announcement
+                else b'<p>Executed credit agreement and borrowing conditions.</p>')
+    docs, errors = collect_requested_documents(submissions, '1059556', '2026-11-04',
+        [{'source_url': PARENT, 'raw': f'<a href="{announcement}">Credit Agreement</a>'.encode(),
+          'filed': '2026-02-18'}], ['credit'], fetch)
+    assert not errors
+    operative = next(d for d in docs if d['source_url'] == AGREEMENT)
+    assert operative['referenced_by']['filed'] == '2024-05-07'
+    assert 'filed' not in operative and 'period' not in operative
+
+
+def test_malformed_or_future_submission_metadata_does_not_date_nested_sources():
+    announcement = AGREEMENT.replace('d824452dex101.htm', 'announcement.htm')
+    submissions = {'filings': {'recent': {'form': ['8-K', '8-K'],
+        'filingDate': ['2026-01-01', '2027-01-01'], 'accessionNumber': [None, '0001193125-24-131945'],
+        'primaryDocument': ['malformed.htm', 'announcement.htm']}}}
+    def fetch(url):
+        return (b'<a href="d824452dex101.htm">Executed Credit Agreement</a>' if url == announcement
+                else b'<p>Executed credit agreement and borrowing conditions.</p>')
+    docs, errors = collect_requested_documents(submissions, '1059556', '2026-11-04',
+        [{'source_url': PARENT, 'raw': f'<a href="{announcement}">Credit Agreement</a>'.encode(),
+          'filed': '2026-02-18'}], ['credit'], fetch)
+    assert not errors
+    assert next(d for d in docs if d['source_url'] == AGREEMENT)['referenced_by']['filed'] is None
