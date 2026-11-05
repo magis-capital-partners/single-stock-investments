@@ -11,7 +11,7 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
   function accept(row){
     if(row.kind==='health'){
       if(['connecting','disconnected','not_entitled','subscription_error'].includes(row.status))clear(row.status);
-      else if(row.status==='subscribed'){health.status='subscribed';health.error=null;health.last_heartbeat=clock();}
+      else if(row.status==='subscribed'){health.status='subscribed';if(health.quote_access!=='received')health.quote_access='awaiting_live_quote';health.error=null;health.last_heartbeat=clock();}
       return;
     }
     if(row.kind==='heartbeat'){health.last_heartbeat=clock();return;}
