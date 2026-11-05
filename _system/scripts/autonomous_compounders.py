@@ -269,24 +269,74 @@ def primary_observations(payload, url, as_of):
 
 
 def frmo_report_facts(as_of):
-    """Discover the newest issuer report and validate its explicit table scale."""
+    return frmo_report(as_of)['facts']
+
+
+def frmo_report(as_of):
+    """Keep the complete issuer PDF behind the same capture's scaled facts."""
     from io import BytesIO
+    from zoneinfo import ZoneInfo
 
     from pypdf import PdfReader
+    from pypdf.errors import PyPdfError
 
     index = 'https://www.frmocorp.com/10ks.html'
-    with urllib.request.urlopen(index, timeout=30) as response:
-        html = response.read().decode('utf-8')
+    def fetch(url):
+        with urllib.request.urlopen(url, timeout=30) as response:
+            if response.geturl() != url:
+                raise ValueError('FRMO issuer source redirected outside its registered URL')
+            raw = response.read(20_000_001)
+        if len(raw) > 20_000_000:
+            raise ValueError('FRMO primary report exceeds the byte bound')
+        return raw
+    index_raw = fetch(index)
+    html = index_raw.decode('utf-8')
     links = re.findall(r'href=["\']([^"\']*FRMO_Annual_Report_(\d{4})\.pdf)["\']', html, re.IGNORECASE)
     links = [(p, int(y)) for p, y in links if int(y) <= int(as_of[:4])]
     if not links:
         raise ValueError('FRMO annual report discovery layout changed')
     path, year = max(links, key=lambda x: x[1])
     url = urllib.parse.urljoin(index, path)
-    with urllib.request.urlopen(url, timeout=30) as response:
-        raw = response.read()
-    texts = [p.extract_text() or '' for p in PdfReader(BytesIO(raw)).pages]
-    return parse_frmo_report(texts, url, year, as_of, hashlib.sha256(raw).hexdigest())
+    if url != f'https://www.frmocorp.com/_content/10k/FRMO_Annual_Report_{year}.pdf':
+        raise ValueError('FRMO annual report is not bound to the registered issuer URL')
+    raw = fetch(url)
+    if not raw.startswith(b'%PDF'):
+        raise ValueError('FRMO primary report is not a PDF')
+    try:
+        pages = PdfReader(BytesIO(raw)).pages
+        if not 1 <= len(pages) <= 200:
+            raise ValueError('FRMO complete report exceeds the page bound')
+        texts = [p.extract_text() or '' for p in pages]
+    except PyPdfError as exc:
+        raise ValueError('FRMO primary PDF extraction failed') from exc
+    if any(not text.strip() for text in texts):
+        raise ValueError('FRMO primary report contains an unextracted page')
+    body = '\n'.join(f'PDF page {i}: '+ ' '.join(text.split()) for i, text in enumerate(texts, 1))
+    if len(body) > 350000:
+        raise ValueError('FRMO complete report exceeds the evidence text bound')
+    if not all(term in body.lower() for term in ('frmo corporation and subsidiaries',
+            'consolidated balance sheets', 'consolidated statements of operations',
+            'consolidated statements of cash flows', 'notes to consolidated financial statements')):
+        raise ValueError('FRMO complete primary statements, notes or issuer identity unavailable')
+    retrieved = stamp()
+    available = datetime.fromisoformat(retrieved).astimezone(ZoneInfo('America/New_York')).date().isoformat()
+    if available > as_of:
+        raise ValueError('FRMO report availability is later than the requested as-of date')
+    content_hash = hashlib.sha256(raw).hexdigest()
+    facts = parse_frmo_report(texts, url, year, as_of, content_hash)
+    period = f'{year}-05-31'
+    metadata = {'form': 'issuer_annual_report', 'period': period, 'filed': '',
+                'source_url': url, 'available_as_of': available}
+    document = {**metadata, 'id': 'doc_issuer_'+hashlib.sha256(url.encode()).hexdigest()[:16],
+                'source_kind': 'issuer_annual_report', 'issuer_ticker': 'FRMO',
+                'content_hash': content_hash, 'contexts': [body], 'page_count': len(pages),
+                'coverage': 'complete_issuer_annual_report', 'retrieved_at': retrieved,
+                'filing_date_status': 'issuer publication date unknown; not an SEC filing',
+                'extraction': 'pypdf all pages; page markers and normalized whitespace',
+                'extracted_text_sha256': hashlib.sha256(body.encode()).hexdigest()}
+    return {'facts': facts, 'primary_documents': [document], 'latest_report': metadata,
+            'report_discovery': {'status': 'verified', 'source_url': index, 'checked_at': as_of,
+                                 'content_hash': hashlib.sha256(index_raw).hexdigest()}}
 
 
 def parse_frmo_report(texts, url, year, as_of, content_hash):
@@ -323,11 +373,30 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
               'quote': prior.get('quote'), 'facts': prior.get('facts') or [],
               'primary_observations': prior.get('primary_observations') or [], 'primary_documents': [], 'errors': []}
     symbol = SYMBOLS.get(ticker, ticker)
-    for kind, fn in [('quote', lambda: quote(symbol, as_of)), ('facts', lambda: frmo_report_facts(as_of) if ticker == 'FRMO' else provider_facts(symbol, as_of))]:
+    for kind, fn in [('quote', lambda: quote(symbol, as_of)), ('facts', lambda: provider_facts(symbol, as_of))]:
         try:
-            result[kind] = fn()
+            if ticker == 'FRMO' and kind == 'facts':
+                report = frmo_report(as_of)
+                document = report['primary_documents'][0]
+                for old in prior.get('primary_documents') or []:
+                    # A recheck of identical bytes/text does not erase the
+                    # original observed availability or private capture date.
+                    if (all(old.get(k) == document[k] for k in ('source_url', 'content_hash', 'contexts', 'coverage'))
+                            and old.get('available_as_of') and old.get('retrieved_at')
+                            and old['available_as_of'] <= document['available_as_of']):
+                        document.update({k: old[k] for k in ('available_as_of', 'retrieved_at')})
+                        report['latest_report']['available_as_of'] = old['available_as_of']
+                        break
+                result.update(report)
+            else:
+                result[kind] = fn()
         except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
             result['errors'].append({'collector': kind, 'error': f'{type(exc).__name__}: {exc}', 'retry': 'next_scheduled_run'})
+            if ticker == 'FRMO' and kind == 'facts':
+                result['primary_documents'] = prior.get('primary_documents') or []
+                result['latest_report'] = prior.get('latest_report')
+                result['report_discovery'] = {'status': 'failed', 'source_url': 'https://www.frmocorp.com/10ks.html',
+                                             'checked_at': as_of}
     cik = (entry.get('download') or {}).get('cik')
     if cik and ticker != 'FRMO':
         url = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'

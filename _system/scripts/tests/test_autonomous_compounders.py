@@ -178,6 +178,122 @@ def test_frmo_parser_scales_parent_equity_and_diluted_shares_not_par_value():
         ac.parse_frmo_report([t.replace('(in thousands', '(in units') for t in texts], 'https://issuer.test/report.pdf', 2026, '2026-10-26', 'hash')
 
 
+def frmo_pdf_source(monkeypatch, *, missing='', redirect=None, pages_extra=()):
+    import hashlib
+    from io import BytesIO
+    from types import SimpleNamespace
+    import pypdf
+    url = 'https://www.frmocorp.com/_content/10k/FRMO_Annual_Report_2026.pdf'
+    raw = b'%PDF-1.7 frozen primary report bytes'
+    texts = ['FRMO CORPORATION AND SUBSIDIARIES. Annual Report for the period ended May 31, 2026.',
+             "Consolidated Balance Sheets (in thousands, except par value amounts) 2026 2025 "
+             "Stockholders' equity attributable to the Company 330,977 327,899",
+             'Consolidated Statements of Operations (in thousands, except per share data) '
+             'Net income (loss) attributable to the Company $ 2,936 $ 100,454 '
+             'Weighted average shares outstanding Basic 44,023 44,023 Diluted 44,027 44,030',
+             'Consolidated Statements of Cash Flows. Complete comparative cash statements.',
+             'Notes to Consolidated Financial Statements. Final parent claim and funding restrictions.']
+    texts = [t.replace(missing, 'omitted') if missing else t for t in texts] + list(pages_extra)
+    calls = []
+    class Response(BytesIO):
+        def __init__(self, data, source):
+            super().__init__(data)
+            self.source = source
+        def geturl(self):
+            return redirect or self.source
+    def fetch(source, **kwargs):
+        calls.append(source)
+        return Response(raw if source == url else f'<a href="{url}">2026 Annual</a>'.encode(), source)
+    monkeypatch.setattr(ac.urllib.request, 'urlopen', fetch)
+    monkeypatch.setattr(pypdf, 'PdfReader', lambda stream: SimpleNamespace(
+        pages=[SimpleNamespace(extract_text=lambda t=t: t) for t in texts]))
+    monkeypatch.setattr(ac, 'stamp', lambda: '2026-11-05T18:00:00+00:00')
+    return url, raw, texts, calls, hashlib.sha256(raw).hexdigest()
+
+
+def test_frmo_collection_keeps_the_full_same_capture_report_and_unknown_filing_date(tmp_path, monkeypatch):
+    url, raw, texts, calls, expected_hash = frmo_pdf_source(monkeypatch)
+    monkeypatch.setattr(ac, 'quote', lambda *a, **kw: {'currency': 'USD', 'symbol': 'FRMO'})
+    data = ac.collect('FRMO', {}, '2026-11-05', tmp_path)
+    assert calls == ['https://www.frmocorp.com/10ks.html', url]
+    doc, = data['primary_documents']
+    assert doc['content_hash'] == expected_hash
+    assert doc['coverage'] == 'complete_issuer_annual_report'
+    assert doc['page_count'] == len(texts)
+    assert all(' '.join(t.split()) in doc['contexts'][0] for t in texts)
+    assert doc['filed'] == '' and data['latest_report']['filed'] == ''
+    assert data['latest_report']['period'] == '2026-05-31'
+    assert data['report_discovery']['status'] == 'verified'
+    assert {p['content_sha256'] for p in data['facts']} == {expected_hash}
+
+
+@pytest.mark.parametrize('missing', ['FRMO CORPORATION', 'Consolidated Statements of Cash Flows',
+                                    'Notes to Consolidated Financial Statements'])
+def test_incomplete_or_unbound_issuer_pdfs_fail_before_becoming_current_primary_sources(monkeypatch, missing):
+    frmo_pdf_source(monkeypatch, missing=missing)
+    with pytest.raises(ValueError):
+        ac.frmo_report('2026-11-05')
+
+
+def test_issuer_report_cannot_claim_availability_before_its_real_capture(monkeypatch):
+    frmo_pdf_source(monkeypatch)
+    with pytest.raises(ValueError, match='availability'):
+        ac.frmo_report('2026-11-04')
+
+
+def test_issuer_discovery_cannot_redirect_to_an_unbound_host(monkeypatch):
+    frmo_pdf_source(monkeypatch, redirect='https://unrelated.test/annual.pdf')
+    with pytest.raises(ValueError, match='issuer'):
+        ac.frmo_report('2026-11-05')
+
+
+def test_issuer_report_page_limit_rejects_the_report_instead_of_slicing_its_notes(monkeypatch):
+    frmo_pdf_source(monkeypatch, pages_extra=['Cash debt and capital obligations.'] * 196)
+    with pytest.raises(ValueError, match='bound'):
+        ac.frmo_report('2026-11-05')
+
+
+def test_identical_issuer_report_rechecks_preserve_original_availability_and_capture(tmp_path, monkeypatch):
+    frmo_pdf_source(monkeypatch)
+    monkeypatch.setattr(ac, 'quote', lambda *a, **kw: {'currency': 'USD', 'symbol': 'FRMO'})
+    first = ac.collect('FRMO', {}, '2026-11-05', tmp_path)
+    monkeypatch.setattr(ac, 'stamp', lambda: '2026-11-06T18:00:00+00:00')
+    second = ac.collect('FRMO', {}, '2026-11-06', tmp_path)
+    assert first['primary_documents'] == second['primary_documents']
+    assert second['latest_report']['available_as_of'] == '2026-11-05'
+
+
+def test_failed_issuer_rechecks_preserve_old_evidence_without_stamping_it_current(tmp_path, monkeypatch):
+    frmo_pdf_source(monkeypatch)
+    monkeypatch.setattr(ac, 'quote', lambda *a, **kw: {'currency': 'USD', 'symbol': 'FRMO'})
+    first = ac.collect('FRMO', {}, '2026-11-05', tmp_path)
+    frmo_pdf_source(monkeypatch, missing='Notes to Consolidated Financial Statements')
+    second = ac.collect('FRMO', {}, '2026-11-06', tmp_path)
+    assert second['primary_documents'] == first['primary_documents']
+    assert second['latest_report'] == first['latest_report']
+    assert second['report_discovery']['status'] == 'failed'
+    assert second['errors']
+
+
+def test_corrupt_issuer_pdf_is_an_explicit_collection_retry(tmp_path, monkeypatch):
+    import pypdf
+    from pypdf.errors import PdfReadError
+    frmo_pdf_source(monkeypatch)
+    monkeypatch.setattr(ac, 'quote', lambda *a, **kw: {'currency': 'USD', 'symbol': 'FRMO'})
+    def broken(stream):
+        raise PdfReadError('Broken cross-reference table')
+    monkeypatch.setattr(pypdf, 'PdfReader', broken)
+    data = ac.collect('FRMO', {}, '2026-11-05', tmp_path)
+    assert data['report_discovery']['status'] == 'failed'
+    assert data['primary_documents'] == []
+
+
+def test_unextracted_issuer_pdf_pages_are_not_silently_omitted(monkeypatch):
+    frmo_pdf_source(monkeypatch, pages_extra=[''])
+    with pytest.raises(ValueError, match='unextracted page'):
+        ac.frmo_report('2026-11-05')
+
+
 def test_core_rows_keep_returns_but_not_large_cashflow_histories():
     from build_dashboard_shards import slim_ticker_row
     full = ac.estimate('MA', inputs(), '2026-10-26')

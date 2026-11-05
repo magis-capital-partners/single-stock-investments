@@ -272,6 +272,49 @@ def test_cold_foreign_packet_uses_registered_share_units_without_changing_report
     assert [o['value'] for o in result['observations'] if o['unit'] == 'shares'] == [100]
 
 
+def issuer_annual_packet(monkeypatch):
+    import autonomous_compounders as ac
+    from test_autonomous_compounders import frmo_pdf_source
+    frmo_pdf_source(monkeypatch)
+    report = ac.frmo_report('2026-11-05')
+    p = packet()
+    p.update(ticker='FRMO', as_of='2026-11-05', financial_period='2026-05-31',
+             latest_report=report['latest_report'], documents=report['primary_documents'])
+    for row in p['observations']:
+        row['period'] = '2026-05-31'
+    return p
+
+
+def test_complete_registered_issuer_report_satisfies_the_annual_document_gate(monkeypatch):
+    from underwriting_evidence import evidence_readiness
+    p = issuer_annual_packet(monkeypatch)
+    assert evidence_readiness(p, require_documents=True)['status'] == 'ready'
+    assert p['latest_report']['filed'] == ''  # The collection date is not a filing date.
+
+
+def test_failed_issuer_discovery_keeps_the_normal_primary_source_retry_gate(monkeypatch):
+    from underwriting_evidence import evidence_readiness
+    p = issuer_annual_packet(monkeypatch)
+    p['source_discovery'] = {'status': 'failed'}
+    result = evidence_readiness(p, require_documents=True)
+    assert any(g['code'] == 'report_discovery_failed' for g in result['gaps'])
+    assert result['status'] == 'evidence_gap'
+
+
+@pytest.mark.parametrize('field,value', [('source_kind', 'primary_metric_extract'),
+    ('coverage', 'selected_tables'), ('issuer_ticker', 'OTHER'), ('page_count', 201),
+    ('available_as_of', '2026-11-06'), ('available_as_of', '2026-00-00'),
+    ('source_url', 'https://unrelated.test/FRMO_Annual_Report_2026.pdf'),
+    ('contexts', ['Only a derived equity total.'])])
+def test_issuer_source_completeness_identity_availability_and_hash_checks_stay_closed(monkeypatch, field, value):
+    from underwriting_evidence import evidence_readiness
+    p = issuer_annual_packet(monkeypatch)
+    p['documents'][0][field] = value
+    result = evidence_readiness(p, require_documents=True)
+    assert result['status'] == 'evidence_gap'
+    assert any(g['code'] == 'annual_primary_document_missing' for g in result['gaps'])
+
+
 def test_possessives_do_not_consume_actual_transaction_search_terms():
     terms = requested_keywords([{'code': 'transaction_terms', 'detail':
         "Copart's disclosure omits the target's funding. Search 'merger consideration', "

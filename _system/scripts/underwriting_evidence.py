@@ -1,7 +1,8 @@
 """Cold-start primary evidence. Old valuations, classifications and prices stay out.
 
-Only HTTPS SEC endpoints are fetched here. The research model receives frozen
-observations and filing tables, without credentials or repository access.
+Only HTTPS SEC endpoints and registered issuer-report adapters supply evidence.
+The research model receives frozen observations and primary disclosures,
+without credentials or repository access.
 """
 from __future__ import annotations
 
@@ -590,6 +591,8 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
     if focus_keywords and documents:
         from valuation_earnings import primary_document
         for index, document in enumerate(documents):
+            if complete_issuer_annual(document, ticker, as_of):
+                continue  # Every page is already present from the fact collector's capture.
             try:
                 reader = client or SecClient(max_attempts=2)
                 raw = reader.get_bytes(document['source_url'], timeout=40)
@@ -705,6 +708,34 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
     return packet
 
 
+def complete_issuer_annual(document, ticker, as_of):
+    """A registered issuer adapter's complete report, never a derived KPI row."""
+    match = re.fullmatch(r'https://www\.frmocorp\.com/_content/10k/FRMO_Annual_Report_(20\d{2})\.pdf',
+                         str(document.get('source_url') or ''))
+    period = f'{match[1]}-05-31' if match else ''
+    available = str(document.get('available_as_of') or '')
+    contexts = document.get('contexts') or []
+    pages = document.get('page_count')
+    try:
+        date.fromisoformat(available)
+    except ValueError:
+        return False
+    if (len(contexts) != 1 or not isinstance(contexts[0], str) or not isinstance(pages, int)
+            or not 1 <= pages <= 200 or len(contexts[0]) > 350000):
+        return False
+    text = contexts[0]
+    return bool(ticker == 'FRMO' and match and document.get('issuer_ticker') == ticker
+                and document.get('form') == document.get('source_kind') == 'issuer_annual_report'
+                and document.get('coverage') == 'complete_issuer_annual_report'
+                and document.get('period') == period and period <= available <= as_of
+                and re.fullmatch(r'[0-9a-f]{64}', str(document.get('content_hash') or ''))
+                and hashlib.sha256(text.encode()).hexdigest() == document.get('extracted_text_sha256')
+                and re.findall(r'(?m)^PDF page (\d+):', text) == [str(i) for i in range(1, pages+1)]
+                and all(term in text.lower() for term in ('frmo corporation and subsidiaries',
+                    'consolidated balance sheets', 'consolidated statements of operations',
+                    'consolidated statements of cash flows', 'notes to consolidated financial statements')))
+
+
 def evidence_readiness(packet, *, require_documents=False):
     """Facts/documents readiness is checked before admitting any judgment call."""
     gaps = []
@@ -723,7 +754,8 @@ def evidence_readiness(packet, *, require_documents=False):
     docs = packet.get('documents') or []
     if require_documents and (not latest.get('period') or not any(d.get('period') == latest['period'] for d in docs)):
         gaps.append({'code': 'latest_primary_document_missing', 'detail': 'Retrieve the newly discovered report, including financial tables.'})
-    if require_documents and not any(d.get('form') in ('10-K', '20-F', '40-F') for d in docs):
+    if require_documents and not any(d.get('form') in ('10-K', '20-F', '40-F')
+                                    or complete_issuer_annual(d, packet['ticker'], packet['as_of']) for d in docs):
         gaps.append({'code': 'annual_primary_document_missing', 'detail': 'Retrieve the annual report and business/financing disclosures.'})
     if require_documents and packet.get('source_discovery', {}).get('status') in ('failed', 'earnings_unresolved'):
         gaps.append({'code': 'report_discovery_failed', 'detail': 'Retry primary submissions; old cached reports do not prove freshness.'})
