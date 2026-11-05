@@ -14,7 +14,9 @@ export async function pollFlexBorrow(env,{now=new Date().toISOString(),token=pro
   if(time<'08:35'){const health=await state('flex_borrow_health');if(!health||health.status==='not_configured')await putState(env,'flex_borrow_health',{status:'configured_waiting_daily_window',observed_at:now,next_daily_window:'08:35 America/New_York',shadow_positions_have_no_actual_charged_fee:true},now);return;}
   const day=etDay(now),previous=await state('flex_borrow_poll');if(previous?.day===day&&(previous.status==='complete'||previous.attempts>=12||Date.parse(now)<Date.parse(previous.next_attempt_at||previous.at)))return;
   const next={day,at:now,attempts:previous?.day===day?previous.attempts+1:1,status:'pending',reference:previous?.day===day?previous.reference:null,report_url:previous?.day===day&&REPORT_URLS.has(previous.report_url)?previous.report_url:BASE+'GetStatement'};
-  next.next_attempt_at=new Date(at(now)+60000).toISOString();
+  // Large existing YTD queries can remain pending well beyond twelve minutes. Spread the
+  // same twelve-call budget across generation, rather than exhaust it in 12m.
+  next.next_attempt_at=new Date(at(now)+Math.min(1800000,60000*2**Math.min(next.attempts-1,5))).toISOString();
   await putState(env,'flex_borrow_poll',next,now);
   async function request(endpoint,q){const url=new URL(endpoint==='GetStatement'?next.report_url:BASE+endpoint);url.search=new URLSearchParams({t:token,q,v:'3'});const r=await fetcher(url,{redirect:'error',signal:AbortSignal.timeout(120000),headers:{'user-agent':'MagisReverseSplitBorrow/1.0'}});if(!r.ok)throw new Error('Flex report request failed');const chunks=[],reader=r.body.getReader();let length=0;for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>128000000){await reader.cancel();throw new Error('Flex report too large');}chunks.push(value);}const bytes=new Uint8Array(length);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;}return new TextDecoder().decode(bytes);}
   try{
@@ -23,7 +25,7 @@ export async function pollFlexBorrow(env,{now=new Date().toISOString(),token=pro
     const errorCode=/<ErrorCode>(\d+)<\/ErrorCode>/.exec(xml.slice(0,10000))?.[1];
     if(errorCode){
       if(['1020','1017'].includes(errorCode))next.reference=null;
-      if(errorCode==='1018')next.next_attempt_at=new Date(at(now)+300000).toISOString();
+      if(errorCode==='1018')next.next_attempt_at=new Date(Math.max(at(next.next_attempt_at),at(now)+300000)).toISOString();
       await putState(env,'flex_borrow_poll',next,now);await putState(env,'flex_borrow_health',{status:['1019','1009','1018'].includes(errorCode)?'report_pending':'unavailable',observed_at:now,attempts:next.attempts,next_attempt_at:next.next_attempt_at,provider_code:errorCode,shadow_positions_have_no_actual_charged_fee:true},now);return;
     }
     const names=new Set((await env.DB.prepare('SELECT DISTINCT ticker FROM rs_events WHERE ticker IS NOT NULL').all()).results.map(r=>r.ticker));
