@@ -50,11 +50,16 @@ def main():
             raise ValueError('Public borrow file exceeds limit')
         data.extend(chunk)
 
+    def bounded_checksum(chunk):
+        if len(checksum) + len(chunk) > 1024:
+            raise ValueError('Public borrow checksum exceeds limit')
+        checksum.extend(chunk)
+
     with ftplib.FTP() as ftp:
         ftp.connect('ftp2.interactivebrokers.com', timeout=8)
         ftp.login('shortstock', '')
         ftp.retrbinary('RETR usa.txt', bounded)
-        ftp.retrbinary('RETR usa.txt.md5', checksum.extend)
+        ftp.retrbinary('RETR usa.txt.md5', bounded_checksum)
     expected = checksum.decode('ascii').strip().split()[0].lower()
     if len(expected) != 32 or hashlib.md5(bytes(data).replace(b'\r\n', b'\n')).hexdigest() != expected:
         raise ValueError('Public borrow checksum mismatch')

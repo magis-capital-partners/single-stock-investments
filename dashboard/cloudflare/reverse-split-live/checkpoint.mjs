@@ -38,7 +38,16 @@ export async function openCheckpoint(env){
       for(const r of db.prepare('SELECT * FROM rs_shadow_quotes').all())await changed('shadow-quote',r.id,r.payload,remote.prepare('INSERT OR IGNORE INTO rs_shadow_quotes VALUES(?,?,?,?,?)').bind(r.id,r.ticker,r.quote_at,r.observed_at,r.payload));
       for(const r of db.prepare('SELECT * FROM rs_shadow_evidence').all())await changed('shadow-evidence',r.id,r.payload,remote.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(r.id,r.event_id,r.kind,r.observed_at,r.payload));
       for(const r of db.prepare('SELECT * FROM rs_shadow_daily').all())await changed('shadow-day',r.id,r.payload,remote.prepare('INSERT INTO rs_shadow_daily VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload').bind(r.id,r.policy_id,r.day,r.payload));
-      const keys=['last_tick','last_completed_tick','service_mode','last_reconciliation','reconciliation_error','collector_job_counts','last_collector_run','shadow_started_at','shadow_summary','shadow_runtime'];
+      for(const r of db.prepare('SELECT * FROM rs_execution_policies').all())await changed('execution-policy',r.id,r.payload,remote.prepare('INSERT OR IGNORE INTO rs_execution_policies VALUES(?,?,?)').bind(r.id,r.registered_at,r.payload));
+      for(const r of db.prepare('SELECT * FROM rs_execution_tracks').all())await changed('execution-track',r.id,r.payload,remote.prepare('INSERT INTO rs_execution_tracks VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET ticker=excluded.ticker,state=excluded.state,updated_at=excluded.updated_at,payload=excluded.payload').bind(r.id,r.event_id,r.policy_id,r.ticker,r.state,r.updated_at,r.payload));
+      for(const r of db.prepare('SELECT * FROM rs_execution_daily').all())await changed('execution-day',r.id,r.payload,remote.prepare('INSERT INTO rs_execution_daily VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload').bind(r.id,r.policy_id,r.day,r.payload));
+      const cursors=[];
+      for(const [table,fields] of [['rs_execution_records',['id','track_id','recorded_at','kind','payload']],['rs_borrow_observations',['id','ticker','day','kind','as_of','observed_at','payload']]]){
+        const key='publication_cursor:'+table,last=Number(db.prepare('SELECT value FROM rs_state WHERE key=?').get(key)?.value||0),rows=db.prepare(`SELECT rowid AS sequence,* FROM ${table} WHERE rowid>? ORDER BY rowid`).all(last);
+        for(const r of rows)publications.push({statement:remote.prepare(`INSERT OR IGNORE INTO ${table} VALUES(${fields.map(()=>'?').join(',')})`).bind(...fields.map(k=>r[k]))});
+        if(rows.length)cursors.push({key,value:String(rows.at(-1).sequence)});
+      }
+      const keys=['last_tick','last_completed_tick','service_mode','last_reconciliation','reconciliation_error','collector_job_counts','last_collector_run','shadow_started_at','shadow_summary','shadow_runtime','execution_summary','validation_plan','validation_summary','shadow_borrow_health','flex_borrow_health'];
       const stateRows=db.prepare('SELECT * FROM rs_state').all().filter(r=>keys.includes(r.key)),states=[];
       for(const r of stateRows){const key='published:state:'+r.key,hash=await sha(JSON.stringify([r.value,r.updated_at]));if(db.prepare('SELECT value FROM rs_state WHERE key=?').get(key)?.value!==hash)states.push({r,key,hash});}
       // Write the inactive slot before committing its pointer. A killed runner leaves the active slot intact.
@@ -47,7 +56,8 @@ export async function openCheckpoint(env){
       await remote.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_checkpoint',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(JSON.stringify(next),at).run();receipt=next;
       // The committed checkpoint is authoritative before any dashboard publication.
       // A failed publication retries from that checkpoint and cannot erase a simulated fill.
-      for(let i=0;i<publications.length;i+=60){const group=publications.slice(i,i+60);await remote.batch(group.map(p=>p.statement));for(const p of group)db.prepare('INSERT INTO rs_state(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(p.key,p.hash,at);}
+      for(let i=0;i<publications.length;i+=60){const group=publications.slice(i,i+60);await remote.batch(group.map(p=>p.statement));for(const p of group)if(p.key)db.prepare('INSERT INTO rs_state(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(p.key,p.hash,at);}
+      for(const {key,value} of cursors)db.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(key,value,at);
       if(states.length){await remote.batch(states.map(({r})=>remote.prepare('INSERT INTO rs_state(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind(r.key,r.value,r.updated_at)));for(const {key,hash} of states)db.prepare('INSERT INTO rs_state(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(key,hash,at);}
       return next;
     },

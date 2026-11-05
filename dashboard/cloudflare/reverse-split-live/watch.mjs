@@ -3,7 +3,10 @@ import {openCheckpoint} from './checkpoint.mjs';
 import {scheduled,dispatch,consume,enqueue,sourceURL,recordEvent} from './worker.mjs';
 import {initializeShadow,shadowTick,putState,digest} from './shadow-service.mjs';
 import {classifyAnnouncement} from './core.mjs';
-import {pollPublicBorrow} from './public-borrow.mjs';
+import {pollIBKRBorrow} from './borrow-service.mjs';
+import {initializeExecution,executionTick} from './execution-service.mjs';
+import {initializeValidation,validationTick} from './validation-service.mjs';
+import {pollFlexBorrow} from './flex-borrow.mjs';
 const now=()=>new Date().toISOString();
 export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false}={}){
   const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,budgetDay,baseline={};
@@ -19,11 +22,11 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
     await remote.prepare("INSERT OR IGNORE INTO rs_state VALUES('collector_lease','0',?)").bind(now()).run();lease=String(Date.now()+600000)+':'+token;
     const claimed=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND CAST(value AS INTEGER)<=? RETURNING value").bind(lease,now(),Date.now()).first();
     if(!claimed)return {skipped:true,reason:'Another collector owns the bounded lease'};
-    checkpoint=await openCheckpoint(env);env.FAST_MONITOR=true;env.EXPECTED_CADENCE_SECONDS=String(interval);await initializeShadow(env);await budget();
-    env.onShadowDecision=async event=>{await shadowTick(env,{event});await save();};
+    checkpoint=await openCheckpoint(env);env.FAST_MONITOR=true;env.EXPECTED_CADENCE_SECONDS=String(interval);await initializeShadow(env);await initializeExecution(env);await initializeValidation(env);await budget();
+    env.onShadowDecision=async event=>{await shadowTick(env,{event});await executionTick(env,{event});await pollIBKRBorrow(env);await executionTick(env);await save();};
     await heartbeat('starting');
     if(env.market?.health?.status!=='not_configured')try{await env.market.quote('AAPL');}catch(e){await putState(env,'shadow_quote_error',{at:now(),message:e.message});}
-    await shadowTick(env);await save();
+    await shadowTick(env);await executionTick(env);await pollIBKRBorrow(env);await validationTick(env);await save();
     while(!stopping&&!shouldStop()&&Date.now()-started<maximumMs){
       const cycle=Date.now();
       const renewed=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(renewed,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=renewed;
@@ -33,6 +36,8 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
         if(Date.now()-lastImport>60000){const records=(await remote.prepare('SELECT payload FROM rs_shadow_evidence WHERE observed_at>=? ORDER BY observed_at LIMIT 1000').bind(new Date(Date.now()-7*86400000).toISOString()).all()).results;for(const r of records){const e=JSON.parse(r.payload);await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(e.id,e.event_id,e.kind,e.observed_at,r.payload).run();}lastImport=Date.now();}
         // Price and exit work precede filing backlogs. Source polling has a bounded deadline.
         await shadowTick(env);
+        await executionTick(env);
+        await validationTick(env);
         await scheduled({cron:new Date().getUTCHours()===8?'17 8 * * *':'continuous'},env);
         if(Date.now()-lastNews>60000&&env.market?.health?.status!=='not_configured'){
           try{for(const item of await env.market.news()){
@@ -43,7 +48,7 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
         }
         let handled=0;
         while(!stopping&&Date.now()-cycle<Math.max(15000,interval*1000)&&Date.now()<env.deadline-2000&&handled<8){if(!env.pending.length)await dispatch(env);const body=env.pending.shift();if(!body)break;await consume({messages:[{body,ack(){}}]},env);jobs++;handled++;}
-        if(Date.now()-lastBorrow>300000){await pollPublicBorrow(env);lastBorrow=Date.now();}
+        if(Date.now()-lastBorrow>60000){await pollIBKRBorrow(env);await pollFlexBorrow(env);lastBorrow=Date.now();}
         ticks++;if(Date.now()-lastHeartbeat>=30000)await heartbeat('running');
         const records=(await env.DB.prepare('SELECT count(*) AS count FROM rs_shadow_records').first()).count;
         if(Date.now()-lastSaved>=60000||records!==lastRecordCount){await save();lastRecordCount=records;}
