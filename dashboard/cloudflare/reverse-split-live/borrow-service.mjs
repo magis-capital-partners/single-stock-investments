@@ -15,7 +15,7 @@ export async function pollIBKRBorrow(env,{now=new Date().toISOString(),fetchRows
   const all=!last||last.day!==day||(last.phase||phaseAt(last.at))!==phase,newNames=tickers.filter(t=>!last?.tickers?.includes(t)),newActive=active.some(t=>!last?.active_tickers?.includes(t));
   if(!all&&!newNames.length&&!newActive&&(!active.length||at(now)-at(last.active_at||last.at)<300000))return;
   const wanted=all?tickers:tickers.filter(t=>newNames.includes(t)||active.includes(t));if(!wanted.length)return;
-  const attempt=await get('ibkr_borrow_attempt');if(attempt&&at(now)-at(attempt)<60000)return;
+  const urgent=newNames.length>0||newActive,attempt=await get('ibkr_borrow_attempt');if(attempt&&at(now)-at(attempt)<(urgent?5000:60000))return;
   await putState(env,'ibkr_borrow_attempt',now,now);
   try{
     const result=fetchRows?await fetchRows(wanted):JSON.parse((await run(process.platform==='win32'?'python':'python3',[fileURLToPath(new URL('./public_borrow.py',import.meta.url)),'--tickers',wanted.join(',')],{timeout:25000,maxBuffer:3000000,windowsHide:true})).stdout);

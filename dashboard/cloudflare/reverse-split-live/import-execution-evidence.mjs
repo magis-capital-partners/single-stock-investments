@@ -12,7 +12,9 @@ export function validateIBKREvidence(r,now){
   }else if(r.kind==='cost_reconciliation'){
     if(typeof r.event_id!=='string'||!r.event_id||!r.policy_id?.startsWith('rs_ibkr_')||!r.source_url?.startsWith('https://')||!r.reference||at(r.observed_at)===null||at(r.observed_at)>at(now)||at(r.covers_fills_through)===null||at(r.covers_fills_through)>at(r.observed_at)||!['estimated','documented'].includes(r.basis))throw new Error('Invalid cost reconciliation');
     if(!completeCosts(r.costs))throw new Error('Every cost component, including signed short-proceeds interest, must be explicit and numeric');
+    const s=r.fractional_settlement;if(s&&(!finite(s.shares)||s.shares<=0||s.shares>=1||!finite(s.price)||s.price<=0||typeof s.security_id!=='string'||!s.security_id||at(r.covers_fills_through)<at(r.observed_at)))throw new Error('Invalid fractional cash-settlement evidence');
   }else validateEvidence(r,now);
+  if(r.kind==='corporate_action'&&r.execution_confirmed!==true)throw new Error('A corporate action must be confirmed executed');
   if(['locate','margin'].includes(r.kind)&&(!/^[A-Za-z0-9_.:-]{1,100}$/.test(r.allocation_id||'')))throw new Error('A shared IBKR allocation reference is required to prevent double counting');
   return {...r,approval_basis:'owner_supplied_ibkr_document',broker_execution_verified:false};
 }
