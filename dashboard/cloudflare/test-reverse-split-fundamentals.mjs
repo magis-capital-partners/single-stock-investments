@@ -6,7 +6,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {readFileSync,readdirSync} from 'node:fs';
 import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
 import {readSnapshotAPI} from './reverse-split-live/read-snapshot.mjs';
-import {publishFinancialCoverage} from './reverse-split-live/financials-harvest.mjs';
+import {publishFinancialCoverage,harvestIssuer} from './reverse-split-live/financials-harvest.mjs';
 import {needsStartupReconciliation} from './reverse-split-live/watch.mjs';
 import {captureReadSnapshot,publishReadSnapshot,trackCard} from './reverse-split-live/snapshot-publish.mjs';
 const now='2026-11-05T17:00:00Z',cik='123';
@@ -51,6 +51,9 @@ test('losing the collector lease cannot commit a checkpoint or publish a new vie
 });
 test('coverage publication uses the cached cards instead of rereading every issuer on every update',async t=>{
   const {env}=setup(t),queue={jobs:Object.fromEntries(Array.from({length:200},(_,i)=>[String(i+1),{cik:String(i+1)}]))};let reads=0;env.EVIDENCE.get=async()=>{reads++;return null;};env.financialCoverageCards=new Map([['123',{cik:'123',version:'a'.repeat(64),status:'stale',observed_at:now}]]);const result=await publishFinancialCoverage(env,queue);assert.equal(result.processed,1);assert.equal(result.issuers,200);assert.equal(reads,0);
+});
+test('a malformed Company Facts response does not poison the primary-filing fallback ledger',async t=>{
+  const {env}=setup(t),client={get:async url=>({bytes:Buffer.from(url.includes('/submissions/')?JSON.stringify({cik:123,name:'Example Research Ltd',filings:{recent:{form:[]}}}):'<html>upstream unavailable</html>'),url,sha256:'a'.repeat(64),captured_at:now})};const result=await harvestIssuer(env,{cik:'123',ticker:null},{client,maximumDocuments:0});assert.equal(result.profile.collection.api_source_sha256,null);assert.equal(result.profile.policy_financials.score,null);assert.equal(result.profile.cik,'123');
 });
 test('slow derived dashboard writes do not block the durable collector checkpoint or quote loop',async t=>{
   const {db,env}=setup(t);env.controlDB=env.DB;env.pending=[];const checkpoint=await openCheckpoint(env);let release,started=false;const wait=new Promise(r=>{release=r;}),put=env.EVIDENCE.put;env.EVIDENCE.put=async(k,v)=>{if(k.startsWith('collector-dashboard/')&&!started){started=true;await wait;}await put(k,v);};
