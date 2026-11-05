@@ -61,7 +61,8 @@ def test_unquoted_section_lists_and_subsections_retrieve_the_containing_sections
     assert 'section 257.4' not in terms
 
 
-def test_numbered_html_paragraphs_retain_complete_requested_credit_clauses():
+@pytest.mark.parametrize('block', ['p', 'div'])
+def test_numbered_html_paragraphs_retain_complete_requested_credit_clauses(block):
     from underwriting_evidence import text_of
     draw = ('4.02 Conditions to All Credit Extensions. '
             + 'The conditions to each borrowing are contractual requirements. ' * 90
@@ -80,10 +81,28 @@ def test_numbered_html_paragraphs_retain_complete_requested_credit_clauses():
            + '<p>Unrelated intervening disclosure. </p>' * 1200
            + '<p>' + remedies + '</p>'
            + '<p>8.03 Application of Funds. Subsequent clause.</p></html>').encode()
+    if block == 'div':
+        raw = raw.replace(b'<p>', b'<div>').replace(b'</p>', b'</div>')
     doc = document_record('https://issuer.test/agreement', raw, ['section 4.02', 'section 8.02'])
     assert any(text_of(draw_html) in context for context in doc['contexts'])
     assert any(remedies in context for context in doc['contexts'])
     assert text_of(draw_html) in text_of(raw.decode())
+
+
+@pytest.mark.parametrize('block', ['p', 'div'])
+def test_page_break_reference_to_an_earlier_section_keeps_the_clause_tail(block):
+    from underwriting_evidence import text_of
+    clause = (f'<{block}>SECTION 5.2 Conditions Precedent to all Credit Extensions.</{block}>'
+              f'<{block}>' + 'The condition remains applicable. ' * 400 + f'</{block}>'
+              f'<{block}>Section 4.16 or the borrower satisfies the final required condition.</{block}>')
+    raw = ('<html><p>Cash, credit, debt, assets and capital.</p>'
+           '<table><tr><td>Section 5.2 Conditions Precedent</td><td>70</td></tr></table>'
+           + '<p>Unrelated introductory disclosure.</p>' * 1200
+           + clause
+           + f'<{block}>SECTION 6.1 Organization and Power.</{block}>'
+           + '<p>Unrelated following disclosure.</p>' * 1200 + '</html>').encode()
+    doc = document_record('https://issuer.test/agreement', raw, ['section 5.2'])
+    assert any(text_of(clause) in context for context in doc['contexts'])
 
 
 def test_possessives_do_not_consume_actual_transaction_search_terms():
