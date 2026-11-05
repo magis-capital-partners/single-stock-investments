@@ -1,5 +1,5 @@
 import unittest
-from fundamental_filing import extract_document
+from fundamental_filing import extract_document,metric_for
 
 META = {'cik': '123', 'company': 'Example Research Ltd', 'form': '6-K', 'filed': '2026-08-15',
         'published_at': '2026-08-15T12:00:00Z', 'observed_at': '2026-11-05T17:00:00Z',
@@ -8,6 +8,10 @@ META = {'cik': '123', 'company': 'Example Research Ltd', 'form': '6-K', 'filed':
 
 
 class FilingExtraction(unittest.TestCase):
+    def test_partial_operating_flows_and_all_current_borrowings_do_not_change_the_registered_definitions(self):
+        self.assertIsNone(metric_for('NetCashUsedInOperatingActivitiesContinuingOperations'))
+        self.assertIsNone(metric_for('CurrentBorrowings'))
+        self.assertEqual(metric_for('CurrentPortionOfNoncurrentBorrowings'),'current_debt')
     def test_comparative_currency_columns_do_not_mix_reported_and_translated_amounts(self):
         raw=b'<h2>Consolidated balance sheets</h2><p>Amounts in thousands</p><table><tr><th></th><th colspan="2">June 30, 2026</th></tr><tr><th></th><th>RMB</th><th>US$</th></tr><tr><td>Total assets</td><td>700</td><td>100</td></tr></table>'
         rows=extract_document(raw,META)['facts'];self.assertEqual({(r['currency'],r['value']) for r in rows},{('CNY',700000),('USD',100000)})

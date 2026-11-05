@@ -22,12 +22,12 @@ NAMES = {
  'revenues': ['revenues', 'revenue', 'total revenue', 'total revenues', 'net revenue', 'net revenues', 'net sales', 'sales revenue net', 'revenue from contracts with customers', 'revenue from contract with customer excluding assessed tax'],
  'net_income': ['net income loss', 'net income', 'net loss', 'net loss for the period', 'net income for the period', 'profit loss', 'loss for the period', 'profit for the period', 'net income loss available to common stockholders basic'],
  'operating_income': ['operating income loss', 'operating income', 'operating loss', 'loss from operations', 'income from operations', 'profit loss from operating activities', 'operating profit loss'],
- 'cfo': ['net cash provided by used in operating activities', 'net cash provided by operating activities', 'net cash used in operating activities', 'net cash used in operating activities continuing operations', 'net cash flows from used in operating activities', 'cash flows from used in operating activities', 'net cash generated from operating activities', 'net cash from operating activities'],
+ 'cfo': ['net cash provided by used in operating activities', 'net cash provided by operating activities', 'net cash used in operating activities', 'net cash flows from used in operating activities', 'cash flows from used in operating activities', 'net cash generated from operating activities', 'net cash from operating activities'],
  'cash': ['cash and cash equivalents', 'cash and cash equivalents at carrying value'],
  'total_assets': ['total assets', 'assets'],
  'stockholders_equity': ['stockholders equity', 'total stockholders equity', 'total stockholders deficit', 'stockholders deficit', 'total shareholders equity', 'total shareholders deficit', 'shareholders equity deficit', 'stockholders equity deficit', 'equity', 'equity attributable to owners of parent', 'total equity'],
  'long_term_debt': ['long term debt noncurrent', 'long term debt non current', 'long term debt net of current portion', 'long term borrowings noncurrent', 'noncurrent borrowings', 'non current borrowings', 'long term debt'],
- 'current_debt': ['long term debt current', 'current portion of long term debt', 'current portion of noncurrent borrowings', 'current portion of non current borrowings', 'current portion of long term borrowings', 'total current borrowings', 'current borrowings'],
+ 'current_debt': ['long term debt current', 'current portion of long term debt', 'current portion of noncurrent borrowings', 'current portion of non current borrowings', 'current portion of long term borrowings'],
 }
 def words(value):
     value = re.sub(r'([a-z])([A-Z])', r'\1 \2', str(value))
