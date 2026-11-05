@@ -26,7 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from atomic_io import attach_envelope, semantic_json_sha256  # noqa: E402
+from atomic_io import semantic_json_sha256  # noqa: E402
 from operating_kpis.model import LayoutError, STORE_DIR, utc_now, write_ticker_store  # noqa: E402
 from operating_kpis.registry import ADAPTERS  # noqa: E402
 from operating_kpis.trends import (  # noqa: E402
@@ -69,23 +69,15 @@ def publish_views() -> None:
     if not KPI_SUMMARY.is_file():
         return
     summary = json.loads(KPI_SUMMARY.read_text(encoding="utf-8"))
-    prior = dict(summary.get("_envelope") or {})
     latest = operating_latest_rows()
-    summary.pop("_envelope", None)
     summary["operating_latest"] = latest
     summary["description"] = (
         "L0 KPI inflection summary extracted from dashboard/data/kpi_trends.json. "
         "Inflections are the accelerating and decelerating series. "
         "operating_latest carries issuer operating levels even when the series is steady."
     )
-    attach_envelope(
-        summary,
-        feed_id=prior.get("feed_id") or "dashboard-kpi-summary",
-        as_of=str(summary.get("as_of") or "")[:10] or None,
-        row_count=prior.get("row_count") if prior.get("row_count") is not None else len(summary.get("inflections") or []),
-        upstream_inputs=prior.get("upstream_inputs"),
-    )
-    KPI_SUMMARY.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    from build_progressive_shards import write_kpi_summary
+    write_kpi_summary(summary, KPI_SUMMARY.parent)
     print(f"kpi_summary operating_latest: {len(latest)} rows")
 
 
