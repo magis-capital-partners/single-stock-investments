@@ -22,6 +22,12 @@ export async function openCheckpoint(env){
       db.exec('BEGIN');try{for(const r of data.records){if(!r.verified||!r.cik||!r.effective_date||!r.known_at||!r.source_url?.startsWith('https://'))throw new Error('Unbound historical action');db.prepare('INSERT OR IGNORE INTO rs_history(id,cik,effective_date,known_at,verified,payload) VALUES(?,?,?,?,1,?)').run(r.cik+':'+r.effective_date,r.cik,r.effective_date,r.known_at,JSON.stringify(r));}db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('prior_history_bootstrap',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(bootstrapHash,new Date().toISOString());db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}
     }
   }catch(e){db?.close();cleanup(dir);throw e;}
+  async function commitPointer(next,at){
+    env.assertCollectorLease?.();
+    if(env.collectorLeaseOwner){const ok=await remote.prepare("INSERT INTO rs_state(key,value,updated_at) SELECT 'collector_checkpoint',?,? WHERE EXISTS(SELECT 1 FROM rs_state WHERE key='collector_lease' AND substr(value,instr(value,':')+1)=? AND CAST(value AS INTEGER)>?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at RETURNING key").bind(JSON.stringify(next),at,env.collectorLeaseOwner,Date.now()+30000).first();if(!ok)throw new Error('Collector lease lost before checkpoint commit');}
+    else await remote.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_checkpoint',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(JSON.stringify(next),at).run();
+    receipt=next;
+  }
   return {
     async save({publicationMode='d1'}={}){
       for(const p of env.pending.splice(0))await env.DB.prepare("UPDATE rs_jobs SET state='pending',token=NULL WHERE id=? AND token=? AND state='queued'").bind(p.id,p.token).run();
@@ -31,7 +37,7 @@ export async function openCheckpoint(env){
         // Capture without yielding: every displayed fill belongs to these exact durable bytes.
         const snapshot=captureReadSnapshot(db),slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
         await env.EVIDENCE.put(`collector-state/slot${slot}.sqlite`,bytes,{httpMetadata:{contentType:'application/vnd.sqlite3'}});
-        await remote.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_checkpoint',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(JSON.stringify(next),at).run();receipt=next;
+        await commitPointer(next,at);
         await publishReadSnapshot(env,db,snapshot);
         if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(at).run();env.snapshotActivated=true;}
         return next;
@@ -65,7 +71,7 @@ export async function openCheckpoint(env){
       // Write the inactive slot before committing its pointer. A killed runner leaves the active slot intact.
       const slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
       await env.EVIDENCE.put(`collector-state/slot${slot}.sqlite`,bytes,{httpMetadata:{contentType:'application/vnd.sqlite3'}});
-      await remote.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_checkpoint',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(JSON.stringify(next),at).run();receipt=next;
+      await commitPointer(next,at);
       // The committed checkpoint is authoritative before any dashboard publication.
       // A failed publication retries from that checkpoint and cannot erase a simulated fill.
       for(let i=0;i<publications.length;i+=60){const group=publications.slice(i,i+60);await remote.batch(group.map(p=>p.statement));for(const p of group)if(p.key)db.prepare('INSERT INTO rs_state(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(p.key,p.hash,at);}

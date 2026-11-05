@@ -40,6 +40,10 @@ test('private snapshot publication keeps full local research running with no eve
   await checkpoint.save({publicationMode:'r2'});assert.equal(db.prepare('SELECT count(*) AS n FROM rs_events').get().n,0);assert.equal(db.prepare("SELECT value FROM rs_state WHERE key='collector_publication'").get().value,'r2');assert.ok(objects.has('collector-dashboard/events.json'));
   env.DB=env.controlDB;const response=await readSnapshotAPI(new URL('https://internal/events'),env);assert.equal((await response.json()).events[0].id,'qa-current');
 });
+test('losing the collector lease cannot commit a checkpoint or publish a new view',async t=>{
+  const {db,env,objects}=setup(t);env.controlDB=env.DB;env.pending=[];env.collectorLeaseOwner='qa-old-owner';db.prepare('INSERT INTO rs_state VALUES(?,?,?)').run('collector_lease',String(Date.now()+600000)+':qa-new-owner',now);
+  const checkpoint=await openCheckpoint(env);t.after(()=>checkpoint.close());await assert.rejects(checkpoint.save({publicationMode:'r2'}),/lease lost/);assert.equal(db.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").get(),undefined);assert.equal(objects.has('collector-dashboard/shadow.json'),false);
+});
 test('snapshot history pagination reaches beyond the first page and paused runtime is never tracking',async t=>{
   const {db,env}=setup(t);for(let i=0;i<5;i++){const id='qa-'+i,payload={id,policy_id:'p',state:'retrospective',enrolled_at:now};db.prepare('INSERT INTO rs_execution_tracks VALUES(?,?,?,?,?,?,?)').run(id,id,'p','QA','retrospective',now,JSON.stringify(payload));}
   let after='',ids=[];for(let i=0;i<4;i++){const r=await readSnapshotAPI(new URL('https://internal/shadow/executable/tracks?limit=2&after='+after),env),b=await r.json();ids.push(...b.tracks.map(r=>r.id));if(!b.next_cursor)break;after=b.next_cursor;}assert.equal(new Set(ids).size,5);
