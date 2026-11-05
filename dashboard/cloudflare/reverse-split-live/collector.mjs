@@ -10,6 +10,7 @@ import {makeMarketData} from './market-data.mjs';
 import {makeDatabentoMarket} from './databento-market.mjs';
 import {initializeShadow,shadowTick,putState} from './shadow-service.mjs';
 import {watchCollector} from './watch.mjs';
+import {recoverWatch} from './recovery.mjs';
 
 export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,cadence=300,maxJobs=40}={}){
   if(!token||!account||!database||!bucket)throw new Error('Collector requires configured Cloudflare credentials and isolated research resources');
@@ -68,10 +69,12 @@ async function main(){
   const cadence=Math.max(15,Number(values.interval)||15),env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:process.env.CLOUDFLARE_ACCOUNT_ID||'e1cac493b315c8fd7398500dd1bfd687',database:process.env.REVERSE_SPLIT_DATABASE_ID||'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:process.env.REVERSE_SPLIT_EVIDENCE_BUCKET||'single-stock-reverse-splits-evidence',cadence:values.watch?cadence:300,maxJobs:Math.min(150,Math.max(1,Number(values['max-jobs'])||40))});
   const reference=makeMarketData({key:process.env.MASSIVE_API_KEY||process.env.POLYGON_API_KEY});
   env.market=process.env.DATABENTO_API_KEY?makeDatabentoMarket({key:process.env.DATABENTO_API_KEY,reference}):reference;
+  let stopRequested=false;const stop=()=>{stopRequested=true;};
+  if(values.watch){process.once('SIGINT',stop);process.once('SIGTERM',stop);}
   try{
-    if(values.watch){const result=await watchCollector(env,{interval:cadence,maximumMs:Number(values['run-minutes'])===0?Infinity:Math.min(310,Math.max(1,Number(values['run-minutes'])||300))*60000});if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'continue='+(!result.skipped)+'\n');console.log(JSON.stringify(result));}
+    if(values.watch){const maximumMs=Number(values['run-minutes'])===0?Infinity:Math.min(310,Math.max(1,Number(values['run-minutes'])||300))*60000,result=await recoverWatch(remaining=>watchCollector(env,{interval:cadence,maximumMs:remaining}),{maximumMs,shouldStop:()=>stopRequested});if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'continue='+(!result.skipped)+'\n');console.log(JSON.stringify(result));}
     else console.log(JSON.stringify(await runOnce(env,{reconcile:values.reconcile})));
   }catch(e){console.error(JSON.stringify({event:'collector_failed',error:e.message}));process.exitCode=1;}
-  finally{env.market.close?.();}
+  finally{process.removeListener('SIGINT',stop);process.removeListener('SIGTERM',stop);env.market.close?.();}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
