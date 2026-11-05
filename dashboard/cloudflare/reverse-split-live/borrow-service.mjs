@@ -11,6 +11,7 @@ export async function pollIBKRBorrow(env,{now=new Date().toISOString(),fetchRows
   const get=async key=>JSON.parse((await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(key).first())?.value||'null');
   const day=etDay(now),hour=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',hourCycle:'h23'}).format(new Date(now)));
   const last=await get('ibkr_borrow_poll'),active=(await env.DB.prepare("SELECT DISTINCT ticker FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') UNION SELECT DISTINCT ticker FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending')").all()).results.map(r=>r.ticker);
+  const activeEvents=new Set((await env.DB.prepare("SELECT DISTINCT event_id FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') UNION SELECT DISTINCT event_id FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending')").all()).results.map(r=>r.event_id));
   const all=!last||last.day!==day||tickers.some(t=>!last.tickers.includes(t))||(hour>=8&&hour<=17&&at(now)-at(last.at)>=3600000);
   if(!all&&(!active.length||at(now)-at(last.active_at||last.at)<300000))return;
   const wanted=all?tickers:tickers.filter(t=>active.includes(t));if(!wanted.length)return;
@@ -28,7 +29,7 @@ export async function pollIBKRBorrow(env,{now=new Date().toISOString(),fetchRows
       observation.id=await digest(ticker+':'+result.as_of+':'+result.source_sha256);
       await env.DB.prepare('INSERT OR IGNORE INTO rs_borrow_observations VALUES(?,?,?,?,?,?,?)').bind(observation.id,ticker,observation.day,observation.kind,result.as_of,result.observed_at,JSON.stringify(observation)).run();
       if(valid)quoted++;else missing++;
-      for(const event of events.filter(e=>e.ticker===ticker)){
+      for(const event of events.filter(e=>e.ticker===ticker&&activeEvents.has(e.event_id))){
         const e={...observation,id:await digest(event.event_id+':'+observation.id),kind:'public_borrow',event_id:event.event_id,valid_until:new Date(at(result.as_of)+1800000).toISOString()};
         await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(e.id,e.event_id,e.kind,e.observed_at,JSON.stringify(e)).run();
       }

@@ -1,5 +1,6 @@
 import {digest,putState} from './shadow-service.mjs';
 import {at,finite,sessionAt} from './shadow-core.mjs';
+import {putSummaryIfChanged} from './summary-state.mjs';
 export const VALIDATION_PLAN=Object.freeze({id:'rs_live_path_2026-11-05.v1',day:'2026-11-05',timezone:'America/New_York',start_at:'2026-11-05T14:25:00Z',end_at:'2026-11-05T21:10:00Z',benchmarks:['AAPL','SPY','IWM'],quote_gate_seconds:15,targets:{capture_to_client_p95_ms:2000,quote_age_p95_ms:5000,evaluation_after_receipt_p95_ms:15000},minimum_regular_samples_per_benchmark:100,authority:'none',research_only:true,broker_connections:0,orders:0});
 const stats=values=>{const a=values.filter(finite).sort((x,y)=>x-y);return {count:a.length,p50:a.length?a[Math.floor((a.length-1)*.5)]:null,p95:a.length?a[Math.floor((a.length-1)*.95)]:null,max:a.length?a.at(-1):null};};
 export async function initializeValidation(env,now=new Date().toISOString()){
@@ -19,7 +20,7 @@ export function validationSummary(samples,now,plan=VALIDATION_PLAN){
 }
 export async function validationTick(env,now=new Date().toISOString()){
   const p=VALIDATION_PLAN;
-  if(at(now)<at(p.start_at)){await putState(env,'validation_summary',validationSummary([],now),now);return;}
+  if(at(now)<at(p.start_at)){await putSummaryIfChanged(env,'validation_summary',validationSummary([],now),now);return;}
   const old=JSON.parse((await env.DB.prepare("SELECT value FROM rs_state WHERE key='validation_samples'").first())?.value||'[]');
   if(at(now)<=at(p.end_at)){
     const names=(await env.DB.prepare("SELECT DISTINCT ticker FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending')").all()).results.map(r=>r.ticker).filter(Boolean);
@@ -38,5 +39,5 @@ export async function validationTick(env,now=new Date().toISOString()){
   const paths=(await env.DB.prepare("SELECT payload FROM rs_execution_tracks WHERE state<>'retrospective' AND json_extract(payload,'$.signal_at') IS NOT NULL ORDER BY updated_at DESC LIMIT 50").all()).results.map(r=>JSON.parse(r.payload));
   summary.announcement_paths=paths.map(t=>({ticker:t.ticker,policy_id:t.policy_id,published_at:t.published_at,first_seen_at:t.first_seen_at,ready_at:t.signal_at,entry_at:t.entry_at||null,publication_to_receipt_ms:t.published_at?at(t.first_seen_at)-at(t.published_at):null,receipt_to_ready_ms:at(t.signal_at)-at(t.first_seen_at),ready_to_counterfactual_entry_ms:t.entry_at?at(t.entry_at)-at(t.signal_at):null,broker_verified:false}));
   if(paths.length)summary.announcement_to_entry_validation=paths.some(t=>t.lane==='executable'&&t.entry_shares)?'counterfactual_path_observed_not_broker_execution':'forward_signal_observed_no_broker_eligible_fill';
-  if(await env.DB.prepare("SELECT value FROM rs_state WHERE key='validation_overflow'").first())summary.status='insufficient_data_overflow';await putState(env,'validation_summary',summary,now);
+  if(await env.DB.prepare("SELECT value FROM rs_state WHERE key='validation_overflow'").first())summary.status='insufficient_data_overflow';await putSummaryIfChanged(env,'validation_summary',summary,now);
 }

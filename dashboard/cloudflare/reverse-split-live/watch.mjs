@@ -24,7 +24,13 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
     const claimed=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND CAST(value AS INTEGER)<=? RETURNING value").bind(lease,now(),Date.now()).first();
     if(!claimed)return {skipped:true,reason:'Another collector owns the bounded lease'};
     checkpoint=await openCheckpoint(env);env.FAST_MONITOR=true;env.EXPECTED_CADENCE_SECONDS=String(interval);await initializeShadow(env);await initializeExecution(env);await initializeValidation(env);await budget();
-    env.onShadowDecision=async event=>{await shadowTick(env,{event});await executionTick(env,{event});await pollIBKRBorrow(env);await executionTick(env);await save();};
+    env.onShadowDecision=async event=>{
+      await shadowTick(env,{event});await executionTick(env,{event});
+      const active=await env.DB.prepare("SELECT id FROM rs_execution_tracks WHERE event_id=? AND (state IN ('armed','partial_entry','open','exit_pending') OR json_extract(payload,'$.entry_shares')>0) UNION ALL SELECT id FROM rs_shadow_tracks WHERE event_id=? AND (state IN ('armed','partial_entry','open','exit_pending') OR json_extract(payload,'$.entry_shares')>0) LIMIT 1").bind(event.id,event.id).first();
+      // Repeated untraded historical revisions are routine work. Opportunities
+      // and any traded-position revisions commit before this callback returns.
+      if(active){await pollIBKRBorrow(env);await executionTick(env);await save();}
+    };
     await heartbeat('starting');
     if(env.market?.health?.status!=='not_configured')try{await env.market.quote('AAPL');}catch(e){await putState(env,'shadow_quote_error',{at:now(),message:e.message});}
     await shadowTick(env);await executionTick(env);await pollIBKRBorrow(env);await validationTick(env);await save();
@@ -51,7 +57,7 @@ export async function watchCollector(env,{interval=15,maximumMs=300*60000,sleep=
         while(!stopping&&Date.now()-cycle<Math.max(15000,interval*1000)&&Date.now()<env.deadline-2000&&handled<8){if(!env.pending.length)await dispatch(env);const body=env.pending.shift();if(!body)break;await consume({messages:[{body,ack(){}}]},env);jobs++;handled++;}
         if(Date.now()-lastBorrow>60000){await pollIBKRBorrow(env);await pollFlexBorrow(env);lastBorrow=Date.now();}
         ticks++;if(Date.now()-lastHeartbeat>=60000)await heartbeat('running');
-        const records=(await env.DB.prepare('SELECT count(*) AS count FROM rs_shadow_records').first()).count;
+        const records=(await env.DB.prepare('SELECT (SELECT count(*) FROM rs_shadow_records)+(SELECT count(*) FROM rs_execution_records) AS count').first()).count;
         if(Date.now()-lastSaved>=60000||records!==lastRecordCount){await save();lastRecordCount=records;}
       }catch(e){await heartbeat('degraded',e.message);if(/lease lost/i.test(e.message))throw e;console.error(JSON.stringify({event:'shadow_cycle_degraded',error:e.message}));}
       await sleep(Math.max(1000,interval*1000-(Date.now()-cycle)));

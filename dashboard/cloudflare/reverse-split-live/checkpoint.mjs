@@ -49,7 +49,8 @@ export async function openCheckpoint(env){
         if(rows.length)cursors.push({key,value:String(rows.at(-1).sequence)});
       }
       const keys=['last_tick','last_completed_tick','service_mode','last_reconciliation','reconciliation_error','collector_job_counts','last_collector_run','shadow_started_at','shadow_summary','execution_summary','validation_plan','validation_summary','shadow_borrow_health','flex_borrow_health'];
-      const stateRows=db.prepare('SELECT * FROM rs_state').all().filter(r=>keys.includes(r.key)),states=[];
+      const routineKeys=['last_tick','last_completed_tick','collector_job_counts'];
+      const stateRows=db.prepare('SELECT * FROM rs_state').all().filter(r=>keys.includes(r.key)&&(backgroundDue||!routineKeys.includes(r.key))),states=[];
       for(const r of stateRows){const key='published:state:'+r.key,hash=await sha(JSON.stringify([r.value,r.updated_at]));if(db.prepare('SELECT value FROM rs_state WHERE key=?').get(key)?.value!==hash)states.push({r,key,hash});}
       // Write the inactive slot before committing its pointer. A killed runner leaves the active slot intact.
       const slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
