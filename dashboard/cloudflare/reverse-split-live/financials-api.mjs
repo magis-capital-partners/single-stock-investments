@@ -8,9 +8,9 @@ export async function financialAPI(request,env){
   if(request.method==='POST'&&path==='/fundamentals/reviews'){
     if(!request.headers.get('x-verified-owner'))return json({error:'Verified owner required'},403);
     if(Number(request.headers.get('content-length'))>65536)return json({error:'Review is too large'},413);
-    const reader=request.body?.getReader();let text='',length=0;
+    const reader=request.body?.getReader(),decoder=new TextDecoder();let text='',length=0;
     if(!reader)return json({error:'Review required'},400);
-    for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>65536){await reader.cancel();return json({error:'Review is too large'},413);}text+=new TextDecoder().decode(value,{stream:true});}
+    for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>65536){await reader.cancel();return json({error:'Review is too large'},413);}text+=decoder.decode(value,{stream:true});}text+=decoder.decode();
     let input;try{input=JSON.parse(text);}catch{return json({error:'Invalid review'},400);}
     const cik=String(Number(input?.cik));if(!/^\d{1,10}$/.test(cik))return json({error:'Invalid company'},400);
     const profile=await read(env,`financials/profiles/${cik}/latest.json`);if(!profile)return json({error:'Financial profile not found'},404);

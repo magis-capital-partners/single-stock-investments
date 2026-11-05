@@ -62,7 +62,7 @@ async function discoverReports(client,cik,sub){
   const unique=new Map();for(const r of rows.filter(r=>r.filed>=cutoff))if(!unique.has(r.url)||r.financial_match)unique.set(r.url,r);
   return [...unique.values()].sort((a,b)=>Number(!!b.financial_match)-Number(!!a.financial_match)||Number(!b.form.startsWith('6-K')&&!b.form.startsWith('8-K'))-Number(!a.form.startsWith('6-K')&&!a.form.startsWith('8-K'))||b.filed.localeCompare(a.filed)).slice(0,120);
 }
-export async function harvestIssuer(env,job,{client=new FinancialSources(env),maximumDocuments=8,offline=false}={}){
+export async function harvestIssuer(env,job,{client=new FinancialSources(env),maximumDocuments=8,offline=false,extract=extractFiling}={}){
   const cik=String(Number(job.cik)),key='financials/work/'+cik+'.json',work=await read(env,key,{facts:[],sources:[],processed:{},candidates:[],issues:[],errors:{}});work.errors||={};
   if(work.parser_hash!==PARSER_HASH){Object.assign(work,{facts:[],processed:{},candidates:[],issues:[],errors:{},parser_hash:PARSER_HASH});}
   const subDoc=await client.get(`https://data.sec.gov/submissions/CIK${cik.padStart(10,'0')}.json`,{mutable:true}),sub=JSON.parse(subDoc.bytes);if(String(Number(sub.cik))!==cik)throw new Error('Financial issuer submissions mismatch');
@@ -80,17 +80,18 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
     if(work.processed[source.url]||work.errors[source.url]?.terminal||work.errors[source.url]?.next_attempt>Date.now())continue;if(processed>=maximumDocuments)break;processed++;
     try{
       const doc=source.source_sha256?{bytes:Buffer.from(await(await env.EVIDENCE.get('documents/'+source.source_sha256)).arrayBuffer()),sha256:source.source_sha256,url:source.url}:await client.get(source.url,{origins:source.origins||[],maximum:64000000});
+      // Retain the captured document for owner review even if extraction fails.
+      work.sources.push({sha256:doc.sha256,url:source.url,form:source.form,filed:source.filed,published_at:source.published_at,publication_basis:source.publication_basis||'SEC_disclosure',parent:source.trusted_parent||null});
       const parsedKey='financials/parsed/'+doc.sha256+'-'+cik+'-'+PARSER_HASH+'.json';let parsed=await read(env,parsedKey);
       const meta={...source,cik,company:name,require_table_identity:true,require_company_identity:source.form==='IR_RELEASE'||doc.bytes.subarray(0,5).toString()==='%PDF-',currency_hint:currency,source_url:source.url,source_sha256:doc.sha256,observed_at:now()};
-      if(!parsed){parsed=await extractFiling(doc.bytes,meta);await put(env,parsedKey,parsed);}
+      if(!parsed){parsed=await extract(doc.bytes,meta);await put(env,parsedKey,parsed);}
       // PDF exhibits may be separate files in the same SEC accession. Keep the
       // parent's CIK and disclosure clock; never follow an arbitrary document URL.
       if(source.accession){for(const m of doc.bytes.toString('utf8').matchAll(/<FILENAME>\s*([^\s<>]+\.pdf)\b/gi)){
         if(!/^[a-zA-Z0-9._-]+\.pdf$/i.test(m[1]))continue;const url=new URL(m[1],source.url).href;
         if(!reports.some(r=>r.url===url)){const attachment={...source,url,source_sha256:undefined,form:'EX-99.PDF',trusted_parent:source.url};reports.push(attachment);(work.discovered||=[]).push(attachment);}
       }}
-      const captured={sha256:doc.sha256,url:source.url,form:source.form,filed:source.filed,published_at:source.published_at,publication_basis:source.publication_basis||'SEC_disclosure',parent:source.trusted_parent||null};
-      work.sources.push(captured);work.facts.push(...parsed.facts);work.candidates.push(...parsed.candidates.map(r=>({...r,source_sha256:doc.sha256,source_url:source.url})));work.issues.push(...parsed.issues.map(r=>({...r,source_sha256:doc.sha256})));work.processed[source.url]={sha256:doc.sha256,at:now()};delete work.errors[source.url];
+      work.facts.push(...parsed.facts);work.candidates.push(...parsed.candidates.map(r=>({...r,source_sha256:doc.sha256,source_url:source.url})));work.issues.push(...parsed.issues.map(r=>({...r,source_sha256:doc.sha256})));work.processed[source.url]={sha256:doc.sha256,at:now()};delete work.errors[source.url];
     }catch(e){const attempt=(work.errors[source.url]?.attempts||0)+1;work.errors[source.url]={attempts:attempt,next_attempt:Date.now()+Math.min(86400000,60000*2**Math.min(attempt,10)),terminal:e.status===404||(attempt>=3&&!['403','429'].includes(String(e.status))),reason:e.message};work.issues.push({source_url:source.url,reason:e.message,at:now()});}
   }
   const reviews=(await env.DB.prepare("SELECT value FROM rs_state WHERE key>=? AND key<? LIMIT 100").bind('financial_review:'+cik+':','financial_review:'+cik+';').all()).results;
