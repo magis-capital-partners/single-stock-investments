@@ -159,12 +159,12 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
     # rather than the dense contents page that can win keyword-window scoring.
     # Add complete bounded passages before the general retrieval windows.
     priority_spans = []
-    # Some agreements label sections as "4.02 Title" in a paragraph, without
-    # the word SECTION. HTML block boundaries distinguish these headings from
-    # inline references and provide the following section's exact boundary.
+    # Some agreements label sections as "4.02 Title" in a paragraph or div,
+    # without the word SECTION. HTML block boundaries distinguish these headings
+    # from inline references and provide the following section's exact boundary.
     headings, cursor = [], 0
     section_requested = any(re.fullmatch(r'section\s+\d+\.\d+', phrase) for phrase in focus)
-    blocks = re.finditer(r'<(p|h[1-6])\b[^>]*>(.*?)</\1>', source, re.I | re.S) if section_requested else ()
+    blocks = re.finditer(r'<(p|h[1-6]|div)\b[^>]*>(.*?)</\1>', source, re.I | re.S) if section_requested else ()
     for block in blocks:
         text = text_of(block[2])
         heading = re.match(r'(?:SECTION\s+)?(\d{1,3}\.\d{1,3})\.?\s+[A-Za-z]', text, re.I)
@@ -178,7 +178,11 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
         if section:
             for index, (number, start) in enumerate(headings):
                 if number == section[1]:
-                    end = headings[index+1][1] if index+1 < len(headings) else len(body)
+                    # A page continuation can begin with a citation to an
+                    # earlier section. It must not cut off the current clause.
+                    order = tuple(map(int, number.split('.')))
+                    end = next((offset for following, offset in headings[index+1:]
+                                if tuple(map(int, following.split('.'))) > order), len(body))
                     passage = body[start:end]
                     if 40 <= len(passage.split()) and len(passage) <= 30000:
                         priority_spans.append((start,end))
