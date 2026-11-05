@@ -140,6 +140,26 @@ def test_kpi_startup_preview_is_bounded_without_losing_source_rows(tmp_path: Pat
     assert len(payload["inflections"]) == 120
 
 
+def test_operating_kpi_publication_keeps_the_startup_budget_and_every_source_row(tmp_path, monkeypatch):
+    import fetch_operating_kpis as fetch
+    rows = [{"ticker": f"T{i}", "kpi": "orders", "label": "Orders", "period": "2026-09",
+             "value": i, "unit": "count", "yoy": .1, "yoy_basis": "ratio",
+             "source_url": "https://issuer.test/" + "source/" * 150, "doc": "Filing"}
+            for i in range(900)]
+    path = tmp_path / "kpi_summary.json"
+    path.write_text(json.dumps({"as_of": "2026-11-05", "inflections": [], "inflection_count": 0}), encoding="utf-8")
+    monkeypatch.setattr(fetch, "KPI_SUMMARY", path)
+    monkeypatch.setattr(fetch, "SHARD_DIR", tmp_path / "no_shards")
+    monkeypatch.setattr(fetch, "merge_operating_series", lambda unused: {})
+    monkeypatch.setattr(fetch, "operating_latest_rows", lambda: rows)
+    fetch.publish_views()
+    assert path.stat().st_size < 102_400
+    summary = json.loads(path.read_text(encoding="utf-8"))
+    assert summary["operating_latest_count"] == len(rows)
+    assert summary["preview_only"] is True
+    assert json.loads((tmp_path / "operating_kpi_latest.json").read_text(encoding="utf-8"))["rows"] == rows
+
+
 def test_l1_agent_shards_and_canonical_evidence() -> None:
     for ticker in ("TPL", "GOOGL"):
         shard_path = ROOT / "dashboard" / "data" / "agent_shards" / f"{ticker}.json"
