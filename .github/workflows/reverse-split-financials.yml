@@ -33,7 +33,12 @@ jobs:
           python -m pip install PyMuPDF==1.28.0
           sudo apt-get update -qq
           sudo apt-get install -y -qq tesseract-ocr-eng
+          RS_TESSDATA_FILE=$(dpkg -L tesseract-ocr-eng | rg '/eng\.traineddata$')
+          test -f "$RS_TESSDATA_FILE"
+          printf 'TESSDATA_PREFIX=%s\n' "$(dirname "$RS_TESSDATA_FILE")" >> "$GITHUB_ENV"
       - name: Validate the installed financial document readers
+        env:
+          RS_REQUIRE_OCR_TEST: 'true'
         run: python -m unittest discover -s dashboard/cloudflare/reverse-split-live -p test_fundamental_filing.py
       - name: Backfill and warm primary financial evidence
         id: harvest
