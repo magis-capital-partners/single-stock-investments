@@ -44,6 +44,48 @@ def test_note_numbers_in_gap_details_become_explicit_retrieval_terms():
     assert {'note 9','note 15','maturity','collateral'} <= set(terms)
 
 
+@pytest.mark.parametrize('reference,expected', [
+    ('Notes 3 and 13', {'note 3', 'note 13'}),
+    ('Notes 3, 13, and 15', {'note 3', 'note 13', 'note 15'}),
+    ('Notes 3, 13 or 15', {'note 3', 'note 13', 'note 15'}),
+    ('Note 3 and Note 13', {'note 3', 'note 13'}),
+])
+def test_plural_financial_note_lists_reach_the_collector(reference, expected):
+    terms = requested_keywords([{'code': 'environmental_funding', 'detail':
+        f'Retrieve 2025 10-K {reference}. Search: "Chiquita", "insurance". '
+        'The 2026 payment of 305.554 million does not establish remaining obligations.'}])
+    assert {term for term in terms if term.startswith('note ')} == expected
+    assert {'chiquita', 'insurance'} <= set(terms)
+
+
+def test_bond_coupon_percentages_and_report_years_are_not_financial_note_numbers():
+    terms = requested_keywords([{'detail':
+        'Retrieve the issued notes 3.5% and senior notes 3 % due 2027, using the 2025 report.'}])
+    assert not any(term.startswith('note ') for term in terms)
+
+
+@pytest.mark.parametrize('block', ['p', 'div'])
+def test_plural_note_requests_keep_complete_numbered_disclosures_past_cross_references(block):
+    from underwriting_evidence import text_of
+    note3 = (f'<{block}><b>3.</b>&nbsp;<b>ACCOUNTING POLICIES</b></{block}>'
+             + f'<{block}>Reported cash obligations and closure costs. </{block}>' * 800
+             + f'<{block}>Final accounting policy payment boundary.</{block}>')
+    note13 = (f'<{block}>13. COMMITMENTS AND CONTINGENCIES</{block}>'
+              + f'<{block}>See Note 3. Accounting policies remain applicable. </{block}>' * 800
+              + f'<{block}>Final environmental payment and insurance boundary.</{block}>')
+    raw = ('<html><div class="page"><p>See Note 13 for the commitments disclosure.</p>'
+           + '<p>Unrelated introductory disclosure.</p>' * 1200
+           + note3 + f'<{block}>4. ESTIMATES</{block}>'
+           + '<p>Unrelated intervening disclosure.</p>' * 1200
+           + note13 + f'<{block}>14. SHAREHOLDERS’ EQUITY</{block}>'
+           + '<p>Subsequent unrelated equity disclosure.</p>' * 1200 + '</div></html>').encode()
+    terms = requested_keywords([{'detail': 'Retrieve Notes 3 and 13. Search: "insurance".'}])
+    doc = document_record('https://issuer.test/annual', raw, terms)
+    assert any(text_of(note3) in c for c in doc['contexts'])
+    assert any(text_of(note13) == c.strip() for c in doc['contexts'])
+    assert sum(map(len, doc['contexts'])) <= 350000
+
+
 def test_requested_credit_sections_survive_quoted_numbers_and_search_punctuation():
     terms = requested_keywords([{'code': 'missing_revolver_terms', 'detail':
         'Retrieve Sections 4.02 (Conditions to All Credit Extensions) and 8.02 '

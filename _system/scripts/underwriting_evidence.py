@@ -84,7 +84,11 @@ def requested_keywords(gaps):
         if not terms:
             terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
                      if w.lower() not in excluded]
-        notes = ['note '+n for n in re.findall(r'\bNote\s+(\d{1,2})\b', detail, re.I)]
+        # Financial-note lists are integral references, not bond coupons or years.
+        note_number = r'\d{1,2}\b(?!\.\d|\s*%)'
+        note_lists = re.findall(r'\bNotes?\s+('+note_number
+            +r'(?:(?:,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)'+note_number+r')*)', detail, re.I)
+        notes = ['note '+n for group in note_lists for n in re.findall(r'\d{1,2}', group)]
         section_lists = re.findall(r'\bSections?\s+('+reference
             +r'(?:(?:,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)'+reference+r')*)', detail, re.I)
         sections = ['section '+n for group in section_lists for n in re.findall(number, group)]
@@ -205,10 +209,12 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
     # without the word SECTION. HTML block boundaries distinguish these headings
     # from inline references and provide the following section's exact boundary.
     headings, cursor = [], 0
+    note_headings, note_cursor = [], 0
     section_requested = any(re.fullmatch(r'section\s+\d+\.\d+', phrase) for phrase in focus)
+    note_requested = any(re.fullmatch(r'note \d{1,2}', phrase) for phrase in focus)
     # Page containers can enclose every paragraph. Inspect their children too;
     # consuming an outer div would hide the actual numbered headings.
-    blocks = re.finditer(r'(?=<(p|h[1-6]|div)\b[^>]*>(.*?)</\1>)', source, re.I | re.S) if section_requested else ()
+    blocks = re.finditer(r'(?=<(p|h[1-6]|div)\b[^>]*>(.*?)</\1>)', source, re.I | re.S) if section_requested or note_requested else ()
     for block in blocks:
         if re.search(r'<(?:p|h[1-6]|div)\b', block[2], re.I):
             continue  # A container is not itself a section heading.
@@ -219,6 +225,15 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
             if start >= 0:
                 headings.append((heading[1], start))
                 cursor = start+len(text)
+        if note_requested:
+            note = re.fullmatch(r'(Note\s+)?(\d{1,2})([.:-]?)\s+([^.!?;:]{2,200})\.?', text, re.I)
+            # Some annual reports omit "Note" and use a standalone all-caps
+            # numbered title. Inline cross-references are not note boundaries.
+            if note and (note[1] or (note[3] and note[4].isupper())):
+                start = body.find(text, note_cursor)
+                if start >= 0:
+                    note_headings.append((int(note[2]), start))
+                    note_cursor = start+len(text)
     for phrase in focus:
         section = re.fullmatch(r'section\s+(\d+\.\d+)',phrase)
         if section:
@@ -255,6 +270,18 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
         if not re.fullmatch(r'note \d{1,2}', phrase):
             continue
         number = phrase.split()[-1]
+        found = False
+        for index, (heading_number, start) in enumerate(note_headings):
+            if heading_number != int(number):
+                continue
+            end = next((offset for following, offset in note_headings[index+1:]
+                        if following > heading_number), len(body))
+            passage = body[start:end]
+            if len(passage.split()) >= 40 and len(passage) <= budget:
+                priority_spans.append((start, end))
+                found = True
+        if found:
+            continue
         matches = list(re.finditer(r'\bNote\s+'+number+r'\b\s*[.:-]?', body, re.I))
         matches.sort(key=lambda m: (bool(re.search(r'[.:-]',m.group())), bool(re.match(r'\s*[A-Z]',body[m.end():m.end()+20])),m.start()),reverse=True)
         for match in matches[:2]:
