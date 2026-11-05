@@ -137,7 +137,7 @@ The external watch retries temporary storage/network failures at most three time
 Free-plan write conservation: a ten-minute collector lease renews at most once
 every two minutes; the dashboard heartbeat updates once a minute; routine
 source-health rows publish every five minutes. Decisions, fills and checkpoints
-keep their immediate/minute cadence. The immutable first executable-registration
+keep their immediate/minute cadence while a name is armed or held. With no active names, routine checkpoints publish every two minutes; the heartbeat and quote-feed status still update every minute. The immutable first executable-registration
 UTC day has a one-time 70k research row-write budget to cover historical cohort
 enrollment; later UTC days return to 40k. This is below the account's 100k/day
 Free limit and does not reset or conceal consumed usage. The budget remains a
@@ -232,7 +232,7 @@ exist. Original baseline P&L remains separate. The annual-rate cutoff table
 uses the rate known at entry (10/25/50/100/200% and no cutoff), never the best
 future rate; it does not automatically choose a live trading cutoff.
 
-Validation plan `rs_live_path_2026-11-05.v1` runs in the existing continuous
+Validation plan `rs_live_path_2026-11-05.v2` runs in the existing continuous
 GitHub collector on November 5 from **09:25–16:10 America/New_York**
 (14:25–21:10 UTC). AAPL, SPY and IWM are benchmark subscriptions in the SAME
 Databento live Mini session; active reverse-split names are checked separately.
@@ -260,3 +260,13 @@ than a silently incomplete download. All schemas live only in the isolated
 reverse-split D1/R2 resources. Cloudflare stays Free; heavy calculations stay
 in the external collector. The Gateway registry and SPX execution are untouched.
 
+
+The existing IBKR reporting credentials were located in the local ls-algo configuration and copied to protected reporting secrets without changing that query or token. Its Borrow Fee Details output can exceed 32 MB, so the isolated adapter accepts bounded 128 MB reports, filters to the strategy tickers and the last 35 report days, and deduplicates stable account/security/day/loan observations across later downloads. Previously collected older dates remain in the immutable history. Daily generation begins after 08:35 ET, uses one reference at a time and at most twelve reporting calls spaced at least a minute apart, with extra rate-limit backoff. Large downloads/normalization run as a bounded background task; shutdown joins it before closing the local ledger. No raw full-account statement is archived or published.
+
+Daily paper carry is reconciled when reported account fee rates become available for the SAME IBKR conid and day with an unambiguous account scope (or explicitly scoped evidence). Multiple loan rows are value-weighted and later restatements replace their earlier rate proxy, with an audit record. Ambiguous accounts and security mismatches cannot silently replace a quote. This uses an actual reported rate as an ex-post COST PROXY on hypothetical shares, not a guaranteed rate for a new loan or an actual charge on a paper trade. Entry-known rate cutoffs and fills are unchanged. Non-session days may carry the last supported position mark and closing share liability, explicitly flagged; absent rates remain missing.
+
+The v2 validation plan supersedes and archives the unsampled v1 plan before the market window. The transport retains the FIRST benchmark receipt in each five-second interval and drains it at the next processing pass. Current-book age is measured separately from receipt-to-evaluation latency; a newly received quote cannot hide earlier unprocessed updates. A pass requires at least 95% of regular-session minutes covered for EACH benchmark, at least 100 distinct current quotes and 100 timed receipts each, no evaluation gap over 60 seconds, and the registered latency/error targets. Queue overflow is an explicit failure. A plan with existing samples or an underway market window cannot be replaced.
+
+Owner-supplied eligibility evidence is imported using a kind/time index, excluding public-inventory rows that the collector already owns locally. This prevents a growing public borrow archive from being repeatedly scanned/re-imported. The new index is isolated to the research database.
+
+Flex loan rows are aggregated as a complete account/conid/day snapshot before deduplication. Their original signed fee amounts and component records are retained in private evidence; only compact daily aggregates enter D1. This prevents a loan removed from a later statement from surviving as an orphaned rate component. The reporting URL returned by IBKR is accepted only if it exactly matches one of its two documented fixed HTTPS reporting endpoints; redirects and arbitrary hosts are rejected.

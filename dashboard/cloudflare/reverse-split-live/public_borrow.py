@@ -29,7 +29,8 @@ def parse(data, wanted, observed):
                 continue
             available = str(row.get('AVAILABLE') or '').strip()
             fee = str(row.get('FEERATE') or '').strip()
-            rows.append({'ticker': row['SYM'], 'available_shares': int(available.lstrip('>')) if available.lstrip('>').isdigit() else None, 'available_at_least': available.startswith('>'), 'apr': float(fee) / 100 if fee not in ('', 'NA', 'N/A') else None, 'as_of': as_of, 'observed_at': observed, 'source_excerpt': line, 'availability_only': True, 'locate_approved': False})
+            contract = next((row.get(k) for k in ('CON', 'CONID', 'CON_ID', 'CONTRACTID') if row.get(k)), '')
+            rows.append({'ticker': row['SYM'], 'conid': str(int(contract)) if contract.isdigit() and int(contract)>0 else None, 'available_shares': int(available.lstrip('>')) if available.lstrip('>').isdigit() else None, 'available_at_least': available.startswith('>'), 'apr': float(fee) / 100 if fee not in ('', 'NA', 'N/A') else None, 'as_of': as_of, 'observed_at': observed, 'source_excerpt': line, 'availability_only': True, 'locate_approved': False})
     if not as_of or not header or declared is None or total != declared:
         raise ValueError('Public borrow file is incomplete or has invalid metadata')
     if datetime.fromisoformat(as_of) > datetime.fromisoformat(observed):
