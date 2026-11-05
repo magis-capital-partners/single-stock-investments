@@ -7,7 +7,7 @@ const log=(event,fields={})=>console.log(JSON.stringify({event,...fields}));
 export const SOURCES=[
   ...['8-K','6-K','10-Q','10-K','20-F','40-F'].map(form=>({id:'sec-'+form,kind:'sec',form,url:`https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=${form}&owner=exclude&count=100&output=atom`})),
   {id:'prnewswire',kind:'news',url:'https://www.prnewswire.com/rss/news-releases-list.rss'},
-  {id:'globenewswire',kind:'news',url:'https://www.globenewswire.com/RssFeed/subjectcode/13-Change%20in%20Share%20Capital/feedTitle/GlobeNewswire%20-%20Change%20in%20Share%20Capital'},
+  {id:'globenewswire',kind:'news',url:'https://rss.globenewswire.com/RssFeed/subjectcode/13-Change%20in%20Share%20Capital/feedTitle/GlobeNewswire%20-%20Change%20in%20Share%20Capital'},
 ];
 const SEC_HOSTS=new Set(['www.sec.gov','data.sec.gov','efts.sec.gov']);
 const NEWS_HOSTS=new Set(['www.prnewswire.com','www.globenewswire.com','rss.globenewswire.com']);
@@ -35,7 +35,7 @@ export async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}=
   if(remaining<=0)throw new Error('Collector source deadline reached; work will retry');
   const response=await fetch(url,{redirect:'manual',headers:{'user-agent':env.SEC_USER_AGENT,'accept':'application/atom+xml, application/rss+xml, application/json, text/html, text/plain, */*'},signal:AbortSignal.timeout(Math.min(18000,remaining))});
   if(response.status>=300&&response.status<400){await response.body?.cancel();if(redirects>=3)throw new Error('Source redirect limit');const next=new URL(response.headers.get('location'),url);sourceURL(next);return limitedFetch(env,next.href,{maximum,redirects:redirects+1});}
-  if(!response.ok){await response.body?.cancel();if(sec&&[403,429].includes(response.status))await state(env,'sec_cooldown',Date.now()+Math.min(3600000,Math.max(300000,Number(response.headers.get('retry-after')||0)*1000)));throw new Error(`Source returned HTTP ${response.status}`);}
+  if(!response.ok){await response.body?.cancel();if(response.status===403&&url.hostname==='www.globenewswire.com'&&redirects<3){const alternate=new URL(url);alternate.hostname='rss.globenewswire.com';return limitedFetch(env,alternate.href,{maximum,redirects:redirects+1});}if(sec&&[403,429].includes(response.status))await state(env,'sec_cooldown',Date.now()+Math.min(3600000,Math.max(300000,Number(response.headers.get('retry-after')||0)*1000)));throw new Error(`Source returned HTTP ${response.status}`);}
   return {bytes:await boundedBody(response,maximum),content_type:response.headers.get('content-type')||'',url:url.href};
 }
 async function archive(env,doc){const hash=await sha(doc.bytes),key='documents/'+hash;await env.EVIDENCE.put(key,doc.bytes,{httpMetadata:{contentType:doc.content_type},customMetadata:{source_url:doc.url,captured_at:stamp()}});await env.DB.prepare('INSERT OR IGNORE INTO rs_documents(sha256,url,object_key,captured_at,bytes,content_type) VALUES(?,?,?,?,?,?)').bind(hash,doc.url,key,stamp(),doc.bytes.length,doc.content_type).run();return {hash,key,text:new TextDecoder().decode(doc.bytes)};}
@@ -56,7 +56,8 @@ async function addFilings(env,items,priority){
 }
 async function poll(env,source){
   await env.DB.prepare('INSERT OR IGNORE INTO rs_sources(id,kind,url) VALUES(?,?,?)').bind(source.id,source.kind,source.url).run();
-  const saved=await env.DB.prepare('SELECT * FROM rs_sources WHERE id=?').bind(source.id).first();
+  let saved=await env.DB.prepare('SELECT * FROM rs_sources WHERE id=?').bind(source.id).first();
+  if(saved.url!==source.url){await env.DB.prepare("UPDATE rs_sources SET url=?,next_attempt=0,failures=0,status='new',error=NULL WHERE id=?").bind(source.url,source.id).run();saved={...saved,url:source.url,next_attempt:0,failures:0};}
   if(saved.next_attempt>Date.now())return;
   try{
     let count=0,complete=false,newest=null,oldest=null;

@@ -48,7 +48,7 @@ jobs:
   collect:
     if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 330
+    timeout-minutes: 300
     outputs:
       continue: ${{ steps.monitor.outputs.continue }}
     steps:
@@ -74,7 +74,7 @@ jobs:
           if [ "$RECONCILE" = 'true' ]; then
             node dashboard/cloudflare/reverse-split-live/collector.mjs --reconcile
           else
-            node dashboard/cloudflare/reverse-split-live/collector.mjs --watch --interval 15 --run-minutes 300
+            node dashboard/cloudflare/reverse-split-live/collector.mjs --watch --interval 15 --run-minutes 270
           fi
 
   continue-monitor:

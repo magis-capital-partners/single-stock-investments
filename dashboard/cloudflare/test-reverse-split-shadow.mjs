@@ -6,7 +6,7 @@ import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
 import {SHADOW_POLICIES,plannedEntry,plannedExit,sessionAt,quoteGate,signalGate,entryCapacity,validateEvidence,feasibility} from './reverse-split-live/shadow-core.mjs';
 import {initializeShadow,enrollShadow,processShadowTrack,shadowTick,summarizeShadow} from './reverse-split-live/shadow-service.mjs';
 import {makeMarketData} from './reverse-split-live/market-data.mjs';
-import {readAPI} from './reverse-split-live/worker.mjs';
+import {readAPI,limitedFetch} from './reverse-split-live/worker.mjs';
 import {onRequestGet} from '../functions/api/v1/reverse-splits/[[path]].js';
 import {watchCollector} from './reverse-split-live/watch.mjs';
 const now='2026-11-04T15:00:00.000Z',primary=SHADOW_POLICIES[0];
@@ -76,6 +76,7 @@ test('market adapter preserves share sizes, nanosecond quote clocks, identity an
   const q=await market.quote('QATEST');assert.equal(q.bid_size,123);assert.equal(q.cik,'123');assert.equal(q.quote_at,now);assert.ok(seen.every(r=>!r.url.includes('secret')));assert.ok(seen.every(r=>r.headers.authorization==='Bearer secret-test-only'));
   const denied=makeMarketData({key:'secret',fetcher:async()=>new Response('secret vendor error',{status:403})});await assert.rejects(denied.quote('QATEST'),/HTTP 403/);assert.ok(!JSON.stringify(denied.health).includes('secret'));
 });
+test('a blocked GlobeNewswire article uses its official RSS host without broadening source access',async t=>{const old=globalThis.fetch,urls=[];globalThis.fetch=async value=>{urls.push(String(value));return new Response(urls.length===1?'blocked':'primary document',{status:urls.length===1?403:200});};t.after(()=>{globalThis.fetch=old;});const doc=await limitedFetch({},'https://www.globenewswire.com/news-release/example.html');assert.equal(new TextDecoder().decode(doc.bytes),'primary document');assert.equal(urls[1],'https://rss.globenewswire.com/news-release/example.html');});
 test('shadow API has bounded pagination, private viewer access and a complete audit route',async t=>{
   const {db,env}=setup(t);await initializeShadow(env,'2026-11-04T14:00:00Z');await enrollShadow(env,event(),now);await summarizeShadow(env,now);
   const summary=await(await readAPI(new Request('https://internal/shadow'),env)).json();assert.equal(summary.authority,'none');assert.equal(summary.policies.length,7);
