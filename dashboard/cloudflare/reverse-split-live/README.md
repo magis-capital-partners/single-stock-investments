@@ -78,3 +78,53 @@ The runner keeps its scan database open, saves the authoritative two-slot checkp
 An independent machine can run the same command with `--run-minutes 0` indefinitely using the prepared service. The service template is for a separate machine; it is not an NY4 deployment. No NY4 upgrade, gateway session, ThetaData login or live order is part of this rollout. Stop the monitor by cancelling its active GitHub run and disabling the workflow; disable/stop an independent service separately. Existing evidence and liabilities must remain intact.
 
 Review operations immediately; review investment results only after sufficient prospective opportunities, distinct issuers and complete exit/cost evidence. There is no automatic promotion to live trading. Missing evidence, funding failures and source outages remain part of the opportunity denominator.
+
+
+### Databento live Mini cohort
+
+The external runner supports the existing licensed `EQUS.MINI` subscription using
+`DATABENTO_API_KEY` from GitHub Actions secrets or its protected process environment.
+The official Python SDK is pinned to 0.82.0. One child process maintains one live
+`mbp-1` session; the startup AAPL subscription checks access, and relevant issuers
+are added as decisions become due. The session is bounded to 128 explicitly
+validated raw symbols. Symbols requiring an unverified spelling conversion are
+refused. The child receives only the data credential, never storage or broker
+credentials. There is no runtime import from DC-Execution.
+
+Mini aggregates selected proprietary venues; it is **not SIP NBBO**. Seven new
+`*_mini.v1` policies mirror the seven original timing/filter variants, with a
+separate registration clock and separate portfolios. The original registered
+parameters remain identical and still require full-market consolidated quotes.
+Mini quotes cannot fill or mark those portfolios. When Databento is configured,
+the dashboard initially selects the immediate Mini policy; each row, policy,
+quote and audit retains the coverage distinction. Earlier announcements remain
+retrospective for the new registration, even if eligible for an older policy.
+
+The SDK uses only live subscriptions with no replay start. Neither Historical
+nor Reference requests, license activation, subscription purchases, nor billing
+changes are implemented. Existing Massive reference endpoints provide CIK,
+share-class identity, common-share type, currency and split actions; a missing
+identity blocks simulation. An unavailable action feed still freezes marks
+across unresolved splits. Mini does not supply approved locates or broker
+feasibility. No broker or ThetaData connection is used.
+
+The transport preserves capture/event nanoseconds and local receipt times,
+converts fixed prices by 1e9 and retains sizes in shares. Undefined/one-sided/
+crossed books, bad-book/capture-clock flags and stale/future timestamps invalidate
+the cached quote. It publishes at most four quote records per second per symbol.
+The collector samples the latest supported quote during its bounded tick or
+announcement callback; it is not a tick-by-tick execution simulator and cannot
+promise every transient BBO. Signal timestamps, quote timestamps and simulation
+timestamps remain distinct.
+
+Disconnects clear quotes before reconnecting with 30–300 second backoff, capped
+at twelve attempts per bounded process. Authentication/licensing rejection stops
+that helper. The collector and source ledger continue; absent quotes never become
+synthetic fills. The parent closes the stream when its leased collector exits.
+GitHub queue/handoff gaps and source-analysis delays remain visible limitations.
+
+Local offline checks: `node --test dashboard/cloudflare/test-reverse-split*.mjs`
+and `python -m unittest discover -s dashboard/cloudflare/reverse-split-live -p test_databento_live.py`.
+A successful subscription acknowledgement proves access, not a fresh book outside
+trading hours. The first real session must verify quotes, identity and both entry
+and exit audits prospectively.

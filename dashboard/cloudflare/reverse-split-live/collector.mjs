@@ -7,6 +7,7 @@ import {parseArgs} from 'node:util';
 import {scheduled,dispatch,consume} from './worker.mjs';
 import {openCheckpoint} from './checkpoint.mjs';
 import {makeMarketData} from './market-data.mjs';
+import {makeDatabentoMarket} from './databento-market.mjs';
 import {initializeShadow,shadowTick,putState} from './shadow-service.mjs';
 import {watchCollector} from './watch.mjs';
 
@@ -65,8 +66,12 @@ export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){
 async function main(){
   const {values}=parseArgs({options:{watch:{type:'boolean',default:false},interval:{type:'string',default:'15'},'run-minutes':{type:'string',default:'300'},'max-jobs':{type:'string',default:'40'},reconcile:{type:'boolean',default:false}}});
   const cadence=Math.max(15,Number(values.interval)||15),env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:process.env.CLOUDFLARE_ACCOUNT_ID||'e1cac493b315c8fd7398500dd1bfd687',database:process.env.REVERSE_SPLIT_DATABASE_ID||'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:process.env.REVERSE_SPLIT_EVIDENCE_BUCKET||'single-stock-reverse-splits-evidence',cadence:values.watch?cadence:300,maxJobs:Math.min(150,Math.max(1,Number(values['max-jobs'])||40))});
-  env.market=makeMarketData({key:process.env.MASSIVE_API_KEY||process.env.POLYGON_API_KEY});
-  if(values.watch){const result=await watchCollector(env,{interval:cadence,maximumMs:Number(values['run-minutes'])===0?Infinity:Math.min(310,Math.max(1,Number(values['run-minutes'])||300))*60000});if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'continue='+(!result.skipped)+'\n');console.log(JSON.stringify(result));}
-  else try{console.log(JSON.stringify(await runOnce(env,{reconcile:values.reconcile})));}catch(e){console.error(JSON.stringify({event:'collector_failed',error:e.message}));process.exitCode=1;}
+  const reference=makeMarketData({key:process.env.MASSIVE_API_KEY||process.env.POLYGON_API_KEY});
+  env.market=process.env.DATABENTO_API_KEY?makeDatabentoMarket({key:process.env.DATABENTO_API_KEY,reference}):reference;
+  try{
+    if(values.watch){const result=await watchCollector(env,{interval:cadence,maximumMs:Number(values['run-minutes'])===0?Infinity:Math.min(310,Math.max(1,Number(values['run-minutes'])||300))*60000});if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'continue='+(!result.skipped)+'\n');console.log(JSON.stringify(result));}
+    else console.log(JSON.stringify(await runOnce(env,{reconcile:values.reconcile})));
+  }catch(e){console.error(JSON.stringify({event:'collector_failed',error:e.message}));process.exitCode=1;}
+  finally{env.market.close?.();}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();

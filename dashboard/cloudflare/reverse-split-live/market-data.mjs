@@ -19,14 +19,15 @@ export function makeMarketData({key,fetcher=fetch,clock=()=>new Date().toISOStri
   }
   async function cached(id,ttl,load){const old=cache.get(id);if(old&&Date.now()-old.at<ttl)return old.value;const value=await load();cache.set(id,{at:Date.now(),value});return value;}
   const symbol=t=>{if(!/^[A-Z][A-Z0-9.-]{0,11}$/.test(t||''))throw new Error('Unsupported ticker');return encodeURIComponent(t);};
+  const identity=ticker=>cached('identity:'+ticker,6*3600000,async()=>{const r=(await get('/v3/reference/tickers/'+symbol(ticker))).results||{};return {cik:r.cik?String(Number(r.cik)):null,security_id:r.share_class_figi||r.composite_figi||null,type:r.type,currency:r.currency_name};});
   return {
-    health,
+    health,identity,
     async quote(ticker){
-      const t=symbol(ticker),identity=await cached('identity:'+ticker,6*3600000,async()=>{const r=(await get('/v3/reference/tickers/'+t)).results||{};return {cik:r.cik?String(Number(r.cik)):null,security_id:r.share_class_figi||r.composite_figi||null,type:r.type,currency:r.currency_name};});
+      const t=symbol(ticker),issuer=await identity(ticker);
       const raw=await get('/v2/last/nbbo/'+t),r=raw.results||{},observed_at=clock(),quote_at=finite(r.t)?iso(r.t/1000000):null;
       if((r.T&&r.T!==ticker)||!quote_at||![r.p,r.P,r.s,r.S].every(finite))throw new Error('Market-data quote is incomplete or has the wrong symbol');
       health.quote_access=raw.status==='DELAYED'?'delayed':'received';
-      return {ticker,...identity,provider:'massive_nbbo',quote_at,observed_at,bid:r.p,ask:r.P,bid_size:r.s,ask_size:r.S,consolidated:true,delayed:raw.status==='DELAYED',size_units:'shares',source_url:BASE+'/v2/last/nbbo/'+t,raw:r};
+      return {ticker,...issuer,provider:'massive_nbbo',quote_at,observed_at,bid:r.p,ask:r.P,bid_size:r.s,ask_size:r.S,consolidated:true,delayed:raw.status==='DELAYED',size_units:'shares',source_url:BASE+'/v2/last/nbbo/'+t,raw:r};
     },
     async actions(ticker,start){return cached('actions:'+ticker+':'+start+':'+clock().slice(0,10),3600000,async()=>{
       let path='/stocks/v1/splits?ticker='+symbol(ticker)+'&execution_date.gte='+encodeURIComponent(start)+'&limit=100',rows=[];

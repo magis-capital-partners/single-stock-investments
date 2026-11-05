@@ -38,6 +38,7 @@ jobs:
       - run: npm ci --prefix dashboard/cloudflare
       - run: python -m pip install requests
       - run: node --test dashboard/cloudflare/test-reverse-split*.mjs
+      - run: python -m unittest discover -s dashboard/cloudflare/reverse-split-live -p test_databento_live.py
       - name: Apply the isolated research schema and deploy the monitor
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -63,12 +64,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install the pinned live market-data client
+        run: python -m pip install databento==0.82.0
       - name: Detect announcements and analyze every company
         id: monitor
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: e1cac493b315c8fd7398500dd1bfd687
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          DATABENTO_API_KEY: ${{ secrets.DATABENTO_API_KEY }}
           RECONCILE: ${{ github.event.action == 'reverse-split-reconcile' }}
         run: |
           if [ "$RECONCILE" = 'true' ]; then

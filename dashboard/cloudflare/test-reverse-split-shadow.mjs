@@ -43,7 +43,7 @@ test('forward enrollment preserves every decision and never fills pre-registrati
   const snapshots=db.prepare('SELECT count(*) AS n FROM rs_shadow_records').get().n;await enrollShadow(env,event(),now);assert.equal(db.prepare('SELECT count(*) AS n FROM rs_shadow_records').get().n,snapshots);
   await enrollShadow(env,event({id:'old',first_seen_at:'2026-11-03T14:00:00Z'}),now);assert.equal(track(db,'rs_immediate.v1:old').state,'retrospective');
   await enrollShadow(env,event({id:'low',financials:{score:40,signal_count:3,period:'2026-06-30'}}),now);assert.equal(track(db,'rs_immediate.v1:low').state,'rejected');
-  assert.equal(db.prepare('SELECT count(*) AS n FROM rs_shadow_tracks').get().n,21);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM rs_shadow_tracks').get().n,3*SHADOW_POLICIES.length);
 });
 test('registered policies cannot be silently edited or reused with new parameters',async t=>{const {db,env}=setup(t);await initializeShadow(env,now);db.prepare("UPDATE rs_shadow_policies SET payload='{}' WHERE id=?").run(primary.id);await assert.rejects(initializeShadow(env,now),/new version/);});
 test('simulated short uses bid, cover uses ask, fees and carry reduce profit; duplicate quotes cannot refill',async t=>{
@@ -79,8 +79,8 @@ test('market adapter preserves share sizes, nanosecond quote clocks, identity an
 test('a blocked GlobeNewswire article uses its official RSS host without broadening source access',async t=>{const old=globalThis.fetch,urls=[];globalThis.fetch=async value=>{urls.push(String(value));return new Response(urls.length===1?'blocked':'primary document',{status:urls.length===1?403:200});};t.after(()=>{globalThis.fetch=old;});const doc=await limitedFetch({},'https://www.globenewswire.com/news-release/example.html');assert.equal(new TextDecoder().decode(doc.bytes),'primary document');assert.equal(urls[1],'https://rss.globenewswire.com/news-release/example.html');});
 test('shadow API has bounded pagination, private viewer access and a complete audit route',async t=>{
   const {db,env}=setup(t);await initializeShadow(env,'2026-11-04T14:00:00Z');await enrollShadow(env,event(),now);await summarizeShadow(env,now);
-  const summary=await(await readAPI(new Request('https://internal/shadow'),env)).json();assert.equal(summary.authority,'none');assert.equal(summary.policies.length,7);
-  let cursor,ids=[];for(let i=0;i<7;i++){const q=new URL('https://internal/shadow/tracks?limit=1');if(cursor)q.searchParams.set('before',cursor);const r=await(await readAPI(new Request(q),env)).json();ids.push(r.tracks[0].id);cursor=r.next_cursor;}assert.equal(new Set(ids).size,7);assert.equal(cursor,null);
+  const summary=await(await readAPI(new Request('https://internal/shadow'),env)).json();assert.equal(summary.authority,'none');assert.equal(summary.policies.length,SHADOW_POLICIES.length);
+  let cursor,ids=[];for(let i=0;i<SHADOW_POLICIES.length;i++){const q=new URL('https://internal/shadow/tracks?limit=1');if(cursor)q.searchParams.set('before',cursor);const r=await(await readAPI(new Request(q),env)).json();ids.push(r.tracks[0].id);cursor=r.next_cursor;}assert.equal(new Set(ids).size,SHADOW_POLICIES.length);assert.equal(cursor,null);
   const detail=await(await readAPI(new Request('https://internal/shadow/tracks/'+encodeURIComponent(ids[0])),env)).json();assert.ok(detail.records.length>=2);
   assert.equal((await readAPI(new Request('https://internal/shadow',{method:'POST'}),env)).status,405);
   let forwarded;const response=await onRequestGet({request:new Request('https://dash/api/v1/reverse-splits/shadow/tracks'),data:{humanViewer:{role:'owner'}},env:{REVERSE_SPLITS:{fetch:async r=>{forwarded=r.url;return Response.json({});}}}});assert.equal(response.status,200);assert.equal(forwarded,'https://reverse-split.internal/shadow/tracks');

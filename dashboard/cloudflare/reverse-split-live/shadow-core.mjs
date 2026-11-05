@@ -4,7 +4,7 @@ import calendar from './sessions.json' with {type:'json'};
 
 export const SHADOW_VERSION='reverse_split_shadow.v1';
 const common={version:SHADOW_VERSION,research_only:true,authority:'none',minimum_ordinal:2,minimum_score:60,minimum_signals:3,max_period_age_days:200,hold_sessions:5,exit_lead_seconds:60,target_notional:25000,reference_equity:1000000,name_stress_loss_fraction:.005,sleeve_stress_loss_fraction:.02,adverse_shock:2,maximum_names:3,maximum_entry_age_seconds:900,entry_window_seconds:900,quote_age_seconds:15,quote_depth_fraction:.05,slippage_bps:10,borrow_apr:.5,minimum_notional:100,commission_per_share:.005,commission_minimum:1,calendar_version:calendar.version,stop:null,profit_target:null};
-export const SHADOW_POLICIES=Object.freeze([
+const fullMarketPolicies=[
   {...common,id:'rs_immediate.v1',label:'Immediate intraday · primary',timing:'immediate',primary:true},
   {...common,id:'rs_wait5m.v1',label:'Wait five minutes',timing:'wait5m'},
   {...common,id:'rs_next_open.v1',label:'Next eligible open',timing:'next_open'},
@@ -12,7 +12,9 @@ export const SHADOW_POLICIES=Object.freeze([
   {...common,id:'rs_post_split.v1',label:'Session after split',timing:'post_split'},
   {...common,id:'rs_repeat_all_scores.v1',label:'Repeat splits · no score threshold',timing:'immediate',minimum_score:0,control:true},
   {...common,id:'rs_third_plus.v1',label:'Third or later · score ≥60',timing:'immediate',minimum_ordinal:3,control:true},
-].map(Object.freeze));
+];
+// Existing policy objects stay byte-for-byte identical. Mini is a new experiment.
+export const SHADOW_POLICIES=Object.freeze([...fullMarketPolicies,...fullMarketPolicies.map(p=>({...p,id:p.id.replace('.v1','_mini.v1'),label:p.label.replace(' · primary','')+' · Mini indicative',primary:false,quote_feed:'databento_mini',quote_coverage:'selected_venues_not_sip_nbbo',indicative:true}))].map(Object.freeze));
 export const sessions=calendar.sessions;
 export const finite=x=>typeof x==='number'&&Number.isFinite(x);
 export const at=x=>Number.isFinite(Date.parse(x))?Date.parse(x):null;
@@ -45,7 +47,9 @@ export function signalGate(event,policy,now){
 }
 export function quoteGate(q,now,policy){
   if(!q)return 'quote_unavailable';
-  if(q.consolidated!==true||q.delayed===true)return 'live_consolidated_quote_required';
+  if(policy.quote_feed==='databento_mini'){
+    if(q.provider!=='databento_mini'||q.dataset!=='EQUS.MINI'||q.coverage!=='selected_venues_not_sip_nbbo'||q.delayed!==false)return 'live_databento_mini_quote_required';
+  }else if(q.consolidated!==true||q.delayed===true)return 'live_consolidated_quote_required';
   const ts=at(q.quote_at),observed=at(q.observed_at),t=at(now);
   if(ts===null||observed===null||ts>t+2000||observed>t+2000||t-ts>policy.quote_age_seconds*1000)return 'quote_stale_or_future';
   if(![q.bid,q.ask,q.bid_size,q.ask_size].every(finite)||q.bid<=0||q.ask<q.bid||q.bid_size<=0||q.ask_size<=0)return 'quote_invalid';
