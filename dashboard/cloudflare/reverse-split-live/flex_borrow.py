@@ -11,6 +11,7 @@ import sys
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 import argparse
+from decimal import Decimal
 
 
 def normalize(raw, observed, wanted=None, lookback_days=35):
@@ -63,6 +64,7 @@ def normalize(raw, observed, wanted=None, lookback_days=35):
                                  'as_of': day + 'T23:59:59Z', 'observed_at': observed,
                                  'apr': apr, 'rate_unit': 'annual_fraction',
                                  'source_rate_unit': 'percent', 'actually_charged': True,
+                                 'reported_rate_percent': rate,
                                  'account_scope': account_scope, 'loan_scope': loan_scope, 'conid': r.get('conid'),
                                  'reported_quantity': r.get('quantity'),
                                  'reported_fee_raw': r.get('borrowFee', r.get('fee')),
@@ -79,7 +81,35 @@ def normalize(raw, observed, wanted=None, lookback_days=35):
                     rows.append(row)
     if not sections:
         raise ValueError('Flex query has no Borrow Fee Details section')
-    return {'rows': rows, 'observed_at': observed, 'sections': sections,
+    # A report is a complete snapshot. Aggregate all loan rows per account /
+    # security / day BEFORE deduplication, so a removed/restated loan cannot
+    # survive as a stale component in the next daily rate estimate.
+    groups = {}
+    for row in rows:
+        groups.setdefault((row['account_scope'], row['conid'], row['ticker'], row['day']), []).append(row)
+    daily = []
+    for group, components in groups.items():
+        quantities = [float(r['reported_quantity'] or 0) for r in components]
+        prices = [float(r['reported_price'] or 0) for r in components]
+        if any(not math.isfinite(x) or x < 0 for x in quantities + prices):
+            raise ValueError('Invalid reported borrow position')
+        value = sum(q * p for q, p in zip(quantities, prices))
+        quantity = sum(quantities)
+        apr = sum(q * p * r['apr'] for q, p, r in zip(quantities, prices, components)) / value if value else None
+        fees = [Decimal(r['reported_fee_raw']) for r in components if r['reported_fee_raw'] is not None]
+        if any(not fee.is_finite() for fee in fees):
+            raise ValueError('Invalid reported fee amount')
+        semantic = sorted(json.dumps([r['loan_scope'], r['apr'], r['reported_quantity'], r['reported_price'], r['reported_fee_raw']]) for r in components)
+        key = hashlib.sha256(json.dumps(group).encode()).hexdigest()
+        row = {**components[0], 'aggregation': 'account_security_day_v1', 'apr': apr,
+               'reported_quantity': str(quantity), 'reported_price': str(value / quantity) if quantity else None,
+               'reported_rate_percent': str(apr * 100) if apr is not None else None,
+               'reported_fee_raw': str(sum(fees, Decimal(0))) if len(fees)==len(components) else None,
+               'reported_fee_sign': 'source_statement_signed_amount', 'component_count': len(components), 'components': components,
+               'position_day_key': key,
+               'observation_key': hashlib.sha256((key + json.dumps(semantic)).encode()).hexdigest()}
+        daily.append(row)
+    return {'rows': daily, 'observed_at': observed, 'sections': sections,
             'report_to_date': max(dates), 'lookback_days': lookback_days,
             'source_sha256': source_hash}
 

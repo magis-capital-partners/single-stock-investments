@@ -15,6 +15,7 @@ export function brokerGates(rows,now){
   const reasons=[];
   if(!locate||locate.approved!==true||!Number.isInteger(locate.shares)||locate.shares<=0||!finite(locate.apr)||locate.apr<0||!locate.allocation_id)reasons.push('ibkr_locate_approval_missing');
   if(!margin||margin.approved!==true||!finite(margin.available_notional)||margin.available_notional<=0||!margin.allocation_id)reasons.push('ibkr_margin_approval_missing');
+  if(locate?.account_scope&&margin?.account_scope&&locate.account_scope!==margin.account_scope)reasons.push('ibkr_account_scope_mismatch');
   if(!ssr||ssr.restricted!==false)reasons.push(ssr?.restricted?'ssr_restricted':'ssr_status_unknown');
   if(!status||status.halted!==false)reasons.push(status?.halted?'security_halted':'halt_status_unknown');
   return {reasons,locate,margin,ssr,status,evidence_ids:[locate,margin,ssr,status].filter(Boolean).map(x=>x.id)};
@@ -67,7 +68,7 @@ export function fill(t,side,shares,price,q,p,now){
 }
 export function chargedRateProxy(rows,day,conid,now,accountScope){
   if(!conid)return null;
-  const candidates=rows.filter(r=>r.kind==='charged'&&r.day===day&&String(r.conid)===String(conid)&&r.account_scope&&finite(r.apr)&&r.apr>=0&&at(r.observed_at)<=at(now));
+  const candidates=rows.filter(r=>r.broker==='IBKR'&&r.kind==='charged'&&r.actually_charged===true&&r.aggregation==='account_security_day_v1'&&r.day===day&&String(r.conid)===String(conid)&&r.account_scope&&finite(r.apr)&&r.apr>=0&&at(r.observed_at)<=at(now));
   const scopes=[...new Set(candidates.map(r=>r.account_scope))];
   const scope=accountScope||(scopes.length===1?scopes[0]:null);if(!scope)return null;
   const latest=new Map();for(const r of candidates.filter(r=>r.account_scope===scope).sort((a,b)=>at(a.observed_at)-at(b.observed_at)))latest.set(r.position_day_key||r.id,r);
