@@ -12,17 +12,25 @@ import {initializeShadow,shadowTick,putState} from './shadow-service.mjs';
 import {watchCollector} from './watch.mjs';
 import {recoverWatch} from './recovery.mjs';
 
-export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,cadence=300,maxJobs=40}={}){
+export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,cadence=300,maxJobs=40,evidenceInterval=500}={}){
   if(!token||!account||!database||!bucket)throw new Error('Collector requires configured Cloudflare credentials and isolated research resources');
   const pending=[],usage={rows_read:0,rows_written:0,queries:0},base=`https://api.cloudflare.com/client/v4/accounts/${account}`,headers={authorization:'Bearer '+token};
-  async function request(path,options={}){const r=await fetcher(base+path,{...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(45000)});if(!r.ok){await r.body?.cancel();throw new Error(`Research storage HTTP ${r.status}`);}return r;}
+  let evidenceSlot=0;
+  async function request(path,options={},allowMissing=false){
+    for(let attempt=0;attempt<4;attempt++){
+      if(path.startsWith('/r2/')){const slot=Math.max(Date.now(),evidenceSlot);evidenceSlot=slot+evidenceInterval;await new Promise(r=>setTimeout(r,Math.max(0,slot-Date.now())));}
+      const r=await fetcher(base+path,{...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(45000)});
+      if(r.status===429&&attempt<3){const delay=Math.max(5,Math.min(120,Number(r.headers.get('retry-after'))||30));await r.body?.cancel();await new Promise(resolve=>setTimeout(resolve,delay*1000));continue;}
+      if(!r.ok&&!(allowMissing&&r.status===404)){await r.body?.cancel();throw new Error(`Research storage HTTP ${r.status}`);}return r;
+    }
+  }
   async function sql(body){const r=await request(`/d1/database/${database}/query`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}),result=await r.json();if(!result.success||result.result?.some(x=>x.success===false))throw new Error('Research database query failed');for(const row of result.result){usage.rows_read+=Number(row.meta?.rows_read||0);usage.rows_written+=Number(row.meta?.rows_written||0);usage.queries++;}return result.result;}
   const prepare=(query,params=[])=>({bind:(...values)=>prepare(query,values),first:async()=>((await sql({sql:query,params}))[0].results||[])[0]||null,all:async()=>({results:(await sql({sql:query,params}))[0].results||[]}),run:async()=>(await sql({sql:query,params}))[0],_query:query,_params:params});
   const DB={prepare,batch:async statements=>sql({batch:statements.map(s=>({sql:s._query,params:s._params}))})};
   const prefix=`/r2/buckets/${encodeURIComponent(bucket)}/objects/`;
   const EVIDENCE={
     async put(key,bytes,options={}){await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':options.httpMetadata?.contentType||'application/octet-stream'},body:bytes});},
-    async get(key){const r=await fetcher(base+prefix+key.split('/').map(encodeURIComponent).join('/'),{headers,signal:AbortSignal.timeout(45000)});if(r.status===404){await r.body?.cancel();return null;}if(!r.ok){await r.body?.cancel();throw new Error(`Evidence storage HTTP ${r.status}`);}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
+    async get(key){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
   };
   return {DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};
 }

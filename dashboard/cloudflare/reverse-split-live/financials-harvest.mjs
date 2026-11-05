@@ -136,6 +136,6 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const {values}=parseArgs({options:{'run-minutes':{type:'string',default:'270'},'max-issuers':{type:'string',default:'500'},'max-documents':{type:'string',default:'8'},offline:{type:'boolean',default:false}}});
-  const env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:'e1cac493b315c8fd7398500dd1bfd687',database:'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:'single-stock-reverse-splits-evidence'});
+  const env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:'e1cac493b315c8fd7398500dd1bfd687',database:'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:'single-stock-reverse-splits-evidence',evidenceInterval:1000});
   try{const result=await runFinancialHarvest(env,{maximumMs:Math.min(270,Number(values['run-minutes']))*60000,maxIssuers:Math.min(5000,Number(values['max-issuers'])),maximumDocuments:Math.min(20,Number(values['max-documents'])),offline:values.offline});if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'continue='+!!result.continue+'\n');console.log(JSON.stringify(result));}catch(e){console.error(JSON.stringify({event:'financial_harvest_failed',error:e.message}));process.exitCode=1;}
 }
