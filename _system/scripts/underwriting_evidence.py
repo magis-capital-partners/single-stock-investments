@@ -115,6 +115,43 @@ def primary_text(raw):
         return raw.decode('cp1252')
 
 
+def registered_securities(source):
+    """Freeze explicit DEI security fields joined by their primary context."""
+    fields, spans, conflicts, issuers = {}, {}, set(), set()
+    pattern = (r'<ix:nonNumeric\b([^>]*)\bname=["\']dei:'
+               r'(TradingSymbol|Security12bTitle|SecurityExchangeName|EntityCentralIndexKey)'
+               r'["\']([^>]*)>(.*?)</ix:nonNumeric\s*>')
+    for match in re.finditer(pattern, source, re.I | re.S):
+        context = re.search(r'\bcontextRef=["\']([^"\']+)', match[1]+match[3], re.I)
+        name, value = match[2].lower(), text_of(match[4])
+        if name == 'entitycentralindexkey':
+            issuers.add(value)
+            continue
+        if not context:
+            continue
+        key = context[1]
+        row = fields.setdefault(key, {})
+        if name in row and row[name] != value:
+            conflicts.add(key)
+        row[name] = value
+        spans.setdefault(key, []).append((match.start(), match.end()))
+    if len(issuers) != 1 or not next(iter(issuers)).isdigit():
+        return []
+    issuer = str(int(next(iter(issuers))))
+    rows = []
+    for context, row in fields.items():
+        if context in conflicts or not all(row.get(k) for k in ('tradingsymbol', 'security12btitle', 'securityexchangename')):
+            continue
+        passage = text_of(source[min(s for s, _ in spans[context]):max(e for _, e in spans[context])])
+        if len(passage) > 4000:
+            continue
+        rows.append({'symbol': row['tradingsymbol'], 'security_title': row['security12btitle'],
+                     'exchange': row['securityexchangename'], 'issuer_cik': issuer,
+                     'context_ref': context, 'context': passage,
+                     'locator': 'dei:Security12bTitle; dei:TradingSymbol; dei:SecurityExchangeName; contextRef='+context})
+    return rows
+
+
 def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=False):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = primary_text(raw)
@@ -133,6 +170,8 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
                 # an actual scale header rather than infer a multiplier.
                 prefix = text_of(source[max(0, table.start()-15000):table.start()])[-1000:]
                 tables.append((score, (prefix+' '+text).strip()))
+    securities = registered_securities(source)
+    registration = {'registered_securities': securities} if securities else {}
     contexts, seen, size = [], set(), 0
     for _, text in sorted(tables, key=lambda item: (-item[0], len(item[1]))):
         if text in seen or size+len(text) > 85000:
@@ -147,7 +186,7 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
         # Complete bounded reports/agreements retain contractual footnotes
         # that could otherwise fall outside selected search windows.
         return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),
-                'contexts':[body],'coverage':'complete_quarterly_filing' if form == '10-Q' else 'complete_requested_primary_document'}
+                'contexts':[body],'coverage':'complete_quarterly_filing' if form == '10-Q' else 'complete_requested_primary_document', **registration}
     budget = 350000 if focus else 150000
     def add_context(text):
         nonlocal size
@@ -155,6 +194,9 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
             contexts.append(text)
             seen.add(text)
             size += len(text)
+    # Registration evidence must not displace one of the financial tables.
+    for security in securities:
+        add_context(security['context'])
     # Explicit contractual requests need operative clauses and definitions,
     # rather than the dense contents page that can win keyword-window scoring.
     # Add complete bounded passages before the general retrieval windows.
@@ -250,11 +292,57 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
     contexts = [c for i,c in enumerate(contexts) if not any(i != j and c in other for j,other in enumerate(contexts))]
     require(contexts, 'No financial tables could be frozen from '+url)
     return {'id': 'doc_'+digest(url)[:16], 'source_url': url,
-            'content_hash': hashlib.sha256(raw).hexdigest(), 'contexts': contexts}
+            'content_hash': hashlib.sha256(raw).hexdigest(), 'contexts': contexts, **registration}
 
 
-def listing_ratio_from_documents(documents):
-    """Extract explicit depositary representation; ambiguity is a gap, never 1:1."""
+def registered_listing_ratio(documents, symbol, calendar, as_of):
+    """A directly registered share is the quoted share, not an assumed ADR."""
+    if not symbol or calendar != 'XNYS':
+        return None
+    try:
+        quote_day = date.fromisoformat(as_of)
+    except (TypeError, ValueError):
+        return None
+    for document in sorted(documents, key=lambda d: d.get('filed', ''), reverse=True):
+        rows = [r for r in document.get('registered_securities') or []
+                if r.get('symbol', '').upper() == symbol.upper()]
+        if not rows:
+            continue
+        # A newer explicit non-common or ambiguous class cannot borrow an
+        # older registration's unit. Missing proof remains a readiness gap.
+        if len(rows) != 1:
+            return None
+        row = rows[0]
+        common_classes = [r for r in document['registered_securities']
+                          if re.search(r'\b(?:common|ordinary)\s+(?:shares?|stock)\b', r.get('security_title', ''), re.I)
+                          and not re.search(r'\b(?:depositary|depository|ADSs?|ADRs?|preferred|warrants?|units?|rights?)\b',
+                                            r.get('security_title', ''), re.I)]
+        if len(common_classes) != 1:
+            return None  # Aggregate issuer shares do not resolve multiple classes.
+        issuer = re.fullmatch(r'https://www\.sec\.gov/Archives/edgar/data/(\d+)/\d{18}/[A-Za-z0-9_.-]+',
+                              document.get('source_url', ''))
+        title = row.get('security_title', '')
+        if (not issuer or row.get('issuer_cik') != str(int(issuer[1]))
+                or row.get('exchange', '').casefold() != 'new york stock exchange'
+                or not re.search(r'\b(?:common|ordinary)\s+(?:shares?|stock)\b', title, re.I)
+                or re.search(r'\b(?:depositary|depository|ADSs?|ADRs?|preferred|preference|warrants?|units?|rights?|represent\w*)\b', title, re.I)):
+            return None
+        try:
+            filed = date.fromisoformat(document['filed'])
+        except (KeyError, TypeError, ValueError):
+            return None
+        if not 0 <= (quote_day-filed).days <= 550:
+            return None
+        return {'ordinary_shares_per_listing_share': 1,
+                'basis': 'direct_registered_common_or_ordinary_share',
+                'source_url': document['source_url'], 'source_as_of': document['filed'],
+                'locator': row['locator'], 'document_hash': document['content_hash'],
+                'symbol': row['symbol'], 'security_title': title, 'exchange': row['exchange']}
+    return None
+
+
+def listing_ratio_from_documents(documents, *, symbol=None, calendar=None, as_of=None):
+    """Require explicit depositary terms or an exact primary share registration."""
     words = dict(one=1, two=2, three=3, four=4, five=5, six=6, seven=7, eight=8, nine=9, ten=10)
     number = r'(?:[0-9]+(?:\.[0-9]+)?|one|two|three|four|five|six|seven|eight|nine|ten)'
     pattern = re.compile(r'\b(?:(?P<receipts>'+number+r')\s+)?(?:American\s+depositary\s+shares?|ADSs?)\b'
@@ -263,6 +351,7 @@ def listing_ratio_from_documents(documents):
                          r'(?:Class\s+[A-Z]\s+)?(?:ordinary|common)\s+shares?\b', re.IGNORECASE)
     def value(token):
         return words[token.lower()] if token.lower() in words else float(token)
+    depositary = None
     for document in sorted(documents, key=lambda d: d.get('filed', ''), reverse=True):
         matches = [m for context in document.get('contexts') or [] for m in pattern.finditer(context)]
         require(all(not m['confirmation'] or value(m['ordinary']) == value(m['confirmation']) for m in matches),
@@ -271,10 +360,15 @@ def listing_ratio_from_documents(documents):
         if not ratios:
             continue
         require(len(ratios) == 1 and next(iter(ratios)) > 0, 'depositary_share_ratio_ambiguous')
-        return {'ordinary_shares_per_listing_share': next(iter(ratios)), 'source_url': document['source_url'],
-                'source_as_of': document.get('period') or document.get('filed'), 'locator': matches[0].group(),
-                'document_hash': document['content_hash']}
-    return None
+        depositary = {'ordinary_shares_per_listing_share': next(iter(ratios)), 'source_url': document['source_url'],
+                      'source_as_of': document.get('period') or document.get('filed'), 'locator': matches[0].group(),
+                      'document_hash': document['content_hash']}
+        break
+    registered = registered_listing_ratio(documents, symbol, calendar, as_of)
+    if registered and depositary:
+        require(registered['ordinary_shares_per_listing_share'] == depositary['ordinary_shares_per_listing_share'],
+                'depositary_share_ratio_sources_disagree')
+    return registered or depositary
 
 
 def fingerprint_facts(source):
@@ -531,7 +625,9 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
         except (OSError, ValueError) as exc:
             errors.append({'source': 'sec_submissions', 'error': type(exc).__name__})
     foreign_us_listing = '.' not in quote['symbol'] and any(d.get('form') in ('20-F', '6-K') for d in documents+observations)
-    extracted_ratio = listing_ratio_from_documents(documents) if foreign_us_listing or listing_ratio else None
+    extracted_ratio = (listing_ratio_from_documents(documents, symbol=quote['symbol'], calendar=quote.get('calendar'),
+                                                   as_of=quote['as_of'])
+                       if foreign_us_listing or listing_ratio else None)
     if listing_ratio and extracted_ratio:
         require(listing_ratio['ordinary_shares_per_listing_share'] == extracted_ratio['ordinary_shares_per_listing_share'],
                 'depositary_share_ratio_sources_disagree')

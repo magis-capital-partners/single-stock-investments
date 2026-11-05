@@ -124,6 +124,112 @@ def test_nested_page_containers_do_not_hide_requested_section_headings(block, ou
     assert any(text_of(clause) in context for context in doc['contexts'])
 
 
+def registered_security_document(symbol='TEST', title='Common Shares', *, context='listing',
+                                 extra='', filed='2026-03-19'):
+    raw = (f'<html><ix:nonNumeric name="dei:EntityCentralIndexKey" contextRef="issuer">123</ix:nonNumeric>'
+           f'<ix:nonNumeric name="dei:Security12bTitle" contextRef="{context}"><b>{title}</b></ix:nonNumeric>'
+           f'<ix:nonNumeric name="dei:TradingSymbol" contextRef="{context}">{symbol}</ix:nonNumeric>'
+           f'<ix:nonNumeric name="dei:SecurityExchangeName" contextRef="{context}">New York Stock Exchange</ix:nonNumeric>'
+           + extra + '<p>Cash, credit, debt and capital disclosures.</p></html>').encode()
+    doc = document_record('https://www.sec.gov/Archives/edgar/data/123/000000012326000001/annual.htm', raw)
+    doc.update(form='40-F', filed=filed, period='2025-12-31')
+    return doc
+
+
+def test_registered_common_share_units_are_bound_to_the_exact_primary_symbol_and_issuer():
+    from underwriting_evidence import listing_ratio_from_documents
+    doc = registered_security_document()
+    ratio = listing_ratio_from_documents([doc], symbol='TEST', calendar='XNYS', as_of='2026-11-04')
+    assert ratio['ordinary_shares_per_listing_share'] == 1
+    assert ratio['basis'] == 'direct_registered_common_or_ordinary_share'
+    assert ratio['source_as_of'] == doc['filed']
+    assert ratio['document_hash'] == doc['content_hash']
+    assert 'dei:TradingSymbol' in ratio['locator']
+    assert any('Common Shares' in c and 'TEST' in c for c in doc['contexts'])
+    assert listing_ratio_from_documents([doc], symbol='OTHER', calendar='XNYS', as_of='2026-11-04') is None
+    assert listing_ratio_from_documents([doc], symbol='TEST', calendar='XNAS', as_of='2026-11-04') is None
+    wrong_issuer = {**doc, 'source_url': doc['source_url'].replace('/data/123/', '/data/456/')}
+    assert listing_ratio_from_documents([wrong_issuer], symbol='TEST', calendar='XNYS', as_of='2026-11-04') is None
+
+
+@pytest.mark.parametrize('title', ['Preferred Shares', 'American Depositary Shares',
+                                 'Units including Common Shares', 'Warrants for Common Shares',
+                                 'Common Shares with attached rights'])
+def test_cover_security_descriptions_never_default_other_claims_to_one_ordinary_share(title):
+    from underwriting_evidence import listing_ratio_from_documents
+    assert listing_ratio_from_documents([registered_security_document(title=title)],
+                                        symbol='TEST', calendar='XNYS', as_of='2026-11-04') is None
+
+
+def test_missing_or_conflicting_cover_fields_do_not_establish_a_listing_unit():
+    from underwriting_evidence import listing_ratio_from_documents
+    conflict = '<ix:nonNumeric name="dei:Security12bTitle" contextRef="listing">Preferred Shares</ix:nonNumeric>'
+    doc = registered_security_document(extra=conflict)
+    assert listing_ratio_from_documents([doc], symbol='TEST', calendar='XNYS', as_of='2026-11-04') is None
+    plain = {'contexts': ['Common Shares TEST New York Stock Exchange'], 'filed': '2026-03-19',
+             'source_url': doc['source_url'], 'content_hash': 'a' * 64}
+    assert listing_ratio_from_documents([plain], symbol='TEST', calendar='XNYS', as_of='2026-11-04') is None
+
+
+def test_a_newer_explicit_security_class_blocks_an_older_common_share_registration():
+    from underwriting_evidence import listing_ratio_from_documents
+    old = registered_security_document()
+    newer = registered_security_document(title='American Depositary Shares', filed='2026-06-01')
+    assert listing_ratio_from_documents([old, newer], symbol='TEST', calendar='XNYS', as_of='2026-11-04') is None
+
+
+def test_explicit_depositary_representation_must_agree_with_direct_registration():
+    from underwriting_evidence import listing_ratio_from_documents
+    doc = registered_security_document()
+    doc['contexts'].append('Each ADS represents two common shares.')
+    with pytest.raises(ContractError, match='sources_disagree'):
+        listing_ratio_from_documents([doc], symbol='TEST', calendar='XNYS', as_of='2026-11-04')
+
+
+@pytest.mark.parametrize('filed', ['2023-01-01', '2026-11-05'])
+def test_direct_registration_must_be_current_and_known_on_the_quote_date(filed):
+    from underwriting_evidence import listing_ratio_from_documents
+    assert listing_ratio_from_documents([registered_security_document(filed=filed)],
+                                        symbol='TEST', calendar='XNYS', as_of='2026-11-04') is None
+
+
+def test_multiple_registered_common_classes_do_not_select_an_aggregate_share_basis():
+    from underwriting_evidence import listing_ratio_from_documents
+    second_class = ('<ix:nonNumeric name="dei:Security12bTitle" contextRef="second">Class B Common Shares</ix:nonNumeric>'
+                    '<ix:nonNumeric name="dei:TradingSymbol" contextRef="second">TEST-B</ix:nonNumeric>'
+                    '<ix:nonNumeric name="dei:SecurityExchangeName" contextRef="second">New York Stock Exchange</ix:nonNumeric>')
+    assert listing_ratio_from_documents([registered_security_document(extra=second_class)],
+                                        symbol='TEST', calendar='XNYS', as_of='2026-11-04') is None
+
+
+def test_cover_evidence_does_not_displace_a_selected_financial_table():
+    tables = ''.join('<table><tr><td>FinancialMarker'+str(i)+'</td><td>'
+                     + 'Reported cash debt assets and capital. ' * 5 + '</td></tr></table>' for i in range(30))
+    doc = registered_security_document(extra=tables)
+    for i in range(30):
+        assert any('FinancialMarker'+str(i)+' ' in c for c in doc['contexts'])
+
+
+def test_cold_foreign_packet_uses_registered_share_units_without_changing_reported_shares(tmp_path):
+    from test_underwriting_pipeline import company_root
+    from underwriting_evidence import prepare_packet
+    from underwriting_pipeline import read, write
+    company_root(tmp_path)
+    quote_path = tmp_path/'_system/reference/market-data/valuation_quotes/TEST.json'
+    quote = read(quote_path)
+    quote['quote']['calendar'] = 'XNYS'
+    write(quote_path, quote)
+    facts = [{'field': field, 'value': value, 'currency': 'USD', 'period': '2025-12-31',
+              'form': '6-K', 'source_kind': 'primary',
+              'source_url': 'https://www.sec.gov/Archives/edgar/data/123/000000012326000001/annual.htm',
+              'locator': field} for field, value in [('net_income', 1000), ('equity', 5000), ('shares', 100)]]
+    write(tmp_path/'_system/reference/market-data/valuation_fundamentals/TEST.json',
+          {'facts': facts, 'primary_documents': [registered_security_document()]})
+    result = prepare_packet(tmp_path, 'TEST', '2026-10-26', collect=False)
+    assert result['listing_ratio']['ordinary_shares_per_listing_share'] == 1
+    assert [o['value'] for o in result['observations'] if o['unit'] == 'shares'] == [100]
+
+
 def test_possessives_do_not_consume_actual_transaction_search_terms():
     terms = requested_keywords([{'code': 'transaction_terms', 'detail':
         "Copart's disclosure omits the target's funding. Search 'merger consideration', "
