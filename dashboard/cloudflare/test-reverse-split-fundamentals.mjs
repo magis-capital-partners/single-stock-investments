@@ -32,6 +32,7 @@ test('a review must refer to a captured source and explicit finite values',()=>{
   const sources=[{sha256:'a'.repeat(64),url:'https://www.sec.gov/Archives/edgar/data/123/a/report.htm',published_at:'2026-08-15T12:00:00Z',form:'6-K',filed:'2026-08-15'}];
   assert.throws(()=>validateReviewedFacts({cik,facts:[fact('cash',5,{})],reason:'checked'},[],now),/source/i);
   assert.throws(()=>validateReviewedFacts({cik,facts:[{...fact('cash',5),value:null}],reason:'checked'},sources,now),/numeric|finite/i);
+  assert.throws(()=>validateReviewedFacts({cik,facts:[{...fact('cash',5),end:'2026-02-31'}],reason:'checked'},sources,now),/periods/i);
 });
 function setup(t){const db=new DatabaseSync(':memory:');for(const f of readdirSync(new URL('./reverse-split-live/migrations/',import.meta.url)).filter(x=>x.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./reverse-split-live/migrations/'+f,import.meta.url),'utf8'));t.after(()=>db.close());const objects=new Map(),EVIDENCE={put:async(k,v)=>objects.set(k,typeof v==='string'?new TextEncoder().encode(v):new Uint8Array(v)),get:async k=>{const v=objects.get(k);return v?{json:async()=>JSON.parse(new TextDecoder().decode(v)),arrayBuffer:async()=>v,body:v}:null;}};return {db,objects,env:{DB:localAdapter(db),EVIDENCE}};}
 test('private snapshot publication keeps full local research running with no event-table writes',async t=>{

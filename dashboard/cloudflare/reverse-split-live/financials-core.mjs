@@ -5,7 +5,7 @@ export const METRICS=Object.freeze(Object.keys(ALIASES));
 const flows=new Set(['revenues','net_income','operating_income','cfo']);
 const finite=v=>typeof v==='number'&&Number.isFinite(v);
 const time=v=>Number.isFinite(Date.parse(v))?Date.parse(v):null;
-const isoDate=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&time(v)!==null;
+const isoDate=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&time(v)!==null&&new Date(Date.parse(v)).toISOString().slice(0,10)===v;
 const useful=r=>({metric:r.metric,start:r.start||null,end:r.end,value:r.value,currency:r.currency,source_url:r.source_url,source_sha256:r.source_sha256,locator:r.locator,kind:r.kind,filed:r.filed,published_at:r.published_at,observed_at:r.observed_at,original_tag:r.original_tag,rounding_tolerance:r.rounding_tolerance,owner_reviewed:r.owner_reviewed});
 export function eligibleFact(r,cik,asOf){
   return !!r&&METRICS.includes(r.metric)&&String(Number(r.cik))===String(Number(cik))&&r.scope==='consolidated'&&r.confidence==='verified'&&finite(r.value)&&/^[A-Z]{3}$/.test(r.currency||'')&&isoDate(r.end)&&(!r.start||isoDate(r.start))&&(flows.has(r.metric)?!!r.start:!r.start)&&(!r.start||r.start<=r.end)&&r.end<=etDay(asOf)&&isoDate(r.filed)&&time(r.published_at)!==null&&time(r.observed_at)!==null&&time(r.published_at)<=time(asOf)&&time(r.observed_at)<=time(asOf)&&/^https:\/\//.test(r.source_url||'')&&/^[a-f0-9]{64}$/.test(r.source_sha256||'')&&typeof r.locator==='string'&&r.locator.length>0;
