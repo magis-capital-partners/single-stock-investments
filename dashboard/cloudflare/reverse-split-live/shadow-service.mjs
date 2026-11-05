@@ -72,6 +72,10 @@ export async function processShadowTrack(env,t,q,peers,now=stamp(),actions={reco
   }
   t.mark_price=q.ask;t.mark_at=q.quote_at;t.quote_source=q.source_url;t.quote_provider=q.provider;t.quote_coverage=q.coverage||'consolidated';t.indicative=p.indicative===true;
   if(active)chargeBorrow(t,p,now);
+  const executionClock=t.state==='exit_pending'?t.exit_requested_at:t.due_at;
+  if(['armed','partial_entry','exit_pending'].includes(t.state)&&at(q.observed_at)<at(executionClock)){
+    t.reason=t.state==='exit_pending'?'waiting_for_post_exit_quote':'quote_received_before_entry_clock';t.net_pnl=pnl(t);t.mark_stale=false;await persist(env,t,'observation_blocked',now,{reason:t.reason,quote_id:q.id,received_at:q.observed_at,execution_clock:executionClock});return t;
+  }
   const current=kind=>evidence.filter(e=>e.kind===kind&&at(e.observed_at)<=at(now)&&at(e.valid_until)>=at(now)).at(-1);
   const blocked=current('ssr')?.restricted===true?'short_sale_restriction_active':current('locate')?.approved===false?'borrow_denied':current('margin')?.approved===false?'margin_denied':null;
   if(blocked&&['armed','partial_entry'].includes(t.state)){t.reason=blocked;t.feasibility=feasibility(evidence,now,t.remaining_shares*q.ask,t.remaining_shares);await persist(env,t,'entry_blocked',now,{reason:blocked});return t;}
