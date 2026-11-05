@@ -171,6 +171,10 @@ def extract_html(text, meta, labels=None):
             issues.append({'reason':'non_consolidated_or_pro_forma_table','table':number+1}); continue
         if not re.search(r'\bconsolidated\s+(?:balance\s+sheets?|statements?\s+of\s+(?:cash\s+flows?|operations|income|comprehensive\s+(?:income|loss)|financial\s+position|profit|loss))',context,re.I):
             issues.append({'reason':'table_consolidation_scope_requires_review','table':number+1}); continue
+        if meta.get('require_table_identity'):
+            identity=re.sub(r'[^a-z0-9]','',str(meta.get('company','')).lower())
+            if not identity or identity not in re.sub(r'[^a-z0-9]','',context.lower()):
+                issues.append({'reason':'financial_table_issuer_scope_requires_review','table':number+1});continue
         grid = []
         for row in rows:
             expanded=[]

@@ -25,6 +25,7 @@ class FilingExtraction(unittest.TestCase):
     def test_issuer_ir_identity_and_consolidation_are_required(self):
         raw=b'<h2>Another Company consolidated balance sheets</h2><p>USD</p><table><tr><th></th><th>June 30, 2026</th></tr><tr><td>Total assets</td><td>100</td></tr></table>'
         self.assertFalse(extract_document(raw,{**META,'require_company_identity':True})['facts'])
+        self.assertFalse(extract_document(raw,{**META,'require_table_identity':True})['facts'])
         self.assertFalse(extract_document(raw.replace(b'consolidated',b'parent company'),META)['facts'])
     def test_inline_custom_concept_preserves_entity_scale_sign_and_context(self):
         html = '''<html><xbrli:context id="c"><xbrli:entity><xbrli:identifier>0000000123</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startDate>2026-01-01</xbrli:startDate><xbrli:endDate>2026-06-30</xbrli:endDate></xbrli:period></xbrli:context><xbrli:unit id="u"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit><ix:nonFraction name="example:NetCashUsedInOperatingActivities" contextRef="c" unitRef="u" scale="3" sign="-">1,250</ix:nonFraction></html>'''

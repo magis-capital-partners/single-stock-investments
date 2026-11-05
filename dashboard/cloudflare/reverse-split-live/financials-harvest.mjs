@@ -81,7 +81,7 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
     try{
       const doc=source.source_sha256?{bytes:Buffer.from(await(await env.EVIDENCE.get('documents/'+source.source_sha256)).arrayBuffer()),sha256:source.source_sha256,url:source.url}:await client.get(source.url,{origins:source.origins||[],maximum:64000000});
       const parsedKey='financials/parsed/'+doc.sha256+'-'+cik+'-'+PARSER_HASH+'.json';let parsed=await read(env,parsedKey);
-      const meta={...source,cik,company:name,require_company_identity:source.form==='IR_RELEASE',currency_hint:currency,source_url:source.url,source_sha256:doc.sha256,observed_at:now()};
+      const meta={...source,cik,company:name,require_table_identity:true,require_company_identity:source.form==='IR_RELEASE'||doc.bytes.subarray(0,5).toString()==='%PDF-',currency_hint:currency,source_url:source.url,source_sha256:doc.sha256,observed_at:now()};
       if(!parsed){parsed=await extractFiling(doc.bytes,meta);await put(env,parsedKey,parsed);}
       // PDF exhibits may be separate files in the same SEC accession. Keep the
       // parent's CIK and disclosure clock; never follow an arbitrary document URL.
