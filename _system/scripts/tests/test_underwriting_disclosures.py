@@ -105,6 +105,25 @@ def test_page_break_reference_to_an_earlier_section_keeps_the_clause_tail(block)
     assert any(text_of(clause) in context for context in doc['contexts'])
 
 
+@pytest.mark.parametrize('block', ['p', 'div'])
+@pytest.mark.parametrize('outer_depth', [1, 3])
+def test_nested_page_containers_do_not_hide_requested_section_headings(block, outer_depth):
+    from underwriting_evidence import text_of
+    clause = (f'<{block}><b>Section&nbsp;4.02.</b> Each Credit Event.</{block}>'
+              f'<{block}>' + 'The specified condition must be satisfied. ' * 400 + f'</{block}>'
+              f'<{block}>The final payment deadline remains part of this condition.</{block}>')
+    content = ('<p>Cash, credit, debt, assets and capital.</p>'
+               '<table><tr><td>Section 4.02. Each Credit Event</td><td>67</td></tr></table>'
+               + '<p>Unrelated introductory disclosure.</p>' * 1200
+               + clause
+               + f'<{block}>Section 4.03. Other Credit Events.</{block}>'
+               + '<p>Unrelated following disclosure.</p>' * 1200)
+    raw = ('<html>' + '<div class="page">' * outer_depth + content
+           + '</div>' * outer_depth + '</html>').encode()
+    doc = document_record('https://issuer.test/agreement', raw, ['section 4.02'])
+    assert any(text_of(clause) in context for context in doc['contexts'])
+
+
 def test_possessives_do_not_consume_actual_transaction_search_terms():
     terms = requested_keywords([{'code': 'transaction_terms', 'detail':
         "Copart's disclosure omits the target's funding. Search 'merger consideration', "
