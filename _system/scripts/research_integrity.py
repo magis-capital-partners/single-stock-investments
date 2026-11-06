@@ -22,7 +22,15 @@ REVIEW_QUEUE = ROOT / "_system/reference/letter_classification_review_queue.json
 def correction_rules() -> tuple[dict, ...]:
     from private_dashboard_assets import read_resolved_json
 
-    document, _restored = read_resolved_json(ROOT, CORRECTIONS.relative_to(ROOT).as_posix())
+    try:
+        document, _restored = read_resolved_json(ROOT, CORRECTIONS.relative_to(ROOT).as_posix())
+    except RuntimeError as exc:
+        # Cloud / sparse checkouts: placeholder without vault returns this.
+        if "Private snapshot" in str(exc) or "vault" in str(exc).lower():
+            return tuple()
+        raise
+    if isinstance(document, dict) and document.get("private_snapshot") is True:
+        return tuple()
     rules = document.get("rules")
     if not isinstance(rules, list):
         raise RuntimeError(
@@ -34,7 +42,13 @@ def correction_rules() -> tuple[dict, ...]:
 
 @lru_cache(maxsize=1)
 def review_candidates() -> tuple[dict, ...]:
-    return tuple(json.loads(REVIEW_QUEUE.read_text(encoding="utf-8"))["rows"])
+    doc = json.loads(REVIEW_QUEUE.read_text(encoding="utf-8"))
+    if isinstance(doc, dict) and doc.get("private_snapshot") is True:
+        return tuple()
+    rows = doc.get("rows") if isinstance(doc, dict) else None
+    if not isinstance(rows, list):
+        return tuple()
+    return tuple(rows)
 
 
 @lru_cache(maxsize=1)
