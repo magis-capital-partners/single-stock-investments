@@ -77,6 +77,34 @@ def events(text):
     return rows
 
 
+def completed_output(rows, file_text=None):
+    """Import one completed native response, including a failed file delivery."""
+    def object_value(text):
+        require(isinstance(text, str) and len(text) <= 500_000, 'Invalid or oversized local stage JSON')
+        text = re.sub(r'^```(?:json)?\s*\n([\s\S]*)\n```$', r'\1', text.strip())
+        value = json.loads(text)
+        require(isinstance(value, dict), 'Local stage must return one JSON object')
+        return value
+    messages = [(index, row['item']) for index, row in enumerate(rows)
+                if row.get('type') == 'item.completed' and (row.get('item') or {}).get('type') == 'agent_message']
+    require(len(messages) <= 1, 'Ambiguous native final messages')
+    stream_value, message_id = None, None
+    if messages:
+        threads = [row for row in rows if row.get('type') == 'thread.started' and row.get('thread_id')]
+        finished = [index for index, row in enumerate(rows) if row.get('type') == 'turn.completed']
+        require(len(threads) == len(finished) == 1 and messages[0][0] < finished[0],
+                'Native final message has no unique completed turn')
+        stream_value = object_value(messages[0][1].get('text'))
+        message_id = messages[0][1].get('id')
+    file_value = object_value(file_text) if file_text is not None else None
+    require(file_value is not None or stream_value is not None, 'No complete native final message or answer file')
+    if file_value is not None and stream_value is not None:
+        require(digest(file_value) == digest(stream_value), 'Native output sources disagree')
+    value = file_value if file_value is not None else stream_value
+    return value, {'source': 'last_message_file' if file_value is not None else 'native_agent_message',
+                   'message_id': message_id, 'output_hash': digest(value)}
+
+
 def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_path, timeout=1200, run=subprocess.run):
     from underwriting_pipeline import write
     require(model == 'gpt-6.1-sol' and effort == 'high' and stage in ('author', 'challenger'),
@@ -112,8 +140,18 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
         # native streams privately before validation or cleanup: an exit 1 can
         # contain only thread.started on stdout and its real error on stderr.
         # A hash of parsed events cannot recover that lost failure explanation.
+        file_text, file_error = None, None
+        try:
+            if answer.is_file():
+                file_text = answer.read_text(encoding='utf-8')
+        except OSError as exc:
+            file_error = str(exc)
         diagnostics = {'stdout': decoded(stdout), 'stderr': decoded(stderr),
                        'process_exit_code': code, 'timed_out': timed_out}
+        if file_text is not None:
+            diagnostics['last_message_file'] = file_text
+        if file_error:
+            diagnostics['last_message_file_error'] = file_error
         diagnostic_path = receipt_path.with_name(receipt_path.stem+'.diagnostics.json')
         write(diagnostic_path, diagnostics)
         receipt['diagnostics'] = {'file': diagnostic_path.name, 'sha256': digest(diagnostics)}
@@ -135,9 +173,7 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
         require(receipt['status'] == 'finished', 'Local Codex stage did not finish without tools: '+receipt['status']
                 +' '+json.dumps(receipt.get('failure_events') or [],ensure_ascii=False)[:1500]
                 +' (private diagnostics: '+diagnostic_path.name+')')
-        text = answer.read_text(encoding='utf-8')
-        require(len(text) <= 500_000, 'Oversized local stage JSON')
-        text = re.sub(r'^```(?:json)?\s*\n([\s\S]*)\n```$', r'\1', text.strip())
-        value = json.loads(text)
-        require(isinstance(value, dict), 'Local stage must return one JSON object')
+        value, provenance = completed_output(rows, file_text)
         write(output_path, value)
+        receipt['output_import'] = provenance
+        write(receipt_path, receipt)
