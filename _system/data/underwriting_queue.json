@@ -15,8 +15,8 @@
       "realization_timing_missing": 15,
       "completed_session_quote_missing": 70,
       "annual_capex_missing": 72,
-      "annual_operating_cash_flow_missing": 44,
       "annual_diluted_share_count_missing": 50,
+      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 431,
       "source_share_basis_unverified": 56,
       "newer_balance_sheet_inputs_available": 221,
@@ -2562,20 +2562,6 @@
     {
       "ticker": "AMT",
       "company": "American Tower",
-      "status": "needs_underwriting",
-      "current_model_basis": "issuer_valuation",
-      "blockers": [
-        "new_financial_report_after_model",
-        "newer_balance_sheet_inputs_available"
-      ],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
-    {
-      "ticker": "AMZN",
-      "company": "Amazon.com",
       "status": "needs_underwriting",
       "current_model_basis": "issuer_valuation",
       "blockers": [
@@ -12164,6 +12150,25 @@
         {
           "code": "missing_current_contractual_debt_maturity_schedule",
           "detail": "doc_e8da53925befc176 Note 6 reports September 2026 debt principal of $127.485 billion and a $1.016 billion current portion, but groups remaining principal into multi-year maturity ranges with coupon ranges. The frozen annual contexts omit the principal maturity table. Annual contractual payments cannot be verified, preventing a supported funding-survival path and executable refinancing-failure scenario alongside the infrastructure commitments. Retrieve the 2025 Form 10-K Note 6 principal maturity table and the principal amounts, maturity dates and coupons for each 2026 issuance from the incorporated financing reports and supplements; reconcile repayments and acquired debt through September 30, 2026. Search terms: 'aggregate maturities', 'future principal payments', '2026 US dollar notes', '2026 Euro notes', and 'Other long-term debt'."
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "AMZN",
+      "company": "Amazon.com",
+      "status": "needs_underwriting",
+      "current_model_basis": "issuer_valuation",
+      "blockers": [
+        "new_financial_report_after_model",
+        "newer_balance_sheet_inputs_available"
+      ],
+      "last_attempt": "2026-11-06T02:52:41.363606+00:00",
+      "retry_after": "2026-11-06",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "local_input_too_large: 1498553 characters exceeds 1048576; complete evidence retained"
         }
       ],
       "unresolved_findings": []
