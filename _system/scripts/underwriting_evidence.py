@@ -235,7 +235,7 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
             note = re.fullmatch(r'(Note\s+)?(\d{1,2})(?=[.\-:\u2013\u2014\s])([.\-:\u2013\u2014]?)\s*([^.!?;:]{2,200})\.?', text, re.I)
             # Some annual reports omit "Note" and use a standalone all-caps
             # numbered title. Inline cross-references are not note boundaries.
-            if note and (note[1] or (note[3] and note[4].isupper())):
+            if note and not note[4].lstrip()[0].isdigit() and (note[1] or (note[3] and note[4].isupper())):
                 start = body.find(text, note_cursor)
                 if start >= 0:
                     note_headings.append((int(note[2]), start))

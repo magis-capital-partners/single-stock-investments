@@ -74,7 +74,7 @@ def converted_class_a_observation(raw, document, quote, eps_contexts):
             continue
         title = text_of(block[2])
         match = re.fullmatch(r'Note\s+(\d{1,2})(?=[.\-:\u2013\u2014\s])[.\-:\u2013\u2014]?\s*([^.!?;:]{2,200})\.?', title, re.I)
-        if not match:
+        if not match or match[2].lstrip()[0].isdigit():
             continue
         offset = body.find(title, cursor)
         if offset < 0:

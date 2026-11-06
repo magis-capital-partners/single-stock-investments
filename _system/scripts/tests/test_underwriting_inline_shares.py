@@ -56,13 +56,26 @@ def extract(source=None, quote=None, **metadata):
     return converted_class_a_observation(raw, doc, quote or QUOTE, eps['contexts'])
 
 
-def test_complete_emdash_note_preserves_conversion_footnotes_and_stops_at_next_note():
+@pytest.mark.parametrize('dash', ['—', '–'])
+def test_complete_emdash_note_preserves_conversion_footnotes_and_stops_at_next_note(dash):
     source = fixture().replace(CONVERSION, ('Reported cash and share allocation disclosure. '*700)+CONVERSION)
+    source = source.replace('—', dash)
     d = document_record(URL, source.encode(), ['note 16'])
     note = next(c for c in d['contexts'] if c.startswith('Note 16'))
     assert CONVERSION in note
     assert 'Final EPS footnote' in note
     assert 'Next note must not be included' not in note
+
+
+def test_a_coupon_heading_inside_a_note_cannot_truncate_the_requested_disclosure():
+    raw = ('<p>Note 3—Debt</p>'+('<p>Detailed debt, cash and capital obligations.</p>'*400)
+           +'<p>4.125% SENIOR NOTES</p>'+('<p>Detailed payment and borrowing provisions.</p>'*400)
+           +'<p>Final source-bound payment deadline.</p><p>Note 4—Taxes</p>'
+           +'<p>Unrelated next disclosure.</p>').encode()
+    d = document_record(URL, raw, ['note 3'])
+    assert any(c.startswith('Note 3') and '4.125% SENIOR NOTES' in c
+               and 'Final source-bound payment deadline' in c
+               and 'Unrelated next disclosure' not in c for c in d['contexts'])
 
 
 def test_reported_diluted_class_is_not_added_to_other_share_classes():
