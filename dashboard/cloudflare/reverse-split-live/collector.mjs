@@ -24,7 +24,10 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
       options.signal?.throwIfAborted();const signal=options.signal?AbortSignal.any([options.signal,AbortSignal.timeout(45000)]):AbortSignal.timeout(45000);
       const {urgent,...requestOptions}=options;const r=await fetcher(base+path,{...requestOptions,headers:{...headers,...options.headers},signal});
       if(r.status===429&&attempt<3){const seconds=Math.max(5,Math.min(120,Number(r.headers.get('retry-after'))||30));await r.body?.cancel();await delay(seconds*1000,undefined,{signal:options.signal});continue;}
-      if(!r.ok&&!(allowMissing&&r.status===404)){await r.body?.cancel();throw new Error(`Research storage HTTP ${r.status}`);}return r;
+      if(!r.ok&&!(allowMissing&&r.status===404)){
+        if(r.status===400&&path.startsWith('/d1/')){const detail=await r.clone().json().catch(()=>null);if(detail?.errors?.some(e=>e.code===7500&&/daily row read limit/i.test(e.message||''))){await r.body?.cancel();throw new Error('Research database daily row-read allowance exhausted; resets at midnight UTC');}}
+        await r.body?.cancel();throw new Error(`Research storage HTTP ${r.status}`);
+      }return r;
     }
   }
   async function sql(body){const r=await request(`/d1/database/${database}/query`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}),result=await r.json();if(!result.success||result.result?.some(x=>x.success===false))throw new Error('Research database query failed');for(const row of result.result){usage.rows_read+=Number(row.meta?.rows_read||0);usage.rows_written+=Number(row.meta?.rows_written||0);usage.queries++;}return result.result;}

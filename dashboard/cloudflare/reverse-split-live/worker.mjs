@@ -242,7 +242,9 @@ export async function readAPI(request,env){
   if(url.pathname==='/prepared'||url.pathname.startsWith('/prepared/'))return preparedAPI(request,env);
   if(url.pathname==='/fundamentals'||url.pathname.startsWith('/fundamentals/'))return financialAPI(request,env);
   if(request.method!=='GET')return json({error:'Read-only research service'},405);
-  if((await state(env,'collector_publication'))==='r2'){const snapshot=await readSnapshotAPI(url,env);if(snapshot)return snapshot;}
+  // A committed private snapshot must remain readable when the account-wide
+  // database allowance is exhausted. Do not query D1 to decide whether to read it.
+  if(env.EVIDENCE){const snapshot=await readSnapshotAPI(url,env);if(snapshot)return snapshot;}
   if(url.pathname==='/shadow'||url.pathname.startsWith('/shadow/'))return shadowAPI(url,env);
   if(url.pathname==='/events'){
     const limit=Math.max(1,Math.min(100,Number(url.searchParams.get('limit'))||50)),filter=url.searchParams.get('result'),query=(url.searchParams.get('q')||'').slice(0,80).toUpperCase();let cursor=['9999',''];

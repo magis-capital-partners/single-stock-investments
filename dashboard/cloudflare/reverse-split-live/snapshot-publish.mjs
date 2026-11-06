@@ -5,10 +5,15 @@ import {readinessSnapshot} from './readiness.mjs';
 const id=v=>createHash('sha256').update(v).digest('hex'),parse=r=>JSON.parse(r.payload);
 const trim=t=>{const {book,fills,daily_marks,...rest}=t;return rest;};
 export function trackCard(t){const row=Object.fromEntries(Object.entries(t).filter(([,v])=>v===null||['string','number','boolean'].includes(typeof v)));if(t.decision_snapshot)row.decision_snapshot={score:t.decision_snapshot.score,ordinal_min:t.decision_snapshot.ordinal_min};for(const k of ['pnl','gates','feasibility','public_borrow'])if(t[k])row[k]=t[k];return row;}
+function trackPages(db,type){
+ const rows=db.prepare(`SELECT payload FROM rs_${type==='shadow'?'shadow':'execution'}_tracks ORDER BY ${type==='shadow'?'enrolled_at DESC,id':'id'}`).all().map(r=>trackCard(parse(r))),objects=[],prefix='cards/'+type;
+ function index(cards,key){const pages=[];for(let n=0;n<cards.length;n+=100){const chunk=cards.slice(n,n+100),pageKey=prefix+'/pages/'+id(JSON.stringify(chunk))+'.json';objects.push({key:pageKey,value:chunk});pages.push({key:pageKey,last:{id:chunk.at(-1).id,enrolled_at:chunk.at(-1).enrolled_at},states:[...new Set(chunk.map(t=>t.state))],lookup:[...new Set(chunk.flatMap(t=>[t.ticker,t.cik].filter(Boolean).map(v=>String(v).toUpperCase())))]});}objects.push({key,value:{schema:'reverse_split_track_pages.v1',count:cards.length,pages}});}
+ index(rows,prefix+'/index.json');for(const policy of new Set(rows.map(t=>t.policy_id)))index(rows.filter(t=>t.policy_id===policy),prefix+'/policy/'+id(policy)+'/index.json');return objects;
+}
 export function captureReadSnapshot(db){
   const state=key=>JSON.parse(db.prepare('SELECT value FROM rs_state WHERE key=?').get(key)?.value||'null');
   const legacy=db.prepare("SELECT * FROM rs_shadow_tracks WHERE state<>'retrospective'").all().map(parse),execution=db.prepare("SELECT * FROM rs_execution_tracks WHERE state<>'retrospective'").all().map(parse);
-  const details=[];for(const [type,tracks,table] of [['shadow',legacy,'rs_shadow_records'],['execution',execution,'rs_execution_records']])for(const track of tracks){
+  const details=[...trackPages(db,'shadow'),...trackPages(db,'execution')];for(const [type,tracks,table] of [['shadow',legacy,'rs_shadow_records'],['execution',execution,'rs_execution_records']])for(const track of tracks){
     const records=db.prepare(`SELECT * FROM ${table} WHERE track_id=? ORDER BY recorded_at,id`).all(track.id).map(r=>({...r,payload:parse(r)})),evidence=type==='shadow'?db.prepare('SELECT payload FROM rs_shadow_evidence WHERE event_id=? ORDER BY observed_at DESC LIMIT 100').all(track.event_id).map(parse):[],size=type==='shadow'?100:25,recordIndex=[];
     if(records.length>size)for(let i=0;i<records.length;i+=size){const chunk=records.slice(i,i+size),key=`tracks/${type}/${id(track.id)}/records/${id(JSON.stringify(chunk))}.json`;details.push({key,value:chunk});recordIndex.push({key,first:[chunk[0].recorded_at,chunk[0].id],last:[chunk.at(-1).recorded_at,chunk.at(-1).id]});}
     details.push({key:`tracks/${type}/${id(track.id)}.json`,value:{track:type==='shadow'?track:trim(track),records:recordIndex.length?[]:records,record_index:recordIndex,evidence}});

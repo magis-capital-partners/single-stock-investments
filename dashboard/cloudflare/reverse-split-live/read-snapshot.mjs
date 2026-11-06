@@ -14,7 +14,7 @@ export async function readSnapshotAPI(url,env){
     const object=await env.EVIDENCE.get(entry.key);if(!object)return json({error:'Archived validation data unavailable'},404);
     return new Response(object.body||await object.arrayBuffer(),{headers:{'content-type':'application/json','content-disposition':`attachment; filename="${id}.json"`,'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
   }
-  if(staticPaths[path]){const data=await read(env,staticPaths[path]);if(!data)return json({error:'Committed snapshot is not yet available'},503);if(path==='/shadow'){const row=await env.DB.prepare("SELECT value FROM rs_state WHERE key='shadow_runtime'").first();if(row)data.runtime=JSON.parse(row.value);const r=data.runtime,fresh=r?.heartbeat_at&&Date.now()-Date.parse(r.heartbeat_at)<180000;data.status=!fresh?'stale':r.status==='running'?(r.market_data?.quote_access==='received'?'tracking':'tracking_signals'):r.status;}return json(data);}
+  if(staticPaths[path]){const data=await read(env,staticPaths[path]);if(!data)return json({error:'Committed snapshot is not yet available'},503);if(path==='/shadow'){const runtime=await read(env,'runtime.json');if(runtime)data.runtime=runtime;const r=data.runtime,fresh=r?.heartbeat_at&&Date.now()-Date.parse(r.heartbeat_at)<180000;data.status=!fresh?'stale':r.status==='running'?(r.market_data?.quote_access==='received'?'tracking':'tracking_signals'):r.status;}return json(data);}
   if(path==='/events'){
     let before;try{before=cursor(url.searchParams.get('before'),['9999','']);}catch{return json({error:'Invalid event cursor'},400);}
     const limit=Math.min(100,Math.max(1,Number(url.searchParams.get('limit'))||50)),q=(url.searchParams.get('q')||'').toUpperCase(),result=url.searchParams.get('result')||'';
@@ -43,12 +43,23 @@ export async function readSnapshotAPI(url,env){
   }
   const policy=(url.searchParams.get('policy')||'').slice(0,100),limit=Math.min(100,Math.max(1,Number(url.searchParams.get('limit'))||50)),state=url.searchParams.get('state')||'',q=(url.searchParams.get('q')||'').toUpperCase();
   let before;try{before=cursor(url.searchParams.get('before'),['9999','']);}catch{return json({error:'Invalid shadow cursor'},400);}
-  const cardKey='cards/'+(executable?'execution':'shadow'),policyCards=policy?await read(env,cardKey+'/policy/'+await keyId(policy)+'.json'):null;
+  const cardKey='cards/'+(executable?'execution':'shadow'),afterId=(url.searchParams.get('after')||'').slice(0,400),index=await read(env,cardKey+(policy?'/policy/'+await keyId(policy):'')+'/index.json');
+  const matchesCursor=r=>executable?r.id>afterId:r.enrolled_at<before[0]||(r.enrolled_at===before[0]&&r.id>before[1]);
+  if(index?.schema==='reverse_split_track_pages.v1'){
+    const pages=index.pages.filter(p=>matchesCursor(p.last)&&(!state||p.states.includes(state))&&(!q||p.lookup.some(v=>v.includes(q))));let rows=[],more=false;
+    for(let n=0;n<pages.length;n++){
+      const page=pages[n];if(!/^cards\/(?:shadow|execution)\/pages\/[a-f0-9]{64}\.json$/.test(page.key))return json({error:'Invalid private track page'},503);
+      const items=await read(env,page.key);if(!Array.isArray(items))return json({error:'Committed track page unavailable'},503);
+      rows.push(...items.filter(r=>matchesCursor(r)&&(!policy||r.policy_id===policy)&&(!state||r.state===state)&&(!q||[r.ticker,r.cik].some(v=>String(v||'').toUpperCase().includes(q)))));
+      if(rows.length>limit){more=true;break;}if(rows.length===limit&&n<pages.length-1){more=true;break;}
+    }
+    const last=rows[Math.min(limit,rows.length)-1];return json({...envelope,tracks:rows.slice(0,limit),historical_data_status:'included',next_cursor:more&&last?(executable?last.id:btoa(JSON.stringify([last.enrolled_at,last.id]))):null});
+  }
+  const policyCards=policy?await read(env,cardKey+'/policy/'+await keyId(policy)+'.json'):null;
   const live=(policyCards||await read(env,cardKey+'.json')||[]).filter(r=>(!policy||r.policy_id===policy)&&(!state||r.state===state)&&(!q||[r.ticker,r.cik].some(v=>String(v||'').toUpperCase().includes(q))));
-  const table=executable?'rs_execution_tracks':'rs_shadow_tracks',afterId=(url.searchParams.get('after')||'').slice(0,400),params=[...(executable?[afterId]:[before[0],before[0],before[1]]),...(policy?[policy]:[]),...(q?['%'+q+'%']:[]),limit+1];
-  const sql=`SELECT payload FROM ${table} WHERE state='retrospective' AND `+(executable?'id>?':'(enrolled_at<? OR (enrolled_at=? AND id>?))')+(policy?' AND policy_id=?':'')+(q?" AND UPPER(COALESCE(ticker,'')) LIKE ?":'')+(executable?' ORDER BY id':' ORDER BY enrolled_at DESC,id')+' LIMIT ?';
-  const historical=state&&state!=='retrospective'?[]:(await env.DB.prepare(sql).bind(...params).all()).results.map(r=>JSON.parse(r.payload));
-  const filtered=[...live,...historical].filter(r=>(!state||r.state===state)&&(!q||[r.ticker,r.cik].some(v=>String(v||'').toUpperCase().includes(q)))&&(executable?r.id>afterId:(r.enrolled_at<before[0]||(r.enrolled_at===before[0]&&r.id>before[1]))));
+  // Older snapshots have only forward cards. Report this explicitly until the
+  // next collector publication adds history; never silently fall back to a scan.
+  const filtered=live.filter(r=>(!state||r.state===state)&&(!q||[r.ticker,r.cik].some(v=>String(v||'').toUpperCase().includes(q)))&&matchesCursor(r));
   filtered.sort(executable?(a,b)=>a.id<b.id?-1:a.id>b.id?1:0:(a,b)=>a.enrolled_at===b.enrolled_at?(a.id<b.id?-1:1):a.enrolled_at>b.enrolled_at?-1:1);
-  return json({...envelope,tracks:filtered.slice(0,limit),next_cursor:filtered.length>limit?(executable?filtered[limit-1].id:btoa(JSON.stringify([filtered[limit-1].enrolled_at,filtered[limit-1].id]))):null});
+  return json({...envelope,tracks:filtered.slice(0,limit),historical_data_status:'awaiting_snapshot_rebuild',next_cursor:filtered.length>limit?(executable?filtered[limit-1].id:btoa(JSON.stringify([filtered[limit-1].enrolled_at,filtered[limit-1].id]))):null});
 }

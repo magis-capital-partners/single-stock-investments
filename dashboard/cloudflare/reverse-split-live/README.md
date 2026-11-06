@@ -351,3 +351,30 @@ fills. SEC catch-up includes unresolved gaps within the last month, archives
 the retrieved daily-index proof and never closes publisher gaps from filing
 indexes. Source/quote work remains independent of this historical queue.
 
+# Database allowance incident — November 6, 2026
+
+Cloudflare account analytics attributed 4,827,240 scanned rows (2,006 calls,
+2,406 rows/call) to the dashboard's retrospective per-policy list query. The
+shadow database accounted for 4,902,997 reads; the other account database
+accounted for 373,543. The account's 5 million/day Free allowance was exhausted
+at approximately 08:28 UTC, stopping collection and financial preparation.
+This outage must remain in the review record; missed announcements cannot be
+converted into original-clock forward fills by subsequent backfill.
+
+Dashboard track lists now use content-addressed private R2 pages (100 cards
+per page) for both historical and forward records. Main snapshots and the
+independent monitor read the private heartbeat without a D1 publication-mode
+lookup. Older snapshots explicitly report `awaiting_snapshot_rebuild` for
+history rather than falling back to the expensive query. Fallback SQL indexes
+are idempotently applied at the first collector start after the UTC reset if
+the deployment-time migration was blocked. The Free plan remains unchanged.
+
+Recovery: the included daily allowance resets at 00:00 UTC (19:00 Eastern on
+November 6). Existing scheduled jobs attempt resumption, but GitHub scheduling
+is not an arrival-time guarantee. Verify the actual collector heartbeat,
+committed checkpoint, publication, source catch-up and quote validation before
+claiming recovery. The November 6 session cannot pass its original complete
+session criteria after the market-hours outage. Do not alter the registered
+review policy to hide this failure. No NY4, Gateway, ThetaData or AWS action is
+part of this repair.
+
