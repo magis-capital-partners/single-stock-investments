@@ -7,6 +7,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
 import {readSnapshotAPI} from './reverse-split-live/read-snapshot.mjs';
 import {publishFinancialCoverage,harvestIssuer,nextFinancialJob} from './reverse-split-live/financials-harvest.mjs';
+import {FinancialSources,hash} from './reverse-split-live/financials-io.mjs';
 import {needsStartupReconciliation} from './reverse-split-live/watch.mjs';
 import {captureReadSnapshot,publishReadSnapshot,trackCard} from './reverse-split-live/snapshot-publish.mjs';
 const now='2026-11-05T17:00:00Z',cik='123';
@@ -43,6 +44,23 @@ test('a review must refer to a captured source and explicit finite values',()=>{
   assert.throws(()=>validateReviewedFacts({cik,facts:[{...fact('cash',5),end:'2026-02-31'}],reason:'checked'},sources,now),/periods/i);
 });
 function setup(t){const db=new DatabaseSync(':memory:');for(const f of readdirSync(new URL('./reverse-split-live/migrations/',import.meta.url)).filter(x=>x.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./reverse-split-live/migrations/'+f,import.meta.url),'utf8'));t.after(()=>db.close());const objects=new Map(),EVIDENCE={put:async(k,v)=>objects.set(k,typeof v==='string'?new TextEncoder().encode(v):new Uint8Array(v)),get:async k=>{const v=objects.get(k);return v?{json:async()=>JSON.parse(new TextDecoder().decode(v)),arrayBuffer:async()=>v,body:v}:null;}};return {db,objects,env:{DB:localAdapter(db),EVIDENCE}};}
+
+test('a source cooldown carries a future retry time without making a network request',async t=>{
+  const {env}=setup(t),client=new FinancialSources(env),until=Date.now()+300000;client.cooldown=until;
+  await assert.rejects(client.get('https://data.sec.gov/submissions/CIK0000000123.json'),e=>e.code==='FINANCIAL_SOURCE_COOLDOWN'&&e.retryAt===until);assert.equal(client.requests,0);
+});
+
+test('a source cooldown stops the visit without failing every remaining document',async t=>{
+  const {env}=setup(t),until=Date.now()+300000;let calls=0;const client={cooldown:0,get:async url=>{
+    if(url.includes('/Archives/')){calls++;client.cooldown=until;throw Object.assign(new Error('Financial source is in backoff'),{code:'FINANCIAL_SOURCE_COOLDOWN',retryAt:until});}
+    return {bytes:Buffer.from(JSON.stringify(url.includes('/submissions/')?{cik:123,name:'Example Research Ltd',filings:{recent:{form:['10-Q','10-Q'],filingDate:['2026-08-15','2026-05-15'],accessionNumber:['0000000123-26-000001','0000000123-26-000002']}}}:{cik:123,facts:{}})),url,sha256:'a'.repeat(64),captured_at:now};
+  }};const result=await harvestIssuer(env,{cik:'123'},{client,maximumDocuments:8}),work=await(await env.EVIDENCE.get('financials/work/123.json')).json();assert.equal(calls,1);assert.equal(result.complete,false);assert.equal(result.profile.collection.remaining_documents,2);assert.ok(result.next_attempt>=until);assert.equal(Object.keys(work.errors).length,1);assert.equal(Object.values(work.errors)[0].terminal,false);assert.equal(Object.values(work.errors)[0].attempts,0);
+});
+
+test('documents parked by the old cooldown bug are reopened and can be extracted',async t=>{
+  const {env}=setup(t),url='https://www.sec.gov/Archives/edgar/data/123/000000012326000001/0000000123-26-000001.txt',parser_hash=hash(readFileSync(new URL('./reverse-split-live/fundamental_filing.py',import.meta.url))),work={parser_hash,facts:[],sources:[],processed:{},candidates:[],issues:[],errors:{[url]:{attempts:3,terminal:true,next_attempt:Date.now()+86400000,reason:'Financial source is in backoff'}}};await env.EVIDENCE.put('financials/work/123.json',JSON.stringify(work));let extracted=0;
+  const client={get:async target=>({bytes:Buffer.from(JSON.stringify(target.includes('/submissions/')?{cik:123,name:'Example Research Ltd',filings:{recent:{form:['10-Q'],filingDate:['2026-08-15'],accessionNumber:['0000000123-26-000001']}}}:{cik:123,facts:{}})),url:target,sha256:'b'.repeat(64),captured_at:now})};const result=await harvestIssuer(env,{cik:'123'},{client,extract:async()=>{extracted++;return {facts:[],candidates:[],issues:[]};}});assert.equal(extracted,1);assert.equal(result.profile.collection.searched_documents,1);assert.equal(result.complete,true);
+});
 test('private snapshot publication keeps full local research running with no event-table writes',async t=>{
   const {db,env,objects}=setup(t);env.controlDB=env.DB;env.pending=[];const checkpoint=await openCheckpoint(env);t.after(()=>checkpoint.close());
   await env.DB.prepare('INSERT INTO rs_events(id,cik,first_seen_at,payload) VALUES(?,?,?,?)').bind('qa-current','123',now,JSON.stringify({id:'qa-current',cik:'123',first_seen_at:now,result:'needs_review'})).run();

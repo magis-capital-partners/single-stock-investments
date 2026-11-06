@@ -4,7 +4,7 @@ import {parseArgs} from 'node:util';
 import {pathToFileURL} from 'node:url';
 import {appendFileSync,readFileSync} from 'node:fs';
 import {remoteEnvironment} from './collector.mjs';
-import {FinancialSources,extractFiling,hash,primaryURL} from './financials-io.mjs';
+import {FinancialSources,extractFiling,hash,primaryURL,isSourceCooldown} from './financials-io.mjs';
 import {buildFinancialProfile,FINANCIAL_VERSION} from './financials-core.mjs';
 import {etDay} from './core.mjs';
 const now=()=>new Date().toISOString(),bytes=v=>new TextEncoder().encode(JSON.stringify(v));
@@ -66,6 +66,8 @@ async function discoverReports(client,cik,sub){
 export async function harvestIssuer(env,job,{client=new FinancialSources(env),maximumDocuments=8,offline=false,extract=extractFiling}={}){
   const cik=String(Number(job.cik)),key='financials/work/'+cik+'.json',work=await read(env,key,{facts:[],sources:[],processed:{},candidates:[],issues:[],errors:{}});work.errors||={};
   if(work.parser_hash!==PARSER_HASH){Object.assign(work,{facts:[],processed:{},candidates:[],issues:[],errors:{},parser_hash:PARSER_HASH});}
+  // Repair only documents that the earlier cooldown handling parked by mistake.
+  for(const error of Object.values(work.errors))if(error.terminal&&isSourceCooldown(error)){error.terminal=false;error.attempts=0;error.next_attempt=0;}
   const subDoc=await client.get(`https://data.sec.gov/submissions/CIK${cik.padStart(10,'0')}.json`,{mutable:true}),sub=JSON.parse(subDoc.bytes);if(String(Number(sub.cik))!==cik)throw new Error('Financial issuer submissions mismatch');
   let companyDoc=null,companyfacts={cik,facts:{}};try{companyDoc=await client.get(`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik.padStart(10,'0')}.json`,{mutable:true});companyfacts=JSON.parse(companyDoc.bytes);if(String(Number(companyfacts.cik))!==cik)throw new Error('Financial Company Facts identity mismatch');}catch(e){companyDoc=null;companyfacts={cik,facts:{}};work.issues.push({reason:'companyfacts_unavailable_primary_filing_fallback',message:e.message});}
   let instrument=await vendorMeta(env,job.ticker,cik);const name=sub.name||job.company;
@@ -93,7 +95,7 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
         if(!reports.some(r=>r.url===url)){const attachment={...source,url,source_sha256:undefined,form:'EX-99.PDF',trusted_parent:source.url};reports.push(attachment);(work.discovered||=[]).push(attachment);}
       }}
       work.facts.push(...parsed.facts);work.candidates.push(...parsed.candidates.map(r=>({...r,source_sha256:doc.sha256,source_url:source.url})));work.issues.push(...parsed.issues.map(r=>({...r,source_sha256:doc.sha256})));work.processed[source.url]={sha256:doc.sha256,at:now()};delete work.errors[source.url];
-    }catch(e){const attempt=(work.errors[source.url]?.attempts||0)+1;work.errors[source.url]={attempts:attempt,next_attempt:Date.now()+Math.min(86400000,60000*2**Math.min(attempt,10)),terminal:e.status===404||(attempt>=3&&!['403','429'].includes(String(e.status))),reason:e.message};work.issues.push({source_url:source.url,reason:e.message,at:now()});}
+    }catch(e){const cooldown=isSourceCooldown(e),attempt=(work.errors[source.url]?.attempts||0)+(cooldown?0:1);work.errors[source.url]={attempts:attempt,next_attempt:Math.max(Number(e.retryAt)||0,Date.now()+Math.min(86400000,60000*2**Math.min(attempt,10))),terminal:!cooldown&&(e.status===404||attempt>=3),reason:e.message};work.issues.push({source_url:source.url,reason:e.message,at:now()});if(cooldown)break;}
   }
   const reviews=(await env.DB.prepare("SELECT value FROM rs_state WHERE key>=? AND key<? LIMIT 100").bind('financial_review:'+cik+':','financial_review:'+cik+';').all()).results;
   for(const row of reviews)try{const review=JSON.parse(row.value),document=await read(env,review.object_key);if(document?.facts)work.facts.push(...document.facts);}catch{}
@@ -106,7 +108,7 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
   await env.assertFinancialLease?.();
   profile.version=hash(JSON.stringify(material));const factsKey='financials/facts/'+cik+'/'+profile.version+'.json',ledger={schema:FINANCIAL_VERSION,cik,observed_at:profile.observed_at,facts:profile.facts,source_profile_version:profile.version};await put(env,factsKey,ledger);
   const {facts,...compact}=profile;compact.facts_object_key=factsKey;compact.facts_sha256=hash(JSON.stringify(ledger));await put(env,'financials/profiles/'+cik+'/'+profile.version+'.json',compact);await put(env,'financials/profiles/'+cik+'/latest.json',compact);await put(env,key,work);(await coverageCache(env)).set(cik,coverageCard(compact));
-  return {profile:compact,complete:remaining===0,processed,next_attempt:Math.min(...Object.values(work.errors).filter(e=>!e.terminal).map(e=>e.next_attempt),Date.now()+60000)};
+  return {profile:compact,complete:remaining===0,processed,next_attempt:Math.max(Number(client.cooldown)||0,Math.min(...Object.values(work.errors).filter(e=>!e.terminal).map(e=>e.next_attempt),Date.now()+60000))};
 }
 export async function publishFinancialCoverage(env,queue){
   const cards=[...(await coverageCache(env)).values()].filter(p=>queue.jobs[p.cik]).sort((a,b)=>b.observed_at.localeCompare(a.observed_at)),counts={};for(const p of cards)counts[p.status]=(counts[p.status]||0)+1;
@@ -131,7 +133,7 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
     if(!job){await new Promise(r=>setTimeout(r,10000));continue;}
     const firstPass=!job.last_attempt;job.last_attempt=now();handled++;
     try{const result=await harvestIssuer(env,job,{client,maximumDocuments:firstPass&&job.priority<1000?0:maximumDocuments,offline});job.complete=result.complete;job.next_attempt=result.complete?Date.now()+3600000:result.next_attempt;job.error=null;job.attempts=0;console.log(JSON.stringify({event:'financial_profile',cik:job.cik,ticker:job.ticker,status:result.profile.coverage.status,score:result.profile.policy_financials.score,remaining:result.profile.collection.remaining_documents}));}
-    catch(e){job.attempts++;job.error=e.message;job.next_attempt=Date.now()+Math.min(86400000,60000*2**Math.min(job.attempts,10));console.log(JSON.stringify({event:'financial_harvest_retry',cik:job.cik,error:e.message}));}
+    catch(e){const cooldown=isSourceCooldown(e);if(!cooldown)job.attempts++;job.complete=false;job.error=e.message;job.next_attempt=cooldown?Math.max(Number(e.retryAt)||0,Date.now()+300000):Date.now()+Math.min(86400000,60000*2**Math.min(job.attempts,10));console.log(JSON.stringify({event:'financial_harvest_retry',cik:job.cik,error:e.message,retry_at:new Date(job.next_attempt).toISOString()}));}
     await put(env,'financials/queue.json',queue);if(handled%5===0||job.priority>=1000)await publishFinancialCoverage(env,queue);
   }await publishFinancialCoverage(env,queue);return {handled,requests:client.requests,continue:!stop,broker_connections:0};}
   finally{clearInterval(timer);await renewing;process.removeListener('SIGTERM',signal);process.removeListener('SIGINT',signal);try{await env.assertFinancialLease();await put(env,'financials/queue.json',queue);}finally{await env.DB.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key=? AND value=?").bind(now(),leaseKey,lease).run();delete env.assertFinancialLease;}}
