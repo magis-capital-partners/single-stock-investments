@@ -34,7 +34,12 @@ def correction_rules() -> tuple[dict, ...]:
 
 @lru_cache(maxsize=1)
 def review_candidates() -> tuple[dict, ...]:
-    return tuple(json.loads(REVIEW_QUEUE.read_text(encoding="utf-8"))["rows"])
+    doc = json.loads(REVIEW_QUEUE.read_text(encoding="utf-8"))
+    rows = doc.get("rows") if isinstance(doc, dict) else None
+    if not isinstance(rows, list):
+        # Placeholder snapshot (private vault not hydrated) or schema drift: treat as no pending reviews.
+        return tuple()
+    return tuple(rows)
 
 
 @lru_cache(maxsize=1)
