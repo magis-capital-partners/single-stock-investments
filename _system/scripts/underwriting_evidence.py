@@ -232,10 +232,10 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
                 headings.append((heading[1], start))
                 cursor = start+len(text)
         if note_requested:
-            note = re.fullmatch(r'(Note\s+)?(\d{1,2})([.:-]?)\s+([^.!?;:]{2,200})\.?', text, re.I)
+            note = re.fullmatch(r'(Note\s+)?(\d{1,2})(?=[.\-:\u2013\u2014\s])([.\-:\u2013\u2014]?)\s*([^.!?;:]{2,200})\.?', text, re.I)
             # Some annual reports omit "Note" and use a standalone all-caps
             # numbered title. Inline cross-references are not note boundaries.
-            if note and (note[1] or (note[3] and note[4].isupper())):
+            if note and not note[4].lstrip()[0].isdigit() and (note[1] or (note[3] and note[4].isupper())):
                 start = body.find(text, note_cursor)
                 if start >= 0:
                     note_headings.append((int(note[2]), start))
@@ -631,6 +631,21 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     raw = filing_bytes(root, ticker, recent['accessionNumber'][i], client, url)
                     document = document_record(url, raw, focus_keywords, form=form)
                     document.update(form=form, filed=recent['filingDate'][i], period=(recent.get('reportDate') or ['']*len(recent['form']))[i])
+                    if ticker == 'V' and form == '10-K':
+                        from underwriting_inline_shares import converted_class_a_observation
+                        eps = document_record(url, raw, ('note 16',), form=form)
+                        point = converted_class_a_observation(raw, document, quote, eps['contexts'])
+                        if point:
+                            note = point.pop('_note_context')
+                            present = any(note in c for c in document['contexts'])
+                            budget = 350000 if focus_keywords else 150000
+                            if present or sum(map(len, document['contexts']))+len(note) <= budget:
+                                if not present:
+                                    document['contexts'].append(note)
+                                try:
+                                    observations.append(_observation(_share_observation(point, market, quote)))
+                                except (BasisGap, ContractError):
+                                    pass  # Retain the source; unresolved share epochs stay gated.
                     documents.append(document)
                     formal_sources.append({'source_url': url, 'raw': raw, 'filed': document['filed'], 'form': form})
                     chosen.add(form)
