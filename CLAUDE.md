@@ -3,11 +3,11 @@
 ## IB Gateway coexistence (three systems, one Gateway) — DO NOT VIOLATE
 
 The NY4 Gateway is shared by **spx-0dte**, **ls-algo**, this repo, and
-**etf-0dte** (SPY/QQQ 0DTE; yields to SPX). SPX 0DTE
+**etf-0dte** (SPY/QQQ/TSLA 0DTE; yields to SPX). SPX 0DTE
 is the protected party. The allocation source of truth is
 `_system/trading/ib_gateway_client_registry.v1.json`, registry version
-`2026-09-09.1`, canonical SHA-256
-`3d2ba10bda3a577696e8e85ae5a6efd1a934e33341ade782506b79f0bad82abd`.
+`2026-11-06.1`, canonical SHA-256
+`e01ec812195749504e7548ebcc0df5734416e75b961b8f9c4e46564b47f8016a`.
 The same version/hash is mirrored in the other two repos. Prose is explanatory,
 not an allocation authority.
 
@@ -16,7 +16,7 @@ not an allocation authority.
 | spx-0dte | 17 live executor; 18 ibc_guard probe; 19 off-hours line probe; 87 basis sampler; 88 off-hours what-if; 97 emergency watchdog |
 | ls-algo | 0 disabled-reserved; 83 read-only stale-order interlock; 41 rebalance; 77 flow; 90 screener; 198 contract probe; leased pool 100–129 |
 | single-stock-investments | 71 Drew legacy sleeve; 72 Michael legacy sleeve; 73 legacy read-only sync; 81 disabled/reserved collector; 82 reserved/no-connect observer; **91 event-driven hub bridge and sole hub transmitter** |
-| etf-0dte | 50 SPY 0DTE live executor; 51 QQQ 0DTE live executor; 130 SPY dead-executor watchdog; 131 QQQ dead-executor watchdog |
+| etf-0dte | 50 SPY 0DTE live executor; 51 QQQ 0DTE live executor; 52 TSLA 0DTE live executor; 130 SPY dead-executor watchdog; 131 QQQ dead-executor watchdog; 132 TSLA dead-executor watchdog |
 
 **Rule 0 — the one that governs the rest. During market hours on a market day
 (09:30–16:00 ET, Mon–Fri, US holidays excluded) no agent initiates anything that
@@ -66,8 +66,8 @@ Rules that keep SPX safe (test-enforced where noted):
 
    *Note (spx-0dte plan W7, 2026-10-27; a reading of the carve-out, not a
    change to it):* the executor-dead evidence is the **SPX** executor's
-   (client 17) and only its. The etf-0dte executors (50/51) and their
-   watchdogs (130/131) share this Gateway, and `ibc_guard` reads their lock
+   (client 17) and only its. The etf-0dte executors (50/51/52) and their
+   watchdogs (130/131/132) share this Gateway, and `ibc_guard` reads their lock
    and heartbeat for PAGING only: a dead ETF heartbeat, a missing ETF lock or
    a failed ETF connect never counts toward the one remedial restart, because
    the restart hits SPX (spx-0dte
@@ -179,9 +179,9 @@ carries to the next.
   still running. Halt it with a `STOP` file in that folder.
 
 **The etf-0dte executors are consumers too, through ONE lane.** spx-0dte's
-`etf-executor@spy` (client 50) and `@qqq` (client 51) read NY4's terminal for
-their DECISIONS only, through spx-0dte's `live/etf_vendor_lane.py` (owner
-design 2026-10-25, spx-0dte `notes/etf_decision_timing_2026-10-26.md`); IB keeps
+`etf-executor@spy` (client 50), `@qqq` (client 51) and `@tsla` (client 52) read
+NY4's terminal for their DECISIONS only, through spx-0dte's
+`live/etf_vendor_lane.py` (owner design 2026-10-25, spx-0dte `notes/etf_decision_timing_2026-10-26.md`); IB keeps
 their orders, stops and rails. The budget is the STANDARD tier's 4 concurrent
 requests: SPX's spot worker, SPX's chain worker (its aligned rounds ride it),
 SPX's executor-thread snapshots, and ONE ETF lane. The lane is enforced, not
@@ -192,7 +192,7 @@ scheduled:
   its last answer, so only one ETF request is ever out. A lane that cannot take
   it by its first round yields that slot to IB;
 - one request in flight per process; 5 whole-expiry snapshots per slot at the
-  product's planned second (SPX's S +20 s SPY, +40 s QQQ, mod 60), 24 slots =
+  product's planned second (SPX's S +20 s SPY, +40 s QQQ, +30 s TSLA, mod 60), 24 slots =
   120 requests a product a session, capped at 150; a timeout stops the burst
   and holds the lock 3 s more, because the abandoned request still runs on the
   terminal;

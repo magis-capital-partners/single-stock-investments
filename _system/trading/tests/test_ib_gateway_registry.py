@@ -57,8 +57,10 @@ def test_embedded_registry_version_hash_and_host_facts_are_pinned():
     assert etf_spy.system == "etf-0dte"
     assert etf_spy.access == "transmit"
     assert allocation_index(raw)[51].system == "etf-0dte"
+    assert allocation_index(raw)[52].system == "etf-0dte"
     assert allocation_index(raw)[130].system == "etf-0dte"
     assert allocation_index(raw)[131].system == "etf-0dte"
+    assert allocation_index(raw)[132].system == "etf-0dte"
 
 
 def test_duplicate_allocation_fails_even_with_a_recomputed_hash(tmp_path):
@@ -89,7 +91,7 @@ def test_embedded_hash_pin_rejects_a_self_consistent_local_fork(tmp_path):
         load_registry(path, expected_hash=EXPECTED_REGISTRY_HASH)
 
 
-@pytest.mark.parametrize("client_id", [0, 17, 50, 51, 77, 90, 130, 198, 100])
+@pytest.mark.parametrize("client_id", [0, 17, 50, 51, 52, 77, 90, 130, 132, 198, 100])
 def test_foreign_ids_fail_ssi_validation(client_id):
     with pytest.raises(RegistryError, match="belongs to"):
         assert_ssi_client_id(client_id, SSI_HUB_BRIDGE_ROLE, readonly=False)

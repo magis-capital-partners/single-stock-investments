@@ -120,7 +120,7 @@ def test_etf_0dte_options_and_shares_blocked_for_both_sleeves():
     # A sleeve SELL of SPY would sell etf-0dte's overnight delivery out from
     # under its 09:30 unwind; a BUY would net against it. Neither owner may.
     for owner in ("drew", "michael"):
-        for root in ("SPY", "QQQ"):
+        for root in ("SPY", "QQQ", "TSLA"):
             for side in ("BUY", "SELL"):
                 shares = check_safeties(
                     owner=owner, ticker=root, side=side, qty=10, limit_price=500,

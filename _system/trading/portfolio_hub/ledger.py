@@ -243,7 +243,7 @@ class PortfolioLedger:
                 dict(position), ls_symbols=ls_symbols, drew_symbols=drew_symbols,
                 etf_0dte_delivery=expected_delivery,
             )
-            # etf-0dte's SPY / QQQ shares: an explicit Drew/Michael lot is another
+            # etf-0dte's SPY / QQQ / TSLA shares: an explicit Drew/Michael lot is another
             # book's KNOWN holding and keeps its owner; only the remainder is
             # attributed against spx-0dte's delivery forecast. Its options are
             # nobody's here, like SPX's.

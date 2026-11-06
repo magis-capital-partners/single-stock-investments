@@ -4,7 +4,7 @@
  * This is the owner-custody rule in
  * `_system/trading/portfolio_hub/allocation_policy.py` and
  * `_system/trading/sleeves/classify_positions.py`: Michael is every broker
- * position except LS Algo, SPX 0DTE, etf-0dte (SPY / QQQ 0DTE options and
+ * position except LS Algo, SPX 0DTE, etf-0dte (SPY / QQQ / TSLA 0DTE options and
  * their delivered shares), and Drew. It is a read-model fallback only. A
  * published projection is never rewritten here.
  *
@@ -13,7 +13,7 @@
  * the OCC root is supplied as that field so the same overlay and index rules
  * fire.
  *
- * The edge has no spx-0dte delivery forecast, so every SPY / QQQ share here is
+ * The edge has no spx-0dte delivery forecast, so every SPY / QQQ / TSLA share here is
  * `etf_0dte_delivery_unattributed` -- owned by nobody, like the attributed kind.
  */
 import universeFile from "../../data/etf_ls_universe.json" with { type: "json" };
@@ -27,9 +27,9 @@ const DREW_LOTS_OPENED_ON_OR_AFTER = { "3905.T": "20260913" };
 const MICHAEL_REF = "MICHAEL_SLEEVE";
 const DREW_HOLDING_REASONS = new Set(["drew_new", "drew_sleeve_holding", "sleeve_tag"]);
 const OCC_ROOT = /^([A-Z0-9.]{1,6})\s+\d{6}[CP]\d/;
-// etf-0dte: spx-0dte's SPY / QQQ 0DTE executors (clients 50/51, watchdogs 130/131).
-const ETF_0DTE_ROOTS = new Set(["SPY", "QQQ"]);
-const ETF_0DTE_REF_PREFIXES = ["SPY0DTE|", "QQQ0DTE|"];
+// etf-0dte: spx-0dte's SPY / QQQ / TSLA 0DTE executors (clients 50/51/52, watchdogs 130/131/132).
+const ETF_0DTE_ROOTS = new Set(["SPY", "QQQ", "TSLA"]);
+const ETF_0DTE_REF_PREFIXES = ["SPY0DTE|", "QQQ0DTE|", "TSLA0DTE|"];
 const ETF_0DTE_OCC_ROOT = /^([A-Z0-9.]{1,6})[\s-]+\d{6}[CP]\d/;
 const ETF_0DTE_POLICY_REASONS = {
   etf_0dte: "etf_0dte_option_exclusion",
@@ -61,7 +61,7 @@ function etfOccRoot(raw) {
   return match ? match[1] : "";
 }
 
-/** Port of etf_0dte_root: "SPY" / "QQQ" for a share or option on those roots, else "". */
+/** Port of etf_0dte_root: "SPY" / "QQQ" / "TSLA" for a share or option on those roots, else "". */
 export function etf0dteRoot(pos) {
   const sec = String(pos.secType || pos.sec_type || "STK").trim().toUpperCase();
   let name = "";
@@ -169,7 +169,7 @@ export function classifyPosition(pos, {
     if (SPX_NAMES.has(indexName) || local.includes("SPXW")) {
       return { ticker: indexName || "SPX", bucket: "spx_0dte", reason: "spxw_option", owner: null };
     }
-    // Ref-less SPY / QQQ options are etf-0dte's, before the LS overlay rule.
+    // Ref-less SPY / QQQ / TSLA options are etf-0dte's, before the LS overlay rule.
     if (etfRoot && !ref) {
       return { ticker: etfRoot, bucket: "etf_0dte", reason: "etf_0dte_root", owner: null };
     }
@@ -186,7 +186,7 @@ export function classifyPosition(pos, {
   if (ETF_LS_REFS.some((tag) => ref.includes(tag))) {
     return { ticker: under || ticker, bucket: "etf_ls", reason: "order_ref", owner: null };
   }
-  // Ref-less SPY / QQQ shares are etf-0dte's deliveries unless another book is
+  // Ref-less SPY / QQQ / TSLA shares are etf-0dte's deliveries unless another book is
   // known to hold them, before the universe and owner rules.
   if (etfRoot && sec === "STK" && !ref) {
     const found = etf0dteShareClassification(pos, etfRoot, etf0dteDelivery, etf0dteKnownHoldings);

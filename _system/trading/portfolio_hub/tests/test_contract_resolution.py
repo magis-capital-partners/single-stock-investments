@@ -157,8 +157,11 @@ class _RecordingService(_Service):
     ("STK", {"symbol": "QQQ", "sec_type": "STK", "local_symbol": "QQQ", "exchange": "NASDAQ"}),
     ("OPT", {"symbol": "SPY", "sec_type": "OPT", "local_symbol": "SPY   261027C00580000", "trading_class": "SPY",
              "strike": 580.0, "right": "C", "expiry": "20261027", "multiplier": "100"}),
+    ("STK", {"symbol": "TSLA", "sec_type": "STK", "local_symbol": "TSLA", "exchange": "NASDAQ"}),
+    ("OPT", {"symbol": "TSLA", "sec_type": "OPT", "local_symbol": "TSLA  261113P00300000", "trading_class": "TSLA",
+             "strike": 300.0, "right": "P", "expiry": "20261113", "multiplier": "100"}),
 ])
-def test_a_spy_or_qqq_ticket_is_refused_before_anything_is_drafted(sec_type, identity):
+def test_an_etf_0dte_ticket_is_refused_before_anything_is_drafted(sec_type, identity):
     """etf-0dte's options and delivered shares are never the hub's to ticket.
 
     The reduce-only check reads the account-wide position, so a hub SELL of SPY
