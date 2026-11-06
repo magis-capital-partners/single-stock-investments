@@ -288,3 +288,54 @@ Private service routes: `GET /fundamentals`, `/fundamentals/summary`, `/fundamen
 
 Continuous research publication uses the private checkpoint and derived read views rather than repeatedly updating thousands of database rows. The checkpoint commits before any displayed fill is published. Sparse database state retains the lease, heartbeat, checkpoint pointer and owner review signals; the Free database write guard no longer suspends detection, exits or latency measurement. A stale/paused/degraded runtime is displayed honestly. The missed morning portion of the November 5 validation remains a gap and cannot be represented as a successful full-session test.
 
+## November 6–13 prospective observation and AWS hold
+
+`review-service.mjs` registers and archives `rs_shadow_review_2026-11-06.v1`
+before the first session. AWS remains deferred for the owner's review after
+the observation week. Five consecutive complete sessions must meet the v3
+market-data criteria (95% minute coverage, gap at most 60s, p95 receipt-to-
+evaluation at most 5s, existing delivery/age/error limits). Operating success,
+conditional capacity, IBKR evidence-gated simulations and actual execution
+are separate conclusions. A quiet week cannot validate trading returns.
+The initial review is November 13 at 16:30 New York; positions still open and
+unreported costs require subsequent follow-up. No hosting upgrade or live
+order is automatically authorized by a passing report.
+
+`reverse-split-review.yml` independently checks HTTPS heartbeat, checkpoint
+freshness, source failures and sample overflow twice an hour during the
+observation day. Results go to the workflow summary and private
+`review/monitor/` archive. Scheduling can be delayed by GitHub; these checks
+do not provide a guaranteed alert time. Existing browser alerts still require
+the dashboard to be open. No new external messaging integration is enabled.
+
+The collector now restores same-day verified score caches, loads an announced
+issuer directly with an abortable four-second storage budget, and warms twelve
+enhanced profiles per background pass. The separate nightly preparation uses
+SEC exchange-listed candidates plus Company Facts bulk data, with bounded,
+checksum-verified shards. Missing XBRL, foreign issuers and non-common-share
+candidates retain explicit unresolved/inapplicable states; complete processing
+does not imply complete fundamental availability. Full filing extraction remains
+the independent coverage process. Prior-split and security verification remain
+entry requirements.
+
+Price evaluation is serialized and quote-triggered, with a one-second fallback;
+source polling targets 15 seconds independently of filing work. Business Wire
+joins the configured SEC, PR Newswire and GlobeNewswire feeds. A blocked
+publisher article may use only its identified primary RSS excerpt and still
+requires issuer, ratio and date verification. Reconciliation stays a recovery
+path and does not establish the first public release time. `/shadow/readiness`
+and `/prepared` are owner-only views. Daily validation v3 archives complete raw
+sessions before scheduling the next full exchange session; November 5 v2 stays
+unchanged and downloadable.
+
+The 900-second original entry expiry is not a waiting period. Eliminating
+actual latency requires continuous collection, prepared inputs, measured feed
+delivery and eventually direct publisher/licensed news delivery where public
+feeds prove late. Same-day financial filing availability is still the inherited
+next-Eastern-day rule. Any timestamp-aware same-day alternative must be a
+separate prospective policy, never a rewrite of original results. A 30/60/300s
+entry-delay and 10/25/50/100bps cost sensitivity audit is required in the review;
+those scenarios do not become measured results merely because they are in
+the plan. Mini quotes cannot measure market impact, queue position, full-market
+NBBO, recalls or guaranteed loan availability.
+

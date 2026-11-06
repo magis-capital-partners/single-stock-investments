@@ -1,0 +1,11 @@
+// Captured with the durable checkpoint, so dashboard evidence refers to committed state.
+export function readinessSnapshot(db,now=new Date().toISOString()){
+  const state=key=>JSON.parse(db.prepare('SELECT value FROM rs_state WHERE key=?').get(key)?.value||'null'),runtime=state('shadow_runtime'),review=state('shadow_review_summary'),prepared=state('prepared_summary'),at=Date.parse(now);
+  const sources=db.prepare('SELECT * FROM rs_sources').all().map(s=>({...s,age_seconds:s.last_success?Math.max(0,(at-Date.parse(s.last_success))/1000):null,fresh:!!s.last_success&&at-Date.parse(s.last_success)<(/sec-(10|20|40)/.test(s.id)?600000:120000)}));
+  const unresolved=db.prepare('SELECT source_id,count(*) AS count,min(start_at) AS oldest FROM rs_source_gaps WHERE resolved_at IS NULL GROUP BY source_id').all(),jobs=db.prepare('SELECT state,count(*) AS count,min(created_at) AS oldest FROM rs_jobs GROUP BY state').all();
+  const values=db.prepare('SELECT payload FROM rs_events WHERE first_seen_at>=?').all(new Date(at-7*86400000).toISOString()).map(r=>JSON.parse(r.payload));
+  const percentile=key=>{const a=values.filter(v=>key!=='source_delay_seconds'||v.publication_clock==='timestamp').map(v=>v[key]).filter(Number.isFinite).sort((a,b)=>a-b);return a.length?a[Math.floor((a.length-1)*.95)]:null;};
+  return {generated_at:now,status:!runtime?.heartbeat_at||at-Date.parse(runtime.heartbeat_at)>180000?'collector_stale':sources.some(s=>!s.fresh||s.status!=='healthy')||unresolved.length||jobs.some(j=>j.state==='failed')?'needs_attention':'tracking',sources,unresolved_source_gaps:unresolved,jobs,prepared,review,
+    latency:{source_to_receipt_p95_seconds:percentile('source_delay_seconds'),receipt_to_filters_p95_seconds:percentile('latency_seconds'),observations:values.length,clock_note:'Publication-to-receipt includes upstream delay. Daily-index dates are conservative availability dates, not measured release timestamps.'},
+    scope:'Configured public publisher feeds and SEC filings; completeness of all first public announcements is not established.',entry_expiry_seconds:900,entry_expiry_is_wait:false,broker_connections:0,orders:0,research_only:true,authority:'none'};
+}

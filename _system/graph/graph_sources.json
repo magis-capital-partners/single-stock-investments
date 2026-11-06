@@ -463,6 +463,26 @@
         "11,41 * * * *"
       ],
       "freshness_hours": 7
+    },
+    {
+      "name": "reverse-split-broad-preparation",
+      "workflow_file": "reverse-split-preparation.yml",
+      "job": "prepare",
+      "work_step": "Prepare the SEC-listed financial universe",
+      "cadence_cron": [
+        "17 9 * * *"
+      ],
+      "freshness_hours": 54
+    },
+    {
+      "name": "reverse-split-shadow-review",
+      "workflow_file": "reverse-split-review.yml",
+      "job": "review",
+      "work_step": "Check the independent shadow evidence",
+      "cadence_cron": [
+        "17,47 13-22 * * 1-5"
+      ],
+      "freshness_hours": 70
     }
   ],
   "unmonitored_workflows": {},

@@ -1,0 +1,29 @@
+name: Reverse-split shadow review
+on:
+  repository_dispatch:
+    types: [reverse-split-review-now]
+  schedule:
+    # November observation window, 08:17-17:47 New York time; runner delays are measured.
+    - cron: '17,47 13-22 * * 1-5'
+permissions:
+  contents: read
+concurrency:
+  group: reverse-split-shadow-review
+  cancel-in-progress: false
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: dashboard/cloudflare/reverse-split-live
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check the independent shadow evidence
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node dashboard/cloudflare/reverse-split-live/review-monitor.mjs

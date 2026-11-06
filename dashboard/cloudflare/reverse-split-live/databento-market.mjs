@@ -4,9 +4,9 @@ import {fileURLToPath} from 'node:url';
 import {createInterface} from 'node:readline';
 import {at} from './shadow-core.mjs';
 
-export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>new Date().toISOString(),python=process.env.PYTHON||'python'}={}){
+export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>new Date().toISOString(),python=process.env.PYTHON||(process.platform==='win32'?'python':'python3')}={}){
   const health={provider:'Databento Equities Mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',status:key?'not_checked':'not_configured',quote_access:'unverified',nbbo_access:'unverified',last_success:null,last_heartbeat:null,error:null,subscriptions:0};
-  const latest=new Map(),symbols=new Set(),telemetry=[],sampleWindows=new Map();let child,closed=false,lines,dropped=0;
+  const latest=new Map(),symbols=new Set(),telemetry=[],sampleWindows=new Map(),listeners=new Set();let child,closed=false,lines,dropped=0;
   function clear(status){latest.clear();health.status=status;health.quote_access=status==='not_entitled'?'not_entitled':'unavailable';}
   function accept(row){
     if(row.kind==='health'){
@@ -24,6 +24,7 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     // quote at a later poll. Otherwise processing latency would look falsely low.
     const window=Math.floor(received/5000);
     if(['AAPL','SPY','IWM'].includes(row.ticker)&&sampleWindows.get(row.ticker)!==window){sampleWindows.set(row.ticker,window);if(telemetry.length<2048)telemetry.push({...row});else dropped++;}
+    for(const listener of listeners)try{listener(row.ticker);}catch{}
   }
   function start(){
     if(child||closed||!key)return;
@@ -47,6 +48,7 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
   }
   return {
     health,activePolicy:key?'rs_immediate_mini.v1':'rs_immediate.v1',
+    onQuote(listener){listeners.add(listener);return ()=>listeners.delete(listener);},
     observe(ticker){if(!['AAPL','SPY','IWM'].includes(ticker))return miniQuote(ticker);return miniQuote(ticker,true);},
     drainTelemetry(){const result={samples:telemetry.splice(0),dropped};dropped=0;return result;},
     async quote(ticker,policy){
@@ -56,6 +58,6 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
       return reference.quote(ticker);
     },
     news:()=>reference.news(),actions:(...args)=>reference.actions(...args),
-    close(){closed=true;latest.clear();if(child){child.stdin.end(JSON.stringify({kind:'stop'})+'\n');const timer=setTimeout(()=>child.kill(),3000);timer.unref();child.once('exit',()=>clearTimeout(timer));lines?.close();}},
+    close(){closed=true;latest.clear();listeners.clear();if(child){child.stdin.end(JSON.stringify({kind:'stop'})+'\n');const timer=setTimeout(()=>child.kill(),3000);timer.unref();child.once('exit',()=>clearTimeout(timer));lines?.close();}},
   };
 }

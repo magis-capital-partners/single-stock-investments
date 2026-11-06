@@ -16,8 +16,10 @@ export function parseFeed(xml,source){
     const url=/<link\b[^>]*href=["']([^"']+)["']/i.exec(body)?.[1]||field(body,'link');
     const cik=/\bCIK=(\d+)/i.exec(url)?.[1]||/\/edgar\/data\/(\d+)\//i.exec(url)?.[1]||/CIK[:= ]+(\d+)/i.exec(body)?.[1];
     const accession=/\b(\d{10}-\d{2}-\d{6})\b/.exec(body)?.[1];
-    const title=plain(field(body,'title'));
-    return {source,url:decode(url),title,published_at:iso(field(body,'published')||field(body,'updated')||field(body,'pubDate')),cik:cik?String(Number(cik)):null,accession,form:/^(8-K(?:\/A)?|6-K(?:\/A)?|10-[KQ](?:\/A)?|20-F(?:\/A)?|40-F(?:\/A)?|DEF\s?14[AC]|PRE\s?14[AC])\s*-/i.exec(title)?.[1]?.replace(/\s/g,'')||null};
+    const title=plain(field(body,'title'));let link=decode(url);
+    if(source==='businesswire'&&/^http:\/\/(?:www\.)?businesswire\.com\//i.test(link))link=link.replace(/^http:/i,'https:');
+    if(source==='businesswire')try{const canonical=new URL(link);canonical.searchParams.delete('feedref');link=canonical.href;}catch{}
+    return {source,url:link,title,excerpt:plain(field(body,'description')||field(body,'summary')||field(body,'content')).slice(0,64000),published_at:iso(field(body,'published')||field(body,'updated')||field(body,'pubDate')),cik:cik?String(Number(cik)):null,accession,form:/^(8-K(?:\/A)?|6-K(?:\/A)?|10-[KQ](?:\/A)?|20-F(?:\/A)?|40-F(?:\/A)?|DEF\s?14[AC]|PRE\s?14[AC])\s*-/i.exec(title)?.[1]?.replace(/\s/g,'')||null};
   }).filter(x=>/^https:\/\//.test(x.url));
 }
 const SPLIT=/reverse[\s-]+(?:stock[\s-]+|share[\s-]+)?split|share consolidation|consolidation of.{0,30}shares/i;
