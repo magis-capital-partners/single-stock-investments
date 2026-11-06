@@ -12,6 +12,7 @@ import {makeDatabentoMarket} from './databento-market.mjs';
 import {initializeShadow,shadowTick,putState} from './shadow-service.mjs';
 import {watchCollector} from './watch.mjs';
 import {recoverWatch} from './recovery.mjs';
+import {extractAnnouncementText} from './announcement-text.mjs';
 
 export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,cadence=300,maxJobs=40,evidenceInterval=500}={}){
   if(!token||!account||!database||!bucket)throw new Error('Collector requires configured Cloudflare credentials and isolated research resources');
@@ -34,7 +35,7 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
     async put(key,bytes,options={}){await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':options.httpMetadata?.contentType||'application/octet-stream'},body:bytes});},
     async get(key,{signal,urgent=false}={}){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal,urgent},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
   };
-  return {DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};
+  return {DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},extractAnnouncementText,ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};
 }
 
 export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){

@@ -339,3 +339,15 @@ those scenarios do not become measured results merely because they are in
 the plan. Mini quotes cannot measure market impact, queue position, full-market
 NBBO, recalls or guaranteed loan availability.
 
+Oversized SEC submission bundles and embedded PDF exhibits use the official,
+CIK/accession-bound filing index. The collector downloads only the primary
+report and EX-99 disclosures (at most twelve documents, 24 MiB each and 48 MiB
+in aggregate). Each captured document keeps its actual URL/hash. Pinned
+PyMuPDF extracts bounded selectable PDF text in a credential-free child;
+scanned, encrypted, over-limit and unreadable documents stay unresolved.
+The new reader reopens previous size-limit failures once, preserving their
+original filing/receipt clocks. Historical discoveries cannot gain forward
+fills. SEC catch-up includes unresolved gaps within the last month, archives
+the retrieved daily-index proof and never closes publisher gaps from filing
+indexes. Source/quote work remains independent of this historical queue.
+

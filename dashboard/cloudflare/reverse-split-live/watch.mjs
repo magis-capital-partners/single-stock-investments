@@ -41,7 +41,7 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,sleep=m
       if(!stopping&&count!==lastRecordCount&&Date.now()-lastSaved>=5000&&!evaluationSavePending){evaluationSavePending=true;save().then(()=>{lastRecordCount=count;}).catch(error=>console.error(JSON.stringify({event:'quote_checkpoint_deferred',error:error.message}))).finally(()=>{evaluationSavePending=false;});}
     }});unsubscribe=env.market?.onQuote?.(ticker=>evaluation.notify(ticker));evaluationTimer=setInterval(()=>{if(!stopping)evaluation.notify(null);},1000);
     const lastTick=(await env.DB.prepare("SELECT value FROM rs_state WHERE key='last_completed_tick'").first())?.value;
-    if(needsStartupReconciliation(lastTick))await enqueue(env,'reconcile',{day:etDay(now())},1,'startup-gap:'+etDay(now())+':'+lastTick);
+    const sourceGap=await env.DB.prepare("SELECT id FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id LIKE 'sec-%' LIMIT 1").first();if(needsStartupReconciliation(lastTick)||sourceGap)await enqueue(env,'reconcile',{day:etDay(now())},12,'startup-gap:'+etDay(now())+':'+lastTick);
     env.onShadowDecision=async event=>{
       const enrolled=await env.DB.prepare("SELECT state,payload FROM rs_shadow_tracks WHERE event_id=? UNION ALL SELECT state,payload FROM rs_execution_tracks WHERE event_id=?").bind(event.id,event.id).all();
       if(enrolled.results.length&&enrolled.results.every(r=>r.state==='retrospective'&&!JSON.parse(r.payload).entry_shares))return;
