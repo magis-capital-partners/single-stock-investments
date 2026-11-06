@@ -6,6 +6,8 @@ import {createHash} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 export const hash=v=>createHash('sha256').update(v).digest('hex');
+export const isSourceCooldown=e=>e?.code==='FINANCIAL_SOURCE_COOLDOWN'||[403,429].includes(e?.status)||/^Financial source (?:is in backoff|HTTP (?:403|429))$/.test(e?.message||e?.reason||'');
+const cooldownError=retryAt=>Object.assign(new Error('Financial source is in backoff'),{code:'FINANCIAL_SOURCE_COOLDOWN',retryAt});
 export function publicAddress(ip){
   if(isIP(ip)===4){const [a,b,c]=ip.split('.').map(Number);return !(a===0||a===10||a===127||a>=224||(a===169&&b===254)||(a===172&&b>=16&&b<=31)||(a===192&&b===168)||(a===100&&b>=64&&b<=127)||(a===198&&[18,19].includes(b))||(a===192&&b===0)||(a===198&&b===51&&c===100)||(a===203&&b===0&&c===113));}
   if(isIP(ip)!==6)return false;
@@ -41,9 +43,9 @@ export class FinancialSources {
   async get(url,{origins=[],mutable=false,maximum=24000000,refresh=false}={}){
     primaryURL(url,origins);const cacheKey='financials/http/'+hash(url)+'.json';const saved=await this.env.EVIDENCE.get(cacheKey),old=saved?await saved.json():null;
     if(old&&(!mutable||(!refresh&&Date.now()-Date.parse(old.captured_at)<3600000)||this.offline)){const object=await this.env.EVIDENCE.get(old.object_key);if(object){const bytes=Buffer.from(await object.arrayBuffer());if(bytes.length<=maximum&&hash(bytes)===old.sha256)return {...old,bytes};}}
-    if(this.offline)throw new Error('Financial source is not cached');if(Date.now()<this.cooldown)throw new Error('Financial source is in backoff');
+    if(this.offline)throw new Error('Financial source is not cached');if(Date.now()<this.cooldown)throw cooldownError(this.cooldown);
     const wait=async()=>{await new Promise(r=>setTimeout(r,Math.max(0,this.interval-(Date.now()-this.last))));this.last=Date.now();this.requests++;};
-    let doc;try{doc=await fetchPrimary(url,{origins,maximum,wait});}catch(e){if([403,429].includes(e.status))this.cooldown=Date.now()+Math.max(300000,Math.min(3600000,(e.retryAfter||300)*1000));throw e;}
+    let doc;try{doc=await fetchPrimary(url,{origins,maximum,wait});}catch(e){if([403,429].includes(e.status)){this.cooldown=Date.now()+Math.max(300000,Math.min(3600000,(e.retryAfter||300)*1000));e.code='FINANCIAL_SOURCE_COOLDOWN';e.retryAt=this.cooldown;}throw e;}
     const record={url:doc.url,sha256:doc.sha256,object_key:'documents/'+doc.sha256,captured_at:new Date().toISOString(),bytes:doc.bytes.length,content_type:doc.headers['content-type']||'application/octet-stream'};
     await this.env.EVIDENCE.put(record.object_key,doc.bytes,{httpMetadata:{contentType:record.content_type}});await this.env.EVIDENCE.put(cacheKey,new TextEncoder().encode(JSON.stringify(record)),{httpMetadata:{contentType:'application/json'}});return {...record,bytes:doc.bytes};
   }
