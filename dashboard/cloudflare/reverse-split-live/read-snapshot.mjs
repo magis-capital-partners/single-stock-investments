@@ -45,8 +45,9 @@ export async function readSnapshotAPI(url,env){
   let before;try{before=cursor(url.searchParams.get('before'),['9999','']);}catch{return json({error:'Invalid shadow cursor'},400);}
   const cardKey='cards/'+(executable?'execution':'shadow'),policyCards=policy?await read(env,cardKey+'/policy/'+await keyId(policy)+'.json'):null;
   const live=(policyCards||await read(env,cardKey+'.json')||[]).filter(r=>(!policy||r.policy_id===policy)&&(!state||r.state===state)&&(!q||[r.ticker,r.cik].some(v=>String(v||'').toUpperCase().includes(q))));
-  const table=executable?'rs_execution_tracks':'rs_shadow_tracks',afterId=(url.searchParams.get('after')||'').slice(0,400),params=[...(executable?[afterId]:[before[0],before[0],before[1]]),...(policy?[policy]:[]),...(q?['%'+q+'%']:[]),limit+1];
-  const sql=`SELECT payload FROM ${table} WHERE state='retrospective' AND `+(executable?'id>?':'(enrolled_at<? OR (enrolled_at=? AND id>?))')+(policy?' AND policy_id=?':'')+(q?" AND UPPER(COALESCE(ticker,'')) LIKE ?":'')+(executable?' ORDER BY id':' ORDER BY enrolled_at DESC,id')+' LIMIT ?';
+  const table=executable?'rs_execution_tracks':'rs_shadow_tracks',afterId=(url.searchParams.get('after')||'').slice(0,400),params=[...(executable?[afterId]:[before[0],before[0],before[0],before[1]]),...(policy?[policy]:[]),...(q?['%'+q+'%']:[]),limit+1];
+  // The redundant enrolled_at<=? bound lets later pages seek rs_shadow_retrospective_page instead of stepping past newer rows.
+  const sql=`SELECT payload FROM ${table} WHERE state='retrospective' AND `+(executable?'id>?':'enrolled_at<=? AND (enrolled_at<? OR (enrolled_at=? AND id>?))')+(policy?' AND policy_id=?':'')+(q?" AND UPPER(COALESCE(ticker,'')) LIKE ?":'')+(executable?' ORDER BY id':' ORDER BY enrolled_at DESC,id')+' LIMIT ?';
   const historical=state&&state!=='retrospective'?[]:(await env.DB.prepare(sql).bind(...params).all()).results.map(r=>JSON.parse(r.payload));
   const filtered=[...live,...historical].filter(r=>(!state||r.state===state)&&(!q||[r.ticker,r.cik].some(v=>String(v||'').toUpperCase().includes(q)))&&(executable?r.id>afterId:(r.enrolled_at<before[0]||(r.enrolled_at===before[0]&&r.id>before[1]))));
   filtered.sort(executable?(a,b)=>a.id<b.id?-1:a.id>b.id?1:0:(a,b)=>a.enrolled_at===b.enrolled_at?(a.id<b.id?-1:1):a.enrolled_at>b.enrolled_at?-1:1);
