@@ -1,6 +1,6 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-05",
+  "as_of": "2026-11-06",
   "summary": {
     "companies": 873,
     "statuses": {
@@ -8,17 +8,17 @@
       "reviewed": 1
     },
     "blocker_companies": {
-      "issuer_forecast_missing": 136,
       "parent_cashflow_attribution_missing": 40,
-      "positive_normalized_owner_cash_not_established": 109,
+      "issuer_forecast_missing": 136,
       "pre_listing_share_basis_unverified": 101,
+      "positive_normalized_owner_cash_not_established": 109,
       "realization_timing_missing": 16,
-      "completed_session_quote_missing": 29,
-      "annual_capex_missing": 72,
       "annual_diluted_share_count_missing": 50,
+      "annual_capex_missing": 72,
       "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 440,
       "source_share_basis_unverified": 56,
+      "completed_session_quote_missing": 29,
       "newer_balance_sheet_inputs_available": 221,
       "financial_inputs_expired_or_undated": 22,
       "new_earnings_disclosure_unresolved": 13,
@@ -69,19 +69,6 @@
       "current_model_basis": "issuer_valuation",
       "blockers": [
         "realization_timing_missing"
-      ],
-      "last_attempt": null,
-      "retry_after": null,
-      "underwriting_gaps": [],
-      "unresolved_findings": []
-    },
-    {
-      "ticker": "RMS.PA",
-      "company": "Hermès International",
-      "status": "needs_underwriting",
-      "current_model_basis": "automatic_operating_first_pass",
-      "blockers": [
-        "completed_session_quote_missing"
       ],
       "last_attempt": null,
       "retry_after": null,
@@ -12153,6 +12140,24 @@
         {
           "code": "ContractError",
           "detail": "ordinary_shares_require_verified_listing_ratio"
+        }
+      ],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "RMS.PA",
+      "company": "Hermès International",
+      "status": "needs_underwriting",
+      "current_model_basis": "automatic_operating_first_pass",
+      "blockers": [
+        "completed_session_quote_missing"
+      ],
+      "last_attempt": "2026-11-06T07:03:41.712243+00:00",
+      "retry_after": "2026-11-07",
+      "underwriting_gaps": [
+        {
+          "code": "ContractError",
+          "detail": "Sourced primary financials and a verified share count are required"
         }
       ],
       "unresolved_findings": []
