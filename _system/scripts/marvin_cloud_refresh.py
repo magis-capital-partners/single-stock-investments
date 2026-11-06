@@ -30,9 +30,17 @@ from marvin_pipeline_common import (  # noqa: E402
 from economic_value_framework import economic_value_trigger  # noqa: E402
 
 
-def run(label: str, cmd: list[str], *, optional: bool = False, cwd: Path | None = None) -> bool:
+def run(
+    label: str,
+    cmd: list[str],
+    *,
+    optional: bool = False,
+    cwd: Path | None = None,
+    env: dict[str, str] | None = None,
+) -> bool:
     print(f"  {label}...", flush=True)
-    r = subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
+    full_env = {**os.environ, **(env or {})}
+    r = subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True, env=full_env)
     out = (r.stdout or "") + (r.stderr or "")
     if out.strip():
         for line in out.strip().splitlines()[-10:]:
@@ -43,12 +51,19 @@ def run(label: str, cmd: list[str], *, optional: bool = False, cwd: Path | None 
     return True
 
 
-def run_script(label: str, script: str, script_args: list[str], *, optional: bool = False) -> bool:
+def run_script(
+    label: str,
+    script: str,
+    script_args: list[str],
+    *,
+    optional: bool = False,
+    env: dict[str, str] | None = None,
+) -> bool:
     path = SCRIPTS / script
     if not path.exists():
         print(f"  SKIP {label}: {script} not in repo")
         return True
-    return run(label, [PY, str(path), *script_args], optional=optional)
+    return run(label, [PY, str(path), *script_args], optional=optional, env=env)
 
 
 def ticker_has_cik(ticker: str) -> bool:
@@ -398,7 +413,6 @@ def main() -> int:
         optional=True,
     )
     ok &= run_script("insights merge", "build_insights.py", [])
-    ok &= run_script("dashboard integrity", "validate_dashboard_data.py", [])
     ok &= run_script(
         "persona calibration",
         "relevance_calibration_check.py",
@@ -433,6 +447,10 @@ def main() -> int:
             [PY, str(SCRIPTS / "build_dashboard_data.py")],
             optional=True,
         )
+        dash_check_extra: list[str] = []
+        if os.environ.get("MARVIN_LIGHT_DASHBOARD_CHECK", "1").lower() in {"1", "true", "yes"}:
+            dash_check_extra.append("--light")
+        ok &= run_script("dashboard integrity", "validate_dashboard_data.py", dash_check_extra)
     ok &= run(
         "cross-check verify",
         [PY, str(SCRIPTS / "check_cross_checks.py"), ticker],

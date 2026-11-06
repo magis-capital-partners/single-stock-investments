@@ -3460,7 +3460,10 @@ def build_source_health(
     sumzero_summary = (sumzero_doc or {}).get("summary") if isinstance(sumzero_doc, dict) else {}
     sumzero_archive = (sumzero_doc or {}).get("archive") if isinstance(sumzero_doc, dict) else {}
     registry_summary = (registry_doc or {}).get("summary") if isinstance(registry_doc, dict) else {}
-    drive_audit_summary = (drive_audit_doc or {}).get("summary") if isinstance(drive_audit_doc, dict) else {}
+    drive_audit_summary: dict = {}
+    if isinstance(drive_audit_doc, dict):
+        _ds = drive_audit_doc.get("summary")
+        drive_audit_summary = _ds if isinstance(_ds, dict) else {}
     filing_files = latest_filing_fact_files()
     kpi_trends_doc = load_json(KPI_TRENDS_PATH)
     if not isinstance(kpi_trends_doc, dict):

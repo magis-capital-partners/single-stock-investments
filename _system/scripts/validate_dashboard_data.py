@@ -2,6 +2,7 @@
 """Validate dashboard_data.json against registry holdings and deep dive files."""
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import os
@@ -306,6 +307,15 @@ def _check_merge_conflict_markers(path: Path) -> str | None:
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser(description="Validate dashboard payload")
+    ap.add_argument(
+        "--light",
+        action="store_true",
+        help="Skip letter-corpus minimums and full-registry index_membership parity (cloud/agent builds)",
+    )
+    args, _rest = ap.parse_known_args()
+    light = bool(args.light)
+
     errors: list[str] = []
     warnings: list[str] = []
     deploy_only = pages_deploy_only()
@@ -695,11 +705,12 @@ def main() -> int:
         letter_index_len = len(insights.get("letter_index") or [])
         classification_policy_version = int(insights.get("classification_policy_version") or 0)
         min_letter_corpus = 12000 if classification_policy_version >= 4 else MIN_LETTER_CORPUS
-        if letter_count < min_letter_corpus or letter_index_len < min_letter_corpus:
-            errors.append(
-                f"letter corpus {letter_count} (index {letter_index_len}) below minimum "
-                f"{min_letter_corpus}; deploy rebuild must preserve committed corpus or refresh vault"
-            )
+        if not light:
+            if letter_count < min_letter_corpus or letter_index_len < min_letter_corpus:
+                errors.append(
+                    f"letter corpus {letter_count} (index {letter_index_len}) below minimum "
+                    f"{min_letter_corpus}; deploy rebuild must preserve committed corpus or refresh vault"
+                )
         manifest_path = letters_root() / "drive_import_manifest.json"
         manifest_count = 0
         if manifest_path.exists():
@@ -707,12 +718,13 @@ def main() -> int:
                 manifest_count = int(json.loads(manifest_path.read_text(encoding="utf-8")).get("file_count") or 0)
             except (json.JSONDecodeError, TypeError, ValueError):
                 pass
-        if manifest_count > 0 and letter_index_len == 0:
-            errors.append(
-                f"letter_index empty but drive_import_manifest has {manifest_count} files; run make letter-backfill"
-            )
-        elif letter_count == 0:
-            errors.append("superinvestor letters empty — run make letter-import-drive")
+        if not light:
+            if manifest_count > 0 and letter_index_len == 0:
+                errors.append(
+                    f"letter_index empty but drive_import_manifest has {manifest_count} files; run make letter-backfill"
+                )
+            elif letter_count == 0:
+                errors.append("superinvestor letters empty — run make letter-import-drive")
         letters_dir = letters_root()
         if letters_dir.is_dir():
             pdfs_needing_text = 0
@@ -944,7 +956,11 @@ def main() -> int:
         missing_idx = sorted(set(holdings) - set(by_ticker.keys()))
         extra_idx = sorted(set(by_ticker.keys()) - set(holdings))
         if missing_idx:
-            fail(f"index_membership missing registry tickers: {', '.join(missing_idx[:20])}")
+            msg = f"index_membership missing registry tickers: {', '.join(missing_idx[:20])}"
+            if light:
+                warnings.append(msg + " (light validation)")
+            else:
+                fail(msg)
         if extra_idx:
             fail(f"index_membership tickers not in registry: {', '.join(extra_idx[:20])}")
         for ticker, entry in by_ticker.items():

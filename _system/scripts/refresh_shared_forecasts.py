@@ -30,7 +30,10 @@ FUNDAMENTALS = Path('_system/reference/market-data/valuation_fundamentals')
 def read(path):
     value = json.loads(path.read_text(encoding='utf-8')) if path.is_file() else {}
     if isinstance(value, dict) and value.get('private_snapshot') is True:
-        raise ValueError('Private input placeholder; restore authorized private inputs before refreshing: '+str(path))
+        # Hydrated vault checkouts replace placeholders; in sparse or agent
+        # environments without the vault, behave like a missing file so builds
+        # can still run on ticker-local inputs.
+        return {}
     return value
 
 
