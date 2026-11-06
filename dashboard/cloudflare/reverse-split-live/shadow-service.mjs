@@ -98,7 +98,7 @@ export async function shadowTick(env,options={}){
   const now=options.now||stamp(),event=options.event||null;
   if(env.SHADOW_ENABLED!=='true')return;
   if(event)await enrollShadow(env,event,now);
-  else for(const r of (await env.DB.prepare("SELECT e.payload FROM rs_events e LEFT JOIN rs_shadow_enrollments s ON s.event_id=e.id WHERE s.event_id IS NULL OR s.processed_at<? OR COALESCE(e.analyzed_at,e.first_seen_at)>s.event_at OR (s.processed_at<? AND EXISTS(SELECT 1 FROM rs_shadow_tracks t WHERE t.event_id=e.id AND t.state='waiting')) ORDER BY e.first_seen_at DESC LIMIT 200").bind(await getState(env,'shadow_policy_registered_at')||'',iso(at(now)-60000)).all()).results)await enrollShadow(env,parse(r),now);
+  else if(!options.pricesOnly)for(const r of (await env.DB.prepare("SELECT e.payload FROM rs_events e LEFT JOIN rs_shadow_enrollments s ON s.event_id=e.id WHERE s.event_id IS NULL OR s.processed_at<? OR COALESCE(e.analyzed_at,e.first_seen_at)>s.event_at OR (s.processed_at<? AND EXISTS(SELECT 1 FROM rs_shadow_tracks t WHERE t.event_id=e.id AND t.state='waiting')) ORDER BY e.first_seen_at DESC LIMIT 200").bind(await getState(env,'shadow_policy_registered_at')||'',iso(at(now)-60000)).all()).results)await enrollShadow(env,parse(r),now);
   const rows=(await env.DB.prepare("SELECT payload FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') ORDER BY CASE WHEN state='exit_pending' THEN 0 ELSE 1 END,due_at LIMIT 250").all()).results.map(parse),quotes=new Map(),actionCache=new Map();
   for(const t of rows){
     if(!t.ticker||at(t.due_at)>at(now))continue;
@@ -117,7 +117,7 @@ export async function shadowTick(env,options={}){
     }
     await processShadowTrack(env,t,q,rows,options.now?now:stamp(),actions);
   }
-  await summarizeShadow(env,now);
+  if(!options.pricesOnly)await summarizeShadow(env,now);
 }
 export async function summarizeShadow(env,now=stamp()){
   const tracks=(await env.DB.prepare('SELECT payload FROM rs_shadow_tracks').all()).results.map(parse),policies=[];

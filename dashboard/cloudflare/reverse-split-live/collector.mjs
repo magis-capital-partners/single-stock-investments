@@ -4,6 +4,7 @@
 import {pathToFileURL} from 'node:url';
 import {appendFileSync} from 'node:fs';
 import {parseArgs} from 'node:util';
+import {setTimeout as delay} from 'node:timers/promises';
 import {scheduled,dispatch,consume} from './worker.mjs';
 import {openCheckpoint} from './checkpoint.mjs';
 import {makeMarketData} from './market-data.mjs';
@@ -18,9 +19,10 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
   let evidenceSlot=0;
   async function request(path,options={},allowMissing=false){
     for(let attempt=0;attempt<4;attempt++){
-      if(path.startsWith('/r2/')){const slot=Math.max(Date.now(),evidenceSlot);evidenceSlot=slot+evidenceInterval;await new Promise(r=>setTimeout(r,Math.max(0,slot-Date.now())));}
-      const r=await fetcher(base+path,{...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(45000)});
-      if(r.status===429&&attempt<3){const delay=Math.max(5,Math.min(120,Number(r.headers.get('retry-after'))||30));await r.body?.cancel();await new Promise(resolve=>setTimeout(resolve,delay*1000));continue;}
+      if(path.startsWith('/r2/')&&!options.urgent){const slot=Math.max(Date.now(),evidenceSlot);evidenceSlot=slot+evidenceInterval;await delay(Math.max(0,slot-Date.now()),undefined,{signal:options.signal});}
+      options.signal?.throwIfAborted();const signal=options.signal?AbortSignal.any([options.signal,AbortSignal.timeout(45000)]):AbortSignal.timeout(45000);
+      const {urgent,...requestOptions}=options;const r=await fetcher(base+path,{...requestOptions,headers:{...headers,...options.headers},signal});
+      if(r.status===429&&attempt<3){const seconds=Math.max(5,Math.min(120,Number(r.headers.get('retry-after'))||30));await r.body?.cancel();await delay(seconds*1000,undefined,{signal:options.signal});continue;}
       if(!r.ok&&!(allowMissing&&r.status===404)){await r.body?.cancel();throw new Error(`Research storage HTTP ${r.status}`);}return r;
     }
   }
@@ -30,7 +32,7 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
   const prefix=`/r2/buckets/${encodeURIComponent(bucket)}/objects/`;
   const EVIDENCE={
     async put(key,bytes,options={}){await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':options.httpMetadata?.contentType||'application/octet-stream'},body:bytes});},
-    async get(key){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
+    async get(key,{signal,urgent=false}={}){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal,urgent},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
   };
   return {DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};
 }
@@ -73,8 +75,8 @@ export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){
 }
 
 async function main(){
-  const {values}=parseArgs({options:{watch:{type:'boolean',default:false},interval:{type:'string',default:'15'},'run-minutes':{type:'string',default:'300'},'max-jobs':{type:'string',default:'40'},reconcile:{type:'boolean',default:false}}});
-  const cadence=Math.max(15,Number(values.interval)||15),env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:process.env.CLOUDFLARE_ACCOUNT_ID||'e1cac493b315c8fd7398500dd1bfd687',database:process.env.REVERSE_SPLIT_DATABASE_ID||'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:process.env.REVERSE_SPLIT_EVIDENCE_BUCKET||'single-stock-reverse-splits-evidence',cadence:values.watch?cadence:300,maxJobs:Math.min(150,Math.max(1,Number(values['max-jobs'])||40))});
+  const {values}=parseArgs({options:{watch:{type:'boolean',default:false},interval:{type:'string',default:'1'},'run-minutes':{type:'string',default:'300'},'max-jobs':{type:'string',default:'40'},reconcile:{type:'boolean',default:false}}});
+  const cadence=Math.max(1,Number(values.interval)||1),env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:process.env.CLOUDFLARE_ACCOUNT_ID||'e1cac493b315c8fd7398500dd1bfd687',database:process.env.REVERSE_SPLIT_DATABASE_ID||'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:process.env.REVERSE_SPLIT_EVIDENCE_BUCKET||'single-stock-reverse-splits-evidence',cadence:values.watch?cadence:300,maxJobs:Math.min(150,Math.max(1,Number(values['max-jobs'])||40))});
   const reference=makeMarketData({key:process.env.MASSIVE_API_KEY||process.env.POLYGON_API_KEY});
   env.market=process.env.DATABENTO_API_KEY?makeDatabentoMarket({key:process.env.DATABENTO_API_KEY,reference}):reference;
   let stopRequested=false;const stop=()=>{stopRequested=true;};

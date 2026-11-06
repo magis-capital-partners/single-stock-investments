@@ -1,0 +1,33 @@
+name: Reverse-split broad financial preparation
+on:
+  repository_dispatch:
+    types: [reverse-split-prepare-now]
+  schedule:
+    - cron: '17 9 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: reverse-split-broad-preparation
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: dashboard/cloudflare/reverse-split-live
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests
+      - name: Prepare the SEC-listed financial universe
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: node dashboard/cloudflare/reverse-split-live/prepare-universe.mjs

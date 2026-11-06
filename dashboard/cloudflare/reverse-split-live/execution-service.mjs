@@ -95,13 +95,13 @@ export async function processExecution(env,t,q,peers,borrowRows,evidence,now=sta
   t.reason=reason||'marked';accrueBorrow(t,borrowRows,now);t.pnl=executionPnl(t);t.entry_deterioration_bps=t.entry_shares?10000*(1-t.entry_price/t.arrival_mid):null;
   if(JSON.stringify(t)!==before){await save(env,t,now);const old=JSON.parse(before);if(JSON.stringify(old.borrow_ledger)!==JSON.stringify(t.borrow_ledger))await audit(env,t,'borrow_accrual',now,{borrow_ledger:t.borrow_ledger});if(t.reason!==old.reason)await audit(env,t,'status',now,{state:t.state,reason:t.reason,gates:t.gates});}return t;
 }
-export async function executionTick(env,{now=stamp(),event}={}){
+export async function executionTick(env,{now=stamp(),event,pricesOnly=false}={}){
   if(env.SHADOW_ENABLED!=='true')return;
   if(event)await enrollExecution(env,event,now);
-  else{
+  else if(!pricesOnly){
     for(const r of (await env.DB.prepare('SELECT payload FROM rs_events').all()).results){const e=parse(r),key='execution_enrolled:'+e.id,value=e.analyzed_at||e.first_seen_at,old=await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(key).first(),waiting=await env.DB.prepare("SELECT id FROM rs_execution_tracks WHERE event_id=? AND state='waiting' LIMIT 1").bind(e.id).first();if(old?.value!==JSON.stringify(value)||waiting){await enrollExecution(env,e,now);await putState(env,key,value,now);}}
   }
-  const tracks=(await env.DB.prepare('SELECT payload FROM rs_execution_tracks').all()).results.map(parse),quotes=new Map(),borrows=new Map(),evidenceCache=new Map(),actions=new Map();
+  const tracks=(await env.DB.prepare('SELECT payload FROM rs_execution_tracks'+(pricesOnly?" WHERE state IN ('armed','partial_entry','open','exit_pending')":'')).all()).results.map(parse),quotes=new Map(),borrows=new Map(),evidenceCache=new Map(),actions=new Map();
   for(const t of tracks.filter(t=>['armed','partial_entry','open','exit_pending','closed'].includes(t.state))){
     if(!borrows.has(t.ticker))borrows.set(t.ticker,(await env.DB.prepare('SELECT payload FROM rs_borrow_observations WHERE ticker=? ORDER BY day DESC,observed_at DESC LIMIT 1500').bind(t.ticker).all()).results.map(parse));
     if(!evidenceCache.has(t.event_id))evidenceCache.set(t.event_id,(await env.DB.prepare('SELECT payload FROM rs_shadow_evidence WHERE event_id=? ORDER BY observed_at DESC LIMIT 500').bind(t.event_id).all()).results.map(parse));
@@ -109,6 +109,7 @@ export async function executionTick(env,{now=stamp(),event}={}){
     if(t.remaining_shares&&t.effective_date<=etDay(now)&&!actions.has(t.ticker))try{actions.set(t.ticker,await env.market.actions(t.ticker,etDay(t.entry_at)));}catch{actions.set(t.ticker,{records:[],complete:false});}
     await processExecution(env,t,quotes.get(t.ticker),tracks,borrows.get(t.ticker),evidenceCache.get(t.event_id),now,actions.get(t.ticker));
   }
+  if(pricesOnly)return;
   const policies=[];
   for(const p of EXECUTION_POLICIES){
     const rows=tracks.filter(t=>t.policy_id===p.id),entered=rows.filter(t=>t.entry_shares),closed=entered.filter(t=>t.state==='closed'),known=entered.filter(t=>finite(t.pnl?.estimated_net_pnl));
