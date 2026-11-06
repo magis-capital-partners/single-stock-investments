@@ -58,7 +58,7 @@ async function addFilings(env,items,priority){
   }
   for(let i=0;i<statements.length;i+=80)await env.DB.batch(statements.slice(i,i+80));
 }
-async function poll(env,source){
+export async function poll(env,source){
   await env.DB.prepare('INSERT OR IGNORE INTO rs_sources(id,kind,url) VALUES(?,?,?)').bind(source.id,source.kind,source.url).run();
   let saved=await env.DB.prepare('SELECT * FROM rs_sources WHERE id=?').bind(source.id).first();
   if(saved.url!==source.url){await env.DB.prepare("UPDATE rs_sources SET url=?,next_attempt=0,failures=0,status='new',error=NULL WHERE id=?").bind(source.url,source.id).run();saved={...saved,url:source.url,next_attempt:0,failures:0};}
@@ -82,9 +82,9 @@ async function poll(env,source){
       if(items.length<100||source.kind!=='sec')complete=true;
       if(complete)break;
     }
-    if(!complete&&oldest)await env.DB.prepare('INSERT OR IGNORE INTO rs_source_gaps(id,source_id,start_at,end_at,created_at) VALUES(?,?,?,?,?)').bind(source.id+':'+cutoff,source.id,cutoff,oldest,stamp()).run();
+    if(oldest&&(!complete||(source.kind==='news'&&saved.watermark&&oldest>cutoff)))await env.DB.prepare('INSERT OR IGNORE INTO rs_source_gaps(id,source_id,start_at,end_at,created_at) VALUES(?,?,?,?,?)').bind(source.id+':'+cutoff,source.id,cutoff,oldest,stamp()).run();
     const gap=await env.DB.prepare('SELECT id FROM rs_source_gaps WHERE source_id=? AND resolved_at IS NULL LIMIT 1').bind(source.id).first();
-    await env.DB.prepare("UPDATE rs_sources SET last_attempt=?,last_success=?,watermark=?,status=?,error=NULL,failures=0,next_attempt=0,coverage_gap=?,items=? WHERE id=?").bind(stamp(),stamp(),newest||saved.watermark,gap?'catching_up':'healthy',gap?1:0,count,source.id).run();
+    await env.DB.prepare("UPDATE rs_sources SET last_attempt=?,last_success=?,watermark=?,status=?,error=NULL,failures=0,next_attempt=0,coverage_gap=?,items=? WHERE id=?").bind(stamp(),stamp(),[newest,saved.watermark].filter(Boolean).sort().at(-1)||null,gap?'catching_up':'healthy',gap?1:0,count,source.id).run();
   }catch(e){const failures=saved.failures+1;await env.DB.prepare("UPDATE rs_sources SET last_attempt=?,status='degraded',error=?,failures=?,next_attempt=? WHERE id=?").bind(stamp(),e.message,failures,Date.now()+Math.min(3600000,30000*2**Math.min(failures,7)),source.id).run();log('source_failure',{source:source.id,error:e.message});}
 }
 export async function dispatch(env,{minimumPriority=0,maximumPriority=10000}={}){
@@ -197,7 +197,7 @@ async function historyFiling(env,p){
     for(const r of (await env.DB.prepare('SELECT id FROM rs_events WHERE cik=? AND effective_date>=?').bind(p.cik,etDay(Date.now())).all()).results)await enqueue(env,'rescore',{id:r.id},7,'history-rescore:'+p.accession+':'+r.id);
   }
 }
-async function reconcile(env){
+export async function reconcile(env){
   for(let ago=1;ago<=7;ago++){
     const day=new Date(Date.now()-ago*DAY).toISOString().slice(0,10),d=new Date(day+'T12:00:00Z');if([0,6].includes(d.getUTCDay()))continue;
     const id='reconcile:'+day;if(await state(env,id))continue;
@@ -207,7 +207,7 @@ async function reconcile(env){
       await state(env,id,JSON.stringify({at:stamp(),filings:count}));await state(env,'last_reconciliation',stamp());
     }catch(e){await state(env,'reconciliation_error',JSON.stringify({day,error:e.message,at:stamp()}));log('reconciliation_failure',{day,error:e.message});}
   }
-  for(const gap of (await env.DB.prepare('SELECT * FROM rs_source_gaps WHERE resolved_at IS NULL').all()).results){let covered=true;for(let t=Date.parse(gap.start_at.slice(0,10)+'T12:00:00Z');t<=Date.parse(gap.end_at.slice(0,10)+'T12:00:00Z');t+=DAY){const d=new Date(t);if([0,6].includes(d.getUTCDay()))continue;if(!await state(env,'reconcile:'+d.toISOString().slice(0,10)))covered=false;}if(covered)await env.DB.prepare('UPDATE rs_source_gaps SET resolved_at=? WHERE id=?').bind(stamp(),gap.id).run();}
+  for(const gap of (await env.DB.prepare("SELECT * FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id LIKE 'sec-%'").all()).results){let covered=true;for(let t=Date.parse(gap.start_at.slice(0,10)+'T12:00:00Z');t<=Date.parse(gap.end_at.slice(0,10)+'T12:00:00Z');t+=DAY){const d=new Date(t);if([0,6].includes(d.getUTCDay()))continue;if(!await state(env,'reconcile:'+d.toISOString().slice(0,10)))covered=false;}if(covered)await env.DB.prepare('UPDATE rs_source_gaps SET resolved_at=? WHERE id=?').bind(stamp(),gap.id).run();}
 }
 export async function consume(batch,env){
   for(const message of batch.messages){const {id,token}=message.body||{},now=Date.now();const row=await env.DB.prepare("UPDATE rs_jobs SET state='running',attempts=attempts+1,lease_until=?,updated_at=? WHERE id=? AND token=? AND state='queued' RETURNING *").bind(now+600000,stamp(),id,token).first();if(!row){message.ack();continue;}
