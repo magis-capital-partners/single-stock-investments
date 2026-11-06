@@ -19,24 +19,31 @@ DREW_LOTS_OPENED_ON_OR_AFTER = {"3905.T": "20260913"}
 MICHAEL_REF = "MICHAEL_SLEEVE"
 OPTION_SEC_TYPES = {"OPT", "FOP"}
 
-# etf-0dte: spx-0dte's SPY and QQQ 0DTE executors (IB clients 50/51, their
-# dead-executor watchdogs 130/131). They trade physically settled options in
-# this shared account and stamp every order with their product's prefix. An
-# assigned short delivers 100 shares per contract overnight; spx-0dte forecasts
-# the delivery (etf_0dte_delivery.py) and its morning unwind sells it at 09:30.
+# etf-0dte: spx-0dte's SPY, QQQ and TSLA 0DTE executors (IB clients 50/51/52,
+# their dead-executor watchdogs 130/131/132). They trade physically settled
+# options in this shared account and stamp every order with their product's
+# prefix. An assigned short delivers 100 shares per contract overnight; spx-0dte
+# forecasts the delivery (etf_0dte_delivery.py) and its morning unwind sells it
+# at 09:30.
 #
-#   etf_0dte                        their SPY / QQQ options
-#   etf_0dte_delivery               SPY / QQQ shares the forecast predicted
-#   etf_0dte_delivery_unattributed  SPY / QQQ shares beyond every other book's
-#                                   known holding that no forecast explains
+#   etf_0dte                        their SPY / QQQ / TSLA options
+#   etf_0dte_delivery               shares of those roots the forecast predicted
+#   etf_0dte_delivery_unattributed  shares of those roots beyond every other
+#                                   book's known holding that no forecast explains
 #
 # No SSI book owns any of the three, and nothing here may size, rebalance,
 # sleeve-tag or ticket against them. ls-algo blacklisted SPY and QQQ on
 # 2026-09-10 for the same reason (strategy_config.yml), so their presence in
 # the 2026-08-13 universe snapshot (data/etf_ls_universe.json) is membership,
 # not a holding.
-ETF_0DTE_ROOTS = frozenset({"SPY", "QQQ"})
-ETF_0DTE_REF_PREFIXES = ("SPY0DTE|", "QQQ0DTE|")
+#
+# TSLA joined on 2026-11-06 and differs in one way: ls-algo's blacklist of it
+# freezes the family rather than exiting it, and ls-algo still held +11 TSLA at
+# the 2026-11-05 Flex while the owner closes them by hand. Those shares read
+# unattributed here until then, which is the fail-closed side. TSLA's wrappers
+# (TSLL, TSLQ, TSLT, TSYY, ...) are other roots and stay ls-algo's.
+ETF_0DTE_ROOTS = frozenset({"SPY", "QQQ", "TSLA"})
+ETF_0DTE_REF_PREFIXES = ("SPY0DTE|", "QQQ0DTE|", "TSLA0DTE|")
 ETF_0DTE = "etf_0dte"
 ETF_0DTE_DELIVERY = "etf_0dte_delivery"
 ETF_0DTE_DELIVERY_UNATTRIBUTED = "etf_0dte_delivery_unattributed"
@@ -119,7 +126,7 @@ def has_etf_0dte_ref(ref: Any) -> bool:
 
 
 def etf_0dte_root(pos: Mapping[str, Any]) -> str:
-    """"SPY" / "QQQ" when the row is a share or option on an etf-0dte root, else ""."""
+    """"SPY" / "QQQ" / "TSLA" when the row is a share or option on an etf-0dte root, else ""."""
     sec = _sec_type(pos)
     if sec in OPTION_SEC_TYPES:
         name = (
@@ -177,7 +184,7 @@ def split_etf_0dte_shares(
     shares: Any,
     expected_delivery: Mapping[str, Any] | None,
 ) -> list[tuple[Decimal, str, str]]:
-    """Attribute SPY / QQQ shares that no other book is known to hold.
+    """Attribute SPY / QQQ / TSLA shares that no other book is known to hold.
 
     `shares` is what is left after every other book's known holding. The part
     spx-0dte's forecast predicted -- same sign, never more than the forecast --
@@ -231,7 +238,7 @@ def _etf_0dte_share_classification(
     etf_0dte_delivery: Mapping[str, Any] | None,
     etf_0dte_known_holdings: Mapping[str, Any] | None,
 ) -> Classification | None:
-    """One bucket for a whole ref-less SPY / QQQ share row; None = keep its current bucket.
+    """One bucket for a whole ref-less SPY / QQQ / TSLA share row; None = keep its current bucket.
 
     None only when every share is another book's known holding. A row that mixes
     a known holding with shares beyond it takes the etf-0dte bucket: fail closed,
@@ -268,7 +275,7 @@ def classify_position(
 
     `etf_0dte_delivery` is spx-0dte's delivery forecast (symbol -> net shares),
     None when none is available. `etf_0dte_known_holdings` is the signed SPY /
-    QQQ shares other books are known to hold; those keep their current bucket.
+    QQQ / TSLA shares other books are known to hold; those keep their current bucket.
     """
     classification = _classify(
         pos,
@@ -309,7 +316,7 @@ def _classify(
     etf_root = etf_0dte_root(pos)
 
     # etf-0dte's own stamp is positive ownership and beats every symbol rule
-    # below. Only orders carry a ref; this is how an open SPY/QQQ order, or the
+    # below. Only orders carry a ref; this is how an open SPY/QQQ/TSLA order, or the
     # 09:30 unwind of a delivery, is recognised as theirs.
     if has_etf_0dte_ref(ref):
         if sec in OPTION_SEC_TYPES:
@@ -325,12 +332,13 @@ def _classify(
             return Classification("XSP", "index_put_hedge", "index_put_hedge", None)
         if index_name in SPX_NAMES or "SPXW" in local:
             return Classification(index_name or "SPX", "spx_0dte", "spxw_option", None)
-        # A ref-less SPY / QQQ option is etf-0dte's. Positions synced from Flex
-        # or the IB API carry no orderRef, so the root is the only evidence. No
-        # other book holds SPY or QQQ options (checked 2026-10-27: both sleeve
-        # books, ls-algo's XSP-only bucket 5 and its SPY/QQQ blacklist), so the
+        # A ref-less SPY / QQQ / TSLA option is etf-0dte's. Positions synced
+        # from Flex or the IB API carry no orderRef, so the root is the only
+        # evidence. No other book holds options on these roots (SPY and QQQ
+        # checked 2026-10-27: both sleeve books, ls-algo's XSP-only bucket 5 and
+        # its SPY/QQQ blacklist; TSLA on the 2026-11-05 Flex: none held), so the
         # root is not narrowed by expiry. This must run before the overlay rule:
-        # SPY and QQQ are in the LS universe snapshot, which would otherwise make
+        # all three are in the LS universe snapshot, which would otherwise make
         # every etf-0dte contract a Drew overlay. A row stamped by another
         # system keeps that system's classification.
         if etf_root and not ref:
@@ -367,7 +375,7 @@ def _classify(
     if any(tag in ref for tag in ETF_LS_REFS):
         return Classification(under or ticker, "etf_ls", "order_ref", None)
 
-    # Ref-less SPY / QQQ shares are etf-0dte's delivered shares unless another
+    # Ref-less SPY / QQQ / TSLA shares are etf-0dte's delivered shares unless another
     # book is known to hold them. This runs before the universe and owner rules
     # below, so neither the LS universe snapshot nor a Drew tag can claim a
     # delivery; shares another book is known to hold fall through to them.
@@ -451,7 +459,7 @@ def classify_positions(
     etf_0dte_delivery: Mapping[str, Any] | None = None,
     etf_0dte_known_holdings: Mapping[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
-    """Classify every row; split a SPY / QQQ share row that mixes holders.
+    """Classify every row; split a SPY / QQQ / TSLA share row that mixes holders.
 
     The known holdings and the forecast are budgets shared by every row of a
     symbol (Flex reports one row per tax lot), spent in row order: known

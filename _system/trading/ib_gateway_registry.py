@@ -16,8 +16,8 @@ from typing import Any, Iterable, Mapping
 
 REGISTRY_PATH = Path(__file__).with_name("ib_gateway_client_registry.v1.json")
 EXPECTED_SCHEMA_VERSION = "ib_gateway_client_registry.v1"
-EXPECTED_REGISTRY_VERSION = "2026-09-09.1"
-EXPECTED_REGISTRY_HASH = "3d2ba10bda3a577696e8e85ae5a6efd1a934e33341ade782506b79f0bad82abd"
+EXPECTED_REGISTRY_VERSION = "2026-11-06.1"
+EXPECTED_REGISTRY_HASH = "e01ec812195749504e7548ebcc0df5734416e75b961b8f9c4e46564b47f8016a"
 REGISTRY_HASH_ALGORITHM = "sha256-canonical-json-without-registry_hash"
 SSI_SYSTEM = "single-stock-investments"
 

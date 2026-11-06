@@ -236,9 +236,9 @@ def owner_policy(event: dict, *, ls_symbols: set[str], blacklist: set[str], open
     ref = event.get("order_ref", "").upper()
     ticker = norm_sym(event.get("ticker") or event.get("symbol"))
     sec = event.get("sec_type", "STK")
-    if any(marker in ref for marker in ("ETF_0DTE", "ETF0DTE", "SPY_0DTE", "QQQ_0DTE")):
+    if any(marker in ref for marker in ("ETF_0DTE", "ETF0DTE", "SPY_0DTE", "QQQ_0DTE", "TSLA_0DTE")):
         return "excluded", "etf_0dte", "order_reference"
-    if sec in OPTION_TYPES and ticker in {"SPY", "QQQ"} and event.get("expiry") == event.get("trade_date"):
+    if sec in OPTION_TYPES and ticker in {"SPY", "QQQ", "TSLA"} and event.get("expiry") == event.get("trade_date"):
         return "excluded", "etf_0dte", "same_day_index_option"
     if ticker == "3905.T" and sec not in OPTION_TYPES:
         if not opening_date:

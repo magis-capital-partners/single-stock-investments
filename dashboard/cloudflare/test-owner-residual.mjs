@@ -138,12 +138,12 @@ test("residual rows keep broker market value by allocating the full quantity", (
   assert.equal(base * allocated / brokerQty, 1200);
 });
 
-// etf-0dte: spx-0dte's SPY / QQQ 0DTE executors. The port must route exactly as
-// classify_positions.py / allocation_policy.py do. The live universe lists SPY
-// and QQQ, which is why these rules run before the LS rules.
+// etf-0dte: spx-0dte's SPY / QQQ / TSLA 0DTE executors. The port must route exactly
+// as classify_positions.py / allocation_policy.py do. The live universe lists all
+// three, which is why these rules run before the LS rules.
 test("etf-0dte options and shares belong to no owner, ahead of the LS rules", () => {
   const ls = lsUniverseSymbols();
-  assert.equal(ls.has("SPY") && ls.has("QQQ"), true);
+  assert.equal(ls.has("SPY") && ls.has("QQQ") && ls.has("TSLA"), true);
   const policy = (row) => classifyPolicyPosition(row, { lsSymbols: ls, drewSymbols: new Set(["SPY", "QQQ"]) });
 
   for (const row of [
@@ -165,6 +165,25 @@ test("etf-0dte options and shares belong to no owner, ahead of the LS rules", ()
   assert.equal(policy({ symbol: "SPYG", local_symbol: "SPYG", sec_type: "STK" }).owner, "michael");
   assert.equal(policy({ symbol: "SPXW  260817P05000000", local_symbol: "SPXW  260817P05000000", sec_type: "OPT" }).strategy, "spx_0dte");
   assert.equal(policy({ symbol: "XSP   270129P00540000", local_symbol: "XSP   270129P00540000", sec_type: "OPT" }).strategy, "ls_algo");
+});
+
+test("TSLA is an etf-0dte root and its wrappers are not", () => {
+  const ls = lsUniverseSymbols();
+  const policy = (row) => classifyPolicyPosition(row, { lsSymbols: ls, drewSymbols: new Set(["TSLA"]) });
+
+  assert.deepEqual(policy({ symbol: "TSLA  261113P00300000", local_symbol: "TSLA  261113P00300000", sec_type: "OPT" }), {
+    owner: "unallocated", strategy: "etf_0dte", reason: "etf_0dte_option_exclusion", bucket: "etf_0dte",
+  });
+  // ls-algo's +11 at the 2026-11-05 Flex: no owner here, like any unattributed share.
+  assert.deepEqual(policy({ symbol: "TSLA", local_symbol: "TSLA", sec_type: "STK", quantity_decimal: "11" }), {
+    owner: "unallocated", strategy: "etf_0dte", reason: "etf_0dte_unattributed_shares",
+    bucket: "etf_0dte_delivery_unattributed",
+  });
+  for (const wrapper of ["TSLL", "TSLQ", "TSLT", "TSYY"]) {
+    assert.equal(policy({ symbol: wrapper, local_symbol: wrapper, sec_type: "STK", quantity_decimal: "-100" }).strategy, "letf");
+  }
+  const stamped = classifyPosition({ symbol: "TSLA", secType: "STK", qty: 100, orderRef: "TSLA0DTE|UNWIND|x" }, { etfLsSymbols: ["TSLA"] });
+  assert.deepEqual(stamped, { ticker: "TSLA", bucket: "etf_0dte_delivery", reason: "order_ref", owner: null });
 });
 
 test("the port matches the Python share rule branch for branch", () => {

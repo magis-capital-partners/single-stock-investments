@@ -73,11 +73,11 @@ def load_etf_ls_universe(cfg: dict[str, Any] | None = None) -> set[str]:
 def load_etf_0dte_expected_delivery(
     cfg: dict[str, Any] | None = None, *, today: date | None = None,
 ) -> dict[str, float] | None:
-    """spx-0dte's SPY / QQQ delivery forecast for the configured account, or None.
+    """spx-0dte's SPY / QQQ / TSLA delivery forecast for the configured account, or None.
 
     The path is `etf_0dte.live_dir` (spx-0dte's `data/live` on this host), which
     `ETF_0DTE_LIVE_DIR` overrides. Unset, or no account, means no forecast: every
-    SPY / QQQ share no other book is known to hold is then unattributed.
+    SPY / QQQ / TSLA share no other book is known to hold is then unattributed.
     """
     cfg = load_config() if cfg is None else cfg
     section = cfg.get("etf_0dte") or {}
@@ -93,7 +93,7 @@ def load_etf_0dte_expected_delivery(
 
 
 def load_etf_0dte_known_holdings(cfg: dict[str, Any] | None = None) -> dict[str, float]:
-    """Signed SPY / QQQ shares another book is known to hold (they keep their bucket)."""
+    """Signed SPY / QQQ / TSLA shares another book is known to hold (they keep their bucket)."""
     cfg = load_config() if cfg is None else cfg
     raw = (cfg.get("etf_0dte") or {}).get("known_share_holdings") or {}
     return {str(k).strip().upper(): float(v) for k, v in raw.items() if str(k).strip()}

@@ -233,7 +233,7 @@ def sync_holdings(
         norm_sym(symbol)
         for symbol in ((cfg.get("operators") or {}).get("drew") or {}).get("symbols") or []
     ]
-    # SPY / QQQ shares are attributed against spx-0dte's delivery forecast; with
+    # SPY / QQQ / TSLA shares are attributed against spx-0dte's delivery forecast; with
     # none configured or found they are etf_0dte_delivery_unattributed. Either
     # way no sleeve owns them.
     classified = classify_positions(
