@@ -522,7 +522,8 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
         approved = None
     if prepare is prepare_packet and state.get('evidence_requests'):
         state['evidence_request_history'] = merge_evidence_requests(state.get('evidence_request_history'),state['evidence_requests'])
-        state['evidence_keywords'] = requested_keywords(state['evidence_request_history'])
+        state['evidence_keywords'] = requested_keywords(state['evidence_requests'],
+                                                       history=state['evidence_request_history'])
     packet = (prepare(root, ticker, as_of, focus_keywords=state.get('evidence_keywords') or [])
               if prepare is prepare_packet else prepare(root, ticker, as_of))
     if prepare is prepare_packet and state.get('evidence_requests'):
@@ -578,7 +579,7 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                     state['evidence_request_history'] = merge_evidence_requests(state.get('evidence_request_history'),gaps)
                     # Requests choose bounded search terms, never destinations or tools.
                     # Re-read the same independently discovered primary documents.
-                    keywords = requested_keywords(state['evidence_request_history'])
+                    keywords = requested_keywords(gaps, history=state['evidence_request_history'])
                     state['evidence_keywords'] = keywords
                     if prepare is prepare_packet and keywords:
                         repaired = prepare(root, ticker, as_of, focus_keywords=keywords)
