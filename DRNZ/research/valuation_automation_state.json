@@ -4,11 +4,11 @@
   "stages": {
     "identity": {
       "status": "complete",
-      "at": "2026-07-29T20:28:55.506841Z"
+      "at": "2026-11-06T10:18:08.422291Z"
     },
     "collection": {
       "status": "complete",
-      "at": "2026-07-29T20:28:56.942752Z",
+      "at": "2026-11-06T10:18:08.579428Z",
       "results": [
         {
           "returncode": 0,
@@ -17,7 +17,7 @@
         },
         {
           "returncode": 0,
-          "stdout": "2026-07-29T16:28:56.241716 Starting download for DRNZ\n2026-07-29T16:28:56.243719 IR PDF URLs found: 0\n2026-07-29T16:28:56.243719 Done DRNZ. SEC=0 IR=0/0\n",
+          "stdout": "2026-11-06T10:18:08.470012 Starting download for DRNZ\n2026-11-06T10:18:08.472514 SEC SKIPPED: no CIK for DRNZ\n2026-11-06T10:18:08.472558 IR PDF URLs found: 0\n2026-11-06T10:18:08.472873 Done DRNZ. SEC=0 IR=0/0\n",
           "stderr": ""
         },
         {
@@ -29,26 +29,47 @@
     },
     "model_compile": {
       "status": "evidence_blocked",
-      "at": "2026-07-29T20:28:56.942752Z",
-      "method_id": "owner_earnings_reinvestment_dcf",
-      "input_errors": [
-        "normalized_owner_earnings_m: missing locked fact",
-        "shares_outstanding: missing locked fact",
-        "cash_m: missing locked fact",
-        "debt_m: missing locked fact"
-      ]
+      "at": "2026-11-06T10:18:08.581262Z",
+      "method_id": null,
+      "input_errors": []
     },
     "decision_contract": {
       "status": "complete",
-      "at": "2026-07-29T20:28:57.606597Z",
+      "at": "2026-11-06T10:18:09.214510Z",
       "result": {
         "returncode": 0,
-        "stdout": "universe: scope=all tickers=1\n[1/6] routes: 1 processed, 0 errors\n[2/6] contracts: 1 ready, 0 model scaffolds, 0 missing, 0 errors\n[3/6] workbenches: 1 built, 0 skipped, 0 errors\n[4/6] pricing: 0 priced, 0 errors\n[5/6] committees: 0 initialized, 0 blocked, 0 evidence tasks\n[6/6] dashboard: skipped\nsummary: _system/reviews/pending/power_zone_security_run_2026-07-29_drnz.json\n",
+        "stdout": "[1/8] universe tiers: T1=40 T2=12 T3=821\nuniverse: scope=all tickers=1\n[2/8] routes: 1 processed, 0 errors\n[3/8] contracts: 1 ready, 0 model scaffolds, 0 missing, 0 errors\n[4/8] workbenches: 1 built, 0 skipped, 0 errors\n[5/8] pricing: 0 priced, 0 errors\n[6/8] committees: 0 initialized, 0 blocked, 0 evidence tasks, 1 outside Tier 1\n[7/8] Tier 1 readiness: 40 names, 4 research blocked, 0 need model depth, 0 committee ready\n[8/8] dashboard: skipped\nsummary: _system/data/runs/power_zone_security_run_2026-11-06_drnz.json\n",
         "stderr": ""
       }
+    },
+    "ssi_report": {
+      "status": "complete",
+      "at": "2026-11-06T10:18:09.434681Z",
+      "results": [
+        {
+          "returncode": 0,
+          "stdout": "[ok] DRNZ/research/evidence/ssi_evidence_pack_2026-11-06.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DRNZ/research/evidence/ssi_claims_2026-11-06.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DRNZ/research/evidence/ssi_verified_claims_2026-11-06.json\n[ok] DRNZ/research/evidence/ssi_time_zero_2026-11-06.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DRNZ/research/ssi_report_2026-11-06.md (gate: see ssi_report_gate_2026-11-06.json)\n",
+          "stderr": ""
+        }
+      ]
     }
   },
-  "updated_at": "2026-07-29T20:28:57.606597Z",
+  "updated_at": "2026-11-06T10:18:09.214492Z",
   "full_rerun": true,
   "status": "evidence_blocked"
 }
