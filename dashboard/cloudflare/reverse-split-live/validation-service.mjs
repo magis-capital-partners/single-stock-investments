@@ -40,7 +40,7 @@ export async function initializeValidation(env,now=new Date().toISOString()){
 export function quoteLatency(q,now){
   const raw=q.raw||{},capture=at(q.quote_at),receipt=at(q.observed_at),evaluated=at(now);let exchangeToCapture=null;
   try{const event=BigInt(raw.ts_event_ns),recv=BigInt(raw.ts_recv_ns);if(event>0n&&recv>=event)exchangeToCapture=Number(recv-event)/1e6;}catch{}
-  return {ticker:q.ticker,quote_at:q.quote_at,received_at:q.observed_at,evaluated_at:now,capture_to_client_ms:receipt-capture,quote_age_ms:evaluated-capture,receipt_to_evaluation_ms:evaluated-receipt,exchange_to_capture_ms:exchangeToCapture,spread_bps:10000*(q.ask-q.bid)/((q.ask+q.bid)/2),bid_size:q.bid_size,ask_size:q.ask_size,size_units:q.size_units,identity_verified:!!q.security_id,coverage:q.coverage,clock_invalid:receipt<capture-2000||evaluated<receipt-2000};
+  return {ticker:q.ticker,quote_at:q.quote_at,received_at:q.observed_at,evaluated_at:now,capture_to_client_ms:receipt-capture,quote_age_ms:evaluated-capture,receipt_to_evaluation_ms:evaluated-receipt,exchange_to_capture_ms:exchangeToCapture,spread_bps:10000*(q.ask-q.bid)/((q.ask+q.bid)/2),bid_size:q.bid_size,ask_size:q.ask_size,size_units:q.size_units,identity_verified:!!q.security_id,coverage:q.coverage,clock_invalid:![capture,receipt,evaluated].every(finite)||receipt<capture-2000||evaluated<receipt-2000};
 }
 export function validationSummary(samples,now,plan=VALIDATION_PLAN){
   const regular=samples.filter(s=>s.regular_session),symbols=[...new Set(samples.map(s=>s.ticker))];

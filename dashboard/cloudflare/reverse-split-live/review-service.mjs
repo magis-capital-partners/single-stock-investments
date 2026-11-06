@@ -20,11 +20,11 @@ export async function initializeReview(env,now=new Date().toISOString()){
   const old=await state(env,'shadow_review_plan'),canonical=JSON.stringify(REVIEW_PLAN),sha256=await digest(canonical);
   if(old){if(old.sha256!==sha256||JSON.stringify(old.plan)!==canonical)throw new Error('Shadow review criteria changed; a new prospective version is required');return old;}
   const record={plan:REVIEW_PLAN,sha256,registered_at:now,registered_before_start:Date.parse(now)<Date.parse(REVIEW_PLAN.starts_at)};
-  await env.EVIDENCE.put('review/plans/'+REVIEW_PLAN.id+'-'+sha256+'.json',new TextEncoder().encode(JSON.stringify(record)),{httpMetadata:{contentType:'application/json'}});
+  const raw=JSON.stringify(record);await env.EVIDENCE.put('review/plans/'+REVIEW_PLAN.id+'-'+sha256+'-'+await digest(raw)+'.json',new TextEncoder().encode(raw),{httpMetadata:{contentType:'application/json'}});
   await putState(env,'shadow_review_plan',record,now);return record;
 }
 export function gradeReview({registration,history=[],validation,events=[],tracks=[],sourceGaps=0,failedJobs=0,now=new Date().toISOString()}={}){
-  const plan=registration?.plan||REVIEW_PLAN,completed=history.filter(r=>plan.observation_days.includes(r.day)).map(r=>({...r}));
+  const plan=registration?.plan||REVIEW_PLAN,completed=history.filter(r=>plan.observation_days.includes(r.day)&&r.id==='rs_live_path_'+r.day+'.v3'&&r.day<=etDay(now)).map(r=>({...r}));
   if(validation?.plan&&Date.parse(now)>=Date.parse(validation.plan.end_at)&&plan.observation_days.includes(validation.plan.day)&&!completed.some(r=>r.day===validation.plan.day))completed.push({id:validation.plan.id,day:validation.plan.day,status:validation.status});
   completed.sort((a,b)=>a.day.localeCompare(b.day));let consecutive=0;
   for(const day of plan.observation_days){if(day>etDay(now))break;const r=completed.find(r=>r.day===day);if(!r){if(day<etDay(now))consecutive=0;continue;}consecutive=r.status==='passed_market_data_checks'?consecutive+1:0;}
