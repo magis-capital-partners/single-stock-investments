@@ -58,8 +58,12 @@ def merge_evidence_requests(previous, incoming):
     return list(rows.values())[-12:]
 
 
-def requested_keywords(gaps):
+def requested_keywords(gaps, *, history=None):
     """Balance explicit disclosure requests; model text never chooses URLs/tools."""
+    if history is not None:
+        # Spend the same bounded query budget on the current missing facts first.
+        # Historical requests remain intact and fill any remaining search slots.
+        return list(dict.fromkeys(requested_keywords(gaps)+requested_keywords(history)))[:18]
     groups = []
     excluded = {'missing', 'evidence', 'primary', 'source', 'required', 'financial', 'report',
                 'statement', 'company', 'specific', 'retrieve', 'contexts', 'expanded', 'still',
@@ -80,7 +84,8 @@ def requested_keywords(gaps):
             section = re.fullmatch(r'(?:section\s+)?('+number+r')(?:\([a-z0-9]+\))*', term)
             if section:
                 terms.append('section '+section[1])
-            elif re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", term):
+            elif (re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ()/,&.'-]{1,119}", term)
+                  and re.search(r'[A-Za-z]', term)):
                 terms.append(term)
         if not terms:
             terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
