@@ -61,6 +61,91 @@ def test_local_receipt_retains_the_real_session_and_excludes_controller_secrets(
     assert json.loads(output.read_text()) == {'ok':True}
 
 
+def test_finished_native_response_survives_a_failed_last_message_file_write(tmp_path, monkeypatch):
+    monkeypatch.setattr(codex, 'executable', lambda: 'codex')
+    prompt, output, receipt = (tmp_path/n for n in ('prompt.txt', 'output.json', 'receipt.json'))
+    prompt.write_text('Frozen issuer evidence', encoding='utf-8')
+    answer = {'status': 'evidence_gap', 'gaps': [{'code': 'contract_terms', 'detail': 'Retrieve the operative agreement.'}]}
+    usage = {'input_tokens': 123, 'output_tokens': 45}
+    def run(args, **kwargs):
+        # The real completed native trace retained its response on stdout, but
+        # reported a failed --output-last-message write and created no file.
+        rows = [{'type': 'thread.started', 'thread_id': 'paid-finished-session'},
+                {'type': 'turn.started'},
+                {'type': 'item.completed', 'item': {'id': 'item_0', 'type': 'agent_message', 'text': json.dumps(answer)}},
+                {'type': 'turn.completed', 'usage': usage}]
+        return subprocess.CompletedProcess(args, 0, '\n'.join(json.dumps(r) for r in rows),
+                                           'Failed to write last message file: path not found (os error 3)')
+    codex.execute_stage(model='gpt-6.1-sol', effort='high', stage='author', prompt_path=prompt,
+                        output_path=output, receipt_path=receipt, run=run)
+    assert json.loads(output.read_text()) == answer
+    saved = json.loads(receipt.read_text())
+    assert saved['status'] == 'finished' and saved['usage'] == usage
+    assert saved['agent_id'] == 'paid-finished-session'
+
+
+def completed_rows(answer):
+    return [{'type': 'thread.started', 'thread_id': 'one-session'},
+            {'type': 'item.completed', 'item': {'id': 'item_0', 'type': 'agent_message', 'text': json.dumps(answer)}},
+            {'type': 'turn.completed', 'usage': {'output_tokens': 12}}]
+
+
+def test_native_file_and_stream_must_agree_without_losing_numeric_identity():
+    value, source = codex.completed_output(completed_rows({'ok': True}), '{ "ok" : true }')
+    assert value == {'ok': True} and source['source'] == 'last_message_file'
+    with pytest.raises(ValueError, match='sources disagree'):
+        codex.completed_output(completed_rows({'amount': 1}), '{"amount":1.0}')
+
+
+@pytest.mark.parametrize('change', ['missing', 'multiple', 'after_turn', 'non_object', 'oversized'])
+def test_native_final_message_recovery_rejects_incomplete_or_ambiguous_outputs(change):
+    rows = completed_rows({'ok': True})
+    if change == 'missing':
+        rows.pop(1)
+    elif change == 'multiple':
+        rows.insert(1, rows[1])
+    elif change == 'after_turn':
+        rows[1], rows[2] = rows[2], rows[1]
+    elif change == 'non_object':
+        rows[1]['item']['text'] = '[]'
+    else:
+        rows[1]['item']['text'] = 'x' * 500001
+    with pytest.raises(ValueError):
+        codex.completed_output(rows)
+
+
+def test_native_stream_recovery_keeps_the_tool_use_rejection(tmp_path, monkeypatch):
+    monkeypatch.setattr(codex, 'executable', lambda: 'codex')
+    prompt = tmp_path/'prompt.txt'
+    prompt.write_text('Evidence', encoding='utf-8')
+    rows = completed_rows({'ok': True})
+    rows.insert(1, {'type': 'item.completed', 'item': {'type': 'command_execution'}})
+    with pytest.raises(ValueError, match='without tools'):
+        codex.execute_stage(model='gpt-6.1-sol', effort='high', stage='author', prompt_path=prompt,
+            output_path=tmp_path/'out.json', receipt_path=tmp_path/'receipt.json',
+            run=lambda args, **kw: subprocess.CompletedProcess(args, 0, '\n'.join(map(json.dumps, rows)), ''))
+    assert not (tmp_path/'out.json').exists()
+    assert json.loads((tmp_path/'receipt.json').read_text())['usage'] == {'output_tokens': 12}
+
+
+def test_disagreeing_native_outputs_preserve_both_private_sources_before_cleanup(tmp_path, monkeypatch):
+    monkeypatch.setattr(codex, 'executable', lambda: 'codex')
+    prompt = tmp_path/'prompt.txt'
+    prompt.write_text('Evidence', encoding='utf-8')
+    rows = completed_rows({'ok': True})
+    def run(args, **kw):
+        Path(args[args.index('--output-last-message')+1]).write_text('{"ok":false}', encoding='utf-8')
+        return subprocess.CompletedProcess(args, 0, '\n'.join(map(json.dumps, rows)), '')
+    with pytest.raises(ValueError, match='sources disagree'):
+        codex.execute_stage(model='gpt-6.1-sol', effort='high', stage='author', prompt_path=prompt,
+                            output_path=tmp_path/'out.json', receipt_path=tmp_path/'receipt.json', run=run)
+    saved = json.loads((tmp_path/'receipt.json').read_text())
+    diagnostics = json.loads((tmp_path/saved['diagnostics']['file']).read_text())
+    assert diagnostics['last_message_file'] == '{"ok":false}'
+    assert diagnostics['stdout'] == '\n'.join(map(json.dumps, rows))
+    assert saved['status'] == 'finished' and saved['usage'] == {'output_tokens': 12}
+
+
 def test_local_timeout_retains_a_started_session(tmp_path,monkeypatch):
     monkeypatch.setattr(codex,'executable',lambda:'codex')
     prompt=tmp_path/'prompt.txt'
