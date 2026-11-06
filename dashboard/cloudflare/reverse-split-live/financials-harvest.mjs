@@ -12,6 +12,7 @@ const PARSER_HASH=hash(readFileSync(new URL('./fundamental_filing.py',import.met
 const coverageCard=p=>({cik:p.cik,ticker:p.ticker,company:p.company,observed_at:p.observed_at,version:p.version,status:p.coverage.status,period:p.coverage.period,age_days:p.coverage.age_days,score:p.policy_financials.score,available_score:p.coverage.available_score,signal_count:p.coverage.signal_count,verified_inputs:p.coverage.verified_inputs,required_inputs:p.coverage.required_inputs,collection_status:p.collection.status,pending_documents:p.collection.remaining_documents,conflicts:p.coverage.conflicts.length});
 async function coverageCache(env){if(env.financialCoverageCards)return env.financialCoverageCards;const manifest=await read(env,'financials/manifest-latest.json');env.financialCoverageCards=new Map((manifest?.cards||[]).map(r=>[r.cik,r]));if(manifest&&!manifest.cards)for(const r of manifest.profiles||[]){const p=await read(env,`financials/profiles/${r.cik}/latest.json`);if(p)env.financialCoverageCards.set(r.cik,coverageCard(p));}return env.financialCoverageCards;}
 const REPORT_FORMS=new Set(['10-K','10-K/A','10-Q','10-Q/A','20-F','20-F/A','40-F','40-F/A','6-K','6-K/A','8-K','8-K/A']);
+export const nextFinancialJob=(jobs,at=Date.now())=>Object.values(jobs).filter(j=>Number(j.next_attempt||0)<=at).sort((a,b)=>Number(b.priority>=1000)-Number(a.priority>=1000)||Number(!b.last_attempt)-Number(!a.last_attempt)||b.priority-a.priority||String(a.last_attempt||'').localeCompare(String(b.last_attempt||'')))[0];
 async function read(env,key,fallback=null){const o=await env.EVIDENCE.get(key);return o?await o.json():fallback;}
 async function put(env,key,value){await env.EVIDENCE.put(key,bytes(value),{httpMetadata:{contentType:'application/json'}});}
 function filingRows(sub,cik){const recent=sub.filings?.recent||sub,rows=[];for(let i=0;i<(recent.form||[]).length;i++){
@@ -126,7 +127,7 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
       const snapshot=await read(env,'collector-dashboard/financial-needs.json',[]);for(const r of snapshot){const cik=r.key.split(':')[1],j=queue.jobs[cik];if(j&&j.last_signal!==r.value){j.next_attempt=0;j.last_signal=r.value;}}
       lastSeed=Date.now();}
     if(Number(lease.split(':')[0])-Date.now()<480000)await renew();if(leaseError)throw leaseError;
-    const job=Object.values(queue.jobs).filter(j=>Number(j.next_attempt||0)<=Date.now()).sort((a,b)=>Number(!b.last_attempt)-Number(!a.last_attempt)||b.priority-a.priority||String(a.last_attempt||'').localeCompare(String(b.last_attempt||'')))[0];
+    const job=nextFinancialJob(queue.jobs);
     if(!job){await new Promise(r=>setTimeout(r,10000));continue;}
     const firstPass=!job.last_attempt;job.last_attempt=now();handled++;
     try{const result=await harvestIssuer(env,job,{client,maximumDocuments:firstPass&&job.priority<1000?0:maximumDocuments,offline});job.complete=result.complete;job.next_attempt=result.complete?Date.now()+3600000:result.next_attempt;job.error=null;job.attempts=0;console.log(JSON.stringify({event:'financial_profile',cik:job.cik,ticker:job.ticker,status:result.profile.coverage.status,score:result.profile.policy_financials.score,remaining:result.profile.collection.remaining_documents}));}
