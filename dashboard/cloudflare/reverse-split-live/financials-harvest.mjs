@@ -3,7 +3,7 @@
 import {parseArgs} from 'node:util';
 import {pathToFileURL} from 'node:url';
 import {appendFileSync,readFileSync} from 'node:fs';
-import {remoteEnvironment} from './collector.mjs';
+import {remoteEnvironment,isolatedWriteFailure} from './collector.mjs';
 import {FinancialSources,extractFiling,hash,primaryURL,isSourceCooldown} from './financials-io.mjs';
 import {buildFinancialProfile,FINANCIAL_VERSION} from './financials-core.mjs';
 import {etDay} from './core.mjs';
@@ -122,6 +122,8 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
   if(!await env.DB.prepare('UPDATE rs_state SET value=?,updated_at=? WHERE key=? AND CAST(value AS INTEGER)<=? RETURNING value').bind(lease,now(),leaseKey,Date.now()).first())return {skipped:true};
   const queue=await read(env,'financials/queue.json',{jobs:{}}),client=new FinancialSources(env,{offline});let handled=0,lastSeed=0,stop=false,leaseError=null,renewing=Promise.resolve();const signal=()=>{stop=true;};process.once('SIGTERM',signal);process.once('SIGINT',signal);
   const renew=()=>{renewing=renewing.then(async()=>{const next=String(Date.now()+600000)+':'+owner;if(!await env.DB.prepare('UPDATE rs_state SET value=?,updated_at=? WHERE key=? AND value=? RETURNING value').bind(next,now(),leaseKey,lease).first())throw new Error('Financial harvest lease lost');lease=next;}).catch(e=>{leaseError=e;stop=true;});return renewing;};
+  // queue.json and the coverage manifest are rewritten every iteration, so one rejected object write waits for the next pass.
+  let deferredWrites=0;const deferrable=async(stage,write)=>{try{await write();deferredWrites=0;}catch(e){if(!isolatedWriteFailure(e)||++deferredWrites>=5)throw e;console.error(JSON.stringify({event:'financial_harvest_write_deferred',stage,error:e.message,consecutive:deferredWrites}));}};
   const timer=setInterval(renew,120000);env.assertFinancialLease=async()=>{await renewing;if(leaseError)throw leaseError;const row=await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(leaseKey).first();if(row?.value?.split(':').at(-1)!==owner||Number(row.value.split(':')[0])<=Date.now())throw new Error('Financial harvest lease lost');};
   try{while(!stop&&Date.now()-start<maximumMs&&handled<maxIssuers){
     if(Date.now()-lastSeed>60000){const remote=(await env.DB.prepare('SELECT cik,ticker,company,payload,analyzed_at FROM rs_events WHERE cik IS NOT NULL').all()).results,live=await read(env,'collector-dashboard/events.json',[]);for(const r of [...remote,...live.filter(e=>e.cik).map(e=>({...e,payload:JSON.stringify(e)}))]){const event=JSON.parse(r.payload),cik=String(Number(r.cik)),priority=event.status==='scheduled'?1000:event.result==='needs_review'?200:50;const old=queue.jobs[cik]||{cik,attempts:0,next_attempt:0};queue.jobs[cik]={...old,ticker:r.ticker||old.ticker,company:r.company||old.company,priority:Math.max(old.priority||0,priority)};}
@@ -134,8 +136,8 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
     const firstPass=!job.last_attempt;job.last_attempt=now();handled++;
     try{const result=await harvestIssuer(env,job,{client,maximumDocuments:firstPass&&job.priority<1000?0:maximumDocuments,offline});job.complete=result.complete;job.next_attempt=result.complete?Date.now()+3600000:result.next_attempt;job.error=null;job.attempts=0;console.log(JSON.stringify({event:'financial_profile',cik:job.cik,ticker:job.ticker,status:result.profile.coverage.status,score:result.profile.policy_financials.score,remaining:result.profile.collection.remaining_documents}));}
     catch(e){const cooldown=isSourceCooldown(e);if(!cooldown)job.attempts++;job.complete=false;job.error=e.message;job.next_attempt=cooldown?Math.max(Number(e.retryAt)||0,Date.now()+300000):Date.now()+Math.min(86400000,60000*2**Math.min(job.attempts,10));console.log(JSON.stringify({event:'financial_harvest_retry',cik:job.cik,error:e.message,retry_at:new Date(job.next_attempt).toISOString()}));}
-    await put(env,'financials/queue.json',queue);if(handled%5===0||job.priority>=1000)await publishFinancialCoverage(env,queue);
-  }await publishFinancialCoverage(env,queue);return {handled,requests:client.requests,continue:!stop,broker_connections:0};}
+    await deferrable('queue',()=>put(env,'financials/queue.json',queue));if(handled%5===0||job.priority>=1000)await deferrable('coverage',()=>publishFinancialCoverage(env,queue));
+  }await deferrable('coverage',()=>publishFinancialCoverage(env,queue));return {handled,requests:client.requests,continue:!stop,broker_connections:0};}
   finally{clearInterval(timer);await renewing;process.removeListener('SIGTERM',signal);process.removeListener('SIGINT',signal);try{await env.assertFinancialLease();await put(env,'financials/queue.json',queue);}finally{await env.DB.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key=? AND value=?").bind(now(),leaseKey,lease).run();delete env.assertFinancialLease;}}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
