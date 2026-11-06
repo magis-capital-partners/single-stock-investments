@@ -1,6 +1,6 @@
 # CRH — Pending third-party sources
 
-**Updated:** 2026-11-05
+**Updated:** 2026-11-06
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 

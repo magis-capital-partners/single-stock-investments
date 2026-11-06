@@ -1,7 +1,7 @@
 # Event triage — human review queue
 
-**Date:** 2026-11-04
-**Rows:** 2571
+**Date:** 2026-11-06
+**Rows:** 2557
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
@@ -30,8 +30,8 @@
 | 2026-10-31 | ROAD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Construction Partners (ROAD) After Strong Q3 And Higher Outl |
 | 2026-10-31 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks: 3 Key Takeaways for Long-Term Investors |
 | 2026-10-31 | DG | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Is Dollar General (DG) Cheap After Raising Its Outlook And E |
-| 2026-10-28 | AMZN | video_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bill Ackman: Is Permanent Capital an Investor’s Biggest Edge |
-| 2026-10-28 | MSFT | video_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bill Ackman: Is Permanent Capital an Investor’s Biggest Edge |
+| 2026-10-28 | AMZN | video_research | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bill Ackman: Is Permanent Capital an Investor’s Biggest Edge |
+| 2026-10-28 | MSFT | video_research | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bill Ackman: Is Permanent Capital an Investor’s Biggest Edge |
 | 2026-10-27 | BEN | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Franklin Resources, Inc. — SC 13D/A |
 | 2026-10-27 | LBRDK | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Liberty Broadband Corporation — SC 13D/A |
 | 2026-10-27 | OXY | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | OXY USA Inc — SC 13D/A |

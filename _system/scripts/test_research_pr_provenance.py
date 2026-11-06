@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import unittest
 
 from validate_research_pr_provenance import validate
@@ -33,6 +34,25 @@ class ResearchPrProvenanceTests(unittest.TestCase):
     def test_contract_backfill_consumer_is_accepted(self):
         state = {**STATE, "consumer": "marvin_contract_backfill"}
         self.assertEqual(validate(MANIFEST, state, "AAA"), [])
+
+    def test_redacted_hash_with_b64_digest_is_valid(self):
+        digest_hex = "a" * 64
+        digest = bytes.fromhex(digest_hex)
+        b64 = base64.b64encode(digest).decode("ascii")
+        manifest = {
+            "ticker": "AAA",
+            "evidence_hash": "[REDACTED]",
+            "evidence_hash_b64": b64,
+            "primary_evidence_ready": True,
+        }
+        state = {
+            "ticker": "AAA",
+            "consumer": "marvin_research",
+            "evidence_hash": "[REDACTED]",
+            "evidence_hash_b64": b64,
+            "completed_at": "2026-07-20T12:00:00+00:00",
+        }
+        self.assertEqual(validate(manifest, state, "AAA"), [])
 
 
 if __name__ == "__main__":

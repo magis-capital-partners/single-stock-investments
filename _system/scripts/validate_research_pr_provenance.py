@@ -3,8 +3,34 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import json
 from pathlib import Path
+
+REDACTED = "[REDACTED]"
+
+
+def _hex_from_evidence_fields(doc: dict) -> str | None:
+    """Return canonical 64-char lowercase hex evidence_hash from document fields."""
+    raw = doc.get("evidence_hash")
+    if isinstance(raw, str) and len(raw) == 64 and raw != REDACTED:
+        try:
+            int(raw, 16)
+        except ValueError:
+            raw = None
+        else:
+            return raw.lower()
+    b64 = doc.get("evidence_hash_b64")
+    if isinstance(b64, str):
+        try:
+            digest = base64.b64decode(b64, validate=True)
+        except (binascii.Error, ValueError):
+            return None
+        if len(digest) != 32:
+            return None
+        return digest.hex()
+    return None
 
 
 def read_json(path: Path) -> dict:
@@ -26,9 +52,9 @@ def validate(manifest: dict, state: dict, ticker: str) -> list[str]:
     """Return all provenance contract violations for one ticker."""
     ticker = ticker.upper()
     errors: list[str] = []
-    evidence_hash = manifest.get("evidence_hash")
-    if not isinstance(evidence_hash, str) or len(evidence_hash) != 64:
-        errors.append("manifest has no valid evidence_hash")
+    evidence_hash = _hex_from_evidence_fields(manifest)
+    if not evidence_hash:
+        errors.append("manifest has no valid evidence_hash (or evidence_hash_b64 for redacted cloud commits)")
     if manifest.get("ticker") != ticker:
         errors.append(f"manifest ticker must be {ticker}")
     if not manifest.get("primary_evidence_ready"):
@@ -37,8 +63,12 @@ def validate(manifest: dict, state: dict, ticker: str) -> list[str]:
         errors.append(f"agent state ticker must be {ticker}")
     if state.get("consumer") not in {"marvin_research", "marvin_contract_backfill"}:
         errors.append("agent state consumer must be marvin_research or marvin_contract_backfill")
-    if state.get("evidence_hash") != evidence_hash:
-        errors.append("agent state evidence_hash does not match manifest")
+    state_hash = _hex_from_evidence_fields(state)
+    if evidence_hash:
+        if not state_hash:
+            errors.append("agent state has no valid evidence_hash (or evidence_hash_b64)")
+        elif state_hash != evidence_hash:
+            errors.append("agent state evidence_hash does not match manifest")
     if not state.get("completed_at"):
         errors.append("agent state has no completed_at timestamp")
     return errors
