@@ -45,13 +45,12 @@
   },
   "method_route": {
     "schema_version": "2.0",
-    "status": "routed",
+    "status": "default_needs_review",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 16.0,
+    "score": 0.0,
     "reasons": [
-      "archetype=compounder",
-      "explicit reviewed profile"
+      "No decisive classification was supplied; owner-earnings is the conservative operating default."
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -72,7 +71,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marks_credit_cycle",
+      "moi",
       "pabrai",
       "stahl"
     ],
@@ -95,11 +96,8 @@
         "reasons": []
       },
       "quality_reinvestment": {
-        "score": 16.0,
-        "reasons": [
-          "archetype=compounder",
-          "explicit reviewed profile"
-        ]
+        "score": 0.0,
+        "reasons": []
       },
       "capital_cycle": {
         "score": 0.0,
@@ -124,12 +122,12 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "EWJ",
-    "as_of": "2026-07-29",
+    "as_of": "2026-11-07",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "compounder",
+      "archetype": "unknown",
       "moat": "unproven",
       "dhando": "pending",
       "stance": "watch",
@@ -162,8 +160,8 @@
         }
       ]
     },
-    "input_hash": "1917950b187ee168933cc785a344f01c5003476258d6d4970e4affcdd5602764",
-    "generated_at": "2026-07-29T20:29:00.444501+00:00"
+    "input_hash": "715edb213244446520291600c26fc3970db088f7b3179a9eb5ae83f4b30c080b",
+    "generated_at": "2026-11-07T09:32:24.198292+00:00"
   },
   "market": {
     "price_per_share": 90.43,
@@ -287,7 +285,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "27fbf36582e417564365e4f2df0c6f3cf38adfd6fac02eecced6967e451bed74",
+    "model_hash": "cd432a98294a53ecb7268a926918682fa1bc3796abe296485e9727908d0620dd",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
@@ -295,9 +293,9 @@
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
   "shared_forecast": {
     "schema_version": "1.0",
-    "method_version": "shared-valuation-forecast/1.1",
+    "method_version": "shared-valuation-forecast/1.3",
     "ticker": "EWJ",
-    "status": "model_gap",
+    "status": "sync_gap",
     "research_only": true,
     "requires_human_review": false,
     "capital_actionable": false,
@@ -306,10 +304,9 @@
     "quote": {
       "value": 90.43,
       "as_of": "2026-07-20",
-      "source_url": "Yahoo EWJ close 2026-07-20",
-      "currency": null
+      "source_url": "Yahoo EWJ close 2026-07-20"
     },
-    "forecast_hash": "1ebec4edf252b32e9bffb71121e06ed60c7272e51bfeb72f3d9e1a8c68cd6a39",
+    "forecast_hash": null,
     "forward_irr_pct": {
       "low": null,
       "base": null,
@@ -335,17 +332,31 @@
     "components": [],
     "gaps": [
       {
-        "code": "issuer_forecast_missing"
+        "code": "listing_calendar_or_completed_close_unverified"
+      },
+      {
+        "code": "corporate_action_history_unverified"
       }
     ],
     "warnings": [],
     "source_refs": [],
-    "next_action": "automatic_model_refresh",
+    "next_action": "automatic_source_refresh",
     "reconciliation": {
       "passed": false
     },
     "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
-    "calculation_id": "9a69a2a1aeb0894c4ccf304b80133464b36e93369c54367e6b06fa1937443519"
+    "financial_period": null,
+    "market_sync": {
+      "status": "updating",
+      "price_as_of": "2026-07-20",
+      "financial_period": null,
+      "model_as_of": "2026-07-20",
+      "price_policy": "latest_completed_exchange_session",
+      "basis_id": null,
+      "latest_report": {}
+    },
+    "assumptions_as_of": "2026-07-20",
+    "calculation_id": "39916865ba218abfed49b3747b1a4c75d7238e2abb9d6ac5bfd81466522d7013"
   },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": false,
