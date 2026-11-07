@@ -112,3 +112,27 @@ def test_inline_rendering_is_deterministic_and_never_changes_the_input():
     assert render(payload) == render(copy.deepcopy(payload))
     assert payload == before
 
+
+@pytest.mark.parametrize('variant,remaining', [(0, 18_000), (1, 24_000), (2, 21_000)])
+def test_complete_punctuated_sources_fit_without_discarding_inline_sharing(variant, remaining):
+    documents = []
+    for i in range(24):
+        clauses = []
+        for j in range(40):
+            locator = 'item_' + str(i) + '_' + str(j)
+            if variant == 0:
+                clause = 'Shared unaltered primary legal passage with exact punctuation, ' + locator + '. '
+            elif variant == 1:
+                clause = locator + ', shared unaltered primary legal passage with exact punctuation. '
+            else:
+                clause = 'Shared unaltered primary legal passage, ' + locator + '; more complete source language preserved. '
+            clauses.append(clause)
+        documents.append({'id': 'doc_' + str(i), 'contexts': [''.join(clauses)]})
+    payload = {'packet': {'documents': documents}}
+    before = copy.deepcopy(payload)
+    # A short intermediate layout can hide repeated phrases from the later
+    # inline pass. The actual gate must see the smallest complete final layout.
+    validate_input('H' * (MAX_INPUT_CHARACTERS - remaining) + render(payload))
+    assert unpack(pack(payload)) == before
+    assert digest(payload) == digest(before)
+
