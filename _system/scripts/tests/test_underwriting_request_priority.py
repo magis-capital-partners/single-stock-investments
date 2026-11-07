@@ -25,6 +25,21 @@ REQUIRED = {'2015 senior notes', '2017 senior notes', 'business day',
             'nineteenth supplemental indenture'}
 
 
+def test_current_dated_base_instrument_and_prior_literal_titles_survive_clause_history():
+    current = {'code': 'base_payment_terms', 'detail':
+        "Retrieve the August 19, 2010 Base Indenture, Sections 7.01 and 7.02. "
+        "Search terms: 'Business Day', 'Legal Holidays', 'principal', 'Event of Default', "
+        "'acceleration', 'notice', 'rescind', 'March 9, 2027', 'January 15, 2028'."}
+    history = older_requests() + [CURRENT]
+    before = copy.deepcopy(history)
+    terms = requested_keywords([current], history=history)
+    assert {'2010 indenture', '2015 senior notes', '2017 senior notes',
+            'nineteenth supplemental indenture'} <= set(terms)
+    assert terms.index('business day') < terms.index('2015 senior notes')
+    assert len(terms) <= 18 and len(terms) == len(set(terms))
+    assert history == before
+
+
 @pytest.mark.parametrize('instrument', ['2015 Senior Notes', '2017 Senior Notes'])
 def test_digit_leading_primary_instrument_labels_remain_literal_queries(instrument):
     assert instrument.lower() in requested_keywords([
