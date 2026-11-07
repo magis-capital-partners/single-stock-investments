@@ -193,13 +193,16 @@ def _pack_dense(payload, segments, minimum_shared_length=30):
     return envelope
 
 
-def _best_dense(payload):
+def _dense_layouts(payload):
     # Primary document IDs and dates are short but repeat across many facts.
     # Keep the original layouts: reference overhead can outweigh their savings
     # on small packets. Every candidate has the same verified decoded payload.
-    return min((_pack_dense(payload, segments, threshold)
-                for threshold in (30, 8) for segments in (_segments, _content_segments)),
-               key=lambda e:len(encoded(e)))
+    return (_pack_dense(payload, segments, threshold)
+            for threshold in (30, 8) for segments in (_segments, _content_segments))
+
+
+def _best_dense(payload):
+    return min(_dense_layouts(payload), key=lambda e: len(encoded(e)))
 
 
 def _inline_parts(text, dictionary_size):
@@ -349,10 +352,20 @@ def _unpack_inline(envelope):
     return unpack(original)
 
 
+def _complete_layouts(payload):
+    # Compare complete encodings: the smallest dense intermediate can split
+    # passages so the later inline pass cannot share them. Keep all four
+    # existing layouts until their exact-text inline sharing is finished.
+    for dense in _dense_layouts(payload):
+        yield DENSE_INSTRUCTIONS, dense
+        inline = _pack_inline(dense)
+        if inline:
+            yield INLINE_INSTRUCTIONS, inline
+
+
 def pack(payload):
-    dense = _best_dense(payload)
-    inline = _pack_inline(dense)
-    return min((dense, inline), key=lambda e: len(encoded(e))) if inline else dense
+    return min((envelope for _, envelope in _complete_layouts(payload)),
+               key=lambda e: len(encoded(e)))
 
 
 def unpack(envelope):
@@ -396,11 +409,9 @@ def unpack(envelope):
 
 
 def render(payload):
-    dense = _best_dense(payload)
-    candidates = [encoded(payload), DENSE_INSTRUCTIONS+encoded(dense)]
-    inline = _pack_inline(dense)
-    if inline:
-        candidates.append(INLINE_INSTRUCTIONS+encoded(inline))
+    candidates = [encoded(payload)]
+    candidates.extend(instructions + encoded(envelope)
+                      for instructions, envelope in _complete_layouts(payload))
     # Retain the old, readable layout when it is smaller, and continue decoding
     # saved paid prompts without changing their evidence or session identities.
     if REFERENCE not in encoded(payload):
