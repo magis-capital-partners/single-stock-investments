@@ -94,6 +94,7 @@ def linked_references(raw, parent_url, cik, keywords):
 
 def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetch):
     from underwriting_evidence import document_record
+    from underwriting_sec_submissions import financing_references, financing_documents
     if not keywords:
         return [], []
     credit, transaction = request_kinds(keywords)
@@ -155,9 +156,14 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
     # contains the executed agreement. Preserve that filing as well as its child.
     # Four references per layer and two layers bound extra requests to eight;
     # the existing issuer/destination checks apply at every step.
-    references = {}
-    for _ in range(2):
-        current_layer = set()
+    try:
+        references = {r['source_url']: r for r in financing_references(submissions, cik, as_of, keywords)}
+    except ValueError as exc:
+        references = {}
+        errors.append({'source': 'requested_financing_discovery', 'error': str(exc)})
+    financing_urls = set(references)
+    for layer in range(2):
+        current_layer = set(references) if layer == 0 else set()
         for parent in parents:
             for reference in linked_references(parent['raw'], parent['source_url'], cik, focus):
                 if reference['source_url'] in existing:
@@ -177,6 +183,11 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
             existing.add(url)
             try:
                 raw = fetch(url)
+                if reference.get('_submission'):
+                    # The authenticated package contains every EX-4 member;
+                    # no per-note requests or truncated contract windows needed.
+                    documents.extend(financing_documents(url, raw, cik, reference['_submission']))
+                    continue
                 doc = document_record(url, raw, focus, prefer_complete=True)
                 doc.update(document_kind='incorporated_primary_document', referenced_by=reference['referenced_by'],
                            reference_text=reference['reference_text'])
@@ -190,4 +201,9 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
         parents = following
         if not parents and not references:
             break
+    missing = sorted(financing_urls-existing)
+    if missing:
+        errors.append({'source': 'requested_financing_source_budget',
+                       'error': 'Dated financing candidates exceed the bounded primary-reference fetch capacity',
+                       'source_urls': missing})
     return documents, errors
