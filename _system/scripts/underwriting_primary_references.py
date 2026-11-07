@@ -29,16 +29,16 @@ def archive_url(value, parent, cik):
     return urldefrag(url)[0]
 
 
-def dated_note_labels(keywords):
+def dated_instrument_labels(keywords):
     """Explicit dated instrument labels, rather than generic financial words."""
     return [term.split() for value in keywords
-            if re.fullmatch(r'(?:19|20)\d{2} (?:senior )?notes?',
+            if re.fullmatch(r'(?:19|20)\d{2} (?:(?:senior )?notes?|indenture)',
                             term := ' '.join(value.lower().split()))]
 
 
 def request_kinds(keywords):
     text = ' '.join(keywords).lower()
-    return (bool(dated_note_labels(keywords)
+    return (bool(dated_instrument_labels(keywords)
                  or re.search(r'credit|covenant|maturit|refinanc|borrow|debt|financ|indenture', text)),
             bool(re.search(r'acqui|merg|consideration|tender|transaction|target', text)))
 
@@ -50,8 +50,8 @@ def linked_references(raw, parent_url, cik, keywords):
         return []
     source = raw.decode('utf-8', errors='replace')
     lower = source.lower()
-    note_labels = dated_note_labels(keywords)
-    indentures_requested = bool(note_labels
+    instrument_labels = dated_instrument_labels(keywords)
+    indentures_requested = bool(instrument_labels
                                 or re.search(r'indenture|bond|maturit|notes due', ' '.join(keywords), re.I))
     result = {}
     for link in re.finditer(r'<a\b[^>]*\bhref\s*=\s*["\']([^"\']+)["\'][^>]*>.*?</a>', source, re.I | re.S):
@@ -83,7 +83,7 @@ def linked_references(raw, parent_url, cik, keywords):
         # over generic indentures before the unchanged bounded fetch selection.
         # Match whole words in this exhibit's own description, never a neighbor.
         score += 40 * any(all(re.search(r'\b'+re.escape(word)+r'\b', body) for word in label)
-                          for label in note_labels)
+                          for label in instrument_labels)
         score += sum(term.lower() in body for term in keywords if len(term) >= 4)
         record = {'source_url': target, 'reference_text': description, '_score': score,
                   'referenced_by': {'source_url': parent_url, 'content_hash': hashlib.sha256(raw).hexdigest()}}
@@ -99,9 +99,8 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
     credit, transaction = request_kinds(keywords)
     if not credit and not transaction:
         return [], []
-    focus = list(dict.fromkeys((['credit agreement', 'covenant'] if credit else [])
-                              + (['merger', 'acquisition', 'tender offer', 'purchase price'] if transaction else [])
-                              + list(keywords)))[:18]
+    focus = list(dict.fromkeys(list(keywords)+(['credit agreement', 'covenant'] if credit else [])
+                              + (['merger', 'acquisition', 'tender offer', 'purchase price'] if transaction else [])))[:18]
     documents, errors = [], []
     parents = list(sources)
     # A transaction can close after the annual report. Its report date is an
@@ -156,19 +155,25 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
     # contains the executed agreement. Preserve that filing as well as its child.
     # Four references per layer and two layers bound extra requests to eight;
     # the existing issuer/destination checks apply at every step.
+    references = {}
     for _ in range(2):
-        references = {}
+        current_layer = set()
         for parent in parents:
             for reference in linked_references(parent['raw'], parent['source_url'], cik, focus):
                 if reference['source_url'] in existing:
                     continue
+                current_layer.add(reference['source_url'])
                 reference['referenced_by']['filed'] = parent.get('filed')
                 old = references.get(reference['source_url'])
                 if old is None or reference['_score'] > old['_score']:
                     references[reference['source_url']] = reference
         following = []
-        for reference in sorted(references.values(), key=lambda row: (-row['_score'], row['source_url']))[:4]:
+        # Selected announcing filings keep priority for their executed children.
+        # Unused second-layer slots can then follow pending index citations.
+        for reference in sorted(references.values(), key=lambda row: (
+                row['source_url'] not in current_layer, -row['_score'], row['source_url']))[:4]:
             url = reference['source_url']
+            references.pop(url)
             existing.add(url)
             try:
                 raw = fetch(url)
@@ -183,6 +188,6 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
             except (OSError, ValueError) as exc:
                 errors.append({'source': 'requested_primary_reference', 'source_url': url, 'error': str(exc)[:500]})
         parents = following
-        if not parents:
+        if not parents and not references:
             break
     return documents, errors

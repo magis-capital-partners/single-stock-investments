@@ -58,12 +58,34 @@ def merge_evidence_requests(previous, incoming):
     return list(rows.values())[-12:]
 
 
+def requested_instruments(gaps):
+    """Literal instrument names in requests, without selecting URLs or facts."""
+    terms = []
+    month = r'(?:January|February|March|April|May|June|July|August|September|October|November|December)'
+    dated = month+r'\s+\d{1,2},?\s+((?:19|20)\d{2})'
+    for gap in gaps[:12]:
+        detail = str(gap.get('detail') or '')[:8000]
+        terms.extend(' '.join(m.lower().split()) for m in
+                     re.findall(r'\b(?:19|20)\d{2}\s+(?:Senior\s+)?Notes?\b', detail, re.I))
+        # A base instrument is often named by its execution date, while the
+        # primary exhibit index says only "Indenture, dated ...".
+        for pattern in (dated+r'\s+Base\s+Indenture\b',
+                        r'\bBase\s+Indenture,?\s+(?:dated\s+(?:as\s+of\s+)?)?'+dated):
+            terms.extend(year+' indenture' for year in re.findall(pattern, detail, re.I))
+        for name in re.findall(r'\b([A-Za-z]+(?:-[A-Za-z]+)?\s+Supplemental\s+Indenture)\b', detail, re.I):
+            if name.split()[0].lower() not in {'the','a','an','this','that','each','any','same',
+                                               'operative','complete','current','latest','applicable'}:
+                terms.append(' '.join(name.lower().split()))
+    return list(dict.fromkeys(terms))
+
+
 def requested_keywords(gaps, *, history=None):
     """Balance explicit disclosure requests; model text never chooses URLs/tools."""
     if history is not None:
         # Spend the same bounded query budget on the current missing facts first.
         # Historical requests remain intact and fill any remaining search slots.
-        return list(dict.fromkeys(requested_keywords(gaps)+requested_keywords(history)))[:18]
+        return list(dict.fromkeys(requested_keywords(gaps)+requested_instruments(history)
+                                  +requested_keywords(history)))[:18]
     groups = []
     excluded = {'missing', 'evidence', 'primary', 'source', 'required', 'financial', 'report',
                 'statement', 'company', 'specific', 'retrieve', 'contexts', 'expanded', 'still',
@@ -98,7 +120,7 @@ def requested_keywords(gaps, *, history=None):
         section_lists = re.findall(r'\bSections?\s+('+reference
             +r'(?:(?:,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)'+reference+r')*)', detail, re.I)
         sections = ['section '+n for group in section_lists for n in re.findall(number, group)]
-        terms = notes+sections+terms
+        terms = requested_instruments([gap])+notes+sections+terms
         groups.append(list(dict.fromkeys(terms))[:12])
     terms = []
     for index in range(12):

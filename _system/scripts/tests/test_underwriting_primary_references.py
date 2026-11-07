@@ -60,9 +60,9 @@ def test_dated_requested_notes_precede_generic_indentures_within_the_existing_fe
         [{'source_url': PARENT, 'raw': raw, 'filed': '2026-10-21'}],
         ['2015 senior notes', '2017 senior notes', 'maturity date', 'nineteenth supplemental indenture'], fetch)
     assert not errors
-    assert set(calls) == {base + name for name in (
+    assert set(calls[:4]) == {base + name for name in (
         'requested-2015.htm', 'requested-2017.htm', 'credit.htm', 'new-supplement.htm')}
-    assert len(calls) == 4
+    assert len(calls) == 7 and len(calls) <= 8
     assert {d['source_url'] for d in docs} == set(calls)
     assert all(d['coverage'] == 'complete_requested_primary_document' for d in docs)
 
@@ -72,6 +72,58 @@ def test_an_explicit_dated_note_request_needs_no_generic_debt_keyword():
            'including the form of Senior Notes due 2027</a>').encode()
     refs = linked_references(raw, PARENT, '1059556', ['2015 senior notes'])
     assert [r['source_url'].rsplit('/', 1)[-1] for r in refs] == ['notes.htm']
+
+
+def test_generic_helpers_cannot_displace_the_eighteenth_explicit_instrument():
+    raw = b'<a href="notes.htm">Indenture dated March 9, 2015 including Senior Notes due 2027</a>'
+    calls = []
+    def fetch(url):
+        calls.append(url)
+        return b'<p>Cash, debt and capital. ' + b'Complete operative terms. ' * 40 + b'</p>'
+    docs, errors = collect_requested_documents({}, '1059556', '2026-11-07',
+        [{'source_url': PARENT, 'raw': raw}],
+        [f'explicit query {i}' for i in range(17)] + ['2015 senior notes'], fetch)
+    assert not errors and len(calls) == 1
+    assert docs[0]['source_url'].endswith('/notes.htm')
+
+
+def test_dated_indentures_match_their_own_date_without_inventing_a_base_alias():
+    raw = ('<a href="old.htm">Indenture dated August 19, 2009 between the Company and Trustee</a>'
+           '<a href="current.htm">Indenture dated August 19, 2010 between the Company and Trustee</a>').encode()
+    refs = linked_references(raw, PARENT, '1059556', ['2010 indenture'])
+    assert refs[0]['source_url'].endswith('/current.htm')
+    assert refs[0]['_score'] > refs[1]['_score']
+
+
+def test_unselected_primary_citations_remain_available_in_the_second_bounded_layer():
+    base = AGREEMENT.rsplit('/', 1)[0] + '/'
+    raw = ''.join(f'<a href="{base}agreement-{i}.htm">Credit Agreement {i}</a>' for i in range(6)).encode()
+    calls = []
+    def fetch(url):
+        calls.append(url)
+        return b'<p>Cash, debt and capital. ' + b'Complete operative terms. ' * 40 + b'</p>'
+    docs, errors = collect_requested_documents({}, '1059556', '2026-11-07',
+        [{'source_url': PARENT, 'raw': raw}], ['credit'], fetch)
+    assert not errors
+    assert len(calls) == 6 and len(set(calls)) == 6
+    assert {d['source_url'] for d in docs} == set(calls)
+
+
+def test_pending_index_citations_cannot_displace_selected_executed_children():
+    base = AGREEMENT.rsplit('/', 1)[0] + '/'
+    initial = [base+f'agreement-{i}.htm' for i in range(6)]
+    children = [base+f'z-operative-{i}.htm' for i in range(4)]
+    raw = ''.join(f'<a href="{url}">Credit Agreement</a>' for url in initial).encode()
+    calls = []
+    def fetch(url):
+        calls.append(url)
+        child = (f'<a href="{children[initial.index(url)]}">Executed Credit Agreement</a>'
+                 if url in initial[:4] else '')
+        return ('<p>Cash, debt and capital. '+'Complete operative terms. '*40+'</p>'+child).encode()
+    docs, errors = collect_requested_documents({}, '1059556', '2026-11-07',
+        [{'source_url': PARENT, 'raw': raw}], ['credit'], fetch)
+    assert not errors and len(calls) == 8
+    assert set(calls) == set(initial[:4]+children)
 
 
 def test_a_requested_supplement_keeps_complete_operative_terms_without_financial_word_padding():
