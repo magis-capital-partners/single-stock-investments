@@ -1,20 +1,20 @@
 {
   "schema": "fico_watch.v1",
-  "generated_at": "2026-11-06T11:24:09Z",
+  "generated_at": "2026-11-07T10:29:33Z",
   "ticker": "FICO",
   "banner": {
     "tone": "fail",
-    "text": "FICO · Software is not an offset · Debt is above 3× operating income",
+    "text": "FICO · Newer filing unread · Debt is above 3× operating income",
     "action": "Open FICO"
   },
   "verdict": {
     "tone": "fail",
-    "title": "Software is not an offset. Debt is above 3× operating income",
-    "detail": "These lines are the watch. A holding pill means that particular gate has not broken. It does not mean the mortgage toll is safe."
+    "title": "A newer SEC filing is unread",
+    "detail": "Latest 10-K filed 2026-11-06 (period 2026-09-30, accession 0000814547-26-000042) is newer than the filing these segment rows were read from (10-Q filed 2026-07-29). Do not treat the Scores split, bureau share, or margin as current."
   },
   "freshness": {
-    "state": "current",
-    "detail": "Segment rows match 10-Q filed 2026-07-29 (period 2026-06-30). Automatic debt, cash, and revenue rows were read from the SEC companyfacts feed on this run.",
+    "state": "unread_filing",
+    "detail": "Latest 10-K filed 2026-11-06 (period 2026-09-30, accession 0000814547-26-000042) is newer than the filing these segment rows were read from (10-Q filed 2026-07-29). Do not treat the Scores split, bureau share, or margin as current.",
     "pinned": {
       "form": "10-Q",
       "accession": "0000814547-26-000030",
@@ -23,10 +23,10 @@
       "source_path": "FICO/research/deep_dive_2026-09-29.md"
     },
     "latest": {
-      "form": "10-Q",
-      "accession": "0000814547-26-000030",
-      "filed": "2026-07-29",
-      "period_end": "2026-06-30"
+      "form": "10-K",
+      "accession": "0000814547-26-000042",
+      "filed": "2026-11-06",
+      "period_end": "2026-09-30"
     },
     "sec_error": null,
     "reused_auto": false
@@ -51,18 +51,18 @@
           "id": "software_growth_pct",
           "label": "Software revenue growth",
           "display": "3% in fiscal 2025",
-          "note": "Watch line is 8% a year, set here so a low-single-digit software result cannot be read as a replacement for Scores. Fiscal 2025 operating income in Software fell $9.8 million.",
+          "note": "A newer SEC filing is unread. Watch line is 8% a year, set here so a low-single-digit software result cannot be read as a replacement for Scores. Fiscal 2025 operating income in Software fell $9.8 million.",
           "as_of": "2025-09-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "fail",
-          "pill": "Broken"
+          "status": "stale",
+          "pill": "Recheck"
         },
         {
           "id": "net_debt_to_annualized_operating_income",
           "label": "Net debt / annualized operating income",
-          "display": "3.98×",
-          "note": "Net debt $5,333.9 million ($5,282.4 million plus $300.0 million minus $248.4 million) divided by $1,340.8 million of operating income stretched to a year. Not a company-reported EBITDA multiple.",
-          "as_of": "2026-06-30",
+          "display": "3.97×",
+          "note": "Net debt $5,041.5 million ($4,921.6 million plus $337.5 million minus $217.6 million) divided by $1,269.2 million of operating income stretched to a year. Not a company-reported EBITDA multiple.",
+          "as_of": "2026-09-30",
           "source": "sec:companyfacts",
           "status": "fail",
           "pill": "Broken"
@@ -81,21 +81,21 @@
           "id": "bureau_revenue_share_pct",
           "label": "Bureau share of revenue",
           "display": "63% of the June quarter",
-          "note": "54% a year earlier and 51% for fiscal 2025. Holding means it has not crossed 70%. It is already the majority of revenue, and the same three firms own the rival score.",
+          "note": "A newer SEC filing is unread. 54% a year earlier and 51% for fiscal 2025. Holding means it has not crossed 70%. It is already the majority of revenue, and the same three firms own the rival score.",
           "as_of": "2026-06-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "pass",
-          "pill": "Holding"
+          "status": "stale",
+          "pill": "Recheck"
         },
         {
           "id": "scores_operating_margin_pct",
           "label": "Scores operating margin",
           "display": "88% in fiscal 2025",
-          "note": "Last reported Scores margin. The June quarter does not restate it. Holding means it has not fallen through 80%.",
+          "note": "A newer SEC filing is unread. Last reported Scores margin. The June quarter does not restate it. Holding means it has not fallen through 80%.",
           "as_of": "2025-09-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "pass",
-          "pill": "Holding"
+          "status": "stale",
+          "pill": "Recheck"
         },
         {
           "id": "mortgage_unit_price",
@@ -116,9 +116,9 @@
         {
           "id": "debt_noncurrent",
           "label": "Long-term debt, excluding the portion due within a year",
-          "display": "$5,282.4 million",
+          "display": "$4,921.6 million",
           "note": "SEC companyfacts, LongTermDebtNoncurrent.",
-          "as_of": "2026-06-30",
+          "as_of": "2026-09-30",
           "source": "sec:companyfacts",
           "status": "context",
           "pill": "SEC feed"
@@ -126,9 +126,9 @@
         {
           "id": "debt_current",
           "label": "Long-term debt due within a year",
-          "display": "$300.0 million",
+          "display": "$337.5 million",
           "note": "SEC companyfacts, LongTermDebtCurrent. Included in the net-debt figure.",
-          "as_of": "2026-06-30",
+          "as_of": "2026-09-30",
           "source": "sec:companyfacts",
           "status": "context",
           "pill": "SEC feed"
@@ -136,9 +136,9 @@
         {
           "id": "cash",
           "label": "Cash",
-          "display": "$248.4 million",
+          "display": "$217.6 million",
           "note": "SEC companyfacts, cash and cash equivalents.",
-          "as_of": "2026-06-30",
+          "as_of": "2026-09-30",
           "source": "sec:companyfacts",
           "status": "context",
           "pill": "SEC feed"
@@ -146,9 +146,9 @@
         {
           "id": "operating_income",
           "label": "Operating income used for the multiple",
-          "display": "$999.1 million",
-          "note": "272 days in the span. Stretched to a year this is $1,340.8 million. Basis: year-to-date.",
-          "as_of": "2026-06-30",
+          "display": "$1,265.7 million",
+          "note": "364 days in the span. Stretched to a year this is $1,269.2 million. Basis: year-to-date.",
+          "as_of": "2026-09-30",
           "source": "sec:companyfacts",
           "status": "context",
           "pill": "SEC feed"
@@ -166,9 +166,9 @@
         {
           "id": "revenue_ytd",
           "label": "Revenue, year to date",
-          "display": "$1,877.8 million",
-          "note": "SEC companyfacts. Span 272 days.",
-          "as_of": "2026-06-30",
+          "display": "$2,534.9 million",
+          "note": "SEC companyfacts. Span 364 days.",
+          "as_of": "2026-09-30",
           "source": "sec:companyfacts",
           "status": "context",
           "pill": "SEC feed"
@@ -187,8 +187,8 @@
           "id": "buybacks_ytd",
           "label": "Stock repurchase payments, year to date",
           "display": "$3,046.0 million",
-          "note": "SEC companyfacts. Span 272 days. This is cash spent, not a statement that the price was wise.",
-          "as_of": "2026-06-30",
+          "note": "SEC companyfacts. Span 364 days. This is cash spent, not a statement that the price was wise.",
+          "as_of": "2026-09-30",
           "source": "sec:companyfacts",
           "status": "context",
           "pill": "SEC feed"
@@ -203,57 +203,57 @@
           "id": "scores_quarter",
           "label": "Scores revenue, June quarter",
           "display": "$459 million",
-          "note": "Up from $324 million. Management tied the business-to-business increase to a higher mortgage origination score unit price. The filing does not split mortgage origination scores out of that book.",
+          "note": "A newer SEC filing is unread. Up from $324 million. Management tied the business-to-business increase to a higher mortgage origination score unit price. The filing does not split mortgage origination scores out of that book.",
           "as_of": "2026-06-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "context",
-          "pill": "Last read"
+          "status": "stale",
+          "pill": "Unread"
         },
         {
           "id": "scores_nine_months",
           "label": "Scores revenue, nine months",
           "display": "$1.24 billion",
-          "note": "Already above the full prior year. Fiscal 2025 Scores were $1.17 billion.",
+          "note": "A newer SEC filing is unread. Already above the full prior year. Fiscal 2025 Scores were $1.17 billion.",
           "as_of": "2026-06-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "context",
-          "pill": "Last read"
+          "status": "stale",
+          "pill": "Unread"
         },
         {
           "id": "scores_b2b",
           "label": "Business-to-business Scores, fiscal 2025",
           "display": "$949 million",
-          "note": "81% of Scores that year. This is the toll the mortgage grid can contest. Fiscal 2026 split is not in the June quarterly report.",
+          "note": "A newer SEC filing is unread. 81% of Scores that year. This is the toll the mortgage grid can contest. Fiscal 2026 split is not in the June quarterly report.",
           "as_of": "2025-09-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "context",
-          "pill": "Last read"
+          "status": "stale",
+          "pill": "Unread"
         },
         {
           "id": "scores_b2c",
           "label": "Direct-to-consumer Scores, fiscal 2025",
           "display": "$220 million",
-          "note": "myFICO. The mortgage grid does not set this price.",
+          "note": "A newer SEC filing is unread. myFICO. The mortgage grid does not set this price.",
           "as_of": "2025-09-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "context",
-          "pill": "Last read"
+          "status": "stale",
+          "pill": "Unread"
         },
         {
           "id": "software_revenue",
           "label": "Software revenue, fiscal 2025",
           "display": "$822 million",
-          "note": "Grew 3%. Software operating income fell $9.8 million. That is not an offset if Scores weaken.",
+          "note": "A newer SEC filing is unread. Grew 3%. Software operating income fell $9.8 million. That is not an offset if Scores weaken.",
           "as_of": "2025-09-30",
           "source": "FICO/research/deep_dive_2026-09-29.md",
-          "status": "context",
-          "pill": "Last read"
+          "status": "stale",
+          "pill": "Unread"
         },
         {
           "id": "interest_nine_months",
           "label": "Interest expense, nine months",
-          "display": "$146.5 million",
-          "note": "SEC companyfacts year-to-date interest, same order of magnitude as the last human read. Up from $94 million. The quarterly report ties the increase to a higher average debt balance: notes issued in May 2025 and March 2026, and a term loan used to buy back stock.",
+          "display": "$223.3 million",
+          "note": "The last human read recorded $146 million. The SEC feed says $223.3 million. This row follows the feed. Up from $94 million. The quarterly report ties the increase to a higher average debt balance: notes issued in May 2025 and March 2026, and a term loan used to buy back stock.",
           "as_of": "2026-06-30",
           "source": "sec:companyfacts",
           "status": "context",
@@ -371,38 +371,38 @@
     }
   ],
   "auto": {
-    "leverage": 3.98,
-    "leverage_as_of": "2026-06-30",
-    "leverage_note": "Net debt $5,333.9 million ($5,282.4 million plus $300.0 million minus $248.4 million) divided by $1,340.8 million of operating income stretched to a year. Not a company-reported EBITDA multiple.",
-    "interest_ytd_millions": 146.5,
+    "leverage": 3.97,
+    "leverage_as_of": "2026-09-30",
+    "leverage_note": "Net debt $5,041.5 million ($4,921.6 million plus $337.5 million minus $217.6 million) divided by $1,269.2 million of operating income stretched to a year. Not a company-reported EBITDA multiple.",
+    "interest_ytd_millions": 223.3,
     "lines": [
       {
         "id": "debt_noncurrent",
         "label": "Long-term debt, excluding the portion due within a year",
-        "display": "$5,282.4 million",
-        "as_of": "2026-06-30",
+        "display": "$4,921.6 million",
+        "as_of": "2026-09-30",
         "note": "SEC companyfacts, LongTermDebtNoncurrent."
       },
       {
         "id": "debt_current",
         "label": "Long-term debt due within a year",
-        "display": "$300.0 million",
-        "as_of": "2026-06-30",
+        "display": "$337.5 million",
+        "as_of": "2026-09-30",
         "note": "SEC companyfacts, LongTermDebtCurrent. Included in the net-debt figure."
       },
       {
         "id": "cash",
         "label": "Cash",
-        "display": "$248.4 million",
-        "as_of": "2026-06-30",
+        "display": "$217.6 million",
+        "as_of": "2026-09-30",
         "note": "SEC companyfacts, cash and cash equivalents."
       },
       {
         "id": "operating_income",
         "label": "Operating income used for the multiple",
-        "display": "$999.1 million",
-        "as_of": "2026-06-30",
-        "note": "272 days in the span. Stretched to a year this is $1,340.8 million. Basis: year-to-date."
+        "display": "$1,265.7 million",
+        "as_of": "2026-09-30",
+        "note": "364 days in the span. Stretched to a year this is $1,269.2 million. Basis: year-to-date."
       },
       {
         "id": "revenue_quarter",
@@ -414,9 +414,9 @@
       {
         "id": "revenue_ytd",
         "label": "Revenue, year to date",
-        "display": "$1,877.8 million",
-        "as_of": "2026-06-30",
-        "note": "SEC companyfacts. Span 272 days."
+        "display": "$2,534.9 million",
+        "as_of": "2026-09-30",
+        "note": "SEC companyfacts. Span 364 days."
       },
       {
         "id": "operating_income_quarter",
@@ -429,11 +429,11 @@
         "id": "buybacks_ytd",
         "label": "Stock repurchase payments, year to date",
         "display": "$3,046.0 million",
-        "as_of": "2026-06-30",
-        "note": "SEC companyfacts. Span 272 days. This is cash spent, not a statement that the price was wise."
+        "as_of": "2026-09-30",
+        "note": "SEC companyfacts. Span 364 days. This is cash spent, not a statement that the price was wise."
       }
     ],
-    "checked_at": "2026-11-06T11:24:09Z"
+    "checked_at": "2026-11-07T10:29:33Z"
   },
   "gate_status": [
     {
@@ -443,13 +443,13 @@
     },
     {
       "kpi_id": "software_growth_pct",
-      "status": "fail",
+      "status": "stale",
       "display": "3% in fiscal 2025"
     },
     {
       "kpi_id": "net_debt_to_annualized_operating_income",
       "status": "fail",
-      "display": "3.98×"
+      "display": "3.97×"
     },
     {
       "kpi_id": "preferred_lender_count",
@@ -458,12 +458,12 @@
     },
     {
       "kpi_id": "bureau_revenue_share_pct",
-      "status": "pass",
+      "status": "stale",
       "display": "63% of the June quarter"
     },
     {
       "kpi_id": "scores_operating_margin_pct",
-      "status": "pass",
+      "status": "stale",
       "display": "88% in fiscal 2025"
     },
     {
