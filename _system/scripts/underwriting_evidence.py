@@ -192,7 +192,16 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
         if len(contexts) >= 30:
             break
     body = text_of(source)
-    if (form == '10-Q' or prefer_complete) and 500 <= len(body) <= 350000 and sum(w in body.lower() for w in words) >= 3:
+    # A requested trustee-succession supplement can contain no monetary table.
+    # Its explicit self-identification, operative sections and execution text
+    # still need to survive intact, rather than becoming disconnected windows.
+    requested_supplement = (prefer_complete and any('indenture' in w for w in focus)
+        and re.search(r'\bthis\s+(?:[a-z-]+\s+){0,3}supplemental\s+indenture\b', body[:1500], re.I)
+        and re.search(r'\bsection\s+\d+\b', body, re.I)
+        and re.search(r'\btrustee\b', body, re.I)
+        and re.search(r'\bin witness whereof\b', body, re.I))
+    if ((form == '10-Q' or prefer_complete) and 500 <= len(body) <= 350000
+            and (sum(w in body.lower() for w in words) >= 3 or requested_supplement)):
         # Complete bounded reports/agreements retain contractual footnotes
         # that could otherwise fall outside selected search windows.
         return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),

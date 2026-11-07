@@ -29,9 +29,17 @@ def archive_url(value, parent, cik):
     return urldefrag(url)[0]
 
 
+def dated_note_labels(keywords):
+    """Explicit dated instrument labels, rather than generic financial words."""
+    return [term.split() for value in keywords
+            if re.fullmatch(r'(?:19|20)\d{2} (?:senior )?notes?',
+                            term := ' '.join(value.lower().split()))]
+
+
 def request_kinds(keywords):
     text = ' '.join(keywords).lower()
-    return (bool(re.search(r'credit|covenant|maturit|refinanc|borrow|debt|financ|indenture', text)),
+    return (bool(dated_note_labels(keywords)
+                 or re.search(r'credit|covenant|maturit|refinanc|borrow|debt|financ|indenture', text)),
             bool(re.search(r'acqui|merg|consideration|tender|transaction|target', text)))
 
 
@@ -42,7 +50,9 @@ def linked_references(raw, parent_url, cik, keywords):
         return []
     source = raw.decode('utf-8', errors='replace')
     lower = source.lower()
-    indentures_requested = bool(re.search(r'indenture|bond|maturit|notes due', ' '.join(keywords), re.I))
+    note_labels = dated_note_labels(keywords)
+    indentures_requested = bool(note_labels
+                                or re.search(r'indenture|bond|maturit|notes due', ' '.join(keywords), re.I))
     result = {}
     for link in re.finditer(r'<a\b[^>]*\bhref\s*=\s*["\']([^"\']+)["\'][^>]*>.*?</a>', source, re.I | re.S):
         target = archive_url(link[1], parent_url, cik)
@@ -68,6 +78,12 @@ def linked_references(raw, parent_url, cik, keywords):
             score += 20 * bool(re.search(r'\bmerger\b|\bacquisition agreement\b|\btender offer\b|\bpurchase agreement\b', body))
         if not score:
             continue
+        # An exhibit index separates "2015 Senior Notes" into its execution
+        # date and the note title. Prefer that explicitly requested instrument
+        # over generic indentures before the unchanged bounded fetch selection.
+        # Match whole words in this exhibit's own description, never a neighbor.
+        score += 40 * any(all(re.search(r'\b'+re.escape(word)+r'\b', body) for word in label)
+                          for label in note_labels)
         score += sum(term.lower() in body for term in keywords if len(term) >= 4)
         record = {'source_url': target, 'reference_text': description, '_score': score,
                   'referenced_by': {'source_url': parent_url, 'content_hash': hashlib.sha256(raw).hexdigest()}}
