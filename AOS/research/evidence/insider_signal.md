@@ -1,4 +1,4 @@
-# AOS — Insider conviction (2026-03-04)
+# AOS — Insider conviction (2026-11-06)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,6 +15,7 @@
 
 **Routine / planned sales (context):**
 
+- Wheeler Kevin J.: 14675 @ $65.6412 on 2026-11-05
 - Schuh Darrell W.: 1104 @ $74.3898 on 2026-03-04
 - Schuh Darrell W.: 356 @ $79.885 on 2026-02-13
 

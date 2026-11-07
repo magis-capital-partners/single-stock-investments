@@ -1,4 +1,4 @@
-# ABT — Insider conviction (2026-09-03)
+# ABT — Insider conviction (2026-11-06)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -20,9 +20,9 @@
 
 **Routine / planned sales (context):**
 
+- Moreland Mary K: 3500 @ $116.0 on 2026-11-05
 - Ford Robert B: 218535 @ $115.57 on 2026-08-25
 - Ford Robert B: 180297 @ $116.19 on 2026-08-25
-- MCCOY JOHN A. JR.: 27 @ $109.54 on 2026-09-02
 
 Source: `_system/reference/market-data/insider/ABT_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

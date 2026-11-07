@@ -1,13 +1,13 @@
-# ADP — Insider conviction (2026-11-03)
+# ADP — Insider conviction (2026-11-06)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 1.33 (negligible) · **Bull case support:** none
+**ICS:** 0.83 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 25% |
-| Base | 55% | 50% |
+| Bear | 20% | 26% |
+| Base | 55% | 49% |
 | Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
@@ -16,9 +16,9 @@
 
 **Routine / planned sales (context):**
 
-- Rodriguez Carlos A: 537 @ $300.0235 on 2026-11-02 (10b5-1)
-- Rodriguez Carlos A: 539 @ $300.0274 on 2026-11-02 (10b5-1)
-- Rodriguez Carlos A: 3345 @ $300.0392 on 2026-11-02 (10b5-1)
+- Rodriguez Carlos A: 4 @ $301.815 on 2026-11-04 (10b5-1)
+- Rodriguez Carlos A: 6 @ $302.0966 on 2026-11-04 (10b5-1)
+- Rodriguez Carlos A: 9 @ $304.8711 on 2026-11-04 (10b5-1)
 
 Source: `_system/reference/market-data/insider/ADP_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

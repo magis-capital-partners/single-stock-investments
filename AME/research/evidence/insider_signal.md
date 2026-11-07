@@ -2,17 +2,17 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.3 (weak) · **Bull case support:** none
+**ICS:** 2.25 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 23% |
+| Bear | 20% | 24% |
 | Base | 55% | 52% |
 | Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Stanage Nick L | 2026-08-11 | 4000 | $255.85 | $1023400.0 | 2.747 |
+| Stanage Nick L | 2026-08-11 | 4000 | $255.85 | $1023400.0 | 2.702 |
 
 **Routine / planned sales (context):**
 

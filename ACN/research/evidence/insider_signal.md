@@ -1,4 +1,4 @@
-# ACN — Insider conviction (2026-10-28)
+# ACN — Insider conviction (2026-11-05)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Sweet Julie Spellman | 2026-10-26 | 10100 | $246.1701 | $2486318.01 | 5.2 |
-| Sweet Julie Spellman | 2026-10-26 | 2100 | $245.1063 | $514723.23 | 4.401 |
-| Price Paula A | 2026-10-26 | 800 | $249.8097 | $199847.76 | 3.837 |
+| Sweet Julie Spellman | 2026-10-26 | 10100 | $246.1701 | $2486318.01 | 5.114 |
+| Sweet Julie Spellman | 2026-10-26 | 2100 | $245.1063 | $514723.23 | 4.328 |
+| Price Paula A | 2026-10-26 | 800 | $249.8097 | $199847.76 | 3.774 |
 
 **Routine / planned sales (context):**
 
