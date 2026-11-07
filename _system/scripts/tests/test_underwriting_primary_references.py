@@ -39,6 +39,98 @@ def test_no_extra_sources_are_fetched_without_an_explicit_evidence_request():
     assert collect_requested_documents({}, '1059556', '2026-11-02', [], [], None) == ([], [])
 
 
+def test_dated_requested_notes_precede_generic_indentures_within_the_existing_fetch_limit():
+    base = AGREEMENT.rsplit('/', 1)[0] + '/'
+    labels = {
+        'credit.htm': 'Credit Agreement and covenant definitions',
+        'a-unrelated.htm': 'First Supplemental Indenture, dated 2011, Senior Notes due 2040',
+        'b-unrelated.htm': 'Second Supplemental Indenture, dated 2012, Senior Notes due 2041',
+        'c-unrelated.htm': 'Third Supplemental Indenture, dated 2013, Senior Notes due 2042',
+        'requested-2015.htm': 'Fifth Supplemental Indenture, dated March 9, 2015, including the form of Senior Notes due 2027',
+        'requested-2017.htm': 'Seventh Supplemental Indenture, dated June 12, 2017, including the form of Senior Notes due 2028',
+        'new-supplement.htm': 'Nineteenth Supplemental Indenture, dated October 7, 2026',
+    }
+    raw = ('<table>' + ''.join(f'<tr><td><a href="{base}{name}">{label}</a></td></tr>'
+                              for name, label in labels.items()) + '</table>').encode()
+    calls = []
+    def fetch(url):
+        calls.append(url)
+        return b'<p>Cash, debt and capital. ' + b'Complete operative principal, maturity and payment terms. ' * 30 + b'</p>'
+    docs, errors = collect_requested_documents({}, '1059556', '2026-11-07',
+        [{'source_url': PARENT, 'raw': raw, 'filed': '2026-10-21'}],
+        ['2015 senior notes', '2017 senior notes', 'maturity date', 'nineteenth supplemental indenture'], fetch)
+    assert not errors
+    assert set(calls) == {base + name for name in (
+        'requested-2015.htm', 'requested-2017.htm', 'credit.htm', 'new-supplement.htm')}
+    assert len(calls) == 4
+    assert {d['source_url'] for d in docs} == set(calls)
+    assert all(d['coverage'] == 'complete_requested_primary_document' for d in docs)
+
+
+def test_an_explicit_dated_note_request_needs_no_generic_debt_keyword():
+    raw = ('<a href="notes.htm">Fifth Supplemental Indenture, dated March 9, 2015, '
+           'including the form of Senior Notes due 2027</a>').encode()
+    refs = linked_references(raw, PARENT, '1059556', ['2015 senior notes'])
+    assert [r['source_url'].rsplit('/', 1)[-1] for r in refs] == ['notes.htm']
+
+
+def test_a_requested_supplement_keeps_complete_operative_terms_without_financial_word_padding():
+    from underwriting_evidence import document_record, primary_text, text_of
+    raw = ('<html><p>Exhibit 4.1 Execution Version NINETEENTH SUPPLEMENTAL INDENTURE. '
+           'This Nineteenth Supplemental Indenture is between the Company and the Trustee.</p>'
+           '<p>Section 1. Appointment. ' + 'Successor Trustee shall perform its duties. ' * 35 + '</p>'
+           '<p>Section 2. Acceptance. ' + 'The appointment is subject to the operative conditions. ' * 35 + '</p>'
+           '<p>Section 3. Governing law. Terms continue through the final provision.</p>'
+           '<p>IN WITNESS WHEREOF the Company and the Trustee have executed this instrument.</p></html>').encode()
+    doc = document_record(AGREEMENT, raw, ['nineteenth supplemental indenture'], prefer_complete=True)
+    assert doc['coverage'] == 'complete_requested_primary_document'
+    assert doc['contexts'] == [text_of(primary_text(raw))]
+
+
+def test_a_mention_of_an_indentures_title_cannot_enable_complete_legal_capture():
+    from underwriting_evidence import document_record
+    raw = ('<p>This report mentions the Nineteenth Supplemental Indenture and its Trustee.</p>'
+           + '<p>Unrelated commentary. ' * 100 + '</p>').encode()
+    doc = document_record(AGREEMENT, raw, ['nineteenth supplemental indenture'], prefer_complete=True)
+    assert doc.get('coverage') != 'complete_requested_primary_document'
+
+
+@pytest.mark.parametrize('old,new', [
+    ('This Nineteenth Supplemental Indenture', 'A report about the supplement'),
+    ('Section 1', 'Paragraph one'), ('Trustee', 'Agent'),
+    ('IN WITNESS WHEREOF', 'End of discussion'),
+])
+def test_complete_supplement_requires_its_own_operative_and_execution_structure(old, new):
+    from underwriting_contract import ContractError
+    from underwriting_evidence import document_record
+    body = ('This Nineteenth Supplemental Indenture is between the Company and the Trustee. '
+            'Section 1. Successor appointment. ' + 'The original obligations continue. ' * 40
+            + 'IN WITNESS WHEREOF the parties executed this supplemental indenture.')
+    raw = ('<p>' + body.replace(old, new) + '</p>').encode()
+    try:
+        doc = document_record(AGREEMENT, raw, ['nineteenth supplemental indenture'], prefer_complete=True)
+    except ContractError:
+        return  # A non-operative mention can also yield no relevant evidence.
+    assert doc.get('coverage') != 'complete_requested_primary_document'
+
+
+def test_dated_note_priority_uses_word_boundaries_and_the_exhibits_own_description():
+    raw = ('<table><tr><td>2015 Senior Notes. '
+           '<a href="wrong.htm">Indenture dated 2017 including Senior Notes due 2030</a> '
+           '<a href="wrong-year.htm">Indenture dated 12015 including Senior Notes due 2030</a> '
+           '<a href="wrong-kind.htm">Indenture dated 2015 including Senior Noteworthy terms</a> '
+           '<a href="right.htm">Indenture dated 2015 including Senior Notes due 2027</a> '
+           '<a href="https://www.sec.gov/Archives/edgar/data/999999/000119312524131945/foreign.htm">'
+           'Indenture dated 2015 including Senior Notes due 2027</a>'
+           '</td></tr></table>').encode()
+    refs = linked_references(raw, PARENT, '1059556', ['2015 senior notes', 'maturity'])
+    by_name = {r['source_url'].rsplit('/', 1)[-1]: r['_score'] for r in refs}
+    assert refs[0]['source_url'].endswith('/right.htm')
+    assert 'foreign.htm' not in by_name
+    assert by_name['right.htm'] > max(by_name[name] for name in (
+        'wrong.htm', 'wrong-year.htm', 'wrong-kind.htm'))
+
+
 def test_a_broad_table_row_cannot_turn_a_form_or_certificate_into_a_credit_exhibit():
     raw = (f'<table><tr><td>Credit agreement and merger disclosures. '
            f'<a href="{AGREEMENT}">Credit Agreement</a> '
