@@ -44,4 +44,4 @@ def test_registry_only_validation_does_not_need_the_scanner(monkeypatch, capsys)
     monkeypatch.setattr(sys, "argv", ["checker", "--skip-mirrors"])
     block_scanner(monkeypatch, SCANNER)
     assert checker.main() == 0
-    assert "OK 2026-09-09.1 sha256:" in capsys.readouterr().out
+    assert "OK 2026-11-06.1 sha256:" in capsys.readouterr().out

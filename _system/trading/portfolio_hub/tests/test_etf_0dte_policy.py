@@ -1,7 +1,7 @@
 """etf-0dte in the hub: owner-custody policy, the ledger's lots, and the ticket guard.
 
-etf-0dte is spx-0dte's SPY / QQQ 0DTE executors (clients 50/51, watchdogs
-130/131). Their options, and the shares an assignment delivers overnight, sit in
+etf-0dte is spx-0dte's SPY / QQQ / TSLA 0DTE executors (clients 50/51/52,
+watchdogs 130/131/132). Their options, and the shares an assignment delivers overnight, sit in
 this account but belong to no hub owner: the hub never sizes, rebalances or
 tickets against them.
 """
@@ -24,7 +24,7 @@ from _system.trading.portfolio_hub.ledger import PortfolioLedger
 from .test_ledger import snapshot
 
 ALIAS = "paper-primary"
-LETF = {"SPY", "QQQ", "AAPL"}   # the committed universe snapshot lists SPY and QQQ
+LETF = {"SPY", "QQQ", "TSLA", "AAPL"}   # the committed universe snapshot lists all three roots
 
 
 @pytest.fixture()
@@ -75,6 +75,7 @@ def test_policy_routes_etf_0dte_options_and_shares_to_no_owner():
         {"symbol": "SPY", "local_symbol": "SPY   261027P00570000", "sec_type": "OPT"},
         {"symbol": "SPY   261027P00570000", "local_symbol": "SPY   261027P00570000", "sec_type": "OPT"},
         {"symbol": "QQQ   261027C00500000", "sec_type": "OPT"},
+        {"symbol": "TSLA  261113C00330000", "sec_type": "OPT"},
     ):
         got = policy(row)
         assert (got.owner, got.strategy, got.bucket, got.reason) == (
@@ -110,6 +111,16 @@ def test_ledger_puts_etf_0dte_lots_outside_both_books(ledger, monkeypatch):
     notes = {row["conid"]: row["note"] for row in ledger.allocation_projection(ALIAS)["allocations"]}
     assert notes[2] == "etf_0dte_expected_delivery:expected_delivery"
     assert notes[3] == "etf_0dte_unattributed_shares:no_forecast"
+    assert [row["symbol"] for row in ledger.latest_portfolio(ALIAS, "michael")["positions"]] == ["CSU"]
+    assert ledger.latest_portfolio(ALIAS, "drew")["positions"] == []
+    assert ledger.reconcile_allocations(snapshot_id) == []
+
+
+def test_ls_algos_tsla_shares_become_an_unattributed_lot_in_no_book(ledger, monkeypatch):
+    # Without this PR they are a "letf" exclusion. Either way no owner holds them.
+    _forecast(monkeypatch, None)
+    snapshot_id = ledger.ingest_account_snapshot(_book((1, "CSU", 12), (5, "TSLA", 11)))
+    assert _lots(ledger, 5) == [("unallocated", "etf_0dte", "etf_0dte_delivery_unattributed", "11")]
     assert [row["symbol"] for row in ledger.latest_portfolio(ALIAS, "michael")["positions"]] == ["CSU"]
     assert ledger.latest_portfolio(ALIAS, "drew")["positions"] == []
     assert ledger.reconcile_allocations(snapshot_id) == []
@@ -188,8 +199,11 @@ def test_hub_forecast_is_read_from_the_environment_on_the_new_york_date(tmp_path
     {"symbol": "QQQ", "sec_type": "STK", "local_symbol": "QQQ"},
     {"symbol": "SPY", "sec_type": "OPT", "local_symbol": "SPY   261027C00580000", "trading_class": "SPY"},
     {"symbol": "QQQ", "sec_type": "OPT", "local_symbol": "QQQ   271217P00400000", "trading_class": "QQQ"},
+    {"symbol": "TSLA", "sec_type": "STK", "local_symbol": "TSLA"},
+    {"symbol": "TSLA", "sec_type": "OPT", "local_symbol": "TSLA  261113C00330000", "trading_class": "TSLA"},
+    {"symbol": "TSLA", "sec_type": "OPT", "local_symbol": "TSLA  271217P00200000", "trading_class": "TSLA"},
 ])
-def test_ticket_guard_refuses_every_spy_and_qqq_contract(identity):
+def test_ticket_guard_refuses_every_etf_0dte_contract(identity):
     reason = etf_0dte_ticket_refusal(identity)
     assert reason and "etf-0dte" in reason and identity["symbol"] in reason
 
@@ -198,6 +212,11 @@ def test_ticket_guard_refuses_every_spy_and_qqq_contract(identity):
     {"symbol": "CSU", "sec_type": "STK", "local_symbol": "CSU"},
     {"symbol": "SPYG", "sec_type": "STK", "local_symbol": "SPYG"},
     {"symbol": "QQQM", "sec_type": "STK", "local_symbol": "QQQM"},
+    {"symbol": "TSLL", "sec_type": "STK", "local_symbol": "TSLL"},
+    {"symbol": "TSLQ", "sec_type": "STK", "local_symbol": "TSLQ"},
+    {"symbol": "TSLT", "sec_type": "STK", "local_symbol": "TSLT"},
+    {"symbol": "TSYY", "sec_type": "STK", "local_symbol": "TSYY"},
+    {"symbol": "TSLL", "sec_type": "OPT", "local_symbol": "TSLL  261120C00010000", "trading_class": "TSLL"},
     {"symbol": "XSP", "sec_type": "OPT", "local_symbol": "XSP   270129P00540000", "trading_class": "XSP"},
     {"symbol": "SPX", "sec_type": "OPT", "local_symbol": "SPXW  260817P05000000", "trading_class": "SPXW"},
 ])

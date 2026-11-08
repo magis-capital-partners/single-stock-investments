@@ -1,4 +1,4 @@
-"""Reading spx-0dte's SPY / QQQ delivery forecast, and what sync does with it."""
+"""Reading spx-0dte's SPY / QQQ / TSLA delivery forecast, and what sync does with it."""
 
 from __future__ import annotations
 
@@ -10,12 +10,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT))
 
+from _system.trading.sleeves.classify_positions import ETF_0DTE_ROOTS  # noqa: E402
 from _system.trading.sleeves.config_loader import (  # noqa: E402
     load_config,
     load_etf_0dte_expected_delivery,
     load_etf_0dte_known_holdings,
 )
-from _system.trading.sleeves.etf_0dte_delivery import forecast_path, read_expected_delivery  # noqa: E402
+from _system.trading.sleeves.etf_0dte_delivery import (  # noqa: E402
+    PRODUCT_SYMBOLS,
+    forecast_path,
+    read_expected_delivery,
+)
 from _system.trading.sleeves.store import SleeveStore  # noqa: E402
 from _system.trading.sleeves.sync_ib import sync_holdings  # noqa: E402
 
@@ -144,3 +149,20 @@ def test_sync_keeps_etf_0dte_out_of_both_books_even_against_sleeve_tags(tmp_path
     assert excluded["etf_0dte"] == 1
     assert excluded["etf_0dte_delivery"] == 1
     assert excluded["etf_0dte_delivery_unattributed"] == 1
+
+
+# ----------------------------------------------------------------------- TSLA
+
+def test_every_root_has_a_forecast_product():
+    # A root added to one list and not the other would read every delivery as
+    # unattributed, with nothing failing.
+    assert set(PRODUCT_SYMBOLS.values()) == ETF_0DTE_ROOTS
+
+
+def test_reads_the_tsla_forecast_beside_the_others(tmp_path):
+    assert forecast_path(tmp_path, "tsla", "2026-10-27", ACCOUNT) == (
+        tmp_path / "tsla" / "2026-10-27" / "expected_delivery_U805366.json"
+    )
+    write_forecast(tmp_path, "spy", "2026-10-27", {"SPY": 100})
+    write_forecast(tmp_path, "tsla", "2026-10-27", {"TSLA": -100})
+    assert read_expected_delivery(tmp_path, ACCOUNT, today=TODAY) == {"SPY": 100.0, "TSLA": -100.0}
