@@ -15,12 +15,28 @@ env:
   RESEARCH_VAULT_ROOT: _external/research-vault
 
 jobs:
-  plan:
+  # The matrix lives in its own job because plan loads the multi-line Google
+  # credentials JSON. The runner masks each line of it, including a bare "{"
+  # and "}", and then drops any job output containing a brace as a possible
+  # secret. Keep secrets out of this job.
+  shards:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 5
     outputs:
       shard_count: ${{ steps.matrix.outputs.shard_count }}
       shard_matrix: ${{ steps.matrix.outputs.shard_matrix }}
+    steps:
+      - id: matrix
+        run: |
+          set -euo pipefail
+          COUNT=8
+          MATRIX=$(python3 -c "import json; print(json.dumps({'shard': list(range($COUNT))}))")
+          echo "shard_count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "shard_matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -103,21 +119,14 @@ jobs:
             _system/reference/document-store/expert_calls_drive_plan.csv
             _system/reference/document-store/expert_calls_drive_plan_summary.json
 
-      - id: matrix
-        run: |
-          COUNT=8
-          MATRIX=$(python -c "import json; print(json.dumps({'shard': list(range($COUNT))}))")
-          echo "shard_count=$COUNT" >> "$GITHUB_OUTPUT"
-          echo "shard_matrix=$MATRIX" >> "$GITHUB_OUTPUT"
-
   ingest:
-    needs: plan
+    needs: [shards, plan]
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 1
-      matrix: ${{ fromJson(needs.plan.outputs.shard_matrix) }}
+      matrix: ${{ fromJson(needs.shards.outputs.shard_matrix) }}
     concurrency:
       group: licensed-research-vault-${{ matrix.shard }}
       cancel-in-progress: false
@@ -169,7 +178,7 @@ jobs:
       - name: Import this shard into the vault
         env:
           SHARD: ${{ matrix.shard }}
-          SHARD_COUNT: ${{ needs.plan.outputs.shard_count }}
+          SHARD_COUNT: ${{ needs.shards.outputs.shard_count }}
         run: |
           set -euo pipefail
           python _system/scripts/import_drive_valueline.py \
@@ -187,7 +196,7 @@ jobs:
         uses: ./.github/actions/commit-vault
         with:
           message: |
-            Ingest ValueLine and Expert Call text (shard ${{ matrix.shard }}/${{ needs.plan.outputs.shard_count }}).
+            Ingest ValueLine and Expert Call text (shard ${{ matrix.shard }}/${{ needs.shards.outputs.shard_count }}).
 
             PDFs and Word files stay gitignored. Dashboard files are not updated here.
           git_add: valueline/ expert-calls/
