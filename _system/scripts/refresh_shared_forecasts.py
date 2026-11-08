@@ -280,8 +280,13 @@ def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
              'primary_observations': data.get('primary_observations') or [], 'report_discovery': data.get('report_discovery') or {},
              'primary_documents': data.get('primary_documents') or [], 'latest_disclosure': data.get('latest_disclosure'),
              'collected_at': collected_at or data.get('attempted_at'),
-             'latest_report': data.get('latest_report') or prior.get('latest_report'),
+             'latest_report': data.get('latest_report') or (prior.get('latest_report')
+                 if (prior.get('latest_report') or {}).get('form') not in ('6-K', '6-K/A') else None),
              'financial_hash': financial_hash, 'last_collected': as_of, 'fx': data.get('fx'), 'errors': data.get('errors') or []}
+    unverified = (data.get('unverified_prior_report') or prior.get('unverified_prior_report')
+                  or (prior.get('latest_report') if (prior.get('latest_report') or {}).get('form') in ('6-K', '6-K/A') else None))
+    if unverified:
+        saved['unverified_prior_report'] = unverified
     if prior.get('underwriting_related_issuers'):
         saved['underwriting_related_issuers'] = prior['underwriting_related_issuers']
     write_json_if_changed(path, saved, volatile_keys={'retrieved_at'})
