@@ -1,7 +1,7 @@
 # Event triage — human review queue
 
-**Date:** 2026-11-06
-**Rows:** 2550
+**Date:** 2026-11-08
+**Rows:** 2531
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
@@ -23,13 +23,13 @@
 | 2026-11-01 | KVUE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Kenvue (KVUE) Q3 Earnings Leave Margin Gains Under Legal Clo |
 | 2026-11-01 | ZETA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | A 'humbling' career move led to Catherine Zeta-Jones' big br |
 | 2026-11-01 | MP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Nancy Grace Roman Space Telescope: 300 MP, $4.3B [2026] - ht |
-| 2026-10-31 | PSA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Does Raised 2026 Guidance Change The Bull Case For Public St |
-| 2026-10-31 | FDX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx: 3 Key Takeaways for Long-Term Investors |
-| 2026-10-31 | FDX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | How Investors Are Reacting To FedEx (FDX) Raised Full Year O |
-| 2026-10-31 | HSIC | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | How Earnings Outlook At Henry Schein (HSIC) Has Changed Its  |
-| 2026-10-31 | ROAD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Construction Partners (ROAD) After Strong Q3 And Higher Outl |
-| 2026-10-31 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks: 3 Key Takeaways for Long-Term Investors |
-| 2026-10-31 | DG | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Is Dollar General (DG) Cheap After Raising Its Outlook And E |
+| 2026-10-31 | PSA | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Does Raised 2026 Guidance Change The Bull Case For Public St |
+| 2026-10-31 | FDX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx: 3 Key Takeaways for Long-Term Investors |
+| 2026-10-31 | FDX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | How Investors Are Reacting To FedEx (FDX) Raised Full Year O |
+| 2026-10-31 | HSIC | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | How Earnings Outlook At Henry Schein (HSIC) Has Changed Its  |
+| 2026-10-31 | ROAD | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Construction Partners (ROAD) After Strong Q3 And Higher Outl |
+| 2026-10-31 | SBUX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks: 3 Key Takeaways for Long-Term Investors |
+| 2026-10-31 | DG | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Is Dollar General (DG) Cheap After Raising Its Outlook And E |
 | 2026-10-28 | AMZN | video_research | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bill Ackman: Is Permanent Capital an Investor’s Biggest Edge |
 | 2026-10-28 | MSFT | video_research | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bill Ackman: Is Permanent Capital an Investor’s Biggest Edge |
 | 2026-10-27 | BEN | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Franklin Resources, Inc. — SC 13D/A |
