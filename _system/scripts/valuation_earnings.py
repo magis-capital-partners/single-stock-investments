@@ -27,6 +27,24 @@ def reporting_period(text, as_of):
     return max(periods) if periods else None
 
 
+def foreign_reporting_period(raw, as_of):
+    """A completed source period plus financial tables, never a cover date."""
+    from underwriting_evidence import primary_text, text_of
+    source = primary_text(raw)
+    text = text_of(source)
+    title = r'\b(?:consolidated|combined|condensed)\s+(?:balance\s+sheets?|statements?\s+of\s+(?:income|operations|earnings|cash\s+flows|financial\s+position|comprehensive))\b'
+    financial = r'\b(?:cash|assets?|liabilit(?:y|ies)|revenues?|net\s+(?:income|earnings)|equity|debt)\b'
+    tables = [text_of(m[0]) for m in re.finditer(r'<table\b[^>]*>.*?</table>', source, re.I | re.S)]
+    has_table = any(len(set(re.findall(financial, table.lower()))) >= 3
+                    and len(re.findall(r'(?<![A-Za-z])\d[\d,.]*', table)) >= 3 for table in tables)
+    if not has_table or not re.search(title, text, re.I):
+        raise ValueError('Foreign source needs financial statement tables; a registration cover is not financial statements')
+    period = reporting_period(text, as_of)
+    if not period:
+        raise ValueError('Foreign financial tables need an explicit completed reporting period')
+    return period
+
+
 def primary_document(url, raw, metadata, focus_keywords=()):
     from underwriting_evidence import document_record, text_of
     if len(raw) > 20_000_000:
@@ -66,6 +84,32 @@ def latest_disclosure(submissions, cik, as_of, formal):
         base = f'https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace("-", "")}/'
         candidates.append({'form': form, 'filed': filed, 'accession': accession, 'source_url': base+primary,
                            'index_url': base+'index.json'})
+    return max(candidates, key=lambda row: (row['filed'], row['accession'])) if candidates else None
+
+
+def latest_foreign_disclosure(submissions, cik, as_of, formal):
+    """Retain an unverified 6-K without calling its event date financial."""
+    recent = (submissions.get('filings') or {}).get('recent') or {}
+    candidates = []
+    for i, form in enumerate(recent.get('form') or []):
+        def value(key):
+            rows = recent.get(key) or []
+            return rows[i] if i < len(rows) else ''
+        filed, accession, primary = (value(k) for k in ('filingDate', 'accessionNumber', 'primaryDocument'))
+        if form not in ('6-K', '6-K/A'):
+            continue
+        try:
+            date.fromisoformat(filed)
+        except ValueError:
+            raise ValueError('Unverified foreign disclosure filing date') from None
+        if not (formal.get('filed', '') < filed <= as_of):
+            continue
+        if (not re.fullmatch(r'\d{10}-\d{2}-\d{6}', accession)
+                or not re.fullmatch(r'[A-Za-z0-9_.-]+', primary)):
+            raise ValueError('Unverified foreign disclosure accession or primary path')
+        candidates.append({'form': form, 'filed': filed, 'accession': accession,
+            'source_url': f'https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace("-", "")}/{primary}',
+            'reported_event_date': value('reportDate'), 'source_role': 'unverified_foreign_disclosure'})
     return max(candidates, key=lambda row: (row['filed'], row['accession'])) if candidates else None
 
 

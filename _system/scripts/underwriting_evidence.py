@@ -698,18 +698,28 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
         try:
             submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json', timeout=30)
             recent = (submission.get('filings') or {}).get('recent') or {}
-            chosen = set()
+            attempted = set()
             for i, form in enumerate(recent.get('form') or []):
-                if form not in ('10-K', '10-Q', '20-F', '40-F', '6-K') or form in chosen or recent['filingDate'][i] > as_of:
+                if form not in ('10-K', '10-Q', '20-F', '40-F', '6-K') or form in attempted or recent['filingDate'][i] > as_of:
                     continue
+                if len(attempted) >= 2:
+                    break
+                attempted.add(form)  # A failed current report cannot become an older report.
                 filename = recent['primaryDocument'][i]
                 if not re.fullmatch(r'[A-Za-z0-9_.-]+', filename):
+                    errors.append({'source': 'sec_submissions', 'error': 'Unsafe current primary document path'})
                     continue
                 url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
                 try:
                     raw = filing_bytes(root, ticker, recent['accessionNumber'][i], client, url)
                     document = document_record(url, raw, focus_keywords, form=form)
-                    document.update(form=form, filed=recent['filingDate'][i], period=(recent.get('reportDate') or ['']*len(recent['form']))[i])
+                    event_date = (recent.get('reportDate') or ['']*len(recent['form']))[i]
+                    period = event_date
+                    if form == '6-K':
+                        from valuation_earnings import foreign_reporting_period
+                        period = foreign_reporting_period(raw, as_of)
+                        document['reported_event_date'] = event_date
+                    document.update(form=form, filed=recent['filingDate'][i], period=period)
                     if ticker == 'V' and form == '10-K':
                         from underwriting_inline_shares import converted_class_a_observation
                         eps = document_record(url, raw, ('note 16',), form=form)
@@ -727,11 +737,9 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                                     pass  # Retain the source; unresolved share epochs stay gated.
                     documents.append(document)
                     formal_sources.append({'source_url': url, 'raw': raw, 'filed': document['filed'], 'form': form})
-                    chosen.add(form)
                 except (OSError, ValueError) as exc:
-                    errors.append({'source': url, 'error': type(exc).__name__})
-                if len(chosen) >= 2:
-                    break
+                    errors.append({'source': 'unverified_foreign_report' if form == '6-K' else url,
+                                   'source_url': url, 'error': type(exc).__name__, 'detail': str(exc)[:500]})
             if focus_keywords:
                 from underwriting_primary_references import collect_requested_documents
                 additional, source_errors = collect_requested_documents(submission, cik, as_of, formal_sources,
@@ -839,6 +847,10 @@ def evidence_readiness(packet, *, require_documents=False):
     """Facts/documents readiness is checked before admitting any judgment call."""
     gaps = []
     for error in packet.get('collection_errors') or []:
+        if error.get('source') == 'unverified_foreign_report':
+            gaps.append({'code': 'foreign_primary_financial_period_unresolved',
+                         'detail': 'Current foreign source needs financial tables and a verified reporting period: '
+                                   + str(error.get('source_url') or '')})
         if error.get('source') in ('requested_primary_reference', 'requested_primary_disclosure'):
             gaps.append({'code': 'requested_primary_document_unavailable',
                          'detail': 'Retry requested primary disclosure: '+str(error.get('source_url') or '')})

@@ -221,11 +221,11 @@ def latest_primary_report(payload, url, as_of):
 
 
 def submission_reports(payload, cik, as_of):
-    """Discover reports independently of whether a particular XBRL tag exists."""
+    """Formal financial reports; a 6-K reportDate is only an event date."""
     recent = (payload.get('filings') or {}).get('recent') or {}
     result = []
     for i, form in enumerate(recent.get('form') or []):
-        if form not in {'10-K', '10-Q', '20-F', '40-F', '6-K', '10-K/A', '10-Q/A', '20-F/A', '40-F/A'}:
+        if form not in {'10-K', '10-Q', '20-F', '40-F', '10-K/A', '10-Q/A', '20-F/A', '40-F/A'}:
             continue
         def value(key):
             rows = recent.get(key) or []
@@ -372,6 +372,13 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
     result = {'schema_version': '1.0', 'ticker': ticker, 'attempted_at': stamp(),
               'quote': prior.get('quote'), 'facts': prior.get('facts') or [],
               'primary_observations': prior.get('primary_observations') or [], 'primary_documents': [], 'errors': []}
+    prior_report = prior.get('latest_report')
+    unverified = (prior_report if (prior_report or {}).get('form') in ('6-K', '6-K/A')
+                  else prior.get('unverified_prior_report'))
+    if unverified:
+        result['unverified_prior_report'] = unverified
+    if (prior_report or {}).get('form') in ('6-K', '6-K/A'):
+        prior_report = None
     symbol = SYMBOLS.get(ticker, ticker)
     for kind, fn in [('quote', lambda: quote(symbol, as_of)), ('facts', lambda: provider_facts(symbol, as_of))]:
         try:
@@ -417,12 +424,12 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
             with _PRIMARY_SEC_LOCK:
                 submissions = _PRIMARY_SEC_CLIENT.get_json(discovery_url, timeout=30)
             reports = submission_reports(submissions, cik, as_of)
-            candidates = reports + [r for r in (result.get('latest_report'), prior.get('latest_report')) if r]
+            candidates = reports + [r for r in (result.get('latest_report'), prior_report) if r]
             if candidates:
                 result['latest_report'] = max(candidates, key=lambda r: (r['period'], r['filed']))
             result['report_discovery'] = {'status': 'verified' if reports else 'no_reports',
                                           'source_url': discovery_url, 'checked_at': as_of}
-            from valuation_earnings import collect_earnings, latest_disclosure
+            from valuation_earnings import collect_earnings, latest_disclosure, latest_foreign_disclosure
             formal_candidates = reports+[r for r in [latest_primary_report(payload, url, as_of)] if r]
             formal = max(formal_candidates, key=lambda r: (r['period'], r['filed'])) if formal_candidates else {}
             disclosure = latest_disclosure(submissions, cik, as_of, formal)
@@ -443,9 +450,21 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
                 except (OSError, ValueError, KeyError, TypeError) as exc:
                     result['report_discovery']['status'] = 'earnings_unresolved'
                     result['errors'].append({'collector': 'sec_earnings', 'error': str(exc), 'retry': 'next_scheduled_run'})
+            foreign = latest_foreign_disclosure(submissions, cik, as_of, formal)
+            current_disclosure = result.get('latest_disclosure') or {}
+            if foreign and (foreign['filed'], foreign['accession']) >= (
+                    current_disclosure.get('filed', ''), current_disclosure.get('accession', '')):
+                # Preserve the disclosure and the hold. Neither an exhibit
+                # number nor a 6-K cover proves financial tables or their period.
+                result['latest_disclosure'] = foreign
+                result['primary_documents'] = result.get('primary_documents') or prior.get('primary_documents') or []
+                result['report_discovery']['status'] = 'earnings_unresolved'
+                result['errors'].append({'collector': 'sec_foreign_disclosure',
+                    'error': 'Foreign disclosure needs verified financial tables and an explicit reporting period; reportDate is not a financial epoch',
+                    'retry': 'next_scheduled_run'})
         except (OSError, ValueError, KeyError, TypeError) as exc:
             result['report_discovery'] = {'status': 'failed', 'source_url': discovery_url, 'checked_at': as_of}
-            result['latest_report'] = result.get('latest_report') or prior.get('latest_report')
+            result['latest_report'] = result.get('latest_report') or prior_report
             if prior.get('latest_disclosure'):
                 result['latest_disclosure'] = prior['latest_disclosure']
                 result['primary_documents'] = prior.get('primary_documents') or []
