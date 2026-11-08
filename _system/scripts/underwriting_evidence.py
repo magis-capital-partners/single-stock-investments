@@ -92,7 +92,8 @@ def requested_keywords(gaps, *, history=None):
                 'omit', 'from', 'with', 'that', 'these', 'this', 'have', 'need', 'needed'}
     for gap in gaps[:12]:
         detail = str(gap.get('detail') or '')[:8000]
-        search = re.split(r'\bsearch(?:\s+terms)?\s*:', detail, maxsplit=1, flags=re.I)[-1]
+        search_list = re.search(r'\bsearch(?:\s+terms)?\s*:\s*(.*)', detail, re.I | re.S)
+        search = search_list[1] if search_list else detail
         # Possessives such as "Copart's" are not opening quotation marks.
         # Match complete quoted phrases without letting a possessive consume
         # the first real search term and invert every subsequent quote pair.
@@ -109,6 +110,17 @@ def requested_keywords(gaps, *, history=None):
             elif (re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ()/,&.'-]{1,119}", term)
                   and re.search(r'[A-Za-z]', term)):
                 terms.append(term)
+        if not terms and search_list and not quoted:
+            # Explicit bare lists are literal queries too. Stop before a
+            # following sentence, without treating dotted abbreviations as
+            # sentence boundaries; quoted dates keep their existing parser.
+            bare = re.split(r'(?<!\.[A-Za-z])\.(?=\s+[A-Z]|\s*$)', search, maxsplit=1)[0]
+            for part in re.split(r'[,;]', bare):
+                term = ' '.join(part.lower().split()).strip(' ,;:.')
+                term = re.sub(r'^(?:and|or)\s+', '', term)
+                if (re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ()/,&.'-]{1,119}", term)
+                        and re.search(r'[A-Za-z]', term)):
+                    terms.append(term)
         if not terms:
             terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
                      if w.lower() not in excluded]
@@ -120,7 +132,9 @@ def requested_keywords(gaps, *, history=None):
         section_lists = re.findall(r'\bSections?\s+('+reference
             +r'(?:(?:,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)'+reference+r')*)', detail, re.I)
         sections = ['section '+n for group in section_lists for n in re.findall(number, group)]
-        terms = requested_instruments([gap])+notes+sections+terms
+        schedules = ['schedule '+n for n in re.findall(
+            r'\bSchedules?\s+(\d{1,3}(?:\.\d{1,3})?)\b(?!\.\d|\s*%)', detail, re.I)]
+        terms = requested_instruments([gap])+notes+sections+schedules+terms
         groups.append(list(dict.fromkeys(terms))[:12])
     terms = []
     for index in range(12):
@@ -247,15 +261,35 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
     # from inline references and provide the following section's exact boundary.
     headings, cursor = [], 0
     note_headings, note_cursor = [], 0
+    schedule_headings, schedule_cursor = [], 0
+    article_headings, article_cursor = [], 0
     section_requested = any(re.fullmatch(r'section\s+\d+\.\d+', phrase) for phrase in focus)
     note_requested = any(re.fullmatch(r'note \d{1,2}', phrase) for phrase in focus)
+    schedule_requested = any(re.fullmatch(r'schedule \d{1,3}(?:\.\d{1,3})?', phrase) for phrase in focus)
+    default_requested = any(re.fullmatch(r'events? of default|defaults?', phrase) for phrase in focus)
+    remedy_requested = default_requested or any(phrase in ('acceleration', 'remedies',
+        'terminate commitments', 'declare immediately due') for phrase in focus)
     # Page containers can enclose every paragraph. Inspect their children too;
     # consuming an outer div would hide the actual numbered headings.
-    blocks = re.finditer(r'(?=<(p|h[1-6]|div)\b[^>]*>(.*?)</\1>)', source, re.I | re.S) if section_requested or note_requested else ()
+    blocks = re.finditer(r'(?=<(p|h[1-6]|div)\b[^>]*>(.*?)</\1>)', source, re.I | re.S) if section_requested or note_requested or schedule_requested or remedy_requested else ()
     for block in blocks:
         if re.search(r'<(?:p|h[1-6]|div)\b', block[2], re.I):
             continue  # A container is not itself a section heading.
         text = text_of(block[2])
+        # Uppercase standalone labels (or semantic HTML headings) distinguish
+        # operative schedules/articles from inline citations. Contents entries
+        # are rejected below by their short, non-operative passage length.
+        labeled = len(text) <= 240 and (text.isupper() or block[1].lower().startswith('h'))
+        if schedule_requested and labeled:
+            schedule = re.fullmatch(r'SCHEDULE\s+(\d{1,3}(?:\.\d{1,3})?)\s+(.{2,200})', text, re.I)
+            if schedule and (start := body.find(text, schedule_cursor)) >= 0:
+                schedule_headings.append((schedule[1], start))
+                schedule_cursor = start + len(text)
+        if remedy_requested and labeled:
+            article = re.fullmatch(r'ARTICLE\s+([IVXLCDM]+|\d{1,3})\s*[-.\u2013\u2014:]?\s+(.{2,200})', text, re.I)
+            if article and (start := body.find(text, article_cursor)) >= 0:
+                article_headings.append((article[1], start, article[2]))
+                article_cursor = start + len(text)
         heading = re.match(r'(?:SECTION\s+)?(\d{1,3}\.\d{1,3})\.?\s+[A-Za-z]', text, re.I)
         if heading:
             start = body.find(text, cursor)
@@ -271,6 +305,20 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
                 if start >= 0:
                     note_headings.append((int(note[2]), start))
                     note_cursor = start+len(text)
+    for index, (number, start) in enumerate(schedule_headings):
+        if 'schedule ' + number in focus:
+            end = next((offset for following, offset in schedule_headings[index+1:]
+                        if following != number), len(body))
+            if 40 <= len(body[start:end].split()) and end-start <= 30000:
+                priority_spans.append((start, end))
+    for index, (number, start, title) in enumerate(article_headings):
+        wanted = (default_requested and re.search(r'\bDEFAULTS?\b', title, re.I)
+                  or remedy_requested and re.search(r'\bACCELERATION\b|\bREMEDIES\b', title, re.I))
+        if wanted:
+            end = next((offset for following, offset, _ in article_headings[index+1:]
+                        if following != number), len(body))
+            if 40 <= len(body[start:end].split()) and end-start <= 30000:
+                priority_spans.append((start, end))
     for phrase in focus:
         section = re.fullmatch(r'section\s+(\d+\.\d+)',phrase)
         if section:
