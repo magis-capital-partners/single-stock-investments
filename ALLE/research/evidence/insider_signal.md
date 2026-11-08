@@ -2,7 +2,7 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.9 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.89 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -15,7 +15,7 @@
 | MAIN SUE | 2026-03-11 | 1300 | $149.5827 | $194457.51 | 2.425 |
 | PETERS LAUREN B | 2025-11-25 | 1600 | $165.4409 | $264705.44 | 2.232 |
 | MAIN SUE | 2026-03-11 | 600 | $150.0533 | $90031.98 | 2.049 |
-| MIZELL STEVEN | 2026-08-28 | 170 | $158.28 | $26907.6 | 1.498 |
+| MIZELL STEVEN | 2026-08-28 | 170 | $158.28 | $26907.6 | 1.486 |
 | MAIN SUE | 2026-03-11 | 100 | $147.26 | $14726.0 | 0.952 |
 
 **Routine / planned sales (context):**

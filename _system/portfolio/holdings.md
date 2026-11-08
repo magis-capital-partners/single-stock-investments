@@ -246,14 +246,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-08.
 | DNP.WA | DNP.WA/ | Dino Polska S.A. | EU | 2026-11-04 | 2026-11-08 | compounder | watch |
 | DOC | DOC/ | Healthpeak Properties | US | 2026-11-04 | 2026-11-08 | unknown | watch |
 | DOV | DOV/ | Dover Corporation | US | 2026-11-04 | 2026-11-08 | unknown | watch |
-| DOW | DOW/ | Dow Inc. | US | 2026-07-29 | 2026-11-08 | unknown | watch |
-| DPZ | DPZ/ | Domino's | US | 2026-07-29 | 2026-11-08 | unknown | watch |
-| DRI | DRI/ | Darden Restaurants | US | 2026-07-29 | 2026-11-08 | unknown | watch |
-| DRNZ | DRNZ/ | DRNZ | US | 2026-07-29 | 2026-11-08 | unknown | watch |
+| DOW | DOW/ | Dow Inc. | US | 2026-11-08 | 2026-11-08 | unknown | watch |
+| DPZ | DPZ/ | Domino's | US | 2026-11-08 | 2026-11-08 | unknown | watch |
+| DRI | DRI/ | Darden Restaurants | US | 2026-11-08 | 2026-11-08 | unknown | watch |
+| DRNZ | DRNZ/ | DRNZ | US | 2026-11-08 | 2026-11-08 | unknown | watch |
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-11-08 | unknown | watch |
-| DTE | DTE/ | DTE Energy | US | 2026-07-29 | 2026-11-08 | unknown | watch |
-| DUK | DUK/ | Duke Energy | US | 2026-07-29 | 2026-11-08 | unknown | watch |
-| DUOL | DUOL/ | DUOL | US | 2026-07-29 | 2026-11-08 | unknown | watch |
+| DTE | DTE/ | DTE Energy | US | 2026-11-08 | 2026-11-08 | unknown | watch |
+| DUK | DUK/ | Duke Energy | US | 2026-11-08 | 2026-11-08 | unknown | watch |
+| DUOL | DUOL/ | DUOL | US | 2026-11-08 | 2026-11-08 | unknown | watch |
 | DVA | DVA/ | DaVita | US | 2026-07-29 | 2026-11-08 | unknown | watch |
 | DVN | DVN/ | Devon Energy | US | 2026-07-29 | 2026-11-08 | unknown | watch |
 | DXCM | DXCM/ | Dexcom | US | 2026-07-29 | 2026-11-08 | unknown | watch |

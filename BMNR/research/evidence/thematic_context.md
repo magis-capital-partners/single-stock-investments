@@ -1,4 +1,4 @@
-# BMNR - Thematic context (2026-11-07)
+# BMNR - Thematic context (2026-11-08)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
@@ -13,9 +13,9 @@
 | SPY 20-day realized vol (annualized %) | 20.23 | 2026-11-06 | +31.8% | up | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
-| Bitcoin spot (USD) | 75731.9296875 | 2026-11-07 | -26.7% | down | no (context) |
+| Bitcoin spot (USD) | 75704.4921875 | 2026-11-08 | -26.0% | down | no (context) |
 | Natural gas (USD/MMBtu; spot or futures fallback) | 2.997999906539917 | 2026-11-06 | -31.2% | down | no (context) |
 | US urban residential electricity price (USD/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-07 | n/a | flat | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-08 | n/a | flat | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.

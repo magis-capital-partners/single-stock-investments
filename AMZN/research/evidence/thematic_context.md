@@ -1,10 +1,10 @@
-# AMZN - Thematic context (2026-11-07)
+# AMZN - Thematic context (2026-11-08)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-07 | n/a | flat | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-08 | n/a | flat | no (context) |
 | Natural gas (USD/MMBtu; spot or futures fallback) | 2.997999906539917 | 2026-11-06 | -31.2% | down | no (context) |
 | US urban residential electricity price (USD/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
 | WTI crude (USD/bbl) | 90.83000183105469 | 2026-11-06 | +52.8% | up | no (context) |

@@ -250,13 +250,13 @@
 | DNP.WA | no_hit | — | — | No activist index hits |
 | DOC | no_hit | — | — | No activist index hits |
 | DOV | no_hit | — | — | No activist index hits |
-| DOW | no_hit | — | — | No activist index hits |
-| DPZ | no_hit | — | — | No activist index hits |
-| DRI | no_hit | — | — | No activist index hits |
+| DOW | indexed | L5/S0 | 2023-04-04 | 5 long, 0 short indexed; 0 short feed-eligible |
+| DPZ | indexed | L4/S0 | 2026-05-15 | 4 long, 0 short indexed; 0 short feed-eligible |
+| DRI | indexed | L1/S0 | 2025-09-03 | 1 long, 0 short indexed; 0 short feed-eligible |
 | DRNZ | no_hit | — | — | No activist index hits |
 | DRR.AX | no_hit | — | — | No activist index hits |
 | DTE | no_hit | — | — | No activist index hits |
-| DUK | no_hit | — | — | No activist index hits |
+| DUK | indexed | L1/S0 | 2019-04-04 | 1 long, 0 short indexed; 0 short feed-eligible |
 | DUOL | no_hit | — | — | No activist index hits |
 | DVA | no_hit | — | — | No activist index hits |
 | DVN | no_hit | — | — | No activist index hits |
