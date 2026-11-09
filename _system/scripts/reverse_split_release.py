@@ -10,8 +10,13 @@ import subprocess
 def release_targets(paths: list[str]) -> dict:
     worker = any(path.startswith('dashboard/cloudflare/reverse-split-live/')
                  or path == '.github/workflows/reverse-split-live.yml' for path in paths)
-    # Preserve the dashboard's existing dashboard/** push behavior after bot merges.
-    dashboard = any(path.startswith('dashboard/') or path == '_system/scripts/validate_dashboard_data.py' for path in paths)
+    # The separate research service and its Node tests are not Pages assets.
+    # workflow_dispatch forces a shared rebuild, bypassing the normal content gate.
+    def backend_only(path: str) -> bool:
+        return path.startswith('dashboard/cloudflare/reverse-split-live/') or (
+            path.startswith('dashboard/cloudflare/test-reverse-split') and path.endswith('.mjs'))
+    dashboard = any((path.startswith('dashboard/') and not backend_only(path))
+                    or path == '_system/scripts/validate_dashboard_data.py' for path in paths)
     public_status = any(path.startswith('dashboard/cloudflare/reverse-split-live/market-status')
                         or path == '.github/workflows/reverse-split-market-status.yml' for path in paths)
     return {'worker': worker, 'dashboard': dashboard, 'public_status': public_status}

@@ -31,10 +31,9 @@ class Release(unittest.TestCase):
         result = dispatch_release('owner/repo', 123, run)
         self.assertEqual(result['status'], 'deployment_dispatched_not_yet_verified')
         sent = [kwargs for args, kwargs in calls if '--method' in args]
-        self.assertEqual(len(sent), 2)
+        self.assertEqual(len(sent), 1)
         self.assertEqual(json.loads(sent[0]['input'])['client_payload']['merged_commit'], 'a' * 40)
         self.assertEqual(json.loads(sent[0]['input'])['event_type'], 'reverse-split-release')
-        self.assertFalse(json.loads(sent[1]['input'])['inputs']['d1_full_resync'])
 
     def test_unmerged_or_unrelated_pr_never_dispatches(self):
         calls, run = self.fake([['README.md']])
@@ -57,6 +56,7 @@ class Release(unittest.TestCase):
         self.assertEqual(len(posts), 1)
         self.assertIn('repos/owner/repo/actions/workflows/dashboard-pages.yml/dispatches', posts[0][0])
         self.assertEqual(result['targets'], {'worker': False, 'dashboard': True, 'public_status': False})
+        self.assertFalse(json.loads(posts[0][1]['input'])['inputs']['d1_full_resync'])
 
     def test_release_workflow_is_separate_from_collection(self):
         root = Path(__file__).resolve().parents[3]
@@ -75,11 +75,17 @@ class Release(unittest.TestCase):
         self.assertTrue(result['targets']['public_status'])
         self.assertEqual([p.get('event_type') for p in sent[:2]], ['reverse-split-release', 'reverse-split-status-continue'])
         self.assertEqual(sent[1]['client_payload']['orders'], 0)
-        self.assertEqual(len(sent), 3)
+        self.assertEqual(len(sent), 2)
         self.assertEqual(release_targets(['.github/workflows/reverse-split-market-status.yml']), {'worker': False, 'dashboard': False, 'public_status': True})
         root = Path(__file__).resolve().parents[3]
         source_workflow = yaml.load((root / '.github/workflows/reverse-split-market-status.yml').read_text(encoding='utf8'), Loader=yaml.BaseLoader)
         self.assertEqual(source_workflow['concurrency']['cancel-in-progress'], 'false')
+
+    def test_backend_repairs_and_tests_do_not_force_an_unchanged_shared_dashboard_rebuild(self):
+        self.assertEqual(release_targets(['dashboard/cloudflare/reverse-split-live/worker.mjs']), {'worker': True, 'dashboard': False, 'public_status': False})
+        self.assertEqual(release_targets(['dashboard/cloudflare/test-reverse-split-market-status.mjs']), {'worker': False, 'dashboard': False, 'public_status': False})
+        self.assertTrue(release_targets(['dashboard/reverse-split-shadow.js'])['dashboard'])
+        self.assertTrue(release_targets(['_system/scripts/validate_dashboard_data.py'])['dashboard'])
 
     def test_post_merge_release_explicitly_handles_skipped_optional_ancestor_jobs(self):
         root = Path(__file__).resolve().parents[3]
