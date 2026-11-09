@@ -193,3 +193,42 @@ def test_private_native_diagnostics_survive_failure_without_a_json_error_event(t
     assert saved['diagnostics']['sha256']==codex.digest(diagnostics)
     assert saved['usage'] is None and saved['agent_id']=='failed-native-session'
     assert not (tmp_path/'out.json').exists()
+
+
+def test_completed_native_json_after_plain_progress_requires_the_matching_last_file():
+    rows = completed_rows({'status': 'evidence_gap', 'gaps': []})
+    rows.insert(1, {'type': 'item.completed', 'item': {'id': 'progress', 'type': 'agent_message',
+        'text': 'I will reconcile the primary evidence.'}})
+    value, source = codex.completed_output(rows, '{"status":"evidence_gap","gaps":[]}')
+    assert value == {'status': 'evidence_gap', 'gaps': []}
+    assert source['ignored_progress_message_ids'] == ['progress']
+    with pytest.raises(ValueError):
+        codex.completed_output(rows)
+
+
+@pytest.mark.parametrize('prior', ['{"ok":true}', '{"ok":false}', '[]', '{unfinished', 'null'])
+def test_progress_separation_never_selects_between_json_candidates(prior):
+    rows = completed_rows({'ok': True})
+    rows.insert(1, {'type': 'item.completed', 'item': {'id': 'prior', 'type': 'agent_message', 'text': prior}})
+    with pytest.raises(ValueError):
+        codex.completed_output(rows, '{"ok":true}')
+
+
+@pytest.mark.parametrize('change', ['after_final', 'after_turn', 'duplicate_id', 'multiple_turns', 'file_mismatch'])
+def test_progress_cannot_hide_final_order_or_native_source_identity_errors(change):
+    rows = completed_rows({'ok': True})
+    progress = {'type': 'item.completed', 'item': {'id': 'progress', 'type': 'agent_message', 'text': 'Checking evidence.'}}
+    rows.insert(1, progress)
+    file = '{"ok":true}'
+    if change == 'after_final':
+        rows[1], rows[2] = rows[2], rows[1]
+    elif change == 'after_turn':
+        rows.append(rows.pop(1))
+    elif change == 'duplicate_id':
+        progress['item']['id'] = 'item_0'
+    elif change == 'multiple_turns':
+        rows.append({'type': 'turn.completed'})
+    else:
+        file = '{"ok":false}'
+    with pytest.raises(ValueError):
+        codex.completed_output(rows, file)
