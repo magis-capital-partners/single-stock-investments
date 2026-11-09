@@ -8,14 +8,14 @@
       "reviewed": 1
     },
     "blocker_companies": {
-      "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 136,
-      "pre_listing_share_basis_unverified": 101,
+      "parent_cashflow_attribution_missing": 40,
       "positive_normalized_owner_cash_not_established": 109,
+      "pre_listing_share_basis_unverified": 101,
       "realization_timing_missing": 17,
+      "annual_operating_cash_flow_missing": 44,
       "annual_capex_missing": 72,
       "annual_diluted_share_count_missing": 50,
-      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 445,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 31,
@@ -11232,25 +11232,6 @@
       "unresolved_findings": []
     },
     {
-      "ticker": "TFPM",
-      "company": "Triple Flag Precious Metals Corp.",
-      "status": "needs_underwriting",
-      "current_model_basis": "legacy_issuer_cashflow_forecast",
-      "blockers": [
-        "new_financial_report_after_model",
-        "underwriting_revision_required"
-      ],
-      "last_attempt": "2026-10-30T19:11:15.094212+00:00",
-      "retry_after": "2026-10-31",
-      "underwriting_gaps": [
-        {
-          "code": "ContractError",
-          "detail": "ordinary_shares_require_verified_listing_ratio"
-        }
-      ],
-      "unresolved_findings": []
-    },
-    {
       "ticker": "BAC",
       "company": "Bank of America",
       "status": "needs_underwriting",
@@ -12195,6 +12176,25 @@
           "detail": "incremental_equity_return estimates returns on separately funded platform projects, but terminal continuation applies the same 20%/40%/60% return to all incremental parent capital, including customer funding and settlement liquidity. The explicit graph generates installed revenue growth separately from those project investments, while terminal_owner_earnings also replaces explicit cash conversion with earnings plus scaled D&A less maintenance. Thus the terminal funding boundary changes materially at realization. doc_7aa39e56c86b958c discloses incentive payments, incentive amortization, litigation cash movements and settlement liquidity; doc_b51ee5d68ad78a5c discloses growing incentive and guarantee requirements. Provide a numerical transition separating timing reversals from recurring customer funding and replacement, and justify a total incremental-parent-capital denominator consistent with continuation earnings. Test a distinct alternative with higher customer/liquidity funding and lower incremental returns; the existing shorter-runway test does not isolate this boundary."
         }
       ]
+    },
+    {
+      "ticker": "TFPM",
+      "company": "Triple Flag Precious Metals Corp.",
+      "status": "needs_underwriting",
+      "current_model_basis": "legacy_issuer_cashflow_forecast",
+      "blockers": [
+        "new_financial_report_after_model",
+        "underwriting_revision_required"
+      ],
+      "last_attempt": "2026-11-09T03:51:12.533065+00:00",
+      "retry_after": "2026-11-09",
+      "underwriting_gaps": [
+        {
+          "code": "ValueError",
+          "detail": "Primary reference capacity exhausted for this layer"
+        }
+      ],
+      "unresolved_findings": []
     }
   ]
 }
