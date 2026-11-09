@@ -483,6 +483,16 @@
         "17,47 13-22 * * 1-5"
       ],
       "freshness_hours": 70
+    },
+    {
+      "name": "reverse-split-public-market-status",
+      "workflow_file": "reverse-split-market-status.yml",
+      "job": "observe",
+      "work_step": "Capture public exchange evidence without a broker connection",
+      "cadence_cron": [
+        "11 */3 * * *"
+      ],
+      "freshness_hours": 12
     }
   ],
   "unmonitored_workflows": {},

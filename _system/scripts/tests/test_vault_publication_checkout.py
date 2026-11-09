@@ -29,6 +29,8 @@ PUBLICATION_CALLERS = set(LOOPS) | {
     # source lane adds only its archive the same way.
     "data-pipeline.yml",
     "company-source-backfill.yml",
+    # The hub validation job reads the immutable published snapshot objects.
+    "python-tests.yml",
 }
 
 
@@ -158,6 +160,13 @@ def test_publication_only_is_opt_in_and_the_three_loops_use_it():
                     elif cache is not None:
                         raise AssertionError(f"{path.name}:{job_name} sets preserve-company-cache")
     assert opted == PUBLICATION_CALLERS
+    python = yaml.safe_load((WORKFLOWS / "python-tests.yml").read_text(encoding="utf-8"))
+    python_readers = [
+        name for name, job in python["jobs"].items()
+        for step in job.get("steps", [])
+        if str((step.get("with") or {}).get("publication-only")).lower() == "true"
+    ]
+    assert python_readers == ["hub-payloads"]
     quality = yaml.safe_load((WORKFLOWS / "research-quality.yml").read_text(encoding="utf-8"))
     # Only validation of already published data may use the scoped snapshot.
     # Keep research-producing jobs on their existing evidence boundary.
