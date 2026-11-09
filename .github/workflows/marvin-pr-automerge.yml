@@ -860,7 +860,10 @@ jobs:
 
   release-reverse-split:
     needs: [resolve-pr, merge]
-    if: needs.merge.outputs.merged == 'true'
+    if: >-
+      !cancelled() &&
+      needs.merge.result == 'success' &&
+      needs.merge.outputs.merged == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

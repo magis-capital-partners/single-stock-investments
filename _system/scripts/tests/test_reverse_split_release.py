@@ -4,6 +4,7 @@ import sys
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from reverse_split_release import dispatch_release, release_targets
@@ -66,6 +67,15 @@ class Release(unittest.TestCase):
         self.assertEqual(release_targets(['.github/workflows/reverse-split-live.yml']), {'worker': True, 'dashboard': False})
         self.assertEqual(release_targets(['dashboard/reverse-split-shadow.js']), {'worker': False, 'dashboard': True})
         self.assertEqual(release_targets(['_system/scripts/validate_dashboard_data.py']), {'worker': False, 'dashboard': True})
+
+    def test_post_merge_release_explicitly_handles_skipped_optional_ancestor_jobs(self):
+        root = Path(__file__).resolve().parents[3]
+        workflow = yaml.load((root / '.github/workflows/marvin-pr-automerge.yml').read_text(encoding='utf8'), Loader=yaml.BaseLoader)
+        condition = workflow['jobs']['release-reverse-split']['if']
+        # An explicit status check is required: implicit success() includes skipped ancestors.
+        self.assertIn('!cancelled()', condition)
+        self.assertIn("needs.merge.result == 'success'", condition)
+        self.assertIn("needs.merge.outputs.merged == 'true'", condition)
 
 
 if __name__ == '__main__':
