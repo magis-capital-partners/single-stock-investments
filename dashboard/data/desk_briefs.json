@@ -1,6 +1,6 @@
 {
   "schema_version": "desk_briefs.v1",
-  "generated_at": "2026-11-06T15:35:09Z",
+  "generated_at": "2026-11-09T13:41:05Z",
   "caption": "Ranked output from the Magis desk bots, one brief per desk per day, filed by pull request and checked by schema. A brief is research only: it carries no authority, sizes nothing, and never enters a base IRR. The one number on each row is the dashboard's or the filing's, not the bot's.",
   "desks": [
     {
@@ -9,7 +9,7 @@
       "owner": "drew",
       "author": "grok-drew-special-situations",
       "as_of": "2026-10-29",
-      "age_hours": 207.6,
+      "age_hours": 277.7,
       "stale": true,
       "path": "_system/data/desk_briefs/special_situations/2026-10-29.json",
       "items": [
@@ -142,7 +142,7 @@
       "owner": "drew",
       "author": "grok-drew-activism",
       "as_of": "2026-10-30",
-      "age_hours": 183.6,
+      "age_hours": 253.7,
       "stale": true,
       "path": "_system/data/desk_briefs/activism/2026-10-30.json",
       "items": [
@@ -282,7 +282,7 @@
       "owner": "drew",
       "author": "codex-core-compounders",
       "as_of": "2026-10-27",
-      "age_hours": 255.6,
+      "age_hours": 325.7,
       "stale": true,
       "path": "_system/data/desk_briefs/fundamentals/2026-10-27.json",
       "items": [
@@ -496,7 +496,7 @@
       "owner": "drew",
       "author": "grok-drew-nol-tax-assets",
       "as_of": "2026-10-30",
-      "age_hours": 183.6,
+      "age_hours": 253.7,
       "stale": true,
       "path": "_system/data/desk_briefs/nol_tax_assets/2026-10-30.json",
       "items": [
@@ -737,52 +737,46 @@
       "desk_label": "Index, forced flow and tape",
       "owner": "drew",
       "author": "grok-drew-tape-index",
-      "as_of": "2026-11-04",
-      "age_hours": 63.6,
+      "as_of": "2026-11-09",
+      "age_hours": 13.7,
       "stale": false,
-      "path": "_system/data/desk_briefs/tape_index/2026-11-04.json",
+      "path": "_system/data/desk_briefs/tape_index/2026-11-09.json",
       "items": [
         {
-          "ticker": "MIAX",
-          "headline": "Miami International's CMF rose to 0.232 (from 0.099), past the 0.10 line, while the stored trend is still lagging_downtrend (RSI 65.6, 6.3% under the 50-day).",
-          "one_number": "CMF 0.232",
-          "lane": "tape",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MIAX cap=normal (prior normal) rsi14=65.6 cmf=0.232 rvol=0.95 dir=lagging_downtrend p50=-6.28% close=33.86",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "TA-Z-5D: CMF still >0.10 next session and a positive 5-session return.",
-          "handoff": null
-        },
-        {
-          "ticker": "BN",
-          "headline": "Brookfield's RSI reached 78.8 (from 67.9) as the capitulation state went from stress_building back to normal; counter-trend overbought (mixed_repair, TAPE-01).",
-          "one_number": "RSI 78.8",
-          "lane": "tape",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BN cap=normal (prior stress_building) rsi14=78.8 cmf=0.221 rvol=1.06 dir=mixed_repair p50=6.52% close=40.64",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "TA-RSI-OB-5D: passes if BN trails SPY over 5 sessions.",
-          "handoff": null
-        },
-        {
-          "ticker": "TPL",
-          "headline": "Texas Pacific Land moved from normal into stress_building with CMF -0.110 (from -0.100) and RSI 31.0.",
-          "one_number": "CMF -0.110",
+          "ticker": "QDEL",
+          "headline": "QuidelOrtho is now capitulation_candidate (normal on Nov 3): RSI 38.0, above the 35 line, 5-session return -19.25%, CMF -0.03.",
+          "one_number": "5d -19.25%",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z TPL cap=stress_building (prior normal) rsi14=31.0 cmf=-0.11 rvol=1.48 dir=lagging_downtrend p50=-5.51% close=332.0",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z QDEL cap=capitulation_candidate scores 75.0/82.1/20.6 (pressure/panic/exhaustion) rsi14=38.0 cmf=-0.03 ret5d=-19.25% as_of 2026-11-06",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z QDEL prior cap=normal rsi14=51.9 as_of 2026-11-03",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "TA-CAP-5D: passes if QDEL beats SPY over 5 sessions.",
+          "handoff": null
+        },
+        {
+          "ticker": "TPL",
+          "headline": "Texas Pacific Land moved from stress_building to exhaustion_emerging: RSI 14.1, CMF -0.268, 5-session return -17.88%.",
+          "one_number": "RSI 14.1",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z TPL cap=exhaustion_emerging scores 85.0/82.8/53.5 (pressure/panic/exhaustion) rsi14=14.1 cmf=-0.268 ret5d=-17.88% as_of 2026-11-06",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z TPL prior cap=stress_building rsi14=31.0 as_of 2026-11-03",
               "url": null
             }
           ],
@@ -791,56 +785,61 @@
           "handoff": null
         },
         {
-          "ticker": "APLD",
-          "headline": "Index feed scores Applied Digital a Russell 1000 deletion_risk 5.52% under the breakpoint for the Dec 11 recon. Feed candidate only, no provider announcement.",
-          "one_number": "R1000 deletion_risk -5.52%",
-          "lane": "index",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z APLD cap=stress_building (prior stress_building) rsi14=42.5 cmf=-0.043 rvol=0.94 dir=lagging_downtrend p50=-24.71% close=17.81",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/index_membership.json gen 2026-11-04T10:06:14Z APLD russell_1000 status=deletion_risk dist=-5.52% (prior member); russell_2000 inclusion_candidate",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "TA-IDX-EVENT: graded on FTSE Russell prelim lists Nov 13 through Dec 11.",
-          "handoff": null
-        },
-        {
-          "ticker": "PBT",
-          "headline": "PBT moved to capitulation_candidate with RSI 15.6; close 27.93 vs 31.62 on Oct 30 (about -11.7% over two sessions, no gap over 10%) as WTI fell 7.4% on Nov 2.",
-          "one_number": "RSI 15.6",
+          "ticker": "AAOI",
+          "headline": "Applied Optoelectronics moved from stress_building to panic: RSI 29.4, CMF -0.20, 5-session return -27.4%.",
+          "one_number": "5d -27.4%",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z PBT cap=capitulation_candidate (prior stress_building) rsi14=15.6 cmf=-0.134 rvol=1.68 dir=pullback_in_uptrend p50=-16.87% close=27.93",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z AAOI cap=panic scores 86.4/71.5/62.1 (pressure/panic/exhaustion) rsi14=29.4 cmf=-0.2 ret5d=-27.4% as_of 2026-11-06",
               "url": null
             },
             {
-              "kind": "news",
-              "ref": "CNBC 2026-11-02: WTI futures -7.4% to $96.46 on US-Iran diplomacy",
-              "url": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html"
+              "kind": "dashboard",
+              "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z AAOI prior cap=stress_building rsi14=31.8 as_of 2026-11-03",
+              "url": null
             }
           ],
           "confidence": "provider",
-          "next": "TA-CAP-5D: passes if PBT beats SPY over 5 sessions.",
+          "next": "TA-CAP-5D: passes if AAOI beats SPY over 5 sessions.",
           "handoff": null
         },
         {
-          "ticker": "RACE",
-          "headline": "Ferrari met the breakout rule after Q3 guidance raise: leading_uptrend, 3.0% above the 50-day, rvol 2.98, CMF 0.177. RSI 71.2 not posted separately (TAPE-02).",
-          "one_number": "rvol 2.98 (breakout)",
-          "lane": "tape",
+          "ticker": "LB",
+          "headline": "LandBridge moved from stress_building to panic (RSI 30.1, CMF -0.265, rvol 2.19) and is a Russell 2000 inclusion_candidate at -14.96%.",
+          "one_number": "rvol 2.19",
+          "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z RACE cap=normal (prior normal) rsi14=71.2 cmf=0.177 rvol=2.98 dir=leading_uptrend p50=3.03% close=414.77",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z LB cap=panic scores 80.2/76.8/58.7 (pressure/panic/exhaustion) rsi14=30.1 cmf=-0.265 rvol=2.19 as_of 2026-11-06",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z LB prior cap=stress_building rsi14=41.0 as_of 2026-11-03",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z LB russell_2000 status=inclusion_candidate dist=-14.96% recon=likely_add",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "TA-CAP-5D: passes if LB beats SPY over 5 sessions.",
+          "handoff": null
+        },
+        {
+          "ticker": "V",
+          "headline": "Visa met the stored breakout rule with stretch_z 2.017: leading uptrend, relative volume 1.28, CMF 0.206.",
+          "one_number": "rvol 1.28 (breakout)",
+          "lane": "breakout",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z V dir=leading_uptrend rvol=1.28 cmf=0.206 p50=9.54% stretch_z=2.017 rsi14=61.6 as_of 2026-11-06",
               "url": null
             }
           ],
@@ -849,14 +848,19 @@
           "handoff": null
         },
         {
-          "ticker": "BRK.B",
-          "headline": "Berkshire met the stored breakout rule: leading_uptrend, 7.7% above the 50-day, rvol 1.21, CMF 0.105 (from 0.036).",
-          "one_number": "rvol 1.21 (breakout)",
-          "lane": "tape",
+          "ticker": "RGLD",
+          "headline": "Royal Gold met the stored breakout rule (rvol 1.62, CMF 0.26) and is an S&P 400 inclusion_candidate at -3.83%.",
+          "one_number": "rvol 1.62 (breakout)",
+          "lane": "breakout",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BRK.B cap=normal (prior normal) rsi14=75.7 cmf=0.105 rvol=1.21 dir=leading_uptrend p50=7.67% close=557.07",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z RGLD dir=leading_uptrend rvol=1.62 cmf=0.26 p50=8.89% rsi14=65.6 as_of 2026-11-06",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z RGLD sp400 status=inclusion_candidate dist=-3.83% recon=size_band_watch",
               "url": null
             }
           ],
@@ -865,56 +869,86 @@
           "handoff": null
         },
         {
-          "ticker": "MSCI",
-          "headline": "MSCI met the stored breakout rule with stretch_z 2.11: leading_uptrend, 12.3% above the 50-day, rvol 1.10, CMF 0.219.",
-          "one_number": "rvol 1.10 (breakout)",
-          "lane": "tape",
+          "ticker": "FNV",
+          "headline": "Franco-Nevada met the stored breakout rule: leading uptrend, relative volume 1.15, CMF 0.199.",
+          "one_number": "rvol 1.15 (breakout)",
+          "lane": "breakout",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MSCI cap=normal (prior normal) rsi14=77.6 cmf=0.219 rvol=1.1 dir=leading_uptrend p50=12.26% close=639.78",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z FNV dir=leading_uptrend rvol=1.15 cmf=0.199 p50=2.52% rsi14=58.6 as_of 2026-11-06",
               "url": null
             }
           ],
           "confidence": "provider",
           "next": "TA-BRK-3S: close above the 50-day on each of the next 3 snapshots.",
+          "handoff": null
+        },
+        {
+          "ticker": "CSU",
+          "headline": "Constellation Software is overbought at RSI 80.5, with CMF 0.443 and relative volume 0.91 below the breakout line.",
+          "one_number": "RSI 80.5",
+          "lane": "overbought",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z CSU rsi14=80.5 cmf=0.443 rvol=0.91 dir=leading_uptrend p50=14.59% pressure=overbought as_of 2026-11-06",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "TA-RSI-OB-5D: passes if CSU trails SPY over 5 sessions.",
           "handoff": null
         }
       ],
       "inputs_read": [
         {
           "path": "dashboard/data/technical_summary.json",
-          "generated_at": "2026-11-04T09:27:05Z",
-          "age_hours_at_read": 14.5,
-          "exists": true
-        },
-        {
-          "path": "dashboard/data/capitulation_daily.json",
-          "generated_at": "2026-11-04T09:28:36.656217+00:00",
-          "age_hours_at_read": 14.5,
+          "generated_at": "2026-11-09T10:22:53Z",
+          "age_hours_at_read": 13.6,
           "exists": true
         },
         {
           "path": "dashboard/data/index_membership.json",
-          "generated_at": "2026-11-04T10:06:14Z",
-          "age_hours_at_read": 13.9,
+          "generated_at": "2026-11-09T10:42:19Z",
+          "age_hours_at_read": 13.3,
           "exists": true
         },
         {
-          "path": "dashboard/data/portfolio_news.json",
-          "generated_at": "2026-11-04T07:35:17.004520+00:00",
-          "age_hours_at_read": 16.4,
+          "path": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json",
+          "generated_at": "2026-11-04T09:27:05Z",
+          "age_hours_at_read": 134.5,
           "exists": true
         },
         {
-          "path": "dashboard/data/desk_briefs.json",
-          "generated_at": "2026-11-02T13:27:46Z",
-          "age_hours_at_read": 58.5,
+          "path": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-09.json",
+          "generated_at": "2026-11-09T10:22:53Z",
+          "age_hours_at_read": 13.6,
+          "exists": true
+        },
+        {
+          "path": "_system/portfolio/registry.json",
+          "generated_at": "2026-11-09T10:42:19Z",
+          "age_hours_at_read": 13.3,
+          "exists": true
+        },
+        {
+          "path": "_system/data/desk_evals/tape_index/index_announcements.json",
+          "generated_at": "2026-11-06",
+          "age_hours_at_read": 96.0,
+          "exists": true
+        },
+        {
+          "path": "_system/data/desk_briefs/tape_index/2026-11-04.json",
+          "generated_at": "2026-11-04",
+          "age_hours_at_read": 144.0,
           "exists": true
         }
       ],
-      "screens_empty": [],
-      "notes": "SPY and QQQ stress_building (RSI 38.9 / 32.8). Universe names in capitulation states 27 to 25, mostly panic easing to stress_building. Held: AENA.MC, LSEG (mid-session rows); TBBK sp600 and AAOI R2000 feed candidates (index feed shows no S&P membership for TBBK and no memberships or exchange for AAOI; see the Nov 2 exchange-field proposal). SNDK 8-for-1 split: record Nov 9, split-adjusted Nov 20. Not in tape feed: JMIA, MBGL, SPCX, LMN, LIFCO.ST."
+      "screens_empty": [
+        "confirmed_next_30d"
+      ],
+      "notes": "Through Fri 2026-11-06. market_context panic (SPY RSI 34.9, QQQ RSI 30.5 exhaustion_emerging). panic 106, capitulation_candidate 17, exhaustion_emerging 8. Stressed names cluster there. V, RGLD, FNV and CSU are the strength names. Held: SNDK gap 11.39%, COHR gap 11.66% (TAPE-06); AENA.MC 2026-11-09 mid-session (FLOW-06). Calendar: SNDK 8-for-1 record Nov 9, adjusted Nov 20; MSCI announcement Nov 11 (effective Nov 30); Russell prelim Nov 13 after close (semi recon Dec 11). APLD Russell 1000 deletion_risk unchanged (feed, dist -24.83%, news_unconfirmed). No tape rows: JMIA, MBGL, LIFCO.ST, LMN."
     }
   ],
   "items_flat": [
@@ -1609,56 +1643,45 @@
       "stale": true
     },
     {
-      "ticker": "MIAX",
-      "headline": "Miami International's CMF rose to 0.232 (from 0.099), past the 0.10 line, while the stored trend is still lagging_downtrend (RSI 65.6, 6.3% under the 50-day).",
-      "one_number": "CMF 0.232",
-      "lane": "tape",
+      "ticker": "QDEL",
+      "headline": "QuidelOrtho is now capitulation_candidate (normal on Nov 3): RSI 38.0, above the 35 line, 5-session return -19.25%, CMF -0.03.",
+      "one_number": "5d -19.25%",
+      "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MIAX cap=normal (prior normal) rsi14=65.6 cmf=0.232 rvol=0.95 dir=lagging_downtrend p50=-6.28% close=33.86",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z QDEL cap=capitulation_candidate scores 75.0/82.1/20.6 (pressure/panic/exhaustion) rsi14=38.0 cmf=-0.03 ret5d=-19.25% as_of 2026-11-06",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z QDEL prior cap=normal rsi14=51.9 as_of 2026-11-03",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "TA-Z-5D: CMF still >0.10 next session and a positive 5-session return.",
+      "next": "TA-CAP-5D: passes if QDEL beats SPY over 5 sessions.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-04",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "BN",
-      "headline": "Brookfield's RSI reached 78.8 (from 67.9) as the capitulation state went from stress_building back to normal; counter-trend overbought (mixed_repair, TAPE-01).",
-      "one_number": "RSI 78.8",
-      "lane": "tape",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BN cap=normal (prior stress_building) rsi14=78.8 cmf=0.221 rvol=1.06 dir=mixed_repair p50=6.52% close=40.64",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "TA-RSI-OB-5D: passes if BN trails SPY over 5 sessions.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-04",
+      "as_of": "2026-11-09",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
       "ticker": "TPL",
-      "headline": "Texas Pacific Land moved from normal into stress_building with CMF -0.110 (from -0.100) and RSI 31.0.",
-      "one_number": "CMF -0.110",
+      "headline": "Texas Pacific Land moved from stress_building to exhaustion_emerging: RSI 14.1, CMF -0.268, 5-session return -17.88%.",
+      "one_number": "RSI 14.1",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z TPL cap=stress_building (prior normal) rsi14=31.0 cmf=-0.11 rvol=1.48 dir=lagging_downtrend p50=-5.51% close=332.0",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z TPL cap=exhaustion_emerging scores 85.0/82.8/53.5 (pressure/panic/exhaustion) rsi14=14.1 cmf=-0.268 ret5d=-17.88% as_of 2026-11-06",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z TPL prior cap=stress_building rsi14=31.0 as_of 2026-11-03",
           "url": null
         }
       ],
@@ -1667,71 +1690,76 @@
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-04",
+      "as_of": "2026-11-09",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "APLD",
-      "headline": "Index feed scores Applied Digital a Russell 1000 deletion_risk 5.52% under the breakpoint for the Dec 11 recon. Feed candidate only, no provider announcement.",
-      "one_number": "R1000 deletion_risk -5.52%",
-      "lane": "index",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z APLD cap=stress_building (prior stress_building) rsi14=42.5 cmf=-0.043 rvol=0.94 dir=lagging_downtrend p50=-24.71% close=17.81",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/index_membership.json gen 2026-11-04T10:06:14Z APLD russell_1000 status=deletion_risk dist=-5.52% (prior member); russell_2000 inclusion_candidate",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "TA-IDX-EVENT: graded on FTSE Russell prelim lists Nov 13 through Dec 11.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-11-04",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "PBT",
-      "headline": "PBT moved to capitulation_candidate with RSI 15.6; close 27.93 vs 31.62 on Oct 30 (about -11.7% over two sessions, no gap over 10%) as WTI fell 7.4% on Nov 2.",
-      "one_number": "RSI 15.6",
+      "ticker": "AAOI",
+      "headline": "Applied Optoelectronics moved from stress_building to panic: RSI 29.4, CMF -0.20, 5-session return -27.4%.",
+      "one_number": "5d -27.4%",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z PBT cap=capitulation_candidate (prior stress_building) rsi14=15.6 cmf=-0.134 rvol=1.68 dir=pullback_in_uptrend p50=-16.87% close=27.93",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z AAOI cap=panic scores 86.4/71.5/62.1 (pressure/panic/exhaustion) rsi14=29.4 cmf=-0.2 ret5d=-27.4% as_of 2026-11-06",
           "url": null
         },
         {
-          "kind": "news",
-          "ref": "CNBC 2026-11-02: WTI futures -7.4% to $96.46 on US-Iran diplomacy",
-          "url": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html"
+          "kind": "dashboard",
+          "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z AAOI prior cap=stress_building rsi14=31.8 as_of 2026-11-03",
+          "url": null
         }
       ],
       "confidence": "provider",
-      "next": "TA-CAP-5D: passes if PBT beats SPY over 5 sessions.",
+      "next": "TA-CAP-5D: passes if AAOI beats SPY over 5 sessions.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-04",
+      "as_of": "2026-11-09",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "RACE",
-      "headline": "Ferrari met the breakout rule after Q3 guidance raise: leading_uptrend, 3.0% above the 50-day, rvol 2.98, CMF 0.177. RSI 71.2 not posted separately (TAPE-02).",
-      "one_number": "rvol 2.98 (breakout)",
-      "lane": "tape",
+      "ticker": "LB",
+      "headline": "LandBridge moved from stress_building to panic (RSI 30.1, CMF -0.265, rvol 2.19) and is a Russell 2000 inclusion_candidate at -14.96%.",
+      "one_number": "rvol 2.19",
+      "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z RACE cap=normal (prior normal) rsi14=71.2 cmf=0.177 rvol=2.98 dir=leading_uptrend p50=3.03% close=414.77",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z LB cap=panic scores 80.2/76.8/58.7 (pressure/panic/exhaustion) rsi14=30.1 cmf=-0.265 rvol=2.19 as_of 2026-11-06",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-04.json gen 2026-11-04T09:27:05Z LB prior cap=stress_building rsi14=41.0 as_of 2026-11-03",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z LB russell_2000 status=inclusion_candidate dist=-14.96% recon=likely_add",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-CAP-5D: passes if LB beats SPY over 5 sessions.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-11-09",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "V",
+      "headline": "Visa met the stored breakout rule with stretch_z 2.017: leading uptrend, relative volume 1.28, CMF 0.206.",
+      "one_number": "rvol 1.28 (breakout)",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z V dir=leading_uptrend rvol=1.28 cmf=0.206 p50=9.54% stretch_z=2.017 rsi14=61.6 as_of 2026-11-06",
           "url": null
         }
       ],
@@ -1740,19 +1768,24 @@
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-04",
+      "as_of": "2026-11-09",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "BRK.B",
-      "headline": "Berkshire met the stored breakout rule: leading_uptrend, 7.7% above the 50-day, rvol 1.21, CMF 0.105 (from 0.036).",
-      "one_number": "rvol 1.21 (breakout)",
-      "lane": "tape",
+      "ticker": "RGLD",
+      "headline": "Royal Gold met the stored breakout rule (rvol 1.62, CMF 0.26) and is an S&P 400 inclusion_candidate at -3.83%.",
+      "one_number": "rvol 1.62 (breakout)",
+      "lane": "breakout",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z BRK.B cap=normal (prior normal) rsi14=75.7 cmf=0.105 rvol=1.21 dir=leading_uptrend p50=7.67% close=557.07",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z RGLD dir=leading_uptrend rvol=1.62 cmf=0.26 p50=8.89% rsi14=65.6 as_of 2026-11-06",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z RGLD sp400 status=inclusion_candidate dist=-3.83% recon=size_band_watch",
           "url": null
         }
       ],
@@ -1761,19 +1794,19 @@
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-04",
+      "as_of": "2026-11-09",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "MSCI",
-      "headline": "MSCI met the stored breakout rule with stretch_z 2.11: leading_uptrend, 12.3% above the 50-day, rvol 1.10, CMF 0.219.",
-      "one_number": "rvol 1.10 (breakout)",
-      "lane": "tape",
+      "ticker": "FNV",
+      "headline": "Franco-Nevada met the stored breakout rule: leading uptrend, relative volume 1.15, CMF 0.199.",
+      "one_number": "rvol 1.15 (breakout)",
+      "lane": "breakout",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json gen 2026-11-04T09:27:05Z MSCI cap=normal (prior normal) rsi14=77.6 cmf=0.219 rvol=1.1 dir=leading_uptrend p50=12.26% close=639.78",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z FNV dir=leading_uptrend rvol=1.15 cmf=0.199 p50=2.52% rsi14=58.6 as_of 2026-11-06",
           "url": null
         }
       ],
@@ -1782,7 +1815,28 @@
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-11-04",
+      "as_of": "2026-11-09",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "CSU",
+      "headline": "Constellation Software is overbought at RSI 80.5, with CMF 0.443 and relative volume 0.91 below the breakout line.",
+      "one_number": "RSI 80.5",
+      "lane": "overbought",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-09T10:22:53Z CSU rsi14=80.5 cmf=0.443 rvol=0.91 dir=leading_uptrend p50=14.59% pressure=overbought as_of 2026-11-06",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-RSI-OB-5D: passes if CSU trails SPY over 5 sessions.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-11-09",
       "author": "grok-drew-tape-index",
       "stale": false
     }
@@ -1803,7 +1857,7 @@
   "counts": {
     "briefs": 5,
     "items": 38,
-    "files": 28,
+    "files": 29,
     "by_desk": {
       "special_situations": 4,
       "activism": 2,
@@ -1819,10 +1873,10 @@
     "status": "degraded",
     "structural_errors": [],
     "problems": [
-      "special_situations brief is 9 days old (2026-10-29)",
-      "activism brief is 8 days old (2026-10-30)",
-      "fundamentals brief is 11 days old (2026-10-27)",
-      "nol_tax_assets brief is 8 days old (2026-10-30)"
+      "special_situations brief is 12 days old (2026-10-29)",
+      "activism brief is 11 days old (2026-10-30)",
+      "fundamentals brief is 14 days old (2026-10-27)",
+      "nol_tax_assets brief is 11 days old (2026-10-30)"
     ],
     "warnings": [
       "_system/data/desk_briefs/activism/2026-10-29.json: items[0].evidence[2] (MGM): filing without a URL",
@@ -1863,7 +1917,7 @@
       "_system/data/desk_briefs/tape_index/2026-10-29.json: inputs_read[5] (_system/data/desk_briefs/schema.json) carries no stamp"
     ],
     "stale_days": 7,
-    "checked_at": "2026-11-06T15:35:09Z"
+    "checked_at": "2026-11-09T13:41:05Z"
   },
   "research_only": true,
   "in_base_irr": false,
@@ -1871,9 +1925,9 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "dashboard-desk-briefs",
-    "generated_at": "2026-11-06T15:35:09Z",
-    "as_of": "2026-11-06",
-    "content_sha256": "sha256:d166870af305a89c7cb9e7d6b2d9603dc2c56df0a74bf8efab191ef82074741a",
+    "generated_at": "2026-11-09T13:41:05Z",
+    "as_of": "2026-11-09",
+    "content_sha256": "sha256:9f06d1bbe1600975437cd17a554dc19445356601ba4db6a42041155292b1e717",
     "row_count": 38,
     "upstream_inputs": [],
     "health": {
