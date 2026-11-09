@@ -1,9 +1,9 @@
 {
- "run_date": "2026-11-08",
- "git_head": "d258e7610c03a698c4e6bfdac5bfcebf29058f39",
+ "run_date": "2026-11-09",
+ "git_head": "ac4ab6a443785671944dc3179c631f9a5ac74f55",
  "nodes": 8420,
  "edges": 7427,
- "exit_code": 0,
+ "exit_code": 1,
  "ratchet": {
   "armed": [
    "L1",
@@ -119,12 +119,14 @@
    "id": "P6",
    "severity": "hard",
    "base_severity": "hard",
-   "count": 0,
-   "delta": "0",
-   "status": "OK",
-   "note": "14/14 feeds fresh (buyback_radar 43h, capitulation_daily 39h, criticality_summary 40h, desk_briefs 49h, market_risk_components_committed 40h, podcast_catalog 217h, reverse_splits 44h, separations 49h, short_alpha 16h, special_situations 49h, spx_surface 41h, technical_summary 41h, vol_metrics 41h, warrant_monitor 49h)",
-   "violations": [],
-   "violations_total": 0,
+   "count": 1,
+   "delta": "+1",
+   "status": "VIOLATIONS",
+   "note": "13/14 feeds fresh (buyback_radar 71h, capitulation_daily 10h, criticality_summary 10h, desk_briefs 7h, market_risk_components_committed 68h, podcast_catalog 245h, reverse_splits 72h, separations 76h, short_alpha 20h, special_situations 76h, spx_surface 10h, technical_summary 10h, vol_metrics 10h, warrant_monitor 76h)",
+   "violations": [
+    "podcast_catalog: stale (window 240h)"
+   ],
+   "violations_total": 1,
    "waived": []
   },
   {
@@ -143,19 +145,22 @@
    "id": "P8",
    "severity": "report",
    "base_severity": "report",
-   "count": 6,
-   "delta": "-1",
+   "count": 9,
+   "delta": "+3",
    "status": "VIOLATIONS",
-   "note": "40 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
+   "note": "37 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
    "violations": [
-    "data-pipeline-activist: last work-done receipt 290.0h old (window 54h)",
-    "data-pipeline-cvr-discover: last work-done receipt 475.4h old (window 342h)",
-    "data-pipeline-intake-full: last work-done receipt 293.9h old (window 54h)",
-    "data-pipeline-world-model: last work-done receipt 667.8h old (window 342h)",
-    "letters: last work-done receipt 331.4h old (window 174h)",
-    "valuation: last work-done receipt 291.1h old (window 56h)"
+    "data-pipeline-activist: last work-done receipt 317.8h old (window 54h)",
+    "data-pipeline-cvr-discover: last work-done receipt 503.2h old (window 342h)",
+    "data-pipeline-intake-full: last work-done receipt 321.7h old (window 54h)",
+    "data-pipeline-world-model: last work-done receipt 695.6h old (window 342h)",
+    "letters: last work-done receipt 359.2h old (window 174h)",
+    "reverse-split-announcement-monitor: last work-done receipt 13.4h old (window 7h)",
+    "reverse-split-financial-coverage: last work-done receipt 13.3h old (window 7h)",
+    "supervisor: last work-done receipt 17.8h old (window 12h)",
+    "valuation: last work-done receipt 318.9h old (window 56h)"
    ],
-   "violations_total": 6,
+   "violations_total": 9,
    "waived": []
   },
   {
@@ -246,7 +251,7 @@
    "severity": "report",
    "base_severity": "report",
    "count": 244,
-   "delta": "-2",
+   "delta": "0",
    "status": "VIOLATIONS",
    "note": "",
    "violations": [
