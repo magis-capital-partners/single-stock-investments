@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import html
 import re
+from datetime import date
 from urllib.parse import parse_qs, unquote, urldefrag, urljoin, urlparse
 from underwriting_foreign_financials import bounded_sources
 
@@ -30,6 +31,66 @@ def archive_url(value, parent, cik):
     return urldefrag(url)[0]
 
 
+# These labels route literal source requests; they select no financial terms.
+_MONTHS = ('january', 'february', 'march', 'april', 'may', 'june', 'july',
+           'august', 'september', 'october', 'november', 'december')
+_DATE_TEXT = r'(' + '|'.join(_MONTHS) + r')\s+(\d{1,2}),?\s+((?:19|20)\d{2})'
+_ORDINAL = (r'(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|'
+            r'eleventh|twelfth|thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|'
+            r'eighteenth|nineteenth|twentieth)')
+_AGREEMENT = (r'(?:' + _ORDINAL + r'\s+amendment|'
+              r'(?:(?:delayed[- ]draw\s+)?term\s+loan|revolving\s+credit|credit)\s+agreement)')
+
+
+def requested_agreement_labels(detail):
+    """Bind only explicitly named agreements to their stated execution dates."""
+    labels = []
+    exhibit = r'(?:Exhibit\s+\d+(?:\.\d+)?\s+)?'
+    pair = (exhibit + '(' + _AGREEMENT + r')\s+and\s+' + exhibit
+            + '(' + _AGREEMENT + r'),?\s+both\s+dated\s+(?:as\s+of\s+)?' + _DATE_TEXT)
+    direct = ('(' + _AGREEMENT + r')(?:\s+to\s+(?:the\s+)?Credit\s+Agreement)?'
+              r',?\s+dated\s+(?:as\s+of\s+)?' + _DATE_TEXT)
+    for pattern, paired in ((pair, True), (direct, False)):
+        for match in re.finditer(pattern, detail, re.I):
+            groups = match.groups()
+            names, values = (groups[:2], groups[2:]) if paired else (groups[:1], groups[1:])
+            month, day, year = values
+            try:
+                stamp = date(int(year), _MONTHS.index(month.lower())+1, int(day)).isoformat()
+            except ValueError:
+                continue
+            labels.extend(stamp+' '+' '.join(name.lower().split()) for name in names)
+    return list(dict.fromkeys(labels))
+
+
+def specific_reference_rank(body, keywords):
+    """Source-own exact execution labels or explicit note-maturity titles."""
+    matches = []
+    for index, value in enumerate(keywords):
+        term = ' '.join(value.lower().split())
+        if re.fullmatch(r'(?:19|20)\d{2}', term):
+            # A year elsewhere in an exhibit is not a note maturity title.
+            matched = bool(re.search(r'\bnotes?\s+due\s+'+term+r'\b', body))
+        else:
+            label = re.fullmatch(r'((?:19|20)\d{2}-\d{2}-\d{2}) ('+_AGREEMENT+')', term, re.I)
+            if not label:
+                continue
+            try:
+                day = date.fromisoformat(label[1])
+            except ValueError:
+                continue
+            name = r'\s+'.join(re.escape(w) for w in label[2].split())
+            if label[2].endswith('term loan agreement'):
+                name = name.replace(r'loan\s+agreement', r'loan\s+(?:credit\s+)?agreement')
+            execution = (r'\bdated\s+(?:as\s+of\s+)?'+_MONTHS[day.month-1]
+                         +r'\s+0?'+str(day.day)+r',?\s+'+str(day.year)+r'\b')
+            title = r'\b'+name+r'(?:\s+to\s+(?:the\s+)?credit\s+agreement)?,?\s+'
+            matched = bool(re.search(title+execution, body))
+        if matched:
+            matches.append(index)
+    return 18-min(matches) if matches else 0
+
+
 def dated_instrument_labels(keywords):
     """Explicit dated instrument labels, rather than generic financial words."""
     return [term.split() for value in keywords
@@ -40,7 +101,8 @@ def dated_instrument_labels(keywords):
 def request_kinds(keywords):
     text = ' '.join(keywords).lower()
     return (bool(dated_instrument_labels(keywords)
-                 or re.search(r'credit|covenant|maturit|refinanc|borrow|debt|financ|indenture', text)),
+                 or any(re.fullmatch(r'(?:19|20)\d{2}', str(term)) for term in keywords)
+                 or re.search(r'credit|loan|amendment|covenant|maturit|refinanc|borrow|debt|financ|indenture', text)),
             bool(re.search(r'acqui|merg|consideration|tender|transaction|target', text)))
 
 
@@ -53,6 +115,7 @@ def linked_references(raw, parent_url, cik, keywords):
     lower = source.lower()
     instrument_labels = dated_instrument_labels(keywords)
     indentures_requested = bool(instrument_labels
+                                or any(re.fullmatch(r'(?:19|20)\d{2}', str(term)) for term in keywords)
                                 or re.search(r'indenture|bond|maturit|notes due', ' '.join(keywords), re.I))
     result = {}
     for link in re.finditer(r'<a\b[^>]*\bhref\s*=\s*["\']([^"\']+)["\'][^>]*>.*?</a>', source, re.I | re.S):
@@ -77,6 +140,9 @@ def linked_references(raw, parent_url, cik, keywords):
             score += 3 * bool(indentures_requested and re.search(r'\bindenture\b|\bguarantee agreement\b', body))
         if transaction:
             score += 20 * bool(re.search(r'\bmerger\b|\bacquisition agreement\b|\btender offer\b|\bpurchase agreement\b', body))
+        # An exact requested title and date can identify a named amendment.
+        specific = specific_reference_rank(body, keywords)
+        score += 80 + specific if specific else 0
         if not score:
             continue
         # An exhibit index separates "2015 Senior Notes" into its execution

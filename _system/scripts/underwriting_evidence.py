@@ -61,11 +61,13 @@ def merge_evidence_requests(previous, incoming):
 
 def requested_instruments(gaps):
     """Literal instrument names in requests, without selecting URLs or facts."""
+    from underwriting_primary_references import requested_agreement_labels
     terms = []
     month = r'(?:January|February|March|April|May|June|July|August|September|October|November|December)'
     dated = month+r'\s+\d{1,2},?\s+((?:19|20)\d{2})'
     for gap in gaps[:12]:
         detail = str(gap.get('detail') or '')[:8000]
+        terms.extend(requested_agreement_labels(detail))
         terms.extend(' '.join(m.lower().split()) for m in
                      re.findall(r'\b(?:19|20)\d{2}\s+(?:Senior\s+)?Notes?\b', detail, re.I))
         # A base instrument is often named by its execution date, while the
@@ -108,6 +110,8 @@ def requested_keywords(gaps, *, history=None):
             section = re.fullmatch(r'(?:section\s+)?('+number+r')(?:\([a-z0-9]+\))*', term)
             if section:
                 terms.append('section '+section[1])
+            elif search_list and re.fullmatch(r'(?:19|20)\d{2}', term):
+                terms.append(term)
             elif (re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ()/,&.'-]{1,119}", term)
                   and re.search(r'[A-Za-z]', term)):
                 terms.append(term)
@@ -119,7 +123,9 @@ def requested_keywords(gaps, *, history=None):
             for part in re.split(r'[,;]', bare):
                 term = ' '.join(part.lower().split()).strip(' ,;:.')
                 term = re.sub(r'^(?:and|or)\s+', '', term)
-                if (re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ()/,&.'-]{1,119}", term)
+                if re.fullmatch(r'(?:19|20)\d{2}', term):
+                    terms.append(term)
+                elif (re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ()/,&.'-]{1,119}", term)
                         and re.search(r'[A-Za-z]', term)):
                     terms.append(term)
         if not terms:

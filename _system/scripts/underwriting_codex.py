@@ -87,22 +87,45 @@ def completed_output(rows, file_text=None):
         return value
     messages = [(index, row['item']) for index, row in enumerate(rows)
                 if row.get('type') == 'item.completed' and (row.get('item') or {}).get('type') == 'agent_message']
-    require(len(messages) <= 1, 'Ambiguous native final messages')
+    progress_ids = []
+    if len(messages) > 1:
+        # Native progress and the final answer share an event type. Only the
+        # final JSON may agree with the independently saved last-message file;
+        # never choose between duplicate, conflicting or malformed JSON drafts.
+        require(file_text is not None, 'Multiple native messages require the saved final file')
+        ids = [item.get('id') for _, item in messages]
+        require(all(ids) and len(set(ids)) == len(ids), 'Ambiguous native message identities')
+        for _, item in messages[:-1]:
+            text = item.get('text')
+            require(isinstance(text, str) and len(text) <= 500_000
+                    and not text.lstrip().startswith(('{', '[', '```')),
+                    'Ambiguous native JSON candidates')
+            try:
+                json.loads(text)
+            except json.JSONDecodeError:
+                pass
+            else:
+                require(False, 'Ambiguous native JSON candidates')
+            progress_ids.append(item['id'])
     stream_value, message_id = None, None
     if messages:
         threads = [row for row in rows if row.get('type') == 'thread.started' and row.get('thread_id')]
         finished = [index for index, row in enumerate(rows) if row.get('type') == 'turn.completed']
-        require(len(threads) == len(finished) == 1 and messages[0][0] < finished[0],
+        require(len(threads) == len(finished) == 1
+                and all(index < finished[0] for index, _ in messages),
                 'Native final message has no unique completed turn')
-        stream_value = object_value(messages[0][1].get('text'))
-        message_id = messages[0][1].get('id')
+        stream_value = object_value(messages[-1][1].get('text'))
+        message_id = messages[-1][1].get('id')
     file_value = object_value(file_text) if file_text is not None else None
     require(file_value is not None or stream_value is not None, 'No complete native final message or answer file')
     if file_value is not None and stream_value is not None:
         require(digest(file_value) == digest(stream_value), 'Native output sources disagree')
     value = file_value if file_value is not None else stream_value
-    return value, {'source': 'last_message_file' if file_value is not None else 'native_agent_message',
-                   'message_id': message_id, 'output_hash': digest(value)}
+    provenance = {'source': 'last_message_file' if file_value is not None else 'native_agent_message',
+                  'message_id': message_id, 'output_hash': digest(value)}
+    if progress_ids:
+        provenance['ignored_progress_message_ids'] = progress_ids
+    return value, provenance
 
 
 def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_path, timeout=1200, run=subprocess.run):
