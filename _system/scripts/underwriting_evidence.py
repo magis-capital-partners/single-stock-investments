@@ -725,6 +725,22 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                         else:
                             documents.append(document)
                     for cover in foreign_proof['covers']:
+                        # Registration is a separate source role. A cover has no
+                        # verified financial period and cannot satisfy annual or
+                        # current financial-report readiness on its own.
+                        if cover.get('registered_securities'):
+                            registration = {k: cover[k] for k in
+                                ('source_url', 'content_hash', 'filed', 'accession', 'registered_securities')}
+                            registration.update(id='doc_'+digest(cover['source_url'])[:16],
+                                form='SEC-registration-cover', source_form=cover['form'],
+                                document_kind='primary_registration_cover',
+                                coverage='explicit_primary_security_registration',
+                                contexts=list(dict.fromkeys(row['context'] for row in cover['registered_securities'])))
+                            old = next((d for d in documents if d['id'] == registration['id']), None)
+                            require(not old or old['content_hash'] == registration['content_hash'],
+                                    'A primary registration source changed')
+                            if old is None:
+                                documents.append(registration)
                         formal_sources.append({'source_url': cover['source_url'],
                             'raw': source_budget().fetch(cover['source_url'], 0,
                                 lambda url: client.get_bytes(url, timeout=40)),
@@ -930,6 +946,45 @@ def evidence_readiness(packet, *, require_documents=False):
     return {'status': 'ready' if not gaps else 'evidence_gap', 'gaps': gaps,
             'primary_observations': len(primary), 'documents': len(docs),
             'history_periods': len({o['period'] for o in primary})}
+
+
+def supplemental_fact_diagnostics(packet, rows):
+    """Explain failed source checks without changing or accepting any fact.
+
+    Exact source windows only extend an already contiguous author quotation to
+    a nearby explicit reporting year. They select no new number, scale, period,
+    claim or financial assumption; normal compilation still validates the row.
+    """
+    documents = {d['id']: d for d in packet.get('documents') or []}
+    diagnostics = []
+    for row in rows:
+        try:
+            supplemental_observations(packet, [row])
+        except (ContractError, KeyError, TypeError, AttributeError) as exc:
+            if not isinstance(row, dict):
+                diagnostics.append({'validation_error': str(exc), 'source_windows': []})
+                continue
+            windows = []
+            quote = ' '.join(str(row.get('quote') or '').split())
+            year = str(row.get('period') or '')[:4]
+            source = documents.get(row.get('document_id')) or {}
+            if quote and re.fullmatch(r'\d{4}', year):
+                for index, context in enumerate(source.get('contexts') or []):
+                    start = context.find(quote)
+                    if start < 0:
+                        continue
+                    end = start + len(quote)
+                    nearby = [(min(start, m.start()), max(end, m.end()))
+                              for m in re.finditer(r'(?<!\d)'+re.escape(year)+r'(?!\d)', context)
+                              if max(end, m.end())-min(start, m.start()) <= 8000]
+                    if nearby:
+                        left, right = min(nearby, key=lambda span: (span[1]-span[0], span[0]))
+                        windows.append({'context_index': index, 'start': left, 'end': right,
+                                        'quote': context[left:right]})
+                        break
+            diagnostics.append({'observation_id': row.get('id'), 'document_id': row.get('document_id'),
+                                'validation_error': str(exc), 'source_windows': windows})
+    return diagnostics
 
 
 def supplemental_observations(packet, rows):

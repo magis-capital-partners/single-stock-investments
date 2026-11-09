@@ -53,6 +53,52 @@ def test_complete_current_and_annual_sources_keep_dates_hashes_and_full_context(
     assert len(calls)==7 and p['reference_budget']['counts']==[3,4]
     assert not any('dividend-ex99' in u for u in calls)
 
+
+def test_registration_on_annual_cover_reaches_normal_listing_check_without_financial_period(tmp_path):
+    import json
+    from test_foreign_report_periods import root
+    from underwriting_evidence import prepare_packet, registered_listing_ratio
+    root(tmp_path);sub,s=fixture();annual=url('0000000123-26-000001','annual.htm')
+    registration=(' <ix:nonNumeric name="dei:EntityCentralIndexKey" contextRef="issuer">123</ix:nonNumeric>'
+      '<ix:nonNumeric name="dei:Security12bTitle" contextRef="registered">Common Shares, no par value</ix:nonNumeric>'
+      '<ix:nonNumeric name="dei:TradingSymbol" contextRef="registered">BKNG</ix:nonNumeric>'
+      '<ix:nonNumeric name="dei:SecurityExchangeName" contextRef="registered">New York Stock Exchange</ix:nonNumeric>')
+    s[annual]=s[annual].replace(b'</html>',registration.encode()+b'</html>')
+    # No hand-configured ratio: only the complete, same-issuer primary cover may establish it.
+    (tmp_path/'_system/reference/valuation_listing_ratios.json').write_text(json.dumps({'listings':{}}))
+    data_path=tmp_path/'_system/reference/market-data/valuation_fundamentals/BKNG.json'
+    data=json.loads(data_path.read_text())
+    # The normal fact collector already supplied the complete source graph,
+    # so packet collection must not depend on separately parsing covers as financials.
+    data['foreign_financial_discovery']={'status':'complete_current_financial_sources'}
+    data_path.write_text(json.dumps(data))
+    class Client:
+        def get_json(self,u,**kw):return sub if '/submissions/' in u else {'facts':{}}
+        def get_bytes(self,u,**kw):return s[u]
+    p=prepare_packet(tmp_path,'BKNG','2026-11-08',collect=False,client=Client())
+    covers=[d for d in p['documents'] if d.get('document_kind')=='primary_registration_cover']
+    assert len(covers)==1 and covers[0]['source_url']==annual
+    assert covers[0]['content_hash']==hashlib.sha256(s[annual]).hexdigest()
+    assert 'period' not in covers[0] and covers[0]['form']=='SEC-registration-cover'
+    assert covers[0]['source_form']=='40-F'
+    assert registered_listing_ratio(covers,'BKNG','XNYS','2026-11-08')['source_url']==annual
+    assert p['listing_ratio']['basis']=='direct_registered_common_or_ordinary_share'
+    assert p['primary_reference_usage']['counts']==[3,4]
+    from underwriting_evidence import evidence_readiness
+    financial_copy={**p,'documents':covers}
+    gaps={g['code'] for g in evidence_readiness(financial_copy,require_documents=True)['gaps']}
+    assert {'latest_primary_document_missing','annual_primary_document_missing'} <= gaps
+
+
+def test_registration_cik_cannot_borrow_the_cover_issuer_name():
+    sub,s=fixture();annual=url('0000000123-26-000001','annual.htm')
+    registration=(' <ix:nonNumeric name="dei:EntityCentralIndexKey" contextRef="issuer">999</ix:nonNumeric>'
+      '<ix:nonNumeric name="dei:Security12bTitle" contextRef="registered">Common Shares</ix:nonNumeric>'
+      '<ix:nonNumeric name="dei:TradingSymbol" contextRef="registered">TEST</ix:nonNumeric>'
+      '<ix:nonNumeric name="dei:SecurityExchangeName" contextRef="registered">New York Stock Exchange</ix:nonNumeric>')
+    s[annual]=s[annual].replace(b'</html>',registration.encode()+b'</html>')
+    with pytest.raises(ValueError,match='registration issuer CIK mismatch'):run(sub,s)
+
 def test_dividend_only_current_day_cannot_be_called_financial():
     sub,s=fixture();sub['filings']['recent']['filingDate'][1]='2026-08-01'
     docs,p,calls=run(sub,s)

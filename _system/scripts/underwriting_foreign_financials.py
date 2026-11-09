@@ -183,7 +183,7 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
     The caller must reuse this budget for any additional reference helpers.
     No provider or model call is made, and no cached report is stamped current.
     """
-    from underwriting_evidence import document_record, primary_text, text_of
+    from underwriting_evidence import document_record, primary_text, registered_securities, text_of
     from valuation_earnings import foreign_reporting_period, reporting_period
     budget = budget if budget is not None else source_budget()
     parents = _current_covers(submissions, cik, as_of)
@@ -196,7 +196,11 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
         if issuer not in _issuer_text(text_of(primary_text(raw))):
             raise ValueError('Foreign primary cover issuer name mismatch')
         content_hash = hashlib.sha256(raw).hexdigest()
-        covers.append({**parent, 'content_hash': content_hash})
+        securities = registered_securities(primary_text(raw))
+        if any(row['issuer_cik'] != str(int(cik)) for row in securities):
+            raise ValueError('Foreign primary registration issuer CIK mismatch')
+        covers.append({**parent, 'content_hash': content_hash,
+                       **({'registered_securities': securities} if securities else {})})
         for reference in _financial_links(raw, parent, cik):
             reference['referenced_by'] = {'source_url': parent['source_url'], 'content_hash': content_hash,
                                          'filed': parent['filed']}

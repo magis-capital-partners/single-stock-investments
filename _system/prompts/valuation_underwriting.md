@@ -144,6 +144,10 @@ the facts array. To extract a fact absent from structured observations, add a
 Use that id as an observation_id/evidence_id. The compiler independently checks
 the quotation, reported number, scale, period, source hash and units. Supplemental
 shares are prohibited because a filing date alone does not establish split basis.
+When revision feedback includes supplemental_fact_diagnostics, resolve every
+listed row against the CURRENT frozen document. Source windows are verbatim
+locator aids, not accepted observations: independently verify the table's period,
+scale, scope and number, and return your own complete supported quotation.
 Current balance-sheet inputs must reflect the latest reporting period in the
 packet. Use historical balances as evidence for normalization judgments, not
 as stale current cash/debt/book-value inputs. A share denominator must be at
