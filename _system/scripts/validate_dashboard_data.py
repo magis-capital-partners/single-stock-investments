@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -80,6 +81,12 @@ INDEX_STATUS_ENUM = {
     "n_a",
 }
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
+_CONFLICT_LINE = re.compile(r"^[ \t]*(?:<{7,}(?:[ \t].*)?|={7,}|>{7,}(?:[ \t].*)?|\|{7,}(?:[ \t].*)?)[ \t]*\r?$", re.MULTILINE)
+
+
+def has_merge_conflict_markers(text: str) -> bool:
+    """Git markers occupy lines; quoted episode separators are ordinary data."""
+    return _CONFLICT_LINE.search(text) is not None
 MIN_LETTER_CORPUS = 15000
 MIN_LETTER_LINKS_RATIO = 0.99
 # Guard against sparse CI rebuilds publishing empty holdings infra.
@@ -299,9 +306,8 @@ def _check_merge_conflict_markers(path: Path) -> str | None:
     if not path.exists():
         return None
     text = path.read_text(encoding="utf-8")
-    for marker in CONFLICT_MARKERS:
-        if marker in text:
-            return f"{path.relative_to(ROOT)} contains unresolved git merge conflict markers"
+    if has_merge_conflict_markers(text):
+        return f"{path.relative_to(ROOT)} contains unresolved git merge conflict markers"
     return None
 
 
@@ -386,7 +392,7 @@ def main() -> int:
                 f"insights.json is {insights_size / (1024 * 1024):.1f}MB; reduce retained event history before it reaches 100MB"
             )
         raw_insights = INSIGHTS_PATH.read_text(encoding="utf-8")
-        if "<<<<<<<" in raw_insights or ">>>>>>>" in raw_insights:
+        if has_merge_conflict_markers(raw_insights):
             errors.append(f"{INSIGHTS_PATH} contains unresolved git merge conflict markers")
         else:
             insights = json.loads(raw_insights)
@@ -399,7 +405,7 @@ def main() -> int:
             )
         for path in shard_paths:
             raw_shard = path.read_text(encoding="utf-8")
-            if any(marker in raw_shard for marker in CONFLICT_MARKERS):
+            if has_merge_conflict_markers(raw_shard):
                 errors.append(f"{path} contains unresolved git merge conflict markers")
                 continue
             try:

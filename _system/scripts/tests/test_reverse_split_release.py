@@ -65,6 +65,7 @@ class Release(unittest.TestCase):
         self.assertIn("github.event.action == 'reverse-split-release'", text)
         self.assertEqual(release_targets(['.github/workflows/reverse-split-live.yml']), {'worker': True, 'dashboard': False})
         self.assertEqual(release_targets(['dashboard/reverse-split-shadow.js']), {'worker': False, 'dashboard': True})
+        self.assertEqual(release_targets(['_system/scripts/validate_dashboard_data.py']), {'worker': False, 'dashboard': True})
 
 
 if __name__ == '__main__':
