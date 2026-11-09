@@ -919,6 +919,11 @@ def complete_issuer_annual(document, ticker, as_of):
 def evidence_readiness(packet, *, require_documents=False):
     """Facts/documents readiness is checked before admitting any judgment call."""
     gaps = []
+    from underwriting_related_evidence import validate_related_identity
+    try:
+        validate_related_identity(packet)
+    except ValueError as exc:
+        gaps.append({'code':'related_issuer_identity_unresolved', 'detail':str(exc)})
     for error in packet.get('collection_errors') or []:
         if error.get('source') == 'unverified_foreign_report':
             gaps.append({'code': 'foreign_primary_financial_period_unresolved',
