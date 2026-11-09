@@ -12,7 +12,9 @@ def release_targets(paths: list[str]) -> dict:
                  or path == '.github/workflows/reverse-split-live.yml' for path in paths)
     # Preserve the dashboard's existing dashboard/** push behavior after bot merges.
     dashboard = any(path.startswith('dashboard/') or path == '_system/scripts/validate_dashboard_data.py' for path in paths)
-    return {'worker': worker, 'dashboard': dashboard}
+    public_status = any(path.startswith('dashboard/cloudflare/reverse-split-live/market-status')
+                        or path == '.github/workflows/reverse-split-market-status.yml' for path in paths)
+    return {'worker': worker, 'dashboard': dashboard, 'public_status': public_status}
 
 
 def dispatch_release(repo: str, pr: int, run=subprocess.run) -> dict:
@@ -40,6 +42,11 @@ def dispatch_release(repo: str, pr: int, run=subprocess.run) -> dict:
     if targets['worker']:
         gh('--method', 'POST', f'repos/{repo}/dispatches', '--input', '-', payload={
             'event_type': 'reverse-split-release',
+            'client_payload': {'pr': pr, 'merged_commit': commit, 'research_only': True, 'orders': 0},
+        })
+    if targets['public_status']:
+        gh('--method', 'POST', f'repos/{repo}/dispatches', '--input', '-', payload={
+            'event_type': 'reverse-split-status-continue',
             'client_payload': {'pr': pr, 'merged_commit': commit, 'research_only': True, 'orders': 0},
         })
     if targets['dashboard']:

@@ -56,7 +56,7 @@ class Release(unittest.TestCase):
         posts = [(args, kwargs) for args, kwargs in calls if '--method' in args]
         self.assertEqual(len(posts), 1)
         self.assertIn('repos/owner/repo/actions/workflows/dashboard-pages.yml/dispatches', posts[0][0])
-        self.assertEqual(result['targets'], {'worker': False, 'dashboard': True})
+        self.assertEqual(result['targets'], {'worker': False, 'dashboard': True, 'public_status': False})
 
     def test_release_workflow_is_separate_from_collection(self):
         root = Path(__file__).resolve().parents[3]
@@ -64,9 +64,22 @@ class Release(unittest.TestCase):
         self.assertIn('reverse-split-release', text)
         self.assertIn("github.event.action != 'reverse-split-release'", text)
         self.assertIn("github.event.action == 'reverse-split-release'", text)
-        self.assertEqual(release_targets(['.github/workflows/reverse-split-live.yml']), {'worker': True, 'dashboard': False})
-        self.assertEqual(release_targets(['dashboard/reverse-split-shadow.js']), {'worker': False, 'dashboard': True})
-        self.assertEqual(release_targets(['_system/scripts/validate_dashboard_data.py']), {'worker': False, 'dashboard': True})
+        self.assertEqual(release_targets(['.github/workflows/reverse-split-live.yml']), {'worker': True, 'dashboard': False, 'public_status': False})
+        self.assertEqual(release_targets(['dashboard/reverse-split-shadow.js']), {'worker': False, 'dashboard': True, 'public_status': False})
+        self.assertEqual(release_targets(['_system/scripts/validate_dashboard_data.py']), {'worker': False, 'dashboard': True, 'public_status': False})
+
+    def test_public_source_repair_queues_its_existing_leased_service_once(self):
+        calls, run = self.fake([['dashboard/cloudflare/reverse-split-live/market-status-source.mjs']])
+        result = dispatch_release('owner/repo', 123, run)
+        sent = [json.loads(kwargs['input']) for args, kwargs in calls if '--method' in args]
+        self.assertTrue(result['targets']['public_status'])
+        self.assertEqual([p.get('event_type') for p in sent[:2]], ['reverse-split-release', 'reverse-split-status-continue'])
+        self.assertEqual(sent[1]['client_payload']['orders'], 0)
+        self.assertEqual(len(sent), 3)
+        self.assertEqual(release_targets(['.github/workflows/reverse-split-market-status.yml']), {'worker': False, 'dashboard': False, 'public_status': True})
+        root = Path(__file__).resolve().parents[3]
+        source_workflow = yaml.load((root / '.github/workflows/reverse-split-market-status.yml').read_text(encoding='utf8'), Loader=yaml.BaseLoader)
+        self.assertEqual(source_workflow['concurrency']['cancel-in-progress'], 'false')
 
     def test_post_merge_release_explicitly_handles_skipped_optional_ancestor_jobs(self):
         root = Path(__file__).resolve().parents[3]

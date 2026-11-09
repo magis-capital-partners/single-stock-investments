@@ -26,6 +26,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Record the checked out public source revision
+        run: echo "RS_STATUS_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Capture public exchange evidence without a broker connection
         id: status
         env:
