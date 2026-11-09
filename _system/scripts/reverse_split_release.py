@@ -11,7 +11,7 @@ def release_targets(paths: list[str]) -> dict:
     worker = any(path.startswith('dashboard/cloudflare/reverse-split-live/')
                  or path == '.github/workflows/reverse-split-live.yml' for path in paths)
     # Preserve the dashboard's existing dashboard/** push behavior after bot merges.
-    dashboard = any(path.startswith('dashboard/') for path in paths)
+    dashboard = any(path.startswith('dashboard/') or path == '_system/scripts/validate_dashboard_data.py' for path in paths)
     return {'worker': worker, 'dashboard': dashboard}
 
 
