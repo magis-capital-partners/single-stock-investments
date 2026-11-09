@@ -103,7 +103,7 @@ def request_kinds(keywords):
     return (bool(dated_instrument_labels(keywords)
                  or any(re.fullmatch(r'(?:19|20)\d{2}', str(term)) for term in keywords)
                  or re.search(r'credit|loan|amendment|covenant|maturit|refinanc|borrow|debt|financ|indenture', text)),
-            bool(re.search(r'acqui|merg|consideration|tender|transaction|target', text)))
+            bool(re.search(r'acqui|merg|consideration|tender|transaction|target|closing\s+(?:financing|consents?|payoff|termination)', text)))
 
 
 def linked_references(raw, parent_url, cik, keywords):
@@ -136,10 +136,16 @@ def linked_references(raw, parent_url, cik, keywords):
                 else anchor+' '+description).lower()
         score = 0
         if credit:
-            score += 20 * bool(re.search(r'\b(?:credit|loan|revolving)\s+agreement\b', body))
+            score += 20 * bool(re.search(r'\b(?:(?:revolving\s+)?credit(?:\s+and\s+security)?|loan|revolving)\s+agreement\b', body))
             score += 3 * bool(indentures_requested and re.search(r'\bindenture\b|\bguarantee agreement\b', body))
         if transaction:
             score += 20 * bool(re.search(r'\bmerger\b|\bacquisition agreement\b|\btender offer\b|\bpurchase agreement\b', body))
+        # An explicit exhibit number binds to this row's opening label,
+        # after its own legal-title classifier has passed.
+        if score and any(re.fullmatch(r'exhibit \d{1,3}\.\d{1,3}', term)
+                         and re.match(r'^'+re.escape(term.split()[1])+r'(?:\s|[*†]|$)', description)
+                         for term in keywords):
+            score += 120
         # An exact requested title and date can identify a named amendment.
         specific = specific_reference_rank(body, keywords)
         score += 80 + specific if specific else 0
@@ -160,7 +166,7 @@ def linked_references(raw, parent_url, cik, keywords):
 
 
 @bounded_sources
-def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetch):
+def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetch, *, require_all_citations=False):
     from underwriting_evidence import document_record
     from underwriting_foreign_financials import source_budget
     from underwriting_sec_submissions import financing_references, financing_documents
@@ -170,6 +176,7 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
     if not credit and not transaction:
         return [], []
     budget = source_budget()
+    inherited_capacity = any(budget.snapshot()['counts'])
     focus = list(dict.fromkeys(list(keywords)+(['credit agreement', 'covenant'] if credit else [])
                               + (['merger', 'acquisition', 'tender offer', 'purchase price'] if transaction else [])))[:18]
     documents, errors = [], []
@@ -246,8 +253,20 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
         following = []
         # Selected announcing filings keep priority for their executed children.
         # Unused second-layer slots can then follow pending index citations.
+        usage = budget.snapshot()
+        remaining = 4-usage['counts'][layer]
+        obtained = {url for urls in usage['urls_by_layer'] for url in urls}
+        selected = []
         for reference in sorted(references.values(), key=lambda row: (
-                row['source_url'] not in current_layer, -row['_score'], row['source_url']))[:4]:
+                row['source_url'] not in current_layer, -row['_score'], row['source_url'])):
+            if reference['source_url'] not in obtained:
+                if not remaining:
+                    continue  # Retain the citation for unused second-layer capacity.
+                remaining -= 1
+            selected.append(reference)
+            if len(selected)==4:
+                break
+        for reference in selected:
             url = reference['source_url']
             references.pop(url)
             existing.add(url)
@@ -271,6 +290,10 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
         parents = following
         if not parents and not references:
             break
+    pending = sorted(set(references)-financing_urls) if require_all_citations or inherited_capacity else []
+    for url in pending:
+        errors.append({'source':'requested_primary_reference','source_url':url,
+                       'error':'Requested primary citations exceed the shared reference capacity'})
     missing = sorted(financing_urls-existing)
     if missing:
         errors.append({'source': 'requested_financing_source_budget',
