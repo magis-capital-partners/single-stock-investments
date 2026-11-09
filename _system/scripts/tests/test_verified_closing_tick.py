@@ -53,7 +53,8 @@ def test_the_daily_bar_still_takes_precedence_and_the_settlement_delay_is_preser
 
 
 @pytest.mark.parametrize('filename', ['valuation_market_sync.py', 'valuation_earnings.py',
-    'autonomous_compounders.py', 'refresh_shared_forecasts.py', 'private_dashboard_assets.py'])
+    'autonomous_compounders.py', 'refresh_shared_forecasts.py', 'private_dashboard_assets.py',
+    'underwriting_foreign_financials.py'])
 def test_collector_repairs_release_build_retry_holds_without_invalidating_paid_stage_cache(tmp_path, filename):
     from test_underwriting_pipeline import company_root, packet
     from underwriting_pipeline import processing_version, stage_hash

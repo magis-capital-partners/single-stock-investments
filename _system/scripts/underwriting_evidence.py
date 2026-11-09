@@ -19,6 +19,7 @@ from pathlib import Path
 from atomic_io import semantic_json_sha256
 from sec_client import SecClient
 from underwriting_contract import ContractError, digest, numeric, require
+from underwriting_foreign_financials import bounded_sources, source_budget
 from valuation_share_basis import (
     BasisGap,
     declaration,
@@ -617,6 +618,7 @@ def filing_bytes(root, ticker, accession, client, url):
     return client.get_bytes(url, timeout=40)
 
 
+@bounded_sources
 def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=None, focus_keywords=()):
     from refresh_shared_forecasts import (
         FUNDAMENTALS,
@@ -675,7 +677,11 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
     if focus_keywords and documents:
         from valuation_earnings import primary_document
         for index, document in enumerate(documents):
-            if complete_issuer_annual(document, ticker, as_of):
+            if complete_issuer_annual(document, ticker, as_of) or (
+                    document.get('document_kind') == 'foreign_financial_attachment'
+                    and document.get('coverage') == 'complete_requested_primary_document'
+                    and len(document.get('contexts') or []) == 1
+                    and hashlib.sha256(document['contexts'][0].encode()).hexdigest() == document.get('extracted_text_sha256')):
                 continue  # Every page is already present from the fact collector's capture.
             try:
                 reader = client or SecClient(max_attempts=2)
@@ -685,6 +691,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                 documents[index] = focused
             except (OSError, ValueError, KeyError, TypeError):
                 pass
+    foreign_proof = None
     cik = (registry.get(ticker, {}).get('download') or {}).get('cik')
     if cik:
         client = client or SecClient(max_attempts=2)
@@ -698,6 +705,43 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
         try:
             submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json', timeout=30)
             recent = (submission.get('filings') or {}).get('recent') or {}
+            annual_form = next((form for i, form in enumerate(recent.get('form') or [])
+                if form in ('10-K', '20-F', '40-F', '20-F/A', '40-F/A')
+                and recent['filingDate'][i] <= as_of), None)
+            foreign_eligible = annual_form in ('20-F', '40-F', '20-F/A', '40-F/A')
+            foreign_attempted, foreign_embedded = False, False
+            def collect_foreign_sourcegraph():
+                nonlocal foreign_proof
+                from underwriting_foreign_financials import collect_foreign_financials
+                try:
+                    financial_docs, foreign_proof = collect_foreign_financials(submission, cik, as_of,
+                        lambda url: client.get_bytes(url, timeout=40))
+                    existing = {d['id']: d for d in documents}
+                    for document in financial_docs:
+                        old = existing.get(document['id'])
+                        require(not old or old['content_hash'] == document['content_hash'], 'A primary financial source changed')
+                        if old:
+                            old.update(document)
+                        else:
+                            documents.append(document)
+                    for cover in foreign_proof['covers']:
+                        formal_sources.append({'source_url': cover['source_url'],
+                            'raw': source_budget().fetch(cover['source_url'], 0,
+                                lambda url: client.get_bytes(url, timeout=40)),
+                            'filed': cover['filed'], 'form': cover['form']})
+                    require(foreign_proof['status'] == 'complete_current_financial_sources',
+                            'Current foreign financial attachments remain unresolved')
+                    cover_urls = {c['source_url'] for c in foreign_proof['covers']}
+                    errors[:] = [e for e in errors if not (e.get('source_url') in cover_urls
+                        and e.get('source') in ('unverified_foreign_report', e.get('source_url')))]
+                except (OSError, ValueError, KeyError, TypeError) as exc:
+                    foreign_proof = None
+                    errors.append({'source': 'unverified_foreign_report',
+                        'source_url': f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json',
+                        'error': type(exc).__name__, 'detail': str(exc)[:500]})
+            if foreign_eligible and (data.get('foreign_financial_discovery') or {}).get('status') == 'complete_current_financial_sources':
+                foreign_attempted = True
+                collect_foreign_sourcegraph()
             attempted = set()
             for i, form in enumerate(recent.get('form') or []):
                 if form not in ('10-K', '10-Q', '20-F', '40-F', '6-K') or form in attempted or recent['filingDate'][i] > as_of:
@@ -705,13 +749,17 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                 if len(attempted) >= 2:
                     break
                 attempted.add(form)  # A failed current report cannot become an older report.
+                if foreign_attempted and form in ('6-K', '20-F', '40-F'):
+                    continue  # The same bounded source graph already handled these covers.
                 filename = recent['primaryDocument'][i]
                 if not re.fullmatch(r'[A-Za-z0-9_.-]+', filename):
                     errors.append({'source': 'sec_submissions', 'error': 'Unsafe current primary document path'})
                     continue
                 url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
                 try:
-                    raw = filing_bytes(root, ticker, recent['accessionNumber'][i], client, url)
+                    raw = (source_budget().fetch(url, 0,
+                        lambda value: filing_bytes(root, ticker, recent['accessionNumber'][i], client, value))
+                        if foreign_eligible else filing_bytes(root, ticker, recent['accessionNumber'][i], client, url))
                     document = document_record(url, raw, focus_keywords, form=form)
                     event_date = (recent.get('reportDate') or ['']*len(recent['form']))[i]
                     period = event_date
@@ -719,6 +767,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                         from valuation_earnings import foreign_reporting_period
                         period = foreign_reporting_period(raw, as_of)
                         document['reported_event_date'] = event_date
+                        foreign_embedded = True
                     document.update(form=form, filed=recent['filingDate'][i], period=period)
                     if ticker == 'V' and form == '10-K':
                         from underwriting_inline_shares import converted_class_a_observation
@@ -740,6 +789,9 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                 except (OSError, ValueError) as exc:
                     errors.append({'source': 'unverified_foreign_report' if form == '6-K' else url,
                                    'source_url': url, 'error': type(exc).__name__, 'detail': str(exc)[:500]})
+            if foreign_eligible and not foreign_attempted and not foreign_embedded:
+                foreign_attempted = True
+                collect_foreign_sourcegraph()
             if focus_keywords:
                 from underwriting_primary_references import collect_requested_documents
                 additional, source_errors = collect_requested_documents(submission, cik, as_of, formal_sources,
@@ -806,6 +858,11 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
         write_json_if_changed(root/FUNDAMENTALS/(ticker+'.json'), data)
         packet['input_fingerprint'] = source_fingerprint(root, ticker)
     packet['source_discovery'] = data.get('report_discovery') or {}
+    if foreign_proof:
+        packet['foreign_financial_discovery'] = foreign_proof
+        packet['source_discovery'] = {**packet['source_discovery'], 'status': 'verified', 'checked_at': as_of}
+    if any(source_budget().snapshot()['counts']):
+        packet['primary_reference_usage'] = source_budget().snapshot()
     packet['readiness'] = evidence_readiness(packet, require_documents=bool(cik))
     packet['evidence_hash'] = digest({'observations': [{k: v for k, v in o.items() if k != 'share_basis'} for o in observations],
                                       'documents': [{**{k: d[k] for k in ('source_url', 'content_hash')}, 'contexts_hash': digest(d['contexts'])} for d in documents],
