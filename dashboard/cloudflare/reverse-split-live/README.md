@@ -341,7 +341,7 @@ NBBO, recalls or guaranteed loan availability.
 
 Oversized SEC submission bundles and embedded PDF exhibits use the official,
 CIK/accession-bound filing index. The collector downloads only the primary
-report and EX-99 disclosures (at most twelve documents, 24 MiB each and 48 MiB
+report and EX-99 disclosures (one primary and at most 64 exhibits, 24 MiB each and 48 MiB
 in aggregate). Each captured document keeps its actual URL/hash. Pinned
 PyMuPDF extracts bounded selectable PDF text in a credential-free child;
 scanned, encrypted, over-limit and unreadable documents stay unresolved.
@@ -377,4 +377,63 @@ claiming recovery. The November 6 session cannot pass its original complete
 session criteria after the market-hours outage. Do not alter the registered
 review policy to hide this failure. No NY4, Gateway, ThetaData or AWS action is
 part of this repair.
+
+## November 9 completion repair
+
+The earlier quota release fixed database exhaustion, not end-to-end readiness.
+Real SEC responses reproduce three reader failures absent from the earlier tests:
+`File Name` in master indexes; an HTML primary plus its PDF rendering; and joint
+reports stored under another explicitly listed registrant. The factual metadata
+fixtures under `fixtures/` retain these actual response structures.
+
+Daily reconciliation accepts both header spellings, uses a quarterly day-filter
+fallback and archives rejected index responses. Repaired terminal jobs retry once
+after their original row is archived under `review/repairs/`. Old 404 retries can
+be superseded only by a later successful source analysis, retaining the failure.
+Public publisher archives run as bounded, low-priority discovery. Partial searches
+never close a gap. GlobeNewswire returned 403 during validation; complete publisher
+recovery is not established. Unknown archive publication times block eligibility.
+
+R2 502/503/504 responses receive bounded retries with ownership rechecks. D1
+mutations and credential errors are not blindly retried. Runtime diagnostics
+include the checked-out revision and collector-only storage consumption, which
+is not the account's total quota. No active collector is cancelled or lease changed.
+
+Incomplete broad prepared issuers seed the separate financial queue with a durable
+cursor and priority below live candidates. Reader changes invalidate extraction
+caches, not earlier decision snapshots. Missing-input recovery plans, source
+conflicts and OCR candidates stay visible; OCR never silently becomes verified
+announcement terms. Raw unreadable documents and diagnostics remain private.
+
+Market health separates transport heartbeat from per-symbol quote freshness.
+Identified candidates warm subscriptions before enrichment finishes. Inactive
+subscriptions can rotate within the 128-symbol budget; gaps remain measurable and
+reconnects cannot replenish previously consumed displayed size. The original eight
+execution policies are retained. Twenty-four separately registered cohorts measure
+30/60/300-second entry delays across the existing price budgets and evidence lanes.
+Old candidates remain retrospective in those new cohorts.
+
+The dashboard and private `/shadow/operations` endpoint expose each dependency,
+candidate filters/clocks/expiry, full-universe daily borrow coverage, source gaps,
+failures, deduplicated companies and outstanding liabilities. New IBKR allocation
+imports require account scope, matching issuer/ticker and a captured-document hash.
+Public inventory and Flex balances never create hypothetical approvals.
+
+Minute operating observations persist in the checksum-bound checkpoint. Completed
+session evidence is archived under `review/operating/`, without overwriting the
+November 6 independent failed-day review or registered validation criteria.
+The deployment is not a complete passing session or proof of profitability.
+
+External dependencies remain explicit: Mini does not include a status schema;
+halt/SSR access and IBKR account-specific allocations must have real evidence.
+No paid feed, new brokerage session, AWS, NY4, Gateway, ThetaData or order action
+is introduced. Missing disclosures and inaccessible publisher history remain unknown.
+
+Public SEC fixture receipts, captured November 9, 2026 (hashes of full responses):
+- Joint Rio Tinto 6-K, accession `0000863064-26-000043`:
+  `0e98df6ba4326e6b83331e2e63504b9f25c9d87b816b30b0ce92d952b7f69e09`.
+- McDonald's 10-Q, accession `0000063908-26-000083`:
+  `720a69d1426c9e7fed072fc6d5ee90eecff195c6bdbb7e50bf3e2e393728fd6d`.
+- SEC `master.20261026.idx`:
+  `ddfad12d4fe1d8e3513725e9c9b0d274683de1cffcb2eb2e73d26205bb135ba3`.
 

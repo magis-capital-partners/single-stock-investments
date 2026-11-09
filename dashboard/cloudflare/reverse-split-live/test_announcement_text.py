@@ -13,4 +13,8 @@ class AnnouncementTextTests(unittest.TestCase):
         doc.close()
     def test_non_pdf_input_is_rejected(self):
         with self.assertRaises(ValueError):extract(b'<html>not a PDF</html>')
+    def test_graphic_pages_return_review_candidates_without_becoming_verified_text(self):
+        doc=pymupdf.open();page=doc.new_page();page.draw_rect(pymupdf.Rect(50,50,300,300));page.insert_text((72,72),'Cover')
+        result=extract(doc.tobytes());doc.close()
+        self.assertFalse(result['complete']);self.assertEqual(result['review_pages'],[1]);self.assertFalse(result['OCR_admitted_to_signals'])
 if __name__=='__main__':unittest.main()

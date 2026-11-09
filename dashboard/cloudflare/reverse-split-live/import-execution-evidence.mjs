@@ -16,6 +16,7 @@ export function validateIBKREvidence(r,now){
   }else validateEvidence(r,now);
   if(r.kind==='corporate_action'&&r.execution_confirmed!==true)throw new Error('A corporate action must be confirmed executed');
   if(['locate','margin'].includes(r.kind)&&(!/^[A-Za-z0-9_.:-]{1,100}$/.test(r.allocation_id||'')))throw new Error('A shared IBKR allocation reference is required to prevent double counting');
+  if(['locate','margin'].includes(r.kind)&&(!/^[A-Za-z0-9_.:-]{1,100}$/.test(r.account_scope||'')||!/^\d{1,10}$/.test(r.cik||'')||!/^[A-Z][A-Z0-9.-]{0,11}$/.test(r.ticker||'')||!/^[a-f0-9]{64}$/.test(r.source_sha256||'')))throw new Error('IBKR allocation requires account scope, issuer, security ticker and captured-document SHA-256');
   return {...r,approval_basis:'owner_supplied_ibkr_document',broker_execution_verified:false};
 }
 if(process.argv[1]&&import.meta.url.endsWith('/import-execution-evidence.mjs')&&process.argv[1].replaceAll('\\','/').endsWith('/import-execution-evidence.mjs')){
@@ -24,6 +25,8 @@ if(process.argv[1]&&import.meta.url.endsWith('/import-execution-evidence.mjs')&&
   const input=JSON.parse(raw);if(input.schema!=='ibkr_reverse_split_evidence.v1'||!Array.isArray(input.records)||input.records.length>100)throw new Error('Invalid evidence envelope');
   const env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:'e1cac493b315c8fd7398500dd1bfd687',database:'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:'single-stock-reverse-splits-evidence'});
   const records=input.records.map(r=>validateIBKREvidence(r,new Date().toISOString()));
-  for(const r of records){if(!await env.DB.prepare('SELECT id FROM rs_events WHERE id=?').bind(r.event_id).first())throw new Error('Unknown reverse-split event');const id=await digest(JSON.stringify(r));await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(id,r.event_id,r.kind,r.observed_at,JSON.stringify({...r,id})).run();}
+  // Validate the entire batch before publication; no broker connection or approval is inferred.
+  for(const r of records){const row=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(r.event_id).first();if(!row)throw new Error('Unknown reverse-split event');const event=JSON.parse(row.payload);if(['locate','margin'].includes(r.kind)&&(String(Number(event.cik))!==String(Number(r.cik))||event.ticker!==r.ticker))throw new Error('IBKR allocation issuer/security does not match the event');}
+  for(const r of records){const id=await digest(JSON.stringify(r));await env.DB.prepare('INSERT OR IGNORE INTO rs_shadow_evidence VALUES(?,?,?,?,?)').bind(id,r.event_id,r.kind,r.observed_at,JSON.stringify({...r,id})).run();}
   console.log(JSON.stringify({imported:records.length,broker_orders:0}));
 }

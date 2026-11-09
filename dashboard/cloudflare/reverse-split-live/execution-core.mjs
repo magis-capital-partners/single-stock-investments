@@ -11,6 +11,10 @@ export const EXECUTION_POLICIES=Object.freeze(['capacity','executable'].flatMap(
   fee_schedule:'illustrative_0.005_per_share_min_1_max_1pct_not_account_verified',impact_model:'unmeasured',primary:false,indicative:true,
 }))));
 
+// Prospective sensitivity cohorts have independent registration and never alter v1.
+export const DELAY_EXECUTION_POLICIES=Object.freeze([30,60,300].flatMap(seconds=>EXECUTION_POLICIES.map(p=>Object.freeze({...p,id:p.id.replace('.v1','_delay'+seconds+'s.v1'),label:p.label+' · delay '+seconds+'s',entry_delay_seconds:seconds,sensitivity_parent:p.id}))));
+export const ALL_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES]);
+
 export function currentEvidence(rows,kind,now){return rows.filter(e=>e.kind===kind&&e.broker==='IBKR'&&e.scope==='reverse_split'&&at(e.observed_at)!==null&&at(e.observed_at)<=at(now)&&at(e.valid_until)!==null&&at(e.valid_until)>=at(now)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];}
 export function brokerGates(rows,now){
   const locate=currentEvidence(rows,'locate',now),margin=currentEvidence(rows,'margin',now),ssr=currentEvidence(rows,'ssr',now),status=currentEvidence(rows,'trading_status',now);
