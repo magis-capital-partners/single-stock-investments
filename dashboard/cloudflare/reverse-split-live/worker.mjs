@@ -35,7 +35,7 @@ export async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}=
     if(Number(await state(env,'sec_cooldown'))>Date.now())throw new Error('SEC access is in backoff');
     await env.DB.prepare("INSERT OR IGNORE INTO rs_state(key,value,updated_at) VALUES('sec_slot','0',?)").bind(stamp()).run();
     let slot=false;
-    for(let i=0;i<12&&!slot;i++){const now=Date.now();slot=await env.DB.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='sec_slot' AND CAST(value AS INTEGER)<=? RETURNING value").bind(String(now+650),stamp(),now).first();if(!slot)await sleep(250);}
+    for(let i=0;i<40&&!slot;i++){const now=Date.now();slot=await env.DB.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='sec_slot' AND CAST(value AS INTEGER)<=? RETURNING value").bind(String(now+650),stamp(),now).first();if(!slot)await sleep(250);}
     if(!slot)throw new Error('SEC request budget occupied');
   }
   const remaining=env.deadline?env.deadline-Date.now():18000;
@@ -185,7 +185,7 @@ async function newsJob(env,p){
   }
   const capturedPublication=p.published_at||iso(/(?:datePublished[\"']?\s*[:=]\s*[\"']|(?:property|name)=[\"']article:published_time[\"'][^>]*content=[\"'])([^\"'<>]+)/i.exec(source.text)?.[1]);
   const parsed=classifyAnnouncement(source.text,{published_at:capturedPublication});if(!parsed)return;
-  if(p.discovery_path==='publisher_archive_catchup'&&!capturedPublication){parsed.status='needs_review';parsed.reason='Archive discovery has no verified original publication timestamp';}
+  if((p.discovery_path==='publisher_archive_catchup'&&!capturedPublication)||(capturedPublication&&Date.parse(capturedPublication)>Date.now()+2000)){parsed.status='needs_review';parsed.reason='Archive discovery has no valid original publication timestamp';}
   const text=plain(source.text),ticker=/\b(?:NASDAQ|NYSE(?:\s+AMERICAN)?|OTCQ[BX])\s*[:：]\s*([A-Z][A-Z0-9.-]{0,11})\b/i.exec(text)?.[1]?.toUpperCase();let cik=null;
   if(ticker)try{cik=await tickerCIK(env,ticker);}catch(e){log('news_identity_pending',{ticker,error:e.message});}
   await recordEvent(env,{...parsed,id:'news:'+await sha(p.url),cik,ticker:ticker||null,company:p.title,published_at:capturedPublication,first_seen_at:p.first_seen_at||stamp(),discovery_path:p.discovery_path||p.primary_publisher||'publisher_article',publication_clock:capturedPublication?'timestamp':'unknown',sources:[{url:p.url,sha256:source.hash,representation,feed_url:representation==='primary_publisher_rss_excerpt'?p.primary_feed_url:undefined}],clock_basis:'Publisher feed timestamp; separately recorded first observation; earliest public release may be earlier'});
@@ -244,8 +244,7 @@ export async function scheduled(event,env){
   if(env.COLLECTOR_MODE==='external_collector')await recoverReaderFailures(env,{hash:sha});
   const financialDue=!env.FAST_MONITOR||Date.now()-Number(await state(env,'financial_poll_at')||0)>300000;
   const selected=SOURCES.filter(s=>financialDue||['sec-8-K','sec-6-K'].includes(s.id)||s.kind==='news');
-  const newsResults=await Promise.allSettled(selected.filter(s=>s.kind==='news').map(s=>poll(env,s)));for(const result of newsResults)if(result.status==='rejected')throw result.reason;
-  for(const source of selected.filter(s=>s.kind==='sec'))await poll(env,source);
+  const results=await Promise.allSettled(selected.map(source=>poll({...env,deadline:env.FAST_MONITOR?Date.now()+12000:env.deadline},source)));for(const result of results)if(result.status==='rejected')throw result.reason;
   if(financialDue)await state(env,'financial_poll_at',Date.now());
   if(await state(env,'daily_rescore')!==etDay(Date.now())){for(const e of (await env.DB.prepare("SELECT id FROM rs_events WHERE first_seen_at>=? AND result IN ('passes_screen','needs_review') ORDER BY first_seen_at DESC LIMIT 300").bind(new Date(Date.now()-30*DAY).toISOString()).all()).results)await enqueue(env,'rescore',{id:e.id},6,'daily-rescore:'+etDay(Date.now())+':'+e.id);await state(env,'daily_rescore',etDay(Date.now()));}
   if(env.COLLECTOR_MODE==='external_collector')await enqueue(env,'publisher_recovery',{},1,'publisher-recovery:'+Math.floor(Date.now()/3600000));
