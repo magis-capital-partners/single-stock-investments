@@ -4,22 +4,29 @@
   "model_anchor": "2026-10-26",
   "primary_observations": [],
   "report_discovery": {
-    "status": "verified",
+    "status": "earnings_unresolved",
     "source_url": "https://data.sec.gov/submissions/CIK0000897455.json",
-    "checked_at": "2026-11-07"
+    "checked_at": "2026-11-09"
   },
   "primary_documents": [],
-  "latest_disclosure": null,
-  "collected_at": "2026-10-29T20:18:49.415978+00:00",
-  "latest_report": {
-    "period": "2010-11-05",
+  "latest_disclosure": {
+    "form": "6-K",
     "filed": "2010-11-08",
     "accession": "0001199073-10-001005",
-    "form": "6-K",
-    "source_url": "https://www.sec.gov/Archives/edgar/data/897455/000119907310001005/d6k.htm"
+    "source_url": "https://www.sec.gov/Archives/edgar/data/897455/000119907310001005/d6k.htm",
+    "reported_event_date": "2010-11-05",
+    "source_role": "unverified_foreign_disclosure"
+  },
+  "collected_at": "2026-11-09T23:28:17.005142+00:00",
+  "latest_report": {
+    "period": "2009-12-31",
+    "filed": "2010-04-01",
+    "accession": "0001199073-10-000261",
+    "form": "40-F",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/897455/000119907310000261/d40f.htm"
   },
   "financial_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-  "last_collected": "2026-11-07",
+  "last_collected": "2026-11-09",
   "fx": null,
   "errors": [
     {
@@ -36,6 +43,23 @@
       "collector": "sec_primary",
       "error": "HTTP Error 404: Not Found",
       "retry": "next_scheduled_run"
+    },
+    {
+      "collector": "sec_foreign_disclosure",
+      "error": "Foreign disclosure needs verified financial tables and an explicit reporting period; reportDate is not a financial epoch",
+      "retry": "next_scheduled_run"
+    },
+    {
+      "collector": "sec_foreign_financials",
+      "error": "Foreign official accession or primary document path is unsafe",
+      "retry": "next_scheduled_run"
     }
-  ]
+  ],
+  "unverified_prior_report": {
+    "period": "2010-11-05",
+    "filed": "2010-11-08",
+    "accession": "0001199073-10-001005",
+    "form": "6-K",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/897455/000119907310001005/d6k.htm"
+  }
 }
