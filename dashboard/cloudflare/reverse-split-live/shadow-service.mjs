@@ -1,5 +1,6 @@
 import {SHADOW_POLICIES,SHADOW_VERSION,signalGate,plannedEntry,plannedExit,sessionAt,nextSession,quoteGate,entryCapacity,commission,feasibility,pnl,at,iso,finite,validateEvidence} from './shadow-core.mjs';
 import {etDay,DAY} from './core.mjs';
+import {validatedPublicStatus} from './market-status-core.mjs';
 const stamp=()=>new Date().toISOString(),parse=r=>JSON.parse(r.payload);
 export async function digest(value){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
 async function getState(env,key){const r=await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(key).first();return r?JSON.parse(r.value):null;}
@@ -65,6 +66,8 @@ export async function processShadowTrack(env,t,q,peers,now=stamp(),actions={reco
   }
   if(!active&&at(now)>at(t.due_at)+p.entry_window_seconds*1000){t.state='missed';t.reason='entry_window_expired_without_supported_quote';await persist(env,t,'missed',now,{reason:t.reason});return t;}
   if(at(now)<at(t.due_at))return t;
+  const halted=evidence.filter(e=>e.kind==='trading_status'&&e.halted===true&&at(e.observed_at)<=at(now)&&at(e.valid_until)>=at(now)&&(!e.provider||validatedPublicStatus(e,'trading_status',now,t))).at(-1);
+  if(halted){if(active)chargeBorrow(t,p,now);t.mark_stale=true;t.net_pnl=pnl(t);if(t.reason!=='security_halted'||active){t.reason='security_halted';await persist(env,t,'observation_blocked',now,{reason:t.reason,evidence_id:halted.id});}return t;}
   const session=sessionAt(now),failure=quoteGate(q,now,p);
   if(!session||failure||q?.cik!==t.cik||q?.type!=='CS'||q?.currency!=='usd'||(t.security_id&&t.security_id!==q?.security_id)){
     const reason=!session?'regular_session_closed':failure||(q?.cik!==t.cik?'quote_issuer_mismatch':t.security_id&&t.security_id!==q?.security_id?'security_identity_changed':'security_type_or_currency_unresolved');
@@ -77,7 +80,8 @@ export async function processShadowTrack(env,t,q,peers,now=stamp(),actions={reco
     t.reason=t.state==='exit_pending'?'waiting_for_post_exit_quote':'quote_received_before_entry_clock';t.net_pnl=pnl(t);t.mark_stale=false;await persist(env,t,'observation_blocked',now,{reason:t.reason,quote_id:q.id,received_at:q.observed_at,execution_clock:executionClock});return t;
   }
   const current=kind=>evidence.filter(e=>e.kind===kind&&at(e.observed_at)<=at(now)&&at(e.valid_until)>=at(now)).at(-1);
-  const blocked=current('ssr')?.restricted===true?'short_sale_restriction_active':current('locate')?.approved===false?'borrow_denied':current('margin')?.approved===false?'margin_denied':null;
+  const publicRestricted=evidence.some(e=>e.restricted===true&&validatedPublicStatus(e,'ssr',now,t));
+  const blocked=current('ssr')?.restricted===true||publicRestricted?'short_sale_restriction_active':current('locate')?.approved===false?'borrow_denied':current('margin')?.approved===false?'margin_denied':null;
   if(blocked&&['armed','partial_entry'].includes(t.state)){t.reason=blocked;t.feasibility=feasibility(evidence,now,t.remaining_shares*q.ask,t.remaining_shares);await persist(env,t,'entry_blocked',now,{reason:blocked});return t;}
   const quoteKey=q.id+':'+(t.state==='exit_pending'?'cover':'entry');
   if(t.state==='exit_pending'&&!t.used_quotes.includes(quoteKey)){

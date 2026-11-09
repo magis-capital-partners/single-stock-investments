@@ -1,0 +1,59 @@
+name: Reverse-split prepared collector handoff
+on:
+  repository_dispatch:
+    types: [reverse-split-shadow-warm]
+permissions:
+  contents: read
+jobs:
+  prepare-and-observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+    outputs:
+      continue: ${{ steps.monitor.outputs.continue }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: dashboard/cloudflare/reverse-split-live
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare the pinned research readers before acquiring the collector lease
+        run: |
+          python -m pip install databento==0.82.0 PyMuPDF==1.28.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr-eng
+          RS_TESSDATA_FILE=$(dpkg -L tesseract-ocr-eng | grep '/eng\.traineddata$')
+          test -f "$RS_TESSDATA_FILE"
+          printf 'TESSDATA_PREFIX=%s\n' "$(dirname "$RS_TESSDATA_FILE")" >> "$GITHUB_ENV"
+          echo "RS_PIPELINE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Wait without a feed connection, then own one bounded research session
+        id: monitor
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: e1cac493b315c8fd7398500dd1bfd687
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          DATABENTO_API_KEY: ${{ secrets.DATABENTO_API_KEY }}
+          IBKR_FLEX_BORROW_TOKEN: ${{ secrets.IBKR_FLEX_BORROW_TOKEN }}
+          IBKR_FLEX_BORROW_QUERY_ID: ${{ secrets.IBKR_FLEX_BORROW_QUERY_ID }}
+          RS_WARM_DISPATCH_TOKEN: ${{ github.token }}
+        run: node dashboard/cloudflare/reverse-split-live/collector.mjs --watch --interval 1 --run-minutes 270 --standby-seconds 1800
+  fallback:
+    needs: prepare-and-observe
+    if: needs.prepare-and-observe.result == 'success' && needs.prepare-and-observe.outputs.continue == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Preserve the normal lease-gated continuation fallback
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: gh api --method POST "repos/$REPOSITORY/dispatches" -f event_type=reverse-split-shadow-continue

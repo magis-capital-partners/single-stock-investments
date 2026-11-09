@@ -269,6 +269,7 @@ jobs:
             /_system/scripts/check_hub_payloads.py
             /_system/scripts/private_dashboard_assets.py
             /_system/scripts/vault_paths.py
+            /_system/scripts/vault_publication_sparse.py
             /.github/actions/checkout-vault/
             /dashboard/private-assets.json
             /dashboard/data/core.json
@@ -286,6 +287,8 @@ jobs:
         uses: ./.github/actions/checkout-vault
         with:
           include-source-archive: "false"
+          # This check reads published snapshots; the full vault exceeds its job budget.
+          publication-only: "true"
       - name: Committed hub shards reconcile
         run: python _system/scripts/check_hub_payloads.py
 

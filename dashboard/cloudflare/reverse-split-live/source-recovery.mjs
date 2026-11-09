@@ -7,9 +7,9 @@ export function parseDailyIndex(text,day){
  return rows;
 }
 export const repairedJobError=e=>/Filing index document identity or format is unsupported|Official filing index lacks an unambiguous primary report|Source exceeds document size limit|Announcement PDF requires verified readable text/.test(e||'');
-export async function recoverReaderFailures(env,{version='document_readers.2026-11-09.v1',hash,now=new Date().toISOString()}={}){
+export async function recoverReaderFailures(env,{version='document_readers.2026-11-09.v1',eligible=repairedJobError,hash,now=new Date().toISOString()}={}){
  const marker='repair:'+version;if(await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(marker).first())return {retried:0};
- const rows=(await env.DB.prepare("SELECT * FROM rs_jobs WHERE state='failed'").all()).results.filter(r=>['filing','history_filing'].includes(r.kind)&&repairedJobError(r.error));
+ const rows=(await env.DB.prepare("SELECT * FROM rs_jobs WHERE state='failed'").all()).results.filter(r=>['filing','history_filing'].includes(r.kind)&&eligible(r.error,r));
  for(const row of rows){const raw=JSON.stringify({schema:'reverse_split_repair_record.v1',version,recorded_at:now,original_job:row,action:'bounded_retry_after_reader_repair',historical_decisions_unchanged:true}),key='review/repairs/'+await hash(raw)+'.json';await env.EVIDENCE.put(key,new TextEncoder().encode(raw),{httpMetadata:{contentType:'application/json'}});await env.DB.prepare("UPDATE rs_jobs SET state='pending',attempts=0,token=NULL,lease_until=0,available_at=?,updated_at=? WHERE id=? AND state='failed' AND updated_at=?").bind(Date.now(),now,row.id,row.updated_at).run();}
  const rescoring=(await env.DB.prepare("SELECT * FROM rs_jobs WHERE kind='rescore' AND state='failed' AND error='Source returned HTTP 404'").all()).results;
  for(const row of rescoring){let payload;try{payload=JSON.parse(row.payload);}catch{continue;}const latest=await env.DB.prepare('SELECT payload,analyzed_at FROM rs_events WHERE id=?').bind(payload.id).first();if(!latest||latest.analyzed_at<=row.updated_at)continue;const event=JSON.parse(latest.payload);if(event.metadata_error||!event.financials?.source_sha256)continue;

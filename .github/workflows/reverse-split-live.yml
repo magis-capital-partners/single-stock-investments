@@ -48,6 +48,8 @@ jobs:
           node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js deploy --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc
   collect:
     if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 300
     outputs:
@@ -85,6 +87,7 @@ jobs:
           DATABENTO_API_KEY: ${{ secrets.DATABENTO_API_KEY }}
           IBKR_FLEX_BORROW_TOKEN: ${{ secrets.IBKR_FLEX_BORROW_TOKEN }}
           IBKR_FLEX_BORROW_QUERY_ID: ${{ secrets.IBKR_FLEX_BORROW_QUERY_ID }}
+          RS_WARM_DISPATCH_TOKEN: ${{ github.token }}
           RECONCILE: ${{ github.event.action == 'reverse-split-reconcile' }}
         run: |
           if [ "$RECONCILE" = 'true' ]; then

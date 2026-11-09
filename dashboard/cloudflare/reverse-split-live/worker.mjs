@@ -6,6 +6,7 @@ import {preparedAPI} from './prepared-universe.mjs';
 import {loadFilingDocuments} from './filing-documents.mjs';
 import {parseDailyIndex,recoverReaderFailures} from './source-recovery.mjs';
 import {recoverPublisherGaps} from './publisher-recovery.mjs';
+import {historySearchURL,historySearchPage,recoverHistorySearch,queueHistorySearch,HISTORY_SEARCH_VERSION} from './history-search.mjs';
 
 const stamp=()=>new Date().toISOString(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const json=(value,status=200)=>Response.json(value,{status,headers:{'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
@@ -135,7 +136,7 @@ async function recordEventSerial(env,event,{refresh=false}={}){
   // Persist detection before external enrichment: even an outage cannot hide a company.
   await env.DB.prepare("INSERT INTO rs_events(id,cik,ticker,company,effective_date,published_at,first_seen_at,payload) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET effective_date=excluded.effective_date,payload=excluded.payload,revision=rs_events.revision+1").bind(event.id,event.cik||null,event.ticker||null,event.company||null,event.effective_date,event.published_at,event.first_seen_at,JSON.stringify(event)).run();
   let f={score:null,status:'issuer_identity_unresolved',signals:{},evidence:[]},prior=[],metadataError=null;
-  if(event.cik){try{const {row,submissions}=await issuer(env,event.cik);event.company ||= row.company;event.ticker ||= row.ticker;if(event.status!=='historical'&&event.status!=='cancelled')env.market?.warm?.(event.ticker);event.multiple_securities=(submissions.tickers||[]).length>1;f=await financials(env,event.cik,now,refresh);prior=(await env.DB.prepare('SELECT payload FROM rs_history WHERE cik=? AND effective_date<?').bind(event.cik,etDay(now)).all()).results.map(r=>JSON.parse(r.payload));await enqueue(env,'history',{cik:event.cik},3,'history:'+event.cik+':'+etDay(now));}catch(e){metadataError=e.message;f={...f,status:'financial_source_unavailable',error:e.message};}}
+  if(event.cik){try{const {row,submissions}=await issuer(env,event.cik);event.company ||= row.company;event.ticker ||= row.ticker;if(event.status!=='historical'&&event.status!=='cancelled')env.market?.warm?.(event.ticker);event.multiple_securities=(submissions.tickers||[]).length>1;f=await financials(env,event.cik,now,refresh);prior=(await env.DB.prepare('SELECT payload FROM rs_history WHERE cik=? AND effective_date<?').bind(event.cik,etDay(now)).all()).results.map(r=>JSON.parse(r.payload));await queueHistorySearch(env,event,(k,p,priority,id)=>enqueue(env,k,p,priority,id),now);}catch(e){metadataError=e.message;f={...f,status:'financial_source_unavailable',error:e.message};}}
   const completed=stamp(),decision=screen(event,f,prior,completed);if(event.multiple_securities){decision.result='needs_review';decision.checks.security={state:'unknown',reason:'Multiple issuer securities require instrument reconciliation'};}
   const payload={...event,financials:f,...decision,analyzed_at:completed,metadata_error:metadataError,latency_seconds:Math.max(0,(Date.parse(completed)-Date.parse(event.first_seen_at))/1000),source_delay_seconds:event.published_at?Math.max(0,(Date.parse(event.first_seen_at)-Date.parse(event.published_at))/1000):null};
   if(event.publication_clock==='date_only_next_day')payload.source_delay_seconds=null;
@@ -153,7 +154,7 @@ function filingText(raw){const docs=[...raw.matchAll(/<DOCUMENT>([\s\S]*?)<\/DOC
 async function filingJob(env,p){
   const row=await env.DB.prepare('SELECT * FROM rs_filings WHERE accession=?').bind(p.accession).first();
   if(row?.state==='complete')return;
-  const downloaded=await loadFilingDocuments({...env,onDocumentIssue:async(doc,error)=>{const proof=await archive(env,doc);await state(env,'document_issue:'+proof.hash,JSON.stringify({at:stamp(),url:doc.url,source_sha256:proof.hash,object_key:proof.key,error:error.message,diagnostic:error.extraction_diagnostic||null,admitted_to_signals:false}));}},p,(url,options)=>limitedFetch(env,url,options)),raw=downloaded.raw;
+  const downloaded=await loadFilingDocuments({...env,onDocumentReview:async(doc,review)=>{const proof=await archive(env,doc);const raw=JSON.stringify({...review,source_sha256:proof.hash,object_key:proof.key});await env.EVIDENCE.put('review/document-reviews/'+await sha(raw)+'.json',new TextEncoder().encode(raw),{httpMetadata:{contentType:'application/json'}});},onDocumentIssue:async(doc,error)=>{const proof=await archive(env,doc);await state(env,'document_issue:'+proof.hash,JSON.stringify({at:stamp(),url:doc.url,source_sha256:proof.hash,object_key:proof.key,error:error.message,diagnostic:error.extraction_diagnostic||null,admitted_to_signals:false}));}},p,(url,options)=>limitedFetch(env,url,options)),raw=downloaded.raw;
   const bound=/ACCESSION NUMBER:\s*([\d-]+)/i.exec(raw)?.[1];if(bound&&bound!==p.accession)throw new Error('Filing accession mismatch');
   const parsed=classifyAnnouncement(filingText(raw),{published_at:p.published_at||p.first_seen_at,form:p.form});
   const known=env.onFinancialDisclosure?await env.DB.prepare('SELECT id FROM rs_events WHERE cik=? LIMIT 1').bind(p.cik).first():null;
@@ -191,10 +192,12 @@ async function newsJob(env,p){
   await recordEvent(env,{...parsed,id:'news:'+await sha(p.url),cik,ticker:ticker||null,company:p.title,published_at:capturedPublication,first_seen_at:p.first_seen_at||stamp(),discovery_path:p.discovery_path||p.primary_publisher||'publisher_article',publication_clock:capturedPublication?'timestamp':'unknown',sources:[{url:p.url,sha256:source.hash,representation,feed_url:representation==='primary_publisher_rss_excerpt'?p.primary_feed_url:undefined}],clock_basis:'Publisher feed timestamp; separately recorded first observation; earliest public release may be earlier'});
 }
 async function historyJob(env,p){
-  const url=`https://efts.sec.gov/LATEST/search-index?q=${encodeURIComponent('"reverse stock split" OR "reverse split" OR "share consolidation"')}&ciks=${p.cik}&forms=8-K,6-K&dateRange=custom&startdt=${new Date(Date.now()-10*365*DAY).toISOString().slice(0,10)}&enddt=${etDay(Date.now())}&from=0&size=30`;
-  const doc=await limitedFetch(env,url,{maximum:5*1024*1024}),result=JSON.parse(new TextDecoder().decode(doc.bytes)),hits=result.hits?.hits||[];
-  await env.DB.prepare('UPDATE rs_issuers SET history_status=? WHERE cik=?').bind((result.hits?.total?.value||0)>30?'partial':'search_complete',p.cik).run();
-  for(const h of hits){const s=h._source||{},acc=s.adsh||/^(\d{10}-\d{2}-\d{6})/.exec(h._id||'')?.[1];if(!acc)continue;const payload={cik:p.cik,accession:acc,published_at:s.file_date?dateOnlyAvailable(s.file_date):null,url:`https://www.sec.gov/Archives/edgar/data/${p.cik}/${acc.replaceAll('-','')}/${acc}.txt`};await enqueue(env,'history_filing',payload,2,'history-filing:'+acc);}
+  const end=p.end||etDay(Date.now()),start=p.start||new Date(Date.now()-10*365*DAY).toISOString().slice(0,10),offset=p.offset||0;
+  const doc=await limitedFetch(env,historySearchURL(p.cik,{offset,start,end}),{maximum:5*1024*1024}),source=await archive(env,doc),page=historySearchPage(JSON.parse(source.text),p.cik,{offset,end});
+  await env.DB.prepare('UPDATE rs_issuers SET history_status=? WHERE cik=?').bind(page.complete?'search_complete':'partial',p.cik).run();
+  await state(env,'history_search:'+p.cik,JSON.stringify({version:HISTORY_SEARCH_VERSION,observed_at:stamp(),offset,total:page.total,complete:page.complete,source_sha256:source.hash,object_key:source.key,verified_prior_actions_are_separate:true}));
+  for(const row of page.filings){const payload={cik:p.cik,accession:row.accession,published_at:dateOnlyAvailable(row.filed),url:`https://www.sec.gov/Archives/edgar/data/${p.cik}/${row.accession.replaceAll('-','')}/${row.accession}.txt`};const id='history-filing:'+row.accession;await enqueue(env,'history_filing',payload,p.urgent?11:2,id);if(p.urgent)await env.DB.prepare("UPDATE rs_jobs SET priority=max(priority,11) WHERE id=? AND state='pending'").bind(id).run();}
+  if(page.next!==null)await enqueue(env,'history',{cik:p.cik,start,end,offset:page.next,urgent:!!p.urgent},p.urgent?12:3,'history:v2:'+p.cik+':'+end+':'+page.next);
 }
 async function historyFiling(env,p){
   const downloaded=await loadFilingDocuments(env,p,(url,options)=>limitedFetch(env,url,options)),captured=[];for(const doc of downloaded.documents)captured.push({...await archive(env,doc),url:doc.url});const source=captured[0],text=plain(filingText(downloaded.raw));
@@ -208,6 +211,7 @@ async function historyFiling(env,p){
 }
 export async function reconcile(env){
   const gaps=(await env.DB.prepare("SELECT * FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id LIKE 'sec-%'").all()).results;
+  const unfinished=[];
   for(const day of reconciliationDays(new Date().toISOString(),gaps)){
     const d=new Date(day+'T12:00:00Z');
     const id='reconcile:'+day;if(await state(env,id))continue;
@@ -220,10 +224,12 @@ export async function reconcile(env){
       }
       const found=rows.map(r=>({...r,published_at:dateOnlyAvailable(r.filed),discovery_path:'sec_daily_index',publication_clock:'date_only_next_day'})),count=found.length;await addFilings(env,found,1);
       const proof=await archive(env,doc);await state(env,id,JSON.stringify({at:stamp(),filings:count,url:doc.url,representation,source_sha256:proof.hash,object_key:proof.key}));await state(env,'last_reconciliation',stamp());
-    }catch(e){await state(env,'reconciliation_error',JSON.stringify({day,error:e.message,at:stamp()}));log('reconciliation_failure',{day,error:e.message});}
+    }catch(e){unfinished.push({day,error:e.message});await state(env,'reconciliation_error',JSON.stringify({day,error:e.message,at:stamp()}));log('reconciliation_failure',{day,error:e.message});}
   }
   await recoverPublisherGaps(env,{fetchDocument:(u,o)=>limitedFetch(env,u,o),enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id),hash:sha});
   for(const gap of (await env.DB.prepare("SELECT * FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id LIKE 'sec-%'").all()).results){let covered=true;for(let t=Date.parse(gap.start_at.slice(0,10)+'T12:00:00Z');t<=Date.parse(gap.end_at.slice(0,10)+'T12:00:00Z');t+=DAY){const d=new Date(t);if([0,6].includes(d.getUTCDay()))continue;if(!await state(env,'reconcile:'+d.toISOString().slice(0,10)))covered=false;}if(covered)await env.DB.prepare('UPDATE rs_source_gaps SET resolved_at=? WHERE id=?').bind(stamp(),gap.id).run();}
+  await state(env,'reconciliation_status',JSON.stringify({at:stamp(),status:unfinished.length?'incomplete':'complete',unfinished}));
+  if(unfinished.length){const error=new Error('Reconciliation incomplete: '+unfinished.map(r=>r.day).join(', '));error.code='RECONCILIATION_INCOMPLETE';throw error;}
 }
 export function reconciliationDays(now,gaps=[]){
   const wanted=new Set(),today=String(now).slice(0,10),floor=Date.parse(today+'T12:00:00Z')-31*DAY;
@@ -235,19 +241,25 @@ export async function consume(batch,env){
   for(const message of batch.messages){const {id,token}=message.body||{},now=Date.now();const row=await env.DB.prepare("UPDATE rs_jobs SET state='running',attempts=attempts+1,lease_until=?,updated_at=? WHERE id=? AND token=? AND state='queued' RETURNING *").bind(now+600000,stamp(),id,token).first();if(!row){message.ack();continue;}
     try{const p=JSON.parse(row.payload);if(row.kind==='filing')await filingJob(env,p);else if(row.kind==='news')await newsJob(env,p);else if(row.kind==='history')await historyJob(env,p);else if(row.kind==='history_filing')await historyFiling(env,p);else if(row.kind==='rescore'){const e=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(p.id).first();if(e){const result=await recordEvent(env,JSON.parse(e.payload),p);if(result.metadata_error)throw new Error(result.metadata_error);}}else if(row.kind==='reconcile')await reconcile(env);else if(row.kind==='publisher_recovery')await recoverPublisherGaps(env,{fetchDocument:(u,o)=>limitedFetch(env,u,o),enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id),hash:sha});else throw new Error('Unsupported job kind');
       await env.DB.prepare("UPDATE rs_jobs SET state='complete',error=NULL,updated_at=? WHERE id=? AND token=?").bind(stamp(),id,token).run();message.ack();
-    }catch(e){const deferred=/source deadline|SEC access is in backoff|SEC request budget occupied|Source returned HTTP (403|429)|abort|timeout/i.test(e.message),attempts=Math.max(0,row.attempts-(deferred?1:0)),delay=Math.min(3600000,30000*2**Math.min(deferred?2:attempts,7));await env.DB.prepare('UPDATE rs_jobs SET state=?,attempts=?,error=?,available_at=?,updated_at=? WHERE id=? AND token=?').bind(attempts>=6?'failed':'pending',attempts,e.message,Date.now()+delay,stamp(),id,token).run();log(deferred?'job_deferred':'job_failure',{id,kind:row.kind,error:e.message,attempt:attempts});message.ack();}
+    }catch(e){const deferred=e.code==='RECONCILIATION_INCOMPLETE'||/source deadline|SEC access is in backoff|SEC request budget occupied|Source returned HTTP (403|429)|abort|timeout/i.test(e.message),attempts=Math.max(0,row.attempts-(deferred?1:0)),delay=Math.min(3600000,30000*2**Math.min(deferred?2:attempts,7));await env.DB.prepare('UPDATE rs_jobs SET state=?,attempts=?,error=?,available_at=?,updated_at=? WHERE id=? AND token=?').bind(attempts>=6?'failed':'pending',attempts,e.message,Date.now()+delay,stamp(),id,token).run();log(deferred?'job_deferred':'job_failure',{id,kind:row.kind,error:e.message,attempt:attempts});message.ack();}
   }
 }
 export async function scheduled(event,env){
   if(env.ENABLED!=='true'){await state(env,'service_mode','paused');return;}
   await state(env,'last_tick',stamp());await state(env,'service_mode',env.COLLECTOR_MODE||'research_monitor');
   if(env.COLLECTOR_MODE==='external_collector')await recoverReaderFailures(env,{hash:sha});
+  if(env.COLLECTOR_MODE==='external_collector'){
+    await recoverHistorySearch(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
+    await recoverReaderFailures(env,{hash:sha,version:'oversized_primary.2026-11-09.v1',eligible:error=>/Source exceeds document size limit/.test(error||'')});
+    await recoverReaderFailures(env,{hash:sha,version:'reviewed_pdf.2026-11-09.v1',eligible:(error,row)=>row.id==='filing:0001193125-26-450710'&&/OCR candidates require review/.test(error||'')});
+    if(await env.DB.prepare("SELECT id FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id LIKE 'sec-%' LIMIT 1").first())await enqueue(env,'reconcile',{},2,'gap-reconcile:v2:'+etDay(Date.now()));
+  }
   const financialDue=!env.FAST_MONITOR||Date.now()-Number(await state(env,'financial_poll_at')||0)>300000;
   const selected=SOURCES.filter(s=>financialDue||['sec-8-K','sec-6-K'].includes(s.id)||s.kind==='news');
   const results=await Promise.allSettled(selected.map(source=>poll({...env,deadline:env.FAST_MONITOR?Date.now()+12000:env.deadline},source)));for(const result of results)if(result.status==='rejected')throw result.reason;
   if(financialDue)await state(env,'financial_poll_at',Date.now());
   if(await state(env,'daily_rescore')!==etDay(Date.now())){for(const e of (await env.DB.prepare("SELECT id FROM rs_events WHERE first_seen_at>=? AND result IN ('passes_screen','needs_review') ORDER BY first_seen_at DESC LIMIT 300").bind(new Date(Date.now()-30*DAY).toISOString()).all()).results)await enqueue(env,'rescore',{id:e.id},6,'daily-rescore:'+etDay(Date.now())+':'+e.id);await state(env,'daily_rescore',etDay(Date.now()));}
-  if(env.COLLECTOR_MODE==='external_collector')await enqueue(env,'publisher_recovery',{},1,'publisher-recovery:'+Math.floor(Date.now()/3600000));
+  if(env.COLLECTOR_MODE==='external_collector')await enqueue(env,'publisher_recovery',{},1,'publisher-recovery:v2:'+Math.floor(Date.now()/60000));
   if(event.cron==='17 8 * * *')await enqueue(env,'reconcile',{day:etDay(Date.now())},1,'daily-reconcile:'+etDay(Date.now()));
   if(!env.DEFER_DISPATCH)await dispatch(env);await state(env,'last_completed_tick',stamp());
 }

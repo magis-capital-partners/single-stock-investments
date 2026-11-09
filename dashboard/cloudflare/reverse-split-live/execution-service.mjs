@@ -1,4 +1,4 @@
-import {EXECUTION_POLICIES,ALL_EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy,completeCosts} from './execution-core.mjs';
+import {EXECUTION_POLICIES,ALL_EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy,completeCosts,marketEvidence} from './execution-core.mjs';
 import {signalGate,plannedEntry,plannedExit,sessionAt,quoteGate,at,finite} from './shadow-core.mjs';
 import {digest,putState} from './shadow-service.mjs';
 import {etDay} from './core.mjs';
@@ -67,7 +67,7 @@ export async function processExecution(env,t,q,peers,borrowRows,evidence,now=sta
     if(t.state==='partial_entry'&&at(now)>at(t.due_at)+p.entry_window_seconds*1000)t.state='open';
   }
   if(!t.remaining_shares&&at(now)>at(t.due_at)+p.entry_window_seconds*1000){t.state='missed';reason='entry_window_expired';}
-  reason ||= at(now)<at(t.due_at)?'waiting_for_entry_clock':!sessionAt(now)?'regular_session_closed':quoteGate(q,now,p);
+  reason ||= marketEvidence(evidence,'trading_status',now,t)?.halted===true?'security_halted':at(now)<at(t.due_at)?'waiting_for_entry_clock':!sessionAt(now)?'regular_session_closed':quoteGate(q,now,p);
   if(!reason&&(q.cik!==t.cik||q.type!=='CS'||q.currency!=='usd'||!q.security_id||(t.security_id&&t.security_id!==q.security_id)))reason='security_identity_unverified_or_changed';
   if(!reason){
     t.security_id ||= q.security_id;t.mark_price=q.ask;t.mark_at=q.quote_at;t.mark_stale=false;t.quote_coverage=q.coverage;
