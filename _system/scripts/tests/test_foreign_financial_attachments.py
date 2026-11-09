@@ -253,3 +253,15 @@ def test_collection_scope_is_released_after_failure_and_between_companies():
     with ThreadPoolExecutor(max_workers=2) as pool:
         assert list(pool.map(collection,[False,False]))==[[4,0],[4,0]]
     with pytest.raises(ValueError,match='collection scope'):source_budget()
+
+def test_foreign_cover_bytes_cannot_come_from_another_member_of_the_accession(tmp_path,monkeypatch):
+    import underwriting_evidence as evidence
+    from test_foreign_report_periods import root
+    root(tmp_path);sub,s=fixture()
+    class Client:
+        def get_json(self,u,**kw):return sub if '/submissions/' in u else {'facts':{}}
+        def get_bytes(self,u,**kw):return s[u]
+    def ambiguous_archive(*a):raise AssertionError('Accession-only archive lookup cannot verify this exact foreign URL')
+    monkeypatch.setattr(evidence,'filing_bytes',ambiguous_archive)
+    packet=evidence.prepare_packet(tmp_path,'BKNG','2026-11-08',collect=False,client=Client())
+    assert len(packet['documents'])==4 and packet['latest_report']['period']=='2026-09-30'

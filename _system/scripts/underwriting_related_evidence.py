@@ -86,7 +86,7 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
         url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-','')}/{filename}"
         try:
             filing_raw = (source_budget().fetch(url,0,
-                lambda value:filing_bytes(root,ticker,accession,client,value))
+                lambda value:client.get_bytes(value,timeout=40))
                 if foreign else filing_bytes(root,ticker,accession,client,url))
             doc = document_record(url,filing_raw,keywords,form=form)
             period = recent['reportDate'][i]

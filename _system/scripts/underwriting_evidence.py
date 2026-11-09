@@ -758,7 +758,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                 url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
                 try:
                     raw = (source_budget().fetch(url, 0,
-                        lambda value: filing_bytes(root, ticker, recent['accessionNumber'][i], client, value))
+                        lambda value: client.get_bytes(value, timeout=40))
                         if foreign_eligible else filing_bytes(root, ticker, recent['accessionNumber'][i], client, url))
                     document = document_record(url, raw, focus_keywords, form=form)
                     event_date = (recent.get('reportDate') or ['']*len(recent['form']))[i]
