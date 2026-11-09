@@ -14,6 +14,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from atomic_io import semantic_json_sha256, write_json_if_changed, write_text_if_changed
+from underwriting_foreign_financials import bounded_sources
 from build_dashboard_shards import (
     shard_filename,
     slim_ticker_row,
@@ -256,6 +257,7 @@ def refresh_quote(ticker, row, root, as_of, *, model_currency=None):
     return ticker
 
 
+@bounded_sources
 def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
     """Collect financials for missing models; never overwrite an issuer's PV."""
     from autonomous_compounders import collect
@@ -287,6 +289,8 @@ def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
                   or (prior.get('latest_report') if (prior.get('latest_report') or {}).get('form') in ('6-K', '6-K/A') else None))
     if unverified:
         saved['unverified_prior_report'] = unverified
+    if data.get('foreign_financial_discovery'):
+        saved['foreign_financial_discovery'] = data['foreign_financial_discovery']
     if prior.get('underwriting_related_issuers'):
         saved['underwriting_related_issuers'] = prior['underwriting_related_issuers']
     write_json_if_changed(path, saved, volatile_keys={'retrieved_at'})

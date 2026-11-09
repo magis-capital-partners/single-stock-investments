@@ -9,6 +9,7 @@ import hashlib
 import html
 import re
 from urllib.parse import parse_qs, unquote, urldefrag, urljoin, urlparse
+from underwriting_foreign_financials import bounded_sources
 
 
 def archive_url(value, parent, cik):
@@ -92,14 +93,17 @@ def linked_references(raw, parent_url, cik, keywords):
     return sorted(result.values(), key=lambda row: (-row['_score'], row['source_url']))
 
 
+@bounded_sources
 def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetch):
     from underwriting_evidence import document_record
+    from underwriting_foreign_financials import source_budget
     from underwriting_sec_submissions import financing_references, financing_documents
     if not keywords:
         return [], []
     credit, transaction = request_kinds(keywords)
     if not credit and not transaction:
         return [], []
+    budget = source_budget()
     focus = list(dict.fromkeys(list(keywords)+(['credit agreement', 'covenant'] if credit else [])
                               + (['merger', 'acquisition', 'tender offer', 'purchase price'] if transaction else [])))[:18]
     documents, errors = [], []
@@ -124,7 +128,7 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
             candidates.append((filed, accession, url, form))
         for filed, accession, url, form in sorted(candidates, reverse=True)[:2]:
             try:
-                raw = fetch(url)
+                raw = budget.fetch(url, 0, fetch)
                 doc = document_record(url, raw, focus, form=form, prefer_complete=True)
                 doc.update(form=form, filed=filed, accession=accession, document_kind='material_transaction_disclosure')
                 documents.append(doc)
@@ -182,7 +186,7 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
             references.pop(url)
             existing.add(url)
             try:
-                raw = fetch(url)
+                raw = budget.fetch(url, layer, fetch)
                 if reference.get('_submission'):
                     # The authenticated package contains every EX-4 member;
                     # no per-note requests or truncated contract windows needed.

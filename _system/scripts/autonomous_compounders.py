@@ -27,6 +27,7 @@ from pathlib import Path
 
 from atomic_io import semantic_json_sha256, write_json_if_changed, write_text_if_changed
 from sec_client import SecClient
+from underwriting_foreign_financials import bounded_sources
 from tci_return_bridge import number
 from universal_valuation_contract import (
     _cashflow_irr,
@@ -366,6 +367,7 @@ def parse_frmo_report(texts, url, year, as_of, content_hash):
     return facts
 
 
+@bounded_sources
 def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
     path = root / inputs_dir / (ticker + '.json')
     prior = read(path)
@@ -450,7 +452,10 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
                 except (OSError, ValueError, KeyError, TypeError) as exc:
                     result['report_discovery']['status'] = 'earnings_unresolved'
                     result['errors'].append({'collector': 'sec_earnings', 'error': str(exc), 'retry': 'next_scheduled_run'})
-            foreign = latest_foreign_disclosure(submissions, cik, as_of, formal)
+            # A same-day companyfacts financial period does not classify every
+            # 6-K on that filing date. Inspect current disclosure sources too.
+            foreign_formal = max(reports, key=lambda r: (r['period'], r['filed'])) if reports else formal
+            foreign = latest_foreign_disclosure(submissions, cik, as_of, foreign_formal)
             current_disclosure = result.get('latest_disclosure') or {}
             if foreign and (foreign['filed'], foreign['accession']) >= (
                     current_disclosure.get('filed', ''), current_disclosure.get('accession', '')):
@@ -462,6 +467,23 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
                 result['errors'].append({'collector': 'sec_foreign_disclosure',
                     'error': 'Foreign disclosure needs verified financial tables and an explicit reporting period; reportDate is not a financial epoch',
                     'retry': 'next_scheduled_run'})
+                from underwriting_foreign_financials import collect_foreign_financials
+                try:
+                    with _PRIMARY_SEC_LOCK:
+                        documents, proof = collect_foreign_financials(submissions, cik, as_of,
+                            lambda source: _PRIMARY_SEC_CLIENT.get_bytes(source, timeout=40))
+                    result['foreign_financial_discovery'] = proof
+                    result['primary_documents'] = documents
+                    if proof['status'] == 'complete_current_financial_sources':
+                        latest = max(documents, key=lambda d: (d['period'], d['filed']))
+                        financial_report = {k: latest[k] for k in ('period', 'filed', 'accession', 'form', 'source_url')}
+                        result['latest_report'] = max([result.get('latest_report') or financial_report, financial_report],
+                            key=lambda r: (r['period'], r['filed']))
+                        result['report_discovery']['status'] = 'verified'
+                        result['errors'] = [e for e in result['errors'] if e.get('collector') != 'sec_foreign_disclosure']
+                except (OSError, ValueError, KeyError, TypeError) as exc:
+                    result['errors'].append({'collector': 'sec_foreign_financials',
+                        'error': str(exc), 'retry': 'next_scheduled_run'})
         except (OSError, ValueError, KeyError, TypeError) as exc:
             result['report_discovery'] = {'status': 'failed', 'source_url': discovery_url, 'checked_at': as_of}
             result['latest_report'] = result.get('latest_report') or prior_report

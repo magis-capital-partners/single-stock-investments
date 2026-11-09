@@ -11,6 +11,7 @@ import re
 from urllib.parse import urlencode
 
 from underwriting_contract import digest, require
+from underwriting_foreign_financials import bounded_sources, source_budget
 
 
 def name_tokens(name):
@@ -62,6 +63,7 @@ def merge_related_packet(parent, target):
     return result
 
 
+@bounded_sources
 def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None):
     from sec_client import SecClient
     from underwriting_evidence import EXTRA_TAGS, _observation, document_record, filing_bytes
@@ -76,20 +78,32 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
         if form in ('10-K','10-Q','20-F','40-F','6-K') and form not in selected and recent['filingDate'][i] <= as_of:
             selected[form] = i
     documents = []
+    foreign = next((form for form in selected if form in ('10-K','20-F','40-F')), None) in ('20-F','40-F')
     for form,i in list(selected.items())[:3]:
         filename = recent['primaryDocument'][i]
         require(re.fullmatch(r'[A-Za-z0-9_.-]+',filename), 'Unsafe SEC document path')
         accession = recent['accessionNumber'][i]
         url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-','')}/{filename}"
-        filing_raw = filing_bytes(root,ticker,accession,client,url)
-        doc = document_record(url,filing_raw,keywords,form=form)
-        period = recent['reportDate'][i]
-        if form == '6-K':
-            from valuation_earnings import foreign_reporting_period
-            period = foreign_reporting_period(filing_raw,as_of)
-            doc['reported_event_date'] = recent['reportDate'][i]
-        doc.update(form=form,filed=recent['filingDate'][i],period=period)
-        documents.append(doc)
+        try:
+            filing_raw = (source_budget().fetch(url,0,
+                lambda value:client.get_bytes(value,timeout=40))
+                if foreign else filing_bytes(root,ticker,accession,client,url))
+            doc = document_record(url,filing_raw,keywords,form=form)
+            period = recent['reportDate'][i]
+            if form == '6-K':
+                from valuation_earnings import foreign_reporting_period
+                period = foreign_reporting_period(filing_raw,as_of)
+                doc['reported_event_date'] = recent['reportDate'][i]
+            doc.update(form=form,filed=recent['filingDate'][i],period=period)
+            documents.append(doc)
+        except (OSError,ValueError):
+            if not foreign:
+                raise
+            from underwriting_foreign_financials import collect_foreign_financials
+            documents, proof = collect_foreign_financials(submission,cik,as_of,
+                lambda value:client.get_bytes(value,timeout=40))
+            require(proof['status']=='complete_current_financial_sources', 'Related foreign financial attachments remain unresolved')
+            break
     require(documents, 'Related issuer primary reports are unavailable')
     latest = max(documents,key=lambda d:(d['period'],d['filed']))
     observations = {}
@@ -164,6 +178,7 @@ def discover_historical_targets(packet, requested, as_of, client, parent_cik=Non
     return identities
 
 
+@bounded_sources
 def augment_requested_targets(root, packet, gaps, as_of, client=None):
     from sec_client import SecClient
     from underwriting_evidence import requested_keywords, source_fingerprint
@@ -172,6 +187,8 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
     requested = ' '.join(str(g.get('detail') or '') for g in gaps).lower()
     if not re.search(r'acquisit|acquir|merger',requested):
         return packet
+    if packet.get('primary_reference_usage'):
+        source_budget().resume(packet['primary_reference_usage'])
     identities = client.get_json('https://www.sec.gov/files/company_tickers.json',timeout=30)
     parent_cik = (((read(root/'_system/portfolio/registry.json').get('holdings') or {})
                    .get(packet['ticker']) or {}).get('download') or {}).get('cik')
@@ -195,6 +212,8 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
             target['identity_discovery'] = identity['identity_discovery']
             target['packet_hash'] = digest({k:v for k,v in target.items() if k != 'packet_hash'})
         packet = merge_related_packet(packet,target)
+        if any(source_budget().snapshot()['counts']):
+            packet['primary_reference_usage'] = source_budget().snapshot()
         path = root/'_system/reference/market-data/valuation_related_evidence'/(target['ticker']+'.json')
         write(path,target)
     if candidates:
@@ -207,6 +226,7 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
     return packet
 
 
+@bounded_sources
 def refresh_related_sources(root, ticker, as_of):
     from underwriting_pipeline import read, write
     model = read(root/ticker/'research/valuation.json')
