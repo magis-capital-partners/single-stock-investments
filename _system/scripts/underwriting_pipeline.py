@@ -165,6 +165,8 @@ def stage_hash(root, stage, payload):
 
 def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execute=None):
     require(stage in ('author', 'challenger'), 'Only local judgment sessions may use model calls')
+    from underwriting_related_evidence import validate_related_identity
+    validate_related_identity(payload.get('packet') or {})
     from underwriting_transport import render
     consumer = STAGES[stage]
     policies = read(root/CALL_POLICY)

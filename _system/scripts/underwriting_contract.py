@@ -62,6 +62,8 @@ def values(row):
 
 
 def _bound_evidence(packet, contract):
+    from underwriting_related_evidence import validate_related_identity
+    validate_related_identity(packet)
     require(contract.get('schema_version') in ('underwriting-contract/1', 'underwriting-contract/2'), 'Unknown underwriting schema')
     if contract['schema_version'] == 'underwriting-contract/2':
         require(isinstance(contract.get('economic_analysis'), dict), 'economic_analysis is required')

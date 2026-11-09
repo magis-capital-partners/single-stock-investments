@@ -19,30 +19,98 @@ def name_tokens(name):
     return [x for x in re.findall(r'[a-z0-9]+', name.lower()) if x not in stop]
 
 
-def acquisition_mentioned(packet, name):
+def _parent_documents(packet):
+    """Related financials cannot establish their own link to the parent."""
+    cik = packet.get('cik')
+    discovery = (packet.get('source_discovery') or {}).get('source_url') or ''
+    match = re.search(r'/CIK(\d+)\.json(?:$|\?)', discovery, re.I)
+    if match:
+        cik = match.group(1)
+    for document in packet.get('documents') or []:
+        if document.get('issuer_ticker') not in (None, '', packet.get('ticker')):
+            continue
+        source = document.get('source_url') or ''
+        owner = re.search(r'/Archives/edgar/data/(\d+)/', source, re.I)
+        if owner and str(cik).isdigit() and int(owner.group(1)) != int(cik):
+            continue
+        yield document
+
+
+def _acquisition_name_pattern(name):
     tokens = name_tokens(name)
     if not tokens:
-        return False
-    for doc in packet.get('documents') or []:
-        for context in doc.get('contexts') or []:
-            body = ' '.join(context.lower().split())
-            # Match the issuer name as a phrase. Loose words such as "liquidity"
-            # and "services" occur throughout unrelated acquisition disclosures.
-            phrase = r'\b'+r'\W+'.join(re.escape(t) for t in tokens)+r'\b'
-            for match in re.finditer(phrase, body):
-                window = body[max(0,match.start()-120):match.end()+120]
-                if re.search(r'acquir|acquisit|merg|purchase',window):
-                    return True
-    return False
+        return None
+    # Generic issuer stems need their legal name, not a common financial noun.
+    # Distinctive names still support the source's ordinary shortened spelling.
+    generic = {'target','financial','institutions','liquidity','services','capital',
+               'investment','investments','international','technology','technologies',
+               'bank','banks','national','global','systems','resources'}
+    if all(token in generic for token in tokens):
+        tokens = re.findall(r'[a-z0-9]+', name.lower())
+    return r'\b'+r'\W+'.join(re.escape(token) for token in tokens)+r'\b'
+
+
+def acquisition_binding(packet, name):
+    """Return the exact parent passage naming an acquired business as object.
+
+    Nearby transaction words do not establish the target role: a seller,
+    lender, share repurchase or hypothetical acquisition is not that link.
+    """
+    phrase = _acquisition_name_pattern(name)
+    if not phrase:
+        return None
+    interest = (r'(?:(?:all|substantially\s+all)\s+)?(?:of\s+)?(?:the\s+)?'
+                r'(?:(?:outstanding|issued|remaining|common)\s+){0,3}'
+                r'(?:shares|stock|equity|assets|business)(?:\s+interests)?\s+(?:of|in)\s+')
+    prefix = (r'\b(?:acquire[ds]?|acquiring|purchase[ds]?|purchasing)\s+(?:'+interest+r')?'
+              r'|\b(?:acquisition|purchase)\s+of\s+(?:'+interest+r')?'
+              r'|\bpending\s+acquisition\s+(?:of\s+)?')
+    pattern = re.compile(r'(?:'+prefix+r')(?:the\s+)?'+phrase, re.I)
+    for document in _parent_documents(packet):
+        for index, context in enumerate(document.get('contexts') or []):
+            for match in pattern.finditer(context):
+                # Negation or a conditional proposal immediately before the
+                # transaction cannot turn into a completed/committed purchase.
+                before = context[max(0,match.start()-100):match.start()]
+                clause = re.split(r'[;.!?\n]', before)[-1]
+                if re.search(r'\b(?:not|never|no|may|might|could|would|if|without)\b', clause, re.I):
+                    continue
+                return {'document_id':document.get('id'),
+                        'source_url':document.get('source_url'),
+                        'content_hash':document.get('content_hash'),
+                        'context_index':index,'start':match.start(),'end':match.end(),
+                        'quote':context[match.start():match.end()]}
+    return None
+
+
+def acquisition_mentioned(packet, name):
+    return acquisition_binding(packet, name) is not None
+
+
+def validate_related_identity(packet):
+    """Fail closed on wrongly linked frozen or recovered related evidence."""
+    related = packet.get('related_issuers') or {}
+    for ticker, metadata in related.items():
+        binding = acquisition_binding(packet, metadata.get('company') or '')
+        require(binding is not None, 'Primary parent evidence does not identify this acquisition: '+ticker)
+        if metadata.get('parent_transaction_binding') is not None:
+            require(metadata['parent_transaction_binding'] == binding,
+                    'Parent acquisition source binding changed: '+ticker)
+    for row in (packet.get('documents') or [])+(packet.get('observations') or []):
+        issuer = row.get('issuer_ticker')
+        require(not issuer or issuer == packet.get('ticker') or issuer in related,
+                'Unknown related-issuer evidence scope')
 
 
 def merge_related_packet(parent, target):
-    require(acquisition_mentioned(parent,target.get('company') or ''), 'Primary parent evidence does not identify this acquisition')
+    binding = acquisition_binding(parent,target.get('company') or '')
+    require(binding is not None, 'Primary parent evidence does not identify this acquisition')
     require(target.get('currency') == parent.get('currency'), 'Related issuer requires an explicit reporting-currency bridge')
     require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}',target.get('ticker') or ''), 'Unsafe related issuer')
     result = copy.deepcopy(parent)
     ticker = target['ticker']
     result.setdefault('related_issuers', {})[ticker] = {k:target.get(k) for k in ('company','cik','latest_report','evidence_hash','source_hash')}
+    result['related_issuers'][ticker]['parent_transaction_binding'] = binding
     known = {o['id'] for o in result['observations']}
     for point in target['observations']:
         if point.get('unit') == 'shares':
