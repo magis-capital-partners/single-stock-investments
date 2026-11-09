@@ -4,10 +4,16 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter} from './reverse-split-live/checkpoint.mjs';
 import {publisherInventory,publisherClock} from './reverse-split-live/publisher-inventory.mjs';
-import {recoverPublisherGaps,publisherArchiveURL} from './reverse-split-live/publisher-recovery.mjs';
+import {recoverPublisherGaps,publisherArchiveURL,schedulePublisherRecovery} from './reverse-split-live/publisher-recovery.mjs';
+import {enqueue,dispatch} from './reverse-split-live/worker.mjs';
 import {createHash} from 'node:crypto';
 const fixture=name=>readFileSync(new URL('./reverse-split-live/fixtures/'+name,import.meta.url),'utf8');
 const hash=async b=>createHash('sha256').update(b).digest('hex');
+
+test('live disclosures precede publisher recovery and bulk history cannot starve it',async t=>{
+ const db=new DatabaseSync(':memory:');t.after(()=>db.close());for(const n of readdirSync(new URL('./reverse-split-live/migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./reverse-split-live/migrations/'+n,import.meta.url),'utf8'));const queued=[],env={DB:localAdapter(db),MAX_DISPATCH:1,JOBS:{send:async body=>queued.push(body)}},put=(...args)=>enqueue(env,...args),at='2026-11-09T19:00:00Z';
+ assert.equal(await schedulePublisherRecovery(env,put,Date.parse(at)),false);await put('history',{cik:'123'},3,'bulk');await put('filing',{},15,'live');db.prepare('INSERT INTO rs_source_gaps(id,source_id,start_at,end_at,created_at) VALUES(?,?,?,?,?)').run('gap','prnewswire',at,at,at);assert.equal(await schedulePublisherRecovery(env,put,Date.parse(at)),true);await dispatch(env);await dispatch(env);assert.deepEqual(queued.map(r=>r.id),['live','publisher-recovery:v3:'+Math.floor(Date.parse(at)/60000)]);assert.equal(db.prepare("SELECT state FROM rs_jobs WHERE id='bulk'").get().state,'pending');
+});
 test('real unfiltered publisher inventories include every release with Eastern clocks',()=>{
  const pr=publisherInventory(fixture('prnewswire-inventory.html'),'prnewswire',publisherArchiveURL('prnewswire',8,'2026-11-06'));
  assert.equal(pr.length,100);assert.equal(pr[0].published_at,'2026-11-08T12:30:00.000Z');

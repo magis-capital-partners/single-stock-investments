@@ -7,23 +7,24 @@ on:
       - 'dashboard/cloudflare/test-reverse-split*.mjs'
       - '.github/workflows/reverse-split-live.yml'
   repository_dispatch:
-    types: [reverse-split-source-ready, reverse-split-reconcile, reverse-split-shadow-continue]
+    types: [reverse-split-source-ready, reverse-split-reconcile, reverse-split-shadow-continue, reverse-split-release]
   schedule:
     # Off the top of the hour; GitHub may delay or skip scheduled runs.
     - cron: '3-58/5 * * * *'
 permissions:
   contents: read
 concurrency:
-  group: reverse-split-live-${{ github.event_name == 'push' && 'deploy' || 'collect' }}
+  group: reverse-split-live-${{ (github.event_name == 'push' || github.event.action == 'reverse-split-release') && 'deploy' || 'collect' }}
   cancel-in-progress: false
 jobs:
   deploy:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event.action == 'reverse-split-release'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           sparse-checkout: |
             dashboard/cloudflare
             dashboard/functions
@@ -45,9 +46,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: e1cac493b315c8fd7398500dd1bfd687
         run: |
           node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js d1 migrations apply single-stock-reverse-splits --remote --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc
-          node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js deploy --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc
+          RS_RELEASE_COMMIT=$(git rev-parse HEAD)
+          node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js deploy --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc --message "reverse-split research release $RS_RELEASE_COMMIT"
   collect:
-    if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
+    if: github.event_name == 'schedule' || (github.event_name == 'repository_dispatch' && github.event.action != 'reverse-split-release')
     permissions:
       contents: write
     runs-on: ubuntu-latest
