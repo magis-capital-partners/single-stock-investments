@@ -512,6 +512,7 @@ def test_world_model_paths_hold_the_profile_inputs_and_no_filing_archive():
         "/*/investor-documents/TRANSCRIPT_MANIFEST.json",
         "/*/third-party-analyses/source_inventory.json",
         "/*/third-party-analyses/activist_reports_index.json",
+        "/*/third-party-analyses/short_reports/*.md",
         "/AGENT_INDEX.md",
     ):
         assert required in paths, required
@@ -551,6 +552,8 @@ def test_world_model_patterns_check_out_cited_proofs_and_skip_filings(tmp_path: 
         "AAA/investor-documents/DOWNLOAD_MANIFEST.json": "{}\n",
         "AAA/third-party-analyses/source_inventory.json": "{}\n",
         "AAA/third-party-analyses/reports/note.pdf": "pdf",
+        "AAA/third-party-analyses/short_reports/2026-short.md": "cache\n",
+        "AAA/third-party-analyses/short_reports/2026-short.pdf": "pdf",
         "_system/reference/activist-reports/short_scorecard/Fugazi_Research.csv": "csv\n",
         "_system/reference/activist-reports/fund/report.pdf": "pdf",
         "_system/__init__.py": "",
@@ -590,6 +593,7 @@ def test_world_model_patterns_check_out_cited_proofs_and_skip_filings(tmp_path: 
         "AAA/investor-documents/sec-edgar/10-K.htm",
         "AAA/investor-documents/DOWNLOAD_MANIFEST.json",
         "AAA/third-party-analyses/source_inventory.json",
+        "AAA/third-party-analyses/short_reports/2026-short.md",
         "_system/reference/activist-reports/short_scorecard/Fugazi_Research.csv",
         "_system/__init__.py",
         "_system/scripts/x.py",

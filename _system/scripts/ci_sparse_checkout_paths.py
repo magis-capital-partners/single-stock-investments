@@ -272,6 +272,8 @@ def world_model_paths() -> list[str]:
         "/*/investor-documents/TRANSCRIPT_MANIFEST.json",
         "/*/third-party-analyses/source_inventory.json",
         "/*/third-party-analyses/activist_reports_index.json",
+        # short_scan_batch.py counts these into the committed short_scan report.
+        "/*/third-party-analyses/short_reports/*.md",
     ]
     patterns += literal_patterns(calculation_proof_sources(files), set(files), tracked_dirs(files))
     patterns += desk_brief_inputs()
