@@ -5,6 +5,7 @@ A budget is shared by callers; failed fetches retain their reservations.
 """
 from __future__ import annotations
 
+import calendar
 import hashlib
 import re
 from contextvars import ContextVar
@@ -137,9 +138,49 @@ def _current_covers(submissions, cik, as_of):
 def _role(title):
     if re.search(r'\b(?:consolidated\s+)?financial\s+statements?\b', title, re.I):
         return 'financial_statements'
-    if re.search(r"\bmanagement(?:['’]s)?\s+discussion\s+and\s+analysis\b", title, re.I):
+    if re.search(r"\bmanagement(?:['’]s)?\s+discussion\s+(?:and|&)\s+analysis\b", title, re.I):
         return 'management_discussion'
     return None
+
+
+def _reference_period(title):
+    """Read a literal financial-title end date, never its filing/event date."""
+    from valuation_earnings import reporting_period
+    period = reporting_period(re.sub(r'\byears(?=\s+ended\b)', 'year', title, flags=re.I), '9999-12-31')
+    if period or not _role(title):
+        return period
+    months = {name.lower(): i for i, name in enumerate(calendar.month_name) if name}
+    months.update({name.lower(): i for i, name in enumerate(calendar.month_abbr) if name})
+    months['sept'] = 9
+    names = '|'.join(sorted(months, key=len, reverse=True))
+    dates = set()
+    for month, day, year in re.findall(r'\bperiod\s+ended\s+('+names+r')\.?\s+(\d{1,2}),?\s+(20\d{2})\b', title, re.I):
+        try:
+            dates.add(date(int(year), months[month.lower()], int(day)).isoformat())
+        except ValueError:
+            return None
+    return next(iter(dates)) if len(dates) == 1 else None
+
+
+def _paired_management_period(body, reference, statements, as_of):
+    """An MD&A period needs its own heading and complete same-filing statements.
+
+    The statement table/period guard is unchanged. Management commentary cannot
+    supply that evidence or establish an epoch on its own.
+    """
+    from valuation_earnings import reporting_period
+    title_period = _reference_period(reference['reference_text'])
+    key = (reference['parent_metadata']['source_url'], title_period)
+    binding = statements.get(key)
+    if not binding:
+        raise ValueError('Management discussion requires complete matching financial statements from the same filing')
+    heading = re.search(r"\bmanagement(?:['’]s)?\s+discussion\s+(?:and|&)\s+analysis\b", body[:2000], re.I)
+    if not heading:
+        raise ValueError('Management discussion requires its own operative source heading')
+    period = reporting_period(body[heading.start():heading.start()+1200], as_of)
+    if not period or period != title_period or period != binding['period']:
+        raise ValueError('Management title, own source period and matching financial statements must agree')
+    return period, binding
 
 
 def _financial_links(raw, parent, cik):
@@ -184,7 +225,7 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
     No provider or model call is made, and no cached report is stamped current.
     """
     from underwriting_evidence import document_record, primary_text, registered_securities, text_of
-    from valuation_earnings import foreign_reporting_period, reporting_period
+    from valuation_earnings import foreign_reporting_period
     budget = budget if budget is not None else source_budget()
     parents = _current_covers(submissions, cik, as_of)
     issuer = _issuer_text(submissions['name'])
@@ -207,20 +248,25 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
             references[reference['source_url']] = reference
     if len(references) > 4:
         raise ValueError('Complete financial attachments exceed the shared child reference capacity')
-    documents = []
+    documents = {}
+    statements = {}
     roles = {'annual': set(), 'current': set()}
-    for reference in references.values():
+    ordered = sorted(references.values(), key=lambda row: row['financial_role'] != 'financial_statements')
+    for reference in ordered:
         parent = reference['parent_metadata']
         raw = budget.fetch(reference['source_url'], 1, fetch)
         source = primary_text(raw)
         body = text_of(source)
         if issuer not in _issuer_text(body):
             raise ValueError('Foreign financial attachment issuer name mismatch')
-        period = foreign_reporting_period(raw, as_of)
-        # A comparative annual title can say "years ended". Keep its original
-        # text intact while the existing parser reads the same explicit date.
-        title_period = reporting_period(re.sub(r'\byears(?=\s+ended\b)', 'year',
-                                               reference['reference_text'], flags=re.I), '9999-12-31')
+        binding = None
+        try:
+            period = foreign_reporting_period(raw, as_of)
+        except ValueError:
+            if reference['financial_role'] != 'management_discussion':
+                raise
+            period, binding = _paired_management_period(body, reference, statements, as_of)
+        title_period = _reference_period(reference['reference_text'])
         if not title_period or period != title_period or period > parent['filed']:
             raise ValueError('Financial attachment title and source reporting periods must agree before filing')
         if not parent['form'].startswith('6-K') and period != parent['reported_event_date']:
@@ -233,10 +279,16 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
             issuer_cik=str(int(cik)), document_kind='foreign_financial_attachment',
             financial_role=reference['financial_role'], referenced_by=reference['referenced_by'],
             reference_text=reference['reference_text'], extracted_text_sha256=hashlib.sha256(body.encode()).hexdigest())
-        documents.append(document)
+        if binding is not None:
+            document['financial_statement_period_binding'] = dict(binding)
+        if reference['financial_role'] == 'financial_statements':
+            statements[(parent['source_url'],period)] = {
+                'document_id':document['id'], 'source_url':document['source_url'],
+                'content_hash':document['content_hash'], 'period':period}
+        documents[reference['source_url']] = document
         roles['current' if parent['form'].startswith('6-K') else 'annual'].add(reference['financial_role'])
     required = {'financial_statements', 'management_discussion'}
-    return documents, {'status': 'complete_current_financial_sources' if all(required <= r for r in roles.values())
+    return [documents[url] for url in references], {'status': 'complete_current_financial_sources' if all(required <= r for r in roles.values())
                        else 'current_financial_sources_unresolved',
         'issuer_cik': str(int(cik)), 'covers': covers, 'roles': {k: sorted(v) for k, v in roles.items()},
         'reference_budget': budget.snapshot(), 'economic_approval': False,
