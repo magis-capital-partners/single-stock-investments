@@ -7,6 +7,7 @@ never inherit the parent's listing or split basis.
 from __future__ import annotations
 
 import copy
+import hashlib
 import re
 from urllib.parse import urlencode
 
@@ -126,6 +127,11 @@ def merge_related_packet(parent, target):
             require(existing[document['id']]['content_hash'] == document['content_hash'], 'A primary document changed')
             continue
         result['documents'].append({**copy.deepcopy(document),'issuer_ticker':ticker})
+    if target.get('collection_errors'):
+        result.setdefault('collection_errors', []).extend(
+            {**copy.deepcopy(error), 'issuer_ticker':ticker} for error in target['collection_errors'])
+    if target.get('primary_reference_usage'):
+        result['primary_reference_usage'] = copy.deepcopy(target['primary_reference_usage'])
     result['evidence_hash'] = digest({'parent_evidence_hash':parent['evidence_hash'], 'related_issuers':result['related_issuers']})
     result['packet_hash'] = digest({k:v for k,v in result.items() if k != 'packet_hash'})
     return result
@@ -140,12 +146,24 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
     base = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
     raw = client.get_json(base,timeout=30)
     submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json',timeout=30)
+    if keywords:
+        submitted = str(submission.get('cik') or '')
+        require(submitted.isdigit() and int(submitted)==int(cik),
+                'Requested related submissions issuer CIK mismatch')
+        require(name_tokens(submission.get('name') or ''),
+                'Requested related submissions issuer name is missing')
+        reported = str(raw.get('cik') or '')
+        require(reported.isdigit() and int(reported)==int(cik),
+                'Requested related companyfacts issuer CIK mismatch or missing')
+        require(isinstance(raw.get('entityName'),str) and name_tokens(raw['entityName'])
+                and name_tokens(raw['entityName'])==name_tokens(submission['name']),
+                'Requested related primary issuer names disagree or are missing')
     recent = submission['filings']['recent']
     selected = {}
     for i,form in enumerate(recent['form']):
         if form in ('10-K','10-Q','20-F','40-F','6-K') and form not in selected and recent['filingDate'][i] <= as_of:
             selected[form] = i
-    documents = []
+    documents, formal_sources = [], []
     foreign = next((form for form in selected if form in ('10-K','20-F','40-F')), None) in ('20-F','40-F')
     for form,i in list(selected.items())[:3]:
         filename = recent['primaryDocument'][i]
@@ -164,6 +182,7 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
                 doc['reported_event_date'] = recent['reportDate'][i]
             doc.update(form=form,filed=recent['filingDate'][i],period=period)
             documents.append(doc)
+            formal_sources.append({'source_url':url,'raw':filing_raw,'filed':doc['filed'],'form':form})
         except (OSError,ValueError):
             if not foreign:
                 raise
@@ -173,7 +192,41 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
             require(proof['status']=='complete_current_financial_sources', 'Related foreign financial attachments remain unresolved')
             break
     require(documents, 'Related issuer primary reports are unavailable')
+    # Transaction dates never become the target's financial reporting period.
     latest = max(documents,key=lambda d:(d['period'],d['filed']))
+    reference_errors = []
+    if keywords:
+        from underwriting_primary_references import collect_requested_documents
+        # Foreign attachment bytes already fetched in this collection scope are
+        # reused; another helper cannot obtain a fresh reference allowance.
+        known_sources = {source['source_url'] for source in formal_sources}
+        if foreign:
+            for document in documents:
+                if document['source_url'] in known_sources:
+                    continue
+                raw_source = source_budget().fetch(document['source_url'],1,
+                    lambda value:client.get_bytes(value,timeout=40))
+                require(hashlib.sha256(raw_source).hexdigest()==document['content_hash'],
+                        'Related primary source hash changed')
+                formal_sources.append({'source_url':document['source_url'],'raw':raw_source,
+                                       'filed':document.get('filed')})
+        additional, reference_errors = collect_requested_documents(submission,cik,as_of,formal_sources,
+            keywords,lambda value:client.get_bytes(value,timeout=40),require_all_citations=True)
+        existing = {document['id']:document for document in documents}
+        for document in additional:
+            previous = existing.get(document['id'])
+            if previous is not None:
+                require(previous['content_hash']==document['content_hash'],
+                        'A related primary disclosure changed')
+                if document.get('coverage')=='complete_requested_primary_document':
+                    previous.update(contexts=document['contexts'],coverage=document['coverage'])
+            else:
+                documents.append(document)
+                existing[document['id']] = document
+            if document.get('coverage') not in ('complete_requested_primary_document','complete_quarterly_filing'):
+                reference_errors.append({'source':'requested_primary_reference',
+                    'source_url':document['source_url'],
+                    'error':'Complete requested related document exceeds bounded context capacity or lacks complete source coverage'})
     observations = {}
     for tag,concept in raw.get('facts',{}).get('us-gaap',{}).items():
         if tag not in EXTRA_TAGS:
@@ -191,8 +244,13 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
     target = {'ticker':ticker,'cik':str(cik),'company':submission.get('name') or raw.get('entityName'), 'currency':currency, 'status':'ready',
               'as_of':as_of,'latest_report':{k:latest[k] for k in ('period','filed','source_url')},
               'observations':list(observations.values()),'documents':documents}
+    if reference_errors:
+        target.update(status='evidence_gap',collection_errors=reference_errors)
+    if any(source_budget().snapshot()['counts']):
+        target['primary_reference_usage'] = source_budget().snapshot()
     target['source_hash'] = digest({'observations':target['observations'],'latest_report':target['latest_report'],
-                                    'documents':[(d['source_url'],d['content_hash']) for d in documents]})
+                                    'documents':[(d['source_url'],d['content_hash']) for d in documents],
+                                    **({'collection_errors':reference_errors} if reference_errors else {})})
     target['evidence_hash'] = digest({'source_hash':target['source_hash'],'contexts':[d['contexts'] for d in documents]})
     target['packet_hash'] = digest(target)
     return target
