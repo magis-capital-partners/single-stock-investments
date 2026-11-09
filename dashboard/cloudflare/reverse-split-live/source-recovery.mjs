@@ -3,7 +3,7 @@ const forms=new Set(['8-K','8-K/A','6-K','6-K/A','10-Q','10-Q/A','10-K','10-K/A'
 export function parseDailyIndex(text,day){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!/^\s*CIK\s*\|\s*Company Name\s*\|\s*Form Type\s*\|\s*Date Filed\s*\|\s*File\s*Name\s*$/im.test(text))throw new Error('Invalid daily index: expected SEC pipe-delimited header');
  const rows=[];
- for(const line of text.split('\n')){const [cik,,form,filed,path]=line.trim().split('|');if(!/^\d+$/.test(cik||'')||!forms.has(form)||filed!==day)continue;const match=/^edgar\/data\/\d+\/(\d{10}-\d{2}-\d{6})\.txt$/.exec(path||'');if(!match)continue;rows.push({cik:String(Number(cik)),accession:match[1],form,filed});}
+ for(const line of text.split('\n')){const [cik,,form,rawDate,path]=line.trim().split('|'),filed=/^\d{8}$/.test(rawDate||'')?rawDate.slice(0,4)+'-'+rawDate.slice(4,6)+'-'+rawDate.slice(6):rawDate;if(!/^\d+$/.test(cik||'')||!forms.has(form)||filed!==day)continue;const match=/^edgar\/data\/\d+\/(\d{10}-\d{2}-\d{6})\.txt$/.exec(path||'');if(!match)continue;rows.push({cik:String(Number(cik)),accession:match[1],form,filed});}
  return rows;
 }
 export const repairedJobError=e=>/Filing index document identity or format is unsupported|Official filing index lacks an unambiguous primary report|Source exceeds document size limit|Announcement PDF requires verified readable text/.test(e||'');
