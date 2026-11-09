@@ -1,0 +1,87 @@
+{
+ "schema_version": "desk_briefs.v2",
+ "desk": "activism",
+ "as_of": "2026-11-09",
+ "author": "grok-drew-activism",
+ "owner": "drew",
+ "inputs_read": [
+  {
+   "path": "dashboard/data/activist_feed.json",
+   "generated_at": "2026-10-27T13:55:22Z"
+  },
+  {
+   "path": "_system/portfolio/registry.json",
+   "generated_at": null
+  },
+  {
+   "path": "AGENT_INDEX.md",
+   "generated_at": null
+  },
+  {
+   "path": "llms.txt",
+   "generated_at": null
+  },
+  {
+   "path": "_system/data/claims.jsonl",
+   "generated_at": null
+  },
+  {
+   "path": "_system/evals/activism/cases.jsonl",
+   "generated_at": null
+  },
+  {
+   "path": "_system/evals/activism/runs.jsonl",
+   "generated_at": null
+  },
+  {
+   "path": "_system/data/activist_records/elliott.md",
+   "generated_at": "built 2026-10-29"
+  }
+ ],
+ "items": [
+  {
+   "ticker": "TFPM",
+   "headline": "Elliott 13D/A No.4 (filed 2026-11-06): margin loans with JPMorgan upsized from $300M to $1.3B, and all 133.2M shares (64.8%) now pledged as collateral",
+   "one_number": "$300M->$1.3B; 133,241,535 (64.8% of 205,685,460), up from ~22.9M; due 2028-03-31",
+   "lane": "13d_control",
+   "evidence": [
+    {
+     "kind": "filing",
+     "ref": "13D/A No.4, CIK 1829726, 0000919574-26-007484, filed/event 2026-11-06, Items 4/5(a)/6: Elliott International $204M->$884M, Elliott $96M->$416M, JPM; +110,361,730 sh; 133,241,535 pledged; Mar 31 2028.",
+     "url": "https://www.sec.gov/Archives/edgar/data/1829726/000091957426007484/primary_doc.xml",
+     "claim_type": "fact",
+     "as_of": "2026-11-06"
+    },
+    {
+     "kind": "filing",
+     "ref": "Share base 205,685,460 as of 2026-11-03 per issuer 6-K Ex.99.1 filed 2026-11-03 (cited in the 13D/A, not re-read).",
+     "url": "https://www.sec.gov/Archives/edgar/data/1829726/000091957426007484/primary_doc.xml",
+     "claim_type": "fact",
+     "as_of": "2026-11-03"
+    },
+    {
+     "kind": "filing",
+     "ref": "Original 13D 0000902664-23-002314 filed 2023-03-21 (67.0%); No.1 2025-12-31, No.2 2026-03-31, No.3 2026-06-30. activist_records/elliott.md: control holder, not a campaign, no sale as of 2026-10-29.",
+     "url": "https://www.sec.gov/Archives/edgar/data/1829726/000090266423002314/",
+     "claim_type": "fact",
+     "as_of": "2026-10-29"
+    },
+    {
+     "kind": "web",
+     "ref": "Held as commentary, not posted: NVDA Hunterbrook Media investigation 2026-11-06 (Hunterbrook Capital states no position).",
+     "url": "https://hntrbrk.com/investigations/nvidia",
+     "claim_type": "fact",
+     "as_of": "2026-11-06"
+    }
+   ],
+   "confidence": "filing",
+   "next": "Financing, not a campaign: keeps 64.8% (was 67.0% in 2023). Only a margin call or enforcement lets the block reach lenders. 13D/A if lenders join (shares may be reallocated), a sale or secondary, due 2028-03-31. Newest row Nov 5. Float-overhang is interpretation, not a filing fact. No hard date.",
+   "handoff": null
+  }
+ ],
+ "screens_empty": [],
+ "notes": "Monday eval replay 2026-11-09: 5/5 cases right (baseline from 2026-11-02 was 5/5; no drop). Held as commentary, not posted: NVDA Hunterbrook Media investigation 2026-11-06 (Hunterbrook Capital states no position). Feed stale: activist_feed.json last_scan still 2026-10-27 (gap already logged). 41 pending runs.jsonl lines for 2026-11-03..2026-11-09 included in the same PR. Dropped (details in runs.jsonl): LYB Access internal transfers, GPGI ministerial, HCA Frist share-count update, MET plan holdings, filer-side Delta/Wheels Up and MGM/PlayStudios, company-only TSLA/BMNR/XTIA DEFA14As.",
+ "research_only": true,
+ "in_base_irr": false,
+ "authority": "none"
+}
