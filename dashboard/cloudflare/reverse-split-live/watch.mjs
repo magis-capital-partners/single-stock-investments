@@ -13,21 +13,22 @@ import {initializeReview,reviewTick} from './review-service.mjs';
 import {preparedManifest} from './prepared-universe.mjs';
 import {ensureRemoteReadIndexes} from './read-indexes.mjs';
 import {recordSessionHealth,archiveDailyHealth} from './session-health.mjs';
+import {finishHandoff} from './handoff.mjs';
 const now=()=>new Date().toISOString();
 export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
 export const needsStartupReconciliation=(last,at=Date.now())=>Number.isFinite(Date.parse(last))&&at-Date.parse(last)>15*60000;
 export async function watchCollector(env,{interval=1,maximumMs=300*60000,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false}={}){
   const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,lastSources=0,lastFullEvaluation=0,budgetDay,baseline={},flexTask=null,financialTask=null,sourceTask=null,newsTask=null,borrowTask=null,evaluation,unsubscribe,leaseTimer,leaseError,renewing=Promise.resolve(),saving=Promise.resolve(),evaluationSavePending=false;let activeSymbols=new Set();
-  let evaluationTimer;const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
+  let evaluationTimer,draining=false,normalHandoff=false;const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
   const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,source_poll_target_seconds:15,quote_evaluation:'event_driven_serialized',ticks,jobs,error,maximum_minutes:Number.isFinite(maximumMs)?maximumMs/60000:null,broker_connections:0,pipeline_version:'readiness_completion.2026-11-09.v1',pipeline_commit:process.env.RS_PIPELINE_COMMIT||null,storage_usage:{scope:'collector_only_not_account_total',day:budgetDay,rows_read:Number(baseline.rows_read||0)+(env.usage?.rows_read||0),rows_written:Number(baseline.rows_written||0)+(env.usage?.rows_written||0),read_ceiling:450000,write_ceiling:researchWriteBudget(budgetDay,env.EXECUTION_REGISTRATION_DAY)},market_data:env.market?.health||null,publication:env.publicationHealth||null,restored_financial_scores:env.financialScoreCache?.size||0};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);await recordSessionHealth(env,value);await env.EVIDENCE.put('collector-dashboard/runtime.json',new TextEncoder().encode(JSON.stringify(value)),{httpMetadata:{contentType:'application/json'}});lastHeartbeat=Date.now();};
   async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<researchWriteBudget(day,env.EXECUTION_REGISTRATION_DAY);}
   const renewLease=()=>{renewing=renewing.then(async()=>{const next=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(next,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=next;}).catch(e=>{leaseError=e;stopping=true;});return renewing;};
-  async function save(){
-    const task=saving.catch(()=>{}).then(saveInternal);saving=task;return task;
+  async function save(options={}){
+    const task=saving.catch(()=>{}).then(()=>saveInternal(options));saving=task;return task;
   }
-  async function saveInternal(){
+  async function saveInternal({checkpointOnly=false}={}){
     const current=await remote.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first();if(current?.value?.split(':').at(-1)!==token||Number(current.value.split(':')[0])<=Date.now())throw new Error('Collector lease lost; stopping before publication');
-    await flushValidationSamples(env);await checkpoint.save({publicationMode:env.PUBLICATION_MODE,backgroundViews:true});lastSaved=Date.now();
+    await flushValidationSamples(env);await checkpoint.save({publicationMode:env.PUBLICATION_MODE,backgroundViews:true,checkpointOnly});lastSaved=Date.now();
     await remote.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind('collector_usage:'+budgetDay,JSON.stringify({rows_read:Number(baseline.rows_read||0)+env.usage.rows_read,rows_written:Number(baseline.rows_written||0)+env.usage.rows_written}),now()).run();
   }
   try{
@@ -41,7 +42,7 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,sleep=m
       if(full){lastFullEvaluation=Date.now();activeSymbols=new Set((await env.DB.prepare("SELECT ticker FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') UNION SELECT ticker FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending')").all()).results.map(r=>r.ticker));}
       if(full){const recent=(await env.DB.prepare('SELECT ticker FROM rs_events WHERE first_seen_at>=? AND ticker IS NOT NULL').bind(new Date(Date.now()-900000).toISOString()).all()).results.map(r=>r.ticker);env.market?.reconcileSymbols?.([...activeSymbols,...recent]);}
       const count=(await env.DB.prepare('SELECT (SELECT count(*) FROM rs_shadow_records)+(SELECT count(*) FROM rs_execution_records) AS count').first()).count;
-      if(!stopping&&count!==lastRecordCount&&Date.now()-lastSaved>=5000&&!evaluationSavePending){evaluationSavePending=true;save().then(()=>{lastRecordCount=count;}).catch(error=>console.error(JSON.stringify({event:'quote_checkpoint_deferred',error:error.message}))).finally(()=>{evaluationSavePending=false;});}
+      if(!stopping&&!draining&&count!==lastRecordCount&&Date.now()-lastSaved>=5000&&!evaluationSavePending){evaluationSavePending=true;save().then(()=>{lastRecordCount=count;}).catch(error=>console.error(JSON.stringify({event:'quote_checkpoint_deferred',error:error.message}))).finally(()=>{evaluationSavePending=false;});}
     }});unsubscribe=env.market?.onQuote?.(ticker=>evaluation.notify(ticker));evaluationTimer=setInterval(()=>{if(!stopping)evaluation.notify(null);},1000);
     const lastTick=(await env.DB.prepare("SELECT value FROM rs_state WHERE key='last_completed_tick'").first())?.value;
     const sourceGap=await env.DB.prepare("SELECT id FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id LIKE 'sec-%' LIMIT 1").first();if(needsStartupReconciliation(lastTick)||sourceGap)await enqueue(env,'reconcile',{day:etDay(now())},12,'startup-gap:'+etDay(now())+':'+lastTick);
@@ -89,10 +90,15 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,sleep=m
       }catch(e){await heartbeat('degraded',e.message);if(/lease lost/i.test(e.message))throw e;console.error(JSON.stringify({event:'shadow_cycle_degraded',error:e.message}));}
       await sleep(Math.max(1000,interval*1000-(Date.now()-cycle)));
     }
-    env.assertCollectorLease();await heartbeat('handoff');await save();return {ticks,jobs,started_at:new Date(started).toISOString(),finished_at:now(),mode:'continuous_shadow'};
+    env.assertCollectorLease();normalHandoff=!stopping;return {ticks,jobs,started_at:new Date(started).toISOString(),finished_at:now(),mode:'continuous_shadow'};
   }finally{
-    process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);clearInterval(evaluationTimer);unsubscribe?.();
-    try{if(sourceTask)await sourceTask;if(newsTask)await newsTask;if(borrowTask)await borrowTask;env.onShadowDecision=null;await evaluation?.close();if(flexTask)await flexTask;if(financialTask)await financialTask;if(env.financialLoads?.size)await Promise.allSettled([...env.financialLoads.values()]);if(checkpoint){try{await save();await checkpoint.flush();}finally{checkpoint.close();}}}finally{
+    draining=true;
+    try{await finishHandoff({keepQuotes:normalHandoff&&!stopping&&!leaseError,
+      drain:async()=>{if(sourceTask)await sourceTask;if(newsTask)await newsTask;if(borrowTask)await borrowTask;if(flexTask)await flexTask;if(financialTask)await financialTask;if(env.financialLoads?.size)await Promise.allSettled([...env.financialLoads.values()]);await saving;await checkpoint?.flush();},
+      quiesce:async()=>{stopping=true;clearInterval(evaluationTimer);unsubscribe?.();env.onShadowDecision=null;await evaluation?.close();},
+      persist:async()=>{if(checkpoint){try{await heartbeat(normalHandoff?'handoff':'stopped');}finally{await save({checkpointOnly:true});}}},
+      close:async()=>checkpoint?.close()});}finally{
+    process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);clearInterval(evaluationTimer);
     clearInterval(leaseTimer);await renewing;delete env.assertCollectorLease;delete env.collectorLeaseOwner;env.DB=remote;await remote.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key='collector_lease' AND value=?").bind(now(),lease||'').run();
     }
   }

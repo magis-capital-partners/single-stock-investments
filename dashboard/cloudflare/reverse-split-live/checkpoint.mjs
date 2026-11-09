@@ -38,16 +38,17 @@ export async function openCheckpoint(env){
     if(!publicationTask)publicationTask=(async()=>{while(latestSnapshot){const current=latestSnapshot;latestSnapshot=null;await publishSnapshot(current);}})().catch(e=>{env.publicationHealth={status:'retry_pending',error:e.message};console.error(JSON.stringify({event:'snapshot_publication_retry',error:e.message}));}).finally(()=>{publicationTask=null;});
   }
   return {
-    async save({publicationMode='d1',backgroundViews=false}={}){
+    async save({publicationMode='d1',backgroundViews=false,checkpointOnly=false}={}){
+      if(checkpointOnly&&publicationMode!=='r2')throw new Error('Checkpoint-only handoff requires private R2 publication');
       for(const p of env.pending.splice(0))await env.DB.prepare("UPDATE rs_jobs SET state='pending',token=NULL WHERE id=? AND token=? AND state='queued'").bind(p.id,p.token).run();
       const at=new Date().toISOString(),jobs=db.prepare('SELECT state,count(*) AS count,min(created_at) AS oldest FROM rs_jobs GROUP BY state').all();
       db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_job_counts',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(JSON.stringify(jobs),at);
       if(publicationMode==='r2'){
         // Capture without yielding: every displayed fill belongs to these exact durable bytes.
-        const snapshot=captureReadSnapshot(db),slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
+        const snapshot=checkpointOnly?null:captureReadSnapshot(db),slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
         await env.EVIDENCE.put(`collector-state/slot${slot}.sqlite`,bytes,{httpMetadata:{contentType:'application/vnd.sqlite3'}});
         await commitPointer(next,at);
-        if(backgroundViews)queueSnapshot(snapshot);else await publishSnapshot(snapshot);
+        if(snapshot){if(backgroundViews)queueSnapshot(snapshot);else await publishSnapshot(snapshot);}
         return next;
       }
       const publications=[];
