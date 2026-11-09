@@ -231,7 +231,7 @@ def _inline_parts(text, dictionary_size):
         position = closing + 1
 
 
-def _pack_inline(envelope):
+def _phrase_candidates(envelope, limit):
     # Learn exact word spans, not summaries or replacements of financial facts.
     # Fixed-width/source-boundary chunks miss short repeated legal phrases when
     # each occurrence is surrounded by different words. Limit the vocabulary,
@@ -253,7 +253,11 @@ def _pack_inline(envelope):
             counts.update(''.join(words[i:i + size]) for i in range(len(words) - size + 1))
     ranked = sorted(((len(s) * (n - 1) - 6 * n - 4, s)
                      for s, n in counts.items() if n >= 2 and len(s) > 6), reverse=True)
-    phrases = [text for saving, text in ranked if saving > 8][:4096]
+    return [text for saving, text in ranked if saving > 8][:limit]
+
+
+def _pack_inline(envelope, *, phrases=None, shortest=False):
+    phrases = _phrase_candidates(envelope, 4096) if phrases is None else phrases
     if not phrases:
         return None
     indices, trie = {s: i for i, s in enumerate(phrases)}, {}
@@ -267,6 +271,30 @@ def _pack_inline(envelope):
         if len(text) <= 128:
             return text
         words, parts, position = re.findall(r'\S+\s*|\s+', text), [], 0
+        if shortest:
+            size = len(words)
+            costs, choices = [0] * (size + 1), [None] * size
+            for position in range(size - 1, -1, -1):
+                literal = words[position].replace('«', '««')
+                best_cost = len(encoded(literal)) - 2 + costs[position + 1]
+                best = (position + 1, literal)
+                node = trie
+                for i in range(position, min(position + 8, size)):
+                    node = node.get(words[i])
+                    if node is None:
+                        break
+                    if None in node:
+                        ref = '«' + str(indices[node[None]]) + '»'
+                        cost = len(ref) + costs[i + 1]
+                        if cost < best_cost:
+                            best_cost, best = cost, (i + 1, ref)
+                costs[position], choices[position] = best_cost, best
+            position = 0
+            while position < size:
+                position, part = choices[position]
+                parts.append(part)
+            candidate = {'$inline': ''.join(parts)}
+            return candidate if len(encoded(candidate)) < len(encoded(text)) else text
         while position < len(words):
             node, best, end = trie, None, position
             for i in range(position, min(position + 8, len(words))):
@@ -352,15 +380,171 @@ def _unpack_inline(envelope):
     return unpack(original)
 
 
+GROUPED_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_'
+GROUPED_MARKERS = '~^|%'
+# This is an optional encoding-search threshold, never a model admission limit.
+GROUPED_MIN_CHARACTERS = 800_000
+GROUPED_INSTRUCTIONS = ('The payload uses underwriting-transport/4 LOSSLESS storage, not a summary. '
+    'First restore inline objects in payload and string_dictionary: an object containing only $inline '
+    'stores full text. A doubled phrase_markers character is one literal marker. Otherwise a marker '
+    'followed by exactly two symbols XY references the literal phrase_dictionary at 4096 times the '
+    'zero-based marker position plus 64 times index(X) plus index(Y), using alphabet ' + GROUPED_ALPHABET + '. '
+    'Concatenate exactly; never recursively decode a phrase entry. An object containing only '
+    '$literal_object stores original literal keys and values as ordered [key,value] pairs; restore '
+    'each value, then the object. After this first pass, decode recursively: a string exactly @<digits> '
+    'references string_dictionary; a literal string beginning @@ loses exactly one leading @. '
+    'String dictionary entries and schema keys are literal in this second pass. An object containing '
+    'only $o has [schema_index,values], zipped with object_schemas[schema_index]; an object containing '
+    'only $text concatenates its strings or references EXACTLY in order. All original source characters, '
+    'observation order, missing/null distinctions, types, IDs, units, facts, quotations and hashes are '
+    'preserved. Use original evidence IDs in responses, never transport indexes.\n')
+
+
+def _grouped_parts(text, markers, dictionary_size):
+    require(isinstance(text, str), 'Invalid grouped inline source text')
+    position, literal = 0, []
+    while position < len(text):
+        char = text[position]
+        if char not in markers:
+            literal.append(char)
+            position += 1
+            continue
+        require(position + 1 < len(text), 'Incomplete grouped inline reference')
+        if text[position + 1] == char:
+            literal.append(char)
+            position += 2
+            continue
+        require(position + 2 < len(text), 'Incomplete grouped inline reference')
+        high, low = GROUPED_ALPHABET.find(text[position + 1]), GROUPED_ALPHABET.find(text[position + 2])
+        index = markers.index(char) * 4096 + high * 64 + low
+        require(high >= 0 and low >= 0 and index < dictionary_size, 'Invalid grouped inline reference')
+        if literal:
+            yield ''.join(literal)
+            literal = []
+        yield index
+        position += 3
+    if literal:
+        yield ''.join(literal)
+
+
+def _group_inline(envelope):
+    phrases = envelope['phrase_dictionary']
+    require(0 < len(phrases) <= 16384, 'Invalid grouped dictionary capacity')
+    markers = GROUPED_MARKERS[:(len(phrases) + 4095) // 4096]
+    def convert(value):
+        if isinstance(value, dict):
+            if set(value) == {'$inline'}:
+                parts = []
+                for part in _inline_parts(value['$inline'], len(phrases)):
+                    if type(part) is int:
+                        parts.append(markers[part // 4096] + GROUPED_ALPHABET[(part % 4096) // 64]
+                                     + GROUPED_ALPHABET[part % 64])
+                    else:
+                        for marker in markers:
+                            part = part.replace(marker, marker * 2)
+                        parts.append(part)
+                return {'$inline': ''.join(parts)}
+            return {k: convert(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [convert(v) for v in value]
+        return value
+    result = {**envelope, 'schema_version': 'underwriting-transport/4', 'phrase_markers': markers,
+              'payload': convert(envelope['payload']), 'string_dictionary': convert(envelope['string_dictionary'])}
+    require(unpack(result) == unpack(envelope), 'Grouped transport failed lossless verification')
+    return result
+
+
+def _unpack_grouped(envelope):
+    phrases = envelope.get('phrase_dictionary')
+    require(isinstance(phrases, list) and 0 < len(phrases) <= 16384
+            and all(isinstance(s, str) for s in phrases), 'Invalid grouped dictionary')
+    markers = envelope.get('phrase_markers')
+    require(markers == GROUPED_MARKERS[:(len(phrases) + 4095) // 4096], 'Invalid grouped marker alphabet')
+    def restore(value):
+        if isinstance(value, dict):
+            if set(value) == {'$inline'}:
+                return {'$inline': ''.join('«' + str(p) + '»' if type(p) is int else p.replace('«', '««')
+                    for p in _grouped_parts(value['$inline'], markers, len(phrases)))}
+            return {k: restore(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [restore(v) for v in value]
+        return value
+    original = {**envelope, 'schema_version': 'underwriting-transport/3',
+                'payload': restore(envelope['payload']), 'string_dictionary': restore(envelope['string_dictionary'])}
+    original.pop('phrase_markers')
+    return _unpack_inline(original)
+
+
+def _prune_inline(envelope):
+    phrases, used = envelope['phrase_dictionary'], Counter()
+    def count(value):
+        if isinstance(value, dict):
+            if set(value) == {'$inline'}:
+                used.update(p for p in _inline_parts(value['$inline'], len(phrases)) if type(p) is int)
+            else:
+                for v in value.values():
+                    count(v)
+        elif isinstance(value, list):
+            for v in value:
+                count(v)
+    count(envelope['payload'])
+    count(envelope['string_dictionary'])
+    remove = {i for i, n in used.items() if n * ((len(encoded(phrases[i].replace('«', '««'))) - 2)
+              - (len(str(i)) + 2)) <= len(encoded(phrases[i])) + 1}
+    order = [i for i in range(len(phrases)) if i not in remove]
+    mapping = {old: new for new, old in enumerate(order)}
+    def rebuild(value):
+        if isinstance(value, dict):
+            if set(value) == {'$inline'}:
+                return {'$inline': ''.join(('«' + str(mapping[p]) + '»' if p not in remove
+                    else phrases[p].replace('«', '««')) if type(p) is int else p.replace('«', '««')
+                    for p in _inline_parts(value['$inline'], len(phrases)))}
+            return {k: rebuild(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [rebuild(v) for v in value]
+        return value
+    result = {**envelope, 'payload': rebuild(envelope['payload']),
+              'string_dictionary': rebuild(envelope['string_dictionary']),
+              'phrase_dictionary': [phrases[i] for i in order]}
+    require(unpack(result) == unpack(envelope), 'Phrase pruning changed source evidence')
+    return result, {phrases[i] for i in remove}
+
+
+def _pack_grouped(dense):
+    pool, candidates = _phrase_candidates(dense, 16384), []
+    for _ in range(8):
+        candidate = _pack_inline(dense, phrases=pool, shortest=True)
+        if not candidate:
+            break
+        pruned, remove = _prune_inline(candidate)
+        if pruned['phrase_dictionary']:
+            candidates.append(_group_inline(pruned))
+        if not remove:
+            break
+        pool = [phrase for phrase in pool if phrase not in remove]
+    return min(candidates, key=lambda e: len(encoded(e))) if candidates else None
+
+
 def _complete_layouts(payload):
     # Compare complete encodings: the smallest dense intermediate can split
     # passages so the later inline pass cannot share them. Keep all four
     # existing layouts until their exact-text inline sharing is finished.
+    smallest = len(encoded(payload))
+    last_dense = None
     for dense in _dense_layouts(payload):
+        last_dense = dense
+        smallest = min(smallest, len(encoded(dense)))
         yield DENSE_INSTRUCTIONS, dense
         inline = _pack_inline(dense)
         if inline:
+            smallest = min(smallest, len(encoded(inline)))
             yield INLINE_INSTRUCTIONS, inline
+    if smallest >= GROUPED_MIN_CHARACTERS:
+        # One additional bounded search on the final content/8 layout. Retain
+        # every existing complete encoding and choose only by final length.
+        grouped = _pack_grouped(last_dense)
+        if grouped:
+            yield GROUPED_INSTRUCTIONS, grouped
 
 
 def pack(payload):
@@ -371,6 +555,7 @@ def pack(payload):
 def unpack(envelope):
     if envelope.get('schema_version') == 'underwriting-transport/1': return _unpack_legacy(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/3': return _unpack_inline(envelope)
+    if envelope.get('schema_version') == 'underwriting-transport/4': return _unpack_grouped(envelope)
     require(envelope.get('schema_version') == 'underwriting-transport/2', 'Unknown prompt transport')
     strings, schemas = envelope['string_dictionary'], envelope['object_schemas']
     require(isinstance(strings,list) and all(isinstance(s,str) for s in strings), 'Invalid string dictionary')
