@@ -446,3 +446,170 @@ def test_heal_activist_runs_only_the_activist_job():
     assert "workflow_dispatch" not in triggers
     decide = _run(_job("decide"))
     assert '"dispatch:heal-activist") activist=true ;;' in decide
+
+
+WORLD_MODEL_VAULT_EXTRAS = [
+    "/dashboard-private/commodity-inputs/",
+    "/valuation-underwriting/packets/",
+    "/superinvestor-letters/letters_index.json",
+]
+
+
+def test_world_model_frees_disk_and_checks_out_its_own_profile():
+    """Run 42521686232 checked out the full tree, then ran out of disk
+    cloning the whole vault."""
+    job = _job("world-model")
+    steps = _steps(job)
+    text = _run(job)
+    assert "free-disk-space" in steps[0]["uses"]
+    assert "actions/checkout" in steps[1]["uses"]
+    assert "ci_checkout_workspace.sh full" not in text
+    assert "ci_checkout_workspace.sh world-model" in text
+    assert job["timeout-minutes"] == 45
+    assert job["env"]["DASHBOARD_PRESERVE_DOCUMENT_REGISTRY"] == "1"
+    assert job["env"]["DASHBOARD_PRESERVE_INFRA_ALWAYS"] == "1"
+
+    vault = _vault_steps(job)
+    assert len(vault) == 1
+    rebuild = next(step for step in steps if str(step.get("uses") or "").endswith("rebuild-data"))
+    assert rebuild["with"]["profile"] == "world-model-weekly"
+    for chosen, extras in (
+        (vault[0]["with"]["publication-only"], vault[0]["with"]["extra-paths"]),
+        (rebuild["with"]["vault-publication-only"], rebuild["with"]["vault-extra-paths"]),
+    ):
+        assert chosen == "true"
+        assert extras.split() == WORLD_MODEL_VAULT_EXTRAS
+    commit = [step for step in steps if str(step.get("uses") or "").endswith("commit-main")]
+    assert len(commit) == 1
+    assert "git_add" not in (commit[0].get("with") or {})
+
+
+def test_world_model_arm_seeds_what_the_path_script_reads():
+    shell = (ROOT / "_system/scripts/ci_checkout_workspace.sh").read_text(encoding="utf-8")
+    arm = re.search(r"(?ms)^  world-model\)\n(.*?\n    ;;\n)", shell)
+    assert arm, "ci_checkout_workspace.sh has no world-model profile"
+    body = arm.group(1)
+    apply = body.index("apply_sparse_paths listed")
+    for seed in (
+        "/_system/scripts/ci_sparse_checkout_paths.py",
+        "/_system/data/desk_briefs/",
+        "'/*/research/valuation.json'",
+    ):
+        assert body.index(seed) < apply, seed
+
+
+def test_world_model_paths_hold_the_profile_inputs_and_no_filing_archive():
+    paths = paths_for_profile("world-model")
+    for required in (
+        "/*",
+        "/*/*",
+        "/*/research/**",
+        "/_system/**",
+        "/dashboard/**",
+        "/.github/**",
+        "/_system/reference/activist-reports/short_scorecard/**",
+        "/*/investor-documents/DOWNLOAD_MANIFEST.json",
+        "/*/investor-documents/TRANSCRIPT_MANIFEST.json",
+        "/*/third-party-analyses/source_inventory.json",
+        "/*/third-party-analyses/activist_reports_index.json",
+        "/AGENT_INDEX.md",
+    ):
+        assert required in paths, required
+    # Last match wins: the scorecard comes back after the activist PDFs go.
+    assert paths.index("!/_system/reference/activist-reports/**") < paths.index(
+        "/_system/reference/activist-reports/short_scorecard/**"
+    )
+    assert "/*/investor-documents/**" not in paths
+    assert "/*/third-party-analyses/**" not in paths
+
+    import ci_sparse_checkout_paths
+
+    cited = set(ci_sparse_checkout_paths.calculation_proof_sources(ci_sparse_checkout_paths.tracked_files()))
+    for path in paths:
+        if path.startswith("/") and "/investor-documents/" in path and "*" not in path:
+            assert path.lstrip("/") in cited, path
+
+
+def test_world_model_patterns_check_out_cited_proofs_and_skip_filings(tmp_path: Path):
+    import ci_sparse_checkout_paths
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    subprocess.run(["git", "-C", str(origin), "init", "-q", "-b", "main"], check=True)
+    subprocess.run(["git", "-C", str(origin), "config", "user.email", "t@example.com"], check=True)
+    subprocess.run(["git", "-C", str(origin), "config", "user.name", "t"], check=True)
+    proof = {"calculation_proof": {
+        "inputs": [{"id": "rev", "source": {"ref": "AAA/investor-documents/sec-edgar/10-K.htm"}}],
+        "assumptions": [{"id": "g", "source": {"ref": "https://example.com/x"}}],
+    }}
+    files = {
+        "AGENT_INDEX.md": "index\n",
+        "AAA/README.md": "readme\n",
+        "AAA/research/valuation.json": json.dumps({"base": proof}),
+        "AAA/investor-documents/sec-edgar/10-K.htm": "cited",
+        "AAA/investor-documents/sec-edgar/10-Q.htm": "not cited",
+        "AAA/investor-documents/DOWNLOAD_MANIFEST.json": "{}\n",
+        "AAA/third-party-analyses/source_inventory.json": "{}\n",
+        "AAA/third-party-analyses/reports/note.pdf": "pdf",
+        "_system/reference/activist-reports/short_scorecard/Fugazi_Research.csv": "csv\n",
+        "_system/reference/activist-reports/fund/report.pdf": "pdf",
+        "_system/__init__.py": "",
+        "_system/scripts/x.py": "\n",
+        "dashboard/data/tickers/AAA.json": "{}\n",
+        "ONLYSUB/sub/file.txt": "kept so the folder is listed\n",
+    }
+    for relative, content in files.items():
+        path = origin / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+    subprocess.run(["git", "-C", str(origin), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(origin), "commit", "-q", "-m", "fixture"], check=True)
+    with mock.patch.object(ci_sparse_checkout_paths, "ROOT", origin), \
+            mock.patch.object(ci_sparse_checkout_paths, "DESK_BRIEFS_DIR", origin / "_system/data/desk_briefs"):
+        patterns = ci_sparse_checkout_paths.world_model_paths()
+    assert "/AAA/investor-documents/sec-edgar/10-K.htm" in patterns
+
+    work = tmp_path / "work"
+    subprocess.run(["git", "clone", "-q", "--no-checkout", str(origin), str(work)], check=True)
+    subprocess.run(["git", "-C", str(work), "sparse-checkout", "init", "--no-cone"], check=True)
+    subprocess.run(
+        ["git", "-C", str(work), "sparse-checkout", "set", "--stdin"],
+        input="\n".join([".github", *patterns]) + "\n",
+        text=True,
+        check=True,
+    )
+    subprocess.run(["git", "-C", str(work), "checkout", "-q", "main"], check=True)
+    present = {
+        rel for rel in files
+        if (work / rel).is_file()
+    }
+    assert present == {
+        "AGENT_INDEX.md",
+        "AAA/README.md",
+        "AAA/research/valuation.json",
+        "AAA/investor-documents/sec-edgar/10-K.htm",
+        "AAA/investor-documents/DOWNLOAD_MANIFEST.json",
+        "AAA/third-party-analyses/source_inventory.json",
+        "_system/reference/activist-reports/short_scorecard/Fugazi_Research.csv",
+        "_system/__init__.py",
+        "_system/scripts/x.py",
+        "dashboard/data/tickers/AAA.json",
+        "ONLYSUB/sub/file.txt",
+    }
+
+
+def test_world_model_rebuild_installs_the_base_requirements():
+    """build_reverse_splits_dashboard.py, which runs before
+    build_dashboard_data in this profile, imports numpy."""
+    action = yaml.safe_load((ROOT / ".github/actions/rebuild-data/action.yml").read_text(encoding="utf-8"))
+    base = next(step for step in action["runs"]["steps"] if step.get("name") == "Install base dependencies")
+    assert "inputs.profile == 'world-model-weekly'" in base["if"]
+    assert "requirements.txt" in base["run"]
+    requirements = (ROOT / "_system/scripts/requirements.txt").read_text(encoding="utf-8").lower()
+    assert "numpy" in requirements
+    steps = ci_rebuild_profile.expand_steps(ci_rebuild_profile.PROFILES["world-model-weekly"])
+    scripts = [step[0] for step in steps]
+    assert "_system/scripts/build_reverse_splits_dashboard.py" in scripts
+    assert scripts.index("_system/scripts/build_reverse_splits_dashboard.py") < scripts.index(
+        "_system/scripts/build_dashboard_data.py"
+    )

@@ -47,7 +47,8 @@ SPARSE_DISABLED = {"full", "history"}
 TREE_WALKING_BUILDERS = ("build_dashboard_data.py",)
 
 CHECKOUT = re.compile(r"ci_checkout_workspace\.sh\s+([a-z-]+)")
-TICKER_RESEARCH = re.compile(r"^[A-Za-z0-9.\-]+/research")
+# Listed profiles name every ticker with one anchored "/*/research/**" pattern.
+TICKER_RESEARCH = re.compile(r"^/?([A-Za-z0-9.\-]+|\*)/research")
 
 
 @lru_cache(maxsize=None)
@@ -129,6 +130,9 @@ def test_the_profiles_this_test_reasons_about_still_behave_as_assumed():
     assert provides_ticker_trees("marvin-pick"), (
         "`marvin-pick` used to ship 1,666 ticker research paths; if that stopped, "
         "ls-algo-universe.yml is now broken the same way darwin was"
+    )
+    assert provides_ticker_trees("world-model"), (
+        "`world-model` ends in build_dashboard_data and must keep every research tree"
     )
     assert not provides_ticker_trees("pages"), (
         "`pages` used to be ticker-less; if it now ships tickers this test has "
