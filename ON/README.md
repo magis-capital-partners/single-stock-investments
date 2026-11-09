@@ -1,10 +1,11 @@
-# ON Semiconductor (ON)
+# ON SEMICONDUCTOR CORP  (ON)  (CIK 0001097864) contingent / CVR candidate (ON)
 
-**Ticker:** ON | **Market:** US
-**Last updated:** 2026-07-10
+**Ticker:** ON | **Market:** US  
+**Last updated:** 2026-11-09  
+**Stage:** pre-close stub (discovery)
 
-## Download
+## Next actions
 
-```powershell
-python ON/investor-documents/download_on_investor_docs.py
-```
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.
