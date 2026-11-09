@@ -1,6 +1,11 @@
 // Bounded discovery from public publisher archives. Partial search never closes a gap.
 import {plain} from './core.mjs';
 import {publisherInventory} from './publisher-inventory.mjs';
+export async function schedulePublisherRecovery(env,enqueue,at=Date.now()){
+ if(!await env.DB.prepare("SELECT id FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id NOT LIKE 'sec-%' LIMIT 1").first())return false;
+ // New disclosures and urgent screening retain precedence; bulk history cannot starve coverage repair.
+ await enqueue('publisher_recovery',{},9,'publisher-recovery:v3:'+Math.floor(at/60000));return true;
+}
 export function publisherArchiveURL(source,page,day){
  if(!Number.isInteger(page)||page<1||page>120||!/^\d{4}-\d{2}-\d{2}$/.test(day))throw new Error('Invalid bounded archive request');
  if(source==='prnewswire')return `https://www.prnewswire.com/news-releases/news-releases-list/?page=${page}&pagesize=100`;

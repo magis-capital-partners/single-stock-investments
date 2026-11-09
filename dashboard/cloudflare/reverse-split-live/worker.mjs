@@ -5,7 +5,7 @@ import {readSnapshotAPI} from './read-snapshot.mjs';
 import {preparedAPI} from './prepared-universe.mjs';
 import {loadFilingDocuments} from './filing-documents.mjs';
 import {parseDailyIndex,recoverReaderFailures} from './source-recovery.mjs';
-import {recoverPublisherGaps} from './publisher-recovery.mjs';
+import {recoverPublisherGaps,schedulePublisherRecovery} from './publisher-recovery.mjs';
 import {historySearchURL,historySearchPage,recoverHistorySearch,queueHistorySearch,HISTORY_SEARCH_VERSION} from './history-search.mjs';
 
 const stamp=()=>new Date().toISOString(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -259,7 +259,7 @@ export async function scheduled(event,env){
   const results=await Promise.allSettled(selected.map(source=>poll({...env,deadline:env.FAST_MONITOR?Date.now()+12000:env.deadline},source)));for(const result of results)if(result.status==='rejected')throw result.reason;
   if(financialDue)await state(env,'financial_poll_at',Date.now());
   if(await state(env,'daily_rescore')!==etDay(Date.now())){for(const e of (await env.DB.prepare("SELECT id FROM rs_events WHERE first_seen_at>=? AND result IN ('passes_screen','needs_review') ORDER BY first_seen_at DESC LIMIT 300").bind(new Date(Date.now()-30*DAY).toISOString()).all()).results)await enqueue(env,'rescore',{id:e.id},6,'daily-rescore:'+etDay(Date.now())+':'+e.id);await state(env,'daily_rescore',etDay(Date.now()));}
-  if(env.COLLECTOR_MODE==='external_collector')await enqueue(env,'publisher_recovery',{},1,'publisher-recovery:v2:'+Math.floor(Date.now()/60000));
+  if(env.COLLECTOR_MODE==='external_collector')await schedulePublisherRecovery(env,(k,p,priority,id)=>enqueue(env,k,p,priority,id));
   if(event.cron==='17 8 * * *')await enqueue(env,'reconcile',{day:etDay(Date.now())},1,'daily-reconcile:'+etDay(Date.now()));
   if(!env.DEFER_DISPATCH)await dispatch(env);await state(env,'last_completed_tick',stamp());
 }
