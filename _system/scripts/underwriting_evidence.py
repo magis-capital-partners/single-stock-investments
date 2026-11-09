@@ -141,10 +141,15 @@ def requested_keywords(gaps, *, history=None):
         sections = ['section '+n for group in section_lists for n in re.findall(number, group)]
         schedules = ['schedule '+n for n in re.findall(
             r'\bSchedules?\s+(\d{1,3}(?:\.\d{1,3})?)\b(?!\.\d|\s*%)', detail, re.I)]
-        terms = requested_instruments([gap])+notes+sections+schedules+terms
-        groups.append(list(dict.fromkeys(terms))[:12])
+        exhibit_lists = re.findall(r'\bExhibits?\s+('+number
+            +r'(?:(?:\s*[/,]\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)'+number+r')*)', detail, re.I)
+        exhibits = ['exhibit '+value for group in exhibit_lists for value in re.findall(number, group)]
+        closing = [' '.join(m.lower().split()) for m in re.findall(
+            r'\bclosing\s+(?:financing|consents?|payoff|termination)\b', detail, re.I)]
+        terms = requested_instruments([gap])+notes+sections+schedules+exhibits+closing+terms
+        groups.append(list(dict.fromkeys(terms))[:18])
     terms = []
-    for index in range(12):
+    for index in range(18):
         for group in groups:
             if index < len(group) and group[index] not in terms:
                 terms.append(group[index])
@@ -935,7 +940,8 @@ def evidence_readiness(packet, *, require_documents=False):
             gaps.append({'code': 'foreign_primary_financial_period_unresolved',
                          'detail': 'Current foreign source needs financial tables and a verified reporting period: '
                                    + str(error.get('source_url') or '')})
-        if error.get('source') in ('requested_primary_reference', 'requested_primary_disclosure'):
+        if error.get('source') in ('requested_primary_reference', 'requested_primary_disclosure',
+                                   'requested_financing_discovery', 'requested_financing_source_budget'):
             gaps.append({'code': 'requested_primary_document_unavailable',
                          'detail': 'Retry requested primary disclosure: '+str(error.get('source_url') or '')})
     day = date.fromisoformat(packet['as_of'])
