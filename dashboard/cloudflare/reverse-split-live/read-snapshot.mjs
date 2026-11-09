@@ -14,6 +14,7 @@ export async function readSnapshotAPI(url,env){
     const object=await env.EVIDENCE.get(entry.key);if(!object)return json({error:'Archived validation data unavailable'},404);
     return new Response(object.body||await object.arrayBuffer(),{headers:{'content-type':'application/json','content-disposition':`attachment; filename="${id}.json"`,'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
   }
+  if(path==='/shadow/operations'){const object=await env.EVIDENCE.get('collector-dashboard/operations.json');if(!object)return json({error:'Detailed readiness snapshot is not yet published'},503);return new Response(object.body||await object.arrayBuffer(),{headers:{'content-type':'application/json','cache-control':'no-store, private','x-content-type-options':'nosniff'}});}
   if(staticPaths[path]){const data=await read(env,staticPaths[path]);if(!data)return json({error:'Committed snapshot is not yet available'},503);if(path==='/shadow'){const runtime=await read(env,'runtime.json');if(runtime)data.runtime=runtime;const r=data.runtime,fresh=r?.heartbeat_at&&Date.now()-Date.parse(r.heartbeat_at)<180000;data.status=!fresh?'stale':r.status==='running'?(r.market_data?.quote_access==='received'?'tracking':'tracking_signals'):r.status;}return json(data);}
   if(path==='/events'){
     let before;try{before=cursor(url.searchParams.get('before'),['9999','']);}catch{return json({error:'Invalid event cursor'},400);}
