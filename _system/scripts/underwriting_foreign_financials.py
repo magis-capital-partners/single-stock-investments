@@ -11,7 +11,7 @@ import re
 from contextvars import ContextVar
 from datetime import date
 from functools import wraps
-from urllib.parse import urlparse
+from urllib.parse import urldefrag, urlparse
 
 _COLLECTION_BUDGET = ContextVar('primary_reference_collection_budget', default=None)
 
@@ -135,11 +135,13 @@ def _current_covers(submissions, cik, as_of):
     return current + ([formal] if formal else [])
 
 
-def _role(title):
+def _role(title, *, allow_report=False):
     if re.search(r'\b(?:consolidated\s+)?financial\s+statements?\b', title, re.I):
         return 'financial_statements'
     if re.search(r"\bmanagement(?:['’]s)?\s+discussion\s+(?:and|&)\s+analysis\b", title, re.I):
         return 'management_discussion'
+    if allow_report and re.search(r'\b(?:interim|quarterly|annual)\s+(?:financial\s+)?report\b', title, re.I):
+        return 'financial_report'
     return None
 
 
@@ -147,7 +149,7 @@ def _reference_period(title):
     """Read a literal financial-title end date, never its filing/event date."""
     from valuation_earnings import reporting_period
     period = reporting_period(re.sub(r'\byears(?=\s+ended\b)', 'year', title, flags=re.I), '9999-12-31')
-    if period or not _role(title):
+    if period or not _role(title, allow_report=True):
         return period
     months = {name.lower(): i for i, name in enumerate(calendar.month_name) if name}
     months.update({name.lower(): i for i, name in enumerate(calendar.month_abbr) if name})
@@ -206,6 +208,8 @@ def _financial_links(raw, parent, cik):
         if not role:
             continue
         url = archive_url(match[1], parent['source_url'], cik)
+        if url == urldefrag(parent['source_url'])[0]:
+            continue  # A report's own financial contents links are not attachments.
         if (not url or urlparse(url).path.rsplit('/', 1)[0] !=
                 urlparse(parent['source_url']).path.rsplit('/', 1)[0]
                 or urlparse(match[1]).fragment):
@@ -214,6 +218,79 @@ def _financial_links(raw, parent, cik):
             continue
         result[url] = {'source_url': url, 'reference_text': title, 'financial_role': role,
                        'parent_metadata': parent}
+    return list(result.values())
+
+
+def _declared_financial_exhibits(raw):
+    """Explicit cover descriptions, not exhibit numbers or event metadata."""
+    from underwriting_evidence import primary_text, text_of
+    body = text_of(primary_text(raw))
+    marks = list(re.finditer(r'\bExhibit\s+(\d{1,3}\.\d{1,3})\b', body, re.I))
+    declared = {}
+    for i, match in enumerate(marks):
+        title = body[match.end():marks[i+1].start() if i+1 < len(marks) else len(body)]
+        title = re.split(r'\bSIGNATURES?\b|\bINDEX OF EXHIBITS\b', title, maxsplit=1, flags=re.I)[0].strip()
+        if len(title) > 1800 or re.search(r'\b(?:news|press)\s+release\b|\bdividend\b', title, re.I):
+            continue
+        role = _role(title, allow_report=True)
+        if role is None or not _reference_period(title):
+            continue
+        number = match[1]
+        value = {'reference_text': title, 'financial_role': role}
+        if number in declared and declared[number] != value:
+            raise ValueError('Conflicting explicit cover financial exhibit descriptions')
+        declared[number] = value
+    return declared
+
+
+def _indexed_financial_links(raw, parent, cik, issuer, declared):
+    """Join a cover's named exhibit to its exact official filing-index member."""
+    from underwriting_evidence import primary_text, text_of
+    from underwriting_primary_references import archive_url
+    if len(raw) > 20_000_000:
+        raise ValueError('Foreign filing index exceeds the existing source size bound')
+    source = primary_text(raw)
+    body = text_of(source)
+    ciks = {str(int(c)) for c in re.findall(r'\bCIK\s*:?\s*(\d+)\b', body, re.I)}
+    accessions = set(re.findall(r'\bSEC Accession No\.\s*(\d{10}-\d{2}-\d{6})\b', body, re.I))
+    forms = set(re.findall(r'\bForm\s+(6-K(?:/A)?)\b', body, re.I))
+    filed = re.findall(r'\bFiling Date\s+(\d{4}-\d{2}-\d{2})\b', body, re.I)
+    if (ciks != {str(int(cik))} or issuer not in _issuer_text(body)
+            or accessions != {parent['accession']} or forms != {parent['form']}
+            or filed != [parent['filed']]):
+        raise ValueError('Official financial filing index must match cover issuer, accession, form and filing date')
+    index_url = parent['source_url'].rsplit('/', 1)[0]+'/'+parent['accession']+'-index.html'
+    def member_url(cell):
+        links = re.findall(r'\bhref\s*=\s*["\']([^"\']+)["\']', cell, re.I)
+        urls = {archive_url(link, index_url, cik) for link in links}
+        if len(urls) != 1 or None in urls or any(urlparse(link).fragment for link in links):
+            raise ValueError('Explicit financial index member has an unsafe or ambiguous source path')
+        url = next(iter(urls))
+        if (urlparse(url).path.rsplit('/', 1)[0] != urlparse(index_url).path.rsplit('/', 1)[0]
+                or text_of(cell) != url.rsplit('/', 1)[1]):
+            raise ValueError('Explicit financial index member must keep its exact same-filing filename')
+        return url
+    result, primary = {}, []
+    for row in re.findall(r'<tr\b[^>]*>(.*?)</tr>', source, re.I | re.S):
+        cells = re.findall(r'<td\b[^>]*>(.*?)</td>', row, re.I | re.S)
+        if len(cells) != 5:
+            continue
+        kind = text_of(cells[3]).upper()
+        if kind == parent['form']:
+            primary.append(member_url(cells[2]))
+            continue
+        if not kind.startswith('EX-') or kind[3:] not in declared:
+            continue
+        number, url = kind[3:], member_url(cells[2])
+        if number in result:
+            raise ValueError('Explicit financial index exhibit type must be unique')
+        result[number] = {'source_url': url, **declared[number], 'parent_metadata': parent,
+            'referenced_by': {'source_url': index_url, 'content_hash': hashlib.sha256(raw).hexdigest(),
+                              'filed': parent['filed']}}
+    selected = [r['source_url'] for r in result.values()]
+    if (primary != [parent['source_url']] or set(result) != set(declared)
+            or parent['source_url'] in selected or len(set(selected)) != len(selected)):
+        raise ValueError('Explicit financial index must bind its exact primary cover and unique exhibit members')
     return list(result.values())
 
 
@@ -229,7 +306,7 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
     budget = budget if budget is not None else source_budget()
     parents = _current_covers(submissions, cik, as_of)
     issuer = _issuer_text(submissions['name'])
-    references, covers = {}, []
+    references, covers, indexes = {}, [], []
     for parent in parents:
         raw = budget.fetch(parent['source_url'], 0, fetch)
         if len(raw) > 20_000_000:
@@ -242,9 +319,21 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
             raise ValueError('Foreign primary registration issuer CIK mismatch')
         covers.append({**parent, 'content_hash': content_hash,
                        **({'registered_securities': securities} if securities else {})})
-        for reference in _financial_links(raw, parent, cik):
-            reference['referenced_by'] = {'source_url': parent['source_url'], 'content_hash': content_hash,
-                                         'filed': parent['filed']}
+        linked = _financial_links(raw, parent, cik)
+        if not linked and parent['form'].startswith('6-K'):
+            declared = _declared_financial_exhibits(raw)
+            if declared:
+                index_url = parent['source_url'].rsplit('/', 1)[0]+'/'+parent['accession']+'-index.html'
+                index_raw = budget.fetch(index_url, 0, fetch)
+                linked = _indexed_financial_links(index_raw, parent, cik, issuer, declared)
+                indexes.append({'source_url': index_url, 'content_hash': hashlib.sha256(index_raw).hexdigest(),
+                                'accession': parent['accession'], 'filed': parent['filed']})
+                for reference in linked:
+                    reference['cover_referenced_by'] = {'source_url': parent['source_url'],
+                        'content_hash': content_hash, 'filed': parent['filed']}
+        for reference in linked:
+            reference.setdefault('referenced_by', {'source_url': parent['source_url'],
+                'content_hash': content_hash, 'filed': parent['filed']})
             references[reference['source_url']] = reference
     if len(references) > 4:
         raise ValueError('Complete financial attachments exceed the shared child reference capacity')
@@ -279,6 +368,8 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
             issuer_cik=str(int(cik)), document_kind='foreign_financial_attachment',
             financial_role=reference['financial_role'], referenced_by=reference['referenced_by'],
             reference_text=reference['reference_text'], extracted_text_sha256=hashlib.sha256(body.encode()).hexdigest())
+        if reference.get('cover_referenced_by'):
+            document['cover_referenced_by'] = reference['cover_referenced_by']
         if binding is not None:
             document['financial_statement_period_binding'] = dict(binding)
         if reference['financial_role'] == 'financial_statements':
@@ -291,5 +382,6 @@ def collect_foreign_financials(submissions, cik, as_of, fetch, *, budget=None):
     return [documents[url] for url in references], {'status': 'complete_current_financial_sources' if all(required <= r for r in roles.values())
                        else 'current_financial_sources_unresolved',
         'issuer_cik': str(int(cik)), 'covers': covers, 'roles': {k: sorted(v) for k, v in roles.items()},
+        **({'financial_indexes': indexes} if indexes else {}),
         'reference_budget': budget.snapshot(), 'economic_approval': False,
         'native_admission_verified': False, 'financial_or_share_assumptions_selected': False}
