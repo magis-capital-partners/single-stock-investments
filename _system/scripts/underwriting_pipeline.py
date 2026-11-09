@@ -395,12 +395,15 @@ def challenge_payload(packet, author, canonical):
             'deterministic_value_driver_tests': diagnostics, 'diagnostics_hash': digest(diagnostics)}
 
 
-def revision_feedback(author, challenger, error):
+def revision_feedback(author, challenger, error, *, packet=None):
     result = {'required_correction': str(error)[:2000]}
     if author:
         result['previous_contract'] = author
     if challenger:
         result['independent_challenge'] = challenger
+    if packet and author and author.get('supplemental_facts'):
+        from underwriting_evidence import supplemental_fact_diagnostics
+        result['supplemental_fact_diagnostics'] = supplemental_fact_diagnostics(packet, author['supplemental_facts'])
     return result
 
 
@@ -569,6 +572,11 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
             else:
                 payload = {'packet': packet, 'revision_feedback': feedback}
                 if (feedback or {}).get('previous_contract'):
+                    # Enrich recovered paid drafts against the current packet;
+                    # never edit the authentic draft or waive its failed checks.
+                    from underwriting_evidence import supplemental_fact_diagnostics
+                    payload['revision_feedback'] = {**feedback, 'supplemental_fact_diagnostics':
+                        supplemental_fact_diagnostics(packet, feedback['previous_contract'].get('supplemental_facts') or [])}
                     payload['revision_base_hash'] = digest(feedback['previous_contract'])
                 if baseline:
                     payload['approved_baseline'] = baseline
@@ -623,7 +631,7 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                 # A provider/build/publication failure does not revoke a valid review.
                 raise StageBlocked('approved_model_build_or_publication: '+str(exc)) from exc
             previous_feedback = progress.get('feedback') or {}
-            feedback = revision_feedback(author, challenger, exc)
+            feedback = revision_feedback(author, challenger, exc, packet=packet)
             if not author:
                 feedback = {**previous_feedback, **feedback}
             progress['feedback'] = feedback
