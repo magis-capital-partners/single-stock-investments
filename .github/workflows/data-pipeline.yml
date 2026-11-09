@@ -1218,7 +1218,27 @@ jobs:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+      # The world-model checkout has every research tree but not the filing
+      # archives. Keep the document registry and the pdf counts on the prior
+      # rows, as downloads, drive and activist do; intake-full remains the
+      # full-tree rebuild. Job-wide so a rebuild inside ci_push_main.sh after
+      # a rebase conflict sees it too.
+      DASHBOARD_PRESERVE_DOCUMENT_REGISTRY: "1"
+      DASHBOARD_PRESERVE_INFRA_ALWAYS: "1"
     steps:
+      # The full tree (~53 GiB) and then the whole vault (~19 GiB) ran the
+      # runner out of disk inside the vault checkout (run 42521686232) or past
+      # the job limit (run 41348724303). The profile reads _system, dashboard,
+      # the ticker research trees and a few root files, never the filings.
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        timeout-minutes: 8
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -1227,10 +1247,20 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full)
-        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout World Model workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh world-model
+      # Publication objects for hydration and commit-main, plus the vault
+      # inputs the rebuild reads: the commodity snapshot (prior observations
+      # and vintages, which commit-main preserves back), underwriting packets
+      # (valuation receipts) and the letter index (document labels).
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
+          extra-paths: |
+            /dashboard-private/commodity-inputs/
+            /valuation-underwriting/packets/
+            /superinvestor-letters/letters_index.json
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -1242,6 +1272,13 @@ jobs:
         with:
           profile: world-model-weekly
           validate: "false"
+          # rebuild-data clones the vault again. Without these it would take
+          # the whole vault, which is what filled the disk.
+          vault-publication-only: "true"
+          vault-extra-paths: |
+            /dashboard-private/commodity-inputs/
+            /valuation-underwriting/packets/
+            /superinvestor-letters/letters_index.json
       - name: Commit World Model artifacts
         uses: ./.github/actions/commit-main
         with:

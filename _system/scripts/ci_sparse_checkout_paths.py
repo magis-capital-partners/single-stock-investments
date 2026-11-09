@@ -11,6 +11,7 @@ Profiles:
   thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
   buyback-radar — buyback snapshots, consumer shards, and the two books it patches
   activist     — Data Pipeline activist job (downloads trees, third-party analyses, desk-brief inputs)
+  world-model  — Data Pipeline World Model weekly rebuild (research trees, _system, dashboard; no filings)
   fact_currency — Research quality currency scan (valuation models, fact ledgers, companyfacts)
   graph_invariants — Research quality graph job (every tree it reads; no filing archives)
   graph_invariants_sources — cited sources graph_build would find missing (second pass)
@@ -132,17 +133,14 @@ def _json_strings(node) -> list[str]:
     return []
 
 
-def graph_invariants_paths() -> list[str]:
-    """Everything the graph-invariants job reads, without the filing archives.
+def research_tree_skeleton(files: list[str]) -> list[str]:
+    """Every folder as on a full checkout, every research tree, no filing archives.
 
-    The job lists every top-level folder, reads every ticker's research tree,
-    all of _system, the root docs, and the P6 feeds graph_sources.json names.
-    The filing trees (investor-documents and the like, ~44 GiB) are read only
-    where a fact or belief cites one file, and graph_invariants_sources adds
-    those after this pass. Top-level files of every folder stay, so the set
-    of folders the checks iterate is the same as on a full checkout.
+    Root files, the top-level files of each folder, every */research tree,
+    _system without the activist PDFs, .github and docs. A folder holding only
+    subfolders keeps one tracked file, so a scan of the root sees the same
+    folders as on a full checkout.
     """
-    files = tracked_files()
     # Non-cone matching takes the last pattern that matches each path, and a
     # folder that matches "!/*/*/" hides its files from a bare "/_system/".
     # The "/**" forms match the files themselves.
@@ -171,6 +169,21 @@ def graph_invariants_paths() -> list[str]:
         if "/" in name and top not in has_top_file:
             keep_folder.setdefault(top, name)
     patterns.extend(anchored(name) for _, name in sorted(keep_folder.items()))
+    return patterns
+
+
+def graph_invariants_paths() -> list[str]:
+    """Everything the graph-invariants job reads, without the filing archives.
+
+    The job lists every top-level folder, reads every ticker's research tree,
+    all of _system, the root docs, and the P6 feeds graph_sources.json names.
+    The filing trees (investor-documents and the like, ~44 GiB) are read only
+    where a fact or belief cites one file, and graph_invariants_sources adds
+    those after this pass. Top-level files of every folder stay, so the set
+    of folders the checks iterate is the same as on a full checkout.
+    """
+    files = tracked_files()
+    patterns = research_tree_skeleton(files)
     # P6 feed paths and any other repo path the graph config names.
     config_path = ROOT / "_system" / "graph" / "graph_sources.json"
     try:
@@ -202,6 +215,67 @@ def graph_invariants_sources() -> list[str]:
         if node.get("type") == "Source" and node.get("status") == "missing"
     ]
     return literal_patterns(missing, set(files), tracked_dirs(files))
+
+
+def _calculation_proofs(node):
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == "calculation_proof" and isinstance(value, dict):
+                yield value
+            yield from _calculation_proofs(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from _calculation_proofs(value)
+
+
+def calculation_proof_sources(files: list[str]) -> list[str]:
+    """Every file a valuation calculation proof cites, as research valuation.json names it.
+
+    calculation_proof.py hashes ROOT/<source.ref> into each input's source_id,
+    and build_dashboard_data publishes those ids. A cited filing that is not
+    checked out would drop its content hash and change the id.
+    """
+    refs: set[str] = set()
+    for name in files:
+        if not name.endswith("/research/valuation.json"):
+            continue
+        try:
+            document = json.loads((ROOT / name).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        for proof in _calculation_proofs(document):
+            for row in [*(proof.get("inputs") or []), *(proof.get("assumptions") or [])]:
+                source = row.get("source") if isinstance(row, dict) else None
+                ref = source.get("ref") if isinstance(source, dict) else None
+                if isinstance(ref, str) and ref:
+                    refs.add(ref)
+    return sorted(refs)
+
+
+def world_model_paths() -> list[str]:
+    """Everything the world-model-weekly rebuild reads and writes, without filings.
+
+    The profile's own builders read and write _system and dashboard. The
+    build_dashboard_data pass at the end reads every research tree, the
+    top-level files of each ticker, and the per-ticker manifests and indexes
+    named below. It also walks the filing trees for pdf counts and recent
+    files; the job keeps those columns on the prior rows instead
+    (DASHBOARD_PRESERVE_INFRA_ALWAYS), as downloads, drive and activist do.
+    """
+    files = tracked_files()
+    patterns = research_tree_skeleton(files)
+    patterns += [
+        # build_short_alpha_dashboard.py reads the Fugazi scorecard.
+        "/_system/reference/activist-reports/short_scorecard/**",
+        "/dashboard/**",
+        "/*/investor-documents/DOWNLOAD_MANIFEST.json",
+        "/*/investor-documents/TRANSCRIPT_MANIFEST.json",
+        "/*/third-party-analyses/source_inventory.json",
+        "/*/third-party-analyses/activist_reports_index.json",
+    ]
+    patterns += literal_patterns(calculation_proof_sources(files), set(files), tracked_dirs(files))
+    patterns += desk_brief_inputs()
+    return patterns
 
 
 def desk_brief_inputs() -> list[str]:
@@ -371,6 +445,10 @@ def paths_for_profile(profile: str) -> list[str]:
             "/*/research/valuation_fact_ledger.json",
             "*sec_companyfacts.json",
         ]
+
+    if profile == "world-model":
+        # ci_checkout_workspace.sh passes "listed".
+        return world_model_paths()
 
     if profile == "graph_invariants":
         return graph_invariants_paths()

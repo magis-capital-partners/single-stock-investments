@@ -15,7 +15,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/ci_resolve_checkout_ref.sh"
 
-PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f|buyback-radar|downloads|drive|activist|fact_currency|graph_invariants}"
+PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f|buyback-radar|downloads|drive|activist|world-model|fact_currency|graph_invariants}"
 REF_INPUT="${2:-}"
 FETCH_DEPTH="${3:-}"
 
@@ -151,6 +151,22 @@ case "$PROFILE" in
     git sparse-checkout set \
       .github \
       _system/scripts/ci_sparse_checkout_paths.py
+    git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
+    checkout_ref
+    apply_sparse_paths listed
+    git read-tree -mu HEAD
+    ;;
+  world-model)
+    # Data Pipeline World Model weekly. The full tree (~53 GiB) and then the
+    # whole vault ran the runner out of disk (run 42521686232). The path
+    # script reads the valuation proofs and desk briefs to name the cited
+    # files, so those are seeded first.
+    git sparse-checkout init --no-cone
+    git sparse-checkout set \
+      /.github/ \
+      /_system/scripts/ci_sparse_checkout_paths.py \
+      /_system/data/desk_briefs/ \
+      '/*/research/valuation.json'
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     apply_sparse_paths listed
