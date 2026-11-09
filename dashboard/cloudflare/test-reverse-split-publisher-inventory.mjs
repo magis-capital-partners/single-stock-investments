@@ -1,0 +1,31 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,readdirSync} from 'node:fs';
+import {DatabaseSync} from 'node:sqlite';
+import {localAdapter} from './reverse-split-live/checkpoint.mjs';
+import {publisherInventory,publisherClock} from './reverse-split-live/publisher-inventory.mjs';
+import {recoverPublisherGaps,publisherArchiveURL} from './reverse-split-live/publisher-recovery.mjs';
+import {createHash} from 'node:crypto';
+const fixture=name=>readFileSync(new URL('./reverse-split-live/fixtures/'+name,import.meta.url),'utf8');
+const hash=async b=>createHash('sha256').update(b).digest('hex');
+test('real unfiltered publisher inventories include every release with Eastern clocks',()=>{
+ const pr=publisherInventory(fixture('prnewswire-inventory.html'),'prnewswire',publisherArchiveURL('prnewswire',8,'2026-11-06'));
+ assert.equal(pr.length,100);assert.equal(pr[0].published_at,'2026-11-08T12:30:00.000Z');
+ const gnw=publisherInventory(fixture('globe-inventory.html'),'globenewswire',publisherArchiveURL('globenewswire',1,'2026-11-06'));
+ assert.equal(gnw.length,50);assert.equal(gnw[0].published_at,'2026-11-06T23:08:00.000Z');assert.ok(gnw.every(r=>r.url.startsWith('https://rss.globenewswire.com/news-release/')));
+ assert.throws(()=>publisherInventory('<html><h1>Newsroom</h1></html>','globenewswire',publisherArchiveURL('globenewswire',1,'2026-11-06')),/no validated inventory/);
+ assert.throws(()=>publisherClock('12:00 ET'),/missing/);
+});
+test('publisher gaps close only after full interval inventory and all archived article jobs complete',async t=>{
+ const db=new DatabaseSync(':memory:');t.after(()=>db.close());for(const name of readdirSync(new URL('./reverse-split-live/migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./reverse-split-live/migrations/'+name,import.meta.url),'utf8'));
+ const now='2026-11-09T18:00:00Z',objects=new Map(),env={DB:localAdapter(db),EVIDENCE:{put:async(k,v)=>objects.set(k,v)}};
+ db.prepare('INSERT INTO rs_source_gaps(id,source_id,start_at,end_at,created_at) VALUES(?,?,?,?,?)').run('gap','globenewswire','2026-11-06T21:10:00Z','2026-11-06T21:20:00Z',now);
+ const row=(time,slug)=>'<li class="row"><div class="date-source"><span>November 06, 2026 '+time+' ET</span></div><div class="mainLink"><a href="/news-release/2026/11/06/'+slug+'/0/en/ordinary.html">Ordinary title</a></div></li>';
+ const html=row('16:30','3')+row('16:15','2')+row('16:00','1'),enqueue=async(kind,p,priority,id)=>{assert.equal(p.first_seen_at,now);db.prepare('INSERT OR IGNORE INTO rs_jobs(id,kind,payload,state,created_at,updated_at) VALUES(?,?,?,?,?,?)').run(id,kind,JSON.stringify(p),'pending',now,now);};
+ const options={now,hash,enqueue,fetchDocument:async()=>({bytes:new TextEncoder().encode(html),content_type:'text/html'})};
+ await recoverPublisherGaps(env,options);assert.equal(db.prepare('SELECT count(*) n FROM rs_jobs').get().n,1,'An ordinary headline must still get body analysis');
+ await recoverPublisherGaps(env,{...options,now:'2026-11-09T18:01:00Z'});assert.equal(db.prepare('SELECT resolved_at FROM rs_source_gaps').get().resolved_at,null);
+ db.prepare("UPDATE rs_jobs SET state='complete'").run();await recoverPublisherGaps(env,{...options,now:'2026-11-09T18:01:30Z'});assert.equal(db.prepare('SELECT resolved_at FROM rs_source_gaps').get().resolved_at,null,'A completed excerpt job cannot establish original article coverage');
+ const article=JSON.parse(db.prepare('SELECT payload FROM rs_jobs').get().payload);db.prepare('INSERT INTO rs_documents VALUES(?,?,?,?,?,?)').run('a'.repeat(64),article.url,'documents/'+'a'.repeat(64),now,100,'text/html');await recoverPublisherGaps(env,{...options,now:'2026-11-09T18:02:00Z'});
+ assert.equal(db.prepare('SELECT resolved_at FROM rs_source_gaps').get().resolved_at,'2026-11-09T18:02:00Z');assert.ok([...objects.keys()].some(k=>k.startsWith('review/source-recovery/')));assert.equal(db.prepare('SELECT start_at FROM rs_source_gaps').get().start_at,'2026-11-06T21:10:00Z');
+});

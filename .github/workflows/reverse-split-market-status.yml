@@ -1,0 +1,46 @@
+name: Reverse-split public market status
+on:
+  push:
+    branches: [main]
+    paths: ['dashboard/cloudflare/reverse-split-live/market-status*.mjs', '.github/workflows/reverse-split-market-status.yml']
+  repository_dispatch:
+    types: [reverse-split-status-continue]
+  schedule:
+    - cron: '11 */3 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: reverse-split-public-market-status
+  cancel-in-progress: false
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 290
+    outputs:
+      continue: ${{ steps.status.outputs.continue }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: dashboard/cloudflare/reverse-split-live
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Capture public exchange evidence without a broker connection
+        id: status
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node dashboard/cloudflare/reverse-split-live/market-status-source.mjs
+  continue:
+    needs: observe
+    if: needs.observe.result == 'success' && needs.observe.outputs.continue == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Continue the bounded public source observer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: gh api --method POST "repos/$REPOSITORY/dispatches" -f event_type=reverse-split-status-continue

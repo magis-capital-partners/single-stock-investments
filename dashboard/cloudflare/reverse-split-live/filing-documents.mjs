@@ -24,6 +24,7 @@ export function filingIndexDocuments(html,p){
   const exhibits=documents.filter(d=>!primaries.includes(d));if(exhibits.length>64)throw new Error('Filing exceeds the bounded relevant-exhibit count');return [primary,...exhibits];
 }
 export async function loadFilingDocuments(env,p,fetchDocument){
+  const maximum=env.COLLECTOR_MODE==='external_collector'?96*1024*1024:MAX,aggregate=env.COLLECTOR_MODE==='external_collector'?128*1024*1024:48*1024*1024;
   let original;
   try{original=await fetchDocument(p.url);}
   catch(e){if(!/Source exceeds document size limit/.test(e.message))throw e;}
@@ -35,8 +36,8 @@ export async function loadFilingDocuments(env,p,fetchDocument){
     const recent=sub.filings?.recent,position=recent?.accessionNumber?.indexOf(p.accession);if(!(position>=0)||!recent.primaryDocument?.[position])throw error;
     selected=filingIndexDocuments(new TextDecoder().decode(index.bytes),{...p,primaryDocument:recent.primaryDocument[position]});identityDocuments.push(metadata);
   }
-  for(const d of selected){const doc=await fetchDocument(d.url,{maximum:MAX});bytes+=doc.bytes.length;if(bytes>48*1024*1024)throw new Error('Relevant filing documents exceed aggregate size limit');documents.push({...doc,form:d.form});
-    const pdf=String.fromCharCode(...doc.bytes.slice(0,5))==='%PDF-';if(pdf){if(!env.extractAnnouncementText)throw new Error('PDF announcement text reader is not configured');try{parts.push(await env.extractAnnouncementText(doc.bytes,{maximumMs:Math.max(1,Math.min(8000,(env.deadline||Date.now()+8000)-Date.now()))}));}catch(error){await env.onDocumentIssue?.({...doc,url:d.url},error);throw error;}}else parts.push(new TextDecoder().decode(doc.bytes));
+  for(const d of selected){const doc=await fetchDocument(d.url,{maximum});bytes+=doc.bytes.length;if(bytes>aggregate)throw new Error('Relevant filing documents exceed aggregate size limit');documents.push({...doc,form:d.form});
+    const pdf=String.fromCharCode(...doc.bytes.slice(0,5))==='%PDF-';if(pdf){if(!env.extractAnnouncementText)throw new Error('PDF announcement text reader is not configured');try{parts.push(await env.extractAnnouncementText(doc.bytes,{maximumMs:Math.max(1,Math.min(8000,(env.deadline||Date.now()+8000)-Date.now())),onReview:review=>env.onDocumentReview?.({...doc,url:d.url},review)}));}catch(error){await env.onDocumentIssue?.({...doc,url:d.url},error);throw error;}}else parts.push(new TextDecoder().decode(doc.bytes));
   }
   return {documents,texts:parts,raw:parts.join('\n\n'),representation:'official_primary_report_and_exhibits',index_url:indexURL,identity_documents:identityDocuments};
 }

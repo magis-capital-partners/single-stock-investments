@@ -5,7 +5,7 @@ import {createInterface} from 'node:readline';
 import {at} from './shadow-core.mjs';
 
 export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>new Date().toISOString(),python=process.env.PYTHON||(process.platform==='win32'?'python':'python3')}={}){
-  const health={provider:'Databento Equities Mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',status:key?'not_checked':'not_configured',quote_access:'unverified',nbbo_access:'unverified',last_success:null,last_heartbeat:null,error:null,subscriptions:0};
+  const health={provider:'Databento Equities Mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',status:key?'not_checked':'not_configured',quote_access:'unverified',nbbo_access:'unverified',last_success:null,last_heartbeat:null,error:null,subscriptions:0,invalidations:0,rejected_records:0};
   const latest=new Map(),symbols=new Set(),telemetry=[],sampleWindows=new Map(),listeners=new Set();let child,closed=false,lines,dropped=0;
   function clear(status){latest.clear();health.status=status;health.quote_access=status==='not_entitled'?'not_entitled':'unavailable';}
   function accept(row){
@@ -61,6 +61,15 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
       return reference.quote(ticker);
     },
     news:()=>reference.news(),actions:(...args)=>reference.actions(...args),
+    async releaseForHandoff(){
+      const old=child;if(!old)return;
+      if(old.exitCode===null||old.exitCode===undefined)await new Promise((resolve,reject)=>{
+        let force,limit;const finish=error=>{clearTimeout(force);clearTimeout(limit);old.removeListener('close',onClose);error?reject(error):resolve();},onClose=()=>finish();old.once('close',onClose);
+        force=setTimeout(()=>old.kill('SIGKILL'),2000);limit=setTimeout(()=>finish(new Error('Databento helper close was not confirmed; collector lease retained')),7000);
+        old.stdin.end(JSON.stringify({kind:'stop'})+'\n');
+      });
+      child=null;lines?.close();latest.clear();symbols.clear();health.subscriptions=0;health.quote_access='unavailable';health.status='closed_for_handoff';
+    },
     close(){closed=true;latest.clear();listeners.clear();if(child){child.stdin.end(JSON.stringify({kind:'stop'})+'\n');const timer=setTimeout(()=>child.kill(),3000);timer.unref();child.once('exit',()=>clearTimeout(timer));lines?.close();}},
   };
 }

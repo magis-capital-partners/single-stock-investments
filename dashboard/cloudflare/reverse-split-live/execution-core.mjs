@@ -1,6 +1,7 @@
 // Counterfactual fills only. Pure functions; no network or broker dependency.
 import {SHADOW_POLICIES,at,finite,commission,sessions} from './shadow-core.mjs';
 import {etDay,DAY} from './core.mjs';
+import {validatedPublicStatus} from './market-status-core.mjs';
 export const EXECUTION_VERSION='ibkr_executable_shadow.v1';
 export const COST_FIELDS=Object.freeze(['commissions','borrow','regulatory','locate','dividends','cash_settlement','buyin','short_proceeds_interest']);
 export const completeCosts=c=>!!c&&Object.keys(c).length===COST_FIELDS.length&&COST_FIELDS.every(k=>finite(c[k]));
@@ -16,8 +17,12 @@ export const DELAY_EXECUTION_POLICIES=Object.freeze([30,60,300].flatMap(seconds=
 export const ALL_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES]);
 
 export function currentEvidence(rows,kind,now){return rows.filter(e=>e.kind===kind&&e.broker==='IBKR'&&e.scope==='reverse_split'&&at(e.observed_at)!==null&&at(e.observed_at)<=at(now)&&at(e.valid_until)!==null&&at(e.valid_until)>=at(now)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];}
-export function brokerGates(rows,now){
-  const locate=currentEvidence(rows,'locate',now),margin=currentEvidence(rows,'margin',now),ssr=currentEvidence(rows,'ssr',now),status=currentEvidence(rows,'trading_status',now);
+export function marketEvidence(rows,kind,now,identity={}){
+ const owner=currentEvidence(rows,kind,now),publicRow=rows.filter(r=>validatedPublicStatus(r,kind,now,identity)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0],choices=[owner,publicRow].filter(Boolean);
+ return choices.find(r=>kind==='ssr'?r.restricted===true:r.halted===true)||choices.sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0]||null;
+}
+export function brokerGates(rows,now,identity={}){
+  const locate=currentEvidence(rows,'locate',now),margin=currentEvidence(rows,'margin',now),ssr=marketEvidence(rows,'ssr',now,identity),status=marketEvidence(rows,'trading_status',now,identity);
   const reasons=[];
   if(!locate||locate.approved!==true||!Number.isInteger(locate.shares)||locate.shares<=0||!finite(locate.apr)||locate.apr<0||!locate.allocation_id)reasons.push('ibkr_locate_approval_missing');
   if(!margin||margin.approved!==true||!finite(margin.available_notional)||margin.available_notional<=0||!margin.allocation_id)reasons.push('ibkr_margin_approval_missing');
@@ -49,7 +54,9 @@ export function priceCapacity(t,q,p){
   return {shares:price>=floor?Number.MAX_SAFE_INTEGER:Math.max(0,Math.floor((headroom+1e-8)/(floor-price))),price,reason:'observed_book_capacity'};
 }
 export function availableCapacity(t,q,p,borrow,evidence,peers,now){
-  const book=bookAvailable(t,q,'short'),price=priceCapacity(t,q,p),gate=brokerGates(evidence,now);
+  const book=bookAvailable(t,q,'short'),price=priceCapacity(t,q,p),gate=brokerGates(evidence,now,t);
+  if(gate.status?.halted===true)return {shares:0,reason:'security_halted',gate};
+  if(gate.ssr?.restricted===true)return {shares:0,reason:'ssr_restricted',gate};
   if(peers.some(x=>x.id!==t.id&&x.policy_id===t.policy_id&&x.cik===t.cik&&x.remaining_shares>0))return {shares:0,reason:'issuer_already_open',gate};
   if(!borrow)return {shares:0,reason:'fresh_ibkr_fee_and_inventory_missing',gate};
   if(!Number.isInteger(borrow.available_shares)||borrow.available_shares<=0)return {shares:0,reason:'ibkr_inventory_unavailable',gate};

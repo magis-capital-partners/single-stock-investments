@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
 import {sha} from './worker.mjs';
 import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
+import {compressCheckpoint,restoreCheckpoint} from './checkpoint-codec.mjs';
 function cleanup(dir){const target=realpathSync(dir),parent=realpathSync(tmpdir()),equal=(a,b)=>process.platform==='win32'?a.toLowerCase()===b.toLowerCase():a===b;if(!equal(dirname(target),parent)||!basename(target).startsWith('reverse-split-'))throw new Error('Unsafe collector temporary directory');rmSync(target,{recursive:true,force:true});}
 
 export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>make(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>({meta:{changes:Number(db.prepare(sql).run(...args).changes)}})});return {prepare:sql=>make(sql),batch:async statements=>{db.exec('BEGIN');try{const rows=[];for(const s of statements)rows.push(await s.run());db.exec('COMMIT');return rows;}catch(e){db.exec('ROLLBACK');throw e;}}};}
@@ -13,7 +14,7 @@ export async function openCheckpoint(env){
   const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,publicationTask=null,latestSnapshot=null,deferDerived=false;
   try{
     receipt=JSON.parse((await remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").first())?.value||'null');
-    if(receipt){const object=await env.EVIDENCE.get(`collector-state/slot${receipt.slot}.sqlite`);if(!object)throw new Error('Committed collector checkpoint is unavailable');const bytes=new Uint8Array(await object.arrayBuffer());if(await sha(bytes)!==receipt.sha256)throw new Error('Collector checkpoint checksum mismatch; original evidence preserved');writeFileSync(file,bytes);}
+    if(receipt){const key=receipt.key||`collector-state/slot${receipt.slot}.sqlite`;if(!/^collector-state\/slot[01]\.sqlite(?:\.gz)?$/.test(key))throw new Error('Invalid checkpoint object identity');const object=await env.EVIDENCE.get(key);if(!object)throw new Error('Committed collector checkpoint is unavailable');const bytes=await restoreCheckpoint(new Uint8Array(await object.arrayBuffer()),receipt);writeFileSync(file,bytes);}
     db=new DatabaseSync(file);db.exec('PRAGMA journal_mode=DELETE');for(const name of readdirSync(new URL('./migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./migrations/'+name,import.meta.url),'utf8'));
     env.DB=localAdapter(db);
     const bootstrap=readFileSync(new URL('./bootstrap.json',import.meta.url)),bootstrapHash=await sha(bootstrap);
@@ -45,8 +46,9 @@ export async function openCheckpoint(env){
       db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_job_counts',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(JSON.stringify(jobs),at);
       if(publicationMode==='r2'){
         // Capture without yielding: every displayed fill belongs to these exact durable bytes.
-        const snapshot=checkpointOnly?null:captureReadSnapshot(db),slot=receipt?.slot===0?1:0,bytes=readFileSync(file),next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
-        await env.EVIDENCE.put(`collector-state/slot${slot}.sqlite`,bytes,{httpMetadata:{contentType:'application/vnd.sqlite3'}});
+        const snapshot=checkpointOnly?null:captureReadSnapshot(db),slot=receipt?.slot===0?1:0,bytes=readFileSync(file),encoded=env.CHECKPOINT_COMPRESSION==='gzip'?await compressCheckpoint(bytes):null,next={slot,sha256:await sha(bytes),bytes:bytes.length,at};
+        const key=`collector-state/slot${slot}.sqlite`+(encoded?'.gz':'');if(encoded)Object.assign(next,{key,compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256});
+        await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'}});
         await commitPointer(next,at);
         if(snapshot){if(backgroundViews)queueSnapshot(snapshot);else await publishSnapshot(snapshot);}
         return next;
