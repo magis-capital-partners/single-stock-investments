@@ -91,6 +91,11 @@ def main():
                     ticker = item.get("ticker", "")
                     if item.get("kind") == "stop":
                         break
+                    if item.get("kind") == "replace_subscriptions":
+                        names = item.get("tickers", [])
+                        if isinstance(names, list) and 0 < len(names) <= MAX_SYMBOLS and all(isinstance(t, str) and re.fullmatch(r"[A-Z][A-Z0-9.]{0,11}", t) for t in names):
+                            commands.put({"kind": "replace_subscriptions", "tickers": names}, timeout=1)
+                        continue
                     if item.get("kind") == "subscribe" and re.fullmatch(r"[A-Z][A-Z0-9.]{0,11}", ticker):
                         commands.put(item, timeout=1)
                 except (ValueError, queue.Full):
@@ -139,7 +144,8 @@ def main():
         try:
             if not wanted:
                 try:
-                    wanted.add(commands.get(timeout=1)["ticker"])
+                    initial = commands.get(timeout=1)
+                    wanted.update(initial["tickers"] if initial.get("kind") == "replace_subscriptions" else [initial["ticker"]])
                 except queue.Empty:
                     continue
             mappings.clear()
@@ -150,9 +156,16 @@ def main():
             client.add_callback(receive)
             client.subscribe(dataset=DATASET, schema="mbp-1", symbols=sorted(wanted), stype_in="raw_symbol")
             client.start()
+            rotation = False
             while not stopping.is_set() and client.is_connected():
                 try:
-                    ticker = commands.get(timeout=1)["ticker"]
+                    command = commands.get(timeout=1)
+                    if command.get("kind") == "replace_subscriptions":
+                        wanted.clear()
+                        wanted.update(command["tickers"])
+                        rotation = True
+                        break
+                    ticker = command["ticker"]
                 except queue.Empty:
                     continue
                 if ticker not in wanted and len(wanted) < MAX_SYMBOLS:
@@ -160,6 +173,9 @@ def main():
                     client.subscribe(dataset=DATASET, schema="mbp-1", symbols=[ticker], stype_in="raw_symbol")
             if stopping.is_set():
                 break
+            if rotation:
+                emit({"kind": "health", "status": "connecting", "at": stamp()})
+                continue
             client.block_for_close(timeout=1)
             raise RuntimeError("Live session ended")
         except Exception as exc:

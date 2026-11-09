@@ -7,7 +7,7 @@ const pair=(a,b)=>a[0]===b[0]?(a[1]<b[1]?-1:a[1]>b[1]?1:0):a[0]<b[0]?-1:1;
 function cursor(value,initial){if(!value)return initial;const r=JSON.parse(atob(value));if(!Array.isArray(r)||r.length!==2||r.some(v=>typeof v!=='string'))throw new Error('Invalid cursor');return r;}
 export async function readSnapshotAPI(url,env){
   if(url.pathname==='/shadow/review-monitor'){const object=await env.EVIDENCE.get('review/monitor-latest.json');return object?json(await object.json()):json({error:'Independent review check has not run'},503);}
-  const path=url.pathname,staticPaths={'/shadow':'shadow.json','/shadow/executable':'execution.json','/shadow/readiness':'readiness.json','/shadow/validation':'validation.json','/health':'health.json','/':'health.json'};
+  const path=url.pathname,staticPaths={'/shadow':'shadow.json','/shadow/executable':'execution.json','/shadow/readiness':'readiness.json','/shadow/operations':'operations.json','/shadow/validation':'validation.json','/health':'health.json','/':'health.json'};
   if(path==='/shadow/validation'&&url.searchParams.has('run')){
     const id=url.searchParams.get('run');if(!/^rs_live_path_\d{4}-\d{2}-\d{2}\.v\d+$/.test(id||''))return json({error:'Invalid validation run'},400);
     const history=await env.EVIDENCE.get('validation/history-latest.json'),entry=history?(await history.json()).runs.find(r=>r.id===id):null;if(!entry||!/^validation\/results\/rs_live_path_[a-zA-Z0-9_.-]+-[a-f0-9]{64}\.json$/.test(entry.key))return json({error:'Archived validation run not found'},404);

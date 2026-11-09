@@ -25,16 +25,17 @@ export function cloudflareErrorDetail(text,secret){
   let detail=String(text||'');try{const body=JSON.parse(detail),errors=[...(body.errors||[]),...(Array.isArray(body.result)?body.result.flatMap(r=>r?.error?[{message:r.error}]:[]):[])];if(errors.length)detail=errors.map(e=>(e.code?e.code+' ':'')+(e.message||'')).join('; ');}catch{}
   if(secret)detail=detail.split(secret).join('[redacted]');detail=detail.replace(/\s+/g,' ').trim();return detail.length>300?detail.slice(0,300)+'…':detail;
 }
-export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,cadence=300,maxJobs=40,evidenceInterval=500}={}){
+export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,cadence=300,maxJobs=40,evidenceInterval=500,retryPause=delay}={}){
   if(!token||!account||!database||!bucket)throw new Error('Collector requires configured Cloudflare credentials and isolated research resources');
   const pending=[],usage={rows_read:0,rows_written:0,queries:0},base=`https://api.cloudflare.com/client/v4/accounts/${account}`,headers={authorization:'Bearer '+token};
-  let evidenceSlot=0;
+  let evidenceSlot=0,environment;
   async function request(path,options={},allowMissing=false){
     for(let attempt=0;attempt<4;attempt++){
       if(path.startsWith('/r2/')&&!options.urgent){const slot=Math.max(Date.now(),evidenceSlot);evidenceSlot=slot+evidenceInterval;await delay(Math.max(0,slot-Date.now()),undefined,{signal:options.signal});}
+      if(attempt&&options.method==='PUT')await (environment?.assertCollectorLease||environment?.assertFinancialLease||environment?.assertPreparationLease)?.();
       options.signal?.throwIfAborted();const signal=options.signal?AbortSignal.any([options.signal,AbortSignal.timeout(45000)]):AbortSignal.timeout(45000);
       const {urgent,...requestOptions}=options;const r=await fetcher(base+path,{...requestOptions,headers:{...headers,...options.headers},signal});
-      if(r.status===429&&attempt<3){const seconds=Math.max(5,Math.min(120,Number(r.headers.get('retry-after'))||30));await r.body?.cancel();await delay(seconds*1000,undefined,{signal:options.signal});continue;}
+      if((r.status===429||(path.startsWith('/r2/')&&[502,503,504].includes(r.status)))&&attempt<3){const seconds=Math.max(5,Math.min(120,Number(r.headers.get('retry-after'))||(r.status===429?30:1+attempt)));await r.body?.cancel();await retryPause(seconds*1000,undefined,{signal:options.signal});continue;}
       if(!r.ok&&!(allowMissing&&r.status===404)){
         const text=await r.text().then(t=>t.slice(0,4000),()=>''),method=(options.method||'GET').toUpperCase(),service=path.startsWith('/d1/')?'D1':path.startsWith('/r2/')?'R2':'Cloudflare API',shown=path.length>200?path.slice(0,200)+'…':path,detail=cloudflareErrorDetail(text,token);let code;try{code=JSON.parse(text).errors?.[0]?.code;}catch{}
         // Keep the "Research storage HTTP <status>" prefix: recoverWatch classifies transient failures by it.
@@ -51,7 +52,7 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
     async put(key,bytes,options={}){await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':safeContentType(options.httpMetadata?.contentType)},body:bytes});},
     async get(key,{signal,urgent=false}={}){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal,urgent},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
   };
-  return {DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},extractAnnouncementText,ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};
+  environment={DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},extractAnnouncementText,ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};return environment;
 }
 
 export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){

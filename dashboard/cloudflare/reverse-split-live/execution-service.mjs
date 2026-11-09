@@ -1,4 +1,4 @@
-import {EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy,completeCosts} from './execution-core.mjs';
+import {EXECUTION_POLICIES,ALL_EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy,completeCosts} from './execution-core.mjs';
 import {signalGate,plannedEntry,plannedExit,sessionAt,quoteGate,at,finite} from './shadow-core.mjs';
 import {digest,putState} from './shadow-service.mjs';
 import {etDay} from './core.mjs';
@@ -7,12 +7,13 @@ const stamp=()=>new Date().toISOString(),parse=r=>JSON.parse(r.payload);
 async function audit(env,t,kind,now,data){const payload=JSON.stringify(data),id=await digest(t.id+':'+kind+':'+now+':'+payload);await env.DB.prepare('INSERT OR IGNORE INTO rs_execution_records VALUES(?,?,?,?,?)').bind(id,t.id,now,kind,payload).run();}
 async function save(env,t,now){t.updated_at=now;await env.DB.prepare('INSERT INTO rs_execution_tracks VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET ticker=excluded.ticker,state=excluded.state,updated_at=excluded.updated_at,payload=excluded.payload').bind(t.id,t.event_id,t.policy_id,t.ticker,t.state,now,JSON.stringify(t)).run();}
 export async function initializeExecution(env,now=stamp()){
-  for(const p of EXECUTION_POLICIES){const old=await env.DB.prepare('SELECT payload FROM rs_execution_policies WHERE id=?').bind(p.id).first();if(old&&JSON.stringify(parse(old))!==JSON.stringify(p))throw new Error('Executable policy changed; register a new version');if(!old)await env.DB.prepare('INSERT INTO rs_execution_policies VALUES(?,?,?)').bind(p.id,now,JSON.stringify(p)).run();}
+  env.executionPolicies ||= env.ENABLE_DELAY_STUDY?ALL_EXECUTION_POLICIES:EXECUTION_POLICIES;
+  for(const p of env.executionPolicies){const old=await env.DB.prepare('SELECT payload FROM rs_execution_policies WHERE id=?').bind(p.id).first();if(old&&JSON.stringify(parse(old))!==JSON.stringify(p))throw new Error('Executable policy changed; register a new version');if(!old)await env.DB.prepare('INSERT INTO rs_execution_policies VALUES(?,?,?)').bind(p.id,now,JSON.stringify(p)).run();}
   const registered=(await env.DB.prepare('SELECT min(registered_at) AS at FROM rs_execution_policies').first()).at;
   env.EXECUTION_REGISTRATION_DAY=registered.slice(0,10);
 }
 export async function enrollExecution(env,event,now=stamp()){
-  for(const p of EXECUTION_POLICIES){
+  for(const p of env.executionPolicies||EXECUTION_POLICIES){
     const id=p.id+':'+event.id,old=await env.DB.prepare('SELECT payload FROM rs_execution_tracks WHERE id=?').bind(id).first();
     const t=old?parse(old):{id,event_id:event.id,policy_id:p.id,lane:p.lane,broker:'IBKR',ticker:event.ticker,cik:event.cik,company:event.company,first_seen_at:event.first_seen_at,published_at:event.published_at,enrolled_at:now,state:'waiting',reason:'analysis_pending',entry_shares:0,remaining_shares:0,entry_proceeds:0,cover_cost:0,commissions:0,fills:[],borrow_ledger:[],daily_marks:[],applied_actions:[],research_only:true,authority:'none',broker_execution_verified:false};
     if(['retrospective','rejected','missed','closed'].includes(t.state))continue;
@@ -27,7 +28,7 @@ export async function enrollExecution(env,event,now=stamp()){
       const gate=signalGate(event,p,now);
       if(gate.state!=='eligible'){t.state=gate.state;t.reason=gate.reason;t.signal_at=null;}
       else if(!t.signal_at){
-        t.signal_at=now;t.due_at=plannedEntry(event,p,now);t.decision_snapshot={score:event.financials.score,ordinal_min:event.ordinal_min,period:event.financials.period,signals:event.financials.signals,analyzed_at:event.analyzed_at,sources:event.sources};
+        t.signal_at=now;t.due_at=plannedEntry(event,p,new Date(at(now)+(p.entry_delay_seconds||0)*1000).toISOString());t.decision_snapshot={score:event.financials.score,ordinal_min:event.ordinal_min,period:event.financials.period,signals:event.financials.signals,analyzed_at:event.analyzed_at,sources:event.sources};
         const oldNews=event.published_at&&at(now)-at(event.published_at)>p.maximum_entry_age_seconds*1000;
         if(oldNews||!t.due_at||etDay(t.due_at)>=event.effective_date){t.state='missed';t.reason=oldNews?'announcement_already_old_when_ready':'no_pre_split_entry_window';}
         else{t.state='armed';t.reason='waiting_for_fresh_quote_and_ibkr_evidence';}
@@ -38,7 +39,7 @@ export async function enrollExecution(env,event,now=stamp()){
   }
 }
 export async function processExecution(env,t,q,peers,borrowRows,evidence,now=stamp(),actions={records:[],complete:false}){
-  const p=EXECUTION_POLICIES.find(x=>x.id===t.policy_id);if(!p)throw new Error('Unknown executable policy');
+  const p=ALL_EXECUTION_POLICIES.find(x=>x.id===t.policy_id);if(!p)throw new Error('Unknown executable policy');
   const fractional=evidence.filter(e=>e.kind==='cost_reconciliation'&&e.broker==='IBKR'&&e.scope==='reverse_split'&&e.policy_id===t.policy_id&&at(e.observed_at)<=at(now)&&completeCosts(e.costs)&&e.fractional_settlement?.security_id===t.security_id&&finite(e.fractional_settlement.price)&&e.fractional_settlement.price>0&&Math.abs(e.fractional_settlement.shares-t.remaining_shares)<1e-8&&at(e.covers_fills_through)>=at(e.observed_at)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];
   if(t.state==='exit_pending'&&t.remaining_shares>0&&t.remaining_shares<1&&!t.action_unresolved&&fractional){
     const f={side:'cover',method:'fractional_cash_settlement',shares:t.remaining_shares,price:fractional.fractional_settlement.price,at:fractional.observed_at,recorded_at:now,evidence_id:fractional.id,simulated:true,broker_execution_verified:false};t.cover_cost+=f.shares*f.price;t.remaining_shares=0;t.state='closed';t.exit_at=f.at;t.reason='fractional_liability_settled_from_evidence';t.fills.push(f);t.cost_reconciliation=fractional;t.pnl=executionPnl(t);await save(env,t,now);await audit(env,t,'fractional_cash_settlement',now,{fill:f,pnl:t.pnl});return t;
@@ -111,7 +112,7 @@ export async function executionTick(env,{now=stamp(),event,pricesOnly=false}={})
   }
   if(pricesOnly)return;
   const policies=[];
-  for(const p of EXECUTION_POLICIES){
+  for(const p of env.executionPolicies||EXECUTION_POLICIES){
     const rows=tracks.filter(t=>t.policy_id===p.id),entered=rows.filter(t=>t.entry_shares),closed=entered.filter(t=>t.state==='closed'),known=entered.filter(t=>finite(t.pnl?.estimated_net_pnl));
     const summary={...p,enrolled:rows.length,retrospective:rows.filter(t=>t.state==='retrospective').length,entered:entered.length,open:entered.filter(t=>t.remaining_shares).length,closed:closed.length,entry_notional:entered.reduce((n,t)=>n+t.entry_proceeds,0),estimated_net_pnl:known.length?known.reduce((n,t)=>n+t.pnl.estimated_net_pnl,0):null,complete_net_pnl:null,actual_net_pnl:null,stale_marks:entered.filter(t=>t.remaining_shares&&(t.mark_stale||at(now)-at(t.mark_at)>15000)).length,unresolved_cost_positions:entered.filter(t=>t.pnl?.cost_gaps?.length).length,cutoffs:cutoffStudy(rows),blocked_reasons:Object.entries(rows.filter(t=>['armed','partial_entry','missed','waiting'].includes(t.state)).reduce((a,t)=>(a[t.reason]=(a[t.reason]||0)+1,a),{})).map(([reason,count])=>({reason,count}))};policies.push(summary);
     if(entered.length)await env.DB.prepare('INSERT INTO rs_execution_daily VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload').bind(p.id+':'+etDay(now),p.id,etDay(now),JSON.stringify({policy_id:p.id,day:etDay(now),estimated_net_pnl:summary.estimated_net_pnl,stale_marks:summary.stale_marks,unresolved_cost_positions:summary.unresolved_cost_positions})).run();

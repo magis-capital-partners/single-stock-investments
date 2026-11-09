@@ -15,10 +15,10 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
       return;
     }
     if(row.kind==='heartbeat'){health.last_heartbeat=clock();return;}
-    if(row.kind==='invalidate'){latest.delete(row.ticker);return;}
+    if(row.kind==='invalidate'){health.invalidations++;latest.delete(row.ticker);return;}
     if(row.kind!=='quote'||row.dataset!=='EQUS.MINI'||row.schema!=='mbp-1'||!symbols.has(row.ticker))return;
     const now=at(clock()),ts=at(row.quote_at),received=at(row.observed_at);
-    if(ts===null||received===null||ts>now+2000||received>now+2000||now-ts>15000||now-received>15000||(row.flags&12)||![row.bid,row.ask,row.bid_size,row.ask_size].every(Number.isFinite)||row.bid<=0||row.ask<row.bid||row.bid_size<=0||row.ask_size<=0){latest.delete(row.ticker);return;}
+    if(ts===null||received===null||ts>now+2000||received>now+2000||now-ts>15000||now-received>15000||(row.flags&12)||![row.bid,row.ask,row.bid_size,row.ask_size].every(Number.isFinite)||row.bid<=0||row.ask<row.bid||row.bid_size<=0||row.ask_size<=0){health.rejected_records++;latest.delete(row.ticker);return;}
     latest.set(row.ticker,row);health.quote_access='received';health.status='available';health.last_success=clock();health.last_heartbeat=clock();
     // Record the FIRST receipt in each five-second window, not just the latest
     // quote at a later poll. Otherwise processing latency would look falsely low.
@@ -47,7 +47,10 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     return {ticker,...identity,provider:'databento_mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',quote_at:row.quote_at,observed_at:row.observed_at,bid:row.bid,ask:row.ask,bid_size:row.bid_size,ask_size:row.ask_size,consolidated:false,delayed:false,size_units:'shares',source_url:'https://databento.com/docs/datasets/equs-mini',raw:row};
   }
   return {
-    health,activePolicy:key?'rs_immediate_mini.v1':'rs_immediate.v1',
+    get health(){const atNow=at(clock()),age=health.last_success?(atNow-at(health.last_success))/1000:null,per_symbol=[...symbols].map(ticker=>{const q=latest.get(ticker),quote_age_seconds=q?(atNow-at(q.quote_at))/1000:null;return {ticker,quote_at:q?.quote_at||null,observed_at:q?.observed_at||null,quote_age_seconds,status:quote_age_seconds!==null&&quote_age_seconds<=15?'fresh':q?'stale':'awaiting_quote'};});return {...health,quote_access:health.quote_access==='received'&&age>15?'stale':health.quote_access,last_quote_age_seconds:age,per_symbol,symbol_budget:128,symbol_budget_remaining:128-symbols.size};},
+    warm(ticker){if(!/^[A-Z][A-Z0-9.]{0,11}$/.test(ticker||'')||!key)return;start();if(!symbols.has(ticker)){if(symbols.size>=128){health.error='Databento symbol budget reached';return;}symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}},
+    reconcileSymbols(wanted){const keep=[...new Set(['AAPL','SPY','IWM',...wanted])].filter(t=>/^[A-Z][A-Z0-9.]{0,11}$/.test(t)).slice(0,128);if(symbols.size<96||keep.length>=symbols.size-16)return;const atNow=at(clock());if(atNow-(health.last_rotation_ms||0)<300000)return;health.last_rotation_ms=atNow;health.subscription_rotations=(health.subscription_rotations||0)+1;symbols.clear();for(const t of keep)symbols.add(t);latest.clear();health.subscriptions=symbols.size;health.quote_access='awaiting_live_quote';child?.stdin.write(JSON.stringify({kind:'replace_subscriptions',tickers:keep})+'\n');},
+    activePolicy:key?'rs_immediate_mini.v1':'rs_immediate.v1',
     onQuote(listener){listeners.add(listener);return ()=>listeners.delete(listener);},
     observe(ticker){if(!['AAPL','SPY','IWM'].includes(ticker))return miniQuote(ticker);return miniQuote(ticker,true);},
     drainTelemetry(){const result={samples:telemetry.splice(0),dropped};dropped=0;return result;},
