@@ -1,7 +1,9 @@
 // Incremental broad queue seeding; expensive extraction stays in the financial lane.
+import {createHash} from 'node:crypto';
 export async function seedPreparedNeeds(env,queue,{pagesPerPass=4}={}){
  const read=async key=>{const o=await env.EVIDENCE.get(key);return o?o.json():null;},manifest=await read('prepared/manifest-latest.json');if(!manifest?.pages)return;
- const generation=manifest.summary?.source_archive_sha256||manifest.generated_at;
+ // Listed issuers and normalized coverage pages can change before the SEC bulk ZIP does.
+ const generation=createHash('sha256').update(JSON.stringify({source:manifest.summary?.source_archive_sha256,pages:manifest.pages})).digest('hex');
  if(queue.prepared_seed?.generation!==generation)queue.prepared_seed={generation,page:0,classified:0,queued:0};
  const seed=queue.prepared_seed,end=Math.min(manifest.pages.length,seed.page+pagesPerPass);
  for(;seed.page<end;seed.page++){

@@ -94,7 +94,7 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,sleep=m
   }finally{
     draining=true;
     try{await finishHandoff({keepQuotes:normalHandoff&&!stopping&&!leaseError,
-      drain:async()=>{if(sourceTask)await sourceTask;if(newsTask)await newsTask;if(borrowTask)await borrowTask;if(flexTask)await flexTask;if(financialTask)await financialTask;if(env.financialLoads?.size)await Promise.allSettled([...env.financialLoads.values()]);await saving;await checkpoint?.flush();},
+      drain:async()=>{if(sourceTask)await sourceTask;if(newsTask)await newsTask;if(borrowTask)await borrowTask;if(flexTask)await flexTask;if(financialTask)await financialTask;if(env.financialLoads?.size)await Promise.allSettled([...env.financialLoads.values()]);await saving;await checkpoint?.flush({handoff:true});},
       quiesce:async()=>{stopping=true;clearInterval(evaluationTimer);unsubscribe?.();env.onShadowDecision=null;await evaluation?.close();},
       persist:async()=>{if(checkpoint){try{await heartbeat(normalHandoff?'handoff':'stopped');}finally{await save({checkpointOnly:true});}}},
       close:async()=>checkpoint?.close()});}finally{

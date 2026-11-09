@@ -32,10 +32,14 @@ export function captureReadSnapshot(db){
   details.push({key:'readiness.json',value:{...envelope,...readiness}});const financialNeeds=db.prepare("SELECT key,value FROM rs_state WHERE key>='financial_need:' AND key<'financial_need;'").all();
   return {objects:[{key:'financial-needs.json',value:financialNeeds},{key:'shadow.json',value:main},{key:'operations.json',value:operations},{key:'execution.json',value:{...envelope,summary:execSummary,daily:executionDaily}},{key:'validation.json',value:{...envelope,summary:validation,plan}},{key:'cards/shadow.json',value:legacy.map(trackCard)},{key:'cards/execution.json',value:execution.map(trackCard)},...cardObjects,{key:'events.json',value:cards},{key:'health.json',value:{status:sources.every(s=>s.status==='healthy')&&!jobs.some(j=>j.state==='failed')?'healthy':'degraded',sources,jobs,state:healthState,counts:db.prepare('SELECT result,count(*) AS count FROM rs_events GROUP BY result').all(),scope:'Public research sources; detailed current state served from the durable private archive.',schedule_note:'Continuous external collector; daily database write budget is protected by private snapshot publication.'}},...details],borrow,borrowHealth,flex,envelope,at:new Date().toISOString()};
 }
-export async function publishReadSnapshot(env,db,snapshot){
+export async function publishReadSnapshot(env,db,snapshot,{shouldYield=()=>false}={}){
   async function put(key,value){env.assertCollectorLease?.();const text=JSON.stringify(value),digest=id(text),marker='snapshot:'+key,old=db.prepare('SELECT value FROM rs_state WHERE key=?').get(marker)?.value;if(old===digest)return;await env.EVIDENCE.put('collector-dashboard/'+key,new TextEncoder().encode(text),{httpMetadata:{contentType:'application/json'}});db.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(marker,digest,snapshot.at);}
-  for(const object of snapshot.objects)await put(object.key,object.value);
+  // Complete the five current-state objects before yielding older derived pages.
+  // Persisted content hashes let the successor resume history without losing work.
+  for(let i=0;i<snapshot.objects.length;i++){if(i>=5&&shouldYield())return {complete:false};const object=snapshot.objects[i];await put(object.key,object.value);}
   const days={};for(const row of snapshot.borrow){const day=row.observed_at.slice(0,10);(days[day]||=[]).push(row);}
-  for(const [day,observations] of Object.entries(days))await put('borrow/'+day+'.json',observations);
+  for(const [day,observations] of Object.entries(days)){if(shouldYield())return {complete:false};await put('borrow/'+day+'.json',observations);}
+  if(shouldYield())return {complete:false};
   await put('manifest.json',{at:snapshot.at,days:Object.keys(days).sort().reverse(),borrow_health:snapshot.borrowHealth,flex:snapshot.flex,envelope:snapshot.envelope});
+  return {complete:true};
 }
