@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Independent, read-only public-document harvest. No broker, quote or NY4 access.
 import {parseArgs} from 'node:util';
-import {pathToFileURL} from 'node:url';
+import {pathToFileURL,fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
+import {PIPELINE_VERSION} from './pipeline-version.mjs';
 import {appendFileSync,readFileSync} from 'node:fs';
 import {remoteEnvironment,isolatedWriteFailure} from './collector.mjs';
 import {FinancialSources,extractFiling,hash,primaryURL,isSourceCooldown} from './financials-io.mjs';
@@ -17,8 +19,9 @@ const REPORT_FORMS=new Set(['10-K','10-K/A','10-Q','10-Q/A','20-F','20-F/A','40-
 const signalPending=j=>!!j.last_signal&&(j.last_signal!==j.processed_signal||j.signal_coverage_pending===true);
 const needClock=value=>{try{const p=JSON.parse(value);return Math.max(0,...['repair_requested_at','first_seen_at','observed_at','at'].map(k=>Date.parse(p[k])||0));}catch{return 0;}};
 export function applyFinancialNeed(queue,cik,value){
- if(!/^\d{1,10}$/.test(cik))return false;const job=queue.jobs[cik];if(!job||job.last_signal===value||needClock(value)<needClock(job.last_signal))return false;
- job.last_signal=value;job.next_attempt=0;try{const request=JSON.parse(value);if(request.request_kind==='reviewed_primary_recovery')job.priority=Math.max(job.priority||0,2000);}catch{}return true;
+ if(!/^\d{1,10}$/.test(cik))return false;const job=queue.jobs[cik];if(!job||needClock(value)<needClock(job.last_signal))return false;
+ try{const request=JSON.parse(value);if(request.request_kind==='reviewed_primary_recovery'&&(job.priority||0)<2000){job.priority=2000;if(!job.error)job.next_attempt=0;}}catch{}
+ if(job.last_signal===value)return false;job.last_signal=value;job.next_attempt=0;return true;
 }
 export function requestedFinancialSources(signal,cik){
  if(!Array.isArray(signal.sources))return signal.url?[signal]:[];
@@ -136,7 +139,7 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
 }
 export async function publishFinancialCoverage(env,queue){
   const cards=[...(await coverageCache(env)).values()].filter(p=>queue.jobs[p.cik]).sort((a,b)=>b.observed_at.localeCompare(a.observed_at)),counts={};for(const p of cards)counts[p.status]=(counts[p.status]||0)+1;
-  const summary={schema:FINANCIAL_VERSION,generated_at:now(),issuers:Object.keys(queue.jobs).length,processed:cards.length,pending:Object.values(queue.jobs).filter(j=>!j.complete).length,prepared_seed:queue.prepared_seed||null,status_counts:counts,eligible_issuer_scope:'Operating-company strategy; non-CS instruments separately classified',broker_connections:0,orders:0,source_policy:'Verified primary disclosures with original availability clocks; no imputed missing zeros'};
+  const summary={schema:FINANCIAL_VERSION,generated_at:now(),runtime:env.financialRuntime||null,issuers:Object.keys(queue.jobs).length,processed:cards.length,pending:Object.values(queue.jobs).filter(j=>!j.complete).length,prepared_seed:queue.prepared_seed||null,status_counts:counts,eligible_issuer_scope:'Operating-company strategy; non-CS instruments separately classified',broker_connections:0,orders:0,source_policy:'Verified primary disclosures with original availability clocks; no imputed missing zeros'};
   const pages=[];for(let i=0;i<cards.length;i+=50){const page={schema:FINANCIAL_VERSION,profiles:cards.slice(i,i+50),next_cursor:i+50<cards.length?String(i+50):null,summary},key='financials/pages/'+hash(JSON.stringify(page))+'.json';await put(env,key,page);pages.push(key);}
   const manifest={...summary,pages,cards,profiles:cards.map(p=>({cik:p.cik,version:p.version,observed_at:p.observed_at}))};await env.assertFinancialLease?.();await put(env,'financials/manifest-latest.json',manifest);return manifest;
 }
@@ -167,5 +170,7 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const {values}=parseArgs({options:{'run-minutes':{type:'string',default:'270'},'max-issuers':{type:'string',default:'500'},'max-documents':{type:'string',default:'8'},offline:{type:'boolean',default:false}}});
   const env=remoteEnvironment({token:process.env.CLOUDFLARE_API_TOKEN,account:'e1cac493b315c8fd7398500dd1bfd687',database:'de0ec6d5-9619-48be-b02e-d007456517ee',bucket:'single-stock-reverse-splits-evidence',evidenceInterval:1000});
+  let runtimeCommit=null;try{const value=execFileSync('git',['rev-parse','HEAD'],{cwd:fileURLToPath(new URL('../../../',import.meta.url)),stdio:['ignore','pipe','ignore'],timeout:5000,windowsHide:true}).toString().trim();if(/^[a-f0-9]{40}$/.test(value))runtimeCommit=value;}catch{}
+  env.financialRuntime={pipeline_version:PIPELINE_VERSION,pipeline_commit:runtimeCommit,parser_sha256:PARSER_HASH,workflow_run_id:/^\d+$/.test(process.env.GITHUB_RUN_ID||'')?process.env.GITHUB_RUN_ID:null};
   try{const result=await runFinancialHarvest(env,{maximumMs:Math.min(270,Number(values['run-minutes']))*60000,maxIssuers:Math.min(5000,Number(values['max-issuers'])),maximumDocuments:Math.min(20,Number(values['max-documents'])),offline:values.offline});if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'continue='+!!result.continue+'\n');console.log(JSON.stringify(result));}catch(e){console.error(JSON.stringify({event:'financial_harvest_failed',error:e.message}));process.exitCode=1;}
 }

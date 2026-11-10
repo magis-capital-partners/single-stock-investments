@@ -56,6 +56,7 @@ test('a new live financial need is not starved by unseen bulk-universe seeds and
 test('older dashboard needs cannot overwrite a newer reviewed request or reset its retry clock repeatedly',()=>{
  const queue={jobs:{'1780652':{cik:'1780652',priority:50,next_attempt:123}}},old=JSON.stringify({first_seen_at:'2026-11-10T12:48:52Z'}),review=JSON.stringify({request_kind:'reviewed_primary_recovery',repair_requested_at:'2026-11-10T17:40:00Z'});
  assert.equal(applyFinancialNeed(queue,'1780652',old),true);assert.equal(applyFinancialNeed(queue,'1780652',review),true);assert.equal(queue.jobs['1780652'].priority,2000);queue.jobs['1780652'].next_attempt=999;assert.equal(applyFinancialNeed(queue,'1780652',old),false);assert.equal(applyFinancialNeed(queue,'1780652',review),false);assert.equal(queue.jobs['1780652'].next_attempt,999);
+ const oldWorker={jobs:{'1780652':{priority:50,last_signal:review,next_attempt:999,error:null}}};assert.equal(applyFinancialNeed(oldWorker,'1780652',review),false);assert.equal(oldWorker.jobs['1780652'].priority,2000);assert.equal(oldWorker.jobs['1780652'].next_attempt,0);oldWorker.jobs['1780652'].next_attempt=999;applyFinancialNeed(oldWorker,'1780652',review);assert.equal(oldWorker.jobs['1780652'].next_attempt,999);
  assert.equal(applyFinancialNeed(queue,'1780652',JSON.stringify({first_seen_at:'2026-11-10T18:00:00Z'})),true);
 });
 test('reviewed financial batches preserve requested order and bind issuer, accession, source digest and disclosure clock',()=>{
