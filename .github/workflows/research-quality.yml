@@ -454,26 +454,41 @@ jobs:
             _system/scripts/ci_checkout_workspace.sh
             _system/scripts/ci_resolve_checkout_ref.sh
             _system/scripts/ci_sparse_checkout_paths.py
+            _system/scripts/ci_underwriting_checkout_scope.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
+      - name: Export and bind the complete PR file scope
+        id: research_scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          metadata=$(gh api "repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}")
+          test "$(printf '%s' "$metadata" | jq -r .head.sha)" = "$CHECKOUT_SHA"
+          count=$(printf '%s' "$metadata" | jq -r .changed_files)
+          gh api --paginate \
+            "repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}/files" \
+            --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
+          mode=$(python3 _system/scripts/ci_underwriting_checkout_scope.py \
+            --files "$RUNNER_TEMP/pr-files.txt" --expected-count "$count" \
+            --roots "$RUNNER_TEMP/underwriting-lint-roots.txt")
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "PR files: $count; checkout mode: $mode"
       - name: Checkout workspace (PR head + base tip)
         run: |
           # Depth only needs enough history for overlay/insider valuation.json
           # comparisons against base tip. Ticker scope comes from the GitHub PR
-          # file list below — never from a shallow two-dot git fallback.
-          bash _system/scripts/ci_checkout_workspace.sh history "$CHECKOUT_SHA" 2
-          git fetch --depth=1 origin "+refs/heads/${{ env.PR_BASE_REF }}:refs/remotes/origin/${{ env.PR_BASE_REF }}"
+          # file list above — never from a shallow two-dot git fallback.
+          if [ "${{ steps.research_scope.outputs.mode }}" = "scoped" ]; then
+            CI_UNDERWRITING_LINT_ROOTS="$RUNNER_TEMP/underwriting-lint-roots.txt" \
+              bash _system/scripts/ci_checkout_workspace.sh underwriting-lint "$CHECKOUT_SHA" 2
+          else
+            bash _system/scripts/ci_checkout_workspace.sh history "$CHECKOUT_SHA" 2
+          fi
+          git fetch --depth=1 --filter=blob:none origin "+refs/heads/${{ env.PR_BASE_REF }}:refs/remotes/origin/${{ env.PR_BASE_REF }}"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Export PR changed files
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api --paginate \
-            "repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}/files" \
-            --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
-          echo "PR files: $(wc -l < "$RUNNER_TEMP/pr-files.txt")"
       - name: Overlay lint scripts from base branch
         run: |
           # Stale PR heads must not break CI when main evolves the lint CLI/API.

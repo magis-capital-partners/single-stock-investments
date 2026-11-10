@@ -15,7 +15,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/ci_resolve_checkout_ref.sh"
 
-PROFILE="${1:?profile required: full|history|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f|buyback-radar|downloads|drive|activist|world-model|fact_currency|graph_invariants}"
+PROFILE="${1:?profile required: full|history|underwriting-lint|news|marvin-pick|marvin-forecast|minimal|marvin-agent|dashboard|pages|two-phase-watch|thirteen-f|buyback-radar|downloads|drive|activist|world-model|fact_currency|graph_invariants}"
 REF_INPUT="${2:-}"
 FETCH_DEPTH="${3:-}"
 
@@ -107,6 +107,15 @@ ensure_full_worktree() {
 }
 
 case "$PROFILE" in
+  underwriting-lint)
+    # Only trusted workflow metadata selects this exact-company data profile.
+    # The roots file is computed before checking out candidate data/code.
+    test -s "${CI_UNDERWRITING_LINT_ROOTS:?validated roots file required}"
+    git sparse-checkout init --cone
+    git sparse-checkout set --stdin < "$CI_UNDERWRITING_LINT_ROOTS"
+    git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
+    checkout_ref
+    ;;
   full|history)
     git sparse-checkout disable 2>/dev/null || true
     fetch_ref
