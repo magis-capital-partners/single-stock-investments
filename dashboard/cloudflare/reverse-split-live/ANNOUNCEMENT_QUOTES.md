@@ -4,7 +4,9 @@ Quotes are observed independently of fundamental eligibility. Every detected
 candidate is registered before enrichment, including an unresolved ticker. The
 shared Databento connection warms resolved symbols; no second feed is opened.
 Existing recent candidates register late at startup with their original clocks
-preserved. Raw books do not imply verified issuer identity. Metadata verification
+preserved. Startup includes the ten-day receipt window and older scheduled actions
+whose effective dates still overlap that window or lie ahead. Raw books do not
+imply verified issuer identity. Metadata verification
 is bounded to two new requests per observation pass, without blocking evaluation.
 
 Five-second sampled books preserve bid, ask, both displayed sizes, instrument/raw
