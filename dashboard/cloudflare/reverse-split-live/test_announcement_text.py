@@ -17,4 +17,14 @@ class AnnouncementTextTests(unittest.TestCase):
         doc=pymupdf.open();page=doc.new_page();page.draw_rect(pymupdf.Rect(50,50,300,300));page.insert_text((72,72),'Cover')
         result=extract(doc.tobytes());doc.close()
         self.assertFalse(result['complete']);self.assertEqual(result['review_pages'],[1]);self.assertFalse(result['OCR_admitted_to_signals'])
+    def test_extended_primary_reader_has_its_own_page_limit_and_standard_remains_strict(self):
+        doc=pymupdf.open()
+        for i in range(121):
+            page=doc.new_page();page.insert_text((72,72),'Readable original primary disclosure page with enough native text '+str(i+1))
+        raw=doc.tobytes();doc.close()
+        with self.assertRaises(ValueError):extract(raw)
+        result=extract(raw,'external_primary_report');self.assertEqual(result['pages'],121);self.assertTrue(result['complete'])
+        with self.assertRaises(ValueError):extract(raw,'unbounded')
+    def test_extended_reader_still_rejects_over_limit_bytes(self):
+        with self.assertRaises(ValueError):extract(b'%PDF-'+b' '*(48*1024*1024),'external_primary_report')
 if __name__=='__main__':unittest.main()

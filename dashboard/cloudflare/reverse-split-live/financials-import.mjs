@@ -6,24 +6,25 @@ import {loadPreparedFinancial} from './prepared-universe.mjs';
 const read=async(env,key,signal,urgent=false)=>{const o=await env.EVIDENCE.get(key,{signal,urgent});return o?o.json():null;};
 const validCik=cik=>/^\d{1,10}$/.test(String(cik));
 const cacheKey=cik=>'financial_score_cache:'+cik;
+export const FINANCIAL_EVIDENCE_REVISION='primary_source_reconciliation.2026-11-10.v1';
 export const MAX_RETAINED_FINANCIAL_PROFILES=24;
 export function retainFinancialProfile(env,cik,saved){
   env.financialProfiles.delete(cik);env.financialProfiles.set(cik,saved);
   while(env.financialProfiles.size>MAX_RETAINED_FINANCIAL_PROFILES)env.financialProfiles.delete(env.financialProfiles.keys().next().value);
 }
 function usableCache(saved,cutoff){
-  if(!saved||saved.schema!==FINANCIAL_VERSION||!validCik(saved.cik)||!saved.computed_at||Date.parse(saved.computed_at)>Date.parse(cutoff)||etDay(saved.computed_at)!==etDay(cutoff))return null;
+  if(!saved||saved.calculation_revision!==FINANCIAL_EVIDENCE_REVISION||saved.schema!==FINANCIAL_VERSION||!validCik(saved.cik)||!saved.computed_at||Date.parse(saved.computed_at)>Date.parse(cutoff)||etDay(saved.computed_at)!==etDay(cutoff))return null;
   const score={...saved.score,cutoff},age=score.period?(Date.parse(etDay(cutoff))-Date.parse(score.period))/DAY:Infinity;
   if(age<0||age>200)return {...score,score:null,status:'stale_or_missing_period'};
   return score;
 }
 async function rememberScore(env,cik,score,computed_at){
-  const saved={schema:FINANCIAL_VERSION,cik,computed_at,score};env.financialScoreCache.set(cik,saved);
+  const saved={schema:FINANCIAL_VERSION,calculation_revision:FINANCIAL_EVIDENCE_REVISION,cik,computed_at,score};env.financialScoreCache.set(cik,saved);
   await env.DB.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind(cacheKey(cik),JSON.stringify(saved),computed_at).run();
 }
 function calculate(saved,cik,cutoff){
   const p=buildFinancialProfile({cik,companyfacts:saved.raw,facts:saved.facts,sources:saved.profile.sources,as_of:cutoff,instrument:saved.profile.coverage.instrument});
-  return {...p.policy_financials,issuer_financials:p.issuer_financials,source_profile_version:saved.profile.version,coverage_status:p.coverage.status,source_url:saved.profile.sources[0]?.url,source_sha256:saved.profile.collection.api_source_sha256||saved.profile.sources[0]?.sha256};
+  return {...p.policy_financials,evidence_revision:FINANCIAL_EVIDENCE_REVISION,issuer_financials:p.issuer_financials,source_profile_version:saved.profile.version,coverage_status:p.coverage.status,source_url:saved.profile.sources[0]?.url,source_sha256:saved.profile.collection.api_source_sha256||saved.profile.sources[0]?.sha256};
 }
 async function loadEnhanced(env,cik,{version,signal,rescore=false,urgent=false}={}){
   const profile=await read(env,`financials/profiles/${cik}/${version||'latest'}.json`,signal,urgent);if(!profile)return false;
@@ -42,7 +43,7 @@ export function installFinancialImport(env){
   env.financialProfiles=new Map();env.financialScoreCache=new Map();env.financialLoads=new Map();env.financialProfileVersions=new Map();
   env.restoreFinancialScores=async()=>{
     const rows=(await env.DB.prepare("SELECT value FROM rs_state WHERE key>='financial_score_cache:' AND key<'financial_score_cache;' LIMIT 20000").all()).results;
-    for(const row of rows)try{const saved=JSON.parse(row.value);if(saved.schema===FINANCIAL_VERSION&&validCik(saved.cik)){env.financialScoreCache.set(saved.cik,saved);if(/^[a-f0-9]{64}$/.test(saved.score?.source_profile_version||''))env.financialProfileVersions.set(saved.cik,saved.score.source_profile_version);}}catch{}
+    for(const row of rows)try{const saved=JSON.parse(row.value);if(saved.schema===FINANCIAL_VERSION&&validCik(saved.cik)){env.financialScoreCache.set(saved.cik,saved);if(saved.calculation_revision===FINANCIAL_EVIDENCE_REVISION&&/^[a-f0-9]{64}$/.test(saved.score?.source_profile_version||''))env.financialProfileVersions.set(saved.cik,saved.score.source_profile_version);}}catch{}
     return env.financialScoreCache.size;
   };
   env.scoreFinancialProfile=(cik,cutoff)=>{
