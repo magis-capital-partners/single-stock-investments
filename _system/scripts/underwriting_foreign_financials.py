@@ -179,7 +179,10 @@ def _paired_management_period(body, reference, statements, as_of):
     heading = re.search(r"\bmanagement(?:['’]s)?\s+discussion\s+(?:and|&)\s+analysis\b", body[:2000], re.I)
     if not heading:
         raise ValueError('Management discussion requires its own operative source heading')
-    period = reporting_period(body[heading.start():heading.start()+1200], as_of)
+    # Keep the source heading aligned with the title's completed-year grammar.
+    own_heading = re.sub(r'\byears(?=\s+ended\b)', 'year',
+                         body[heading.start():heading.start()+1200], flags=re.I)
+    period = reporting_period(own_heading, as_of)
     if not period or period != title_period or period != binding['period']:
         raise ValueError('Management title, own source period and matching financial statements must agree')
     return period, binding
