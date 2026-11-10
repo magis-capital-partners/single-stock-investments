@@ -32,6 +32,8 @@ IDEA_TYPES = {"long", "short", "update", "postmortem", "special_situation", "cre
 EDITORIAL_CHECKS = ("complete_document", "idea_coverage", "claim_accuracy", "numerical_accuracy", "original_writing", "historical_dates")
 NUMBER_RE = re.compile(r"\d+(?:[,.]\d+)*(?:%|[xX])?")
 LABEL_RE = re.compile(r"\b[A-Za-z]+[0-9]+\b")
+# A minus sign as letters print it, directly before a figure: "-3.8%", "‐ 3.8%", "-$40".
+MINUS_BEFORE = "[-\u2010\u2011\u2012\u2013\u2212]\\s?[$€£¥]?"
 YEAR_RE = re.compile(r"^(?:19|20)\d{2}$")
 DRIVE_VIEW = "https://drive.google.com/file/d/{}/view"
 DRIVE_ID_RE = re.compile(r"[A-Za-z0-9_-]{10,}")
@@ -287,17 +289,67 @@ def quality_errors(draft: dict, parts: list[dict]) -> list[str]:
         for number in checkable_numbers(body):
             if number not in " ".join(quotes):
                 errors.append(f"{label}: numerical claim {number} lacks cited evidence.")
+        # Optional per-statement citations: one source section for each line of
+        # the summary, and the idea must hold private evidence in that section.
+        cites = idea.get("cites")
+        if cites is not None:
+            lines = [line for line in body.split("\n") if line.strip()]
+            held = {claim.get("section_id") for claim in evidence if isinstance(claim, dict)}
+            if not isinstance(cites, list) or len(cites) != len(lines) or any(cite not in by_section or cite not in held for cite in cites):
+                errors.append(f"{label}: statement citations and evidence must match the summary line by line.")
     stance = draft.get("stance") if isinstance(draft.get("stance"), dict) else {}
     leans = [lean for key in ("leaning_in", "leaning_out") for lean in (stance.get(key) or []) if isinstance(lean, dict)]
-    rendered = " ".join([str(draft.get("overview") or "")] + [" ".join(str(i.get(k) or "") for k in ("title", "summary", "evolution", "activity")) for i in ideas if isinstance(i, dict)] + [" ".join(str(lean.get(k) or "") for k in ("subject", "why")) for lean in leans])
-    all_quotes = " ".join([str(e.get("quote") or "") for i in ideas if isinstance(i, dict) for e in (i.get("evidence") or []) if isinstance(e, dict)] + [str(q) for lean in leans for q in [lean.get("quote"), *(lean.get("quotes") or [])] if q])
+    # Optional tables transcribed from the letter. Readers see each row label
+    # with every value under its column heading; the quoted table text stays
+    # private. Every figure shown must be printed in that quote, and a value
+    # shown with a minus must be printed with one.
+    tables = draft.get("tables") or []
+    if not isinstance(tables, list):
+        errors.append("Table evidence must match: tables is not a list.")
+        tables = []
+    figure_text, figure_quotes = [], []
+    for table in tables:
+        table = table if isinstance(table, dict) else {}
+        quote = re.sub(r"\s+", " ", str(table.get("quote") or "")).strip()
+        passage = re.sub(r"\s+", " ", by_section.get(table.get("section_id"), "")).strip()
+        title = table.get("title") if isinstance(table.get("title"), str) else ""
+        columns, rows = table.get("columns"), table.get("rows")
+        shaped = (
+            isinstance(columns, list) and len(columns) >= 2 and all(isinstance(c, str) and c.strip() for c in columns)
+            and isinstance(rows, list) and bool(rows) and all(
+                isinstance(row, dict) and isinstance(row.get("label"), str) and row["label"].strip()
+                and isinstance(row.get("values"), list) and len(row["values"]) == len(columns)
+                and all(isinstance(value, str) and NUMBER_RE.search(value) for value in row["values"])
+                for row in rows)
+        )
+        if not shaped or not quote or quote not in passage or (table.get("idea_id") is not None and table.get("idea_id") not in ids):
+            errors.append("Table evidence must match its source passage exactly, with one value under every heading.")
+            continue
+        for row in rows:
+            for value in row["values"]:
+                for number in NUMBER_RE.findall(value):
+                    if number not in quote:
+                        errors.append(f"Table numerical claim {number} lacks cited evidence.")
+                    elif value.strip().startswith("-") and not re.search(MINUS_BEFORE + re.escape(number), quote):
+                        errors.append(f"Table numerical claim {number} is shown as negative but is not printed so.")
+        for number in checkable_numbers(" ".join([title, *columns, *(row["label"] for row in rows)])):
+            if number not in quote:
+                errors.append(f"Table numerical claim {number} lacks cited evidence.")
+        figure_text.append(" ".join([title] + [
+            " ".join([row["label"]] + [f"{column} {value}" for column, value in zip(columns, row["values"])]) for row in rows]))
+        figure_quotes.append(quote)
+    coverage = draft.get("coverage")
+    if coverage is not None and (not isinstance(coverage, dict) or any(isinstance(v, bool) or not isinstance(v, int) or v < 0 for v in coverage.values())):
+        errors.append("Coverage counts must be whole numbers.")
+    rendered = " ".join([str(draft.get("overview") or "")] + [" ".join(str(i.get(k) or "") for k in ("title", "summary", "evolution", "activity")) for i in ideas if isinstance(i, dict)] + [" ".join(str(lean.get(k) or "") for k in ("subject", "why")) for lean in leans] + figure_text)
+    all_quotes = " ".join([str(e.get("quote") or "") for i in ideas if isinstance(i, dict) for e in (i.get("evidence") or []) if isinstance(e, dict)] + [str(q) for lean in leans for q in [lean.get("quote"), *(lean.get("quotes") or [])] if q] + figure_quotes)
     for number in checkable_numbers(rendered):
         if number not in all_quotes:
             errors.append(f"Published numerical claim {number} lacks cited evidence.")
     tokens = words(rendered)
     if any(tuple(tokens[i:i+12]) in source_grams for i in range(max(0, len(tokens)-11))):
         errors.append("Excessive source overlap: at least twelve consecutive words copied.")
-    if re.search(r"https?://|drive\.google|_system/|[A-Za-z]:[\\/]", rendered, re.I):
+    if re.search(r"https?://|drive\.google|_system/|[A-Za-z]:[\\/]", rendered + " " + str(draft.get("headline") or ""), re.I):
         errors.append("Reader prose contains a source link or private reference.")
     checklist = draft.get("checklist") or []
     visited = []

@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -33,6 +34,12 @@ from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 SUMMARIZER = ROOT / "_system/scripts/summarize_fund_letter_reader.py"
 SYNC = ROOT / "_system/scripts/sync_fund_letters_release.py"
+LMS_MODEL = os.environ.get("FUND_LETTERS_LMS_MODEL", "qwen/qwen3.5-9b")
+LMS_IDENTIFIER = os.environ.get("FUND_LETTERS_LMS_IDENTIFIER", "qwen-gpu")
+# Limits past which the lane waits instead of summarizing. See memory_shortage().
+# With the model and both lanes working, this 16 GB Mac sits at a few gigabytes of swap.
+MAX_SWAP_GB = float(os.environ.get("FUND_LETTERS_MAX_SWAP_GB", "12"))
+MIN_FREE_DISK_GB = float(os.environ.get("FUND_LETTERS_MIN_FREE_DISK_GB", "8"))
 ACCOUNT_ID_RE = re.compile(r"\b([0-9a-f]{32})\b")
 OAUTH_TOKEN_RE = re.compile(r'(?m)^oauth_token\s*=\s*"([^"]+)"\s*$')
 
@@ -81,6 +88,122 @@ def run_step(label: str, argv: list[str], env: dict) -> int:
         print(json.dumps({"step_failed": label, "code": proc.returncode,
                           "tail": (proc.stderr or proc.stdout or "")[-400:]}), flush=True)
     return proc.returncode
+
+
+def find_lms() -> Path | None:
+    for candidate in (shutil.which("lms"), Path.home() / ".lmstudio/bin/lms"):
+        if candidate and Path(candidate).is_file():
+            return Path(candidate)
+    return None
+
+
+def model_answering() -> bool:
+    import llm_local
+
+    # LM Studio gives its internal server a new port on every load, so an
+    # address remembered from an earlier cycle proves nothing.
+    llm_local._RESOLVED.clear()
+    try:
+        return bool(llm_local.models())
+    except llm_local.LocalLLMUnavailable:
+        return False
+
+
+def ensure_model() -> bool:
+    """Load the local model when nothing is answering.
+
+    The lane used to rely on the podcast lane having loaded it. After a restart,
+    or once the model had been unloaded to free memory, every cycle failed with
+    "no local LLM server" until someone noticed. The load command is the media
+    lane's, so the two lanes share one copy of the model. LM Studio's own server
+    on port 1234 is never started here: older callers prefer it when it answers
+    and then fail on its JSON mode.
+    """
+    if model_answering():
+        return True
+    lms = find_lms()
+    if lms is None:
+        print(json.dumps({"model": "unavailable", "reason": "lms CLI not found; open LM Studio and load the model"}), flush=True)
+        return False
+    try:
+        listed = subprocess.run([str(lms), "ps"], text=True, capture_output=True, timeout=60).stdout or ""
+        if LMS_IDENTIFIER in listed:
+            # Another lane is part-way through loading it. A second load would
+            # put a second copy of the model in memory.
+            time.sleep(45)
+            return model_answering()
+        print(json.dumps({"step": "load-model", "model": LMS_MODEL, "at": now()}), flush=True)
+        subprocess.run([str(lms), "load", LMS_MODEL, "--identifier", LMS_IDENTIFIER,
+                        "-c", str(summarizer.CONTEXT_TOKENS), "--parallel", "1", "-y", "--gpu", "max"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600)
+    except (OSError, subprocess.SubprocessError) as exc:
+        print(json.dumps({"model": "unavailable", "reason": f"lms failed: {exc}"[:200]}), flush=True)
+        return False
+    ready = model_answering()
+    if not ready:
+        print(json.dumps({"model": "unavailable", "reason": "the model was loaded but its server is not answering"}), flush=True)
+    return ready
+
+
+def release_model() -> bool:
+    """Unload the model while the machine is short of memory. True when it was unloaded.
+
+    A loaded model holds about ten gigabytes whether or not anyone is asking
+    it anything. It is left alone when another lane is in the middle of a
+    reply; `ensure_model` in either lane loads it again when it is next wanted.
+    """
+    lms = find_lms()
+    if lms is None:
+        return False
+    try:
+        listed = subprocess.run([str(lms), "ps"], text=True, capture_output=True, timeout=60).stdout or ""
+        row = next((line.split() for line in listed.splitlines() if line.split()[:1] == [LMS_IDENTIFIER]), [])
+        if "IDLE" not in row:
+            return False
+        done = subprocess.run([str(lms), "unload", LMS_IDENTIFIER], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    if done.returncode:
+        return False
+    print(json.dumps({"step": "unload-model", "model": LMS_MODEL, "at": now()}), flush=True)
+    return True
+
+
+def _sysctl(name: str) -> str:
+    try:
+        return subprocess.run(["sysctl", "-n", name], text=True, capture_output=True, timeout=10).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def memory_shortage(pressure: str | None = None, swap: str | None = None, free_disk_gb: float | None = None) -> str | None:
+    """Why the lane should wait this cycle, or None when there is room.
+
+    On 2026-11-10 this Mac ran out of swap space and the kernel panicked:
+    other jobs held tens of gigabytes while the model was answering. macOS
+    grows swap onto the startup disk, so a nearly full disk and a large swap
+    are the same emergency. Summarizing through it only adds page traffic and
+    GPU load to a machine that is already failing, so the lane sits the
+    cycle out, unloads the model, and tries again on the next one. Publishing
+    still runs.
+    """
+    pressure = _sysctl("kern.memorystatus_vm_pressure_level") if pressure is None else pressure
+    if pressure.strip() == "4":
+        return "the system reports critical memory pressure"
+    swap = _sysctl("vm.swapusage") if swap is None else swap
+    used = re.search(r"used = ([\d.]+)([MG])", swap)
+    if used:
+        gigabytes = float(used.group(1)) / (1024 if used.group(2) == "M" else 1)
+        if gigabytes > MAX_SWAP_GB:
+            return f"{gigabytes:.0f} GB of swap is in use (limit {MAX_SWAP_GB:.0f} GB)"
+    if free_disk_gb is None:
+        try:
+            free_disk_gb = shutil.disk_usage(Path.home()).free / 1e9
+        except OSError:
+            free_disk_gb = None
+    if free_disk_gb is not None and free_disk_gb < MIN_FREE_DISK_GB:
+        return f"only {free_disk_gb:.0f} GB of disk is free for swap (minimum {MIN_FREE_DISK_GB:.0f} GB)"
+    return None
 
 
 def output_dir() -> Path:
@@ -176,6 +299,28 @@ def publish_verified(db, state: dict) -> dict:
     return counts
 
 
+def prune_old_releases(keep: Path) -> int:
+    """Drop superseded release snapshots.
+
+    Each publish copies every letter extract into a new directory. The live
+    archive is archive.sqlite, and sync resumes from the release it was given,
+    so older directories are only spare copies. One of them is about 580 MB;
+    leaving them all on disk is what filled the machine.
+    """
+    root = keep.parent
+    removed = 0
+    if not root.is_dir():
+        return 0
+    for path in root.iterdir():
+        if not path.is_dir() or path.resolve() == keep.resolve():
+            continue
+        shutil.rmtree(path)
+        removed += 1
+    if removed:
+        print(json.dumps({"pruned_releases": removed, "kept": keep.name}), flush=True)
+    return removed
+
+
 def export_and_sync(db, env: dict, sync_remote: bool) -> dict:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     release = ROOT / "_private/fund_letters/releases" / f"auto-{stamp}"
@@ -204,6 +349,7 @@ def export_and_sync(db, env: dict, sync_remote: bool) -> dict:
     out["synced"] = code == 0
     if code:
         out["sync"] = "sync step failed; rerun resumes from the release progress file"
+    out["pruned_releases"] = prune_old_releases(release)
     return out
 
 
@@ -227,13 +373,41 @@ def commit_vault(env: dict, note: str) -> dict:
             "reason": "" if pushed.returncode == 0 else (pushed.stderr or "")[-300:]}
 
 
+def summarize_batch(args, env: dict) -> int:
+    """Summarize up to one batch, a letter at a time. Returns how many runs started.
+
+    A letter takes several minutes of model time, so memory is looked at
+    before every letter and not once per batch: a batch that began with room
+    to spare must not keep the model busy for most of an hour after the
+    machine has run short.
+    """
+    started = 0
+    for index in range(max(1, args.batch)):
+        shortage = memory_shortage()
+        if shortage:
+            released = release_model()
+            print(json.dumps({"note": f"summarize step skipped: {shortage}; "
+                                      + ("the model was unloaded to give its memory back; " if released else "")
+                                      + "publishing continues"}), flush=True)
+            break
+        if not ensure_model():
+            print(json.dumps({"note": "summarize step skipped: the local model is not available; publishing continues"}), flush=True)
+            break
+        command = [sys.executable, str(SUMMARIZER), "--limit", "1", "--retry-failed"]
+        if args.refresh_older and index < args.refresh_older:
+            command += ["--refresh-older", "1"]
+        started += 1
+        if run_step("summarize", command, env):
+            print(json.dumps({"note": "summarize step did not complete (a manual run may hold the lock); publishing continues"}), flush=True)
+            break
+    return started
+
+
 def cycle(args, db, state: dict, env: dict) -> dict:
     if not args.no_repair:
         run_step("repair", [sys.executable, str(SUMMARIZER), "--repair-existing"], env)
     if not args.no_summarize:
-        code = run_step("summarize", [sys.executable, str(SUMMARIZER), "--limit", str(args.batch), "--retry-failed"], env)
-        if code:
-            print(json.dumps({"note": "summarize step did not complete (a manual run may hold the lock); publishing continues"}), flush=True)
+        summarize_batch(args, env)
     published = {"published": 0, "quarantined": 0, "already": 0}
     if not args.no_publish:
         published = publish_verified(db, state)
@@ -249,6 +423,8 @@ def main() -> int:
     parser.add_argument("--batch", type=int, default=5, help="Letters summarized per cycle")
     parser.add_argument("--cycles", type=int, default=1, help="0 runs forever")
     parser.add_argument("--sleep", type=int, default=120, help="Seconds between cycles when running forever")
+    parser.add_argument("--refresh-older", type=int, default=0,
+                        help="Each cycle, also redo this many summaries written by an earlier method")
     parser.add_argument("--no-summarize", action="store_true")
     parser.add_argument("--no-repair", action="store_true")
     parser.add_argument("--no-publish", action="store_true")

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { humanRole, requireHumanViewer, viewerFromAccessPayload } from '../functions/_lib/auth.js';
 import { accessDecision, onRequest } from '../functions/_middleware.js';
-import { parseSearchTokens, readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
+import { parseSearchTokens, readerExtras, readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
 import { onRequestGet, onRequestPost } from '../functions/api/fund-letters.js';
 
 function database() {
@@ -174,6 +174,37 @@ test('years and labels are not numerical claims, and stance reaches readers with
   assert.equal(readerLetter(row,[],null,'https://drive.google.com/SECRET').headline,null);
   assert.deepEqual(letter.stance.leaning_in,[{subject:'Equities',why:'Cash yields are low.'}]);
   assert.equal(JSON.stringify(letter).includes('PRIVATE QUOTE'),false);
+});
+test('a transcribed table is gated on its source and reaches readers without its quote',()=>{
+  const quote='Fund results Q3 2011 YTD Net Performance \u2010 3.83% 1.14% Benchmark 2.10% 4.00%';
+  const letterText=source+' '+quote;
+  const parts=sourceSections(letterText);
+  const tabled=()=>({...draft(),tables:[{idea_id:null,section_id:'s1',quote,title:'Fund results',columns:['Q3 2011','YTD'],rows:[{label:'Net Performance',values:['-3.83%','1.14%']},{label:'Benchmark',values:['2.10%','4.00%']}]}]});
+  assert.deepEqual(validateDraft(tabled(),parts),[]);
+  const sign=tabled();sign.tables[0].rows[1].values[0]='-2.10%';
+  assert.ok(validateDraft(sign,parts).some(e=>e.includes('shown as negative but is not printed so')));
+  const invented=tabled();invented.tables[0].rows[0].values[1]='11.14%';
+  assert.ok(validateDraft(invented,parts).some(e=>e.includes('Table numerical claim 11.14% lacks cited evidence')));
+  const short=tabled();short.tables[0].rows[0].values.pop();
+  assert.ok(validateDraft(short,parts).some(e=>e.includes('one value under every heading')));
+  const moved=tabled();moved.tables[0].quote='Fund results Q3 2011 YTD Net Performance 9.99%';
+  assert.ok(validateDraft(moved,parts).some(e=>e.includes('Table evidence must match its source passage exactly')));
+  const orphan=tabled();orphan.tables[0].idea_id='no-such-idea';
+  assert.ok(validateDraft(orphan,parts).length);
+  // A figure in the overview may rest on a table the letter prints.
+  const cited=tabled();cited.overview+=' The benchmark returned 4.00% for the year to date.';
+  assert.deepEqual(validateDraft(cited,parts),[]);
+
+  const stored={...tabled(),coverage:{sections:1,sections_cited:1,topics:1,statements:2,tables:1,tables_omitted:2,figures:4,source_words:40,summary_words:30,secret:'SECRET'}};
+  stored.ideas[0].cites=['s1','s1'];
+  stored.tables[0].source_url='SECRET';stored.tables.push({columns:['Only one'],rows:[{label:'x',values:['1']}]});
+  const row={id:'l0',fund_id:'fund',fund:'Fund',reporting_period:'2011Q3',letter_date:null,publication_date:null,published_at:'x',created_at:'y',revision_id:'r1',overview:'Overview'};
+  const letter=readerLetter(row,[{id:'acme',title:'Acme',ticker:null,idea_type:'long',activity:'new',summary:'One.\nTwo.',evolution:null,compared_letter_id:null}],null,'Headline',readerExtras(stored));
+  assert.deepEqual(letter.tables,[{index:0,idea_id:null,passage:1,title:'Fund results',columns:['Q3 2011','YTD'],rows:[{label:'Net Performance',values:['-3.83%','1.14%']},{label:'Benchmark',values:['2.10%','4.00%']}]}]);
+  assert.deepEqual(letter.coverage,{sections:1,sections_cited:1,topics:1,statements:2,tables:1,tables_omitted:2,figures:4,source_words:40,summary_words:30});
+  assert.deepEqual(letter.ideas[0].cites,[1,1]);
+  assert.equal(JSON.stringify(letter).includes('SECRET'),false);
+  assert.equal(JSON.stringify(letter).includes('Net Performance \u2010'),false);
 });
 test('cross-fund letters feed, period catalog, and category/activity filters return allowlisted summaries',async()=>{
   const DB=database();seed(DB,3);

@@ -127,3 +127,81 @@ def test_wrangler_login_fills_budget_credentials(tmp_path, monkeypatch):
     assert auto.apply_wrangler_login(env) is None
     assert env["CLOUDFLARE_ACCOUNT_ID"] == "e1cac493b315c8fd7398500dd1bfd687"
     assert env["CLOUDFLARE_API_TOKEN"] == "secret-token"
+
+
+def test_the_lane_waits_when_the_machine_is_out_of_memory_or_swap_room():
+    roomy = "total = 3072.00M  used = 2208.38M  free = 863.62M  (encrypted)"
+    assert auto.memory_shortage("1", roomy, 40.0) is None
+    assert auto.memory_shortage("2", roomy, 40.0) is None  # a warning alone is normal on this machine
+    assert "critical memory pressure" in auto.memory_shortage("4", roomy, 40.0)
+    assert "45 GB of swap" in auto.memory_shortage("1", "total = 46080.00M  used = 45900.00M  free = 180.00M", 40.0)
+    assert "30 GB of swap" in auto.memory_shortage("1", "total = 31.00G  used = 30.00G  free = 1.00G", 40.0)
+    assert "only 3 GB of disk" in auto.memory_shortage("1", roomy, 3.0)
+    assert auto.memory_shortage("", "", 40.0) is None  # unreadable indicators never stop the lane
+
+
+def test_a_cycle_short_of_memory_skips_summarizing_but_still_publishes(tmp_path, monkeypatch, capsys):
+    steps = []
+    monkeypatch.setattr(auto, "memory_shortage", lambda: "the system reports critical memory pressure")
+    monkeypatch.setattr(auto, "run_step", lambda label, argv, env: steps.append(label) or 0)
+    monkeypatch.setattr(auto, "release_model", lambda: steps.append("unload-model") or True)
+    monkeypatch.setattr(auto, "ensure_model", lambda: steps.append("load-model") or True)
+    monkeypatch.setattr(auto, "publish_verified", lambda db, state: steps.append("publish") or {"published": 0, "quarantined": 0, "already": 0})
+
+    class Args:
+        no_repair = no_summarize = no_publish = sync_remote = commit_vault = False
+        batch, refresh_older = 5, 0
+
+    auto.cycle(Args, None, {}, {})
+    assert steps == ["repair", "unload-model", "publish"]
+    assert ("summarize step skipped: the system reports critical memory pressure; "
+            "the model was unloaded to give its memory back; publishing continues") in capsys.readouterr().out
+
+
+def test_memory_is_checked_before_every_letter_and_not_once_per_batch(monkeypatch, capsys):
+    commands = []
+    room = iter([None, None, "30 GB of swap is in use (limit 24 GB)"])
+    monkeypatch.setattr(auto, "memory_shortage", lambda: next(room))
+    monkeypatch.setattr(auto, "ensure_model", lambda: True)
+    monkeypatch.setattr(auto, "release_model", lambda: False)
+    monkeypatch.setattr(auto, "run_step", lambda label, argv, env: commands.append(argv[2:]) or 0)
+
+    class Args:
+        batch, refresh_older = 5, 1
+
+    assert auto.summarize_batch(Args, {}) == 2
+    assert commands == [["--limit", "1", "--retry-failed", "--refresh-older", "1"], ["--limit", "1", "--retry-failed"]]
+    assert "summarize step skipped: 30 GB of swap" in capsys.readouterr().out
+
+    # A run that cannot start (another run holds the lock) ends the batch.
+    commands.clear()
+    monkeypatch.setattr(auto, "memory_shortage", lambda: None)
+    monkeypatch.setattr(auto, "run_step", lambda label, argv, env: commands.append(argv[2:]) or 1)
+    assert auto.summarize_batch(Args, {}) == 1 and len(commands) == 1
+
+
+def test_the_model_is_unloaded_only_when_it_is_loaded_and_idle(tmp_path, monkeypatch):
+    calls = []
+    table = "IDENTIFIER    MODEL              STATUS    SIZE\n{row}\n"
+
+    def fake_run(argv, **kwargs):
+        calls.append(argv[1:])
+
+        class Done:
+            returncode = 0
+            stdout = table.format(row=state["row"])
+        return Done()
+
+    monkeypatch.setattr(auto, "find_lms", lambda: tmp_path / "lms")
+    monkeypatch.setattr(auto.subprocess, "run", fake_run)
+    state = {"row": "qwen-gpu      qwen/qwen3.5-9b    IDLE      6.55 GB"}
+    assert auto.release_model() is True
+    assert calls == [["ps"], ["unload", "qwen-gpu"]]
+    for row in ("qwen-gpu      qwen/qwen3.5-9b    GENERATING      6.55 GB", "other-model   some/model   IDLE   4 GB", ""):
+        calls.clear()
+        state["row"] = row
+        assert auto.release_model() is False
+        assert calls == [["ps"]]  # another lane is mid-reply, or the model is not loaded
+    monkeypatch.setattr(auto, "find_lms", lambda: None)
+    assert auto.release_model() is False
+

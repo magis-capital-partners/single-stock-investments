@@ -118,6 +118,8 @@ def _post(url: str, payload: dict, timeout: int) -> dict:
 
 
 _RESOLVED: dict[str, str] = {}
+# Servers that refused response_format "json_object"; not asked again.
+_NO_JSON_OBJECT: set[str] = set()
 
 
 def _resolve(base: str) -> str:
@@ -157,6 +159,94 @@ def models(base: str = DEFAULT_BASE, timeout: int = 15) -> list[str]:
     return [m.get("id") for m in (doc.get("data") or []) if m.get("id")]
 
 
+def chat(
+    messages: list[dict],
+    *,
+    model: str | None = None,
+    base: str = DEFAULT_BASE,
+    temperature: float = 0.2,
+    max_tokens: int = 2048,
+    timeout: int = DEFAULT_TIMEOUT,
+    json_object: bool = False,
+    schema: dict | None = None,
+    retries: int = 2,
+) -> dict:
+    """One chat completion, with what a caller needs to judge the reply.
+
+    Returns ``{"text", "reasoning", "finish", "usage", "timings"}``. ``text`` is
+    the visible answer only; hidden reasoning is reported separately and never
+    stands in for it. ``finish`` is ``"length"`` when the reply was cut off at
+    ``max_tokens``, which for JSON means the object is incomplete.
+
+    ``schema`` constrains the reply to a JSON Schema. The runtime enforces it
+    while decoding, so the reply always parses unless it was cut off.
+    """
+    base = _resolve(base)
+    if model is None:
+        available = models(base=base)
+        if not available:
+            raise LocalLLMUnavailable(f"{base} has no model loaded")
+        model = available[0]
+
+    payload: dict = {
+        "model": model,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "stream": False,
+    }
+    if schema is not None:
+        payload["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {"name": "reply", "strict": True, "schema": schema},
+        }
+    elif json_object and base not in _NO_JSON_OBJECT:
+        payload["response_format"] = {"type": "json_object"}
+    if DISABLE_THINKING:
+        # Two switches because the two servers honour different ones. Measured
+        # on this Mac, 120-token cap: LM Studio's own server on :1234 ignores
+        # chat_template_kwargs (116 of 120 tokens spent reasoning, empty answer)
+        # and obeys reasoning_effort; its internal llama-server obeys
+        # chat_template_kwargs and ignores the other. Sending both is harmless.
+        payload["chat_template_kwargs"] = {"enable_thinking": False}
+        payload["reasoning_effort"] = "none"
+
+    last: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            doc = _post(f"{base}/chat/completions", payload, timeout)
+            choices = doc.get("choices") or []
+            if not choices:
+                raise LocalLLMUnavailable(f"empty completion: {str(doc)[:200]}")
+            msg = choices[0].get("message") or {}
+            return {
+                "text": (msg.get("content") or "").strip(),
+                "reasoning": msg.get("reasoning_content") or "",
+                "finish": choices[0].get("finish_reason") or "",
+                "usage": doc.get("usage") or {},
+                "timings": doc.get("timings") or {},
+            }
+        except urllib.error.HTTPError as exc:
+            # LM Studio's server rejects response_format "json_object" outright
+            # (HTTP 400: must be json_schema or text). Ask in plain text
+            # instead; extract_json copes with a fenced or wrapped object.
+            if exc.code == 400 and (payload.get("response_format") or {}).get("type") == "json_object":
+                _NO_JSON_OBJECT.add(base)
+                payload.pop("response_format")
+                last = exc
+                continue
+            last = exc
+            if attempt < retries:
+                time.sleep(5 * (attempt + 1))
+        except (urllib.error.URLError, OSError, json.JSONDecodeError) as exc:
+            last = exc
+            if attempt < retries:
+                # A local server drops requests while it swaps models or reloads
+                # a context. Short linear backoff; this is not a rate limit.
+                time.sleep(5 * (attempt + 1))
+    raise LocalLLMUnavailable(f"{base} failed after {retries + 1} attempts: {last}")
+
+
 def complete(
     messages: list[dict],
     *,
@@ -173,44 +263,14 @@ def complete(
     `temperature` defaults low: this job extracts claims that must be traceable
     to the transcript, so creativity is a defect rather than a feature.
     """
-    base = _resolve(base)
-    if model is None:
-        available = models(base=base)
-        if not available:
-            raise LocalLLMUnavailable(f"{base} has no model loaded")
-        model = available[0]
-
-    payload: dict = {
-        "model": model,
-        "messages": messages,
-        "temperature": temperature,
-        "max_tokens": max_tokens,
-        "stream": False,
-    }
-    if json_object:
-        payload["response_format"] = {"type": "json_object"}
-    if DISABLE_THINKING:
-        payload["chat_template_kwargs"] = {"enable_thinking": False}
-
-    last: Exception | None = None
-    for attempt in range(retries + 1):
-        try:
-            doc = _post(f"{base}/chat/completions", payload, timeout)
-            choices = doc.get("choices") or []
-            if not choices:
-                raise LocalLLMUnavailable(f"empty completion: {str(doc)[:200]}")
-            msg = choices[0].get("message") or {}
-            # If thinking slipped through anyway, the visible content can be
-            # empty while the answer sits in reasoning_content. Prefer content,
-            # fall back rather than returning "" and losing the episode.
-            return (msg.get("content") or "").strip() or (msg.get("reasoning_content") or "")
-        except (urllib.error.URLError, OSError, json.JSONDecodeError) as exc:
-            last = exc
-            if attempt < retries:
-                # A local server drops requests while it swaps models or reloads
-                # a context. Short linear backoff; this is not a rate limit.
-                time.sleep(5 * (attempt + 1))
-    raise LocalLLMUnavailable(f"{base} failed after {retries + 1} attempts: {last}")
+    reply = chat(
+        messages, model=model, base=base, temperature=temperature, max_tokens=max_tokens,
+        timeout=timeout, json_object=json_object, retries=retries,
+    )
+    # If thinking slipped through anyway, the visible content can be empty
+    # while the answer sits in reasoning_content. Prefer content, fall back
+    # rather than returning "" and losing the episode.
+    return reply["text"] or reply["reasoning"]
 
 
 def extract_json(text: str) -> dict | None:

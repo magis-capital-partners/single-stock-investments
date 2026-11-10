@@ -1,9 +1,9 @@
 // Local development only. This directory is excluded from the deployed site.
 import { createServer } from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
+import { extname, resolve } from 'node:path';
 import { onRequestGet, onRequestPost } from '../functions/api/fund-letters.js';
 
 const args=process.argv.slice(2);
@@ -24,8 +24,20 @@ if(fixture){
   }
 }
 const DB={prepare(sql){return{bind(...args){return{async all(){return{results:db.prepare(sql).all(...args)};},async first(){return db.prepare(sql).get(...args)||null;},async run(){return{meta:{changes:db.prepare(sql).run(...args).changes}};}};}};},async batch(statements){db.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());db.exec('COMMIT');return results;}catch(error){db.exec('ROLLBACK');throw error;}}};
-const assetRoot=fileURLToPath(new URL('../fund-letters/',import.meta.url));
-const assets=new Map([['/fund-letters/','index.html'],['/fund-letters/index.html','index.html'],['/fund-letters/reader.js','reader.js'],['/fund-letters/reader.css','reader.css']]);
+// The whole committed dashboard is served, not only the reader files, so the
+// Insights tab can be checked inside the real page with its own stylesheets:
+// that is where the embedded reader inherits the theme tokens and control rules.
+const siteRoot=fileURLToPath(new URL('../',import.meta.url));
+const types={'.html':'text/html','.js':'application/javascript','.mjs':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.ico':'image/x-icon','.woff2':'font/woff2'};
+function asset(pathname){
+  let path;
+  try{path=decodeURIComponent(pathname);}catch{return null;}
+  if(path.endsWith('/'))path+='index.html';
+  const file=resolve(siteRoot,'.'+path);
+  // Stay inside dashboard/, and never hand out the local tooling or Functions source.
+  if(!file.startsWith(siteRoot)||/^\/(cloudflare|functions)\//.test(path)||!existsSync(file)||!statSync(file).isFile())return null;
+  return file;
+}
 const server=createServer(async(req,res)=>{
   try{
     if(req.headers.host!==`127.0.0.1:${port}`&&req.headers.host!==`localhost:${port}`){res.writeHead(403);res.end();return;}
@@ -37,10 +49,10 @@ const server=createServer(async(req,res)=>{
       const response=await(req.method==='POST'?onRequestPost(context):onRequestGet(context));
       res.writeHead(response.status,Object.fromEntries(response.headers));res.end(await response.text());return;
     }
-    const file=assets.get(url.pathname);
+    const file=asset(url.pathname);
     if(!file){res.writeHead(404);res.end();return;}
-    res.writeHead(200,{'content-type':file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':'text/html','cache-control':'no-store'});
-    res.end(readFileSync(resolve(assetRoot,file)));
+    res.writeHead(200,{'content-type':types[extname(file)]||'application/octet-stream','cache-control':'no-store'});
+    res.end(readFileSync(file));
   }catch(error){res.writeHead(500);res.end(error.message);}
 });
 server.listen(port,'127.0.0.1',()=>console.log(`Local ${fixture?'synthetic UI test':'private archive'} · ${role} · http://127.0.0.1:${port}/fund-letters/`));
