@@ -163,3 +163,17 @@ def test_source_parts_use_verified_object_store_before_manifest(environment,monk
     assert fake.restore(relative)==raw
     assert fake.restore('dashboard-private/company-source-backfill-v2/manifest.json') is None
     assert subprocess.check_output(['git','log','--format=%s'],cwd=vault).strip()==b'baseline'
+
+
+def test_relative_vault_root_matches_normal_CI_publication(environment,monkeypatch):
+    vault,fake=environment
+    io.initialize(vault,storage=fake)
+    path=vault/'valuation-underwriting/runtime/states/V.json'
+    path.parent.mkdir(parents=True);path.write_text('{"status":"validated"}')
+    monkeypatch.chdir(vault.parent.parent)
+    relative=Path('_external/research-vault')
+    selected=io.selected_files(relative,'--force valuation-underwriting')
+    assert list(selected)==['valuation-underwriting/runtime/states/V.json']
+    result=io.publish_paths(relative,selected,storage=fake)
+    assert result['files_preserved']==1
+    assert fake.restore('valuation-underwriting/runtime/states/V.json')==path.read_bytes()

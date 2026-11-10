@@ -31,6 +31,7 @@ def owned(vault):
 
 
 def path_in(vault, relative):
+    vault = Path(vault).resolve()
     relative_path(relative)
     path = vault/relative
     if path.is_symlink() or not path.resolve().is_relative_to(vault):
@@ -113,6 +114,7 @@ def materialize(vault, relative, *, storage=None):
 
 
 def selected_files(vault, pathspec):
+    vault = owned(vault)
     arguments = shlex.split(pathspec)
     # Preserve Git pathspec/exclusion behavior without staging private bytes.
     options = [a for a in arguments if a.startswith('-')]
