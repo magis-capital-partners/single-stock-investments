@@ -79,6 +79,16 @@ def requested_instruments(gaps):
             if name.split()[0].lower() not in {'the','a','an','this','that','each','any','same',
                                                'operative','complete','current','latest','applicable'}:
                 terms.append(' '.join(name.lower().split()))
+        # A quoted search list must not hide the plain governing instruments
+        # explicitly requested before it. Preserve only their literal labels.
+        request = re.split(r'\bsearch(?:\s+terms)?\s*:', detail, maxsplit=1, flags=re.I)[0]
+        request = re.sub(r'https?://\S+', '', request)
+        action = re.search(r'\b(?:retrieve|obtain|provide|include|supply)\b', request, re.I)
+        if action:
+            for kind in re.findall(r'\b(governing|base|supplemental)\s+indentures?\b',
+                                   request[action.end():], re.I):
+                terms.append('indenture' if kind.lower() == 'governing'
+                             else kind.lower()+' indenture')
     return list(dict.fromkeys(terms))
 
 
