@@ -1143,9 +1143,44 @@ class TruncatedReply(ValueError):
     """The model ran out of output tokens, so the JSON is incomplete."""
 
 
-def ask_json(messages: list[dict], model: str | None, max_tokens: int, schema: dict, stats: dict | None = None) -> dict:
-    from llm_local import chat, extract_json
+def memory_emergency() -> str | None:
+    """Why a letter in progress should be put down, or None.
 
+    Only the automated lane asks for this, by setting
+    FUND_LETTERS_ABORT_SWAP_GB. A letter takes several minutes of model
+    time; when other work on the machine fills swap or the startup disk in
+    that time, finishing the letter is what tips it over."""
+    limit = os.environ.get("FUND_LETTERS_ABORT_SWAP_GB")
+    if not limit:
+        return None
+    import shutil
+    import subprocess
+
+    try:
+        swap = subprocess.run(["sysctl", "-n", "vm.swapusage"], text=True, capture_output=True, timeout=10).stdout
+    except (OSError, subprocess.SubprocessError):
+        swap = ""
+    used = re.search(r"used = ([\d.]+)([MG])", swap)
+    if used:
+        gigabytes = float(used.group(1)) / (1024 if used.group(2) == "M" else 1)
+        if gigabytes > float(limit):
+            return f"{gigabytes:.0f} GB of swap is in use"
+    try:
+        free = shutil.disk_usage(Path.home()).free / 1e9
+    except OSError:
+        return None
+    if free < float(os.environ.get("FUND_LETTERS_MIN_FREE_DISK_GB", "8")):
+        return f"only {free:.0f} GB of disk is free"
+    return None
+
+
+def ask_json(messages: list[dict], model: str | None, max_tokens: int, schema: dict, stats: dict | None = None) -> dict:
+    from llm_local import LocalLLMUnavailable, chat, extract_json
+
+    shortage = memory_emergency()
+    if shortage:
+        # Handled like a model that went away: the letter is not marked as failed and is read again later.
+        raise LocalLLMUnavailable(f"put down part-way through a letter: {shortage}")
     reply = chat(messages, model=model, max_tokens=max_tokens, temperature=0.2, schema=schema)
     if stats is not None:
         usage = reply.get("usage") or {}
