@@ -79,6 +79,21 @@ def requested_instruments(gaps):
             if name.split()[0].lower() not in {'the','a','an','this','that','each','any','same',
                                                'operative','complete','current','latest','applicable'}:
                 terms.append(' '.join(name.lower().split()))
+        # Keep only explicitly requested named license instruments before the
+        # following search sentence; order identifiers are literal, never ranges.
+        license_request = re.split(r'\bsearch(?:\s+terms)?\s*(?::|(?=["\'\u201c\u2018]))',
+                                   detail, maxsplit=1, flags=re.I)[0]
+        license_request = re.sub(r'https?://\S+', '', license_request)
+        license_action = re.search(r'\b(?:retrieve|obtain|provide|include|supply)\b', license_request, re.I)
+        if license_action:
+            license_request = license_request[license_action.end():]
+            if re.search(r'\bmaster\s+license\s+agreement\b', license_request, re.I):
+                terms.append('master license agreement')
+                for orders in re.findall(r'\borders?(?:\s+no\.?)?\s+(\d{1,3}-\d{1,3}'
+                                         r'(?:\s*(?:,|and)\s*\d{1,3}-\d{1,3}){0,5})\b',
+                                         license_request, re.I):
+                    terms.extend('order '+number for number in re.findall(r'\d{1,3}-\d{1,3}', orders))
+
         # A quoted search list must not hide the plain governing instruments
         # explicitly requested before it. Preserve only their literal labels.
         request = re.split(r'\bsearch(?:\s+terms)?\s*:', detail, maxsplit=1, flags=re.I)[0]
@@ -226,7 +241,7 @@ def registered_securities(source):
     return rows
 
 
-def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=False):
+def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=False, expected_license_title=None):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = primary_text(raw)
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
@@ -270,8 +285,26 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
         and re.search(r'\bsection\s+\d+\b', body, re.I)
         and re.search(r'\btrustee\b', body, re.I)
         and re.search(r'\bin witness whereof\b', body, re.I))
+    # A named executed license is a legal source, not a financial report.
+    # Keep the complete signed text only after its own bounded opening binds
+    # the exact requested instrument; redactions stay verbatim in that text.
+    license_opening = body[:1500]
+    license_order = re.search(r'\bthis\s+order(?:\s+no\.?)?\s+(\d{1,3}-\d{1,3})\b', license_opening, re.I)
+    requested_license = (expected_license_title and prefer_complete and form is None and 'master license agreement' in focus
+        and re.search(r'\bexecution\s+copy\b', license_opening, re.I)
+        and re.search(r'\bbetween\b', license_opening, re.I)
+        and re.search(r'\bin witness whereof\b', body, re.I)
+        and len(re.findall(r'/s/\s*[A-Za-z]', body)) >= 2
+        and ((expected_license_title == 'master license agreement'
+              and re.search(r'\bthis\s+master\s+license\s+agreement\b', license_opening, re.I))
+             or (license_order and expected_license_title == 'order '+license_order[1]
+                 and 'order '+license_order[1] in focus
+                 and re.search(r'\bmaster\s+license\s+agreement\b', license_opening, re.I))))
+    if expected_license_title is not None:
+        require(500 <= len(body) <= 350000 and requested_license,
+                'Requested license source lacks a matching complete executed instrument: '+url)
     if ((form == '10-Q' or prefer_complete) and 500 <= len(body) <= 350000
-            and (sum(w in body.lower() for w in words) >= 3 or requested_supplement)):
+            and (sum(w in body.lower() for w in words) >= 3 or requested_supplement or requested_license)):
         # Complete bounded reports/agreements retain contractual footnotes
         # that could otherwise fall outside selected search windows.
         return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),
