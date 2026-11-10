@@ -3378,113 +3378,6 @@
     return `<span class="badge badge-us" title="${escapeHtml(meta.title)}">${escapeHtml(meta.label)}</span>`;
   }
 
-  function renderInflectionCoverage(kpiTrends) {
-    const cov = (kpiTrends && kpiTrends.coverage) || null;
-    if (!cov) return '';
-    const parts = [
-      cov.resolvable_ciks != null
-        ? `${cov.fundamentals_tickers || 0}/${cov.resolvable_ciks} SEC CIK fundamentals`
-        : `${cov.fundamentals_tickers || 0}/${cov.universe || '?'} tickers with SEC quarterly fundamentals`,
-      `${cov.analyzed_tickers || cov.universe || 0} in universe`,
-    ];
-    if (cov.displayed_count != null) parts.push(`${cov.displayed_count} displayed signals`);
-    if (cov.confirmed_count != null) parts.push(`${cov.confirmed_count} confirmed`);
-    if (cov.regime_downshift_count != null) parts.push(`${cov.regime_downshift_count} regime downshifts`);
-    if (cov.stale_suppressed_count) parts.push(`${cov.stale_suppressed_count} stale series suppressed`);
-    if (cov.leadership_risk_watch) parts.push(`${cov.leadership_risk_watch} leadership/gov watch`);
-    if (cov.missing_fundamentals && cov.missing_fundamentals.length) {
-      parts.push(`${cov.missing_fundamentals.length} resolvable CIK(s) missing fundamentals cache`);
-    }
-    if (cov.no_trend_data && cov.no_trend_data.length) {
-      parts.push(`${cov.no_trend_data.length} without financial trend data`);
-    }
-    if (cov.peer_relative_count != null && cov.peer_relative_count) parts.push(`${cov.peer_relative_count} peer-relative`);
-    if (cov.earnings_revision_count != null && cov.earnings_revision_count) parts.push(`${cov.earnings_revision_count} EPS revision`);
-    if (cov.suspect_points_excluded) parts.push(`${cov.suspect_points_excluded} suspect datapoints excluded`);
-    return `<p class="tier-sub" style="margin-bottom:4px">Coverage: ${parts.join(' · ')}. Operating flow metrics prioritized; balance-sheet drift hidden by default.</p>`;
-  }
-
-  function renderInflectionRollup(kpiTrends, escapeHtml) {
-    const byTicker = (kpiTrends && kpiTrends.by_ticker) || {};
-    const rows = Object.entries(byTicker)
-      .map(([ticker, entry]) => {
-        const bms = entry.business_momentum;
-        const displayed = (entry.metrics || []).filter(m => m.display);
-        if (!bms && !displayed.length) return null;
-        const direction = (bms && bms.direction) || (displayed[0] && displayed[0].direction) || 'steady';
-        if (direction !== 'accelerating' && direction !== 'decelerating') return null;
-        const labels = displayed.map(m => m.label || m.metric).slice(0, 3);
-        const score = bms && bms.score != null ? bms.score : null;
-        return { ticker, direction, label: bms && bms.label, labels, score, strength: displayed[0] && displayed[0].strength };
-      })
-      .filter(Boolean)
-      .sort((a, b) => Math.abs(b.score || b.strength || 0) - Math.abs(a.score || a.strength || 0))
-      .slice(0, 24);
-    if (!rows.length) return '';
-    return `
-      <div style="margin-bottom:12px">
-        <h3 style="margin:0 0 6px;font-size:13px">Ticker momentum rollup</h3>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          ${rows.map(r => `
-            <button type="button" class="badge ${r.direction === 'accelerating' ? 'badge-ok' : 'badge-bad'} linkish" data-select-ticker="${escapeHtml(r.ticker)}" title="${escapeHtml(r.label || r.labels.join(', '))}">
-              ${escapeHtml(r.ticker)} ${r.direction === 'accelerating' ? '▲' : '▼'}${r.score != null ? ` ${r.score.toFixed(2)}` : ''}
-            </button>`).join('')}
-        </div>
-      </div>`;
-  }
-
-  function inflectionTierTabs(activeTier, escapeHtml) {
-    const tiers = [
-      { id: 'displayed', label: 'Displayed' },
-      { id: 'regime', label: 'Growth regime' },
-      { id: 'peer', label: 'Peer / EPS' },
-      { id: 'confirmed', label: 'Confirmed' },
-      { id: 'emerging', label: 'Emerging' },
-      { id: 'all', label: 'All signals' },
-      { id: 'balance_sheet', label: 'Balance sheet' },
-    ];
-    return `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
-      ${tiers.map(t => `<button type="button" class="view-tab${activeTier === t.id ? ' active' : ''}" data-inflection-tier="${t.id}">${escapeHtml(t.label)}</button>`).join('')}
-    </div>`;
-  }
-
-  function matchesInflectionTier(row, tier) {
-    const active = row.direction === 'accelerating' || row.direction === 'decelerating'
-      || row.direction === 'downshift' || row.direction === 'upshift';
-    if (!active) return false;
-    if (tier === 'all') return true;
-    // Extreme / sign-flip prints stay under All signals only.
-    if (row.artifact) return false;
-    if (tier === 'balance_sheet') {
-      return (row.tier === 'excluded' || ['cash', 'total_assets', 'stockholders_equity', 'long_term_debt'].includes(String(row.metric || '').split('.').pop()))
-        && (row.direction === 'accelerating' || row.direction === 'decelerating');
-    }
-    if (tier === 'regime') {
-      return row.signal_type === 'regime' && !!row.display
-        && (row.direction === 'downshift' || row.direction === 'upshift');
-    }
-    if (tier === 'peer') return row.signal_type === 'peer_relative' || row.signal_type === 'estimate_revision';
-    if (tier === 'confirmed') return row.signal_tier === 'confirmed';
-    if (tier === 'emerging') return row.signal_tier === 'emerging';
-    return !!row.display;
-  }
-
-  function inflectionHelpCopy(tier) {
-    if (tier === 'regime') {
-      return `
-        <p class="tier-sub" style="margin-bottom:6px">
-          Compares this quarter’s year-over-year growth to <strong>this company’s own history</strong>, not to peers.
-          Strengthening means above its normal band; softening means below.
-          Extreme percentages usually mean the business flipped between profit and loss — those stay under All signals.
-        </p>`;
-    }
-    return `
-      <p class="tier-sub" style="margin-bottom:6px">
-        Highlights meaningful changes in growth — not the growth rate alone.
-        <span title="YoY quarterly growth, 3-period smoothing, materiality floors, two-quarter persistence, and trailing-twelve-month cross-check">How this works</span>
-      </p>`;
-  }
-
   function respFmtUsd(value) {
     if (value == null || !Number.isFinite(Number(value))) return '—';
     return `$${Number(value).toFixed(1)}M`;
@@ -3685,67 +3578,10 @@
     </details>`;
   }
 
-  function renderInflections(kpiTrends, escapeHtml, opts) {
-    const byTicker = (kpiTrends && kpiTrends.by_ticker) || {};
-    const search = ((opts && opts.search) || '').trim().toLowerCase();
-    const tier = (opts && opts.inflectionTier) || 'displayed';
-    const rows = [];
-    Object.entries(byTicker).forEach(([ticker, entry]) => {
-      (entry.metrics || []).forEach(m => {
-        if (!['accelerating', 'decelerating', 'downshift', 'upshift'].includes(m.direction)) return;
-        rows.push({ ticker, ...m });
-      });
-    });
-    let filtered = rows.filter(r => matchesInflectionTier(r, tier));
-    if (search) {
-      filtered = filtered.filter(r => `${r.ticker} ${r.metric} ${r.label} ${r.source} ${r.human_summary || ''}`.toLowerCase().includes(search));
-    }
-    filtered.sort((a, b) => {
-      const sa = a.strength != null ? a.strength : Math.abs(a.accel || 0) / Math.max(a.threshold || 1e-9, 1e-9);
-      const sb = b.strength != null ? b.strength : Math.abs(b.accel || 0) / Math.max(b.threshold || 1e-9, 1e-9);
-      return sb - sa;
-    });
-    if (!filtered.length) {
-      if (!kpiTrends) {
-        return `<p class="subhead">KPI trend data not built yet — run: python _system/scripts/build_fundamental_series.py then build_kpi_trends.py.</p>`;
-      }
-      return `${renderInflectionCoverage(kpiTrends)}${inflectionTierTabs(tier, escapeHtml)}${inflectionHelpCopy(tier)}<p class="subhead">No inflections match this filter — try All signals or Emerging.</p>`;
-    }
-    const accel = filtered.filter(r => r.direction === 'accelerating' || r.direction === 'upshift').length;
-    const decel = filtered.filter(r => r.direction === 'decelerating' || r.direction === 'downshift').length;
-    const cov = (kpiTrends && kpiTrends.coverage) || {};
-    const accelLabel = tier === 'regime' ? 'strengthening' : 'accelerating';
-    const decelLabel = tier === 'regime' ? 'softening' : 'decelerating';
-    return `
-      ${renderInflectionCoverage(kpiTrends)}
-      ${inflectionTierTabs(tier, escapeHtml)}
-      ${tier === 'displayed' || tier === 'confirmed' ? renderInflectionRollup(kpiTrends, escapeHtml) : ''}
-      ${inflectionHelpCopy(tier)}
-      <p class="tier-sub" style="margin-bottom:8px">
-        ${accel} ${accelLabel} · ${decel} ${decelLabel}${tier === 'displayed' || tier === 'confirmed' ? ` · ${cov.displayed_count || 0} displayed total` : ''}
-      </p>
-      <table class="darwin-table" id="insights-inflections-table">
-        <thead><tr><th>Ticker</th><th>Metric</th><th>Trend</th><th>Tier</th><th>What changed</th><th>Growth</th><th>Strength</th><th>Last periods</th><th>Source</th></tr></thead>
-        <tbody>
-          ${filtered.slice(0, 120).map(r => {
-            const accelTip = r.accel != null
-              ? (r.mode === 'diff' ? `Second derivative: ${r.accel}` : `Second derivative: ${(r.accel * 100).toFixed(1)} pp`)
-              : '';
-            return `
-            <tr>
-              <td><button type="button" class="linkish mono" data-select-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
-              <td>${escapeHtml(r.label || r.metric)}${r.composite && r.composite_members ? `<div class="tier-sub">${escapeHtml(r.composite_members.join(', '))}</div>` : ''}${r.stale ? '<div class="tier-sub">stale series</div>' : ''}${r.revenue_proxy ? '<div class="tier-sub">revenue proxy</div>' : ''}${r.signal_type === 'regime' ? '<div class="tier-sub">growth regime</div>' : ''}${r.artifact ? '<div class="tier-sub">volatile base</div>' : ''}</td>
-              <td title="${escapeHtml(accelTip)}">${trendBadge(r.direction, r.signal_tier)}</td>
-              <td>${signalTierBadge(r.signal_tier, escapeHtml)}</td>
-              <td style="max-width:340px">${inflectionWhatChanged(r, escapeHtml)}</td>
-              <td class="mono" title="${escapeHtml(accelTip)}">${escapeHtml(formatGrowth(r))}${r.ttm_agrees === true ? ' ✓TTM' : r.ttm_agrees === false ? ' ✗TTM' : ''}</td>
-              <td>${strengthLabel(r)}</td>
-              <td>${renderSparkline(r.points, r.direction)}</td>
-              <td>${trendSourceBadge(r.source, escapeHtml)}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+  function renderInflections(overview, escapeHtml, opts) {
+    return global.InflectionsViz
+      ? global.InflectionsViz.render(overview, opts || {}, opts || {})
+      : '<p>Inflections could not be loaded. Reload this page to try again.</p>';
   }
 
   function formatFreshnessDisplay(days) {
@@ -5281,7 +5117,6 @@
       videoDetail = null,
       videoDetailLoading = false,
       kpiTrends = null,
-      inflectionTier = 'displayed',
       eventTier = 'signal',
       eventRange = 'last7',
       eventScope = 'holdings',
@@ -5373,7 +5208,7 @@
 
     let body = '';
     if (activeSection === 'inflections') {
-      body = renderInflections(kpiTrends, escapeHtml, { search: fundSearch, bookOnly, inflectionTier });
+      body = '<div id="inflections-workbench"></div>';
     } else if (activeSection === 'events') {
       body = renderSectionClock(options?.feedStatus, 'insights-events', escapeHtml)
         + renderDecisionEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, {
@@ -5531,13 +5366,13 @@
 
     return `
       ${activeSection === 'consensus' ? '' : `<h2 style="font-size:18px;margin-bottom:6px">Insights</h2>
-      <p class="subhead" style="margin-bottom:14px" ${['memory','tickers'].includes(activeSection)?'hidden':''}>
+      <p class="subhead" style="margin-bottom:14px" ${['memory','tickers','inflections'].includes(activeSection)?'hidden':''}>
         Portfolio context only · ${insights?.event_count || 0} events · ${insights?.letter_count || 0} letters · ${insights?.podcast_count || 0} podcasts · ${insights?.video_count || 0} videos · ${insights?.front_record_count || 0} front records · ${insights?.archived_record_count || 0} archived
       </p>
       <nav class="insights-section-groups" id="insights-section-tabs" aria-label="Insights workbench" style="margin-bottom:10px">
         ${sectionGroups.map(group => `<div class="insights-section-group"><span>${group.label}</span><div>${group.ids.map(id => sections.find(section => section.id === id)).filter(Boolean).map(s => `<button type="button" class="view-tab${activeSection === s.id ? ' active' : ''}" data-insights-section="${s.id}">${s.label}</button>`).join('')}</div></div>`).join('')}
       </nav>`}
-      <div class="detail-section${activeSection === 'consensus' ? ' consensus-toolbar' : ''}" style="display:grid;gap:8px;margin-bottom:12px">
+      <div class="detail-section${activeSection === 'consensus' ? ' consensus-toolbar' : ''}" style="display:${activeSection === 'inflections' ? 'none' : 'grid'};gap:8px;margin-bottom:12px"${activeSection === 'inflections' ? ' hidden' : ''}>
         ${activeSection === 'consensus' ? `<div class="consensus-toolbar-main">
           <label><span>Period</span><select id="consensus-period-select" class="search">
             ${[...rangeTabs, ...yearTabs, ...quarterTabs.filter(t => t.id !== `year:${selectedYear}`)].map(t => `<option value="${escapeHtml(t.id)}"${period.id === t.id ? ' selected' : ''}>${escapeHtml(t.label)}</option>`).join('')}

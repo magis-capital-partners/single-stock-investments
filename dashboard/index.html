@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
+<link href="inflections.css?v=20261110-company-overview" rel="stylesheet">
 <link href="strategy-workbench.css" rel="stylesheet">
 <link href="reverse-split-strategy.css?v=20261104-announcement-v1" rel="stylesheet">
 <link href="reverse-split-fundamentals.css?v=20261105-financials-v1" rel="stylesheet">
@@ -2020,7 +2021,8 @@
 <script src="equity-model-viz.js"></script>
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
-<script src="insights-viz.js?v=20261028-investors"></script>
+<script src="inflections-viz.js?v=20261110-company-overview"></script>
+<script src="insights-viz.js?v=20261110-inflections"></script>
 <script src="strategy-workbench.js?v=20261029"></script>
 <link rel="stylesheet" href="fund-letters/reader.css?v=5">
 <script src="fund-letters/reader.js?v=5"></script>
@@ -2293,7 +2295,7 @@ let insightsSection = (() => {
     return 'letters';
   }
 })();
-let insightsInflectionTier = 'displayed';
+let insightsInflectionsMount = null;
 let insightsEventTier = (() => {
   try {
     return localStorage.getItem(INSIGHTS_EVENT_TIER_KEY) || 'signal';
@@ -3551,6 +3553,10 @@ function loadLazyFile(key) {
     research_memory: () => loadShardOnce('file:research_memory', 'data/research_memory.json', (doc) => { data.research_memory = doc; }),
     index_membership: () => loadShardOnce('file:index_membership', 'data/index_membership.json', (doc) => { data.index_membership = doc; }),
     kpi_trends: () => loadShardOnce('file:kpi_trends', 'data/kpi_trends.json', (doc) => { data.kpi_trends = doc; }),
+    inflection_overview: () => loadShardOnce('file:inflection_overview', 'data/inflection_overview.json', (doc) => {
+      if (doc.schema_version !== 'inflections.v1' || !Array.isArray(doc.companies)) throw new Error('Invalid Inflections snapshot');
+      data.inflection_overview = doc;
+    }),
     technical_signals: () => loadShardOnce('file:technical_signals', 'data/technical_signals.json', (doc) => { data.technical_signals = doc; }),
     commodity_models: () => loadShardOnce('file:commodity_models','data/commodity_models.json',doc=>{data.commodity_models=doc;}),
     world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = CommodityModelViz.cleanLegacyGold(doc); }),
@@ -3579,7 +3585,7 @@ const INSIGHTS_SECTION_SHARDS = {
 };
 // Insights section -> standalone lazy files it needs.
 const INSIGHTS_SECTION_FILES = {
-  inflections: ['kpi_trends'],
+  inflections: ['inflection_overview'],
   index_watch: ['index_membership'],
   documents: ['document_catalog'],
   memory: ['research_memory'],
@@ -4420,6 +4426,10 @@ function renderActivist() {
 }
 
 function renderInsights(opts = {}) {
+  if (insightsInflectionsMount) {
+    insightsInflectionsMount.dispose();
+    insightsInflectionsMount = null;
+  }
   const previousReader = document.querySelector('[data-reader-root]');
   if (previousReader && window.FundLettersReader) FundLettersReader.unmount(previousReader);
   if (insightsSection === 'letters' && window.FundLettersReader) {
@@ -4489,7 +4499,10 @@ function renderInsights(opts = {}) {
       loadInsightsSection(insightsSection).then(
         () => renderInsights(opts),
         () => {
-          loading.textContent = 'Insights feed unavailable · open Data status for source details.';
+          if (insightsSection === 'inflections') {
+            loading.innerHTML = '<p>Company observations could not be loaded.</p><button type="button" id="inflections-load-retry">Retry Inflections</button>';
+            loading.querySelector('#inflections-load-retry').addEventListener('click', () => renderInsights(opts), { once: true });
+          } else loading.textContent = 'Insights feed unavailable · open Data status for source details.';
         },
       );
     }
@@ -4555,7 +4568,6 @@ function renderInsights(opts = {}) {
     kpiTrends: data.kpi_trends || null,
     respiratoryModel: data.respiratory_model || null,
     indexMembership: data.index_membership || null,
-    inflectionTier: insightsInflectionTier,
     eventTier: insightsEventTier,
     ...insightsEventFilters,
     eventReviewState: insightsEventWorkflow,
@@ -4566,6 +4578,17 @@ function renderInsights(opts = {}) {
     memoryLifecycleFilter,
     memoryReviewed,
   });
+  if (insightsSection === 'inflections' && window.InflectionsViz) {
+    const inflectionsRoot = content.querySelector('#inflections-workbench');
+    if (inflectionsRoot) insightsInflectionsMount = InflectionsViz.mount(inflectionsRoot, {
+      overview: data.inflection_overview,
+      tickers: data.tickers || [],
+      fetchJson: fetchShardJson,
+      onOverviewReload: doc => { data.inflection_overview = doc; },
+      renderModel: doc => InsightsViz.renderRespiratoryPanel(doc, escapeHtml),
+      onResearch: ticker => { setView('holdings'); selectTicker(ticker); },
+    });
+  }
   if (activeView === 'insights' && ['tickers','memory'].includes(insightsSection)) {
     const filters = new URLSearchParams();
     if (fundRegistrySearch) filters.set('q', fundRegistrySearch);
@@ -4654,12 +4677,6 @@ function renderInsights(opts = {}) {
         tickerInsightsSelectedTicker = null;
       }
       syncRouteHash();
-      renderInsights();
-    });
-  });
-  content.querySelectorAll('[data-inflection-tier]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      insightsInflectionTier = btn.dataset.inflectionTier;
       renderInsights();
     });
   });
