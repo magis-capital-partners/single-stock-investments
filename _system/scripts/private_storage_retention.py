@@ -30,8 +30,12 @@ def candidate(root,path):
     if any(p.is_symlink() or getattr(p,'is_junction',lambda:False)() for p in (path,*path.parents) if p!=root.parent):return None
     if len(relative.parts)==1 and re.fullmatch(r'private-publication(?:-[a-f0-9]{32})?[.]index',relative.name):
         return 'inactive temporary publication index; complete bytes and Git objects retained in backup'
-    caches={'__pycache__','.pytest_cache','.ruff_cache'}
-    if any(part in caches for part in relative.parts):return 'disposable rebuildable dependency/test cache'
+    if relative.parts[0] in {'vault','work','evidence-inbox','runs','paid','packets','handoffs'}:return None
+    if '__pycache__' in relative.parts and path.suffix=='.pyc':return 'disposable rebuildable Python bytecode cache'
+    if '.pytest_cache' in relative.parts and path.name in {'README.md','CACHEDIR.TAG','.gitignore','nodeids','lastfailed','stepwise','durations'}:
+        return 'disposable rebuildable test cache'
+    if '.ruff_cache' in relative.parts and (path.name in {'CACHEDIR.TAG','.gitignore'} or re.fullmatch(r'[0-9a-f]{8,}',path.name)):
+        return 'disposable rebuildable lint cache'
     return None
 
 def inventory(root):

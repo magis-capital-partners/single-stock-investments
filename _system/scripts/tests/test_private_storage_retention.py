@@ -76,3 +76,8 @@ def test_retention_keeps_referenced_evidence_unknowns_and_five_rollbacks():
 def test_registered_retention_age_boundaries(kind,age,eligible):
     now=datetime(2026,11,10,tzinfo=timezone.utc);row={'path':'disposable/item','kind':kind,'created_at':(now-timedelta(days=age)).isoformat(),'rebuild_verified':True}
     assert bool(retention.retention_selection([row],now=now))==eligible
+
+@pytest.mark.parametrize('name',['evidence-inbox/__pycache__/source.pyc','vault/__pycache__/paid.pyc','work/__pycache__/receipt.pyc','debug/__pycache__/annual-report.pdf','debug/.pytest_cache/custom-evidence.json'])
+def test_primary_evidence_paid_records_and_unknown_cache_members_are_protected(tmp_path,name):
+    root=tmp_path/'owned';root.mkdir();path=root/name;path.parent.mkdir(parents=True);path.write_bytes(b'unique bytes')
+    assert retention.candidate(root,path) is None
