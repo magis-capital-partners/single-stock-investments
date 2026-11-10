@@ -98,6 +98,29 @@ def record_applied(path: Path, batch: list[str]) -> None:
         os.fsync(handle.fileno())
 
 
+def sources_ledger_path(bucket_name: str) -> Path:
+    return ROOT / "_private/fund_letters/applied" / f"{bucket_name}-sources.txt"
+
+
+def sources_to_upload(sources: list[str], uploaded: list[str], stored: set[str]) -> list[str]:
+    """Source texts this run still has to put in the private bucket.
+
+    An object is named by the hash of its text, so one that was stored by any
+    earlier release is the same object. Without this every release uploaded
+    every published letter's source again, a few seconds each, and a sync
+    grew by that much with each letter published."""
+    done = set(uploaded) | stored
+    return [digest for digest in sources if digest not in done]
+
+
+def record_source(path: Path, digest: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(digest + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
 def budget_check() -> None:
     token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
     # Wrangler OAuth access tokens are not Account Analytics API tokens.
@@ -130,7 +153,7 @@ def main() -> int:
     parser.add_argument("--remote", action="store_true")
     parser.add_argument("--target-database-id", help="Must exactly match the DB binding in config")
     parser.add_argument("--max-batches", type=int, default=5)
-    parser.add_argument("--full", action="store_true", help="Replay every statement, ignoring the ledger of accepted inserts")
+    parser.add_argument("--full", action="store_true", help="Replay every statement and upload every source, ignoring the ledgers of what was accepted")
     parser.add_argument("--activate", action="store_true", help="Activate reviewed pointers after data/source import")
     parser.add_argument("--rollback", action="store_true", help="Restore the prior pointers recorded by this release")
     args = parser.parse_args()
@@ -193,19 +216,20 @@ def main() -> int:
     if args.remote:
         budget_check()
         sources = list(manifest.get("source_objects") or [])
-        for index, digest in enumerate(sources):
-            if digest in state["uploaded"]:
-                continue
+        stored_path = sources_ledger_path(bucket["bucket_name"])
+        todo_sources = sources_to_upload(sources, state["uploaded"], set() if args.full else read_ledger(stored_path))
+        for index, digest in enumerate(todo_sources):
             call(
                 ["r2", "object", "put", f"{bucket['bucket_name']}/fund-letters/source/{digest}.txt", "--remote", "--file", str(release / "sources" / f"{digest}.txt")],
                 retries=R2_RETRY_LIMIT,
             )
             state["uploaded"].append(digest)
             state_path.write_text(json.dumps(state), encoding="utf-8")
-            if index + 1 < len(sources):
+            record_source(stored_path, digest)
+            if index + 1 < len(todo_sources):
                 time.sleep(R2_PUT_GAP_SECONDS)
-            if len(state["uploaded"]) % 10 == 0:
-                print(json.dumps({"uploaded": len(state["uploaded"]), "total": len(sources)}), flush=True)
+            if (index + 1) % 10 == 0:
+                print(json.dumps({"uploaded": index + 1, "total": len(todo_sources)}), flush=True)
     lines = statements((release / "archive.sql").read_text(encoding="utf-8"))
     # The ledger describes the remote database only. A local simulation is
     # disposable, so it always replays the whole release.
