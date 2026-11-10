@@ -62,3 +62,22 @@ proofs and their original source identities are protected from automatic expiry.
 Disposable-log, preview and rollback retention settings describe eligible
 rebuildable data only. Removal requires a reference audit and verified complete
 restoration; absence from today's source manifest alone is not deletion proof.
+
+## Activated recovery and publication
+
+The owned CI checkout overlays control records from the pinned private catalog,
+and demand-loads only named snapshot objects and current archive parts. Unchanged
+legacy evidence remains readable at its original Git commit. The old bulk vault
+is never a write target after activation. Catalog updates compare against the
+revision actually materialized by each writer; unrelated concurrent changes
+remain independent and conflicting writes fail closed. The real local admission
+ledger is also kept as append-only Git control metadata.
+
+Company builds require an explicit repository-dispatch request containing exactly
+one ticker and limit 1. Source merges, timers and price refreshes cannot start an
+unscoped company build. No transport change authorizes another paid judgment.
+
+Activation evidence: the approved V archive and all 75 exact members round-tripped
+privately; GitHub Actions run 42898302925 verified read, normal approval validation
+and write access using existing credentials. Required contract, identity, source,
+compiler, independent-review and native input gates are unchanged.

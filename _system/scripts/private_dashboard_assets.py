@@ -47,6 +47,9 @@ def decode_object_bytes(raw: bytes, sha256: str) -> bytes:
 def private_object(vault: Path, sha256: str) -> Path:
     stored = stored_object(vault, sha256)
     if not stored.is_file():
+        from private_storage_io import materialize
+        materialize(vault, "dashboard-private/objects/" + sha256)
+    if not stored.is_file():
         return stored
     with stored.open('rb') as stream:
         compressed = stream.read(2) == b'\x1f\x8b'

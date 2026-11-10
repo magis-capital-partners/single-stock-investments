@@ -243,3 +243,26 @@ def test_real_git_catalog_preserves_nonoverlapping_changes_and_rejects_conflicts
     assert second.read(second.fetch()) == {"one.json": a, "two.json": b}
     with pytest.raises(store.ConcurrentUpdate):
         second.publish({"one.json": b}, original)
+
+
+def test_real_ledger_control_is_append_only(tmp_path, monkeypatch):
+    remote=tmp_path/'remote.git'
+    work=tmp_path/'work'
+    subprocess.run(['git','init','--bare',str(remote)],check=True,capture_output=True)
+    subprocess.run(['git','clone',str(remote),str(work)],check=True,capture_output=True)
+    for args in [('config','user.name','Test'),('config','user.email','test@example.invalid'),('checkout','-b','main')]:
+        subprocess.run(['git','-C',str(work),*args],check=True,capture_output=True)
+    (work/'README').write_text('metadata only')
+    for args in [('add','README'),('commit','-m','baseline'),('push','origin','main')]:
+        subprocess.run(['git','-C',str(work),*args],check=True,capture_output=True)
+    subprocess.run(['git','-C',str(remote),'symbolic-ref','HEAD','refs/heads/main'],check=True)
+    catalog=store.Catalog({'catalog_repository':'magis-capital-partners/research-catalog'},tmp_path/'catalog.git')
+    catalog.url=str(remote)
+    monkeypatch.setattr(catalog,'assert_private',lambda:None)
+    old=ledger({'status':'unknown'},{'status':'reserved'})
+    new=old+ledger({'status':'completed'})
+    catalog.publish({}, {}, control_files={'control/admission-ledger.jsonl':old})
+    head=catalog.publish({}, {}, control_files={'control/admission-ledger.jsonl':new})
+    assert store.run_git(catalog.directory,'show',head+':control/admission-ledger.jsonl').stdout==new
+    with pytest.raises(store.StorageError,match='lose or reorder'):
+        catalog.publish({}, {}, control_files={'control/admission-ledger.jsonl':ledger({'status':'completed'})})

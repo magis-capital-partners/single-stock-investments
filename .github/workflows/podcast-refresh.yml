@@ -82,6 +82,7 @@ jobs:
     # group below still prevents two podcast runs from overlapping each other,
     # which is the only overlap this job actually needs to prevent.
     env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       # Discovery falls back to iTunes search when these are absent, so a
       # missing secret degrades coverage rather than failing the lane. Both
       # spellings are read by discover_podcasts.py; set whichever exists.

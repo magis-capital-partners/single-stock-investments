@@ -64,6 +64,15 @@ def publish(vault: Path, limit=200_000_000):
                   file=sys.stderr, flush=True)
             raise
 
+    from private_storage import enabled
+    if enabled():
+        from private_storage_io import publish_paths
+        # Every referenced immutable part is verified before its manifest can
+        # become current. Shared catalog publication leaves legacy Git intact.
+        result = publish_paths(vault, {p.relative_to(vault).as_posix():p for p in paths})
+        return {"parts_uploaded": result['files_preserved'], "batches": 1,
+                "catalog_commit": result['catalog_commit']}
+
     git(vault, "fetch", "origin", "main")
     remote_files = set(git(vault, "ls-tree", "--name-only", "origin/main:" + relative.as_posix()).splitlines())
     paths = [path for path in paths if path.name not in remote_files]

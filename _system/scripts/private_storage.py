@@ -348,7 +348,10 @@ class Catalog:
                 records[relative] = entry
         return records
 
-    def publish(self, updates, expected):
+    def publish(self, updates, expected, *, control_files=None):
+        control_files = control_files or {}
+        if set(control_files) - {"control/admission-ledger.jsonl"}:
+            raise StorageError("Unexpected private ledger control file")
         for relative in updates:
             relative_path(relative)
         for _ in range(3):
@@ -361,7 +364,18 @@ class Catalog:
                 if current.get(relative) != expected.get(relative):
                     raise ConcurrentUpdate("Private artifact changed concurrently: " + relative)
                 changed[relative] = entry
-            if not changed:
+            control_changes = {}
+            for path, raw in control_files.items():
+                if len(raw) > MAX_METADATA_BYTES:
+                    raise StorageError('Real admission ledger exceeded its control metadata bound')
+                prior = run_git(self.directory, 'show', parent+':'+path, check=False)
+                if prior.returncode == 0:
+                    if merge_ledger(prior.stdout, raw) != raw:
+                        raise StorageError('Real admission ledger cannot lose or reorder prior events')
+                    if prior.stdout == raw:
+                        continue
+                control_changes[path] = raw
+            if not changed and not control_changes:
                 return parent
             current.update(changed)
             shards = {}
@@ -382,6 +396,9 @@ class Catalog:
                         raise StorageError("Private catalog shard exceeds its metadata-only budget")
                     blob = run_git(self.directory, "hash-object", "-w", "--stdin", data=raw).stdout.decode().strip()
                     run_git(self.directory, "update-index", "--add", "--cacheinfo", "100644," + blob + "," + path, env=env)
+                for path, raw in control_changes.items():
+                    blob = run_git(self.directory, 'hash-object', '-w', '--stdin', data=raw).stdout.decode().strip()
+                    run_git(self.directory, 'update-index', '--add', '--cacheinfo', '100644,'+blob+','+path, env=env)
                 tree = run_git(self.directory, "write-tree", env=env).stdout.decode().strip()
                 commit = run_git(self.directory, "commit-tree", tree, "-p", parent,
                                  data=b"Preserve verified private object references\n", env=env).stdout.decode().strip()

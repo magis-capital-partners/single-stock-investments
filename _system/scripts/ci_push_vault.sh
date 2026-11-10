@@ -33,6 +33,12 @@ if [ -z "$CLONE_TOKEN" ]; then
   exit 1
 fi
 
+# The metadata catalog is the only writable destination after activation.
+if python "$SCRIPT_DIR/private_storage_io.py" enabled; then
+  python "$SCRIPT_DIR/private_storage_io.py" publish --vault "$VAULT_ROOT" --pathspec="$GIT_ADD"
+  exit 0
+fi
+
 cd "$VAULT_ROOT"
 git config user.name "${GIT_AUTHOR_NAME:-github-actions[bot]}"
 git config user.email "${GIT_AUTHOR_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"

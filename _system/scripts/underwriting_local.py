@@ -67,6 +67,10 @@ def clone_vault(home):
         path = vault/ledger_name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(git(vault, 'show', 'origin/main:'+ledger_name))
+    from private_storage import enabled
+    if enabled():
+        from private_storage_io import initialize
+        initialize(vault)
     return vault
 
 
@@ -156,6 +160,11 @@ def publish_runtime(vault, home):
         files += [p for p in (vault/'valuation-underwriting'/folder).rglob('*') if p.is_file() and p.suffix in ('.json', '.jsonl')]
     if not files:
         return False
+    from private_storage import enabled
+    if enabled():
+        from private_storage_io import publish_paths
+        result = publish_paths(vault, {p.relative_to(vault).as_posix():p for p in files})
+        return bool(result['files_preserved'])
     for _ in range(3):
         git(vault, 'fetch', '-q', 'origin', 'main')
         base = git(vault, 'rev-parse', 'origin/main').decode().strip()

@@ -46,6 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       # Job-wide, not on one command: ci_push_main.sh rebuilds the dashboard
       # when the push hits a rebase conflict on dashboard/data, and that
       # rebuild refuses without the opt-in (marvin-pick carries every tree).
