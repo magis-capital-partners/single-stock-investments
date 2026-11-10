@@ -1,28 +1,28 @@
 # Event triage — human review queue
 
-**Date:** 2026-11-08
-**Rows:** 2531
+**Date:** 2026-11-10
+**Rows:** 2508
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
-| 2026-11-02 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | [Major Banks] CMB International raises Microsoft’s (MSFT.US) |
-| 2026-11-02 | CSGP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | CoStar Group (CSGP) Could Be 16% Below Fair Value On Profit  |
-| 2026-11-02 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Declares Force Majeure On Freeport Butane  |
-| 2026-11-01 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation (UNP) stock price, news, quote and |
-| 2026-11-01 | CHD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Church & Dwight (CHD) Q3 Earnings Highlight Margin Strength  |
-| 2026-11-01 | CVNA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Carvana (CVNA) Earnings And Guidance Put Its Valuation Narra |
-| 2026-11-01 | ALGN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | How Investors May Respond To Align Technology (ALGN) Cautiou |
-| 2026-11-01 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) Stock May Trade At A Premium To Cash Flo |
-| 2026-11-01 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Doordash is acquiring Instacart. For you, that means one les |
-| 2026-11-01 | WELL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Welltower (WELL) Could Be 10% Undervalued Following Q3 Earni |
-| 2026-11-01 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Form 4 Verizon Communications : Kyle Malady (EVP and Group C |
-| 2026-11-01 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation $UNP Stock: Sumitomo Mitsui Trust  |
-| 2026-11-01 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation $UNP Stock Holdings Lowered by MGO |
-| 2026-11-01 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Alphabet Says Its AI Spending Will Keep Rising. 2 Data Cente |
-| 2026-11-01 | CTAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Is Cintas (CTAS) Fully Priced for Its Cash Flow Outlook? - S |
-| 2026-11-01 | KVUE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Kenvue (KVUE) Q3 Earnings Leave Margin Gains Under Legal Clo |
-| 2026-11-01 | ZETA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | A 'humbling' career move led to Catherine Zeta-Jones' big br |
-| 2026-11-01 | MP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Nancy Grace Roman Space Telescope: 300 MP, $4.3B [2026] - ht |
+| 2026-11-02 | MSFT | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | [Major Banks] CMB International raises Microsoft’s (MSFT.US) |
+| 2026-11-02 | CSGP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | CoStar Group (CSGP) Could Be 16% Below Fair Value On Profit  |
+| 2026-11-02 | PSX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Declares Force Majeure On Freeport Butane  |
+| 2026-11-01 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation (UNP) stock price, news, quote and |
+| 2026-11-01 | CHD | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Church & Dwight (CHD) Q3 Earnings Highlight Margin Strength  |
+| 2026-11-01 | CVNA | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Carvana (CVNA) Earnings And Guidance Put Its Valuation Narra |
+| 2026-11-01 | ALGN | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | How Investors May Respond To Align Technology (ALGN) Cautiou |
+| 2026-11-01 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) Stock May Trade At A Premium To Cash Flo |
+| 2026-11-01 | DASH | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Doordash is acquiring Instacart. For you, that means one les |
+| 2026-11-01 | WELL | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Welltower (WELL) Could Be 10% Undervalued Following Q3 Earni |
+| 2026-11-01 | VZ | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Form 4 Verizon Communications : Kyle Malady (EVP and Group C |
+| 2026-11-01 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation $UNP Stock: Sumitomo Mitsui Trust  |
+| 2026-11-01 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation $UNP Stock Holdings Lowered by MGO |
+| 2026-11-01 | GOOGL | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Alphabet Says Its AI Spending Will Keep Rising. 2 Data Cente |
+| 2026-11-01 | CTAS | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Is Cintas (CTAS) Fully Priced for Its Cash Flow Outlook? - S |
+| 2026-11-01 | KVUE | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Kenvue (KVUE) Q3 Earnings Leave Margin Gains Under Legal Clo |
+| 2026-11-01 | ZETA | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | A 'humbling' career move led to Catherine Zeta-Jones' big br |
+| 2026-11-01 | MP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Nancy Grace Roman Space Telescope: 300 MP, $4.3B [2026] - ht |
 | 2026-10-31 | PSA | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Does Raised 2026 Guidance Change The Bull Case For Public St |
 | 2026-10-31 | FDX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx: 3 Key Takeaways for Long-Term Investors |
 | 2026-10-31 | FDX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | How Investors Are Reacting To FedEx (FDX) Raised Full Year O |
