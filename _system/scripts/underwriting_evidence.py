@@ -108,7 +108,13 @@ def requested_keywords(gaps, *, history=None):
         terms = []
         for term in quoted:
             section = re.fullmatch(r'(?:section\s+)?('+number+r')(?:\([a-z0-9]+\))*', term)
-            if section:
+            if (search_list and re.fullmatch(number, term)
+                    and re.search(r'(?<![\w./:=?&+\-])'+re.escape(term)+r'\s*%(?!\w)',
+                                  detail[:search_list.start()])):
+                # An exact percentage already named by the request is a literal
+                # search token, not an invented legal-section reference.
+                terms.append(term)
+            elif section:
                 terms.append('section '+section[1])
             elif search_list and re.fullmatch(r'(?:19|20)\d{2}', term):
                 terms.append(term)
@@ -215,13 +221,20 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
     source = primary_text(raw)
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
              'revenue', 'credit', 'receivables', 'segment', 'net income', 'financing')
+    body = text_of(source)
+    # Numeric queries need a percentage in financial source text; they never
+    # contribute a table's financial-content score.
+    financial_body = sum(w in body.lower() for w in words) >= 3
+    percentage = lambda phrase: r'(?<![\w./:=?&+\-])'+re.escape(phrase)+r'(?=\s*%(?!\w))'
     focus = tuple(' '.join(w.lower().split()) for w in focus_keywords
-                  if re.fullmatch(r"[A-Za-z][A-Za-z0-9_ ()/,&.'-]{1,119}", w))[:18]
+                  if re.fullmatch(r"[A-Za-z][A-Za-z0-9_ ()/,&.'-]{1,119}", w)
+                  or (financial_body and re.fullmatch(r'\d{1,3}\.\d{1,3}', w)
+                      and re.search(percentage(w), body)))[:18]
     tables = []
     for table in re.finditer(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
         text = text_of(table.group())
         if 80 <= len(text) <= 16000:
-            score = sum(w in text.lower() for w in words)+5*sum(w in text.lower() for w in focus)
+            score = sum(w in text.lower() for w in words)+5*sum(w in text.lower() for w in focus if w[0].isalpha())
             if score >= 3:
                 # Scale, title and period often sit just outside the table.
                 # Keep adjacent primary text so supplemental facts can quote
@@ -239,7 +252,6 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
         size += len(text)
         if len(contexts) >= 30:
             break
-    body = text_of(source)
     # A requested trustee-succession supplement can contain no monetary table.
     # Its explicit self-identification, operative sections and execution text
     # still need to survive intact, rather than becoming disconnected windows.
@@ -403,7 +415,8 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
                 start = match.start()
                 add_context(body[max(0, start-250):start+2300])
     for phrase in focus:
-        matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
+        pattern = percentage(phrase) if re.fullmatch(r'\d{1,3}\.\d{1,3}', phrase) else re.escape(phrase)
+        matches = list(re.finditer(pattern, body, flags=re.IGNORECASE))
         # A contents mention is not the disclosure. Prefer the occurrence
         # surrounded by other requested concepts, with a stable document order.
         matches.sort(key=lambda m: (-sum(w in body[max(0, m.start()-1500):m.start()+8500].lower()
