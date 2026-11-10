@@ -60,7 +60,7 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     async quote(ticker,policy){
       health.nbbo_access=reference.health.quote_access;
       if(policy?.quote_feed==='databento_mini')return miniQuote(ticker);
-      if(!policy&&key){start();if(!symbols.has(ticker)){symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}return null;}
+      if(!policy&&key){start();if(!symbols.has(ticker)){if(symbols.size>=128)throw new Error('Databento symbol budget reached');symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}return null;}
       return reference.quote(ticker);
     },
     news:()=>reference.news(),actions:(...args)=>reference.actions(...args),

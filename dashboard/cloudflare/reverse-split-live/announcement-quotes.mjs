@@ -5,21 +5,23 @@ const DAY=86400000;
 export async function registerAnnouncement(env,event,now=new Date().toISOString()){
  const old=await env.DB.prepare('SELECT payload FROM rs_announcement_watches WHERE event_id=?').bind(event.id).first();
  const saved=old?JSON.parse(old.payload):null;
- const until=new Date(Math.max(at(event.first_seen_at)||at(now),at(event.effective_date)||0)+10*DAY).toISOString();
- const row={...saved,event_id:event.id,ticker:event.ticker||saved?.ticker||null,cik:event.cik||null,company:event.company||null,announcement_status:event.status,first_seen_at:event.first_seen_at,registered_at:saved?.registered_at||now,watch_until:until,late_registration:at(now)-at(event.first_seen_at)>15000,status:saved?.status||'awaiting_quote',samples:saved?.samples||0,authority:'none'};
+ const historical=event.status==='historical';
+ const until=historical?new Date(at(now)-1).toISOString():new Date(Math.max(at(event.first_seen_at)||at(now),at(event.effective_date)||0)+10*DAY).toISOString();
+ const row={...saved,event_id:event.id,ticker:event.ticker||saved?.ticker||null,cik:event.cik||null,company:event.company||null,announcement_status:event.status,first_seen_at:event.first_seen_at,registered_at:saved?.registered_at||now,watch_until:until,late_registration:at(now)-at(event.first_seen_at)>15000,status:historical?'historical_reference':saved?.status||'awaiting_quote',samples:saved?.samples||0,authority:'none'};
  await env.DB.prepare('INSERT INTO rs_announcement_watches VALUES(?,?,?,?,?,?) ON CONFLICT(event_id) DO UPDATE SET ticker=excluded.ticker,watch_until=excluded.watch_until,payload=excluded.payload').bind(row.event_id,row.ticker,row.first_seen_at,row.registered_at,row.watch_until,JSON.stringify(row)).run();
  if(at(until)>at(now))env.market?.warm?.(row.ticker);
  return row;
 }
 export async function initializeAnnouncementQuotes(env,now=new Date().toISOString()){
- const events=(await env.DB.prepare('SELECT payload FROM rs_events WHERE first_seen_at>=?').bind(new Date(at(now)-2*DAY).toISOString()).all()).results;
+ for(const ticker of ['AAPL','SPY','IWM'])env.market?.warm?.(ticker);
+ const events=(await env.DB.prepare("SELECT payload FROM rs_events WHERE first_seen_at>=? ORDER BY CASE WHEN json_extract(payload,'$.status')='scheduled' THEN 0 ELSE 1 END,first_seen_at DESC").bind(new Date(at(now)-2*DAY).toISOString()).all()).results;
  for(const r of events)await registerAnnouncement(env,JSON.parse(r.payload),now);
  env.onAnnouncementDetection=event=>registerAnnouncement(env,event);
 }
 export async function announcementQuoteTick(env,now=new Date().toISOString()){
  if(at(now)<(env.nextAnnouncementQuotes||0))return;
  env.nextAnnouncementQuotes=at(now)+5000;
- const rows=(await env.DB.prepare('SELECT payload FROM rs_announcement_watches WHERE watch_until>=? ORDER BY first_seen_at DESC').bind(now).all()).results.map(r=>JSON.parse(r.payload));
+ const rows=(await env.DB.prepare("SELECT payload FROM rs_announcement_watches WHERE watch_until>=? ORDER BY CASE WHEN json_extract(payload,'$.announcement_status')='scheduled' THEN 0 ELSE 1 END,first_seen_at DESC").bind(now).all()).results.map(r=>JSON.parse(r.payload));
  const names=[...new Set(rows.map(r=>r.ticker).filter(t=>/^[A-Z][A-Z0-9.]{0,11}$/.test(t||'')))];env.announcementQuoteSymbols=names;
  const errors=new Map(),quotes=new Map();let identityRequests=0;
  // Read the existing shared subscription. No additional market-data session.
