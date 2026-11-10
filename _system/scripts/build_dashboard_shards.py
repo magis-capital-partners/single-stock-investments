@@ -705,6 +705,12 @@ def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> di
         report = report_for_companies(companies, date.fromisoformat(companies[0]["as_of"]))
         (data_dir / "irr_readiness.json").write_text(_dump(report), encoding="utf-8")
         payload.setdefault("summary", {})["irr_readiness"] = report["summary"]
+    # The Inflections landing page reads only the compact projection. Detail
+    # and the full observation index are requested when the reader opens them.
+    kpi = payload.get("kpi_trends") or _read_json_object(data_dir / "kpi_trends.json")
+    if isinstance(kpi, dict) and kpi.get("by_ticker") and payload.get("tickers"):
+        from build_inflections import write_inflection_assets
+        write_inflection_assets(kpi, payload["tickers"], data_dir)
     core = build_core_payload(payload)
     core_path.write_text(_dump(core), encoding="utf-8")
     ticker_count = write_ticker_shards(payload, data_dir)

@@ -47,7 +47,9 @@ class AnalyzeQuarterlyYoyTests(unittest.TestCase):
         base = [100.0, 80.0, 90.0, 150.0]
         y2 = [v * 1.10 for v in base]
         y3 = [base[0] * 1.10 * 1.12, base[1] * 1.10 * 1.20, base[2] * 1.10 * 1.35, base[3] * 1.10 * 1.60]
-        result = analyze_quarterly_yoy(quarterly(base + y2 + y3), metric_key="revenues")
+        # Fixed historical fixtures test the detector, independent of wall-clock
+        # aging. Freshness itself has separate pinned-date regression coverage.
+        result = analyze_quarterly_yoy(quarterly(base + y2 + y3), metric_key="revenues", series_meta={"stale": False})
         self.assertIsNotNone(result)
         self.assertEqual(result["direction"], "accelerating")
         self.assertIn(result["signal_tier"], ("confirmed", "emerging"))
@@ -56,7 +58,7 @@ class AnalyzeQuarterlyYoyTests(unittest.TestCase):
         base = [100.0, 80.0, 90.0, 150.0]
         y2 = [v * 1.30 for v in base]
         y3 = [base[0] * 1.30 * 1.28, base[1] * 1.30 * 1.18, base[2] * 1.30 * 1.06, base[3] * 1.30 * 0.90]
-        result = analyze_quarterly_yoy(quarterly(base + y2 + y3), metric_key="revenues")
+        result = analyze_quarterly_yoy(quarterly(base + y2 + y3), metric_key="revenues", series_meta={"stale": False})
         self.assertIsNotNone(result)
         self.assertEqual(result["direction"], "decelerating")
 

@@ -627,7 +627,7 @@ def peer_relative_signal(
 
 
 def earnings_revision_signal(events: list[dict]) -> dict | None:
-    """Estimate-revision layer from reported EPS surprises (beat/miss streaks)."""
+    """Reported EPS-surprise layer; the legacy function/key is retained for callers."""
     reported: list[tuple[str, float]] = []
     for event in events:
         if not event.get("reported"):
@@ -663,10 +663,10 @@ def earnings_revision_signal(events: list[dict]) -> dict | None:
         label = "Consecutive EPS beats vs consensus"
     elif revision <= -0.10:
         direction = "decelerating"
-        label = "Estimate revision down (EPS surprise worsened)"
+        label = "Reported EPS surprise worsened"
     elif revision >= 0.10:
         direction = "accelerating"
-        label = "Estimate revision up (EPS surprise improved)"
+        label = "Reported EPS surprise improved"
     else:
         return None
 
@@ -685,6 +685,8 @@ def earnings_revision_signal(events: list[dict]) -> dict | None:
             "basis": "surprise",
             "mode": "pct",
             "surprise_streak": len(surprises),
+            "latest_period": reported[-1][0],
+            "prior_period": reported[-2][0],
             "artifact": False,
         }
     )

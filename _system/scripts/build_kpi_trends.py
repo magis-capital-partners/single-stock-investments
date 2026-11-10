@@ -231,6 +231,7 @@ def enrich_analysis(
     threshold = analysis["threshold"]
     material = passes_materiality(analysis.get("growth_latest"), metric_key, direction=direction)
     tier = signal_tier_from_accels(raw_accels, direction, threshold)
+    confirmation_basis = ("two_quarters" if analysis.get("basis") == "yoy" else "two_periods") if tier == "confirmed" else None
     if not material and direction != "steady":
         direction = "steady"
         tier = "steady"
@@ -253,6 +254,7 @@ def enrich_analysis(
 
     if tier == "emerging" and ttm_agrees is True:
         tier = "confirmed"
+        confirmation_basis = "trailing_year"
 
     artifact = is_growth_artifact(
         growth_latest=analysis.get("growth_latest"),
@@ -268,6 +270,7 @@ def enrich_analysis(
         "metric": analysis.get("metric") or metric_key,
         "direction": direction,
         "signal_tier": tier,
+        "confirmation_basis": confirmation_basis if tier == "confirmed" else None,
         "tier": metric_tier(metric_key),
         "material": material,
         "strength": round(strength({**analysis, "direction": direction}), 3),
