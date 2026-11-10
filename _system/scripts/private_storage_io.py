@@ -110,7 +110,7 @@ def materialize(vault, relative, *, storage=None):
     if cache_key not in _VIEW_CACHE:
         _VIEW_CACHE[cache_key] = view(vault, storage)
     records = _VIEW_CACHE[cache_key]
-    entry = records.get(relative)
+    entry = storage.lookup_entry(relative, records)
     if entry:
         destination.parent.mkdir(parents=True, exist_ok=True)
         restore_file(storage.objects, entry, destination)
