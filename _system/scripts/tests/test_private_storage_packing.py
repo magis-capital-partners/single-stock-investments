@@ -77,3 +77,10 @@ def test_hosting_private_storage_receives_existing_cloudflare_credentials():
     assert 'CLOUDFLARE_API_TOKEN: '+chr(36)+'{{ secrets.CLOUDFLARE_API_TOKEN }}' in build
     assert 'CLOUDFLARE_ACCOUNT_ID: '+chr(36)+'{{ secrets.CLOUDFLARE_ACCOUNT_ID }}' in build
     assert 'RESEARCH_VAULT_CLONE_TOKEN:' in build
+
+@pytest.mark.parametrize('path',['legacy/pin/manifests/original.json','audit/approval/original.json','recovery/V/original.json'])
+def test_cold_archive_and_approval_audits_are_immutable(path):
+    s=store.PrivateStorage(config={},objects=Objects(),catalog=MemoryCatalog())
+    s.publish({path:b'original bytes'})
+    with pytest.raises(store.StorageError,match='immutable'):s.publish({path:b'different bytes'})
+    assert s.restore(path)==b'original bytes'

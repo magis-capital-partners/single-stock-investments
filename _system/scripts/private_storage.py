@@ -499,6 +499,7 @@ class PrivateStorage:
                     raise StorageError("Existing private file differs")
                 continue
             immutable = re.search(r"(?:^|/)(?:objects|packets|handoffs)/[0-9a-f]{64}(?:\.json|\.zip)?$", relative)
+            immutable = immutable or relative.startswith(("legacy/", "audit/", "recovery/"))
             if prior and immutable:
                 raise StorageError("An immutable private artifact cannot be replaced")
             updates[relative] = store_bytes(self.objects, raw)

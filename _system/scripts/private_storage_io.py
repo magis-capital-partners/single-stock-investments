@@ -162,7 +162,7 @@ def publish_paths(vault, paths, *, storage=None):
         if prior == entry:
             continue
         immutable = ('/objects/' in relative or '/packets/' in relative or '/handoffs/' in relative and '/latest/' not in relative
-                     or relative.endswith('.zip'))
+                     or relative.endswith('.zip') or relative.startswith(('legacy/','audit/','recovery/')))
         if prior and immutable and prior['sha256'] != entry['sha256']:
             raise StorageError('An immutable private artifact cannot be replaced')
         if prior and relative.endswith('/ledger.jsonl'):
