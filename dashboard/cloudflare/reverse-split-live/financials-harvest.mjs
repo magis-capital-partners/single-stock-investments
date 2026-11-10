@@ -67,7 +67,10 @@ async function discoverReports(client,cik,sub){
 }
 export async function harvestIssuer(env,job,{client=new FinancialSources(env),maximumDocuments=8,offline=false,extract=extractFiling}={}){
   const cik=String(Number(job.cik)),key='financials/work/'+cik+'.json',work=await read(env,key,{facts:[],sources:[],processed:{},candidates:[],issues:[],errors:{}});work.errors||={};
-  if(work.parser_hash!==PARSER_HASH){Object.assign(work,{facts:[],processed:{},candidates:[],issues:[],errors:{},parser_hash:PARSER_HASH});}
+  if(work.parser_hash!==PARSER_HASH){
+    if(work.parser_hash){const archive={schema:'reverse_split_parser_repair_archive.v1',cik,archived_at:now(),previous_parser:work.parser_hash,next_parser:PARSER_HASH,work};const raw=JSON.stringify(archive),archiveKey='review/repairs/'+hash(raw)+'.json';await env.assertFinancialLease?.();await put(env,archiveKey,archive);work.previous_parser_archive=archiveKey;}
+    Object.assign(work,{facts:[],processed:{},candidates:[],issues:[],errors:{},parser_hash:PARSER_HASH});
+  }
   // Repair only documents that the earlier cooldown handling parked by mistake.
   for(const error of Object.values(work.errors))if(error.terminal&&isSourceCooldown(error)){error.terminal=false;error.attempts=0;error.next_attempt=0;}
   const refreshForSignal=!!job.last_signal&&job.last_signal!==work.last_signal;

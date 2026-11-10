@@ -14,6 +14,14 @@ META = {'cik': '123', 'company': 'Example Research Ltd', 'form': '6-K', 'filed':
 
 
 class FilingExtraction(unittest.TestCase):
+    def test_silexion_tagged_note_balances_and_explicit_fixed_zero(self):
+        raw=b'''<html xmlns:ixt="http://www.xbrl.org/inlineXBRL/transformation/2020-02-12"><xbrli:context id="c"><xbrli:entity><xbrli:identifier>2022416</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2026-06-30</xbrli:instant></xbrli:period></xbrli:context><xbrli:unit id="u"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit><ix:nonFraction name="slxn:RelatedPartyPromissoryNoteCurrent" contextRef="c" unitRef="u" scale="3">985</ix:nonFraction><ix:nonFraction name="slxn:PromissoryNotesToRelatedPartiesNoncurrent" contextRef="c" unitRef="u" scale="3" format="ixt:fixed-zero">-</ix:nonFraction></html>'''
+        rows=extract_document(raw,{**META,'cik':'2022416'})['facts']
+        self.assertEqual({(r['metric'],r['value'])for r in rows},{('current_debt',985000),('long_term_debt',0)})
+        self.assertTrue(next(r for r in rows if r['metric']=='long_term_debt')['explicit_zero'])
+        self.assertFalse(extract_document(raw.replace(b'format="ixt:fixed-zero"',b''),{**META,'cik':'2022416'})['facts'][-1]['metric']=='long_term_debt')
+        self.assertFalse(extract_document(raw.replace(b'2022416',b'123'),META)['facts'])
+        self.assertFalse(any(r['metric']=='long_term_debt'for r in extract_document(raw.replace(b'http://www.xbrl.org/inlineXBRL/transformation/2020-02-12',b'https://untrusted.example/transform'),{**META,'cik':'2022416'})['facts']))
     def test_partial_operating_flows_and_all_current_borrowings_do_not_change_the_registered_definitions(self):
         self.assertIsNone(metric_for('NetCashUsedInOperatingActivitiesContinuingOperations'))
         self.assertIsNone(metric_for('CurrentBorrowings'))

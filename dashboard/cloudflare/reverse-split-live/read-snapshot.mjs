@@ -6,6 +6,11 @@ async function keyId(value){return [...new Uint8Array(await crypto.subtle.digest
 const pair=(a,b)=>a[0]===b[0]?(a[1]<b[1]?-1:a[1]>b[1]?1:0):a[0]<b[0]?-1:1;
 function cursor(value,initial){if(!value)return initial;const r=JSON.parse(atob(value));if(!Array.isArray(r)||r.length!==2||r.some(v=>typeof v!=='string'))throw new Error('Invalid cursor');return r;}
 export async function readSnapshotAPI(url,env){
+  if(url.pathname.startsWith('/shadow/announcement-quotes/')){
+    const sha=url.pathname.slice('/shadow/announcement-quotes/'.length);if(!/^[a-f0-9]{64}$/.test(sha))return json({error:'Invalid quote archive'},400);
+    const object=await env.EVIDENCE.get('announcement-quotes/'+sha+'.json');if(!object)return json({error:'Quote archive not found'},404);
+    return new Response(object.body||await object.arrayBuffer(),{headers:{'content-type':'application/json','content-disposition':`attachment; filename="announcement-quotes-${sha}.json"`,'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
+  }
   if(url.pathname==='/shadow/review-monitor'){const object=await env.EVIDENCE.get('review/monitor-latest.json');return object?json(await object.json()):json({error:'Independent review check has not run'},503);}
   const path=url.pathname,staticPaths={'/shadow':'shadow.json','/shadow/executable':'execution.json','/shadow/readiness':'readiness.json','/shadow/operations':'operations.json','/shadow/validation':'validation.json','/health':'health.json','/':'health.json'};
   if(path==='/shadow/validation'&&url.searchParams.has('run')){

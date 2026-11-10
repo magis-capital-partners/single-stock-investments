@@ -35,6 +35,13 @@ def words(value):
 def clean(value):
     return re.sub(r'\s+', ' ', words(value)).strip()
 ALIASES = {clean(v): k for k, vals in NAMES.items() for v in vals}
+# Reviewed balance-sheet bindings, restricted to the filing's entity identifier.
+# SLXN 2026 Q2 primary statement: current note $985k, noncurrent note fixed-zero.
+# A repayment schedule, lease liability or absent row never substitutes for debt.
+ISSUER_CONCEPTS = {'2022416': {'RelatedPartyPromissoryNoteCurrent':'current_debt',
+                              'PromissoryNotesToRelatedPartiesNoncurrent':'long_term_debt'}}
+ZERO_TRANSFORM_NAMESPACES = {'http://www.xbrl.org/inlineXBRL/transformation/2020-02-12',
+                             'http://www.xbrl.org/inlineXBRL/transformation/2022-02-16'}
 def metric_for(value):
     label = re.sub(r'\([^)]*\)|\[[^]]*\]', '', str(value))
     return ALIASES.get(clean(label))
@@ -93,8 +100,11 @@ class FilingHTML(HTMLParser):
         self.contexts, self.units, self.inline, self.tables = {}, {}, [], []
         self.ctx = self.unit = self.fact = self.capture = None
         self.skip = 0; self.recent = ''; self.table = None; self.row = None; self.cell = None
+        self.namespaces = {}
     def handle_starttag(self, tag, attrs):
         a = dict(attrs); local = tag.split(':')[-1].lower()
+        for key,value in attrs:
+            if key.startswith('xmlns:'): self.namespaces[key.split(':',1)[1]] = value
         if local in {'script','style','exclude','sup'}: self.skip += 1
         if self.skip: return
         if local == 'context': self.ctx = {'id': a.get('id'), 'dimensions': 0}
@@ -102,7 +112,9 @@ class FilingHTML(HTMLParser):
         elif self.ctx is not None and local in {'segment','scenario'}: self.ctx['dimensions'] += 1
         elif local == 'unit': self.unit = {'id': a.get('id'), 'measures': []}
         elif self.unit is not None and local == 'measure': self.capture = ['measure', '']
-        elif local in {'nonfraction','nonnumeric'} and tag.startswith('ix:'): self.fact = {**a, 'text':'', 'inline_type':local}
+        elif local in {'nonfraction','nonnumeric'} and tag.startswith('ix:'):
+            self.fact = {**a, 'text':'', 'inline_type':local,
+                         'format_namespace':self.namespaces.get(a.get('format','').split(':')[0])}
         if local == 'table' and self.table is None: self.table = {'context':self.recent[-1800:], 'rows':[]}
         elif local == 'tr' and self.table is not None: self.row = []
         elif local in {'td','th'} and self.row is not None: self.cell = {'text':'', 'colspan':min(12, max(1, int(a.get('colspan','1')) if a.get('colspan','1').isdigit() else 1))}
@@ -146,7 +158,7 @@ def extract_html(text, meta, labels=None):
     facts, candidates, issues = [], [], []
     for row in parser.inline:
         if row.get('inline_type') != 'nonfraction': continue
-        tag = row.get('name',''); caption=(labels or {}).get(tag.split(':')[-1]);metric = metric_for(tag.split(':')[-1]) or metric_for(caption or '')
+        tag = row.get('name',''); caption=(labels or {}).get(tag.split(':')[-1]);metric = metric_for(tag.split(':')[-1]) or metric_for(caption or '') or ISSUER_CONCEPTS.get(str(int(meta['cik'])),{}).get(tag.split(':')[-1])
         if not metric: continue
         ctx = parser.contexts.get(row.get('contextref'), {}); unit = parser.units.get(row.get('unitref'))
         if ctx.get('dimensions') or str(ctx.get('identifier','')).lstrip('0') != str(meta['cik']).lstrip('0'): continue
@@ -154,8 +166,9 @@ def extract_html(text, meta, labels=None):
         end, start = ctx.get('instant') or ctx.get('enddate'), ctx.get('startdate')
         if not end or (metric in FLOW) != bool(start): continue
         raw = row['text']; fmt = row.get('format','').lower()
+        if row.get('xsi:nil','').lower() in {'true','1'}: continue
         if 'commadecimal' in fmt or 'comma-decimal' in fmt: raw = raw.replace('.', '').replace(',', '.')
-        value = numeric(raw)
+        value = 0 if fmt.split(':')[-1]=='fixed-zero' and row.get('format_namespace') in ZERO_TRANSFORM_NAMESPACES else numeric(raw)
         try:
             exponent = int(row.get('scale',0))
             if abs(exponent) > 12: continue

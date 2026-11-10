@@ -6,7 +6,7 @@ import {at} from './shadow-core.mjs';
 
 export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>new Date().toISOString(),python=process.env.PYTHON||(process.platform==='win32'?'python':'python3')}={}){
   const health={provider:'Databento Equities Mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',status:key?'not_checked':'not_configured',quote_access:'unverified',nbbo_access:'unverified',last_success:null,last_heartbeat:null,error:null,subscriptions:0,invalidations:0,rejected_records:0};
-  const latest=new Map(),symbols=new Set(),telemetry=[],sampleWindows=new Map(),listeners=new Set();let child,closed=false,lines,dropped=0;
+  const identityTimes=new Map(),identityLoads=new Map(),identities=new Map(),latest=new Map(),symbols=new Set(),telemetry=[],sampleWindows=new Map(),listeners=new Set();let child,closed=false,lines,dropped=0;
   function clear(status){latest.clear();health.status=status;health.quote_access=status==='not_entitled'?'not_entitled':'unavailable';}
   function accept(row){
     if(row.kind==='health'){
@@ -37,19 +37,22 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     child.on('error',()=>{clear('unavailable');health.error='Databento live helper could not start';});
     child.on('exit',code=>{clear(code===2?'not_entitled':'disconnected');health.error=code===2?'Databento live access was rejected or the retry budget was exhausted':'Databento live helper stopped';});
   }
+  async function verifyIdentity(ticker){if(identities.has(ticker))return identities.get(ticker);if(!identityLoads.has(ticker))identityLoads.set(ticker,reference.identity(ticker).then(identity=>{identities.set(ticker,identity);identityTimes.set(ticker,clock());return identity;}).finally(()=>identityLoads.delete(ticker)));return identityLoads.get(ticker);}
   async function miniQuote(ticker,benchmark=false){
     if(!/^[A-Z][A-Z0-9.]{0,11}$/.test(ticker||''))throw new Error('Databento raw symbol requires explicit verification');
     if(!key)throw new Error('Databento credential is not configured');
     start();if(!symbols.has(ticker)){if(symbols.size>=128)throw new Error('Databento symbol budget reached');symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}
-    const identity=await reference.identity(ticker),row=latest.get(ticker);
+    const identity=await verifyIdentity(ticker),row=latest.get(ticker);
     if(!identity.security_id||identity.currency!=='usd'||(!benchmark&&(!identity.cik||identity.type!=='CS')))throw new Error('Databento quote issuer or common-share identity is unresolved');
     if(!row||at(clock())-at(row.quote_at)>15000)throw new Error('Waiting for a fresh Databento Mini quote');
     return {ticker,...identity,provider:'databento_mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',quote_at:row.quote_at,observed_at:row.observed_at,bid:row.bid,ask:row.ask,bid_size:row.bid_size,ask_size:row.ask_size,consolidated:false,delayed:false,size_units:'shares',source_url:'https://databento.com/docs/datasets/equs-mini',raw:row};
   }
   return {
     get health(){const atNow=at(clock()),age=health.last_success?(atNow-at(health.last_success))/1000:null,per_symbol=[...symbols].map(ticker=>{const q=latest.get(ticker),quote_age_seconds=q?(atNow-at(q.quote_at))/1000:null;return {ticker,quote_at:q?.quote_at||null,observed_at:q?.observed_at||null,quote_age_seconds,status:quote_age_seconds!==null&&quote_age_seconds<=15?'fresh':q?'stale':'awaiting_quote'};});return {...health,quote_access:health.quote_access==='received'&&age>15?'stale':health.quote_access,last_quote_age_seconds:age,per_symbol,symbol_budget:128,symbol_budget_remaining:128-symbols.size};},
+    verifyIdentity,identityKnown:ticker=>identities.has(ticker),
+    peek(ticker){const row=latest.get(ticker);if(!row)return null;const identity=identities.get(ticker);return {...identity,...row,raw:row,size_units:'shares',coverage:'selected_venues_not_sip_nbbo',identity_verified_at:identityTimes.get(ticker)||null,identity_verified:!!identity?.security_id&&!!identity.cik&&identity.type==='CS'&&identity.currency==='usd',security_id:identity?.security_id||null};},
     warm(ticker){if(!/^[A-Z][A-Z0-9.]{0,11}$/.test(ticker||'')||!key)return;start();if(!symbols.has(ticker)){if(symbols.size>=128){health.error='Databento symbol budget reached';return;}symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}},
-    reconcileSymbols(wanted){const keep=[...new Set(['AAPL','SPY','IWM',...wanted])].filter(t=>/^[A-Z][A-Z0-9.]{0,11}$/.test(t)).slice(0,128);if(symbols.size<96||keep.length>=symbols.size-16)return;const atNow=at(clock());if(atNow-(health.last_rotation_ms||0)<300000)return;health.last_rotation_ms=atNow;health.subscription_rotations=(health.subscription_rotations||0)+1;symbols.clear();for(const t of keep)symbols.add(t);latest.clear();health.subscriptions=symbols.size;health.quote_access='awaiting_live_quote';child?.stdin.write(JSON.stringify({kind:'replace_subscriptions',tickers:keep})+'\n');},
+    reconcileSymbols(wanted){const keep=[...new Set(['AAPL','SPY','IWM',...wanted])].filter(t=>/^[A-Z][A-Z0-9.]{0,11}$/.test(t)).slice(0,128);if(symbols.size<96||(!keep.some(t=>!symbols.has(t))&&keep.length>=symbols.size-16))return;const atNow=at(clock());if(atNow-(health.last_rotation_ms||0)<300000)return;health.last_rotation_ms=atNow;health.subscription_rotations=(health.subscription_rotations||0)+1;symbols.clear();for(const t of keep)symbols.add(t);latest.clear();health.subscriptions=symbols.size;health.quote_access='awaiting_live_quote';child?.stdin.write(JSON.stringify({kind:'replace_subscriptions',tickers:keep})+'\n');},
     activePolicy:key?'rs_immediate_mini.v1':'rs_immediate.v1',
     onQuote(listener){listeners.add(listener);return ()=>listeners.delete(listener);},
     observe(ticker){if(!['AAPL','SPY','IWM'].includes(ticker))return miniQuote(ticker);return miniQuote(ticker,true);},
@@ -57,7 +60,7 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     async quote(ticker,policy){
       health.nbbo_access=reference.health.quote_access;
       if(policy?.quote_feed==='databento_mini')return miniQuote(ticker);
-      if(!policy&&key){start();if(!symbols.has(ticker)){symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}return null;}
+      if(!policy&&key){start();if(!symbols.has(ticker)){if(symbols.size>=128)throw new Error('Databento symbol budget reached');symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}return null;}
       return reference.quote(ticker);
     },
     news:()=>reference.news(),actions:(...args)=>reference.actions(...args),
