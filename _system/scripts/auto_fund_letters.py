@@ -37,7 +37,8 @@ SYNC = ROOT / "_system/scripts/sync_fund_letters_release.py"
 LMS_MODEL = os.environ.get("FUND_LETTERS_LMS_MODEL", "qwen/qwen3.5-9b")
 LMS_IDENTIFIER = os.environ.get("FUND_LETTERS_LMS_IDENTIFIER", "qwen-gpu")
 # Limits past which the lane waits instead of summarizing. See memory_shortage().
-MAX_SWAP_GB = float(os.environ.get("FUND_LETTERS_MAX_SWAP_GB", "24"))
+# With the model and both lanes working, this 16 GB Mac sits at a few gigabytes of swap.
+MAX_SWAP_GB = float(os.environ.get("FUND_LETTERS_MAX_SWAP_GB", "12"))
 MIN_FREE_DISK_GB = float(os.environ.get("FUND_LETTERS_MIN_FREE_DISK_GB", "8"))
 ACCOUNT_ID_RE = re.compile(r"\b([0-9a-f]{32})\b")
 OAUTH_TOKEN_RE = re.compile(r'(?m)^oauth_token\s*=\s*"([^"]+)"\s*$')
@@ -144,6 +145,30 @@ def ensure_model() -> bool:
     return ready
 
 
+def release_model() -> bool:
+    """Unload the model while the machine is short of memory. True when it was unloaded.
+
+    A loaded model holds about ten gigabytes whether or not anyone is asking
+    it anything. It is left alone when another lane is in the middle of a
+    reply; `ensure_model` in either lane loads it again when it is next wanted.
+    """
+    lms = find_lms()
+    if lms is None:
+        return False
+    try:
+        listed = subprocess.run([str(lms), "ps"], text=True, capture_output=True, timeout=60).stdout or ""
+        row = next((line.split() for line in listed.splitlines() if line.split()[:1] == [LMS_IDENTIFIER]), [])
+        if "IDLE" not in row:
+            return False
+        done = subprocess.run([str(lms), "unload", LMS_IDENTIFIER], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    if done.returncode:
+        return False
+    print(json.dumps({"step": "unload-model", "model": LMS_MODEL, "at": now()}), flush=True)
+    return True
+
+
 def _sysctl(name: str) -> str:
     try:
         return subprocess.run(["sysctl", "-n", name], text=True, capture_output=True, timeout=10).stdout.strip()
@@ -159,7 +184,8 @@ def memory_shortage(pressure: str | None = None, swap: str | None = None, free_d
     grows swap onto the startup disk, so a nearly full disk and a large swap
     are the same emergency. Summarizing through it only adds page traffic and
     GPU load to a machine that is already failing, so the lane sits the
-    cycle out and tries again on the next one. Publishing still runs.
+    cycle out, unloads the model, and tries again on the next one. Publishing
+    still runs.
     """
     pressure = _sysctl("kern.memorystatus_vm_pressure_level") if pressure is None else pressure
     if pressure.strip() == "4":
@@ -359,7 +385,10 @@ def summarize_batch(args, env: dict) -> int:
     for index in range(max(1, args.batch)):
         shortage = memory_shortage()
         if shortage:
-            print(json.dumps({"note": f"summarize step skipped: {shortage}; publishing continues"}), flush=True)
+            released = release_model()
+            print(json.dumps({"note": f"summarize step skipped: {shortage}; "
+                                      + ("the model was unloaded to give its memory back; " if released else "")
+                                      + "publishing continues"}), flush=True)
             break
         if not ensure_model():
             print(json.dumps({"note": "summarize step skipped: the local model is not available; publishing continues"}), flush=True)
