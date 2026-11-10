@@ -40,6 +40,8 @@ LMS_IDENTIFIER = os.environ.get("FUND_LETTERS_LMS_IDENTIFIER", "qwen-gpu")
 # With the model and both lanes working, this 16 GB Mac sits at a few gigabytes of swap.
 MAX_SWAP_GB = float(os.environ.get("FUND_LETTERS_MAX_SWAP_GB", "12"))
 MIN_FREE_DISK_GB = float(os.environ.get("FUND_LETTERS_MIN_FREE_DISK_GB", "8"))
+# A letter already being read is put down when swap climbs this far while it is in progress.
+ABORT_SWAP_GB = float(os.environ.get("FUND_LETTERS_ABORT_SWAP_GB", str(MAX_SWAP_GB + 6)))
 ACCOUNT_ID_RE = re.compile(r"\b([0-9a-f]{32})\b")
 OAUTH_TOKEN_RE = re.compile(r'(?m)^oauth_token\s*=\s*"([^"]+)"\s*$')
 
@@ -397,7 +399,7 @@ def summarize_batch(args, env: dict) -> int:
         if args.refresh_older and index < args.refresh_older:
             command += ["--refresh-older", "1"]
         started += 1
-        if run_step("summarize", command, env):
+        if run_step("summarize", command, {**env, "FUND_LETTERS_ABORT_SWAP_GB": str(ABORT_SWAP_GB)}):
             print(json.dumps({"note": "summarize step did not complete (a manual run may hold the lock); publishing continues"}), flush=True)
             break
     return started

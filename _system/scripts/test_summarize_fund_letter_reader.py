@@ -740,3 +740,22 @@ def test_a_rejected_headline_becomes_the_statement_the_overview_opens_with(monke
     s.verify_summary(again, LETTER)
     assert again["headline"] == payload["headline"]
 
+
+def test_the_lane_can_have_a_letter_put_down_when_memory_runs_out_part_way(monkeypatch):
+    import subprocess
+    import llm_local
+
+    class Swap:
+        stdout = "total = 20480.00M  used = 19456.00M  free = 1024.00M  (encrypted)"
+
+    monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: Swap())
+    monkeypatch.delenv("FUND_LETTERS_ABORT_SWAP_GB", raising=False)
+    assert s.memory_emergency() is None  # a manual run is never interrupted
+    monkeypatch.setenv("FUND_LETTERS_ABORT_SWAP_GB", "18")
+    assert s.memory_emergency() == "19 GB of swap is in use"
+    with pytest.raises(llm_local.LocalLLMUnavailable, match="put down part-way"):
+        s.ask_json([], None, 10, {})
+    monkeypatch.setenv("FUND_LETTERS_ABORT_SWAP_GB", "40")
+    monkeypatch.setenv("FUND_LETTERS_MIN_FREE_DISK_GB", "0")
+    assert s.memory_emergency() is None
+
