@@ -141,3 +141,25 @@ def test_company_builds_require_explicit_ticker_and_limit():
     step=next(s for s in config['jobs']['underwrite']['steps'] if s.get('name')=='Author, independently challenge and build company valuations')
     assert 'test "$REQUESTED_LIMIT" = "1"' in step['run']
     assert '--tickers "$REQUESTED_TICKERS" --limit 1' in step['run']
+
+
+def test_source_parts_use_verified_object_store_before_manifest(environment,monkeypatch):
+    vault,fake=environment
+    io.initialize(vault,storage=fake)
+    import push_company_source_parts as parts
+    import private_storage
+    monkeypatch.setattr(private_storage,'enabled',lambda:True)
+    actual_publish=io.publish_paths
+    monkeypatch.setattr(io,'publish_paths',lambda root,paths:actual_publish(root,paths,storage=fake))
+    raw=b'PK\x03\x04complete original archive bytes'
+    identity=storage.sha(raw)
+    folder=vault/'dashboard-private/company-source-backfill-v2'
+    folder.mkdir(parents=True)
+    path=folder/(identity+'.zip');path.write_bytes(raw)
+    (folder/'manifest.json').write_text(json.dumps({'parts':[{'file':path.name,'sha256':identity}]}))
+    result=parts.publish(vault)
+    assert result['parts_uploaded']==1
+    relative=path.relative_to(vault).as_posix()
+    assert fake.restore(relative)==raw
+    assert fake.restore('dashboard-private/company-source-backfill-v2/manifest.json') is None
+    assert subprocess.check_output(['git','log','--format=%s'],cwd=vault).strip()==b'baseline'

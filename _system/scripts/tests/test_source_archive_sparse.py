@@ -20,6 +20,14 @@ ROOT = Path(__file__).resolve().parents[3]
 PREFIX = 'dashboard-private/company-source-backfill-v2'
 
 
+@pytest.fixture(autouse=True)
+def legacy_archive_transport_fixture(monkeypatch):
+    # Retain explicit coverage for the read-only legacy transport protocol.
+    # The activated object-store path is covered by the owned-view suite.
+    import private_storage
+    monkeypatch.setattr(private_storage, 'enabled', lambda *a, **k: False)
+
+
 def git(root, *args, input=None):
     return subprocess.check_output(['git', '-C', str(root), '-c', 'core.autocrlf=false',
         *args], input=input, stderr=subprocess.STDOUT).decode().strip()
