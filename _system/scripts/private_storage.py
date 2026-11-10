@@ -6,6 +6,7 @@ changes a paid record, or changes underwriting/admission/economic validation.
 from __future__ import annotations
 
 import base64
+from collections import OrderedDict
 import gzip
 import hashlib
 import io
@@ -136,6 +137,7 @@ def cloudflare_token():
 class R2Objects:
     def __init__(self, config, *, http=None):
         self.config = config
+        self._verified_cache = OrderedDict()
         self.http = http or HTTP(cloudflare_token, "api.cloudflare.com",
                                  requests_per_second=config.get("requests_per_second", 2))
         self.base = "/client/v4/accounts/" + config["account_id"] + "/r2/buckets/" + config["bucket"] + "/objects/"
@@ -148,11 +150,20 @@ class R2Objects:
     def get(self, identity, size):
         if type(size) is not int or not 0 <= size <= MAX_CHUNK_BYTES + 1024 * 1024:
             raise StorageError("Invalid immutable object size")
+        cached = self._verified_cache.get(identity)
+        if cached is not None:
+            if len(cached) != size:
+                raise StorageError("Immutable cached object size changed")
+            self._verified_cache.move_to_end(identity)
+            return cached
         raw = self.http.request("GET", self.base + self.key(identity), limit=size)
         if raw is None:
             return None
         if len(raw) != size or sha(raw) != identity:
             raise StorageError("Immutable private object hash or size changed")
+        self._verified_cache[identity] = raw
+        while len(self._verified_cache) > 2:
+            self._verified_cache.popitem(last=False)
         return raw
 
     def put(self, raw):
@@ -206,6 +217,47 @@ def store_file(objects, path):
     return {"sha256": identity.hexdigest(), "bytes": size, "chunks": chunks}
 
 
+def store_packed(objects, files):
+    """Preserve many complete files with one verified bounded object per pack.
+
+    Pack offsets are storage transport only. Original bytes, SHA-256 values,
+    file boundaries and all prior chunk layouts remain unchanged.
+    """
+    entries, pending, packed = {}, [], bytearray()
+
+    def flush():
+        if not pending:
+            return
+        identity = objects.put(bytes(packed))
+        size = len(packed)
+        for target, metadata in pending:
+            target.update(stored_sha256=identity, stored_bytes=size, **metadata)
+        pending.clear()
+        packed.clear()
+
+    for relative, raw in files.items():
+        relative_path(relative)
+        if not isinstance(raw, bytes):
+            raise StorageError("A complete binary private file is required")
+        chunks = []
+        entries[relative] = {"sha256": sha(raw), "bytes": len(raw), "chunks": chunks}
+        for start in range(0, len(raw), MAX_CHUNK_BYTES):
+            piece = raw[start:start + MAX_CHUNK_BYTES]
+            stored, codec = compress(piece)
+            if len(packed) + len(stored) > MAX_CHUNK_BYTES:
+                flush()
+            item = {"sha256": sha(piece), "bytes": len(piece), "encoding": "packed-" + codec}
+            metadata = {"packed_offset": len(packed), "packed_bytes": len(stored)}
+            pending.append((item, metadata))
+            packed.extend(stored)
+            chunks.append(item)
+    flush()
+    for relative, entry in entries.items():
+        if restore_bytes(objects, entry) != files[relative]:
+            raise StorageError("Complete packed private file did not round-trip")
+    return entries
+
+
 def decoded_chunks(objects, entry):
     if not HEX.fullmatch(entry.get("sha256", "")) or type(entry.get("bytes")) is not int or entry["bytes"] < 0:
         raise StorageError("Invalid private file identity")
@@ -218,13 +270,21 @@ def decoded_chunks(objects, entry):
         raw = objects.get(item.get("stored_sha256", ""), item.get("stored_bytes"))
         if raw is None:
             raise StorageError("Required immutable private object is missing")
-        if item.get("encoding") == "gzip":
+        codec = item.get("encoding")
+        if codec in ("packed-raw", "packed-gzip"):
+            offset, size = item.get("packed_offset"), item.get("packed_bytes")
+            if (type(offset) is not int or type(size) is not int or offset < 0
+                    or size <= 0 or offset + size > len(raw)):
+                raise StorageError("Invalid packed private file boundary")
+            raw = raw[offset:offset + size]
+            codec = codec.removeprefix("packed-")
+        if codec == "gzip":
             try:
                 with gzip.GzipFile(fileobj=io.BytesIO(raw)) as stream:
                     raw = stream.read(item["bytes"] + 1)
             except (OSError, EOFError):
                 raise StorageError("Invalid lossless private object") from None
-        elif item.get("encoding") != "raw":
+        elif codec != "raw":
             raise StorageError("Unsupported lossless private object encoding")
         if len(raw) != item["bytes"] or sha(raw) != item.get("sha256"):
             raise StorageError("Decoded private chunk changed")
@@ -418,6 +478,7 @@ class PrivateStorage:
         self.config = config if config is not None else load_config(root, require_enabled=True)
         self.objects = objects or R2Objects(self.config)
         self.catalog = catalog or Catalog(self.config)
+        self._legacy_indexes = OrderedDict()
 
     def snapshot(self):
         commit = self.catalog.fetch()
@@ -438,17 +499,70 @@ class PrivateStorage:
                     raise StorageError("Existing private file differs")
                 continue
             immutable = re.search(r"(?:^|/)(?:objects|packets|handoffs)/[0-9a-f]{64}(?:\.json|\.zip)?$", relative)
+            immutable = immutable or relative.startswith(("legacy/", "audit/", "recovery/"))
             if prior and immutable:
                 raise StorageError("An immutable private artifact cannot be replaced")
             updates[relative] = store_bytes(self.objects, raw)
         return self.catalog.publish(updates, expected)
 
+    def lookup_entry(self, relative, records):
+        relative_path(relative)
+        if relative in records:
+            return records[relative]
+        manifest_path = self.config.get("legacy_archive_manifest")
+        if not manifest_path:
+            return None
+        relative_path(manifest_path)
+        manifest_entry = records.get(manifest_path)
+        if manifest_entry is None:
+            raise StorageError("Required verified legacy manifest is missing")
+        identity = manifest_entry["sha256"]
+        if identity not in self._legacy_indexes:
+            manifest = json.loads(restore_bytes(self.objects, manifest_entry))
+            if (manifest.get("schema_version") != "private-legacy-manifest/1"
+                    or manifest.get("source_commit") != self.config["legacy_pin"]
+                    or manifest.get("complete") is not True
+                    or set(manifest.get("shards", {})) != {format(i, "02x") for i in range(256)}
+                    or type(manifest.get("path_count")) is not int or manifest["path_count"] <= 0
+                    or type(manifest.get("unique_git_blobs")) is not int
+                    or not 0 < manifest["unique_git_blobs"] <= manifest["path_count"]):
+                raise StorageError("Legacy manifest source identity or completeness changed")
+            self._legacy_indexes[identity] = manifest
+        manifest = self._legacy_indexes[identity]
+        prefix = sha(relative.encode())[:2]
+        shard_path = manifest.get("shards", {}).get(prefix)
+        if shard_path is None:
+            raise StorageError("Complete legacy manifest is missing a path shard")
+        relative_path(shard_path)
+        shard_entry = records.get(shard_path)
+        if shard_entry is None:
+            raise StorageError("Required legacy path index is missing")
+        shard_id = shard_entry["sha256"]
+        if shard_id not in self._legacy_indexes:
+            values = json.loads(restore_bytes(self.objects, shard_entry))
+            if not isinstance(values, dict) or any(sha(k.encode())[:2] != prefix for k in values):
+                raise StorageError("Legacy path index identity changed")
+            self._legacy_indexes[shard_id] = values
+            while len(self._legacy_indexes) > 3:
+                victim = next(k for k in self._legacy_indexes if k != identity)
+                del self._legacy_indexes[victim]
+        entry = self._legacy_indexes[shard_id].get(relative)
+        if entry is not None:
+            if not re.fullmatch(r"[0-9a-f]{40}", entry.get("git_blob", "")):
+                raise StorageError("Legacy Git blob identity is missing")
+        return entry
+
     def restore(self, relative, *, records=None):
         relative_path(relative)
         if records is None:
             _, records = self.snapshot()
-        entry = records.get(relative)
-        return None if entry is None else restore_bytes(self.objects, entry)
+        entry = self.lookup_entry(relative, records)
+        raw = None if entry is None else restore_bytes(self.objects, entry)
+        if raw is not None and entry.get("git_blob"):
+            git_identity = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+            if git_identity != entry["git_blob"]:
+                raise StorageError("Restored legacy Git blob identity changed")
+        return raw
 
 
 def merge_ledger(original, incoming):

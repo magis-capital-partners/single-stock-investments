@@ -110,7 +110,7 @@ def materialize(vault, relative, *, storage=None):
     if cache_key not in _VIEW_CACHE:
         _VIEW_CACHE[cache_key] = view(vault, storage)
     records = _VIEW_CACHE[cache_key]
-    entry = records.get(relative)
+    entry = storage.lookup_entry(relative, records)
     if entry:
         destination.parent.mkdir(parents=True, exist_ok=True)
         restore_file(storage.objects, entry, destination)
@@ -162,7 +162,7 @@ def publish_paths(vault, paths, *, storage=None):
         if prior == entry:
             continue
         immutable = ('/objects/' in relative or '/packets/' in relative or '/handoffs/' in relative and '/latest/' not in relative
-                     or relative.endswith('.zip'))
+                     or relative.endswith('.zip') or relative.startswith(('legacy/','audit/','recovery/')))
         if prior and immutable and prior['sha256'] != entry['sha256']:
             raise StorageError('An immutable private artifact cannot be replaced')
         if prior and relative.endswith('/ledger.jsonl'):
