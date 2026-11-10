@@ -69,3 +69,11 @@ test('broad imports retain bounded raw filings while compact scores and version 
  for(let i=0;i<MAX_RETAINED_FINANCIAL_PROFILES*5;i++){const id=String(i);retainFinancialProfile(env,id,{profile:{version:id},raw:{large:'primary history'},facts:[]});env.financialProfileVersions.set(id,id);env.financialScoreCache.set(id,{schema:'test'});}
  assert.equal(env.financialProfiles.size,MAX_RETAINED_FINANCIAL_PROFILES);assert.equal(env.financialProfiles.has('0'),false);assert.equal(env.financialProfileVersions.get('0'),'0');assert.ok(env.financialScoreCache.has('0'));
 });
+
+import {FINANCIAL_EVIDENCE_REVISION} from './reverse-split-live/financials-import.mjs';
+import {FINANCIAL_VERSION} from './reverse-split-live/financials-core.mjs';
+test('handoffs cannot reuse an old numeric score under a newly repaired evidence calculation',async t=>{
+ const db=new DatabaseSync(':memory:');db.exec('CREATE TABLE rs_state(key TEXT PRIMARY KEY,value TEXT,updated_at TEXT)');t.after(()=>db.close());const now=new Date().toISOString(),saved={schema:FINANCIAL_VERSION,cik:'1876766',computed_at:now,score:{score:66.7,period:new Date(Date.now()-120*86400000).toISOString().slice(0,10),source_profile_version:'a'.repeat(64)}};
+ db.prepare('INSERT INTO rs_state VALUES(?,?,?)').run('financial_score_cache:1876766',JSON.stringify(saved),now);const env={DB:localAdapter(db)};installFinancialImport(env);await env.restoreFinancialScores();assert.equal(env.scoreFinancialProfile('1876766',now),null);assert.equal(env.financialProfileVersions.has('1876766'),false);assert.deepEqual(JSON.parse(db.prepare('SELECT value FROM rs_state').get().value),saved);
+ saved.calculation_revision=FINANCIAL_EVIDENCE_REVISION;saved.score.score=75;db.prepare('UPDATE rs_state SET value=?').run(JSON.stringify(saved));await env.restoreFinancialScores();assert.equal(env.scoreFinancialProfile('1876766',now).score,75);assert.equal(env.financialProfileVersions.get('1876766'),'a'.repeat(64));
+});
