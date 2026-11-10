@@ -177,3 +177,34 @@ def test_relative_vault_root_matches_normal_CI_publication(environment,monkeypat
     result=io.publish_paths(relative,selected,storage=fake)
     assert result['files_preserved']==1
     assert fake.restore('valuation-underwriting/runtime/states/V.json')==path.read_bytes()
+
+
+def test_validation_view_restores_only_complete_packets_and_cannot_publish(environment):
+    vault,fake=environment
+    packet='valuation-underwriting/packets/'+'b'*64+'.json'
+    paid='valuation-underwriting/local-runtime/paid/receipt.json'
+    fake.publish({packet:b'complete original packet',paid:b'private paid receipt'})
+    io.initialize(vault,storage=fake,prefixes=['valuation-underwriting/packets/'])
+    assert (vault/packet).read_bytes()==b'complete original packet'
+    assert not (vault/paid).exists()
+    with pytest.raises(storage.StorageError,match='cannot publish'):
+        io.publish_paths(vault,{packet:vault/packet},storage=fake)
+
+
+def test_validation_view_rejects_unsafe_prefix(environment):
+    vault,fake=environment
+    with pytest.raises(storage.StorageError,match='Unsafe'):
+        io.initialize(vault,storage=fake,prefixes=['../outside/'])
+
+
+def test_strict_validation_reads_trusted_storage_before_replay():
+    import yaml
+    root=Path(__file__).resolve().parents[3]
+    job=yaml.safe_load((root/'.github/workflows/underwriting-validation.yml').read_text())['jobs']['validate']
+    assert 'CLOUDFLARE_API_TOKEN' in job['env']
+    trusted=next(s for s in job['steps'] if s.get('name')=='Read trusted validators from main')
+    assert '_system/config/private_storage.json' in trusted['with']['sparse-checkout']
+    names=[s.get('name') for s in job['steps']]
+    assert names.index('Restore named immutable packets from the private catalog')<names.index('Recompile every reviewed candidate from its exact frozen evidence')
+    restore=next(s for s in job['steps'] if s.get('name')=='Restore named immutable packets from the private catalog')
+    assert '--prefix valuation-underwriting/packets/' in restore['run']
