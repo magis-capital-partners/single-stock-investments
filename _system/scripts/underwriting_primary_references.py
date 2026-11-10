@@ -114,10 +114,26 @@ def request_kinds(keywords):
             bool(re.search(r'acqui|merg|consideration|tender|transaction|target|closing\s+(?:financing|consents?|payoff|termination)', text)))
 
 
+def requested_license(keywords):
+    return any(' '.join(value.lower().split()) == 'master license agreement' for value in keywords)
+
+
+def license_reference_title(body, keywords):
+    """A requested legal title must open its own primary anchor/description."""
+    if not requested_license(keywords):
+        return None
+    title = re.sub(r'^(?:(?:exhibit\s+)?\d{1,3}\.\d{1,3}\s*[*+\u2020]*\s*){0,3}', '', body)
+    if re.match(r'^master\s+license\s+agreement(?=\s*(?:,|$|dated\b))', title):
+        return 'master license agreement'
+    order = re.match(r'^order(?:\s+no\.?)?\s+(\d{1,3}-\d{1,3})\s+to\s+(?:the\s+)?master\s+license\s+agreement(?=\s*(?:,|$|dated\b))', title)
+    return 'order '+order[1] if order and 'order '+order[1] in keywords else None
+
+
 def linked_references(raw, parent_url, cik, keywords):
     from underwriting_evidence import text_of
     credit, transaction = request_kinds(keywords)
-    if not credit and not transaction:
+    licensing = requested_license(keywords)
+    if not credit and not transaction and not licensing:
         return []
     source = raw.decode('utf-8', errors='replace')
     lower = source.lower()
@@ -142,7 +158,9 @@ def linked_references(raw, parent_url, cik, keywords):
         # table row must not lend a neighboring agreement's words to them.
         body = (anchor if len(re.findall(r'[A-Za-z]{2,}', anchor)) >= 4
                 else anchor+' '+description).lower()
-        score = 0
+        license_title = license_reference_title(body, keywords)
+        license_score = 20 if license_title else 0
+        score = license_score
         if credit:
             score += 20 * bool(re.search(r'\b(?:(?:revolving\s+)?credit(?:\s+and\s+security)?|loan|revolving)\s+agreement\b', body))
             # A requested amending-agreement title must match this anchor's
@@ -172,6 +190,8 @@ def linked_references(raw, parent_url, cik, keywords):
         score += sum(term.lower() in body for term in keywords if len(term) >= 4)
         record = {'source_url': target, 'reference_text': description, '_score': score,
                   'referenced_by': {'source_url': parent_url, 'content_hash': hashlib.sha256(raw).hexdigest()}}
+        if license_score:
+            record['_requested_license'] = license_title
         if target not in result or score > result[target]['_score']:
             result[target] = record
     return sorted(result.values(), key=lambda row: (-row['_score'], row['source_url']))
@@ -185,7 +205,8 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
     if not keywords:
         return [], []
     credit, transaction = request_kinds(keywords)
-    if not credit and not transaction:
+    licensing = requested_license(keywords)
+    if not credit and not transaction and not licensing:
         return [], []
     budget = source_budget()
     inherited_capacity = any(budget.snapshot()['counts'])
@@ -289,7 +310,11 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
                     # no per-note requests or truncated contract windows needed.
                     documents.extend(financing_documents(url, raw, cik, reference['_submission']))
                     continue
-                doc = document_record(url, raw, focus, prefer_complete=True)
+                license_options = ({'expected_license_title': reference['_requested_license']}
+                                   if reference.get('_requested_license') else {})
+                doc = document_record(url, raw, focus, prefer_complete=True, **license_options)
+                if reference.get('_requested_license') and doc.get('coverage') != 'complete_requested_primary_document':
+                    raise ValueError('Requested license instrument is not retained completely')
                 doc.update(document_kind='incorporated_primary_document', referenced_by=reference['referenced_by'],
                            reference_text=reference['reference_text'])
                 documents.append(doc)
@@ -305,7 +330,7 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
     governing_requested = any(term in ('indenture', 'base indenture', 'supplemental indenture')
                               for term in keywords)
     pending = (sorted(set(references)-financing_urls)
-               if require_all_citations or inherited_capacity or governing_requested else [])
+               if require_all_citations or inherited_capacity or governing_requested or licensing else [])
     for url in pending:
         errors.append({'source':'requested_primary_reference','source_url':url,
                        'error':'Requested primary citations exceed the shared reference capacity'})
