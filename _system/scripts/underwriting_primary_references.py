@@ -98,9 +98,17 @@ def dated_instrument_labels(keywords):
                             term := ' '.join(value.lower().split()))]
 
 
+def requested_amending_agreements(keywords):
+    """Literal requested amendment titles; never derive a name from other prose."""
+    return [term for value in keywords
+            if re.fullmatch(_ORDINAL+r'\s+amending\s+agreement',
+                            term := ' '.join(str(value).lower().split()))]
+
+
 def request_kinds(keywords):
     text = ' '.join(keywords).lower()
-    return (bool(dated_instrument_labels(keywords)
+    return (bool(requested_amending_agreements(keywords)
+                 or dated_instrument_labels(keywords)
                  or any(re.fullmatch(r'(?:19|20)\d{2}', str(term)) for term in keywords)
                  or re.search(r'credit|loan|amendment|covenant|maturit|refinanc|borrow|debt|financ|indenture', text)),
             bool(re.search(r'acqui|merg|consideration|tender|transaction|target|closing\s+(?:financing|consents?|payoff|termination)', text)))
@@ -137,6 +145,10 @@ def linked_references(raw, parent_url, cik, keywords):
         score = 0
         if credit:
             score += 20 * bool(re.search(r'\b(?:(?:revolving\s+)?credit(?:\s+and\s+security)?|loan|revolving)\s+agreement\b', body))
+            # A requested amending-agreement title must match this anchor's
+            # own legal name before an exhibit number or generic words can rank it.
+            score += 20 * any(re.search(r'\b'+r'\s+'.join(map(re.escape, title.split()))+r'\b', body)
+                              for title in requested_amending_agreements(keywords))
             score += 3 * bool(indentures_requested and re.search(r'\bindenture\b|\bguarantee agreement\b', body))
         if transaction:
             score += 20 * bool(re.search(r'\bmerger\b|\bacquisition agreement\b|\btender offer\b|\bpurchase agreement\b', body))
