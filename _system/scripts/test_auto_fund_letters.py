@@ -147,6 +147,7 @@ def test_a_cycle_short_of_memory_skips_summarizing_but_still_publishes(tmp_path,
     monkeypatch.setattr(auto, "release_model", lambda: steps.append("unload-model") or True)
     monkeypatch.setattr(auto, "ensure_model", lambda: steps.append("load-model") or True)
     monkeypatch.setattr(auto, "publish_verified", lambda db, state: steps.append("publish") or {"published": 0, "quarantined": 0, "already": 0})
+    monkeypatch.setattr(auto.fl, "withdraw_unreadable", lambda db: [])
 
     class Args:
         no_repair = no_summarize = no_publish = sync_remote = commit_vault = False
@@ -205,3 +206,20 @@ def test_the_model_is_unloaded_only_when_it_is_loaded_and_idle(tmp_path, monkeyp
     monkeypatch.setattr(auto, "find_lms", lambda: None)
     assert auto.release_model() is False
 
+
+
+def test_a_withdrawn_letter_is_released_even_when_nothing_new_was_published(monkeypatch, capsys):
+    steps = []
+    monkeypatch.setattr(auto, "run_step", lambda label, argv, env: 0)
+    monkeypatch.setattr(auto, "publish_verified", lambda db, state: {"published": 0, "quarantined": 0, "already": 3})
+    monkeypatch.setattr(auto.fl, "withdraw_unreadable", lambda db: ["fl-unreadable"])
+    monkeypatch.setattr(auto, "export_and_sync", lambda db, env, remote: steps.append("release") or {"release": "r1"})
+
+    class Args:
+        no_repair = no_publish = sync_remote = commit_vault = False
+        no_summarize = True
+        batch, refresh_older = 5, 0
+
+    result = auto.cycle(Args, None, {}, {})
+    assert steps == ["release"] and result["withdrawn"] == 1 and result["release"] == {"release": "r1"}
+    assert '"withdrawn": ["fl-unreadable"]' in capsys.readouterr().out
