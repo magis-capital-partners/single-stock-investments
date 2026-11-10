@@ -656,3 +656,49 @@ def test_a_letter_that_keeps_failing_is_parked_after_the_attempt_cap(tmp_path, m
     write_saved(path, prompt_version=s.PROMPT_VERSION, status="quarantine", chunks_covered=2, chunks_total=2, attempts=s.MAX_ATTEMPTS)
     assert s.already_done("abc", True) is True
     assert s.attempts_so_far(s.load_saved("abc")) == s.MAX_ATTEMPTS
+
+
+def _topic(activity, *quotes):
+    return {"activity": activity, "points": [{"text": "A statement.", "cites": [{"section_id": "s1", "quote": quote}]} for quote in quotes]}
+
+
+def test_a_purchase_or_a_reduction_is_recorded_only_when_a_cited_sentence_reports_it_as_the_funds_own():
+    discussed = _topic("add", "We remain skeptical that Patch will ever generate a return.",
+                       "Local businesses would generate a superior return by purchasing Google AdWords than display advertisements on Patch.")
+    s.settle_trade(discussed)
+    assert discussed["activity"] == "hold"  # a company the letter only discusses; the purchase is someone else's
+
+    for quote in ("We also aggressively added to our domestically exposed industrials.",
+                  "We then opportunistically recycled the capital back into Fifth Third Bancorp.",
+                  "We remain skeptical and have begun rebuilding a position.",
+                  "The Fund initiated a new position in Acme during the quarter."):
+        bought = _topic("add", "The shares fell 28%.", quote)
+        s.settle_trade(bought)
+        assert bought["activity"] == "add", quote
+
+    fell = _topic("trim", "KeyCorp fell over 28%, right in line with the KBW Bank Index.")
+    s.settle_trade(fell)
+    assert fell["activity"] == "hold"  # a falling price is not a smaller position
+    trimmed = _topic("trim", "We reduced our position in Acme after the shares doubled.")
+    s.settle_trade(trimmed)
+    assert trimmed["activity"] == "trim"
+
+    untouched = _topic("short", "AOL fell 40% in the period.")
+    s.settle_trade(untouched)
+    assert untouched["activity"] == "short"
+
+
+def test_a_company_the_fund_is_short_is_filed_as_a_short_whatever_its_statements_were_filed_under():
+    cite = [{"section_id": "s1", "quote": "AOL was our second largest short entering the quarter."}]
+    notes = [
+        {"kind": "sector", "subject": "AOL", "ticker": None, "activity": "hold",
+         "points": [{"text": "AOL has three businesses.", "cites": cite}, {"text": "Dial-up is in decline.", "cites": cite}]},
+        {"kind": "update", "subject": "AOL", "ticker": None, "activity": "short",
+         "points": [{"text": "AOL was the second-largest short entering the quarter.", "cites": cite}]},
+        {"kind": "macro", "subject": "Market setting", "ticker": None, "activity": "short",
+         "points": [{"text": "Volatility rose sharply.", "cites": cite}]},
+    ]
+    aol, market = s.group_notes(notes)
+    assert (aol["idea_type"], aol["activity"]) == ("short", "short")
+    assert market["idea_type"] == "macro"
+

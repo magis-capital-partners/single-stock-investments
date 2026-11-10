@@ -155,3 +155,24 @@ def test_a_cycle_short_of_memory_skips_summarizing_but_still_publishes(tmp_path,
     assert steps == ["repair", "publish"]
     assert "summarize step skipped: the system reports critical memory pressure" in capsys.readouterr().out
 
+
+def test_memory_is_checked_before_every_letter_and_not_once_per_batch(monkeypatch, capsys):
+    commands = []
+    room = iter([None, None, "30 GB of swap is in use (limit 24 GB)"])
+    monkeypatch.setattr(auto, "memory_shortage", lambda: next(room))
+    monkeypatch.setattr(auto, "ensure_model", lambda: True)
+    monkeypatch.setattr(auto, "run_step", lambda label, argv, env: commands.append(argv[2:]) or 0)
+
+    class Args:
+        batch, refresh_older = 5, 1
+
+    assert auto.summarize_batch(Args, {}) == 2
+    assert commands == [["--limit", "1", "--retry-failed", "--refresh-older", "1"], ["--limit", "1", "--retry-failed"]]
+    assert "summarize step skipped: 30 GB of swap" in capsys.readouterr().out
+
+    # A run that cannot start (another run holds the lock) ends the batch.
+    commands.clear()
+    monkeypatch.setattr(auto, "memory_shortage", lambda: None)
+    monkeypatch.setattr(auto, "run_step", lambda label, argv, env: commands.append(argv[2:]) or 1)
+    assert auto.summarize_batch(Args, {}) == 1 and len(commands) == 1
+

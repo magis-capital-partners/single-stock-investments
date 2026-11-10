@@ -347,22 +347,38 @@ def commit_vault(env: dict, note: str) -> dict:
             "reason": "" if pushed.returncode == 0 else (pushed.stderr or "")[-300:]}
 
 
+def summarize_batch(args, env: dict) -> int:
+    """Summarize up to one batch, a letter at a time. Returns how many runs started.
+
+    A letter takes several minutes of model time, so memory is looked at
+    before every letter and not once per batch: a batch that began with room
+    to spare must not keep the model busy for most of an hour after the
+    machine has run short.
+    """
+    started = 0
+    for index in range(max(1, args.batch)):
+        shortage = memory_shortage()
+        if shortage:
+            print(json.dumps({"note": f"summarize step skipped: {shortage}; publishing continues"}), flush=True)
+            break
+        if not ensure_model():
+            print(json.dumps({"note": "summarize step skipped: the local model is not available; publishing continues"}), flush=True)
+            break
+        command = [sys.executable, str(SUMMARIZER), "--limit", "1", "--retry-failed"]
+        if args.refresh_older and index < args.refresh_older:
+            command += ["--refresh-older", "1"]
+        started += 1
+        if run_step("summarize", command, env):
+            print(json.dumps({"note": "summarize step did not complete (a manual run may hold the lock); publishing continues"}), flush=True)
+            break
+    return started
+
+
 def cycle(args, db, state: dict, env: dict) -> dict:
     if not args.no_repair:
         run_step("repair", [sys.executable, str(SUMMARIZER), "--repair-existing"], env)
     if not args.no_summarize:
-        shortage = memory_shortage()
-        if shortage:
-            print(json.dumps({"note": f"summarize step skipped: {shortage}; publishing continues"}), flush=True)
-        elif not ensure_model():
-            print(json.dumps({"note": "summarize step skipped: the local model is not available; publishing continues"}), flush=True)
-        else:
-            command = [sys.executable, str(SUMMARIZER), "--limit", str(args.batch), "--retry-failed"]
-            if args.refresh_older:
-                command += ["--refresh-older", str(args.refresh_older)]
-            code = run_step("summarize", command, env)
-            if code:
-                print(json.dumps({"note": "summarize step did not complete (a manual run may hold the lock); publishing continues"}), flush=True)
+        summarize_batch(args, env)
     published = {"published": 0, "quarantined": 0, "already": 0}
     if not args.no_publish:
         published = publish_verified(db, state)

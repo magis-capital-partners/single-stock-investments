@@ -1460,6 +1460,42 @@ def settle_exit(note_or_idea: dict) -> None:
     note_or_idea["activity"] = "hold"
 
 
+# Words with which a letter reports its own buying, and its own reducing.
+BUY_WORDS = re.compile(
+    r"\b(?:bought|buy(?:ing|s)?|purchas\w+|add(?:ed|ing|s)?|additions?|initiat\w+|increas\w+|rais(?:ed|ing)|buil[dt]\w*|rebuil[dt]\w*"
+    r"|establish\w+|accumulat\w+|invest(?:ed|ing)|recycl\w+|redeploy\w+|deploy\w+|allocat\w+|doubl\w+ down|averag\w+ down"
+    r"|buyers?|re-?enter\w+|participat\w+|subscrib\w+|(?:swapp|rotat|switch|mov)\w+ into|(?:went|gone|going|got) long"
+    r"|new(?:est)? (?:position|holding|investment|idea|long|short|purchase)s?"
+    r"|(?:took|taken|taking|start(?:ed|ing)|began|begun|open(?:ed|ing)|enter(?:ed|ing)) (?:into )?(?:a |an |our |the )?(?:\w+ )?(?:position|stake|investment)s?)\b",
+    re.I,
+)
+TRIM_WORDS = re.compile(
+    r"\b(?:trimm\w+|reduc\w+|par(?:ed|ing)|cut(?:ting)?|lower(?:ed|ing)|decreas\w+|lighten\w+|scal(?:ed|ing) back|harvest\w+"
+    r"|sold|sell(?:ing|s)?|sales? of|exit(?:ed|ing)|clos(?:ed|ing)|cover(?:ed|ing)|took (?:some |our |the )?profits?)\b",
+    re.I,
+)
+_OWN_ACTION = re.compile(r"\b(?:we|our|ours|us|i|my|fund|funds|partnership|portfolio|manager|firm)\b", re.I)
+
+
+def _cited(note_or_idea: dict, words: re.Pattern) -> bool:
+    """Whether a sentence the note cites reports that action as the fund's own."""
+    return any(words.search(cite["quote"]) and _OWN_ACTION.search(cite["quote"])
+               for point in note_or_idea.get("points") or [] for cite in point["cites"])
+
+
+def settle_trade(note_or_idea: dict) -> None:
+    """The activity a topic is filed under has to be said by a sentence it
+    cites. A small model will mark a company the letter only discusses as
+    bought, or a position that fell as reduced; without the words, the topic
+    is recorded as held."""
+    settle_exit(note_or_idea)
+    activity = note_or_idea.get("activity")
+    if activity in {"new", "add"} and not _cited(note_or_idea, BUY_WORDS):
+        note_or_idea["activity"] = "hold"
+    elif activity == "trim" and not _cited(note_or_idea, TRIM_WORDS):
+        note_or_idea["activity"] = "hold"
+
+
 def check_notes(notes: list[dict], group: list[dict], record: dict, model: str | None, stats: dict | None = None) -> list[dict]:
     """Show the model each statement beside the sentences it cites.
 
@@ -1553,7 +1589,7 @@ def map_with_split(group: list[dict], record: dict, index: int, total: int, earl
             stats["passages_unchecked"] = stats.get("passages_unchecked", 0) + 1
     mapped["notes"] = settle_problems(mapped["notes"], stats)
     for note in mapped["notes"]:
-        settle_exit(note)
+        settle_trade(note)
     return mapped
 
 
@@ -1628,7 +1664,9 @@ def group_notes(notes: list[dict], fund: str = "") -> list[dict]:
         used[base] = used.get(base, 0) + 1
         kind = max(idea["kinds"], key=lambda kind: idea["kinds"][kind])
         activity = next((activity for activity in idea["activities"] if activity != "hold"), "hold")
-        if kind == "long" and ("short" in idea["kinds"] or activity in {"short", "cover"}):
+        # A company the fund is short is a short, however most of its statements were filed.
+        if kind not in {"macro", "portfolio", "factual_note", "postmortem"} and (
+                activity in {"short", "cover"} or (kind == "long" and "short" in idea["kinds"])):
             kind = "short"
         result.append({
             "id": base if used[base] == 1 else f"{base}-{used[base]}",
@@ -2043,7 +2081,7 @@ def verify_summary(payload: dict, source: str) -> tuple[list[str], list[str]]:
             if not number_in(number, quotes):
                 title = title.replace(number, "").strip(" -,:")
         kept = {**idea, "title": title or "Position note", "points": points}
-        settle_exit(kept)
+        settle_trade(kept)
         ideas.append(kept)
     payload["ideas"] = ideas
     sold = [idea for idea in ideas if idea.get("activity") in {"exit", "trim", "cover"}]
