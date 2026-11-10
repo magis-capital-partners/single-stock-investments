@@ -54,7 +54,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 PROMPT_VERSION = "letter_detail_v6"
-PIPELINE_VERSION = "fund-reader-local.6"
+PIPELINE_VERSION = "fund-reader-local.7"
 # Finished summaries from these versions stay valid: they are not redone unless
 # asked for with --refresh-older, and a verified one may still publish.
 LEGACY_VERSIONS = frozenset({"letter_detail_v5", "letter_detail_v4"})
@@ -110,7 +110,12 @@ PADDING_RE = re.compile(
     r"\b(?:the|this) (?:letter|text|passage|document|excerpt|notes?)\b[^.!?]{0,60}?"
     r"\b(?:does not|doesn't|do not|did not|provides? no|gives? no|offers? no|makes? no|is silent)\b"
     r"|\b(?:in|from|within) the (?:provided|available|given) (?:text|passage|notes|excerpt|material)\b"
-    r"|\bno (?:specific )?(?:figures|details|information) (?:are|is|were|was) (?:provided|given|stated|disclosed)\b",
+    r"|\bno (?:specific )?(?:figures|details|information) (?:are|is|were|was) (?:provided|given|stated|disclosed)\b"
+    # Remarks about the material itself, which a correction from the second reading sometimes carries.
+    r"|\bsource (?:text|sentences?|material|passages?)\b|\bcited sentences?\b"
+    r"|\b(?:letter|text|sentences?|passages?|source|manager|author|fund) (?:do|does|did) not mention\b"
+    r"|\bcontains? no (?:information|mention|reference)\b"
+    r"|\bno (?:information|mention) (?:regarding|about|of|on)\b",
     re.I,
 )
 
@@ -426,6 +431,54 @@ def content_words(text: str) -> set[str]:
 
 def _overlap(sentence: str, unit: dict) -> int:
     return len(content_words(sentence) & content_words(unit["text"]))
+
+
+_SUFFIXES = ("ization", "isation", "ations", "ation", "ments", "ment", "ingly", "ings", "ing", "edly", "ied", "ies", "ed", "es", "ly", "s")
+# The share of a statement's own words that must occur in the sentences it cites.
+GROUNDING = 0.25
+
+
+def _stems(text: str) -> set[str]:
+    stems = set()
+    for word in content_words(text):
+        for suffix in _SUFFIXES:
+            if word.endswith(suffix) and len(word) - len(suffix) >= 4:
+                word = word[:-len(suffix)]
+                break
+        stems.add(word)
+    return stems
+
+
+# Who is said to say it. Two statements that differ only here say the same thing.
+_FRAMING = _stems("manager managers fund firm letter author partnership notes believes argues views expects "
+                  "warns states says thinks sees considers describes explains adds stresses")
+
+
+def repeats(statement: str, earlier: list[str]) -> bool:
+    """Whether an earlier statement already says this, in nearly the same words and with the same figures."""
+    words, figures = _stems(statement) - _FRAMING, sorted(checkable_numbers(statement))
+    if not words:
+        return False
+    for other in earlier:
+        theirs = _stems(other) - _FRAMING
+        if figures == sorted(checkable_numbers(other)) and len(words & theirs) / len(words | theirs) >= 0.85:
+            return True
+    return False
+
+
+def grounded(statement: str, quotes: list[str]) -> bool:
+    """Whether a statement without a figure shares enough words with the sentences it cites.
+
+    A figure is checked exactly against the sentence that prints it. A
+    statement without one could cite any sentence at all. On real letters,
+    statements that paraphrase their source share a third or more of their
+    words with it, and invented ones (a view or a position the passage never
+    mentions) share almost none."""
+    words = _stems(statement)
+    if not words or checkable_numbers(statement):
+        return True
+    shared = len(words & _stems(" ".join(quotes)))
+    return shared >= min(len(words), max(2, -(-len(words) * GROUNDING // 1)))
 
 
 # ---------------------------------------------------------------------------
@@ -1334,8 +1387,9 @@ def support_point(text: str, cited: list[dict], pool: list[dict], sale_rule: boo
     Sentences about what the letter omits, or carrying a link or contact
     details, are removed, and so is a claim that a position was sold when no
     cited sentence speaks of a sale.
-    A point with no figure keeps the sentences the model named; when it named
-    none that exist, the unit sharing the most words with it is cited."""
+    A point with no figure keeps the sentences the model named when it shares
+    enough words with them. Otherwise the sentence of the passage that shares
+    the most is cited, and the point goes when none shares enough."""
     cited = list(cited)
     kept = []
     for sentence in prose_sentences(text):
@@ -1357,6 +1411,13 @@ def support_point(text: str, cited: list[dict], pool: list[dict], sale_rule: boo
     joined = " ".join(kept)
     best = max(pool, key=lambda unit: _overlap(joined, unit))
     if not cited or (max(_overlap(joined, unit) for unit in cited) == 0 and _overlap(joined, best) >= 3):
+        cited = [best]
+    if not grounded(joined, [unit["text"] for unit in cited]):
+        # The model may have named the wrong sentence: the one in the passage that says it is cited instead.
+        wanted = _stems(joined)
+        best = max(pool, key=lambda unit: len(wanted & _stems(unit["text"])))
+        if not grounded(joined, [best["text"]]):
+            return None, []
         cited = [best]
     cited.sort(key=lambda unit: unit["n"])
     return joined, cited
@@ -1677,13 +1738,10 @@ def group_notes(notes: list[dict], fund: str = "") -> list[dict]:
         if ticker:
             idea["ticker"] = idea["ticker"] or ticker
             by_ticker.setdefault(ticker, idea)
-        seen = [content_words(point["text"]) for point in idea["points"]]
         added = 0
         for point in note["points"]:
-            words = content_words(point["text"])
-            if any(words and len(words & other) / len(words | other) >= 0.85 for other in seen):
+            if repeats(point["text"], [earlier["text"] for earlier in idea["points"]]):
                 continue
-            seen.append(words)
             idea["points"].append({"text": point["text"], "cites": point["cites"], "para": idea["paragraphs"]})
             added += 1
         if added:
@@ -2145,6 +2203,12 @@ def verify_summary(payload: dict, source: str) -> tuple[list[str], list[str]]:
         for point in idea.get("points") or []:
             cites = [cite for cite in point.get("cites") or [] if located(cite)]
             text = _keep_supported(point.get("text") or "", [cite["quote"] for cite in cites], warnings, f"idea {idea.get('title')}")
+            if text and cites and not grounded(text, [cite["quote"] for cite in cites]):
+                warnings.append(f"removed a statement from idea {idea.get('title')}: it shares too few words with the sentences it cites")
+                continue
+            if text and cites and repeats(text, [earlier["text"] for earlier in points]):
+                warnings.append(f"removed a statement from idea {idea.get('title')}: it repeats an earlier one")
+                continue
             if text and cites:
                 points.append({"text": text, "cites": cites, "para": int(point.get("para") or 0)})
             elif point.get("text"):
