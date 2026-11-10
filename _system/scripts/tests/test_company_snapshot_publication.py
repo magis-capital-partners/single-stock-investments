@@ -18,6 +18,14 @@ COMPANIES = {"CME": {"company": "CME Group Inc.", "market": "US"}}
 ROOT = Path(__file__).resolve().parents[3]
 
 
+@pytest.fixture(autouse=True)
+def legacy_archive_transport_fixture(monkeypatch):
+    # Retain explicit coverage for the read-only legacy transport protocol.
+    # The activated object-store path is covered by the owned-view suite.
+    import private_storage
+    monkeypatch.setattr(private_storage, 'enabled', lambda *a, **k: False)
+
+
 def snapshot(tmp_path):
     b = Builder(tmp_path, None, tmp_path / "first", tmp_path / "cache", companies=COMPANIES)
     b.now = "2026-10-28T00:00:00+00:00"

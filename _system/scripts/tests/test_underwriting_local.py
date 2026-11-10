@@ -10,6 +10,14 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from underwriting_local import local_lock, publish_runtime
 
 
+@pytest.fixture(autouse=True)
+def legacy_git_transport_fixtures(monkeypatch):
+    # These tests exercise preserved legacy transport and local locking. The
+    # activated catalog transport has its own owned-checkout integration suite.
+    import private_storage
+    monkeypatch.setattr(private_storage, "enabled", lambda *a, **k: False)
+
+
 def test_slow_remote_ledger_probe_does_not_prevent_audit_import(tmp_path, monkeypatch):
     import underwriting_local as local
     vault = tmp_path / 'vault'

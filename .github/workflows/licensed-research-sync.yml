@@ -35,6 +35,8 @@ jobs:
           echo "shard_matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
   plan:
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -120,6 +122,8 @@ jobs:
             _system/reference/document-store/expert_calls_drive_plan_summary.json
 
   ingest:
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     needs: [shards, plan]
     runs-on: ubuntu-latest
     timeout-minutes: 120

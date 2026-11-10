@@ -1,25 +1,8 @@
 name: Autonomous company underwriting
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/valuation-underwriting.yml'
-      - '_system/scripts/underwriting_*.py'
-      - '_system/scripts/underwriting_stage.mjs'
-      - '_system/scripts/publish_underwriting.py'
-      - '_system/prompts/valuation_underwriting.md'
-      - '_system/config/underwriting_policy.json'
-      - '_system/config/llm_usage_policy.json'
   repository_dispatch:
     types: [valuation-underwriting-run]
-  schedule:
-    - cron: '47 9,17,21 * * 1-5'
-      timezone: America/New_York
-  workflow_run:
-    workflows: [Autonomous compounder IRRs]
-    types: [completed]
-    branches: [main]
 
 permissions:
   contents: write
@@ -31,10 +14,10 @@ concurrency:
 
 jobs:
   underwrite:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       GH_TOKEN: ${{ github.token }}
@@ -48,6 +31,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /_system/scripts/
+            /_system/config/private_storage.json
             /_system/config/llm_usage_policy.json
             /_system/config/underwriting_policy.json
             /_system/prompts/valuation_underwriting.md
@@ -104,9 +88,11 @@ jobs:
           REQUESTED_TICKERS: ${{ github.event.client_payload.tickers }}
           REQUESTED_LIMIT: ${{ github.event.client_payload.limit }}
         run: |
-          ARGS=(run --phase build --launch)
-          if [ -n "$REQUESTED_TICKERS" ]; then ARGS+=(--tickers "$REQUESTED_TICKERS"); fi
-          if [ -n "$REQUESTED_LIMIT" ]; then ARGS+=(--limit "$REQUESTED_LIMIT"); fi
+          # Company builds are explicit, exact-ticker operations. Source merges
+          # and scheduled refreshes cannot accidentally consume other handoffs.
+          [[ "$REQUESTED_TICKERS" =~ ^[A-Z0-9][A-Z0-9.\-]*$ ]]
+          test "$REQUESTED_LIMIT" = "1"
+          ARGS=(run --phase build --launch --tickers "$REQUESTED_TICKERS" --limit 1)
           python -u _system/scripts/underwriting_pipeline.py "${ARGS[@]}"
       - name: Preserve frozen evidence and paid-call audit before any public model
         if: always()

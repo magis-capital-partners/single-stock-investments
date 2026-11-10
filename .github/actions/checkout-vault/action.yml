@@ -58,13 +58,22 @@ runs:
           ${{ inputs.publication-only == 'true' && '/dashboard-private/manifest.json' || '' }}
           ${{ inputs.publication-only == 'true' && '/dashboard-private/.gitattributes' || '' }}
           ${{ inputs.publication-only != 'true' && '/*' || '' }}
+          !/dashboard-private/objects/
           ${{ inputs.publication-only != 'true' && inputs.include-source-archive != 'true' && inputs.source-archive-current != 'true' && '!/dashboard-private/company-source-backfill-v2/' || '' }}
           ${{ inputs.publication-only != 'true' && (inputs.include-source-archive == 'true' || inputs.source-archive-current == 'true') && '!/dashboard-private/company-source-backfill-v2/*' || '' }}
           ${{ inputs.publication-only != 'true' && inputs.include-investor-history != 'true' && '!/dashboard-private/investor-history/' || '' }}
         sparse-checkout-cone-mode: false
 
+    - name: Materialize the verified private catalog view
+      shell: bash
+      run: |
+        set -euo pipefail
+        git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /dashboard/private-assets.json
+        if python _system/scripts/private_storage_io.py enabled; then
+          python _system/scripts/private_storage_io.py initialize --vault _external/research-vault
+        fi
+
     - name: Materialize publication objects
-      if: inputs.publication-only == 'true'
       shell: bash
       run: |
         set -euo pipefail
@@ -80,6 +89,8 @@ runs:
         import json
         import sys
         from pathlib import Path
+        sys.path.insert(0, "_system/scripts")
+        from private_storage_io import materialize
 
         manifest = json.loads(Path("dashboard/private-assets.json").read_text(encoding="utf-8"))
         objects = Path("_external/research-vault/dashboard-private/objects")
@@ -89,13 +100,15 @@ runs:
             for relative, entry in (manifest.get(section) or {}).items():
                 total += 1
                 if not (objects / entry["private_sha256"]).is_file():
+                    materialize(Path("_external/research-vault"), "dashboard-private/objects/" + entry["private_sha256"])
+                if not (objects / entry["private_sha256"]).is_file():
                     missing += 1
                     print(f"::error::missing private object for {relative}")
         print(f"publication objects present: {total - missing} of {total}")
         if missing:
             sys.exit(1)
         PY
-        echo "VAULT_PUBLICATION_ONLY=true" >> "$GITHUB_ENV"
+        if [ "${{ inputs.publication-only }}" = "true" ]; then echo "VAULT_PUBLICATION_ONLY=true" >> "$GITHUB_ENV"; fi
 
     - name: Add extra vault paths
       if: inputs.extra-paths != ''
@@ -134,6 +147,22 @@ runs:
         if [ -s "$RUNNER_TEMP/vault-source-part-patterns.txt" ]; then
           git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-source-part-patterns.txt"
         fi
+
+    - name: Restore requested immutable source parts from private storage
+      if: inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true')
+      shell: bash
+      run: |
+        python3 - <<'PY'
+        import json, sys
+        from pathlib import Path
+        sys.path.insert(0, '_system/scripts')
+        from private_storage_io import materialize
+        vault=Path('_external/research-vault')
+        manifest=vault/'dashboard-private/company-source-backfill-v2/manifest.json'
+        if manifest.is_file():
+            for part in json.loads(manifest.read_text()).get('parts', []):
+                materialize(vault, 'dashboard-private/company-source-backfill-v2/'+part['file'])
+        PY
 
     - name: Export RESEARCH_VAULT_ROOT
       shell: bash
