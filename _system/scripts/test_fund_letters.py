@@ -251,3 +251,16 @@ def test_inserts_already_accepted_are_not_sent_again_but_updates_always_are(tmp_
     sync.record_applied(ledger, [update])  # nothing to remember
     sync.record_applied(ledger, [other])
     assert sync.pending([insert, other, update], sync.read_ledger(ledger)) == [update]
+
+
+def test_a_source_text_already_in_the_private_bucket_is_not_uploaded_again(tmp_path):
+    import sync_fund_letters_release as sync
+
+    ledger = tmp_path / "applied" / "bucket-sources.txt"
+    assert sync.sources_to_upload(["a", "b", "c"], [], sync.read_ledger(ledger)) == ["a", "b", "c"]
+    sync.record_source(ledger, "a")
+    sync.record_source(ledger, "c")
+    # "b" was stored earlier in this run; "a" and "c" by an earlier release.
+    assert sync.sources_to_upload(["a", "b", "c", "d"], ["b"], sync.read_ledger(ledger)) == ["d"]
+    assert sync.sources_ledger_path("bucket").name == "bucket-sources.txt"
+
