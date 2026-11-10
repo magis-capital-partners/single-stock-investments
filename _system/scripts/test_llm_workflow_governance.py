@@ -252,7 +252,7 @@ class WorkflowGovernanceTests(unittest.TestCase):
             workflow,
             r"(?m)^  CHECKOUT_SHA: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.event\.client_payload\.sha \|\| github\.sha \}\}$",
         )
-        checkouts = re.findall(r"ci_checkout_workspace\.sh \w+(.*)$", workflow, re.MULTILINE)
+        checkouts = re.findall(r"ci_checkout_workspace\.sh [A-Za-z0-9_-]+(.*)$", workflow, re.MULTILINE)
         self.assertTrue(checkouts)
         for rest in checkouts:
             self.assertTrue(rest.strip().startswith('"$CHECKOUT_SHA"'), rest)
