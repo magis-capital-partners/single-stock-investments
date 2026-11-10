@@ -29,17 +29,20 @@ export function classifyAnnouncement(raw,{published_at,form}={}){
   const text=plain(raw),all=text.split(/\n/).filter(p=>SPLIT.test(p));
   const passages=all.length?all:[...text.matchAll(new RegExp(SPLIT.source,'gi'))].map(m=>text.slice(Math.max(0,m.index-220),m.index+1800));
   if(!passages.length)return null;
-  const action=passages.filter(p=>/will (?:effect|implement|become|begin)|announces?.{0,140}(?:reverse|consolidation)|has (?:determined|approved)|effective|begin trading/i.test(p));
+  const action=passages.filter(p=>/will (?:effect|implement|become|begin)|(?:shall|will) take effect|announces?.{0,140}(?:reverse|consolidation)|has (?:determined|approved)|effective|begin trading/i.test(p));
   const candidates=action.length?action:passages,ratios=new Set(),effective=new Set();
   const words={two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,twelve:12,fifteen:15,twenty:20,thirty:30,forty:40,fifty:50,hundred:100};
   for(const p of candidates){
     for(const m of p.matchAll(/(?:\b1|\bone)[\s-]*(?:for|to|:)[\s-]*(\d[\d,]*(?:\.\d+)?|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|hundred)\b/gi)){const n=words[m[1].toLowerCase()]||Number(m[1].replaceAll(',',''));if(n>1)ratios.add(n);}
-    for(const m of p.matchAll(/(?:effective|begin(?:s)? trading|commence(?:s)? trading|trading.{0,35}(?:begin|commence))[^\n]{0,230}/gi))for(const d of dates(m[0]))effective.add(d);
+    const numbered=p.replace(/\bone hundred\s*\(\s*100\s*\)/gi,'100').replace(/\bone\s*\(\s*1\s*\)/gi,'1');
+    for(const m of numbered.matchAll(/\b(\d[\d,]*(?:\.\d+)?)[\s-]*(?:for|to|:)[\s-]*(?:1\b|one\b)/gi)){const n=Number(m[1].replaceAll(',',''));if(n>1)ratios.add(n);}
+    for(const m of p.matchAll(/(?:effective|(?:shall|will) take effect|takes? effect|begin(?:s)? trading|commence(?:s)? trading|trading.{0,35}(?:begin|commence))[^\n]{0,230}/gi))for(const d of dates(m[0]))effective.add(d);
   }
   const day=published_at?etDay(published_at):null;
   const future=[...effective].filter(d=>!day||d>=day),past=effective.size&&future.length===0;
   const cancelled=candidates.some(p=>/(?:cancel(?:led|ed)?|abandon\w*|will not proceed|not to proceed).{0,140}(?:reverse|consolidation)|(?:reverse|consolidation).{0,140}(?:cancel(?:led|ed)?|abandon\w*)/i.test(p));
-  const proposal=/14[AC]/i.test(form||'')||candidates.every(p=>/propos|seek.{0,35}approval|range of|between.{0,60}and|authorize/i.test(p)&&!/will (?:effect|implement|become)|has (?:selected|determined)/i.test(p));
+  const implemented=p=>/(?:will (?:effect|implement|become)|has (?:selected|determined)|approved (?:a )?(?:stock )?split ratio|(?:shall|will) take effect|filed.{0,140}(?:certificate|amendment).{0,140}to effect)/i.test(p)&&!/(?:subject to.{0,100}(?:approval|closing)|if.{0,40}approved|may.{0,30}(?:effect|implement))/i.test(p);
+  const proposal=/14[AC]/i.test(form||'')||candidates.every(p=>/propos|seek.{0,35}approval|range of|between.{0,60}and|authorize/i.test(p)&&!implemented(p));
   const conflict=ratios.size!==1||future.length>1;
   const status=cancelled?'cancelled':past?'historical':proposal?'authorization':conflict?'needs_review':!future.length?'needs_review':'scheduled';
   return {status,ratio:ratios.size===1?[...ratios][0]:null,effective_date:future.length===1?future[0]:null,ratio_candidates:[...ratios],date_candidates:[...effective],evidence:candidates.slice(0,4).map(p=>p.slice(0,2800)),reason:cancelled?'Announcement cancelled':past?'References a previously effective split':proposal?'Authorization or proposal; implementation not established':conflict?'Conflicting or missing split terms':!future.length?'Effective date requires source verification':'Ratio and upcoming effective date extracted'};

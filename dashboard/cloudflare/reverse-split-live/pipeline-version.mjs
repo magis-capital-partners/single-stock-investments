@@ -1,1 +1,1 @@
-export const PIPELINE_VERSION='announcement_quotes.2026-11-09.v1';
+export const PIPELINE_VERSION='financial_recovery.2026-11-10.v1';

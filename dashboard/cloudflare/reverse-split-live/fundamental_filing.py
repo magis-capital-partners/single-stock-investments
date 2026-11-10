@@ -19,7 +19,7 @@ from html.parser import HTMLParser
 VERSION = 'primary_financial_extraction.v1'
 FLOW = {'revenues', 'net_income', 'operating_income', 'cfo'}
 NAMES = {
- 'revenues': ['revenues', 'revenue', 'total revenue', 'total revenues', 'net revenue', 'net revenues', 'net sales', 'sales revenue net', 'revenue from contracts with customers', 'revenue from contract with customer excluding assessed tax'],
+ 'revenues': ['revenues', 'revenue', 'total revenue', 'total revenues', 'net revenue', 'net revenues', 'net sales', 'sales revenue net', 'revenue from contracts with customers', 'revenue from contract with customer excluding assessed tax', 'revenue from contract with customer including assessed tax'],
  'net_income': ['net income loss', 'net income', 'net loss', 'net loss for the period', 'net income for the period', 'profit loss', 'loss for the period', 'profit for the period', 'net income loss available to common stockholders basic'],
  'operating_income': ['operating income loss', 'operating income', 'operating loss', 'loss from operations', 'income from operations', 'profit loss from operating activities', 'operating profit loss'],
  'cfo': ['net cash provided by used in operating activities', 'net cash provided by operating activities', 'net cash used in operating activities', 'net cash flows from used in operating activities', 'cash flows from used in operating activities', 'net cash generated from operating activities', 'net cash from operating activities'],
@@ -40,6 +40,10 @@ ALIASES = {clean(v): k for k, vals in NAMES.items() for v in vals}
 # A repayment schedule, lease liability or absent row never substitutes for debt.
 ISSUER_CONCEPTS = {'2022416': {'RelatedPartyPromissoryNoteCurrent':'current_debt',
                               'PromissoryNotesToRelatedPartiesNoncurrent':'long_term_debt'}}
+# Canaan's primary face balance sheet lists cash and separates the current loan
+# portion from noncurrent loans. These labels do not bind another issuer or note.
+ISSUER_BALANCE_LABELS = {'1780652': {'cash':'cash','long term loans':'long_term_debt',
+                                   'current portion of long term loans':'current_debt'}}
 ZERO_TRANSFORM_NAMESPACES = {'http://www.xbrl.org/inlineXBRL/transformation/2020-02-12',
                              'http://www.xbrl.org/inlineXBRL/transformation/2022-02-16'}
 def metric_for(value):
@@ -99,7 +103,7 @@ class FilingHTML(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.contexts, self.units, self.inline, self.tables = {}, {}, [], []
         self.ctx = self.unit = self.fact = self.capture = None
-        self.skip = 0; self.recent = ''; self.table = None; self.row = None; self.cell = None
+        self.skip = 0; self.recent = ''; self.outside_table = ''; self.table = None; self.row = None; self.cell = None
         self.namespaces = {}
     def handle_starttag(self, tag, attrs):
         a = dict(attrs); local = tag.split(':')[-1].lower()
@@ -115,12 +119,13 @@ class FilingHTML(HTMLParser):
         elif local in {'nonfraction','nonnumeric'} and tag.startswith('ix:'):
             self.fact = {**a, 'text':'', 'inline_type':local,
                          'format_namespace':self.namespaces.get(a.get('format','').split(':')[0])}
-        if local == 'table' and self.table is None: self.table = {'context':self.recent[-1800:], 'rows':[]}
+        if local == 'table' and self.table is None: self.table = {'context':self.outside_table[-1800:], 'rows':[]}
         elif local == 'tr' and self.table is not None: self.row = []
         elif local in {'td','th'} and self.row is not None: self.cell = {'text':'', 'colspan':min(12, max(1, int(a.get('colspan','1')) if a.get('colspan','1').isdigit() else 1))}
     def handle_data(self, data):
         if self.skip: return
         self.recent = (self.recent + ' ' + data)[-3000:]
+        if self.table is None: self.outside_table=(self.outside_table+' '+data)[-3000:]
         if self.capture is not None: self.capture[1] += data
         if self.fact is not None: self.fact['text'] += data
         if self.cell is not None: self.cell['text'] += ' ' + data
@@ -140,7 +145,7 @@ class FilingHTML(HTMLParser):
         if local in {'td','th'} and self.cell is not None and self.row is not None:
             self.row.append(self.cell); self.cell = None
         if local == 'tr' and self.row is not None and self.table is not None: self.table['rows'].append(self.row); self.row = None
-        if local == 'table' and self.table is not None: self.tables.append(self.table); self.table = None
+        if local == 'table' and self.table is not None: self.tables.append(self.table); self.table = None; self.outside_table=''
 
 
 def make_fact(meta, metric, value, start, end, currency, locator, kind, **extra):
@@ -178,24 +183,35 @@ def extract_html(text, meta, labels=None):
         if value is None or not math.isfinite(value): continue
         value=economic_sign(metric,value,caption or tag.split(':')[-1])
         facts.append(make_fact(meta,metric,value,start,end,unit,'iXBRL '+tag+' context '+row.get('contextref',''), 'inline_xbrl',original_tag=tag))
+    previous_statement = None
+    statement_re = r'\bconsolidated\s+(?:balance\s+sheets?|statements?\s+of\s+(?:cash\s+flows?|operations|income|comprehensive\s+(?:income|loss)|financial\s+position|profit|loss))'
+    identity_key = lambda v: re.sub(r'[^a-z0-9]','',re.sub(r'\blimited\b','ltd',re.sub(r'\bincorporated\b','inc',str(v).lower())))
+    bound_labels = ISSUER_BALANCE_LABELS.get(str(int(meta['cik'])),{})
+    table_metric = lambda v: metric_for(v) or bound_labels.get(clean(v))
     for number, table in enumerate(parser.tables):
         context = table['context']; rows = table['rows']
-        if re.search(r'pro\s*forma|acquired business|parent.company.only|segment information', context[-1000:], re.I):
-            issues.append({'reason':'non_consolidated_or_pro_forma_table','table':number+1}); continue
-        if not re.search(r'\bconsolidated\s+(?:balance\s+sheets?|statements?\s+of\s+(?:cash\s+flows?|operations|income|comprehensive\s+(?:income|loss)|financial\s+position|profit|loss))',context,re.I):
-            issues.append({'reason':'table_consolidation_scope_requires_review','table':number+1}); continue
-        if meta.get('require_table_identity'):
-            identity=re.sub(r'[^a-z0-9]','',str(meta.get('company','')).lower())
-            if not identity or identity not in re.sub(r'[^a-z0-9]','',context.lower()):
-                issues.append({'reason':'financial_table_issuer_scope_requires_review','table':number+1});continue
+        prior,previous_statement = previous_statement,None
         grid = []
         for row in rows:
             expanded=[]
             for cell in row: expanded.extend([re.sub(r'\s+',' ',cell['text']).strip()] * cell['colspan'])
             grid.append(expanded)
         if not grid: continue
-        first_metric = next((i for i,r in enumerate(grid) if r and metric_for(r[0])),len(grid))
+        first_metric = next((i for i,r in enumerate(grid) if r and table_metric(r[0])),len(grid))
         headers=grid[:first_metric]; heading=' '.join(' '.join(r) for r in headers)
+        signature=tuple(dict.fromkeys(clean(c) for row in headers for c in row if clean(c)))
+        statements=list(re.finditer(statement_re,context,re.I))
+        barriers=list(re.finditer(r'notes\s+to\s+(?:the\s+)?(?:consolidated\s+)?financial statements|pro\s*forma|acquired business|parent.company.only|segment information',context,re.I))
+        if barriers and (not statements or barriers[-1].start()>statements[-1].start()):
+            issues.append({'reason':'non_consolidated_or_pro_forma_table','table':number+1}); continue
+        if not statements and prior and prior['number']==number-1 and signature and signature==prior['signature']:
+            context=prior['context'];statements=list(re.finditer(statement_re,context,re.I))
+        if not statements:
+            issues.append({'reason':'table_consolidation_scope_requires_review','table':number+1}); continue
+        if meta.get('require_table_identity'):
+            names=[meta.get('company',''),*meta.get('issuer_names',[])];identities=[identity_key(n) for n in names if n]
+            if not any(identity and identity in identity_key(context) for identity in identities):
+                issues.append({'reason':'financial_table_issuer_scope_requires_review','table':number+1});continue
         table_context=context+' '+heading
         currency=currency_in(table_context); scale=scale_in(table_context)
         if scale==1 and re.search(r'thousands|millions|billions|[\'’]000|000s',table_context,re.I):
@@ -214,12 +230,14 @@ def extract_html(text, meta, labels=None):
                 except ValueError: pass
         if not ends:
             issues.append({'reason':'comparative_period_columns_unresolved','table':number+1}); continue
+        previous_statement={'number':number,'signature':signature,'context':context}
         # Currency symbols are often standalone cells. Use numeric columns only,
         # and inherit a header date only across an explicitly empty/symbol cell.
         for index,row in enumerate(grid[first_metric:], first_metric):
             if not row: continue
-            metric=metric_for(row[0])
+            metric=table_metric(row[0])
             if not metric: continue
+            if not metric_for(row[0]) and not re.search(r'consolidated\s+balance\s+sheets?',context,re.I): continue
             for col,end in ends.items():
                 if col>=len(row): continue
                 value=numeric(row[col]); selected=col
@@ -235,7 +253,7 @@ def extract_html(text, meta, labels=None):
                     issues.append({'reason':'flow_duration_unresolved','table':number+1,'metric':metric}); continue
                 if metric in {'cfo','net_income','operating_income'} and re.search(r'\b(?:used|loss)\b',row[0],re.I) and not re.search(r'provided.*used|used.*provided|income.*loss|loss.*income|profit.*loss|loss.*profit',row[0],re.I): value=-abs(value)
                 raw_value=str(row[selected]); places=len(raw_value.split('.')[-1].strip(')')) if '.' in raw_value else 0
-                facts.append(make_fact(meta,metric,value*scale,start,end,column_currency,f'HTML table {number+1}, row {index+1}, column {selected+1}: {row[0]}','html_table',rounding_tolerance=scale*.5*10**(-places),original_label=row[0]))
+                facts.append(make_fact(meta,metric,value*scale,start,end,column_currency,f'HTML table {number+1}, row {index+1}, column {selected+1}: {row[0]}','html_table',rounding_tolerance=scale*.5*10**(-places),original_label=row[0],statement_total=metric=='revenues' and bool(re.fullmatch(r'total (?:net )?revenues?',clean(row[0])))))
     return facts,candidates,issues
 
 

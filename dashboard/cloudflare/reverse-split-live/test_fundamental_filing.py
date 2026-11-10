@@ -14,6 +14,25 @@ META = {'cik': '123', 'company': 'Example Research Ltd', 'form': '6-K', 'filed':
 
 
 class FilingExtraction(unittest.TestCase):
+    def test_statement_continuation_requires_same_headers_and_does_not_cross_notes(self):
+        header='<tr><th></th><th>Six months ended June 30, 2026 USD</th></tr>'
+        first='<h2>Example Research Ltd Consolidated statements of comprehensive loss</h2><table>'+header+'<tr><td>Total revenues</td><td>100</td></tr></table>'
+        tail='<table>'+header+'<tr><td>Net loss</td><td>(12)</td></tr></table>'
+        rows=extract_document((first+tail).encode(),{**META,'require_table_identity':True})['facts']
+        self.assertTrue(any(r['metric']=='net_income' and r['value']==-12 for r in rows))
+        self.assertFalse(any(r['metric']=='net_income' for r in extract_document((first+'<h2>Notes to the financial statements</h2>'+tail).encode(),{**META,'require_table_identity':True})['facts']))
+        self.assertFalse(any(r['metric']=='net_income' for r in extract_document((first+tail.replace('2026','2025')).encode(),{**META,'require_table_identity':True})['facts']))
+    def test_total_revenue_role_and_verified_legal_name_forms(self):
+        raw=b'<h2>Example Research Limited Consolidated statements of operations</h2><table><tr><th></th><th>Year ended December 31, 2025 USD</th></tr><tr><td>Total revenues</td><td>24518</td></tr></table>'
+        rows=extract_document(raw,{**META,'require_table_identity':True})['facts']
+        self.assertTrue(any(r['metric']=='revenues' and r.get('statement_total') for r in rows))
+        self.assertEqual(metric_for('RevenueFromContractWithCustomerIncludingAssessedTax'),'revenues')
+    def test_reviewed_canaan_face_balance_labels_are_issuer_and_statement_bound(self):
+        raw=b'<h2>Canaan Inc. Consolidated balance sheets</h2><table><tr><th></th><th>June 30, 2026 USD</th></tr><tr><td>Cash</td><td>66006</td></tr><tr><td>Long-term loans</td><td>34901</td></tr><tr><td>Current portion of long-term loans</td><td>23888</td></tr></table>'
+        meta={**META,'cik':'1780652','company':'Canaan Inc.','require_table_identity':True}
+        self.assertEqual({r['metric'] for r in extract_document(raw,meta)['facts']},{'cash','long_term_debt','current_debt'})
+        self.assertFalse(extract_document(raw,{**meta,'cik':'123'})['facts'])
+        self.assertFalse(extract_document(raw.replace(b'Consolidated balance sheets',b'Notes to financial statements'),meta)['facts'])
     def test_silexion_tagged_note_balances_and_explicit_fixed_zero(self):
         raw=b'''<html xmlns:ixt="http://www.xbrl.org/inlineXBRL/transformation/2020-02-12"><xbrli:context id="c"><xbrli:entity><xbrli:identifier>2022416</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2026-06-30</xbrli:instant></xbrli:period></xbrli:context><xbrli:unit id="u"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit><ix:nonFraction name="slxn:RelatedPartyPromissoryNoteCurrent" contextRef="c" unitRef="u" scale="3">985</ix:nonFraction><ix:nonFraction name="slxn:PromissoryNotesToRelatedPartiesNoncurrent" contextRef="c" unitRef="u" scale="3" format="ixt:fixed-zero">-</ix:nonFraction></html>'''
         rows=extract_document(raw,{**META,'cik':'2022416'})['facts']
