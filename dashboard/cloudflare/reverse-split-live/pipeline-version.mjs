@@ -1,1 +1,1 @@
-export const PIPELINE_VERSION='financial_recovery.2026-11-10.v1';
+export const PIPELINE_VERSION='financial_recovery.2026-11-10.v2';
