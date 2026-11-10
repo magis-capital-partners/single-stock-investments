@@ -54,7 +54,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 PROMPT_VERSION = "letter_detail_v6"
-PIPELINE_VERSION = "fund-reader-local.5"
+PIPELINE_VERSION = "fund-reader-local.6"
 # Finished summaries from these versions stay valid: they are not redone unless
 # asked for with --refresh-older, and a verified one may still publish.
 LEGACY_VERSIONS = frozenset({"letter_detail_v5", "letter_detail_v4"})
@@ -1917,6 +1917,47 @@ def _mentions(sentence: str, idea: dict) -> bool:
     return bool(words & set(_tokens(sentence))) or bool(ticker and re.search(r"\b" + re.escape(ticker) + r"\b", sentence))
 
 
+_HEAD_TRADES = (
+    ("buy", re.compile(r"\b(?:add(?:ed|ing|s)?|bought|buy(?:ing|s)?|purchas\w+|initiat\w+|increas\w+|expand\w+|built|building"
+                       r"|rebuil\w+|new (?:positions?|holdings?|investments?))\b", re.I)),
+    ("sell", re.compile(r"\b(?:sold|sell(?:ing|s)?|exit(?:ed|ing|s)?|trimm\w+|reduc\w+|clos(?:ed|ing)|cover(?:ed|ing)|liquidat\w+)\b", re.I)),
+    ("short", re.compile(r"\bshort(?:ed|ing|s)?\b", re.I)),
+    ("long", re.compile(r"\blongs?\b", re.I)),
+)
+_HEAD_FITS = {
+    "buy": lambda idea: idea.get("activity") in {"new", "add"},
+    "sell": lambda idea: idea.get("activity") in {"exit", "trim", "cover"},
+    "short": lambda idea: idea.get("idea_type") == "short" or idea.get("activity") in {"short", "cover"},
+    "long": lambda idea: idea.get("idea_type") != "short" and idea.get("activity") not in {"short", "cover"},
+}
+
+
+def headline_trades_hold(headline: str, ideas: list[dict]) -> bool:
+    """Whether every trade the headline reports for a named topic is the one recorded for it.
+
+    The headline is the one sentence written freely, and a small model
+    listing several companies after one verb will put a purchase among the
+    shorts. Each topic named in the headline is read with the trade word that
+    most nearly precedes it in the same sentence, and that word has to agree
+    with the topic's activity, which itself rests on cited sentences."""
+    for sentence in prose_sentences(headline or ""):
+        trades = sorted((match.start(), kind) for kind, pattern in _HEAD_TRADES for match in pattern.finditer(sentence))
+        if not trades:
+            continue
+        for idea in ideas:
+            names = [word for word in re.findall(r"[A-Z][\w&'-]*", idea.get("title") or "")
+                     if len(word) > 2 and word.lower() not in CORPORATE_WORDS and word.lower() not in STOPWORDS]
+            found = [match.start() for word in names for match in [re.search(r"\b" + re.escape(word) + r"\b", sentence)] if match]
+            if idea.get("ticker"):
+                found += [match.start() for match in [re.search(r"\b" + re.escape(idea["ticker"]) + r"\b", sentence)] if match]
+            if not found or (len(found) < min(2, len(names)) and not idea.get("ticker")):
+                continue
+            before = [kind for at, kind in trades if at < min(found)]
+            if before and not _HEAD_FITS[before[-1]](idea):
+                return False
+    return True
+
+
 def _overview_parts(paragraph: str, statements: set) -> list[tuple[str, bool]]:
     """An overview paragraph as (text, verified) pieces: whole statements of the
     ideas, which were verified against their own citations, and any other
@@ -2125,9 +2166,15 @@ def verify_summary(payload: dict, source: str) -> tuple[list[str], list[str]]:
             ) if paragraph.strip()
         )
         headline = _keep_supported(clean_prose(payload.get("headline")), all_quotes, warnings, "the headline", payload["tables"], sold)
+        if headline and headline not in statements and not headline_trades_hold(headline, ideas):
+            warnings.append("replaced the headline: it reported a trade that is not the one recorded for that topic")
+            headline = ""
         if not headline and ideas:
+            # The statement the overview opens with has already been checked against its citations.
+            opening = next((text for text, verified in _overview_parts(payload["overview"].split("\n\n")[0], statements) if verified), "")
             names = [idea["title"] for idea in ideas[:3]]
-            headline = "The letter covers " + (", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]).rstrip(".") + "."
+            headline = opening if opening and len(opening.split()) <= 45 else (
+                "The letter covers " + (", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]).rstrip(".") + ".")
         payload["headline"] = headline
         if not drop_copied_runs(payload, grams):
             break

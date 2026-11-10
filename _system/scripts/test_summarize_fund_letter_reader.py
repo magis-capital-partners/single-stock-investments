@@ -428,7 +428,9 @@ def test_verifying_a_finished_summary_again_changes_nothing(monkeypatch):
 def test_a_headline_the_letter_does_not_support_is_replaced(monkeypatch):
     fixed_replies(monkeypatch, {**CLOSED, "headline": "The fund gained 77% in the third quarter."})
     payload = s.summarize_letter(RECORD, LETTER, None)
-    assert payload["headline"] == "The letter covers Market setting, KeyCorp and JPMorgan Chase & Co."
+    # The replacement is the checked statement the overview opens with.
+    assert payload["headline"] == "The short book returned 25% gross in the quarter."
+    assert payload["overview"].startswith(payload["headline"])
     # A headline the second reading rejects is replaced by its correction.
     fixed_replies(monkeypatch)
     payload = s.summarize_letter(RECORD, LETTER, None)
@@ -701,4 +703,40 @@ def test_a_company_the_fund_is_short_is_filed_as_a_short_whatever_its_statements
     aol, market = s.group_notes(notes)
     assert (aol["idea_type"], aol["activity"]) == ("short", "short")
     assert market["idea_type"] == "macro"
+
+
+def test_a_headline_may_not_report_a_trade_other_than_the_one_recorded_for_the_topic():
+    ideas = [
+        {"title": "JPMorgan Chase", "ticker": "JPM", "idea_type": "long", "activity": "add"},
+        {"title": "Wells Fargo", "ticker": "WFC", "idea_type": "long", "activity": "add"},
+        {"title": "AOL", "ticker": None, "idea_type": "short", "activity": "short"},
+        {"title": "Patch", "ticker": None, "idea_type": "credit", "activity": "hold"},
+        {"title": "Fifth Third Bancorp", "ticker": None, "idea_type": "update", "activity": "add"},
+        {"title": "Short Book Performance", "ticker": None, "idea_type": "short", "activity": "short"},
+        {"title": "Fund performance", "ticker": None, "idea_type": "portfolio", "activity": "hold"},
+    ]
+    holds = s.headline_trades_hold
+    assert not holds("JAM Partners rose 4.4% in Q2 2011, expanding longs in JPMorgan Chase while shorting Raymond James, "
+                     "Wells Fargo and TCF Financial.", ideas)  # Wells Fargo was bought
+    assert not holds("Estekene Master Fund reports -3.83% Q3 2011 performance, all but exited the short in AOL, "
+                     "and added Fifth Third and Patch.", ideas)  # Patch is only discussed
+    assert holds("Estekene Master Fund reports -3.83% Q3 2011 performance, all but exited the short in AOL, "
+                 "and added Fifth Third Bancorp.", ideas)
+    assert holds("JAM Partners rose 4.4% in Q2 2011, expanding longs in JPMorgan Chase and Wells Fargo.", ideas)
+    assert holds("The fund lost 3.83% as financials fell; Patch is described as management's greatest folly.", ideas)
+    assert not holds("The fund sold JPMorgan Chase.", ideas)
+
+
+def test_a_rejected_headline_becomes_the_statement_the_overview_opens_with(monkeypatch):
+    closed = {**CLOSED, "headline": "Estekene Master Fund lost 3.83% in the quarter and added KeyCorp."}
+    fixed_replies(monkeypatch, closed)
+    payload = s.summarize_letter(RECORD, LETTER, None)
+    first = payload["overview"].split("\n\n")[0]
+    assert payload["headline"] != closed["headline"]
+    assert first.startswith(payload["headline"])
+    assert any("replaced the headline" in warning for warning in payload["warnings"])
+    assert s.gate_errors(s.to_archive_draft(payload, LETTER)[0], LETTER) == []
+    again = json.loads(json.dumps(payload))
+    s.verify_summary(again, LETTER)
+    assert again["headline"] == payload["headline"]
 
