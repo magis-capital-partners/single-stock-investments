@@ -119,13 +119,14 @@ async function financials(env,cik,cutoff,refresh=false){
   if(!raw){const doc=await archive(env,await limitedFetch(env,`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik.padStart(10,'0')}.json`));raw=JSON.parse(doc.text);if(String(Number(raw.cik))!==cik)throw new Error('Companyfacts issuer identity mismatch');hash=doc.hash;await env.DB.prepare('UPDATE rs_issuers SET cache_key=?,facts_captured_at=? WHERE cik=?').bind(doc.key,stamp(),cik).run();}
   return {...scoreFundamentals(raw,cutoff,cik),source_sha256:hash,source_url:`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik.padStart(10,'0')}.json`};
 }
-export async function recordEvent(env,event,{refresh=false}={}){
+export async function recordEvent(env,event,{refresh=false,preserveEventId=false}={}){
   env.eventSerial ||= new Map();const key=event.cik||event.id,previous=env.eventSerial.get(key)||Promise.resolve();let release;const completed=new Promise(resolve=>{release=resolve;});env.eventSerial.set(key,completed);
-  await previous;try{return await recordEventSerial(env,event,{refresh});}finally{release();if(env.eventSerial.get(key)===completed)env.eventSerial.delete(key);}
+  await previous;try{return await recordEventSerial(env,event,{refresh,preserveEventId});}finally{release();if(env.eventSerial.get(key)===completed)env.eventSerial.delete(key);}
 }
-async function recordEventSerial(env,event,{refresh=false}={}){
+async function recordEventSerial(env,event,{refresh=false,preserveEventId=false}={}){
   let previous;
-  if(event.cik){previous=await env.DB.prepare('SELECT * FROM rs_events WHERE cik=? AND effective_date=? ORDER BY first_seen_at LIMIT 1').bind(event.cik,event.effective_date).first();
+  if(preserveEventId)previous=await env.DB.prepare('SELECT * FROM rs_events WHERE id=?').bind(event.id).first();
+  if(event.cik&&!preserveEventId){previous=await env.DB.prepare('SELECT * FROM rs_events WHERE cik=? AND effective_date=? ORDER BY first_seen_at LIMIT 1').bind(event.cik,event.effective_date).first();
     const changedSchedule=(event.sources||[]).some(s=>/\/A$/.test(s.form||''))||(event.evidence||[]).some(t=>/postpon|reschedul|amend.{0,50}(?:effective|split)|changed.{0,50}(?:effective|split)/i.test(t));
     if(!previous&&(event.status==='cancelled'||changedSchedule)){const possible=(await env.DB.prepare("SELECT * FROM rs_events WHERE cik=? AND first_seen_at>=? AND effective_date>=? ORDER BY first_seen_at DESC LIMIT 3").bind(event.cik,new Date(Date.now()-30*DAY).toISOString(),etDay(Date.now())).all()).results;if(possible.length===1)previous=possible[0];else if(possible.length>1){event.related_event_ids=possible.map(r=>r.id);event.status='needs_review';event.reason='Multiple outstanding issuer actions; amendment linkage is unresolved';}}
   }
@@ -152,6 +153,28 @@ async function recordEventSerial(env,event,{refresh=false}={}){
   return payload;
 }
 function filingText(raw){const docs=[...raw.matchAll(/<DOCUMENT>([\s\S]*?)<\/DOCUMENT>/gi)];if(!docs.length)return raw;return docs.map(x=>x[1]).filter(t=>/<TYPE>\s*(?:8-K|6-K|10-[KQ]|20-F|40-F|EX-99)/i.test(t)).join('\n');}
+export const ANNOUNCEMENT_TERMS_VERSION='announcement_terms.2026-11-10.v1';
+export async function replayAnnouncement(env,id){
+  const row=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(id).first();if(!row)return;
+  const original=JSON.parse(row.payload),sources=(original.sources||[]).filter(s=>s.sha256&&!/-index\.html(?:$|\?)/i.test(s.url)&&!s.url.startsWith('https://data.sec.gov/'));
+  if(!['authorization','needs_review'].includes(original.status))return {changed:false};
+  if(!sources.length||sources.length>8)throw new Error('Announcement replay needs bounded archived primary sources');
+  const text=[];
+  for(const source of sources){sourceURL(source.url);if(!['complete_submission','official_primary_report_and_exhibits','original_release'].includes(source.representation))throw new Error('Announcement replay source is not an original primary document');const object=await env.EVIDENCE.get('documents/'+source.sha256);if(!object)throw new Error('Archived primary announcement is missing');const bytes=new Uint8Array(await object.arrayBuffer());if(bytes.length>96*1024*1024||await sha(bytes)!==source.sha256)throw new Error('Archived announcement integrity check failed');text.push(new TextDecoder().decode(bytes.slice(0,5))==='%PDF-'?await env.extractAnnouncementText(bytes):filingText(new TextDecoder().decode(bytes)));}
+  const parsed=classifyAnnouncement(text.join('\n'),{published_at:original.published_at,form:sources[0].form});
+  if(original.cik&&env.onFinancialDisclosure){const source=sources[0];await env.onFinancialDisclosure({cik:original.cik,ticker:original.ticker,form:source.form||'6-K',url:source.url,accession:source.accession,filed:etDay(original.published_at),published_at:original.published_at,first_seen_at:original.first_seen_at,source_sha256:source.sha256});}
+  if(!parsed||['status','ratio','effective_date'].every(k=>parsed[k]===original[k]))return {changed:false};
+  const at=stamp(),raw=JSON.stringify({schema:'reverse_split_announcement_repair.v1',version:ANNOUNCEMENT_TERMS_VERSION,recorded_at:at,original_event:original,corrected_terms:parsed,not_original_clock_fill:true}),key='review/repairs/'+await sha(raw)+'.json';
+  await env.EVIDENCE.put(key,new TextEncoder().encode(raw),{httpMetadata:{contentType:'application/json'}});
+  await recordEvent(env,{...original,...parsed,classification_repair:{version:ANNOUNCEMENT_TERMS_VERSION,at,original_object_key:key}},{preserveEventId:true});
+  return {changed:true,original_object_key:key};
+}
+async function queueAnnouncementRepairs(env){
+  const marker='repair:'+ANNOUNCEMENT_TERMS_VERSION;if(await state(env,marker))return;
+  const rows=(await env.DB.prepare("SELECT id,payload FROM rs_events WHERE first_seen_at>=? AND json_extract(payload,'$.status') IN ('authorization','needs_review') ORDER BY first_seen_at DESC").bind(new Date(Date.now()-2*DAY).toISOString()).all()).results;let queued=0;const skipped=[];
+  for(const row of rows){const event=JSON.parse(row.payload);if(!event.sources?.length||event.sources.some(s=>!['complete_submission','official_primary_report_and_exhibits','original_release'].includes(s.representation))){skipped.push({event_id:row.id,reason:'Original primary representation is incomplete; no automatic relabel.'});continue;}await enqueue(env,'classification_replay',{id:row.id},8,'classification-replay:'+ANNOUNCEMENT_TERMS_VERSION+':'+row.id);queued++;}
+  await state(env,marker,JSON.stringify({at:stamp(),queued,skipped,originals:'review/repairs/',historical_decisions_unchanged:true,not_original_clock_fills:true}));
+}
 async function filingJob(env,p){
   const row=await env.DB.prepare('SELECT * FROM rs_filings WHERE accession=?').bind(p.accession).first();
   if(row?.state==='complete')return;
@@ -160,7 +183,7 @@ async function filingJob(env,p){
   const parsed=classifyAnnouncement(filingText(raw),{published_at:p.published_at||p.first_seen_at,form:p.form});
   const known=env.onFinancialDisclosure?await env.DB.prepare('SELECT id FROM rs_events WHERE cik=? LIMIT 1').bind(p.cik).first():null;
   const captured=[];for(const doc of [...downloaded.documents,...(downloaded.identity_documents||[])])captured.push(parsed||known?{...await archive(env,doc),url:doc.url,form:doc.form||p.form}:{hash:await sha(doc.bytes),url:doc.url,form:doc.form||p.form});const source=captured[0];
-  if(known&&/^(?:10-[KQ]|20-F|40-F|6-K|8-K)/.test(p.form||''))await env.onFinancialDisclosure({...p,filed:etDay(p.published_at||stamp()),source_sha256:source.hash});
+  if(env.onFinancialDisclosure&&(known||parsed)&&/^(?:10-[KQ]|20-F|40-F|6-K|8-K)/.test(p.form||''))await env.onFinancialDisclosure({...p,filed:etDay(p.published_at||stamp()),source_sha256:source.hash});
   let event=null;
   if(parsed){const ticker=/<ix:nonNumeric[^>]*name=["']dei:TradingSymbol["'][^>]*>([^<]+)/i.exec(raw)?.[1]?.trim();
     event=await recordEvent(env,{...parsed,id:'sec:'+p.accession,cik:p.cik,ticker:ticker||null,company:/COMPANY CONFORMED NAME:\s*([^\r\n]+)/i.exec(raw)?.[1]?.trim()||null,published_at:p.published_at,first_seen_at:row?.first_seen_at||p.first_seen_at,discovery_path:p.discovery_path||'sec_current_feed',publication_clock:p.publication_clock||'timestamp',sources:captured.map(d=>({url:d.url,sha256:d.hash,accession:p.accession,form:d.form,representation:downloaded.representation,index_url:downloaded.index_url})),clock_basis:p.publication_clock==='date_only_next_day'?'SEC daily index: conservative next-day availability; first public release time is unknown':'SEC feed publication; separately recorded first observation'});
@@ -240,7 +263,7 @@ export function reconciliationDays(now,gaps=[]){
 }
 export async function consume(batch,env){
   for(const message of batch.messages){const {id,token}=message.body||{},now=Date.now();const row=await env.DB.prepare("UPDATE rs_jobs SET state='running',attempts=attempts+1,lease_until=?,updated_at=? WHERE id=? AND token=? AND state='queued' RETURNING *").bind(now+600000,stamp(),id,token).first();if(!row){message.ack();continue;}
-    try{const p=JSON.parse(row.payload);if(row.kind==='filing')await filingJob(env,p);else if(row.kind==='news')await newsJob(env,p);else if(row.kind==='history')await historyJob(env,p);else if(row.kind==='history_filing')await historyFiling(env,p);else if(row.kind==='rescore'){const e=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(p.id).first();if(e){const result=await recordEvent(env,JSON.parse(e.payload),p);if(result.metadata_error)throw new Error(result.metadata_error);}}else if(row.kind==='reconcile')await reconcile(env);else if(row.kind==='publisher_recovery')await recoverPublisherGaps(env,{fetchDocument:(u,o)=>limitedFetch(env,u,o),enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id),hash:sha});else throw new Error('Unsupported job kind');
+    try{const p=JSON.parse(row.payload);if(row.kind==='filing')await filingJob(env,p);else if(row.kind==='news')await newsJob(env,p);else if(row.kind==='history')await historyJob(env,p);else if(row.kind==='history_filing')await historyFiling(env,p);else if(row.kind==='classification_replay')await replayAnnouncement(env,p.id);else if(row.kind==='rescore'){const e=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(p.id).first();if(e){const result=await recordEvent(env,JSON.parse(e.payload),p);if(result.metadata_error)throw new Error(result.metadata_error);}}else if(row.kind==='reconcile')await reconcile(env);else if(row.kind==='publisher_recovery')await recoverPublisherGaps(env,{fetchDocument:(u,o)=>limitedFetch(env,u,o),enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id),hash:sha});else throw new Error('Unsupported job kind');
       await env.DB.prepare("UPDATE rs_jobs SET state='complete',error=NULL,updated_at=? WHERE id=? AND token=?").bind(stamp(),id,token).run();message.ack();
     }catch(e){const deferred=e.code==='RECONCILIATION_INCOMPLETE'||/source deadline|SEC access is in backoff|SEC request budget occupied|Source returned HTTP (403|429)|abort|timeout/i.test(e.message),attempts=Math.max(0,row.attempts-(deferred?1:0)),delay=Math.min(3600000,30000*2**Math.min(deferred?2:attempts,7));await env.DB.prepare('UPDATE rs_jobs SET state=?,attempts=?,error=?,available_at=?,updated_at=? WHERE id=? AND token=?').bind(attempts>=6?'failed':'pending',attempts,e.message,Date.now()+delay,stamp(),id,token).run();log(deferred?'job_deferred':'job_failure',{id,kind:row.kind,error:e.message,attempt:attempts});message.ack();}
   }
@@ -250,6 +273,7 @@ export async function scheduled(event,env){
   await state(env,'last_tick',stamp());await state(env,'service_mode',env.COLLECTOR_MODE||'research_monitor');
   if(env.COLLECTOR_MODE==='external_collector')await recoverReaderFailures(env,{hash:sha});
   if(env.COLLECTOR_MODE==='external_collector'){
+    await queueAnnouncementRepairs(env);
     await recoverHistorySearch(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'oversized_primary.2026-11-09.v1',eligible:error=>/Source exceeds document size limit/.test(error||'')});
     await recoverReaderFailures(env,{hash:sha,version:'reviewed_pdf.2026-11-09.v1',eligible:(error,row)=>row.id==='filing:0001193125-26-450710'&&/OCR candidates require review/.test(error||'')});

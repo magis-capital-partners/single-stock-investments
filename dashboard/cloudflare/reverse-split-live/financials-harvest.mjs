@@ -14,7 +14,8 @@ const PARSER_HASH=hash(Buffer.concat(['fundamental_filing.py','filing-documents.
 const coverageCard=p=>({cik:p.cik,ticker:p.ticker,company:p.company,observed_at:p.observed_at,version:p.version,status:p.coverage.status,period:p.coverage.period,age_days:p.coverage.age_days,score:p.policy_financials.score,available_score:p.coverage.available_score,signal_count:p.coverage.signal_count,verified_inputs:p.coverage.verified_inputs,required_inputs:p.coverage.required_inputs,collection_status:p.collection.status,pending_documents:p.collection.remaining_documents,conflicts:p.coverage.conflicts.length});
 async function coverageCache(env){if(env.financialCoverageCards)return env.financialCoverageCards;const manifest=await read(env,'financials/manifest-latest.json');env.financialCoverageCards=new Map((manifest?.cards||[]).map(r=>[r.cik,r]));if(manifest&&!manifest.cards)for(const r of manifest.profiles||[]){const p=await read(env,`financials/profiles/${r.cik}/latest.json`);if(p)env.financialCoverageCards.set(r.cik,coverageCard(p));}return env.financialCoverageCards;}
 const REPORT_FORMS=new Set(['10-K','10-K/A','10-Q','10-Q/A','20-F','20-F/A','40-F','40-F/A','6-K','6-K/A','8-K','8-K/A']);
-export const nextFinancialJob=(jobs,at=Date.now())=>Object.values(jobs).filter(j=>Number(j.next_attempt||0)<=at).sort((a,b)=>Number(b.priority>=1000)-Number(a.priority>=1000)||Number(!b.last_attempt)-Number(!a.last_attempt)||b.priority-a.priority||String(a.last_attempt||'').localeCompare(String(b.last_attempt||'')))[0];
+const signalPending=j=>!!j.last_signal&&(j.last_signal!==j.processed_signal||j.signal_coverage_pending===true);
+export const nextFinancialJob=(jobs,at=Date.now())=>Object.values(jobs).filter(j=>Number(j.next_attempt||0)<=at).sort((a,b)=>Number(signalPending(b))-Number(signalPending(a))||Number(b.priority>=1000)-Number(a.priority>=1000)||b.priority-a.priority||String(a.last_attempt||'').localeCompare(String(b.last_attempt||'')))[0];
 async function read(env,key,fallback=null){const o=await env.EVIDENCE.get(key);return o?await o.json():fallback;}
 async function put(env,key,value){await env.EVIDENCE.put(key,bytes(value),{httpMetadata:{contentType:'application/json'}});}
 function filingRows(sub,cik){const recent=sub.filings?.recent||sub,rows=[];for(let i=0;i<(recent.form||[]).length;i++){
@@ -59,7 +60,7 @@ async function discoverReports(client,cik,sub){
   for(const f of (sub.filings?.files||[]).filter(x=>x.filingTo>=cutoff).slice(0,4))try{const doc=await client.get('https://data.sec.gov/submissions/'+f.name);rows.push(...filingRows(JSON.parse(doc.bytes),cik));}catch{}
   // Financial-text search finds foreign-interim exhibits among numerous 6-Ks.
   if(rows.some(r=>r.form.startsWith('6-K')))try{
-    const url=new URL('https://efts.sec.gov/LATEST/search-index');url.search=new URLSearchParams({dateRange:'custom',startdt:cutoff,enddt:etDay(now()),ciks:String(Number(cik)),forms:'6-K',q:'"cash flows"',from:'0',size:'40'});
+    const url=new URL('https://efts.sec.gov/LATEST/search-index');url.search=new URLSearchParams({dateRange:'custom',startdt:cutoff,enddt:etDay(now()),ciks:String(Number(cik)).padStart(10,'0'),forms:'6-K',q:'"cash flows"',from:'0',size:'40'});
     const doc=await client.get(url.href,{mutable:true});for(const hit of JSON.parse(doc.bytes).hits?.hits||[]){const s=hit._source||{},acc=s.adsh||String(hit._id||'').split(':')[0],filed=s.file_date;if(/^\d{10}-\d{2}-\d{6}$/.test(acc)&&filed)rows.push({form:'6-K',filed,published_at:filed+'T23:59:59Z',report_end:s.period_of_report||null,accession:acc,financial_match:true,url:`https://www.sec.gov/Archives/edgar/data/${Number(cik)}/${acc.replaceAll('-','')}/${acc}.txt`});}
   }catch{}
   const unique=new Map();for(const r of rows.filter(r=>r.filed>=cutoff))if(!unique.has(r.url)||r.financial_match)unique.set(r.url,r);
@@ -79,9 +80,10 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
   let instrument=await vendorMeta(env,job.ticker,cik);const name=sub.name||job.company;
   if(!instrument&&/^(?:ProShares Trust|iShares Trust|Direxion Shares ETF|ETF Series Solutions|Exchange Traded Concepts Trust)\b/i.test(name||''))instrument={type:'FUND',source_url:`https://data.sec.gov/submissions/CIK${cik.padStart(10,'0')}.json`,basis:'verified_registered_fund_issuer_name'};
   const current=buildFinancialProfile({cik,companyfacts,as_of:now()});const currency=current.coverage.metrics.total_assets.currency||current.coverage.metrics.revenues.currency;
-  const deferDiscovery=maximumDocuments===0&&(!instrument?.type||instrument.type==='CS');
+  const issuerResearch=!instrument?.type||['CS','ADRC'].includes(instrument.type);
+  const deferDiscovery=maximumDocuments===0&&issuerResearch;
   let reports=maximumDocuments===0?[]:[...await discoverReports(client,cik,sub),...(work.discovered||[])],processed=0;
-  if(instrument?.type&&instrument.type!=='CS')reports=[];
+  if(!issuerResearch)reports=[];
   if(maximumDocuments>0&&(reports.length<5||current.coverage.status!=='current'))reports.push(...await discoverIR(client,instrument?.homepage_url,name));
   const requests=job.last_signal||(await env.DB.prepare("SELECT value FROM rs_state WHERE key=?").bind('financial_need:'+cik).first())?.value;
   if(requests)try{const signal=JSON.parse(requests);if(signal.url&&!reports.some(r=>r.url===signal.url))reports.unshift(signal);}catch{}
@@ -92,7 +94,7 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
       // Retain the captured document for owner review even if extraction fails.
       work.sources.push({sha256:doc.sha256,url:source.url,form:source.form,filed:source.filed,published_at:source.published_at,publication_basis:source.publication_basis||'SEC_disclosure',parent:source.trusted_parent||null});
       const parsedKey='financials/parsed/'+doc.sha256+'-'+cik+'-'+PARSER_HASH+'.json';let parsed=await read(env,parsedKey);
-      const meta={...source,cik,company:name,require_table_identity:true,require_company_identity:source.form==='IR_RELEASE'||doc.bytes.subarray(0,5).toString()==='%PDF-',currency_hint:currency,source_url:source.url,source_sha256:doc.sha256,observed_at:now()};
+      const meta={...source,cik,company:name,issuer_names:(sub.formerNames||[]).map(r=>r.name).filter(n=>typeof n==='string'),require_table_identity:true,require_company_identity:source.form==='IR_RELEASE'||doc.bytes.subarray(0,5).toString()==='%PDF-',currency_hint:currency,source_url:source.url,source_sha256:doc.sha256,observed_at:now()};
       if(!parsed){parsed=await extract(doc.bytes,meta);await put(env,parsedKey,parsed);}
       // PDF exhibits may be separate files in the same SEC accession. Keep the
       // parent's CIK and disclosure clock; never follow an arbitrary document URL.
@@ -142,7 +144,7 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
     const job=nextFinancialJob(queue.jobs);
     if(!job){await new Promise(r=>setTimeout(r,10000));continue;}
     const firstPass=!job.last_attempt;job.last_attempt=now();handled++;
-    try{const result=await harvestIssuer(env,job,{client,maximumDocuments:firstPass&&job.priority<1000?0:maximumDocuments,offline});job.complete=result.complete;job.next_attempt=result.complete?Date.now()+3600000:result.next_attempt;job.error=null;job.attempts=0;console.log(JSON.stringify({event:'financial_profile',cik:job.cik,ticker:job.ticker,status:result.profile.coverage.status,score:result.profile.policy_financials.score,remaining:result.profile.collection.remaining_documents}));}
+    try{const result=await harvestIssuer(env,job,{client,maximumDocuments:firstPass&&job.priority<1000&&!signalPending(job)?0:maximumDocuments,offline});job.complete=result.complete;job.processed_signal=job.last_signal||job.processed_signal;job.signal_coverage_pending=!!job.last_signal&&!result.complete&&(result.profile.issuer_financials||result.profile.policy_financials).score===null;job.next_attempt=result.complete?Date.now()+3600000:result.next_attempt;job.error=null;job.attempts=0;console.log(JSON.stringify({event:'financial_profile',cik:job.cik,ticker:job.ticker,status:result.profile.coverage.status,score:result.profile.policy_financials.score,remaining:result.profile.collection.remaining_documents}));}
     catch(e){const cooldown=isSourceCooldown(e);if(!cooldown)job.attempts++;job.complete=false;job.error=e.message;job.next_attempt=cooldown?Math.max(Number(e.retryAt)||0,Date.now()+300000):Date.now()+Math.min(86400000,60000*2**Math.min(job.attempts,10));console.log(JSON.stringify({event:'financial_harvest_retry',cik:job.cik,error:e.message,retry_at:new Date(job.next_attempt).toISOString()}));}
     await deferrable('queue',()=>put(env,'financials/queue.json',queue));if(handled%5===0||job.priority>=1000)await deferrable('coverage',()=>publishFinancialCoverage(env,queue));
   }await deferrable('coverage',()=>publishFinancialCoverage(env,queue));return {handled,requests:client.requests,continue:!stop,broker_connections:0};}

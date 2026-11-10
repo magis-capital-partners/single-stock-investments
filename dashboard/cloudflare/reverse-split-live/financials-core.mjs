@@ -6,6 +6,7 @@ const flows=new Set(['revenues','net_income','operating_income','cfo']);
 const finite=v=>typeof v==='number'&&Number.isFinite(v);
 const time=v=>Number.isFinite(Date.parse(v))?Date.parse(v):null;
 const isoDate=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&time(v)!==null&&new Date(Date.parse(v)).toISOString().slice(0,10)===v;
+const primaryTotal=r=>r.metric==='revenues'&&r.kind==='html_table'&&r.statement_total===true&&/^total (?:net )?revenues?$/i.test(r.original_label||'');
 const useful=r=>({metric:r.metric,start:r.start||null,end:r.end,value:r.value,currency:r.currency,source_url:r.source_url,source_sha256:r.source_sha256,locator:r.locator,kind:r.kind,filed:r.filed,published_at:r.published_at,observed_at:r.observed_at,original_tag:r.original_tag,rounding_tolerance:r.rounding_tolerance,owner_reviewed:r.owner_reviewed});
 export function eligibleFact(r,cik,asOf){
   return !!r&&METRICS.includes(r.metric)&&String(Number(r.cik))===String(Number(cik))&&r.scope==='consolidated'&&r.confidence==='verified'&&finite(r.value)&&/^[A-Z]{3}$/.test(r.currency||'')&&isoDate(r.end)&&(!r.start||isoDate(r.start))&&(flows.has(r.metric)?!!r.start:!r.start)&&(!r.start||r.start<=r.end)&&r.end<=etDay(asOf)&&isoDate(r.filed)&&time(r.published_at)!==null&&time(r.observed_at)!==null&&time(r.published_at)<=time(asOf)&&time(r.observed_at)<=time(asOf)&&/^https:\/\//.test(r.source_url||'')&&/^[a-f0-9]{64}$/.test(r.source_sha256||'')&&typeof r.locator==='string'&&r.locator.length>0;
@@ -17,6 +18,7 @@ export function reconcileFacts(rows){
     const reviewed=values.filter(r=>r.owner_reviewed===true).sort((a,b)=>b.observed_at.localeCompare(a.observed_at));
     if(reviewed.length){facts.push(reviewed[0]);continue;}
     const latest=values.map(r=>r.filed).sort().at(-1);let current=values.filter(r=>r.filed===latest);
+    const totals=current.filter(primaryTotal);if(totals.length)current=totals;
     // Entity-wide tagged facts preserve the registered concept priorities.
     // An untagged note/table is never allowed to replace a tagged statement.
     const structured=current.filter(r=>r.kind==='inline_xbrl');if(structured.length){const rank=r=>{const n=ALIASES[r.metric].indexOf(String(r.original_tag||'').split(':').at(-1));return n<0?100:n;},best=Math.min(...structured.map(rank));current=structured.filter(r=>rank(r)===best);}
@@ -31,7 +33,7 @@ export function reconcileFacts(rows){
 export function buildFinancialProfile({cik,ticker=null,company=null,companyfacts,facts=[],sources=[],as_of,instrument=null,errors=[]}={}){
   if(!/^\d{1,10}$/.test(String(cik))||time(as_of)===null)throw new Error('Financial profile identity and clock required');
   const baseline=monetaryFacts({...companyfacts,verified_metric_facts:[]},as_of).metrics;
-  const accepted=facts.filter(r=>eligibleFact(r,cik,as_of)).filter(r=>r.owner_reviewed||r.kind==='inline_xbrl'||!(baseline[r.metric]||[]).some(x=>x.unit===r.currency&&(x.start||null)===(r.start||null)&&x.end===r.end&&x.filed>=r.filed)),reconciled=reconcileFacts(accepted);
+  const accepted=facts.filter(r=>eligibleFact(r,cik,as_of)).filter(r=>r.owner_reviewed||r.kind==='inline_xbrl'||primaryTotal(r)||!(baseline[r.metric]||[]).some(x=>x.unit===r.currency&&(x.start||null)===(r.start||null)&&x.end===r.end&&x.filed>=r.filed)),reconciled=reconcileFacts(accepted),conceptResolutions=[];
   reconciled.facts=reconciled.facts.filter(r=>{
     if(r.owner_reviewed)return true;
     const same=(baseline[r.metric]||[]).filter(x=>x.unit===r.currency&&(x.start||null)===(r.start||null)&&x.end===r.end),latest=same.map(x=>x.filed).sort().at(-1);
@@ -39,6 +41,12 @@ export function buildFinancialProfile({cik,ticker=null,company=null,companyfacts
     if(latest>r.filed)return false;
     const priority=Math.min(...same.filter(x=>x.filed===latest).map(x=>x.rank));
     const preferred=same.filter(x=>x.filed===latest&&x.rank===priority);
+    const alternatives=[];
+    if(primaryTotal(r))for(const ns of ['us-gaap','ifrs-full','dei'])for(const tag of ALIASES[r.metric])for(const value of companyfacts?.facts?.[ns]?.[tag]?.units?.[r.currency]||[])if(value.filed===latest&&(value.start||null)===(r.start||null)&&value.end===r.end)alternatives.push({...value,tag:ns+':'+tag});
+    // A face-statement TOTAL can identify which of several standard API tags
+    // is the consolidated measure. Require independent same-filing tagged
+    // agreement; a note table or an unmatched total never overrides the API.
+    if(primaryTotal(r)&&preferred.some(x=>Math.abs(x.val-r.value)>Math.max(Number(r.rounding_tolerance)||0,1e-6))&&alternatives.some(x=>Math.abs(x.val-r.value)<=Math.max(Number(r.rounding_tolerance)||0,1e-6))){conceptResolutions.push({version:'primary_consolidated_total.v1',metric:r.metric,start:r.start,end:r.end,value:r.value,source_sha256:r.source_sha256,locator:r.locator,superseded_concepts:preferred.map(x=>({tag:x.tag,value:x.val,accession:x.accn})),matching_concepts:alternatives.filter(x=>Math.abs(x.val-r.value)<=Math.max(Number(r.rounding_tolerance)||0,1e-6)).map(x=>x.tag)});return true;}
     if(preferred.some(x=>Math.abs(x.val-r.value)>Math.max(Number(r.rounding_tolerance)||0,1e-6)))reconciled.conflicts.push({key:[r.metric,r.start||'',r.end,r.currency].join('|'),reason:'filing_disagrees_with_companyfacts',values:[useful(r),...preferred.map(x=>({value:x.val,tag:x.tag,accession:x.accn,filed:x.filed}))]});
     return false;
   });
@@ -63,8 +71,9 @@ export function buildFinancialProfile({cik,ticker=null,company=null,companyfacts
   const type=instrument?.type,excluded=type&&type!=='CS';
   if(excluded){status='not_applicable';policy={...policy,score:null,status:'instrument_not_in_operating_company_strategy'};}
   if(reconciled.conflicts.length&&!excluded){status='needs_review';policy={...policy,score:null,status:'financial_source_conflict'};}
-  const coverage={status,reason:policy.status,period:anchor||null,age_days:anchor?Math.floor((Date.parse(etDay(as_of))-Date.parse(anchor))/DAY):null,available_score:available.score,policy_score:policy.score,signal_count:available.signal_count||0,metrics:metricRows,components,conflicts:reconciled.conflicts,required_inputs:METRICS.length+2,verified_inputs:Object.values(metricRows).filter(r=>finite(r.value)).length,instrument,missing_does_not_mean_zero:true};
-  return {schema:FINANCIAL_VERSION,cik:String(Number(cik)),ticker,company,observed_at:as_of,policy_financials:{...policy,coverage:undefined,evidence_layer:FINANCIAL_VERSION},coverage,facts:reconciled.facts,sources,errors};
+  const issuer=scoreFundamentals(raw,as_of,cik),issuerFinancials={score:reconciled.conflicts.length?null:issuer.score,status:reconciled.conflicts.length?'financial_source_conflict':issuer.status,signal_count:issuer.signal_count||0,period:issuer.period,currency:issuer.currency,signals:issuer.signals,method:issuer.method,cutoff:as_of};
+  const coverage={status,reason:policy.status,period:anchor||null,age_days:anchor?Math.floor((Date.parse(etDay(as_of))-Date.parse(anchor))/DAY):null,available_score:available.score,policy_score:policy.score,signal_count:available.signal_count||0,issuer_financial_status:issuerFinancials.status,metrics:metricRows,components,conflicts:reconciled.conflicts,concept_resolutions:conceptResolutions,required_inputs:METRICS.length+2,verified_inputs:Object.values(metricRows).filter(r=>finite(r.value)).length,instrument,missing_does_not_mean_zero:true};
+  return {schema:FINANCIAL_VERSION,cik:String(Number(cik)),ticker,company,observed_at:as_of,policy_financials:{...policy,coverage:undefined,evidence_layer:FINANCIAL_VERSION},issuer_financials:issuerFinancials,coverage,facts:reconciled.facts,sources,errors};
 }
 export function validateReviewedFacts(input,sources,now){
   if(!input||!/^\d{1,10}$/.test(String(input.cik))||!Array.isArray(input.facts)||input.facts.length<1||input.facts.length>30||typeof input.reason!=='string'||input.reason.trim().length<3)throw new Error('Review identity, facts and reason required');
