@@ -68,3 +68,10 @@ def test_legacy_identity_and_completeness_cannot_default(alteration):
     else:
         v=json.loads(store.restore_bytes(s.objects,c.records[sh]));v[p]['git_blob']='0'*40;c.records[sh]=store.store_bytes(s.objects,store.encoded_json(v))
     with pytest.raises(store.StorageError):s.restore(p)
+
+def test_hosting_private_storage_receives_existing_cloudflare_credentials():
+    workflow=(Path(__file__).resolve().parents[3]/'.github/workflows/dashboard-pages.yml').read_text(encoding='utf-8')
+    build=workflow.split('  build:',1)[1].split('    steps:',1)[0]
+    assert 'CLOUDFLARE_API_TOKEN: '+chr(36)+'{{ secrets.CLOUDFLARE_API_TOKEN }}' in build
+    assert 'CLOUDFLARE_ACCOUNT_ID: '+chr(36)+'{{ secrets.CLOUDFLARE_ACCOUNT_ID }}' in build
+    assert 'RESEARCH_VAULT_CLONE_TOKEN:' in build

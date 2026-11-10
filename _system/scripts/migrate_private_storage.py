@@ -5,7 +5,7 @@ history stay read-only. Every complete source blob is checked against Git,
 stored privately, read back and checked before a durable batch is registered.
 """
 from __future__ import annotations
-import argparse,hashlib,json,os,re,shutil,subprocess,time
+import argparse,hashlib,json,os,re,shutil,stat,subprocess,time
 from pathlib import Path
 from private_storage import (PrivateStorage,StorageError,encoded_json,relative_path,
                              restore_bytes,sha,store_bytes,store_packed,run_git)
@@ -78,6 +78,15 @@ def migrate(repository,output,*,storage=None,batch_files=128,max_batches=None,re
     rows,listing=inventory(repository,storage.config['legacy_pin']);output.mkdir(parents=True,exist_ok=True)
     journal=output/'migration-journal.json';progress=json.loads(journal.read_text()) if journal.exists() else {'source_commit':storage.config['legacy_pin'],'source_listing_sha256':listing,'batches':[]}
     if progress['source_commit']!=storage.config['legacy_pin'] or progress['source_listing_sha256']!=listing:raise StorageError('Migration inventory changed')
+    if not progress['batches']:
+        catalog_commit,records=storage.snapshot()
+        prefix='legacy/'+storage.config['legacy_pin']+'/batches/'
+        for name,entry in sorted(records.items()):
+            if not name.startswith(prefix):continue
+            if not re.fullmatch(re.escape(prefix)+r'[0-9]{6}-[0-9a-f]{64}[.]json',name):raise StorageError('Unexpected migration batch path')
+            if int(name[len(prefix):len(prefix)+6])!=len(progress['batches']):raise StorageError('Missing or conflicting migration checkpoint')
+            batch=json.loads(storage.restore(name,records=records))
+            progress['batches'].append({'logical_path':name,'sha256':entry['sha256'],'catalog_commit':catalog_commit,'files':len(batch['entries']),'bytes':sum(x['bytes'] for x in batch['entries'].values())})
     all_entries={}
     for record in progress['batches']:
         batch=verified_batch(storage,record)
@@ -130,7 +139,9 @@ def migrate(repository,output,*,storage=None,batch_files=128,max_batches=None,re
             # Existing metadata packs and all original vault Git objects stay.
             proof=output/('staging-release-'+str(len(progress['batches'])).zfill(6)+'.json')
             proof.write_bytes(encoded_json({'verified_batch':record,'duplicate_staging_files':released,'original_vault_untouched':True}))
-            for path in new_packs:path.unlink()
+            for path in new_packs:
+                if os.name=='nt':path.chmod(path.stat().st_mode|stat.S_IWRITE)
+                path.unlink()
         completed+=1
         print(json.dumps({'batch':len(progress['batches']),'files_verified':len(all_entries),'total_files':len(rows),'bytes_verified':sum(x['bytes'] for x in all_entries.values())}),flush=True)
     complete=set(all_entries)=={r['path'] for r in rows}
@@ -152,9 +163,25 @@ def migrate(repository,output,*,storage=None,batch_files=128,max_batches=None,re
     proof={'complete':True,'source_commit':storage.config['legacy_pin'],'files_verified':len(rows),'manifest_path':manifest_path,'catalog_commit':commit,'legacy_history_deleted':False}
     (output/'migration-completion-proof.json').write_bytes(encoded_json(proof));print(json.dumps(proof),flush=True);return proof
 
+def initialize_repository(repository,config):
+    repository=Path(repository).resolve();marker=repository/'migration-owner.json'
+    expected={'purpose':'verified-private-legacy-migration','source_commit':config['legacy_pin']}
+    if repository.exists():
+        if not marker.is_file() or json.loads(marker.read_text(encoding='utf-8'))!=expected:
+            raise StorageError('Refusing to repurpose an existing repository')
+    else:
+        repository.mkdir(parents=True,mode=0o700)
+        run_git(repository,'init','--bare')
+        run_git(repository,'config','core.longpaths','true')
+        run_git(repository,'remote','add','origin','https://github.com/'+config['legacy_repository']+'.git')
+        marker.write_bytes(encoded_json(expected))
+    run_git(repository,'fetch','--no-tags','--depth','1','--filter=blob:none','origin',config['legacy_pin'])
+
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--repository',required=True,type=Path);p.add_argument('--output',required=True,type=Path);p.add_argument('--batch-files',default=128,type=int);p.add_argument('--max-batches',type=int);p.add_argument('--release-staging-packs',action='store_true')
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--repository',required=True,type=Path);p.add_argument('--output',required=True,type=Path);p.add_argument('--batch-files',default=128,type=int);p.add_argument('--max-batches',type=int);p.add_argument('--release-staging-packs',action='store_true');p.add_argument('--initialize-repository',action='store_true')
     args=p.parse_args()
     if not 1<=args.batch_files<=256:raise StorageError('Bounded migration batch required')
-    migrate(args.repository,args.output,batch_files=args.batch_files,max_batches=args.max_batches,release_staging_packs=args.release_staging_packs)
+    storage=PrivateStorage()
+    if args.initialize_repository:initialize_repository(args.repository,storage.config)
+    migrate(args.repository,args.output,storage=storage,batch_files=args.batch_files,max_batches=args.max_batches,release_staging_packs=args.release_staging_packs)
 if __name__=='__main__':main()

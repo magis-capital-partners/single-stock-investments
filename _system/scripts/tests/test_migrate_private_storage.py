@@ -59,3 +59,15 @@ def test_git_reader_handles_more_output_than_pipe_capacity(tmp_path):
     for actual,data in migration.read_blobs(repo,[identity]*128):
         assert actual==identity and data==raw;count+=1
     assert count==128
+
+def test_existing_repository_is_never_repurposed(tmp_path):
+    repository=tmp_path/'ordinary';repository.mkdir();(repository/'precious').write_bytes(b'unpublished')
+    with pytest.raises(store.StorageError):migration.initialize_repository(repository,{'legacy_pin':'a'*40,'legacy_repository':'magis-capital-partners/research-vault'})
+    assert (repository/'precious').read_bytes()==b'unpublished'
+
+def test_hosted_migration_has_no_model_or_automatic_trigger():
+    workflow=(Path(__file__).resolve().parents[3]/'.github/workflows/private-storage.yml').read_text(encoding='utf-8')
+    assert 'private-storage-migrate' in workflow and 'timeout-minutes: 100' in workflow
+    assert 'schedule:' not in workflow and 'workflow_dispatch:' not in workflow
+    assert 'migrate_private_storage.py' in workflow and '--release-staging-packs' in workflow
+    assert 'ANTHROPIC_API_KEY' not in workflow and 'OPENAI_API_KEY' not in workflow

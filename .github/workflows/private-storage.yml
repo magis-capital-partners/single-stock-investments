@@ -2,7 +2,7 @@ name: Verify private object storage
 
 on:
   repository_dispatch:
-    types: [private-storage-check]
+    types: [private-storage-check, private-storage-migrate]
 
 permissions:
   contents: read
@@ -13,6 +13,7 @@ concurrency:
 
 jobs:
   verify:
+    if: github.event.action == 'private-storage-check'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -37,3 +38,31 @@ jobs:
         run: python -m pip install pypdf PyYAML exchange-calendars==4.13.2
       - name: Verify existing approval and private storage round trip
         run: python _system/scripts/private_storage_bootstrap.py check --ticker V --limit 1
+
+  migrate:
+    if: github.event.action == 'private-storage-migrate'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/config/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve complete pinned legacy bytes in resumable verified batches
+        run: >-
+          python _system/scripts/migrate_private_storage.py
+          --repository "$RUNNER_TEMP/private-migration.git"
+          --output "$RUNNER_TEMP/private-migration-proof"
+          --initialize-repository --release-staging-packs

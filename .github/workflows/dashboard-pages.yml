@@ -297,6 +297,8 @@ jobs:
     # The initial complete archive index is cold; later builds reuse private caches.
     timeout-minutes: 120
     env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
