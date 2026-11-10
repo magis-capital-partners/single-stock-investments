@@ -76,7 +76,7 @@ test('a primary consolidated total can resolve an API concept-priority ambiguity
  const wrong=buildFinancialProfile({cik,companyfacts:raw,facts:[{...fact,value:999999}],as_of:'2026-11-10T15:00:00Z'});assert.ok(wrong.coverage.conflicts.length);
 });
 
-import {retainFinancialProfile,MAX_RETAINED_FINANCIAL_PROFILES,installFinancialImport} from './reverse-split-live/financials-import.mjs';
+import {retainFinancialProfile,MAX_RETAINED_FINANCIAL_PROFILES,installFinancialImport,importFinancialProfiles} from './reverse-split-live/financials-import.mjs';
 test('broad imports retain bounded raw filings while compact scores and version receipts survive eviction',()=>{
  const env={};installFinancialImport(env);
  for(let i=0;i<MAX_RETAINED_FINANCIAL_PROFILES*5;i++){const id=String(i);retainFinancialProfile(env,id,{profile:{version:id},raw:{large:'primary history'},facts:[]});env.financialProfileVersions.set(id,id);env.financialScoreCache.set(id,{schema:'test'});}
@@ -89,4 +89,21 @@ test('handoffs cannot reuse an old numeric score under a newly repaired evidence
  const db=new DatabaseSync(':memory:');db.exec('CREATE TABLE rs_state(key TEXT PRIMARY KEY,value TEXT,updated_at TEXT)');t.after(()=>db.close());const now=new Date().toISOString(),saved={schema:FINANCIAL_VERSION,cik:'1876766',computed_at:now,score:{score:66.7,period:new Date(Date.now()-120*86400000).toISOString().slice(0,10),source_profile_version:'a'.repeat(64)}};
  db.prepare('INSERT INTO rs_state VALUES(?,?,?)').run('financial_score_cache:1876766',JSON.stringify(saved),now);const env={DB:localAdapter(db)};installFinancialImport(env);await env.restoreFinancialScores();assert.equal(env.scoreFinancialProfile('1876766',now),null);assert.equal(env.financialProfileVersions.has('1876766'),false);assert.deepEqual(JSON.parse(db.prepare('SELECT value FROM rs_state').get().value),saved);
  saved.calculation_revision=FINANCIAL_EVIDENCE_REVISION;saved.score.score=75;db.prepare('UPDATE rs_state SET value=?').run(JSON.stringify(saved));await env.restoreFinancialScores();assert.equal(env.scoreFinancialProfile('1876766',now).score,75);assert.equal(env.financialProfileVersions.get('1876766'),'a'.repeat(64));
+});
+
+test('a revised financial calculation queues a new decision even when the same profile was already rescored',async t=>{
+ const db=new DatabaseSync(':memory:');for(const f of readdirSync(new URL('./reverse-split-live/migrations/',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./reverse-split-live/migrations/'+f,import.meta.url),'utf8'));t.after(()=>db.close());
+ const cik='1780652',version='a'.repeat(64),eventId='same-profile-repair',at=new Date().toISOString(),oldId='financial-profile:'+version+':'+eventId;
+ const ledger={schema:FINANCIAL_VERSION,cik,source_profile_version:version,facts:[]},factsKey='financials/facts/'+cik+'/'+version+'.json';
+ const profile={schema:FINANCIAL_VERSION,cik,version,facts_object_key:factsKey,facts_sha256:await sha(JSON.stringify(ledger)),sources:[],collection:{api_source_sha256:null},coverage:{instrument:{type:'ADRC'}}};
+ const objects=new Map([['financials/manifest-latest.json',{schema:FINANCIAL_VERSION,profiles:[{cik,version}]}],['financials/profiles/'+cik+'/'+version+'.json',profile],[factsKey,ledger]]);
+ const original=JSON.stringify({id:eventId,cik,first_seen_at:at,financials:{score:null}});
+ db.prepare('INSERT INTO rs_events(id,cik,first_seen_at,payload) VALUES(?,?,?,?)').run(eventId,cik,at,original);
+ db.prepare('INSERT INTO rs_jobs(id,kind,payload,priority,state,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(oldId,'rescore',JSON.stringify({id:eventId}),14,'complete',at,at);
+ const env={DB:localAdapter(db),EVIDENCE:{get:async key=>objects.has(key)?{json:async()=>objects.get(key)}:null}};installFinancialImport(env);await importFinancialProfiles(env);
+ const newId='financial-profile:'+FINANCIAL_EVIDENCE_REVISION+':'+version+':'+eventId;
+ assert.equal(db.prepare('SELECT state FROM rs_jobs WHERE id=?').get(newId)?.state,'pending');
+ assert.equal(db.prepare('SELECT state FROM rs_jobs WHERE id=?').get(oldId).state,'complete');
+ assert.equal(db.prepare('SELECT payload FROM rs_events WHERE id=?').get(eventId).payload,original);
+ await importFinancialProfiles(env);assert.equal(db.prepare('SELECT count(*) AS n FROM rs_jobs WHERE id=?').get(newId).n,1);
 });
