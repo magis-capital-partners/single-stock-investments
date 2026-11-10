@@ -380,8 +380,8 @@ class OrderCommandLoop:
         # disagreement between the two shows up in the fingerprint the human is
         # asked to confirm.
         identity = self._identity(row, broker)
-        # Judged on what IBKR says the conId is, never on the form. A SPY / QQQ / TSLA
-        # contract is etf-0dte's, and nothing is drafted for it.
+        # Judged on what IBKR says the conId is, never on the form. A SPY / QQQ /
+        # TSLA / NVDA / AMZN contract is etf-0dte's, and nothing is drafted for it.
         refusal = etf_0dte_ticket_refusal(identity)
         if refusal:
             self.channel.publish(row["request_id"], {"state": "rejected", "reject_reason": refusal})

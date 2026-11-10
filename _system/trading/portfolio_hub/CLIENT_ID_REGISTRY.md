@@ -6,8 +6,8 @@ Status: implemented. The machine-readable registry is authoritative.
 
 Source: `_system/trading/ib_gateway_client_registry.v1.json`
 
-- Registry version: `2026-11-06.1`
-- Canonical SHA-256: `e01ec812195749504e7548ebcc0df5734416e75b961b8f9c4e46564b47f8016a`
+- Registry version: `2026-11-10.1`
+- Canonical SHA-256: `6fabc701ce3de90f6d281c680201f2ff2f7181628d3020fac7bc2a80221b1cb5`
 - Local validation:
   `python _system/scripts/check_ib_gateway_registry.py --skip-mirrors`
 - Manual cross-repo mirror validation:
@@ -28,7 +28,9 @@ JSON and all repo mirrors before first use.
 The cross-system allocation is SPX 17/18/19/87/88/97; LS client 0 is
 disabled-reserved because `ib_insync` auto-binds open orders for client zero.
 LS client 83 is the read-only stale-order interlock, with 41/77/90/198 plus leased pool 100–129;
-etf-0dte uses 50/51/52 (SPY/QQQ/TSLA executors) and 130/131/132 (their +80 watchdogs);
+etf-0dte uses 50/51/52/53/54 (SPY/QQQ/TSLA/NVDA/AMZN executors) and
+130/131/132/133/134 (their +80 watchdogs), with order-ref prefixes `SPY0DTE|` /
+`QQQ0DTE|` / `TSLA0DTE|` / `NVDA0DTE|` / `AMZN0DTE|`;
 SSI uses 71/72/73/81/82/91. Retired
 IDs and ranges are recorded in the same JSON and may not be reused.
 
@@ -58,11 +60,12 @@ Before accepting commands, startup recovery reads open orders, classifies each
 one by positive ownership, and refuses an unresolved `MAGIS|` namespace.
 Uncertain-send reconciliation also checks completed orders. Manual,
 foreign, and legacy orders are visible and never bound, modified, or cancelled.
-`reqGlobalCancel` is prohibited. etf-0dte's `SPY0DTE|` / `QQQ0DTE|` / `TSLA0DTE|`
-orders (clients 50/51/52 and watchdogs 130/131/132, including the 09:30 unwind of
-a delivery) are foreign by the same rule, even on client 91, with no special case
-in the bridge (`tests/test_ib_bridge.py`); the order loop also refuses to draft
-any SPY, QQQ or TSLA ticket (`allocation_policy.etf_0dte_ticket_refusal`).
+`reqGlobalCancel` is prohibited. etf-0dte's `SPY0DTE|` / `QQQ0DTE|` / `TSLA0DTE|` /
+`NVDA0DTE|` / `AMZN0DTE|` orders (clients 50-54 and watchdogs 130-134, including
+the 09:30 unwind of a delivery) are foreign by the same rule, even on client 91,
+with no special case in the bridge (`tests/test_ib_bridge.py`); the order loop
+also refuses to draft any SPY, QQQ, TSLA, NVDA or AMZN ticket
+(`allocation_policy.etf_0dte_ticket_refusal`).
 
 Positive hub ownership requires all three: a `MAGIS|` orderRef, the configured
 account, and client ID 91. `find_owned_order`, startup recovery, and cancellation

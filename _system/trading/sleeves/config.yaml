@@ -59,24 +59,30 @@ paths:
   etf_to_under_json: data/etf_to_under.json
   etf_ls_universe_json: data/etf_ls_universe.json
 
-# etf-0dte: spx-0dte's SPY / QQQ / TSLA 0DTE executors (clients 50/51/52,
-# watchdogs 130/131/132) share this account. An assigned short delivers shares
-# overnight; spx-0dte forecasts them at the close in
-# <live_dir>/<spy|qqq|tsla>/<session>/expected_delivery_<account>.json and sells
-# them at 09:30. The classifier labels SPY / QQQ / TSLA shares against that
-# forecast (etf_0dte_delivery) or, with none, as etf_0dte_delivery_unattributed.
-# No book here owns either, and nothing here sizes or tickets against them.
+# etf-0dte: spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN 0DTE executors (clients
+# 50-54, watchdogs 130-134) share this account. An assigned short delivers
+# shares overnight; spx-0dte forecasts them at the close in
+# <live_dir>/<spy|qqq|tsla|nvda|amzn>/<session>/expected_delivery_<account>.json
+# and sells them at 09:30. The classifier labels shares on those roots against
+# that forecast (etf_0dte_delivery) or, with none, as
+# etf_0dte_delivery_unattributed. No book here owns either, and nothing here
+# sizes or tickets against them.
 etf_0dte:
   # spx-0dte's data/live on this host. ETF_0DTE_LIVE_DIR overrides it.
   # Unset means no forecast.
   live_dir: null
   # Use a product's newest forecast only if at most this many days old.
   forecast_max_age_days: 4
-  # Signed SPY / QQQ / TSLA shares another book is KNOWN to hold, e.g. {SPY: 300}.
-  # Those keep their current bucket; only shares beyond them are etf-0dte's.
+  # Signed SPY / QQQ / TSLA / NVDA / AMZN shares another book is KNOWN to hold,
+  # e.g. {SPY: 300}. Those keep their current bucket; only shares beyond them
+  # are etf-0dte's.
   # Empty: no book held SPY or QQQ on 2026-10-27, and ls-algo has
   # blacklisted both since 2026-09-10. ls-algo's +11 TSLA (2026-11-05 Flex) is
   # left out on purpose: the owner is closing it by hand, and an entry that
   # outlived it would hand part of a later delivery to ls-algo. Until it closes
   # it reads etf_0dte_delivery_unattributed, which no book owns.
+  # NVDA and AMZN (2026-11-10): no SSI book holds either. ls-algo's shares of
+  # both (its LETF-pair hedges; the 2026-08-28 Flex is the newest this repo
+  # has) are left out for the same reason as its TSLA, and read
+  # etf_0dte_delivery_unattributed until the owner closes them.
   known_share_holdings: {}

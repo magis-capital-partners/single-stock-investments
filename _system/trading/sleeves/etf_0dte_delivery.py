@@ -1,8 +1,8 @@
-"""Read spx-0dte's SPY / QQQ / TSLA delivery forecast. Read-only: it opens files, nothing else.
+"""Read spx-0dte's etf-0dte delivery forecast. Read-only: it opens files, nothing else.
 
-etf-0dte is spx-0dte's SPY, QQQ and TSLA 0DTE executors (IB clients 50/51/52,
-dead-executor watchdogs 130/131/132, orderRef prefixes ``SPY0DTE|`` / ``QQQ0DTE|`` /
-``TSLA0DTE|``). They trade
+etf-0dte is spx-0dte's SPY, QQQ, TSLA, NVDA and AMZN 0DTE executors (IB clients
+50-54, dead-executor watchdogs 130-134, orderRef prefixes ``SPY0DTE|`` /
+``QQQ0DTE|`` / ``TSLA0DTE|`` / ``NVDA0DTE|`` / ``AMZN0DTE|``). They trade
 physically settled options in the account this repo shares, so an assigned short
 delivers 100 shares per contract overnight. At each close the executor (or, if it
 died, its watchdog) writes the shares it expects to be delivered:
@@ -10,15 +10,16 @@ died, its watchdog) writes the shares it expects to be delivered:
     <live_dir>/<product>/<session>/expected_delivery_<account>.json
     {"written_at": ..., "shares": {"SPY": -100}, "detail": [...]}
 
-``live_dir`` is spx-0dte's ``data/live``; ``product`` is ``spy``, ``qqq`` or ``tsla``;
+``live_dir`` is spx-0dte's ``data/live``; ``product`` is ``spy``, ``qqq``, ``tsla``,
+``nvda`` or ``amzn``;
 ``session`` is the session that closed (``YYYY-MM-DD``); ``shares`` is signed net
 shares (a short put assigned delivers +100, a short call -100). The morning unwind
 reads the same file and sells the delivery at 09:30. A dry run writes under
 ``<live_dir>/<dry-run dir>/<product>/...``, which this reader never looks at, so a
 simulated book can never explain real shares.
 
-The classifier uses the result only to LABEL SPY / QQQ / TSLA shares that no other
-book is known to hold: ``etf_0dte_delivery`` when this forecast predicted them,
+The classifier uses the result only to LABEL SPY / QQQ / TSLA / NVDA / AMZN shares
+that no other book is known to hold: ``etf_0dte_delivery`` when this forecast predicted them,
 ``etf_0dte_delivery_unattributed`` when nothing did. No SSI book owns either.
 """
 
@@ -29,7 +30,7 @@ import re
 from datetime import date, datetime
 from pathlib import Path
 
-PRODUCT_SYMBOLS = {"spy": "SPY", "qqq": "QQQ", "tsla": "TSLA"}
+PRODUCT_SYMBOLS = {"spy": "SPY", "qqq": "QQQ", "tsla": "TSLA", "nvda": "NVDA", "amzn": "AMZN"}
 
 # The newest forecast at most this many calendar days old. It covers a weekend
 # plus a holiday: Friday's forecast still explains shares a failed Monday unwind
@@ -74,9 +75,10 @@ def read_expected_delivery(
     """Symbol -> forecast net shares from each product's newest forecast, or None.
 
     None means no forecast was available at all, which is a real answer: every
-    SPY / QQQ / TSLA share no other book holds is then unattributed. A symbol missing from
-    the result had no forecast either. A product whose newest forecast cannot be
-    read is treated as having none -- an older file is never substituted for it.
+    SPY / QQQ / TSLA / NVDA / AMZN share no other book holds is then unattributed.
+    A symbol missing from the result had no forecast either. A product whose
+    newest forecast cannot be read is treated as having none -- an older file is
+    never substituted for it.
     """
     if not live_dir or not str(account or "").strip():
         return None

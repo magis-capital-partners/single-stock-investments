@@ -52,8 +52,10 @@ def test_michael_can_trade_residual_but_not_ls_universe():
     assert not aplz.ok
     tqqq = check_safeties(owner="michael", ticker="TQQQ", side="BUY", qty=10, limit_price=40, quote=_quote(40), proposal={"snapshot_last": 40})
     assert not tqqq.ok
-    nvda = check_safeties(owner="michael", ticker="NVDA", side="BUY", qty=10, limit_price=100, quote=_quote(100), proposal={"snapshot_last": 100})
-    assert not nvda.ok
+    # NVDA was this example until it became an etf-0dte root on 2026-11-10.
+    msft = check_safeties(owner="michael", ticker="MSFT", side="BUY", qty=10, limit_price=100, quote=_quote(100), proposal={"snapshot_last": 100})
+    assert not msft.ok
+    assert any("systematic" in f.lower() for f in msft.failures), msft.failures
 
 
 def test_proposal_id_one_shot_and_stale_quote():
@@ -120,7 +122,7 @@ def test_etf_0dte_options_and_shares_blocked_for_both_sleeves():
     # A sleeve SELL of SPY would sell etf-0dte's overnight delivery out from
     # under its 09:30 unwind; a BUY would net against it. Neither owner may.
     for owner in ("drew", "michael"):
-        for root in ("SPY", "QQQ", "TSLA"):
+        for root in ("SPY", "QQQ", "TSLA", "NVDA", "AMZN"):
             for side in ("BUY", "SELL"):
                 shares = check_safeties(
                     owner=owner, ticker=root, side=side, qty=10, limit_price=500,
@@ -137,6 +139,24 @@ def test_etf_0dte_options_and_shares_blocked_for_both_sleeves():
                 )
                 assert not option.ok
                 assert any("etf-0dte" in f for f in option.failures), (owner, root, side, option.failures)
+
+
+def test_drew_overlays_move_off_nvda_and_amzn_but_not_off_other_universe_names():
+    # Before 2026-11-10 an NVDA or AMZN option classified as a Drew LS overlay
+    # and passed this gate for either owner. Now they are etf-0dte roots; an
+    # overlay on any other universe underlying is untouched.
+    def option(root):
+        quote = _quote(last=2)
+        quote.update({"secType": "OPT", "underlying": root, "multiplier": 100})
+        return check_safeties(owner="drew", ticker=root, side="SELL", qty=1, limit_price=2,
+                              quote=quote, proposal={"snapshot_last": 2})
+
+    msft = option("MSFT")
+    assert msft.ok, msft.failures
+    for root in ("NVDA", "AMZN"):
+        refused = option(root)
+        assert not refused.ok
+        assert any("etf-0dte" in f for f in refused.failures), (root, refused.failures)
 
 
 def test_etf_0dte_rows_never_count_toward_a_sleeves_gross():

@@ -73,16 +73,18 @@ def test_snapshot_universe_includes_underlyings():
 
 
 def test_ls_algo_universe_always_excluded_from_michael():
-    nvda = classify_position(
-        {"symbol": "NVDA", "secType": "STK"},
+    # NVDA was this example until 2026-11-10, when it became an etf-0dte root
+    # (test_classify_etf_0dte.py); MSFT is a universe underlying that is not.
+    msft = classify_position(
+        {"symbol": "MSFT", "secType": "STK"},
         blacklist_family={"APLD"},
-        etf_ls_symbols={"NVDA", "NVDX", "TQQQ"},
+        etf_ls_symbols={"MSFT", "MSFU", "TQQQ"},
     )
-    assert nvda.bucket == "etf_ls"
+    assert msft.bucket == "etf_ls"
     apld = classify_position(
         {"symbol": "APLD", "secType": "STK"},
         blacklist_family={"APLD", "APLZ"},
-        etf_ls_symbols={"APLD", "APLZ", "NVDA"},
+        etf_ls_symbols={"APLD", "APLZ", "MSFT"},
     )
     assert apld.bucket == "etf_ls"
     assert apld.reason == "etf_ls_universe"
@@ -125,13 +127,14 @@ def test_equity_option_follows_underlying():
     # systematic pair leg, not a systematic holding. The shares stay excluded;
     # the overlay routes to Drew so a discretionary trade has somewhere visible
     # to live instead of disappearing into the etf_ls bucket. The shares assertion
-    # below is what pins that only OPT/FOP moves.
-    nvda = classify_position(
-        {"symbol": "NVDA  260821C00100000", "secType": "OPT", "underlyingSymbol": "NVDA"},
+    # below is what pins that only OPT/FOP moves. (NVDA was this example until it
+    # became an etf-0dte root on 2026-11-10; a ref-less NVDA option is etf-0dte's.)
+    msft = classify_position(
+        {"symbol": "MSFT  260821C00400000", "secType": "OPT", "underlyingSymbol": "MSFT"},
         blacklist_family=set(),
-        etf_ls_symbols={"NVDA"},
+        etf_ls_symbols={"MSFT"},
     )
-    assert nvda.bucket == "drew" and nvda.reason == "ls_algo_option_overlay"
+    assert msft.bucket == "drew" and msft.reason == "ls_algo_option_overlay"
     apld = classify_position(
         {"symbol": "APLD  260821C00030000", "secType": "OPT", "underlyingSymbol": "APLD"},
         blacklist_family={"APLD"},

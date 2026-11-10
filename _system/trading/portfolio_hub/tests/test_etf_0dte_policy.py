@@ -1,9 +1,9 @@
 """etf-0dte in the hub: owner-custody policy, the ledger's lots, and the ticket guard.
 
-etf-0dte is spx-0dte's SPY / QQQ / TSLA 0DTE executors (clients 50/51/52,
-watchdogs 130/131/132). Their options, and the shares an assignment delivers overnight, sit in
-this account but belong to no hub owner: the hub never sizes, rebalances or
-tickets against them.
+etf-0dte is spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN 0DTE executors (clients
+50-54, watchdogs 130-134). Their options, and the shares an assignment delivers
+overnight, sit in this account but belong to no hub owner: the hub never sizes,
+rebalances or tickets against them.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from _system.trading.portfolio_hub.ledger import PortfolioLedger
 from .test_ledger import snapshot
 
 ALIAS = "paper-primary"
-LETF = {"SPY", "QQQ", "TSLA", "AAPL"}   # the committed universe snapshot lists all three roots
+LETF = {"SPY", "QQQ", "TSLA", "NVDA", "AMZN", "AAPL"}   # the committed universe snapshot lists every root
 
 
 @pytest.fixture()
@@ -76,6 +76,8 @@ def test_policy_routes_etf_0dte_options_and_shares_to_no_owner():
         {"symbol": "SPY   261027P00570000", "local_symbol": "SPY   261027P00570000", "sec_type": "OPT"},
         {"symbol": "QQQ   261027C00500000", "sec_type": "OPT"},
         {"symbol": "TSLA  261113C00330000", "sec_type": "OPT"},
+        {"symbol": "NVDA  261113C00200000", "sec_type": "OPT"},
+        {"symbol": "AMZN", "local_symbol": "AMZN  261113P00230000", "sec_type": "OPT", "underlying": "AMZN"},
     ):
         got = policy(row)
         assert (got.owner, got.strategy, got.bucket, got.reason) == (
@@ -121,6 +123,42 @@ def test_ls_algos_tsla_shares_become_an_unattributed_lot_in_no_book(ledger, monk
     _forecast(monkeypatch, None)
     snapshot_id = ledger.ingest_account_snapshot(_book((1, "CSU", 12), (5, "TSLA", 11)))
     assert _lots(ledger, 5) == [("unallocated", "etf_0dte", "etf_0dte_delivery_unattributed", "11")]
+    assert [row["symbol"] for row in ledger.latest_portfolio(ALIAS, "michael")["positions"]] == ["CSU"]
+    assert ledger.latest_portfolio(ALIAS, "drew")["positions"] == []
+    assert ledger.reconcile_allocations(snapshot_id) == []
+
+
+def test_nvda_and_amzn_options_were_drew_overlays_and_are_now_etf_0dte():
+    # Both roots are ls-algo universe underlyings. Until 2026-11-10 a ref-less
+    # option on either was Drew's letf_option_overlay; it now belongs to no owner.
+    # No book held one at the 2026-08-28 Flex.
+    for root in ("NVDA", "AMZN"):
+        got = classify_policy_position(
+            {"symbol": root, "local_symbol": f"{root:<6}261113C00200000", "sec_type": "OPT", "underlying": root},
+            ls_symbols=LETF, drew_symbols={root},
+        )
+        assert (got.owner, got.strategy, got.bucket, got.reason) == (
+            "unallocated", "etf_0dte", "etf_0dte", "etf_0dte_option_exclusion",
+        ), root
+    # An overlay on any other universe underlying keeps Drew.
+    msft = classify_policy_position(
+        {"symbol": "MSFT", "local_symbol": "MSFT  261113C00400000", "sec_type": "OPT", "underlying": "MSFT"},
+        ls_symbols=LETF | {"MSFT"}, drew_symbols=set(),
+    )
+    assert (msft.owner, msft.strategy) == ("drew", "letf_option_overlay")
+
+
+def test_ls_algos_nvda_and_amzn_shares_become_unattributed_lots_in_no_book(ledger, monkeypatch):
+    # ls-algo held both as LETF-pair hedges at the 2026-08-28 Flex. Without this
+    # PR they are "letf" exclusions; either way no owner holds them. A forecast
+    # for one root never explains the other's shares.
+    _forecast(monkeypatch, {"NVDA": 0})
+    snapshot_id = ledger.ingest_account_snapshot(_book((1, "CSU", 12), (6, "NVDA", 13), (7, "AMZN", 8)))
+    assert _lots(ledger, 6) == [("unallocated", "etf_0dte", "etf_0dte_delivery_unattributed", "13")]
+    assert _lots(ledger, 7) == [("unallocated", "etf_0dte", "etf_0dte_delivery_unattributed", "8")]
+    notes = {row["conid"]: row["note"] for row in ledger.allocation_projection(ALIAS)["allocations"]}
+    assert notes[6] == "etf_0dte_unattributed_shares:beyond_forecast"
+    assert notes[7] == "etf_0dte_unattributed_shares:no_forecast"
     assert [row["symbol"] for row in ledger.latest_portfolio(ALIAS, "michael")["positions"]] == ["CSU"]
     assert ledger.latest_portfolio(ALIAS, "drew")["positions"] == []
     assert ledger.reconcile_allocations(snapshot_id) == []
@@ -202,6 +240,12 @@ def test_hub_forecast_is_read_from_the_environment_on_the_new_york_date(tmp_path
     {"symbol": "TSLA", "sec_type": "STK", "local_symbol": "TSLA"},
     {"symbol": "TSLA", "sec_type": "OPT", "local_symbol": "TSLA  261113C00330000", "trading_class": "TSLA"},
     {"symbol": "TSLA", "sec_type": "OPT", "local_symbol": "TSLA  271217P00200000", "trading_class": "TSLA"},
+    {"symbol": "NVDA", "sec_type": "STK", "local_symbol": "NVDA"},
+    {"symbol": "NVDA", "sec_type": "OPT", "local_symbol": "NVDA  261113C00200000", "trading_class": "NVDA"},
+    {"symbol": "NVDA", "sec_type": "OPT", "local_symbol": "NVDA  271217P00150000", "trading_class": "NVDA"},
+    {"symbol": "AMZN", "sec_type": "STK", "local_symbol": "AMZN"},
+    {"symbol": "AMZN", "sec_type": "OPT", "local_symbol": "AMZN  261113P00230000", "trading_class": "AMZN"},
+    {"symbol": "AMZN", "sec_type": "OPT", "local_symbol": "AMZN  271217C00300000", "trading_class": "AMZN"},
 ])
 def test_ticket_guard_refuses_every_etf_0dte_contract(identity):
     reason = etf_0dte_ticket_refusal(identity)
@@ -217,6 +261,14 @@ def test_ticket_guard_refuses_every_etf_0dte_contract(identity):
     {"symbol": "TSLT", "sec_type": "STK", "local_symbol": "TSLT"},
     {"symbol": "TSYY", "sec_type": "STK", "local_symbol": "TSYY"},
     {"symbol": "TSLL", "sec_type": "OPT", "local_symbol": "TSLL  261120C00010000", "trading_class": "TSLL"},
+    {"symbol": "NVDL", "sec_type": "STK", "local_symbol": "NVDL"},
+    {"symbol": "NVD", "sec_type": "STK", "local_symbol": "NVD"},
+    {"symbol": "NVDX", "sec_type": "STK", "local_symbol": "NVDX"},
+    {"symbol": "NVDL", "sec_type": "OPT", "local_symbol": "NVDL  261120C00050000", "trading_class": "NVDL"},
+    {"symbol": "AMZU", "sec_type": "STK", "local_symbol": "AMZU"},
+    {"symbol": "AMZZ", "sec_type": "STK", "local_symbol": "AMZZ"},
+    {"symbol": "AMZU", "sec_type": "OPT", "local_symbol": "AMZU  261120C00040000", "trading_class": "AMZU"},
+    {"symbol": "MSFT", "sec_type": "OPT", "local_symbol": "MSFT  261120C00400000", "trading_class": "MSFT"},
     {"symbol": "XSP", "sec_type": "OPT", "local_symbol": "XSP   270129P00540000", "trading_class": "XSP"},
     {"symbol": "SPX", "sec_type": "OPT", "local_symbol": "SPXW  260817P05000000", "trading_class": "SPXW"},
 ])
