@@ -162,7 +162,23 @@ def evaluate(
     if len(today) >= int(config.get("daily_repo_limit") or 999999) and not force:
         return {**base, "decision": "suppressed", "gate_reason": "daily_repo_limit"}
     today_subject = [row for row in today if row.get("subject") == subject]
-    if len(today_subject) >= int(config.get("per_subject_daily_limit") or 999999) and not force:
+    subject_limit = int(config.get("per_subject_daily_limit") or 999999)
+    dated_limits = config.get("dated_subject_daily_limits", {})
+    if not isinstance(dated_limits, dict):
+        return {**base, "decision": "suppressed", "gate_reason": "invalid_dated_subject_daily_limit"}
+    utc_day = at.astimezone(timezone.utc).date().isoformat()
+    dated_subjects = dated_limits.get(utc_day, {})
+    if not isinstance(dated_subjects, dict):
+        return {**base, "decision": "suppressed", "gate_reason": "invalid_dated_subject_daily_limit"}
+    if subject in dated_subjects:
+        renewed = dated_subjects[subject]
+        if (type(renewed) is not int or renewed < 1
+                or renewed > int(config.get("daily_repo_limit") or 999999)):
+            return {**base, "decision": "suppressed", "gate_reason": "invalid_dated_subject_daily_limit"}
+        subject_limit = renewed
+        base["effective_per_subject_daily_limit"] = subject_limit
+        base["dated_subject_limit_scope"] = {"UTC_day": utc_day, "subject": subject}
+    if len(today_subject) >= subject_limit and not force:
         return {**base, "decision": "suppressed", "gate_reason": "per_subject_daily_limit"}
 
     cooldown = timedelta(hours=float(config.get("cooldown_hours") or 0))
