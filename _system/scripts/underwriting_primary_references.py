@@ -290,7 +290,10 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
         parents = following
         if not parents and not references:
             break
-    pending = sorted(set(references)-financing_urls) if require_all_citations or inherited_capacity else []
+    governing_requested = any(term in ('indenture', 'base indenture', 'supplemental indenture')
+                              for term in keywords)
+    pending = (sorted(set(references)-financing_urls)
+               if require_all_citations or inherited_capacity or governing_requested else [])
     for url in pending:
         errors.append({'source':'requested_primary_reference','source_url':url,
                        'error':'Requested primary citations exceed the shared reference capacity'})
