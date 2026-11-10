@@ -222,3 +222,32 @@ def test_release_parser_handles_multiline_prose_and_semicolons():
     assert len(statements(sql)) == 2
     with pytest.raises(ValueError, match="Incomplete"):
         statements("INSERT INTO t VALUES('unclosed")
+
+
+def test_release_commands_are_bounded_by_bytes_and_an_oversized_statement_is_refused():
+    import sync_fund_letters_release as sync
+
+    lines = [f"INSERT OR IGNORE INTO fl_ideas VALUES({n},'" + "x" * 900 + "');\n" for n in range(40)]
+    batches = sync.byte_batches(lines, limit=10_000, count=250)
+    assert [line for batch in batches for line in batch] == lines
+    assert len(batches) > 1 and all(sum(len(line.encode()) for line in batch) <= 10_000 for batch in batches)
+    assert [len(batch) for batch in sync.byte_batches(lines, limit=10**9, count=15)] == [15, 15, 10]
+    with pytest.raises(ValueError, match="D1 accepts at most"):
+        sync.byte_batches(["INSERT OR IGNORE INTO fl_ideas VALUES('" + "é" * sync.STATEMENT_BYTES + "');\n"])
+
+
+def test_inserts_already_accepted_are_not_sent_again_but_updates_always_are(tmp_path):
+    import sync_fund_letters_release as sync
+
+    insert = "INSERT OR IGNORE INTO fl_ideas VALUES(1,'a');\n"
+    other = "INSERT OR IGNORE INTO fl_ideas VALUES(2,'b');\n"
+    update = "UPDATE fl_letters SET published_revision='r2' WHERE id='l1' AND published_revision='r1';\n"
+    ledger = tmp_path / "applied" / "db.txt"
+    assert sync.read_ledger(ledger) == set()
+    sync.record_applied(ledger, [insert, update])
+    applied = sync.read_ledger(ledger)
+    assert applied == {sync.fingerprint(insert)}
+    assert sync.pending([insert, other, update], applied) == [other, update]
+    sync.record_applied(ledger, [update])  # nothing to remember
+    sync.record_applied(ledger, [other])
+    assert sync.pending([insert, other, update], sync.read_ledger(ledger)) == [update]

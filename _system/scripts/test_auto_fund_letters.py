@@ -127,3 +127,31 @@ def test_wrangler_login_fills_budget_credentials(tmp_path, monkeypatch):
     assert auto.apply_wrangler_login(env) is None
     assert env["CLOUDFLARE_ACCOUNT_ID"] == "e1cac493b315c8fd7398500dd1bfd687"
     assert env["CLOUDFLARE_API_TOKEN"] == "secret-token"
+
+
+def test_the_lane_waits_when_the_machine_is_out_of_memory_or_swap_room():
+    roomy = "total = 3072.00M  used = 2208.38M  free = 863.62M  (encrypted)"
+    assert auto.memory_shortage("1", roomy, 40.0) is None
+    assert auto.memory_shortage("2", roomy, 40.0) is None  # a warning alone is normal on this machine
+    assert "critical memory pressure" in auto.memory_shortage("4", roomy, 40.0)
+    assert "45 GB of swap" in auto.memory_shortage("1", "total = 46080.00M  used = 45900.00M  free = 180.00M", 40.0)
+    assert "30 GB of swap" in auto.memory_shortage("1", "total = 31.00G  used = 30.00G  free = 1.00G", 40.0)
+    assert "only 3 GB of disk" in auto.memory_shortage("1", roomy, 3.0)
+    assert auto.memory_shortage("", "", 40.0) is None  # unreadable indicators never stop the lane
+
+
+def test_a_cycle_short_of_memory_skips_summarizing_but_still_publishes(tmp_path, monkeypatch, capsys):
+    steps = []
+    monkeypatch.setattr(auto, "memory_shortage", lambda: "the system reports critical memory pressure")
+    monkeypatch.setattr(auto, "run_step", lambda label, argv, env: steps.append(label) or 0)
+    monkeypatch.setattr(auto, "ensure_model", lambda: steps.append("load-model") or True)
+    monkeypatch.setattr(auto, "publish_verified", lambda db, state: steps.append("publish") or {"published": 0, "quarantined": 0, "already": 0})
+
+    class Args:
+        no_repair = no_summarize = no_publish = sync_remote = commit_vault = False
+        batch, refresh_older = 5, 0
+
+    auto.cycle(Args, None, {}, {})
+    assert steps == ["repair", "publish"]
+    assert "summarize step skipped: the system reports critical memory pressure" in capsys.readouterr().out
+

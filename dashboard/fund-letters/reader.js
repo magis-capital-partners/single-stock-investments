@@ -684,6 +684,45 @@
       }).join('');
     }
 
+    // In newer summaries the overview is made of statements from the ideas below, so each one
+    // carries the passage marker it has there. Any other text is shown as it is.
+    function citedOverview(letter) {
+      const known = [];
+      for (const idea of Array.isArray(letter.ideas) ? letter.ideas : []) {
+        if (!Array.isArray(idea.cites)) continue;
+        String(idea.summary || '').split('\n').map(text => text.trim()).filter(Boolean).forEach((text, line) => {
+          if (idea.cites[line]) known.push({ text, passage: idea.cites[line], idea: idea.id, line });
+        });
+      }
+      if (!known.length) return paragraphs(letter.overview);
+      known.sort((a, b) => b.text.length - a.text.length);
+      return String(letter.overview || '').split(/\n\s*\n/).filter(block => block.trim()).map(block => {
+        const pieces = [];
+        let rest = block.trim();
+        while (rest) {
+          const hit = known.find(item => rest.startsWith(item.text));
+          if (hit) {
+            pieces.push({ text: hit.text, hit });
+            rest = rest.slice(hit.text.length).trimStart();
+            continue;
+          }
+          const next = known.map(item => rest.indexOf(item.text)).filter(at => at > 0).sort((a, b) => a - b)[0];
+          pieces.push({ text: rest.slice(0, next || rest.length).trim() });
+          rest = next ? rest.slice(next) : '';
+        }
+        let run = [];
+        return `<p>${pieces.map((piece, index) => {
+          if (!piece.hit) return escape(piece.text);
+          const following = pieces[index + 1]?.hit;
+          run.push(piece.hit.line);
+          const closes = !following || following.passage !== piece.hit.passage || following.idea !== piece.hit.idea;
+          const marker = closes ? citeHtml(letter, piece.hit.passage, { idea: piece.hit.idea, lines: run.join(',') }) : '';
+          if (closes) run = [];
+          return `${escape(piece.text)}${marker}`;
+        }).join(' ')}</p>`;
+      }).join('');
+    }
+
     // Tables the summarizer transcribed from the letter, under the letter's own column headings.
     // `ideaId` picks the tables that belong to one idea; null picks the ones about the fund itself.
     function tablesHtml(letter, ideaId) {
@@ -769,7 +808,7 @@
             </div>` : ''}
           </header>
 
-          <div class="fl-overview">${paragraphs(letter.overview)}</div>
+          <div class="fl-overview">${citedOverview(letter)}</div>
 
           ${fundTablesHtml(letter)}
 

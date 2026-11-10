@@ -36,6 +36,9 @@ SUMMARIZER = ROOT / "_system/scripts/summarize_fund_letter_reader.py"
 SYNC = ROOT / "_system/scripts/sync_fund_letters_release.py"
 LMS_MODEL = os.environ.get("FUND_LETTERS_LMS_MODEL", "qwen/qwen3.5-9b")
 LMS_IDENTIFIER = os.environ.get("FUND_LETTERS_LMS_IDENTIFIER", "qwen-gpu")
+# Limits past which the lane waits instead of summarizing. See memory_shortage().
+MAX_SWAP_GB = float(os.environ.get("FUND_LETTERS_MAX_SWAP_GB", "24"))
+MIN_FREE_DISK_GB = float(os.environ.get("FUND_LETTERS_MIN_FREE_DISK_GB", "8"))
 ACCOUNT_ID_RE = re.compile(r"\b([0-9a-f]{32})\b")
 OAUTH_TOKEN_RE = re.compile(r'(?m)^oauth_token\s*=\s*"([^"]+)"\s*$')
 
@@ -139,6 +142,42 @@ def ensure_model() -> bool:
     if not ready:
         print(json.dumps({"model": "unavailable", "reason": "the model was loaded but its server is not answering"}), flush=True)
     return ready
+
+
+def _sysctl(name: str) -> str:
+    try:
+        return subprocess.run(["sysctl", "-n", name], text=True, capture_output=True, timeout=10).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def memory_shortage(pressure: str | None = None, swap: str | None = None, free_disk_gb: float | None = None) -> str | None:
+    """Why the lane should wait this cycle, or None when there is room.
+
+    On 2026-11-10 this Mac ran out of swap space and the kernel panicked:
+    other jobs held tens of gigabytes while the model was answering. macOS
+    grows swap onto the startup disk, so a nearly full disk and a large swap
+    are the same emergency. Summarizing through it only adds page traffic and
+    GPU load to a machine that is already failing, so the lane sits the
+    cycle out and tries again on the next one. Publishing still runs.
+    """
+    pressure = _sysctl("kern.memorystatus_vm_pressure_level") if pressure is None else pressure
+    if pressure.strip() == "4":
+        return "the system reports critical memory pressure"
+    swap = _sysctl("vm.swapusage") if swap is None else swap
+    used = re.search(r"used = ([\d.]+)([MG])", swap)
+    if used:
+        gigabytes = float(used.group(1)) / (1024 if used.group(2) == "M" else 1)
+        if gigabytes > MAX_SWAP_GB:
+            return f"{gigabytes:.0f} GB of swap is in use (limit {MAX_SWAP_GB:.0f} GB)"
+    if free_disk_gb is None:
+        try:
+            free_disk_gb = shutil.disk_usage(Path.home()).free / 1e9
+        except OSError:
+            free_disk_gb = None
+    if free_disk_gb is not None and free_disk_gb < MIN_FREE_DISK_GB:
+        return f"only {free_disk_gb:.0f} GB of disk is free for swap (minimum {MIN_FREE_DISK_GB:.0f} GB)"
+    return None
 
 
 def output_dir() -> Path:
@@ -312,7 +351,10 @@ def cycle(args, db, state: dict, env: dict) -> dict:
     if not args.no_repair:
         run_step("repair", [sys.executable, str(SUMMARIZER), "--repair-existing"], env)
     if not args.no_summarize:
-        if not ensure_model():
+        shortage = memory_shortage()
+        if shortage:
+            print(json.dumps({"note": f"summarize step skipped: {shortage}; publishing continues"}), flush=True)
+        elif not ensure_model():
             print(json.dumps({"note": "summarize step skipped: the local model is not available; publishing continues"}), flush=True)
         else:
             command = [sys.executable, str(SUMMARIZER), "--limit", str(args.batch), "--retry-failed"]
