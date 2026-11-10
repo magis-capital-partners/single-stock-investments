@@ -411,13 +411,18 @@ def cycle(args, db, state: dict, env: dict) -> dict:
     if not args.no_summarize:
         summarize_batch(args, env)
     published = {"published": 0, "quarantined": 0, "already": 0}
+    withdrawn = []
     if not args.no_publish:
         published = publish_verified(db, state)
+        # A published letter whose extract turns out not to be readable text comes down again.
+        withdrawn = fl.withdraw_unreadable(db)
+        if withdrawn:
+            print(json.dumps({"withdrawn": withdrawn, "reason": fl.UNREADABLE_EXTRACT}), flush=True)
     release = {}
-    if published["published"] and not args.no_publish:
+    if (published["published"] or withdrawn) and not args.no_publish:
         release = export_and_sync(db, env, args.sync_remote)
     vault = commit_vault(env, f"{published['published']} newly published") if args.commit_vault else {"committed": False}
-    return {"at": now(), **published, "release": release, "vault": vault}
+    return {"at": now(), **published, "withdrawn": len(withdrawn), "release": release, "vault": vault}
 
 
 def main() -> int:

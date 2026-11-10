@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import time
 
 import pytest
 
@@ -824,3 +826,45 @@ def test_saved_summaries_lose_ungrounded_statements_and_headlines_about_the_sour
     again = json.loads(json.dumps(payload))
     s.verify_summary(again, LETTER)
     assert again == payload
+
+
+CIPHER_EXTRACT = 'I;"/:"/0>D+9:/06%&",/JJ/>$%;";5"9N5/,";3+">50>%$:/50";39;"L3/%+"Y9:3/06;50"H$D0:("PD+:/,+0;" ' * 20
+
+
+def test_an_unreadable_extract_is_blocked_without_a_model_call(tmp_path, monkeypatch):
+    import llm_local
+
+    source = tmp_path / "cipher.txt"
+    source.write_text(CIPHER_EXTRACT, encoding="utf-8")
+    monkeypatch.setattr(s, "output_dir", lambda: tmp_path)
+    monkeypatch.setattr(s, "load_records", lambda: [{**RECORD, "source_file": "cipher.txt"}])
+    monkeypatch.setattr(s, "letter_path", lambda record: source)
+    monkeypatch.setattr(llm_local, "models", lambda: ["local"])
+    monkeypatch.setattr(s, "ask_json", lambda *args, **kwargs: pytest.fail("the model was asked about an unreadable extract"))
+    counts = s.run(1, True, None)
+    assert counts["blocked"] == 1 and counts["written"] == 0 and counts["failed"] == 0
+    saved = s.load_saved(s.digest(source.read_bytes()))
+    assert saved["status"] == "blocked_extraction" and "not readable" in saved["reason"]
+    # It is not picked up again on the next run.
+    assert s.already_done(s.digest(source.read_bytes()), True) is True
+    # A letter only half readable waits for a new extract too: its summary would pass over the rest.
+    source.write_text(LETTER + " " + CIPHER_EXTRACT[:len(LETTER)], encoding="utf-8")
+    assert s.run(1, True, None)["blocked"] == 1
+
+
+def test_a_saved_summary_of_an_unreadable_extract_is_blocked_and_loses_its_draft(tmp_path, monkeypatch):
+    source = tmp_path / "cipher.txt"
+    source.write_text(CIPHER_EXTRACT, encoding="utf-8")
+    monkeypatch.setattr(s, "output_dir", lambda: tmp_path)
+    monkeypatch.setattr(s, "load_records", lambda: [{**RECORD, "source_file": "cipher.txt"}])
+    monkeypatch.setattr(s, "letter_path", lambda record: source)
+    write_saved(s.summary_path("abc"), prompt_version=s.PROMPT_VERSION, pipeline_version="older", status="draft",
+                source_ref="cipher.txt", overview="Invented.", ideas=[], chunks_covered=1, chunks_total=1)
+    s.draft_path("abc").write_text("{}", encoding="utf-8")
+    old = time.time() - 600
+    os.utime(s.summary_path("abc"), (old, old))
+    counts = s.repair_existing()
+    assert counts["blocked_extraction"] == 1 and counts["draft"] == 0
+    assert s.load_saved("abc")["status"] == "blocked_extraction" and not s.draft_path("abc").exists()
+    os.utime(s.summary_path("abc"), (old, old))
+    assert s.repair_existing()["current"] == 1

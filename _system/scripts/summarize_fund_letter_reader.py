@@ -54,7 +54,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 PROMPT_VERSION = "letter_detail_v6"
-PIPELINE_VERSION = "fund-reader-local.7"
+PIPELINE_VERSION = "fund-reader-local.8"
 # Finished summaries from these versions stay valid: they are not redone unless
 # asked for with --refresh-older, and a verified one may still publish.
 LEGACY_VERSIONS = frozenset({"letter_detail_v5", "letter_detail_v4"})
@@ -2950,6 +2950,7 @@ def finish(payload: dict, text: str) -> dict:
 
 def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | None = None,
         period: str | None = None, refresh_older: int = 0) -> dict:
+    from fund_letters import UNREADABLE_EXTRACT, needs_new_extract
     from llm_local import LocalLLMUnavailable, models
 
     available = models()
@@ -2987,11 +2988,14 @@ def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | No
                 continue
             attempt = attempts_so_far(saved) + 1
             text = raw.decode("utf-8", errors="replace")
-            if len(text.strip()) < 400:
+            too_short = len(text.strip()) < 400
+            if too_short or needs_new_extract(text):
+                # No model call: a summary of an extract like this would cover only stray fragments.
                 write_summary(content_hash, {
                     "prompt_version": PROMPT_VERSION, "status": "blocked_extraction", "published": False,
                     "source_ref": record.get("source_file"), "fund_id": record.get("fund_id"),
-                    "reporting_period": record.get("quarter"), "reason": "extract is empty or too short",
+                    "reporting_period": record.get("quarter"),
+                    "reason": "extract is empty or too short" if too_short else UNREADABLE_EXTRACT,
                     "chunks_total": 0, "chunks_covered": 0, "created_at": now(),
                 })
                 counts["blocked"] += 1
@@ -3057,12 +3061,14 @@ def repair_existing(force: bool = False) -> dict:
     the pass costs nothing once the archive is up to date. Files a live
     summary run may be writing are skipped when very fresh, so it is safe
     to run alongside one."""
+    from fund_letters import UNREADABLE_EXTRACT, unreadable
+
     by_ref = {}
     for record in load_records():
         path = letter_path(record)
         if path is not None:
             by_ref[record.get("source_file")] = path
-    counts = {"checked": 0, "draft": 0, "quarantine": 0, "skipped": 0, "current": 0}
+    counts = {"checked": 0, "draft": 0, "quarantine": 0, "blocked_extraction": 0, "skipped": 0, "current": 0}
     for path in sorted(output_dir().glob("*.json")):
         if path.name in {"progress.json", "publish_state.json"} or path.name.endswith(".draft.json"):
             continue
@@ -3078,7 +3084,7 @@ def repair_existing(force: bool = False) -> dict:
         if payload.get("prompt_version") not in PUBLISHABLE_VERSIONS:
             counts["skipped"] += 1
             continue
-        if not force and payload.get("pipeline_version") == PIPELINE_VERSION and payload.get("status") in {"draft", "quarantine"}:
+        if not force and payload.get("pipeline_version") == PIPELINE_VERSION and payload.get("status") in {"draft", "quarantine", "blocked_extraction"}:
             counts["current"] += 1
             continue
         source_path = by_ref.get(payload.get("source_ref"))
@@ -3087,6 +3093,17 @@ def repair_existing(force: bool = False) -> dict:
             continue
         counts["checked"] += 1
         text = source_path.read_text(encoding="utf-8", errors="replace")
+        if unreadable(text):
+            # Summarized before extracts were checked for readability: it covers only stray fragments.
+            payload.update({"status": "blocked_extraction", "published": False, "reason": UNREADABLE_EXTRACT,
+                            "pipeline_version": PIPELINE_VERSION})
+            write_summary(path.stem, payload)
+            if draft_path(path.stem).exists():
+                draft_path(path.stem).unlink()
+            counts["blocked_extraction"] += 1
+            print(json.dumps({"repaired": "blocked_extraction", "fund_id": payload.get("fund_id"),
+                              "period": payload.get("reporting_period")}), flush=True)
+            continue
         payload["errors"] = list(payload.get("errors") or [])
         if payload.get("prompt_version") == PROMPT_VERSION:
             errors, _warnings = verify_summary(payload, text)

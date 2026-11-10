@@ -158,6 +158,49 @@ def printed_header_date(text: str) -> str | None:
     return next(iter(candidates)) if len(candidates) == 1 else None
 
 
+_ORDINARY_TOKEN = re.compile(
+    r"(?:[A-Za-z]+(?:['’\-/&.][A-Za-z]+)*\.?"
+    r"|[$€£¥(+\-‐–−]*\d[\d.,:/\-]*(?:%|x|bps|bn|mm|m|k|st|nd|rd|th|s)?\)?)$"
+)
+# A watermark can stamp an address on every line; it says nothing about the letter either way.
+_ADDRESS_TOKEN = re.compile(r"@|^(?:https?:|www\.)|\.(?:com|net|org|info)\b", re.I)
+LONGEST_WORD = 25
+# Below this share a letter is not summarized until its original is extracted again.
+MIN_READABLE_SHARE = 0.6
+# Below this one, nothing published from the extract can be trusted and it comes down.
+UNREADABLE_SHARE = 0.3
+UNREADABLE_EXTRACT = ("The extracted text is not readable: the PDF's font did not carry its characters, "
+                      "or the words run together without spaces. OCR the original before synthesis.")
+
+
+def readable_share(text: str) -> float:
+    """The share of a text's characters that sit in ordinary words and numbers.
+
+    Some PDFs embed a font whose characters do not map back to letters, and
+    their extract is glyph numbers ("/i255/45/43") or a substitution cipher.
+    Others lose their spaces, so that a line is one long word no sentence
+    can be cited from. Addresses and links are left out of the count."""
+    total = good = 0
+    for token in (text or "").split():
+        core = token.strip("\"'“”‘’()[]{}<>,.;:!?*•·…—–-")
+        if not core or _ADDRESS_TOKEN.search(core):
+            continue
+        total += len(core)
+        if len(core) <= LONGEST_WORD and _ORDINARY_TOKEN.match(core):
+            good += len(core)
+    return good / total if total else 0.0
+
+
+def unreadable(text: str) -> bool:
+    """Almost none of the extract is ordinary text."""
+    return readable_share(text) < UNREADABLE_SHARE
+
+
+def needs_new_extract(text: str) -> bool:
+    """Too much of the extract is unreadable for a summary to cover the letter."""
+    return readable_share(text) < MIN_READABLE_SHARE
+
+
 def queue(db, letter_id: str, kind: str, detail: str) -> None:
     db.execute("INSERT INTO fl_reviews(letter_id,kind,detail) VALUES(?,?,?) ON CONFLICT(letter_id,kind) DO UPDATE SET detail=excluded.detail,status='open'", (letter_id, kind, detail))
 
@@ -423,7 +466,7 @@ def auto_resolve_reviews(db, letter_id: str) -> list[str]:
     if "extraction" in open_kinds:
         text = letter["source_text"] or ""
         joined = "".join(row[0] for row in db.execute("SELECT text FROM fl_sections WHERE letter_id=? ORDER BY ordinal", (letter_id,)))
-        if len(text.strip()) > 100 and joined == text:
+        if len(text.strip()) > 100 and joined == text and not unreadable(text):
             db.execute("UPDATE fl_reviews SET status='resolved',detail=detail||' [auto: full text present, sections reconcile]' WHERE letter_id=? AND kind='extraction'", (letter_id,))
             resolved.append("extraction")
     if "duplicate_sources" in open_kinds:
@@ -510,6 +553,11 @@ def publish_automated(db, revision_id: str, author: str = AUTO_AUTHOR) -> dict:
     row = db.execute("SELECT letter_id FROM fl_revisions WHERE id=?", (revision_id,)).fetchone()
     if not row:
         raise ValueError("Unknown revision")
+    source = db.execute("SELECT source_text FROM fl_letters WHERE id=?", (row["letter_id"],)).fetchone()
+    if source and unreadable(source["source_text"] or ""):
+        queue(db, row["letter_id"], "extraction", UNREADABLE_EXTRACT)
+        db.commit()
+        raise ValueError("Automated publication blocked: " + UNREADABLE_EXTRACT)
     resolved = auto_resolve_reviews(db, row["letter_id"])
     attestations, record = machine_attestations(db, revision_id)
     record["auto_resolved_reviews"] = resolved
@@ -517,6 +565,27 @@ def publish_automated(db, revision_id: str, author: str = AUTO_AUTHOR) -> dict:
         raise ValueError("Automated publication blocked: " + "; ".join(record["errors"] or ["a machine check failed"]))
     publish(db, revision_id, author, {**attestations, "_machine_record": record})
     return {"published": revision_id, "letter_id": row["letter_id"], "auto_resolved": resolved, "checks": record["checks"]}
+
+
+def withdraw_unreadable(db, author: str = AUTO_AUTHOR) -> list[str]:
+    """Take down published letters whose extract is not readable text.
+
+    A summary of such a letter covers only the fragments that happened to
+    survive extraction, and reads as if they were the whole letter. The
+    revision is kept; the letter returns to pending behind an open
+    extraction review until its original is read again."""
+    withdrawn = []
+    for letter in db.execute("SELECT id,published_revision,source_text FROM fl_letters WHERE published_revision IS NOT NULL").fetchall():
+        if not unreadable(letter["source_text"] or ""):
+            continue
+        queue(db, letter["id"], "extraction", UNREADABLE_EXTRACT)
+        db.execute("UPDATE fl_letters SET published_revision=NULL,status='pending' WHERE id=?", (letter["id"],))
+        db.execute("INSERT INTO fl_publication_events VALUES(?,?,?,?,?,?,?)",
+                   ("event-" + uuid.uuid4().hex, letter["id"], letter["published_revision"], letter["published_revision"], author, now(), "withdraw"))
+        withdrawn.append(letter["id"])
+    if withdrawn:
+        db.commit()
+    return withdrawn
 
 
 def local_completion(messages: list[dict], model: str, maximum: int, transport: str) -> str:
@@ -669,6 +738,20 @@ def export_release(db, output: Path) -> dict:
         activation.append(f"UPDATE fl_letters SET published_revision={rid},status='published' WHERE id={lid} AND {prior_guard} AND EXISTS(SELECT 1 FROM fl_revisions WHERE id={rid} AND status='published') AND NOT EXISTS(SELECT 1 FROM fl_reviews WHERE letter_id={lid} AND status='open' AND kind IN ('identity','extraction','duplicate_sources'));")
         prior_status = "'published'" if previous else "'pending'"
         rollback.append(f"UPDATE fl_letters SET published_revision={prior},status={prior_status} WHERE id={lid} AND published_revision IS {rid};")
+    # Letters taken down locally. The pointer is cleared online only when it still
+    # points at a revision this archive published, so an owner's later edit stays.
+    withdrawn = {}
+    for event in db.execute("SELECT letter_id,revision_id FROM fl_publication_events WHERE action='withdraw' ORDER BY created_at"):
+        if event["letter_id"] not in published:
+            withdrawn[event["letter_id"]] = event["revision_id"]
+    for letter_id, revision_id in withdrawn.items():
+        quote = lambda value: "'" + value.replace("'", "''") + "'"
+        lid, rid = quote(letter_id), quote(revision_id)
+        review = db.execute("SELECT detail FROM fl_reviews WHERE letter_id=? AND kind='extraction' AND status='open'", (letter_id,)).fetchone()
+        if review:
+            activation.append(f"UPDATE fl_reviews SET status='open',detail={quote(review['detail'])} WHERE letter_id={lid} AND kind='extraction';")
+        activation.append(f"UPDATE fl_letters SET published_revision=NULL,status='pending' WHERE id={lid} AND published_revision IS {rid};")
+        rollback.append(f"UPDATE fl_letters SET published_revision={rid},status='published' WHERE id={lid} AND published_revision IS NULL;")
     (output / "activate.sql").write_text("\n".join(activation) + "\n", encoding="utf-8")
     (output / "rollback.sql").write_text("\n".join(rollback) + "\n", encoding="utf-8")
     manifest = {"id": release_id, "created_at": now(), "pipeline_version": VERSION, "counts": counts, "published": published, "source_objects": sorted(source_objects), "rollback": "Apply rollback.sql to restore prior published pointers. Compare-and-set guards preserve intervening online edits; revisions and evidence remain immutable."}
