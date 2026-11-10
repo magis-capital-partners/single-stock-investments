@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {classifyAnnouncement} from './reverse-split-live/core.mjs';
 import {nextFinancialJob} from './reverse-split-live/financials-harvest.mjs';
+import {applyFinancialNeed,requestedFinancialSources} from './reverse-split-live/financials-harvest.mjs';
 import {buildFinancialProfile} from './reverse-split-live/financials-core.mjs';
 import {financialAssessment} from './reverse-split-live/financial-assessment.mjs';
 import {DatabaseSync} from 'node:sqlite';
@@ -51,6 +52,17 @@ test('conditional proposals and discretionary ratio ranges remain non-qualifying
 test('a new live financial need is not starved by unseen bulk-universe seeds and still respects backoff',()=>{
  const jobs={LICN:{cik:'1876766',priority:200,last_attempt:'2026-11-09',last_signal:'new-primary-disclosure',next_attempt:0},bulk:{cik:'123',priority:200,next_attempt:0}};
  assert.equal(nextFinancialJob(jobs,100).cik,'1876766');jobs.LICN.next_attempt=200;assert.equal(nextFinancialJob(jobs,100).cik,'123');
+});
+test('older dashboard needs cannot overwrite a newer reviewed request or reset its retry clock repeatedly',()=>{
+ const queue={jobs:{'1780652':{cik:'1780652',priority:50,next_attempt:123}}},old=JSON.stringify({first_seen_at:'2026-11-10T12:48:52Z'}),review=JSON.stringify({request_kind:'reviewed_primary_recovery',repair_requested_at:'2026-11-10T17:40:00Z'});
+ assert.equal(applyFinancialNeed(queue,'1780652',old),true);assert.equal(applyFinancialNeed(queue,'1780652',review),true);assert.equal(queue.jobs['1780652'].priority,2000);queue.jobs['1780652'].next_attempt=999;assert.equal(applyFinancialNeed(queue,'1780652',old),false);assert.equal(applyFinancialNeed(queue,'1780652',review),false);assert.equal(queue.jobs['1780652'].next_attempt,999);
+ assert.equal(applyFinancialNeed(queue,'1780652',JSON.stringify({first_seen_at:'2026-11-10T18:00:00Z'})),true);
+});
+test('reviewed financial batches preserve requested order and bind issuer, accession, source digest and disclosure clock',()=>{
+ const source={cik:'1780652',accession:'0001104659-26-107048',url:'https://www.sec.gov/Archives/edgar/data/1780652/000110465926107048/0001104659-26-107048.txt',source_sha256:'a'.repeat(64),form:'6-K',filed:'2026-09-11',published_at:'2026-09-12T04:00:00Z'},second={...source,accession:'0001104659-25-087782',url:'https://www.sec.gov/Archives/edgar/data/1780652/000110465925087782/0001104659-25-087782.txt'};
+ assert.deepEqual(requestedFinancialSources({sources:[source,second]},'1780652').map(r=>r.accession),[source.accession,second.accession]);
+ for(const wrong of [{...source,cik:'123'},{...source,url:source.url.replace('/1780652/','/123/')},{...source,source_sha256:null},{...source,published_at:'unknown'}])assert.throws(()=>requestedFinancialSources({sources:[wrong]},'1780652'),/identity|provenance/);
+ assert.throws(()=>requestedFinancialSources({sources:Array(9).fill(source)},'1780652'),/count/);
 });
 test('a primary consolidated total can resolve an API concept-priority ambiguity only with matching filed tagged evidence',()=>{
  const cik='1876766',annual={start:'2025-01-01',end:'2025-12-31',form:'20-F',filed:'2026-04-28'};

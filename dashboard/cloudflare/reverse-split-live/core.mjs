@@ -1,3 +1,4 @@
+import {reviewedPriorHistory} from './split-history.mjs';
 // Pure, replayable research rules. No brokerage, market-data seat, or order dependencies.
 export const POLICY = Object.freeze({id:'reverse_split_live.v1',score_method:'as_filed_annual_or_matched_fiscal_ytd.v3',minimum_ordinal:2,minimum_score:60,minimum_signals:3,max_period_age_days:200,holding_sessions:5,timing:'observed_announcement_time',research_only:true,authority:'none'});
 export const DAY=86400000;
@@ -95,7 +96,7 @@ export function scoreFundamentals(raw,cutoff,expectedCik,{maxAgeDays=200}={}){
   return {status:score===null?'fewer_than_three_independent_signals':'scored',score,period:anchor,currency,currency_candidates,signals,signal_count:values.length,flows,balances,evidence:[...unique.values()],current_debt_reported:finite(balances.current_debt),method:POLICY.score_method,cutoff,limitations:['Date-only financial facts become available on the next Eastern day.','Inherited score has no industry-specific underwriting adjustment.','Unreported current debt is zero in the inherited score and is separately disclosed.']};
 }
 export function screen(event,financials,prior,now){
-  const history=prior.filter(p=>p.cik===event.cik&&p.effective_date<etDay(event.published_at||event.first_seen_at)&&p.known_at<=event.first_seen_at&&p.verified),ordinal=1+new Set(history.map(p=>p.effective_date)).size;
+  const history=reviewedPriorHistory(prior,now).filter(p=>p.cik===event.cik&&p.effective_date<etDay(event.published_at||event.first_seen_at)&&p.known_at<=event.first_seen_at&&p.verified),ordinal=1+new Set(history.map(p=>p.effective_date)).size;
   const checks={announcement:{state:event.status==='scheduled'?'pass':['cancelled','historical','authorization'].includes(event.status)?'fail':'unknown',reason:event.reason},repeat:{state:ordinal>=2?'pass':'unknown',reason:ordinal>=2?'At least one prior completed split is documented':'No prior completed split verified yet',ordinal_min:ordinal},fundamentals:{state:financials.score===null?'unknown':financials.score>=60?'pass':'fail',reason:financials.status,score:financials.score},timing:{state:event.effective_date&&event.effective_date<=etDay(now)?'fail':event.effective_date?'pass':'unknown',reason:'Research must precede the effective split date'}};
   const states=Object.values(checks).map(r=>r.state),result=states.includes('fail')?'fails_screen':states.includes('unknown')?'needs_review':'passes_screen';
   return {result,checks,ordinal_min:ordinal,prior_splits:history,policy:POLICY,decision_at:now,execution_ready:false};

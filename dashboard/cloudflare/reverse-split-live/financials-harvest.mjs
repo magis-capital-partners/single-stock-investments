@@ -15,6 +15,19 @@ const coverageCard=p=>({cik:p.cik,ticker:p.ticker,company:p.company,observed_at:
 async function coverageCache(env){if(env.financialCoverageCards)return env.financialCoverageCards;const manifest=await read(env,'financials/manifest-latest.json');env.financialCoverageCards=new Map((manifest?.cards||[]).map(r=>[r.cik,r]));if(manifest&&!manifest.cards)for(const r of manifest.profiles||[]){const p=await read(env,`financials/profiles/${r.cik}/latest.json`);if(p)env.financialCoverageCards.set(r.cik,coverageCard(p));}return env.financialCoverageCards;}
 const REPORT_FORMS=new Set(['10-K','10-K/A','10-Q','10-Q/A','20-F','20-F/A','40-F','40-F/A','6-K','6-K/A','8-K','8-K/A']);
 const signalPending=j=>!!j.last_signal&&(j.last_signal!==j.processed_signal||j.signal_coverage_pending===true);
+const needClock=value=>{try{const p=JSON.parse(value);return Math.max(0,...['repair_requested_at','first_seen_at','observed_at','at'].map(k=>Date.parse(p[k])||0));}catch{return 0;}};
+export function applyFinancialNeed(queue,cik,value){
+ if(!/^\d{1,10}$/.test(cik))return false;const job=queue.jobs[cik];if(!job||job.last_signal===value||needClock(value)<needClock(job.last_signal))return false;
+ job.last_signal=value;job.next_attempt=0;try{const request=JSON.parse(value);if(request.request_kind==='reviewed_primary_recovery')job.priority=Math.max(job.priority||0,2000);}catch{}return true;
+}
+export function requestedFinancialSources(signal,cik){
+ if(!Array.isArray(signal.sources))return signal.url?[signal]:[];
+ if(!signal.sources.length||signal.sources.length>8)throw new Error('Financial recovery source count is invalid');
+ return signal.sources.map(source=>{const accession=source.accession,url=new URL(source.url),prefix=`/Archives/edgar/data/${Number(cik)}/${String(accession).replaceAll('-','')}/`;
+  if(!/^\d{10}-\d{2}-\d{6}$/.test(accession||'')||String(Number(source.cik))!==cik||url.origin!=='https://www.sec.gov'||url.username||url.password||url.search||!url.pathname.startsWith(prefix)||!/^\w[\w.-]*\.(?:txt|html?|pdf)$/i.test(url.pathname.slice(prefix.length))||!/^[a-f0-9]{64}$/.test(source.source_sha256||'')||!REPORT_FORMS.has(source.form)||!/^\d{4}-\d{2}-\d{2}$/.test(source.filed||'')||!Number.isFinite(Date.parse(source.published_at)))throw new Error('Financial recovery source identity or provenance is invalid');
+  return {...source,cik};
+ });
+}
 export const nextFinancialJob=(jobs,at=Date.now())=>Object.values(jobs).filter(j=>Number(j.next_attempt||0)<=at).sort((a,b)=>Number(signalPending(b))-Number(signalPending(a))||Number(b.priority>=1000)-Number(a.priority>=1000)||b.priority-a.priority||String(a.last_attempt||'').localeCompare(String(b.last_attempt||'')))[0];
 async function read(env,key,fallback=null){const o=await env.EVIDENCE.get(key);return o?await o.json():fallback;}
 async function put(env,key,value){await env.EVIDENCE.put(key,bytes(value),{httpMetadata:{contentType:'application/json'}});}
@@ -86,11 +99,12 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
   if(!issuerResearch)reports=[];
   if(maximumDocuments>0&&(reports.length<5||current.coverage.status!=='current'))reports.push(...await discoverIR(client,instrument?.homepage_url,name));
   const requests=job.last_signal||(await env.DB.prepare("SELECT value FROM rs_state WHERE key=?").bind('financial_need:'+cik).first())?.value;
-  if(requests)try{const signal=JSON.parse(requests);if(signal.url&&!reports.some(r=>r.url===signal.url))reports.unshift(signal);}catch{}
+  if(requests){let signal;try{signal=JSON.parse(requests);}catch{}if(signal){const requested=requestedFinancialSources(signal,cik),urls=new Set(requested.map(r=>r.url));reports=[...requested,...reports.filter(r=>!urls.has(r.url))];}}
   for(const source of reports){
     if(work.processed[source.url]||work.errors[source.url]?.terminal||work.errors[source.url]?.next_attempt>Date.now())continue;if(processed>=maximumDocuments)break;processed++;
     try{
       let doc;if(source.source_sha256)doc={bytes:Buffer.from(await(await env.EVIDENCE.get('documents/'+source.source_sha256)).arrayBuffer()),sha256:source.source_sha256,url:source.url};else if(source.accession&&/\.txt$/i.test(source.url)){const loaded=await loadFilingDocuments(env,{...source,cik},async(url,opts={})=>{try{const d=await client.get(url,{origins:source.origins||[],maximum:opts.maximum||24000000});return {...d,content_type:d.content_type||'application/octet-stream'};}catch(e){if(/Financial document size limit/.test(e.message))throw new Error('Source exceeds document size limit');throw e;}});doc=loaded.documents[0];for(const extra of loaded.documents.slice(1)){if(!reports.some(r=>r.url===extra.url)){const attachment={...source,url:extra.url,source_sha256:extra.sha256,form:extra.form||'EX-99',trusted_parent:source.url};reports.push(attachment);(work.discovered||=[]).push(attachment);}}}else doc=await client.get(source.url,{origins:source.origins||[],maximum:24000000});
+      if(source.source_sha256&&hash(doc.bytes)!==source.source_sha256)throw new Error('Financial recovery document hash mismatch');
       // Retain the captured document for owner review even if extraction fails.
       work.sources.push({sha256:doc.sha256,url:source.url,form:source.form,filed:source.filed,published_at:source.published_at,publication_basis:source.publication_basis||'SEC_disclosure',parent:source.trusted_parent||null});
       const parsedKey='financials/parsed/'+doc.sha256+'-'+cik+'-'+PARSER_HASH+'.json';let parsed=await read(env,parsedKey);
@@ -137,8 +151,8 @@ export async function runFinancialHarvest(env,{maximumMs=270*60000,maxIssuers=50
   const timer=setInterval(renew,120000);env.assertFinancialLease=async()=>{await renewing;if(leaseError)throw leaseError;const row=await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(leaseKey).first();if(row?.value?.split(':').at(-1)!==owner||Number(row.value.split(':')[0])<=Date.now())throw new Error('Financial harvest lease lost');};
   try{while(!stop&&Date.now()-start<maximumMs&&handled<maxIssuers){
     if(Date.now()-lastSeed>60000){const remote=(await env.DB.prepare('SELECT cik,ticker,company,payload,analyzed_at FROM rs_events WHERE cik IS NOT NULL').all()).results,live=await read(env,'collector-dashboard/events.json',[]);for(const r of [...remote,...live.filter(e=>e.cik).map(e=>({...e,payload:JSON.stringify(e)}))]){const event=JSON.parse(r.payload),cik=String(Number(r.cik)),priority=event.status==='scheduled'?1000:event.result==='needs_review'?200:50;const old=queue.jobs[cik]||{cik,attempts:0,next_attempt:0};queue.jobs[cik]={...old,ticker:r.ticker||old.ticker,company:r.company||old.company,priority:Math.max(old.priority||0,priority)};}
-      const signals=(await env.DB.prepare("SELECT key,value FROM rs_state WHERE key>='financial_need:' AND key<'financial_need;' LIMIT 1000").all()).results;for(const r of signals){const cik=r.key.split(':')[1],j=queue.jobs[cik];if(j&&j.last_signal!==r.value){j.next_attempt=0;j.last_signal=r.value;}}
-      const snapshot=await read(env,'collector-dashboard/financial-needs.json',[]);for(const r of snapshot){const cik=r.key.split(':')[1],j=queue.jobs[cik];if(j&&j.last_signal!==r.value){j.next_attempt=0;j.last_signal=r.value;}}
+      const signals=(await env.DB.prepare("SELECT key,value FROM rs_state WHERE key>='financial_need:' AND key<'financial_need;' LIMIT 1000").all()).results;for(const r of signals)applyFinancialNeed(queue,r.key.split(':')[1],r.value);
+      const snapshot=await read(env,'collector-dashboard/financial-needs.json',[]);for(const r of snapshot)applyFinancialNeed(queue,r.key.split(':')[1],r.value);
       await seedPreparedNeeds(env,queue);lastSeed=Date.now();}
     if(Number(lease.split(':')[0])-Date.now()<480000)await renew();if(leaseError)throw leaseError;
     const job=nextFinancialJob(queue.jobs);
