@@ -759,3 +759,68 @@ def test_the_lane_can_have_a_letter_put_down_when_memory_runs_out_part_way(monke
     monkeypatch.setenv("FUND_LETTERS_MIN_FREE_DISK_GB", "0")
     assert s.memory_emergency() is None
 
+
+
+def test_a_statement_without_a_figure_must_share_words_with_what_it_cites():
+    units = units_of()
+    largest = unit_with(units, "Our largest position")
+    capital = unit_with(units, "best capitalized")
+    # A paraphrase of the cited sentence stays.
+    text, cited = s.support_point("KeyCorp was the fund's largest position entering and leaving the quarter.", [largest], units)
+    assert text and cited == [largest]
+    # The model named the wrong sentence: the one in the passage that says it is cited instead.
+    text, cited = s.support_point("KeyCorp was the fund's largest position entering and leaving the quarter.", [capital], units)
+    assert text and cited == [largest]
+    # Nothing in the passage says this, so it goes however it is cited.
+    assert s.support_point("The manager kept a positive view on fiscal policy, with long holdings helping results.", [largest], units) == (None, [])
+    # A figure is checked exactly instead, so a short statement naming a ticker's company still stands.
+    text, cited = s.support_point("KeyCorp shares fell over 28%.", [capital], units)
+    assert text == "KeyCorp shares fell over 28%." and cited == [capital]
+
+
+def test_remarks_about_the_source_material_are_not_statements():
+    units = units_of()
+    largest = unit_with(units, "Our largest position")
+    for remark in (
+        "The source text contains no information regarding the Federal Reserve or interest rate cuts.",
+        "The cited sentences do not mention holding long positions.",
+        "The letter does not mention the dividend.",
+    ):
+        assert s.support_point(remark, [largest], units) == (None, []), remark
+    # A company's management staying silent on something is a fact about the company.
+    assert not s.PADDING_RE.search("Management did not mention the dividend on the call.")
+
+
+def test_a_statement_that_repeats_an_earlier_one_is_dropped():
+    first = "The manager notes that the President's actions have resulted in a stalled economy and a budget that increases debt."
+    again = "The fund believes that the President's actions have resulted in a stalled economy and a budget that increases debt."
+    assert s.repeats(again, [first])
+    # A different figure, or a different direction, is a different statement.
+    assert not s.repeats("KeyCorp fell 28% in the third quarter of the year.", ["KeyCorp fell 18% in the third quarter of the year."])
+    assert not s.repeats("KeyCorp rose in the third quarter.", ["KeyCorp fell in the third quarter."])
+    units = units_of()
+    cite = [unit_with(units, "Our largest position")]
+    notes = [{"subject": "KeyCorp", "ticker": "KEY", "kind": "long", "activity": "hold",
+              "points": [{"text": "The manager says KeyCorp was the largest position entering the quarter.", "cites": s._cites(cite)},
+                         {"text": "The fund states KeyCorp was the largest position entering the quarter.", "cites": s._cites(cite)}]}]
+    assert [point["text"] for point in s.group_notes(notes)[0]["points"]] == ["The manager says KeyCorp was the largest position entering the quarter."]
+
+
+def test_saved_summaries_lose_ungrounded_statements_and_headlines_about_the_source(monkeypatch):
+    fixed_replies(monkeypatch)
+    payload = s.summarize_letter(RECORD, LETTER, None)
+    idea = payload["ideas"][0]
+    kept = [point["text"] for point in idea["points"]]
+    idea["points"].append({"text": "The manager kept a positive view on fiscal policy, with long holdings helping results.",
+                           "cites": idea["points"][0]["cites"], "para": 0})
+    payload["headline"] = "The source sentences criticize fiscal policy but do not mention holding long positions."
+    errors, warnings = s.verify_summary(payload, LETTER)
+    assert errors == []
+    assert [point["text"] for point in payload["ideas"][0]["points"]] == kept
+    assert any("shares too few words" in warning for warning in warnings)
+    # A headline about the source material is replaced by the checked statement the overview opens with.
+    assert payload["headline"] and "source sentences" not in payload["headline"]
+    assert payload["overview"].startswith(payload["headline"])
+    again = json.loads(json.dumps(payload))
+    s.verify_summary(again, LETTER)
+    assert again == payload
