@@ -36,7 +36,7 @@ async function loadEnhanced(env,cik,{version,signal,rescore=false,urgent=false}=
   const raw=rawDoc||{cik,facts:{}};if(String(Number(raw.cik))!==cik||(profile.collection.api_source_sha256&&!rawDoc))throw new Error('Financial API cache identity mismatch');
   if(signal?.aborted)throw signal.reason;
   const saved={profile,raw,facts:ledger.facts},at=new Date().toISOString(),score=calculate(saved,cik,at);retainFinancialProfile(env,cik,saved);await rememberScore(env,cik,score,at);env.financialProfileVersions.set(cik,profile.version);
-  if(rescore)for(const e of (await env.DB.prepare('SELECT id FROM rs_events WHERE cik=?').bind(cik).all()).results)await enqueue(env,'rescore',{id:e.id},14,'financial-profile:'+profile.version+':'+e.id);
+  if(rescore)for(const e of (await env.DB.prepare('SELECT id FROM rs_events WHERE cik=?').bind(cik).all()).results)await enqueue(env,'rescore',{id:e.id},14,'financial-profile:'+FINANCIAL_EVIDENCE_REVISION+':'+profile.version+':'+e.id);
   return true;
 }
 export function installFinancialImport(env){
