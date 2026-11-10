@@ -23,6 +23,7 @@ function setup(t){const db=new DatabaseSync(':memory:');for(const f of readdirSy
 function event(id='qa'){return {id,cik:'123',ticker:'QA',company:'QA fixture',status:'scheduled',effective_date:'2026-11-20',first_seen_at:now,published_at:now,analyzed_at:now,ordinal_min:2,financials:{score:75,signal_count:3,period:'2026-06-30'},sources:[]};}
 
 test('announcement observation peeks raw books before score eligibility and verifies identity without a second feed',async t=>{const x=transport(t);x.market.warm('QA');x.send(row());await new Promise(resolve=>setImmediate(resolve));assert.equal(x.market.peek('QA').bid_size,1000);assert.equal(x.market.peek('QA').identity_verified,false);await x.market.verifyIdentity('QA');assert.equal(x.market.peek('QA').identity_verified,true);assert.equal(x.market.peek('QA').cik,'123');assert.equal(x.launches(),1);});
+test('a full symbol budget can rotate in a new announcement while retaining benchmark slots',t=>{const x=transport(t),names=Array.from({length:128},(_,i)=>'Q'+i);for(const ticker of names)x.market.warm(ticker);x.market.reconcileSymbols(['NEW',...names]);assert.ok(x.commands().includes('replace_subscriptions'));assert.ok(x.market.health.per_symbol.some(r=>r.ticker==='NEW'));assert.equal(x.market.health.subscriptions,128);assert.equal(x.launches(),1);});
 
 test('one live session uses secret environment only, preserves limited coverage and never falls back to history',async t=>{
   const x=transport(t);await assert.rejects(x.market.quote('QA',mini),/Waiting/);x.send(row());
