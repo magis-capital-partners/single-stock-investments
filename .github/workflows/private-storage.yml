@@ -1,0 +1,39 @@
+name: Verify private object storage
+
+on:
+  repository_dispatch:
+    types: [private-storage-check]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-storage-maintenance
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/config/
+            /_system/prompts/valuation_underwriting.md
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the existing bounded underwriting verification dependencies
+        run: python -m pip install pypdf PyYAML exchange-calendars==4.13.2
+      - name: Verify existing approval and private storage round trip
+        run: python _system/scripts/private_storage_bootstrap.py check --ticker V --limit 1
