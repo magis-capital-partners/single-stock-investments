@@ -14,7 +14,8 @@ export async function registerAnnouncement(env,event,now=new Date().toISOString(
 }
 export async function initializeAnnouncementQuotes(env,now=new Date().toISOString()){
  for(const ticker of ['AAPL','SPY','IWM'])env.market?.warm?.(ticker);
- const events=(await env.DB.prepare("SELECT payload FROM rs_events WHERE first_seen_at>=? ORDER BY CASE WHEN json_extract(payload,'$.status')='scheduled' THEN 0 ELSE 1 END,first_seen_at DESC").bind(new Date(at(now)-2*DAY).toISOString()).all()).results;
+ const cutoff=new Date(at(now)-10*DAY).toISOString();
+ const events=(await env.DB.prepare("SELECT payload FROM rs_events WHERE first_seen_at>=? OR (json_extract(payload,'$.status')='scheduled' AND json_extract(payload,'$.effective_date')>=?) ORDER BY CASE WHEN json_extract(payload,'$.status')='scheduled' THEN 0 ELSE 1 END,first_seen_at DESC").bind(cutoff,cutoff.slice(0,10)).all()).results;
  for(const r of events)await registerAnnouncement(env,JSON.parse(r.payload),now);
  env.onAnnouncementDetection=event=>registerAnnouncement(env,event);
 }
