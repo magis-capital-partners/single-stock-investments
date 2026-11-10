@@ -21,9 +21,46 @@ const safe = (value) => {
   const text = String(value ?? "");
   return /https?:\/\/|drive\.google|_system[\\/]|[a-z]:[\\/]/i.test(text) ? "" : text;
 };
-export function readerIdea(row) {
-  return { id: safe(row.id), title: safe(row.title), ticker: safe(row.ticker), idea_type: safe(row.idea_type),
+// A citation reaches readers only as a passage number. The quoted source words stay private.
+const passageNumber = (id) => (typeof id === "string" && /^s\d{1,5}$/.test(id) ? Number(id.slice(1)) : null);
+export function readerIdea(row, cites = null) {
+  const idea = { id: safe(row.id), title: safe(row.title), ticker: safe(row.ticker), idea_type: safe(row.idea_type),
     activity: safe(row.activity), summary: safe(row.summary), evolution: safe(row.evolution), compared_letter_id: safe(row.compared_letter_id) };
+  // One passage number for each line of the summary, or nothing at all.
+  const passages = Array.isArray(cites) && cites.length <= 2000 ? cites.map(passageNumber) : [];
+  if (passages.length && passages.every(Boolean) && passages.length === idea.summary.split("\n").filter(line => line.trim()).length) idea.cites = passages;
+  return idea;
+}
+// A table transcribed from the letter: its title, column headings and rows of values, with the passage
+// it came from. `index` is its place in the stored draft, which is how an owner asks for its quote.
+function readerTables(items, ideaIds) {
+  const cell = (value) => (typeof value === "string" ? safe(value).trim().slice(0, 160) : "");
+  const tables = [];
+  (Array.isArray(items) ? items : []).slice(0, 12).forEach((item, index) => {
+    if (!item || typeof item !== "object" || !Array.isArray(item.columns) || !Array.isArray(item.rows)) return;
+    const columns = item.columns.slice(0, 12).map(cell);
+    const rows = item.rows.slice(0, 40)
+      .filter(row => row && typeof row === "object" && Array.isArray(row.values) && row.values.length === columns.length)
+      .map(row => ({ label: cell(row.label), values: row.values.map(cell) }));
+    if (columns.length < 2 || columns.some(column => !column) || !rows.length || rows.some(row => !row.label || row.values.some(value => !value))) return;
+    tables.push({ index, idea_id: typeof item.idea_id === "string" && ideaIds.has(item.idea_id) ? item.idea_id : null,
+      passage: passageNumber(item.section_id), title: cell(item.title), columns, rows });
+  });
+  return tables;
+}
+const COVERAGE_KEYS = ["sections", "sections_cited", "topics", "statements", "tables", "tables_omitted", "figures", "source_words", "summary_words"];
+function readerCoverage(coverage) {
+  if (!coverage || typeof coverage !== "object" || Array.isArray(coverage)) return null;
+  const result = {};
+  for (const key of COVERAGE_KEYS) if (Number.isSafeInteger(coverage[key]) && coverage[key] >= 0) result[key] = coverage[key];
+  return result.sections ? result : null;
+}
+// The reader-safe parts of a stored draft beyond its ideas: transcribed tables, coverage counts and per-line citations.
+export function readerExtras(content) {
+  const draft = content && typeof content === "object" ? content : {};
+  const cites = new Map();
+  for (const idea of Array.isArray(draft.ideas) ? draft.ideas : []) if (idea && typeof idea.id === "string" && Array.isArray(idea.cites)) cites.set(idea.id, idea.cites);
+  return { tables: draft.tables, coverage: draft.coverage, cites };
 }
 function readerStance(stance) {
   if (!stance || typeof stance !== "object") return null;
@@ -34,14 +71,18 @@ function readerStance(stance) {
   const result = { focus: ["micro", "macro", "mixed"].includes(focus) ? focus : "micro", leaning_in: lean(stance.leaning_in), leaning_out: lean(stance.leaning_out) };
   return result.leaning_in.length || result.leaning_out.length ? result : null;
 }
-export function readerLetter(row, ideas, stance = null, headline = null) {
+export function readerLetter(row, ideas, stance = null, headline = null, extras = null) {
   const focus = safe(stance?.focus || row?.focus);
+  const tables = readerTables(extras?.tables, new Set(ideas.map(idea => idea.id)));
+  const coverage = readerCoverage(extras?.coverage);
+  const cites = extras?.cites instanceof Map ? extras.cites : new Map();
   return { id: safe(row.id), fund_id: safe(row.fund_id), fund: safe(row.fund), reporting_period: safe(row.reporting_period),
     letter_date: safe(row.letter_date) || null, publication_date: safe(row.publication_date) || null,
     summary_published_at: safe(row.published_at), summary_revised_at: safe(row.created_at),
     revision_id: safe(row.revision_id), headline: safe(headline ?? row.headline) || null,
     focus: ["micro", "macro", "mixed"].includes(focus) ? focus : null,
-    overview: safe(row.overview), stance: readerStance(stance), ideas: ideas.map(readerIdea) };
+    overview: safe(row.overview), stance: readerStance(stance), ideas: ideas.map(idea => readerIdea(idea, cites.get(idea.id))),
+    ...(tables.length ? { tables } : {}), ...(coverage ? { coverage } : {}) };
 }
 export function readerFund(row) {
   return { id: safe(row.id), name: safe(row.name), manager: safe(row.manager), strategy: safe(row.strategy), letter_count: Number(row.letter_count), latest: safe(row.latest) };
@@ -89,6 +130,8 @@ export function sourceSections(text) {
   return parts;
 }
 const words = (text) => String(text || "").toLowerCase().match(/[\p{L}\p{N}_]+/gu) || [];
+// A minus sign as letters print it, directly before a figure: "-3.8%", "‐ 3.8%", "-$40".
+const MINUS_BEFORE = "[-\u2010\u2011\u2012\u2013\u2212]\\s?[$€£¥]?";
 // Calendar years and labels such as QE2 are dates or names, not numerical
 // claims; the historical_dates attestation covers those.
 const numbers = text => (String(text || "").replace(/\b[A-Za-z]+[0-9]+\b/g, " ").match(/\d+(?:[,.]\d+)*(?:%|[xX])?/g) || [])
@@ -112,7 +155,42 @@ export function validateDraft(draft, parts) {
       quotes += ` ${evidence?.quote || ""}`;
     }
     for (const n of numbers(idea.summary)) if (!quotes.includes(n)) errors.push(`Numerical claim ${n} lacks cited evidence.`);
+    // Optional per-statement citations: one source section for each line of the summary,
+    // and the idea must hold private evidence in that section.
+    if (idea.cites !== undefined && idea.cites !== null) {
+      const lines = idea.summary.split("\n").filter(line => line.trim());
+      const held = new Set((idea.evidence || []).map(e => e?.section_id));
+      if (!Array.isArray(idea.cites) || idea.cites.length !== lines.length || idea.cites.some(cite => !sections.has(cite) || !held.has(cite))) errors.push("Statement citations and evidence must match the summary line by line.");
+    }
   }
+  // Optional tables transcribed from the letter. Readers see each row label with every value under its
+  // column heading; the quoted table text stays private. Every figure shown must be printed in that
+  // quote, and a value shown with a minus must be printed with one.
+  const tables = draft.tables || [];
+  if (!Array.isArray(tables)) errors.push("Table evidence must match: tables is not a list.");
+  const figureText = [], figureQuotes = [];
+  const figuresIn = (text) => String(text || "").match(/\d+(?:[,.]\d+)*(?:%|[xX])?/g) || [];
+  for (const table of Array.isArray(tables) ? tables : []) {
+    const quote = String(table?.quote || "").replace(/\s+/g, " ").trim();
+    const passage = String(sections.get(table?.section_id) || "").replace(/\s+/g, " ").trim();
+    const title = typeof table?.title === "string" ? table.title : "";
+    const columns = table?.columns, rows = table?.rows;
+    const shaped = Array.isArray(columns) && columns.length >= 2 && columns.every(c => typeof c === "string" && c.trim())
+      && Array.isArray(rows) && rows.length > 0 && rows.every(row => row && typeof row === "object" && typeof row.label === "string" && row.label.trim()
+        && Array.isArray(row.values) && row.values.length === columns.length && row.values.every(v => typeof v === "string" && figuresIn(v).length));
+    if (!shaped || !quote || !passage.includes(quote) || (table.idea_id !== null && table.idea_id !== undefined && !ids.includes(table.idea_id))) {
+      errors.push("Table evidence must match its source passage exactly, with one value under every heading.");
+      continue;
+    }
+    for (const row of rows) for (const value of row.values) for (const n of figuresIn(value)) {
+      if (!quote.includes(n)) errors.push(`Table numerical claim ${n} lacks cited evidence.`);
+      else if (value.trim().startsWith("-") && !new RegExp(MINUS_BEFORE + n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(quote)) errors.push(`Table numerical claim ${n} is shown as negative but is not printed so.`);
+    }
+    for (const n of numbers([title, ...columns, ...rows.map(row => row.label)].join(" "))) if (!quote.includes(n)) errors.push(`Table numerical claim ${n} lacks cited evidence.`);
+    figureText.push([title, ...rows.map(row => [row.label, ...columns.map((column, i) => `${column} ${row.values[i]}`)].join(" "))].join(" "));
+    figureQuotes.push(quote);
+  }
+  if (draft.coverage !== undefined && draft.coverage !== null && (typeof draft.coverage !== "object" || Array.isArray(draft.coverage) || Object.values(draft.coverage).some(v => !Number.isInteger(v) || v < 0))) errors.push("Coverage counts must be whole numbers.");
   const visited = [];
   for (const item of draft.checklist) {
     visited.push(item?.section_id);
@@ -127,8 +205,8 @@ export function validateDraft(draft, parts) {
   const stanceQuotes = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).flatMap(i => [i?.quote || "", ...(Array.isArray(i?.quotes) ? i.quotes : [])]));
   const sourceWords = words(parts.map(p => p.text).join(" "));
   const grams = new Set(sourceWords.slice(0, -11).map((_, i) => sourceWords.slice(i, i + 12).join(" ")));
-  const prose = [draft.overview, ...draft.ideas.flatMap(i => [i?.title, i?.summary, i?.evolution, i?.activity]), ...stanceText].filter(Boolean).join(" ");
-  const allQuotes = [...draft.ideas.flatMap(i => (i?.evidence || []).map(e => e?.quote || "")), ...stanceQuotes].join(" ");
+  const prose = [draft.overview, ...draft.ideas.flatMap(i => [i?.title, i?.summary, i?.evolution, i?.activity]), ...stanceText, ...figureText].filter(Boolean).join(" ");
+  const allQuotes = [...draft.ideas.flatMap(i => (i?.evidence || []).map(e => e?.quote || "")), ...stanceQuotes, ...figureQuotes].join(" ");
   for (const n of numbers(prose)) if (!allQuotes.includes(n)) errors.push(`Published numerical claim ${n} lacks cited evidence.`);
   if (safe(prose) !== prose || (draft.headline && safe(draft.headline) !== String(draft.headline))) errors.push("Reader prose contains a source link or private reference.");
   const tokens = words(prose);

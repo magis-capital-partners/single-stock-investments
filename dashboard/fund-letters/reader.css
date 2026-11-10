@@ -1,26 +1,39 @@
 .fl-page {
   margin: 0;
-  background: var(--bg-card);
-  color: var(--text-primary);
+  background: var(--bg-primary, #0a0e17);
+  color: var(--text-primary, #e8ecf4);
 }
 
+/* Palette. Every colour resolves from the dashboard display tokens, so the
+   reader follows the Dark / Light switch on the standalone page and inside the
+   Insights tab alike. Surfaces step one way only: wash (page) -> paper (cards,
+   toolbar, directory) -> subtle (insets inside a card). A text role is never
+   mapped to a surface token, nor a surface to a text token: that mix-up is
+   what once drew light prose on light cards. The fallbacks are the dark theme,
+   so the reader stays legible even where the token sheet is not loaded. */
 .fl-reader {
-  color-scheme: light;
-  --fl-ink: var(--bg-secondary);
-  --fl-prose: var(--accent-blue);
-  --fl-muted: var(--accent-blue);
-  --fl-blue: var(--accent-blue);
-  --fl-blue-soft: rgba(37, 88, 167, 0.09);
-  --fl-line: var(--text-primary);
-  --fl-paper: var(--text-primary);
-  --fl-wash: var(--text-primary);
-  --fl-subtle: var(--text-primary);
-  --fl-control-bg: var(--bg-card);
-  --fl-menu-bg: var(--bg-card);
-  --fl-hover: var(--text-primary);
-  --fl-active: var(--accent-blue);
-  --fl-shadow: 0 1px 2px rgba(15, 29, 48, 0.04);
-  --fl-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235b718a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  color-scheme: dark;
+  --fl-paper: var(--bg-card, #151d2e);
+  --fl-wash: var(--bg-primary, #0a0e17);
+  --fl-subtle: var(--bg-secondary, #111827);
+  --fl-control-bg: var(--bg-input, #0d1424);
+  --fl-menu-bg: var(--bg-card, #151d2e);
+  --fl-hover: var(--bg-card-hover, #1a2438);
+  --fl-ink: var(--text-primary, #e8ecf4);
+  --fl-prose: color-mix(in srgb, var(--fl-ink) 88%, var(--fl-paper));
+  --fl-muted: var(--text-muted, #9aaac2);
+  --fl-blue: var(--accent-blue, #75aaff);
+  --fl-on-accent: var(--bg-primary, #0a0e17);
+  --fl-blue-soft: color-mix(in srgb, var(--fl-blue) 14%, transparent);
+  --fl-active: color-mix(in srgb, var(--fl-blue) 16%, transparent);
+  --fl-line-strong: var(--border, #526580);
+  --fl-line: color-mix(in srgb, var(--fl-line-strong) 50%, transparent);
+  --fl-good: var(--positive, #57d5ad);
+  --fl-bad: var(--negative, #ff8e98);
+  --fl-warn: var(--warning, #f3bd62);
+  --fl-violet: var(--accent-purple, #b49aff);
+  --fl-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  --fl-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aaac2' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   --fl-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --fl-serif: Charter, 'Iowan Old Style', 'Palatino Linotype', Cambria, Georgia, serif;
   --fl-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -30,26 +43,17 @@
   min-height: 80vh;
 }
 
+:root[data-theme="light"] .fl-reader {
+  color-scheme: light;
+  --fl-shadow: 0 1px 2px rgba(15, 29, 48, 0.07);
+  --fl-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23506580' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+/* Inside the dashboard the reader is a framed region on the page background.
+   Only the frame differs here; the colours are the same tokens as above. */
 .fl-reader.is-embedded {
-  color-scheme: dark;
-  --fl-ink: var(--text-primary);
-  --fl-prose: var(--text-primary);
-  --fl-muted: var(--accent-blue);
-  --fl-blue: var(--accent-blue);
-  --fl-blue-soft: rgba(96, 165, 250, 0.14);
-  --fl-line: var(--bg-secondary);
-  --fl-paper: var(--text-primary);
-  --fl-wash: transparent;
-  --fl-subtle: var(--bg-secondary);
-  --fl-control-bg: var(--bg-secondary);
-  --fl-menu-bg: var(--bg-secondary);
-  --fl-hover: var(--bg-secondary);
-  --fl-active: var(--bg-secondary);
-  --fl-shadow: none;
-  --fl-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b9bb4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   border: 1px solid var(--fl-line);
   border-radius: 10px;
-  background: var(--bg-card);
   overflow: hidden;
 }
 
@@ -86,7 +90,7 @@
 .fl-reader select,
 .fl-reader input {
   min-height: 34px;
-  border: 1px solid var(--fl-line);
+  border: 1px solid var(--fl-line-strong);
   border-radius: 6px;
   background-color: var(--fl-control-bg);
   color: var(--fl-ink);
@@ -94,13 +98,16 @@
   transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
+/* The dashboard styles every control under #main-content with a `background`
+   shorthand, which would reset this arrow inside the Insights tab and leave a
+   select with no affordance. The arrow is therefore marked important. */
 .fl-reader select {
   appearance: none;
   -webkit-appearance: none;
-  background-image: var(--fl-chevron);
-  background-repeat: no-repeat;
-  background-position: right 9px center;
-  background-size: 12px 12px;
+  background-image: var(--fl-chevron) !important;
+  background-repeat: no-repeat !important;
+  background-position: right 9px center !important;
+  background-size: 12px 12px !important;
   padding-right: 28px;
   cursor: pointer;
 }
@@ -128,7 +135,7 @@
   background-color: var(--fl-control-bg);
 }
 
-.fl-reader:focus-visible {
+.fl-reader :focus-visible {
   outline: 2px solid var(--fl-blue);
   outline-offset: 2px;
 }
@@ -254,10 +261,13 @@
   color: var(--fl-ink);
 }
 
+/* Text on a filled accent uses --fl-on-accent. The accent is light on the dark
+   theme and dark on the light theme, so the page background is the one token
+   that contrasts with it on both. */
 .fl-view-tab.is-active {
   background-color: var(--fl-blue) !important;
-  color: var(--text-primary) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  color: var(--fl-on-accent) !important;
+  box-shadow: var(--fl-shadow);
 }
 
 .fl-filters {
@@ -340,7 +350,7 @@
 }
 
 .fl-suggest-code {
-  font: 600 11.5px/1.3 var(--fl-mono);
+  font: 600 12px/1.3 var(--fl-mono);
   color: var(--fl-blue);
 }
 
@@ -516,7 +526,7 @@
 }
 
 .fl-signal-pill strong {
-  font: 700 11.5px var(--fl-mono);
+  font: 700 12px var(--fl-mono);
   color: var(--fl-blue);
 }
 
@@ -530,7 +540,7 @@
 }
 
 .fl-signal-pill.is-battleground {
-  border-color: rgba(245, 158, 11, 0.4) !important;
+  border-color: color-mix(in srgb, var(--fl-warn) 50%, transparent) !important;
 }
 
 .fl-signal-pill.is-active {
@@ -540,16 +550,12 @@
 
 .fl-in-book-dot {
   font-style: normal;
-  font: 700 9.5px var(--fl-mono);
+  font: 700 12px var(--fl-mono);
   text-transform: uppercase;
   padding: 1px 5px;
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.14);
-  color: var(--positive);
-}
-
-.fl-reader.is-embedded .fl-in-book-dot {
-  color: var(--positive);
+  background: color-mix(in srgb, var(--fl-good) 14%, transparent);
+  color: var(--fl-good);
 }
 
 /* Main Two-Column Grid */
@@ -582,7 +588,7 @@
 }
 
 .fl-reader .fl-directory h2 {
-  font: 700 10.5px/1.3 var(--fl-mono);
+  font: 700 12px/1.3 var(--fl-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0;
@@ -751,58 +757,38 @@
   color: var(--fl-muted);
 }
 
+/* Tinted badges take their fill and outline from the same token as their text,
+   so each stays readable on either theme. */
 .fl-badge--long,
 .fl-badge--add {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: var(--positive);
-}
-
-.fl-reader.is-embedded .fl-badge--long,
-.fl-reader.is-embedded .fl-badge--add {
-  color: var(--positive);
+  background: color-mix(in srgb, var(--fl-good) 12%, transparent);
+  border-color: color-mix(in srgb, var(--fl-good) 38%, transparent);
+  color: var(--fl-good);
 }
 
 .fl-badge--short {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: var(--negative);
-}
-
-.fl-reader.is-embedded .fl-badge--short {
-  color: var(--negative);
+  background: color-mix(in srgb, var(--fl-bad) 12%, transparent);
+  border-color: color-mix(in srgb, var(--fl-bad) 38%, transparent);
+  color: var(--fl-bad);
 }
 
 .fl-badge--trim,
 .fl-badge--warn {
-  background: rgba(245, 158, 11, 0.11);
-  border-color: rgba(245, 158, 11, 0.32);
-  color: var(--warning);
-}
-
-.fl-reader.is-embedded .fl-badge--trim,
-.fl-reader.is-embedded .fl-badge--warn {
-  color: var(--warning);
+  background: color-mix(in srgb, var(--fl-warn) 12%, transparent);
+  border-color: color-mix(in srgb, var(--fl-warn) 38%, transparent);
+  color: var(--fl-warn);
 }
 
 .fl-badge--special {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.3);
-  color: var(--accent-purple);
-}
-
-.fl-reader.is-embedded .fl-badge--special {
-  color: var(--accent-blue);
+  background: color-mix(in srgb, var(--fl-violet) 12%, transparent);
+  border-color: color-mix(in srgb, var(--fl-violet) 38%, transparent);
+  color: var(--fl-violet);
 }
 
 .fl-badge--macro {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: var(--accent-blue);
-}
-
-.fl-reader.is-embedded .fl-badge--macro {
-  color: var(--accent-blue);
+  background: var(--fl-blue-soft);
+  border-color: color-mix(in srgb, var(--fl-blue) 38%, transparent);
+  color: var(--fl-blue);
 }
 
 .fl-ticker {
@@ -811,14 +797,14 @@
   align-items: center;
   padding: 1px 6px !important;
   border-radius: 4px !important;
-  border: 1px solid rgba(59, 130, 246, 0.28) !important;
+  border: 1px solid color-mix(in srgb, var(--fl-blue) 34%, transparent) !important;
   font: 700 12px/1.35 var(--fl-mono) !important;
   background: var(--fl-blue-soft) !important;
   color: var(--fl-blue) !important;
 }
 
 .fl-idea-chip.is-book {
-  border-color: rgba(16, 185, 129, 0.42);
+  border-color: color-mix(in srgb, var(--fl-good) 50%, transparent);
 }
 
 .fl-fund-tag {
@@ -932,7 +918,10 @@
   padding-top: 4px;
 }
 
-.fl-idea-chip {
+/* `.fl-reader a` would otherwise colour the whole chip as a link, which makes a
+   row of chips read as one blue block. The ticker carries the accent instead. */
+.fl-idea-chip,
+.fl-reader a.fl-idea-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -954,13 +943,13 @@
 }
 
 .fl-chip-ticker {
-  font: 700 10.5px var(--fl-mono);
+  font: 700 12px var(--fl-mono);
   color: var(--fl-blue);
 }
 
 .fl-chip-act {
   font-style: normal;
-  font: 600 9.5px var(--fl-mono);
+  font: 600 12px var(--fl-mono);
   text-transform: uppercase;
   color: var(--fl-muted);
   padding-left: 4px;
@@ -1039,7 +1028,7 @@
 .fl-quarter-pill.is-active {
   background: var(--fl-blue) !important;
   border-color: var(--fl-blue) !important;
-  color: var(--text-primary) !important;
+  color: var(--fl-on-accent) !important;
 }
 
 .fl-reader .fl-letter-select {
@@ -1093,6 +1082,124 @@
   margin: 0 0 13px;
 }
 
+/* Citation markers. A small number after a statement names the passage of the
+   original letter it rests on. For owners the marker is a button that opens
+   that passage; for other readers it is a plain superscript. */
+.fl-reader .fl-cite,
+.fl-reader button.fl-cite {
+  display: inline-block;
+  min-height: 0;
+  min-width: 1.5em;
+  margin: 0 1px 0 3px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--fl-blue-soft);
+  color: var(--fl-blue);
+  font: 600 10.5px/1.5 var(--fl-mono);
+  text-align: center;
+  vertical-align: 0.42em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.fl-reader button.fl-cite:hover {
+  background: var(--fl-blue);
+  color: var(--fl-on-accent);
+}
+
+/* Tables transcribed from the letter. Each keeps the letter's own column
+   headings; a wide table scrolls sideways inside its frame instead of
+   stretching the page. */
+.fl-tables {
+  margin: 18px 0 4px;
+}
+
+.fl-tables > h4 {
+  margin: 0 0 8px;
+}
+
+.fl-table {
+  margin: 0 0 14px;
+  max-width: 100%;
+}
+
+.fl-idea .fl-table {
+  margin: 14px 0 4px;
+}
+
+.fl-table figcaption {
+  margin: 0 0 6px;
+  font: 600 12.5px/1.45 var(--fl-sans);
+  color: var(--fl-muted);
+}
+
+.fl-table-scroll {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--fl-line);
+  border-radius: 8px;
+  background: var(--fl-subtle);
+  vertical-align: top;
+}
+
+.fl-table table {
+  border-collapse: collapse;
+  font: 400 13px/1.4 var(--fl-sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--fl-ink);
+}
+
+.fl-table th,
+.fl-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--fl-line);
+  white-space: nowrap;
+}
+
+.fl-table tbody tr:last-child th,
+.fl-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.fl-table thead th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fl-muted);
+  text-align: right;
+  background: color-mix(in srgb, var(--fl-line) 32%, transparent);
+}
+
+.fl-table tbody th {
+  font-weight: 500;
+  text-align: left;
+  white-space: normal;
+  min-width: 11ch;
+  max-width: 34ch;
+}
+
+.fl-table td {
+  text-align: right;
+}
+
+.fl-table td.fl-neg {
+  color: var(--fl-bad);
+}
+
+.fl-coverage {
+  margin: 22px 0 0;
+  max-width: 78ch;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--fl-muted);
+}
+
+.fl-coverage strong {
+  color: var(--fl-ink);
+  font-weight: 600;
+}
+
 /* Portfolio Stance Block */
 .fl-stance {
   background: var(--fl-subtle);
@@ -1114,26 +1221,18 @@
 }
 
 .fl-stance h4 {
-  font: 700 10.5px/1.4 var(--fl-mono);
+  font: 700 12px/1.4 var(--fl-mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 0 0 6px;
 }
 
 .fl-stance-col.is-in h4 {
-  color: var(--positive);
-}
-
-.fl-reader.is-embedded .fl-stance-col.is-in h4 {
-  color: var(--positive);
+  color: var(--fl-good);
 }
 
 .fl-stance-col.is-out h4 {
-  color: var(--warning);
-}
-
-.fl-reader.is-embedded .fl-stance-col.is-out h4 {
-  color: var(--warning);
+  color: var(--fl-warn);
 }
 
 .fl-stance ul {
@@ -1172,7 +1271,7 @@
 }
 
 .fl-contents h4 {
-  font: 700 10.5px/1.4 var(--fl-mono);
+  font: 700 12px/1.4 var(--fl-mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--fl-muted);
@@ -1251,7 +1350,7 @@
 }
 
 .fl-evolution h4 {
-  font: 700 10.5px/1.4 var(--fl-mono);
+  font: 700 12px/1.4 var(--fl-mono);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--fl-muted);
@@ -1373,10 +1472,10 @@
 }
 
 .fl-error {
-  border-left: 3px solid var(--negative);
+  border-left: 3px solid var(--fl-bad);
   padding: 12px 16px;
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--negative);
+  background: color-mix(in srgb, var(--fl-bad) 11%, transparent);
+  color: var(--fl-bad);
   border-radius: 6px;
   margin-bottom: 12px;
 }
@@ -1478,8 +1577,13 @@
 
 .fl-reader .fl-primary {
   background: var(--fl-blue);
-  color: var(--text-primary);
+  color: var(--fl-on-accent);
   border-color: var(--fl-blue);
+  font-weight: 600;
+}
+
+.fl-reader .fl-primary:hover {
+  background: color-mix(in srgb, var(--fl-blue) 86%, var(--fl-ink));
 }
 
 .fl-dialog-actions {
@@ -1526,7 +1630,7 @@
 .fl-original-views [aria-selected="true"] {
   background: var(--fl-blue);
   border-color: var(--fl-blue);
-  color: var(--text-primary);
+  color: var(--fl-on-accent);
 }
 
 .fl-original-pane {
@@ -1555,13 +1659,22 @@
   background: var(--fl-subtle);
 }
 
+.fl-original-text mark {
+  background: color-mix(in srgb, var(--fl-warn) 30%, transparent);
+  color: var(--fl-ink);
+  border-radius: 3px;
+  padding: 1px 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--fl-warn) 30%, transparent);
+  scroll-margin: 96px;
+}
+
 .fl-original-pdf {
   flex: 1;
   min-height: 0;
   width: 100%;
   border: 1px solid var(--fl-line);
   border-radius: 8px;
-  background: var(--bg-card);
+  background: var(--fl-paper);
 }
 
 .fl-reader .fl-notice {

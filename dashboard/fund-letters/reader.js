@@ -651,12 +651,88 @@
         </section>`;
     }
 
+    // A small number after a statement names the passage of the original letter it rests on.
+    // Owners can open that passage; everyone else sees where in the letter it comes from.
+    function citeHtml(letter, passage, target) {
+      if (!passage) return '';
+      const total = letter.coverage?.sections;
+      const where = `passage ${passage}${total ? ` of ${total}` : ''} of the original letter`;
+      if (role !== 'owner') return `<span class="fl-cite" title="From ${escape(where)}" aria-label="From ${escape(where)}">${passage}</span>`;
+      const data = Object.entries(target).map(([key, value]) => ` data-cite-${key}="${escape(value)}"`).join('');
+      return `<button type="button" class="fl-cite" data-cite="${escape(letter.id)}" data-cite-passage="${passage}"${data} title="Open ${escape(where)}" aria-label="Open ${escape(where)}">${passage}</button>`;
+    }
+
+    // Newer summaries keep one statement per line with a passage number for each.
+    // Statements that rest on the same passage share one marker.
+    function citedProse(letter, idea) {
+      const cites = Array.isArray(idea.cites) ? idea.cites : null;
+      if (!cites) return paragraphs(idea.summary);
+      let line = 0;
+      return String(idea.summary || '').split(/\n\s*\n/).filter(block => block.trim()).map(block => {
+        const lines = block.split('\n').filter(text => text.trim());
+        let run = [];
+        const parts = lines.map((text, index) => {
+          const passage = cites[line];
+          run.push(line);
+          line += 1;
+          const closes = index === lines.length - 1 || cites[line] !== passage;
+          const marker = closes ? citeHtml(letter, passage, { idea: idea.id, lines: run.join(',') }) : '';
+          if (closes) run = [];
+          return `${escape(text.trim())}${marker}`;
+        });
+        return `<p>${parts.join(' ')}</p>`;
+      }).join('');
+    }
+
+    // Tables the summarizer transcribed from the letter, under the letter's own column headings.
+    // `ideaId` picks the tables that belong to one idea; null picks the ones about the fund itself.
+    function tablesHtml(letter, ideaId) {
+      const tables = (Array.isArray(letter.tables) ? letter.tables : []).filter(table => (table.idea_id || null) === ideaId);
+      return tables.map(table => `
+        <figure class="fl-table">
+          <figcaption>${escape(table.title || 'From a table in the letter')}${citeHtml(letter, table.passage, { table: table.index })}</figcaption>
+          <div class="fl-table-scroll" tabindex="0" role="group" aria-label="${escape(table.title || 'Table from the letter')}">
+            <table>
+              <thead><tr><td></td>${table.columns.map(column => `<th scope="col">${escape(column)}</th>`).join('')}</tr></thead>
+              <tbody>
+                ${table.rows.map(row => `<tr><th scope="row">${escape(row.label)}</th>${row.values.map(value => `<td${/^[-(]/.test(value) ? ' class="fl-neg"' : ''}>${escape(value)}</td>`).join('')}</tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </figure>`).join('');
+    }
+
+    function fundTablesHtml(letter) {
+      const html = tablesHtml(letter, null);
+      if (!html) return '';
+      return `
+        <section class="fl-tables" aria-label="Figures from the letter's tables">
+          <h4 class="fl-meta">Figures from the letter's tables</h4>
+          ${html}
+        </section>`;
+    }
+
+    function coverageHtml(letter) {
+      const c = letter.coverage;
+      if (!c || !c.sections) return '';
+      const count = (n, one, many) => `${Number(n).toLocaleString('en-US')} ${n === 1 ? one : many}`;
+      const parts = [];
+      if (c.statements) parts.push(`${count(c.statements, 'statement', 'statements')}${c.topics ? ` on ${count(c.topics, 'topic', 'topics')}` : ''}`);
+      if (c.tables) parts.push(`${count(c.tables, 'table', 'tables')} transcribed${c.figures ? ` (${count(c.figures, 'figure', 'figures')})` : ''}`);
+      if (c.sections_cited) parts.push(`drawn from ${c.sections_cited} of ${count(c.sections, 'passage', 'passages')} of the original`);
+      if (c.summary_words && c.source_words) parts.push(`${Number(c.summary_words).toLocaleString('en-US')} words on a ${Number(c.source_words).toLocaleString('en-US')}-word letter`);
+      if (!parts.length) return '';
+      const omitted = c.tables_omitted ? ` ${count(c.tables_omitted, 'other table or chart', 'other tables or charts')} could not be transcribed with certainty and ${c.tables_omitted === 1 ? 'is' : 'are'} in the original only.` : '';
+      return `<p class="fl-coverage"><strong>Coverage.</strong> ${escape(parts.join(' · '))}. The small numbers mark the passage each statement comes from${role === 'owner' ? '; select one to read it in the original' : ''}.${escape(omitted)}</p>`;
+    }
+
     function ideaSectionHtml(letter, i) {
       return `
         <section class="fl-idea" id="fl-idea-${escape(letter.id)}-${escape(i.id)}">
           <div class="fl-idea-badges">${ideaMetaBadges(i)}</div>
           <h4>${escape(i.title)}</h4>
-          <div class="fl-idea-prose">${paragraphs(i.summary)}</div>
+          <div class="fl-idea-prose">${citedProse(letter, i)}</div>
+          ${tablesHtml(letter, i.id)}
           ${i.evolution ? `
           <div class="fl-evolution">
             <h4>What changed</h4>
@@ -694,6 +770,8 @@
           </header>
 
           <div class="fl-overview">${paragraphs(letter.overview)}</div>
+
+          ${fundTablesHtml(letter)}
 
           ${stanceHtml(letter)}
 
@@ -736,6 +814,8 @@
           <div class="fl-idea-group">
             ${factualIdeas.map(i => ideaSectionHtml(letter, i)).join('')}
           </div>`) : ''}
+
+          ${coverageHtml(letter)}
 
           <footer class="fl-revision">
             Attributed to ${escape(letter.fund)} · ${escape(letter.reporting_period || 'Period unavailable')}${letter.summary_published_at ? ` · Summary published ${escape(letter.summary_published_at.slice(0, 10))}` : ''}${letter.summary_revised_at ? ` · Revision ${escape(letter.summary_revised_at.slice(0, 10))}` : ''}
@@ -991,7 +1071,53 @@
       }
     }
 
-    async function readOriginal(letterId) {
+    // Evidence quotes are stored with single spaces; the original keeps its line breaks.
+    function markQuotes(container, text, quotes) {
+      const spans = [];
+      for (const quote of quotes) {
+        const words = String(quote || '').trim().split(/\s+/).filter(Boolean);
+        if (!words.length) continue;
+        const match = new RegExp(words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s+')).exec(text);
+        if (match) spans.push([match.index, match.index + match[0].length]);
+      }
+      spans.sort((a, b) => a[0] - b[0]);
+      container.textContent = '';
+      let at = 0, first = null;
+      for (const [start, end] of spans) {
+        if (start < at) continue;
+        const mark = document.createElement('mark');
+        mark.textContent = text.slice(start, end);
+        container.append(text.slice(at, start), mark);
+        first = first || mark;
+        at = end;
+      }
+      container.append(text.slice(at));
+      return first;
+    }
+
+    // The private quotes behind one citation marker. Owner only; the API refuses everyone else.
+    const sourceCache = new Map();
+    async function citedQuotes(target) {
+      const letterId = target.dataset.cite;
+      if (!sourceCache.has(letterId)) sourceCache.set(letterId, api({ action: 'source', letter: letterId }).catch(error => { sourceCache.delete(letterId); throw error; }));
+      const source = await sourceCache.get(letterId);
+      if (target.dataset.citeTable !== undefined) {
+        return [source.tables?.[Number(target.dataset.citeTable)]?.quote].filter(Boolean);
+      }
+      const lines = new Set(String(target.dataset.citeLines || '').split(',').filter(Boolean).map(Number));
+      const row = (source.evidence || []).find(item => item.idea_id === target.dataset.citeIdea);
+      let claims = [];
+      try { claims = JSON.parse(row?.claims_json || '[]'); } catch { claims = []; }
+      return claims.filter(claim => lines.has(claim?.line)).map(claim => claim.quote);
+    }
+
+    async function openCitation(target) {
+      let quotes = [];
+      try { quotes = await citedQuotes(target); } catch { quotes = []; }
+      await readOriginal(target.dataset.cite, { quotes, passage: target.dataset.citePassage });
+    }
+
+    async function readOriginal(letterId, focus = null) {
       dialog.classList.add('fl-original-dialog');
       dialog.innerHTML = '<p role="status">Loading the original letter…</p>';
       if (!dialog.open) dialog.showModal();
@@ -1021,7 +1147,15 @@
           </div>` : ''}
           ${!views.length ? `<p class="fl-notice">${data.original_url ? 'The extracted text is not available for this letter. Open the original instead.' : 'This letter is not linked to an original yet; it remains in the private research vault.'}</p>` : ''}`;
         const text = dialog.querySelector('.fl-original-text');
-        if (text) text.textContent = String(data.text).replace(/\f/g, '\n\n');
+        const body = String(data.text || '').replace(/\f/g, '\n\n');
+        const cited = text && focus?.quotes?.length ? markQuotes(text, body, focus.quotes) : null;
+        if (text && !cited) text.textContent = body;
+        if (text && focus) {
+          const notice = dialog.querySelector('.fl-original-pane[data-pane="text"] .fl-notice');
+          if (notice) notice.textContent = cited
+            ? `Highlighted: the sentences in passage ${focus.passage} that the statement rests on.`
+            : `The cited sentences in passage ${focus.passage} could not be located in this copy of the text.`;
+        }
         const show = key => {
           dialog.querySelectorAll('[data-pane]').forEach(pane => { pane.hidden = pane.dataset.pane !== key; });
           dialog.querySelectorAll('[data-original-view]').forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.originalView === key)));
@@ -1031,6 +1165,7 @@
         dialog.querySelectorAll('[data-original-view]').forEach(tab => { tab.onclick = () => show(tab.dataset.originalView); });
         if (views.length) show(views[0][0]);
         dialog.querySelector('[data-close]').onclick = () => dialog.close();
+        if (cited) cited.scrollIntoView({ block: 'center' });
       } catch (error) {
         dialog.innerHTML = `<h2 id="fl-review-title">Original unavailable</h2><p>${escape(error.message)}</p><button data-close type="button">Close</button>`;
         dialog.querySelector('button').onclick = () => dialog.close();
@@ -1130,6 +1265,8 @@
             dialog.querySelectorAll('[data-idea]').forEach(group => group.querySelectorAll('[data-idea-field]').forEach(el => {
               const idea = edited.ideas[Number(group.dataset.idea)], key = el.dataset.ideaField;
               if (el.value || Object.hasOwn(idea, key)) idea[key] = el.value || (key === 'summary' || key === 'title' ? '' : null);
+              // Citations are kept line by line, so a hand-edited summary no longer carries them.
+              if (key === 'summary' && idea.cites && el.value !== draft.ideas[Number(group.dataset.idea)].summary) delete idea.cites;
             }));
             return edited;
           };
@@ -1143,6 +1280,7 @@
             await api({}, { action: 'publish', letter_id: letterId, revision_id: revision.id, expected_revision: source.source.published_revision, attestations });
             status.textContent = 'Published. The previous revision remains available.';
             source.source.published_revision = revision.id;
+            sourceCache.delete(letterId);
             load();
           });
         }
@@ -1307,6 +1445,7 @@
       if (target.hasAttribute('data-retry')) load();
       if (target.hasAttribute('data-archive')) navigate({ letter: '', idea: '', stack: '' });
       if (target.hasAttribute('data-results')) navigate({ fund: '', letter: '', idea: '', stack: '' });
+      if (target.dataset.cite) openCitation(target);
       if (target.dataset.original) readOriginal(target.dataset.original);
       if (target.dataset.source) review(target.dataset.source);
       if (target.hasAttribute('data-review-queue')) navigate({ mode: params.get('mode') === 'review' ? '' : 'review', letter: '', idea: '' });

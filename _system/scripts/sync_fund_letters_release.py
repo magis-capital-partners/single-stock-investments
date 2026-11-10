@@ -3,6 +3,11 @@
 
 Remote mode requires an explicit database UUID, matching config, a working daily
 budget check, and a private R2 binding. It never deploys code or changes Access.
+
+Every release is a full snapshot, so most of its statements were already sent
+with an earlier one. Remote mode keeps a ledger of the inserts the database has
+accepted and sends only the rest; --full ignores the ledger and replays
+everything (use it after the remote database has been restored or rebuilt).
 """
 from __future__ import annotations
 
@@ -20,6 +25,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 R2_PUT_GAP_SECONDS = 0.75
 R2_RETRY_LIMIT = 8
+# One wrangler --command. The whole command is a single process argument, and
+# macOS allows about 1 MB for all arguments together; D1 itself was measured
+# accepting 480 KB in one call.
+COMMAND_BYTES = 400_000
+BATCH_STATEMENTS = 250
+# D1 refuses a single statement longer than this (SQLITE_TOOBIG).
+STATEMENT_BYTES = 100_000
+INSERT_PREFIX = "INSERT OR IGNORE INTO "
 
 
 def statements(text: str) -> list[str]:
@@ -33,6 +46,56 @@ def statements(text: str) -> list[str]:
     if current.strip():
         raise ValueError("Incomplete release SQL")
     return output
+
+
+def byte_batches(lines: list[str], limit: int = COMMAND_BYTES, count: int = BATCH_STATEMENTS) -> list[list[str]]:
+    """Group statements into commands bounded by bytes as well as by count."""
+    batches, current, size = [], [], 0
+    for line in lines:
+        length = len(line.encode("utf-8"))
+        if length > STATEMENT_BYTES:
+            raise ValueError(f"A release statement is {length} bytes; D1 accepts at most {STATEMENT_BYTES}: {line[:90]!r}")
+        if current and (size + length > limit or len(current) >= count):
+            batches.append(current)
+            current, size = [], 0
+        current.append(line)
+        size += length
+    if current:
+        batches.append(current)
+    return batches
+
+
+def fingerprint(statement: str) -> str:
+    return hashlib.sha256(statement.encode("utf-8")).hexdigest()[:24]
+
+
+def pending(lines: list[str], applied: set[str]) -> list[str]:
+    """Statements still to send. An accepted INSERT OR IGNORE can never do
+    anything a second time, so it is skipped. Updates are conditional on the
+    current remote row and are always sent again."""
+    return [line for line in lines if not (line.startswith(INSERT_PREFIX) and fingerprint(line) in applied)]
+
+
+def ledger_path(database_id: str) -> Path:
+    # Outside releases/, which is pruned down to the newest snapshot.
+    return ROOT / "_private/fund_letters/applied" / f"{database_id}.txt"
+
+
+def read_ledger(path: Path) -> set[str]:
+    if not path.is_file():
+        return set()
+    return {line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()}
+
+
+def record_applied(path: Path, batch: list[str]) -> None:
+    marks = [fingerprint(line) for line in batch if line.startswith(INSERT_PREFIX)]
+    if not marks:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write("\n".join(marks) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
 
 
 def budget_check() -> None:
@@ -67,6 +130,7 @@ def main() -> int:
     parser.add_argument("--remote", action="store_true")
     parser.add_argument("--target-database-id", help="Must exactly match the DB binding in config")
     parser.add_argument("--max-batches", type=int, default=5)
+    parser.add_argument("--full", action="store_true", help="Replay every statement, ignoring the ledger of accepted inserts")
     parser.add_argument("--activate", action="store_true", help="Activate reviewed pointers after data/source import")
     parser.add_argument("--rollback", action="store_true", help="Restore the prior pointers recorded by this release")
     args = parser.parse_args()
@@ -113,10 +177,17 @@ def main() -> int:
                 continue
             (release / "last-error.log").write_text(last, encoding="utf-8")
             raise RuntimeError("Release step failed. Details saved to private last-error.log; rerun resumes safely.")
-    def execute(path: Path):
-        call(["d1", "execute", "DB", "--remote" if args.remote else "--local", "--yes", "--file", str(path)], retries=R2_RETRY_LIMIT)
+    def execute(sql: str):
+        # --file posts to the D1 import API, which rejects this account's OAuth
+        # session (401, error 10000). The same session can run the SQL through
+        # the query API, so each command travels as one argument and has to
+        # stay inside the limits byte_batches enforces.
+        call(["d1", "execute", "DB", "--remote" if args.remote else "--local", "--yes", "--command", sql], retries=R2_RETRY_LIMIT)
+    def execute_file(path: Path):
+        for batch in byte_batches(statements(path.read_text(encoding="utf-8"))):
+            execute("".join(batch))
     if args.rollback:
-        execute(release / "rollback.sql")
+        execute_file(release / "rollback.sql")
         print(json.dumps({"rolled_back": manifest["id"], "remote": args.remote}))
         return 0
     if args.remote:
@@ -136,17 +207,33 @@ def main() -> int:
             if len(state["uploaded"]) % 10 == 0:
                 print(json.dumps({"uploaded": len(state["uploaded"]), "total": len(sources)}), flush=True)
     lines = statements((release / "archive.sql").read_text(encoding="utf-8"))
-    batches = [lines[i:i+250] for i in range(0, len(lines), 250)]
+    # The ledger describes the remote database only. A local simulation is
+    # disposable, so it always replays the whole release.
+    ledger = ledger_path(db["database_id"]) if args.remote else None
+    applied = read_ledger(ledger) if ledger and not args.full else set()
+    todo = pending(lines, applied)
+    # Inserts first, so a run cut short by --max-batches always shortens the
+    # next one. Every update refers to a row inserted by this release or an
+    # earlier one, so it loses nothing by running last.
+    todo = [line for line in todo if line.startswith(INSERT_PREFIX)] + [line for line in todo if not line.startswith(INSERT_PREFIX)]
+    batches = byte_batches(todo)
+    # The batch marker belongs to one plan. Once the ledger has grown the plan
+    # is a different, shorter one and starts from its own beginning.
+    plan = hashlib.sha256("".join(todo).encode("utf-8")).hexdigest()[:24]
+    if state.get("plan") != plan:
+        state.update({"plan": plan, "batch": 0})
+    sent = 0
     for index in range(state["batch"], min(len(batches), state["batch"] + args.max_batches)):
-        file = release / "current-batch.sql"
-        file.write_text("".join(batches[index]), encoding="utf-8")
-        execute(file)
+        execute("".join(batches[index]))
+        if ledger:
+            record_applied(ledger, batches[index])
+        sent += 1
         state["batch"] = index + 1
         state_path.write_text(json.dumps(state), encoding="utf-8")
     complete = state["batch"] == len(batches)
     if args.activate and complete:
-        execute(release / "activate.sql")
-    print(json.dumps({"release_id": manifest["id"], "remote": args.remote, "imported_batches": state["batch"], "total_batches": len(batches), "complete": complete, "activation_requested": args.activate, "activation_attempted": bool(args.activate and complete)}))
+        execute_file(release / "activate.sql")
+    print(json.dumps({"release_id": manifest["id"], "remote": args.remote, "statements": len(lines), "already_applied": len(lines) - len(todo), "sent_batches": sent, "imported_batches": state["batch"], "total_batches": len(batches), "complete": complete, "activation_requested": args.activate, "activation_attempted": bool(args.activate and complete)}))
     return 0
 
 

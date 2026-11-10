@@ -1,6 +1,6 @@
 import { privateJson, requireHumanViewer } from "../_lib/auth.js";
 import { requireDatabase } from "../_lib/http.js";
-import { EDITORIAL_CHECKS, LETTER_SORT_SQL, letterWhere, pageArgs, readerArchiveEntry, readerFund, readerLetter, readerPeriod, readerSearchResult, readerTickerSignal, searchWhere, sourceSections, validateDraft } from "../_lib/fund-letters.js";
+import { EDITORIAL_CHECKS, LETTER_SORT_SQL, letterWhere, pageArgs, readerArchiveEntry, readerExtras, readerFund, readerLetter, readerPeriod, readerSearchResult, readerTickerSignal, searchWhere, sourceSections, validateDraft } from "../_lib/fund-letters.js";
 
 const all = async (db, sql, args = []) => (await db.prepare(sql).bind(...args).all()).results || [];
 const first = (db, sql, args = []) => db.prepare(sql).bind(...args).first();
@@ -84,16 +84,18 @@ export async function onRequestGet(context) {
         ORDER BY ${LETTER_SORT_SQL} DESC,l.id LIMIT ? OFFSET ?`, [...where.args, limit+1, offset]);
       const page = rows.slice(0, limit);
       const letters = await Promise.all(page.map(async row => {
-        let stance = null, headline = null;
+        let stance = null, headline = null, extras = null;
         try {
           const parsed = JSON.parse(row.content_json || "{}");
           stance = parsed.stance || null;
           headline = parsed.headline || null;
+          extras = readerExtras(parsed);
         } catch {
           stance = null;
           headline = null;
+          extras = null;
         }
-        return readerLetter(row, await all(db, "SELECT * FROM fl_ideas WHERE letter_id=? AND revision_id=? ORDER BY ordinal", [row.id, row.revision_id]), stance, headline);
+        return readerLetter(row, await all(db, "SELECT * FROM fl_ideas WHERE letter_id=? AND revision_id=? ORDER BY ordinal", [row.id, row.revision_id]), stance, headline, extras);
       }));
       return privateJson({ letters, next_offset: rows.length > limit ? offset+limit : null });
     }
@@ -157,8 +159,19 @@ export async function onRequestGet(context) {
       }
       const letter = await first(db, "SELECT id,fund_id,reporting_period,letter_date,source_ref,source_url,alternate_sources_json,published_revision FROM fl_letters WHERE id=?", [letterId]);
       if (!letter) return privateJson({ error: "Letter not found." }, 404);
-      const evidence = await all(db, "SELECT idea_id,claims_json FROM fl_evidence WHERE revision_id=?", [params.get("revision") || letter.published_revision]);
-      return privateJson({ source: letter, evidence });
+      const revisionId = params.get("revision") || letter.published_revision;
+      const evidence = await all(db, "SELECT idea_id,claims_json FROM fl_evidence WHERE revision_id=?", [revisionId]);
+      // Owners also get the quoted source text behind each transcribed table, in stored order,
+      // so a table can be opened in the original.
+      let tables = [];
+      try {
+        const stored = await first(db, "SELECT content_json FROM fl_revisions WHERE id=? AND letter_id=?", [revisionId, letterId]);
+        const parsed = JSON.parse(stored?.content_json || "{}").tables;
+        if (Array.isArray(parsed)) tables = parsed.map(table => ({ section_id: String(table?.section_id || ""), quote: String(table?.quote || "") }));
+      } catch {
+        tables = [];
+      }
+      return privateJson({ source: letter, evidence, tables });
     }
     return privateJson({ error: "Unknown archive action." }, 400);
   } catch (error) {

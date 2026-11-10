@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -33,6 +34,8 @@ from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 SUMMARIZER = ROOT / "_system/scripts/summarize_fund_letter_reader.py"
 SYNC = ROOT / "_system/scripts/sync_fund_letters_release.py"
+LMS_MODEL = os.environ.get("FUND_LETTERS_LMS_MODEL", "qwen/qwen3.5-9b")
+LMS_IDENTIFIER = os.environ.get("FUND_LETTERS_LMS_IDENTIFIER", "qwen-gpu")
 ACCOUNT_ID_RE = re.compile(r"\b([0-9a-f]{32})\b")
 OAUTH_TOKEN_RE = re.compile(r'(?m)^oauth_token\s*=\s*"([^"]+)"\s*$')
 
@@ -81,6 +84,61 @@ def run_step(label: str, argv: list[str], env: dict) -> int:
         print(json.dumps({"step_failed": label, "code": proc.returncode,
                           "tail": (proc.stderr or proc.stdout or "")[-400:]}), flush=True)
     return proc.returncode
+
+
+def find_lms() -> Path | None:
+    for candidate in (shutil.which("lms"), Path.home() / ".lmstudio/bin/lms"):
+        if candidate and Path(candidate).is_file():
+            return Path(candidate)
+    return None
+
+
+def model_answering() -> bool:
+    import llm_local
+
+    # LM Studio gives its internal server a new port on every load, so an
+    # address remembered from an earlier cycle proves nothing.
+    llm_local._RESOLVED.clear()
+    try:
+        return bool(llm_local.models())
+    except llm_local.LocalLLMUnavailable:
+        return False
+
+
+def ensure_model() -> bool:
+    """Load the local model when nothing is answering.
+
+    The lane used to rely on the podcast lane having loaded it. After a restart,
+    or once the model had been unloaded to free memory, every cycle failed with
+    "no local LLM server" until someone noticed. The load command is the media
+    lane's, so the two lanes share one copy of the model. LM Studio's own server
+    on port 1234 is never started here: older callers prefer it when it answers
+    and then fail on its JSON mode.
+    """
+    if model_answering():
+        return True
+    lms = find_lms()
+    if lms is None:
+        print(json.dumps({"model": "unavailable", "reason": "lms CLI not found; open LM Studio and load the model"}), flush=True)
+        return False
+    try:
+        listed = subprocess.run([str(lms), "ps"], text=True, capture_output=True, timeout=60).stdout or ""
+        if LMS_IDENTIFIER in listed:
+            # Another lane is part-way through loading it. A second load would
+            # put a second copy of the model in memory.
+            time.sleep(45)
+            return model_answering()
+        print(json.dumps({"step": "load-model", "model": LMS_MODEL, "at": now()}), flush=True)
+        subprocess.run([str(lms), "load", LMS_MODEL, "--identifier", LMS_IDENTIFIER,
+                        "-c", str(summarizer.CONTEXT_TOKENS), "--parallel", "1", "-y", "--gpu", "max"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600)
+    except (OSError, subprocess.SubprocessError) as exc:
+        print(json.dumps({"model": "unavailable", "reason": f"lms failed: {exc}"[:200]}), flush=True)
+        return False
+    ready = model_answering()
+    if not ready:
+        print(json.dumps({"model": "unavailable", "reason": "the model was loaded but its server is not answering"}), flush=True)
+    return ready
 
 
 def output_dir() -> Path:
@@ -176,6 +234,28 @@ def publish_verified(db, state: dict) -> dict:
     return counts
 
 
+def prune_old_releases(keep: Path) -> int:
+    """Drop superseded release snapshots.
+
+    Each publish copies every letter extract into a new directory. The live
+    archive is archive.sqlite, and sync resumes from the release it was given,
+    so older directories are only spare copies. One of them is about 580 MB;
+    leaving them all on disk is what filled the machine.
+    """
+    root = keep.parent
+    removed = 0
+    if not root.is_dir():
+        return 0
+    for path in root.iterdir():
+        if not path.is_dir() or path.resolve() == keep.resolve():
+            continue
+        shutil.rmtree(path)
+        removed += 1
+    if removed:
+        print(json.dumps({"pruned_releases": removed, "kept": keep.name}), flush=True)
+    return removed
+
+
 def export_and_sync(db, env: dict, sync_remote: bool) -> dict:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     release = ROOT / "_private/fund_letters/releases" / f"auto-{stamp}"
@@ -204,6 +284,7 @@ def export_and_sync(db, env: dict, sync_remote: bool) -> dict:
     out["synced"] = code == 0
     if code:
         out["sync"] = "sync step failed; rerun resumes from the release progress file"
+    out["pruned_releases"] = prune_old_releases(release)
     return out
 
 
@@ -231,9 +312,15 @@ def cycle(args, db, state: dict, env: dict) -> dict:
     if not args.no_repair:
         run_step("repair", [sys.executable, str(SUMMARIZER), "--repair-existing"], env)
     if not args.no_summarize:
-        code = run_step("summarize", [sys.executable, str(SUMMARIZER), "--limit", str(args.batch), "--retry-failed"], env)
-        if code:
-            print(json.dumps({"note": "summarize step did not complete (a manual run may hold the lock); publishing continues"}), flush=True)
+        if not ensure_model():
+            print(json.dumps({"note": "summarize step skipped: the local model is not available; publishing continues"}), flush=True)
+        else:
+            command = [sys.executable, str(SUMMARIZER), "--limit", str(args.batch), "--retry-failed"]
+            if args.refresh_older:
+                command += ["--refresh-older", str(args.refresh_older)]
+            code = run_step("summarize", command, env)
+            if code:
+                print(json.dumps({"note": "summarize step did not complete (a manual run may hold the lock); publishing continues"}), flush=True)
     published = {"published": 0, "quarantined": 0, "already": 0}
     if not args.no_publish:
         published = publish_verified(db, state)
@@ -249,6 +336,8 @@ def main() -> int:
     parser.add_argument("--batch", type=int, default=5, help="Letters summarized per cycle")
     parser.add_argument("--cycles", type=int, default=1, help="0 runs forever")
     parser.add_argument("--sleep", type=int, default=120, help="Seconds between cycles when running forever")
+    parser.add_argument("--refresh-older", type=int, default=0,
+                        help="Each cycle, also redo this many summaries written by an earlier method")
     parser.add_argument("--no-summarize", action="store_true")
     parser.add_argument("--no-repair", action="store_true")
     parser.add_argument("--no-publish", action="store_true")
