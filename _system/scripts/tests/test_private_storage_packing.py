@@ -50,7 +50,7 @@ def legacy_fixture():
     entry['git_blob']=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
     shard='legacy/'+pin+'/indexes/a.json';manifest='legacy/'+pin+'/manifest.json';prefix=store.sha(path.encode())[:2]
     catalog.records[shard]=store.store_bytes(objects,store.encoded_json({path:entry}))
-    catalog.records[manifest]=store.store_bytes(objects,store.encoded_json({'schema_version':'private-legacy-manifest/1','source_commit':pin,'complete':True,'shards':{prefix:shard}}))
+    catalog.records[manifest]=store.store_bytes(objects,store.encoded_json({'schema_version':'private-legacy-manifest/1','source_commit':pin,'complete':True,'path_count':1,'unique_git_blobs':1,'shards':{format(i,'02x'):shard for i in range(256)}}))
     s=store.PrivateStorage(config={'legacy_pin':pin,'legacy_archive_manifest':manifest},objects=objects,catalog=catalog)
     return s,catalog,path,raw,manifest,shard
 
@@ -58,11 +58,13 @@ def test_cold_legacy_lookup_restores_original_and_current_pointer_wins():
     s,c,p,raw,_,_=legacy_fixture();assert s.restore(p)==raw
     s.publish({p:b'new version'});assert s.restore(p)==b'new version'
 
-@pytest.mark.parametrize('alteration',['missing-manifest','missing-shard','wrong-pin','incomplete','wrong-blob'])
+@pytest.mark.parametrize('alteration',['missing-manifest','missing-shard','wrong-pin','incomplete','missing-prefix','wrong-blob'])
 def test_legacy_identity_and_completeness_cannot_default(alteration):
     s,c,p,raw,m,sh=legacy_fixture()
     if alteration=='missing-manifest':del c.records[m]
     elif alteration=='missing-shard':del c.records[sh]
+    elif alteration=='missing-prefix':
+        v=json.loads(store.restore_bytes(s.objects,c.records[m]));v['shards'].pop(next(iter(v['shards'])));c.records[m]=store.store_bytes(s.objects,store.encoded_json(v))
     elif alteration in ('wrong-pin','incomplete'):
         v=json.loads(store.restore_bytes(s.objects,c.records[m]));v['source_commit' if alteration=='wrong-pin' else 'complete']='b'*40 if alteration=='wrong-pin' else False;c.records[m]=store.store_bytes(s.objects,store.encoded_json(v))
     else:

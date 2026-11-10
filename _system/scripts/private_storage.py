@@ -520,7 +520,11 @@ class PrivateStorage:
             manifest = json.loads(restore_bytes(self.objects, manifest_entry))
             if (manifest.get("schema_version") != "private-legacy-manifest/1"
                     or manifest.get("source_commit") != self.config["legacy_pin"]
-                    or manifest.get("complete") is not True):
+                    or manifest.get("complete") is not True
+                    or set(manifest.get("shards", {})) != {format(i, "02x") for i in range(256)}
+                    or type(manifest.get("path_count")) is not int or manifest["path_count"] <= 0
+                    or type(manifest.get("unique_git_blobs")) is not int
+                    or not 0 < manifest["unique_git_blobs"] <= manifest["path_count"]):
                 raise StorageError("Legacy manifest source identity or completeness changed")
             self._legacy_indexes[identity] = manifest
         manifest = self._legacy_indexes[identity]
