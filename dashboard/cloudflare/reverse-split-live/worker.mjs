@@ -1,3 +1,4 @@
+import {completedSplitEvidence,queueReviewedHistoryRepair} from './split-history.mjs';
 import {POLICY,DAY,etDay,iso,dateOnlyAvailable,plain,parseFeed,classifyAnnouncement,scoreFundamentals,screen} from './core.mjs';
 import {shadowAPI} from './shadow-api.mjs';
 import {financialAPI} from './financials-api.mjs';
@@ -162,7 +163,7 @@ export async function replayAnnouncement(env,id){
   const text=[];
   for(const source of sources){sourceURL(source.url);if(!['complete_submission','official_primary_report_and_exhibits','original_release'].includes(source.representation))throw new Error('Announcement replay source is not an original primary document');const object=await env.EVIDENCE.get('documents/'+source.sha256);if(!object)throw new Error('Archived primary announcement is missing');const bytes=new Uint8Array(await object.arrayBuffer());if(bytes.length>96*1024*1024||await sha(bytes)!==source.sha256)throw new Error('Archived announcement integrity check failed');text.push(new TextDecoder().decode(bytes.slice(0,5))==='%PDF-'?await env.extractAnnouncementText(bytes,{pdfProfile:env.COLLECTOR_MODE==='external_collector'?'external_primary_report':'standard'}):filingText(new TextDecoder().decode(bytes)));}
   const parsed=classifyAnnouncement(text.join('\n'),{published_at:original.published_at,form:sources[0].form});
-  if(original.cik&&env.onFinancialDisclosure){const source=sources[0];await env.onFinancialDisclosure({cik:original.cik,ticker:original.ticker,form:source.form||'6-K',url:source.url,accession:source.accession,filed:etDay(original.published_at),published_at:original.published_at,first_seen_at:original.first_seen_at,source_sha256:source.sha256});}
+  if(original.cik&&env.onFinancialDisclosure){const source=sources[0];await env.onFinancialDisclosure({cik:original.cik,ticker:original.ticker,form:source.form||'6-K',url:source.url,accession:source.accession,filed:source.filed||etDay(original.published_at),published_at:original.published_at,first_seen_at:original.first_seen_at,source_sha256:source.sha256});}
   if(!parsed||['status','ratio','effective_date'].every(k=>parsed[k]===original[k]))return {changed:false};
   const at=stamp(),raw=JSON.stringify({schema:'reverse_split_announcement_repair.v1',version:ANNOUNCEMENT_TERMS_VERSION,recorded_at:at,original_event:original,corrected_terms:parsed,not_original_clock_fill:true}),key='review/repairs/'+await sha(raw)+'.json';
   await env.EVIDENCE.put(key,new TextEncoder().encode(raw),{httpMetadata:{contentType:'application/json'}});
@@ -183,10 +184,10 @@ async function filingJob(env,p){
   const parsed=classifyAnnouncement(filingText(raw),{published_at:p.published_at||p.first_seen_at,form:p.form});
   const known=env.onFinancialDisclosure?await env.DB.prepare('SELECT id FROM rs_events WHERE cik=? LIMIT 1').bind(p.cik).first():null;
   const captured=[];for(const doc of [...downloaded.documents,...(downloaded.identity_documents||[])])captured.push(parsed||known?{...await archive(env,doc),url:doc.url,form:doc.form||p.form}:{hash:await sha(doc.bytes),url:doc.url,form:doc.form||p.form});const source=captured[0];
-  if(env.onFinancialDisclosure&&(known||parsed)&&/^(?:10-[KQ]|20-F|40-F|6-K|8-K)/.test(p.form||''))await env.onFinancialDisclosure({...p,filed:etDay(p.published_at||stamp()),source_sha256:source.hash});
+  if(env.onFinancialDisclosure&&(known||parsed)&&/^(?:10-[KQ]|20-F|40-F|6-K|8-K)/.test(p.form||''))await env.onFinancialDisclosure({...p,url:source.url,original_submission_url:p.url,representation:downloaded.representation,filed:p.filed||etDay(p.published_at||stamp()),source_sha256:source.hash});
   let event=null;
   if(parsed){const ticker=/<ix:nonNumeric[^>]*name=["']dei:TradingSymbol["'][^>]*>([^<]+)/i.exec(raw)?.[1]?.trim();
-    event=await recordEvent(env,{...parsed,id:'sec:'+p.accession,cik:p.cik,ticker:ticker||null,company:/COMPANY CONFORMED NAME:\s*([^\r\n]+)/i.exec(raw)?.[1]?.trim()||null,published_at:p.published_at,first_seen_at:row?.first_seen_at||p.first_seen_at,discovery_path:p.discovery_path||'sec_current_feed',publication_clock:p.publication_clock||'timestamp',sources:captured.map(d=>({url:d.url,sha256:d.hash,accession:p.accession,form:d.form,representation:downloaded.representation,index_url:downloaded.index_url})),clock_basis:p.publication_clock==='date_only_next_day'?'SEC daily index: conservative next-day availability; first public release time is unknown':'SEC feed publication; separately recorded first observation'});
+    event=await recordEvent(env,{...parsed,id:'sec:'+p.accession,cik:p.cik,ticker:ticker||null,company:/COMPANY CONFORMED NAME:\s*([^\r\n]+)/i.exec(raw)?.[1]?.trim()||null,published_at:p.published_at,first_seen_at:row?.first_seen_at||p.first_seen_at,discovery_path:p.discovery_path||'sec_current_feed',publication_clock:p.publication_clock||'timestamp',sources:captured.map(d=>({url:d.url,sha256:d.hash,accession:p.accession,form:d.form,filed:p.filed||etDay(p.published_at),representation:downloaded.representation,index_url:downloaded.index_url})),clock_basis:p.publication_clock==='date_only_next_day'?'SEC daily index: conservative next-day availability; first public release time is unknown':'SEC feed publication; separately recorded first observation'});
   }
   if(/^10-[KQ]|20-F|40-F/.test(p.form||'')){
     const active=(await env.DB.prepare('SELECT id FROM rs_events WHERE cik=? AND effective_date>=?').bind(p.cik,etDay(Date.now())).all()).results;
@@ -226,10 +227,9 @@ async function historyJob(env,p){
 async function historyFiling(env,p){
   const downloaded=await loadFilingDocuments(env,p,(url,options)=>limitedFetch(env,url,options)),captured=[];for(const doc of downloaded.documents)captured.push({...await archive(env,doc),url:doc.url});const source=captured[0],text=plain(filingText(downloaded.raw));
   // Only an explicit completed action, with a single bound date, establishes a prior split.
-  const clauses=text.split('\n').filter(x=>/reverse.{0,20}split|share consolidation/i.test(x));
-  const dates=[];
-  for(const line of clauses){const m=/(?:became effective|was effective|effected|completed|implemented)[^\n]{0,120}?((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+20\d{2})/i.exec(line);if(m){const day=iso(m[1])?.slice(0,10);if(day&&day<etDay(Date.now())&&p.published_at&&day<=etDay(p.published_at))dates.push(day);}}
-  if(new Set(dates).size===1){const d=dates[0],record={cik:p.cik,effective_date:d,known_at:p.published_at,verified:true,source_url:source.url,source_sha256:source.hash,sources:captured.map(s=>({url:s.url,sha256:s.hash,representation:downloaded.representation})),verification:'explicit_completed_primary_clause'};await env.DB.prepare('INSERT OR IGNORE INTO rs_history(id,cik,effective_date,known_at,verified,payload) VALUES(?,?,?,?,1,?)').bind(p.cik+':'+d,p.cik,d,p.published_at,JSON.stringify(record)).run();
+  if(p.expected_sha256&&source.hash!==p.expected_sha256)throw new Error('Reviewed historical source hash mismatch');
+  const completion=completedSplitEvidence(text,{published_at:p.published_at}),dates=completion.map(r=>r.date);
+  if(new Set(dates).size===1){const d=dates[0],record={cik:p.cik,effective_date:d,known_at:p.published_at,verified:true,source_url:source.url,source_sha256:source.hash,sources:captured.map(s=>({url:s.url,sha256:s.hash,representation:downloaded.representation})),verification:'explicit_completed_primary_clause',observed_at:stamp(),completion_evidence:completion.filter(r=>r.date===d)};await env.DB.prepare('INSERT OR IGNORE INTO rs_history(id,cik,effective_date,known_at,verified,payload) VALUES(?,?,?,?,1,?)').bind(p.cik+':'+d,p.cik,d,p.published_at,JSON.stringify(record)).run();
     for(const r of (await env.DB.prepare('SELECT id FROM rs_events WHERE cik=? AND effective_date>=?').bind(p.cik,etDay(Date.now())).all()).results)await enqueue(env,'rescore',{id:r.id},7,'history-rescore:'+p.accession+':'+r.id);
   }
 }
@@ -274,6 +274,7 @@ export async function scheduled(event,env){
   if(env.COLLECTOR_MODE==='external_collector')await recoverReaderFailures(env,{hash:sha});
   if(env.COLLECTOR_MODE==='external_collector'){
     await queueAnnouncementRepairs(env);
+    await queueReviewedHistoryRepair(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'extended_primary_pdf.2026-11-10.v1',eligible:(error,row)=>['history-filing:0001015820-24-000069','history-filing:0001193125-22-108042'].includes(row.id)&&/Announcement PDF (?:exceeds byte limit|requires verified readable text)/.test(error||'')});
     await recoverHistorySearch(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'oversized_primary.2026-11-09.v1',eligible:error=>/Source exceeds document size limit/.test(error||'')});
