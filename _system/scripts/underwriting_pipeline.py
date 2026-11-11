@@ -185,7 +185,10 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
               +render(payload))
     from underwriting_codex import validate_input
     try:
-        input_admission = validate_input(prompt)
+        from underwriting_source_profiles import native_context_tokens
+        from underwriting_codex import validate_context_window
+        context_window=native_context_tokens(root,ticker,payload.get('packet') or {})
+        input_admission = {**validate_input(prompt),**validate_context_window(context_window,ticker)}
     except ContractError as exc:
         # No attempt, reservation or provider receipt exists for a local size
         # rejection. Keep its evidence identity and retry reason explicit.
@@ -237,7 +240,8 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
             from underwriting_codex import execute_stage
             execute_stage(model=model, effort=effort, stage=stage, prompt_path=prompt_path,
                           output_path=output, receipt_path=receipt_path,
-                          timeout=int(env.get('UNDERWRITING_TIMEOUT_MS', 1200000))/1000)
+                          timeout=int(env.get('UNDERWRITING_TIMEOUT_MS', 1200000))/1000,
+                          context_window=context_window, subject=ticker)
         else:
             raise StageBlocked('Only signed-in local Codex execution is allowed for company judgments')
     except (ContractError, subprocess.SubprocessError) as exc:

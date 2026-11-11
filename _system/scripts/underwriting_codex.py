@@ -54,12 +54,30 @@ def preflight(run=subprocess.run):
     return {'provider': 'codex-local', 'model': 'gpt-6.1-sol', 'reasoning_effort': 'high', 'login': 'ChatGPT'}
 
 
-def command(binary, directory, output):
+def validate_context_window(context_window,subject=None):
+    if context_window is None:return {}
+    require(subject=='CPRT' and type(context_window) is int and context_window==872000,
+            'Only the explicit CPRT native context exception is supported')
+    cache=Path(os.environ.get('CODEX_HOME') or Path.home()/'.codex')/'models_cache.json'
+    require(cache.is_file(),'Current native model context catalog is required before admission')
+    raw=cache.read_bytes();catalog=json.loads(raw);models=catalog.get('models') or []
+    model=next((item for item in models if item.get('slug')=='gpt-6.1-sol'),None) or {}
+    maximum=model.get('max_context_window');default=model.get('context_window')
+    require(type(maximum) is int and type(default) is int and default<=context_window<=maximum,
+            'Requested context is not advertised by the current native model catalog')
+    return {'model_context_window':context_window,'catalog_default_context_window':default,
+            'catalog_max_context_window':maximum,'catalog_hash':digest(catalog),'subject':'CPRT'}
+
+
+def command(binary, directory, output, *, context_window=None, subject=None):
     args = [binary, 'exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check',
             '--sandbox', 'read-only', '--model', 'gpt-6.1-sol', '--json', '--color', 'never',
             '--config', 'model_reasoning_effort="high"', '--config', 'forced_login_method="chatgpt"',
             '--config', 'approval_policy="never"', '--config', 'web_search="disabled"',
             '--config', 'mcp_servers={}', '--cd', str(directory), '--output-last-message', str(output)]
+    if context_window is not None:
+        validate_context_window(context_window,subject)
+        args += ['--config','model_context_window='+str(context_window)]
     for feature in DISABLED:
         args += ['--disable', feature]
     return args+['-']
@@ -128,12 +146,12 @@ def completed_output(rows, file_text=None):
     return value, provenance
 
 
-def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_path, timeout=1200, run=subprocess.run):
+def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_path, timeout=1200, run=subprocess.run, context_window=None, subject=None):
     from underwriting_pipeline import write
     require(model == 'gpt-6.1-sol' and effort == 'high' and stage in ('author', 'challenger'),
             'Local underwriting requires GPT-6.1 Sol High and a judgment role')
     prompt = prompt_path.read_text(encoding='utf-8')
-    input_admission = validate_input(prompt)
+    input_admission = {**validate_input(prompt),**validate_context_window(context_window,subject)}
     # No controller secrets, Cursor key, GitHub credential or API-key override
     # enter the model process. It reuses the existing signed-in Codex account.
     permitted = {'PATH', 'SystemRoot', 'SYSTEMROOT', 'WINDIR', 'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH',
@@ -149,7 +167,7 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
         require(directory.resolve().parent == Path(tempfile.gettempdir()).resolve()
                 and directory.name.startswith('ssi-codex-underwriting-'), 'Unsafe isolated session directory')
         answer = directory/'answer.json'
-        args = command(executable(), directory, answer)
+        args = command(executable(), directory, answer, context_window=context_window, subject=subject)
         timed_out = False
         try:
             result = run(args, input=prompt, capture_output=True,
