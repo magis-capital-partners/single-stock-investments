@@ -20,6 +20,7 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PRIVATE_STORAGE_TEST_TRANSPORT: ${{ github.event.client_payload.transport || 'rest' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,7 +38,7 @@ jobs:
       - name: Install the existing bounded underwriting verification dependencies
         run: python -m pip install pypdf PyYAML exchange-calendars==4.13.2
       - name: Verify existing approval and private storage round trip
-        run: python _system/scripts/private_storage_bootstrap.py check --ticker V --limit 1
+        run: python _system/scripts/private_storage_bootstrap.py check --ticker V --limit 1 --transport "$PRIVATE_STORAGE_TEST_TRANSPORT"
 
   migrate:
     if: github.event.action == 'private-storage-migrate'

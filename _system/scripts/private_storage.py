@@ -138,9 +138,14 @@ class R2Objects:
     def __init__(self, config, *, http=None):
         self.config = config
         self._verified_cache = OrderedDict()
-        self.http = http or HTTP(cloudflare_token, "api.cloudflare.com",
-                                 requests_per_second=config.get("requests_per_second", 2))
-        self.base = "/client/v4/accounts/" + config["account_id"] + "/r2/buckets/" + config["bucket"] + "/objects/"
+        if http is None and config.get("object_transport") == "s3_existing_api_token" and os.environ.get("CLOUDFLARE_API_TOKEN"):
+            from private_storage_s3 import S3HTTP
+            self.http = S3HTTP(config)
+            self.base = "/" + config["bucket"] + "/"
+        else:
+            self.http = http or HTTP(cloudflare_token, "api.cloudflare.com",
+                                     requests_per_second=config.get("requests_per_second", 2))
+            self.base = "/client/v4/accounts/" + config["account_id"] + "/r2/buckets/" + config["bucket"] + "/objects/"
 
     def key(self, identity):
         if not HEX.fullmatch(identity):
