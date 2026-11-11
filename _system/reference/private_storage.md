@@ -5,9 +5,11 @@ Bulk research bytes belong in the existing private R2 bucket. The private
 pointers. The existing research-vault history remains unchanged and readable.
 
 `_system/config/private_storage.json` pins the account, bucket, catalog repository
-identity, and lossless transport limits. The activation flag initially remains
-false while the new transport is verified. Explicit bootstrap commands can
-register an approved archive and test the real CI credentials before activation.
+identity, and lossless transport limits. Storage is enabled after verified private round trips and real CI access.
+The configured complete legacy manifest resolves all 141,700 original paths
+through private cold indexes; current records and the append-only ledger retain
+precedence. Explicit bootstrap commands remain available for a genuinely needed
+approved-handoff recovery.
 
 ## Integrity
 
