@@ -108,7 +108,12 @@ def migrate(repository,output,*,storage=None,batch_files=128,max_batches=None,re
         pack_root=(pack_location if pack_location.is_absolute() else repository/pack_location).resolve()
         if not pack_root.is_relative_to(repository):raise StorageError('Staging object root escaped the owned repository')
         before_packs={p.name for p in pack_root.iterdir()}
-        run_git(repository,'-c','fetch.unpackLimit=1','fetch','--no-tags','origin',*selected)
+        # Large historical compressed objects can exceed one bounded download.
+        # Keep the logical batch intact while fetching exact identities in
+        # smaller source requests under the unchanged command timeout.
+        for fetch_start in range(0,len(selected),16):
+            run_git(repository,'-c','fetch.unpackLimit=1','fetch','--no-tags','origin',
+                    *selected[fetch_start:fetch_start+16])
         new_packs=[p for p in pack_root.iterdir() if p.name not in before_packs]
         batch_entries={};pending={};total=0
         def flush():
