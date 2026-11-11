@@ -371,8 +371,11 @@ jobs:
       # inputs the scan and rebuild read: the letter index (letter_drive_links),
       # the Drive import manifest (validation), the HK index (third-party
       # inventory) and underwriting packets (valuation receipts).
+      # Private-storage checkouts restore the catalog view and then fetch each
+      # publication object from R2: buyback-radar and technicals spent 8-11
+      # minutes here, and run 43035914495 timed out at 5.
       - name: Checkout research vault
-        timeout-minutes: 5
+        timeout-minutes: 20
         uses: ./.github/actions/checkout-vault
         with:
           publication-only: "true"

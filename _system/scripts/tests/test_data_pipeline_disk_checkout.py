@@ -342,6 +342,14 @@ def test_activist_checks_out_its_trees_and_a_narrow_vault():
             assert line not in {"/superinvestor-letters/", "/investment-wisdom/", "/podcasts/", "/videos/"}
 
 
+def test_activist_vault_checkout_fits_a_private_storage_restore():
+    """Run 43035914495 timed out after 5 minutes restoring publication
+    objects from R2, so no scan ran and the feed went stale."""
+    vault = _vault_steps(_job("activist"))
+    assert len(vault) == 1
+    assert vault[0]["timeout-minutes"] >= 20
+
+
 def test_activist_paths_hold_what_the_scan_reads_and_writes_and_no_filings():
     paths = paths_for_profile("activist")
     holdings = json.loads((ROOT / "_system/portfolio/registry.json").read_text(encoding="utf-8"))["holdings"]
