@@ -307,9 +307,20 @@ def test_snapshot_validation_is_read_only_and_opt_in_for_hub():
 
 def test_full_manifest_validation_does_not_use_workspace_scope():
     objects=next(s for s in _action()["runs"]["steps"] if s.get("name")=="Materialize publication objects")
-    assert objects["env"]["HYDRATE_PUBLICATION"]=="${{ inputs.hydrate }}"
-    assert 'if [ "$HYDRATE_PUBLICATION" = "true" ]; then' in objects["run"]
-    assert 'if os.environ["HYDRATE_PUBLICATION"] == "true" else None' in objects["run"]
+    assert objects["env"]["SNAPSHOT_VALIDATION_ONLY"]=="${{ inputs.snapshot-validation-only }}"
+    assert 'if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then' in objects["run"]
+    assert 'if os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" else None' in objects["run"]
     workflow=yaml.safe_load((WORKFLOWS/"vault-publication-checkout.yml").read_text(encoding="utf-8"))
     checkout=next(s for s in workflow["jobs"]["publication-objects"]["steps"] if s.get("uses")=="./.github/actions/checkout-vault")
     assert checkout["with"]["hydrate"]=="false"
+
+
+def test_normal_publication_keeps_inputs_requested_after_checkout(tmp_path):
+    selected=tmp_path/"dashboard/data/core.json";selected.parent.mkdir(parents=True);selected.write_text("stub")
+    manifest={"assets":{"data/core.json":{"private_sha256":"a"*64},"data/holdings/directory_index.json":{"private_sha256":"b"*64}}}
+    assert object_patterns(manifest)==["/dashboard-private/objects/"+"a"*64,"/dashboard-private/objects/"+"b"*64]
+    assert object_patterns(manifest,tmp_path)==["/dashboard-private/objects/"+"a"*64]
+    action=_action();assert action["inputs"]["snapshot-validation-only"]["default"]=="false"
+    step=next(s for s in action["runs"]["steps"] if s.get("name")=="Materialize publication objects")
+    assert step["env"]["SNAPSHOT_VALIDATION_ONLY"]=="${{ inputs.snapshot-validation-only }}"
+    assert 'if os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" else None' in step["run"]
