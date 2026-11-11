@@ -27,7 +27,7 @@ def test_default_view_still_refuses_differing_unpublished_build_record(tmp_path,
 def test_author_view_preserves_unneeded_shared_batch_and_advances_only_verified_ledger(tmp_path):
  v=vault(tmp_path);original=b'{"selected":["old unpublished build"]}';p=put(v,BATCH,original);ledger=put(v,LEDGER,b'{ "id":1 }\r\n')
  store=Storage({BATCH:b'{"selected":["remote build"]}',LEDGER:b'{"id":1}\n{"id":2}\n'})
- result=io.initialize(v,storage=store,materialization_role='local_author')
+ result=io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
  assert p.read_bytes()==original and BATCH not in store.restored
  assert ledger.read_bytes()==b'{ "id":1 }\r\n{"id":2}\n'
  marker=json.loads((v/io.MARKER).read_bytes());assert marker['materialization_role']=='local_author' and not marker['read_only']
@@ -39,12 +39,12 @@ def test_author_view_preserves_unneeded_shared_batch_and_advances_only_verified_
 def test_author_view_never_skips_required_ledger_or_paid_state_conflicts(tmp_path,monkeypatch,path,old,new):
  v=vault(tmp_path);p=put(v,path,old);store=Storage({path:new})
  monkeypatch.setattr(io,'run_git',lambda *a,**k:subprocess.CompletedProcess(a,1,b'',b''))
- with pytest.raises(StorageError):io.initialize(v,storage=store,materialization_role='local_author')
+ with pytest.raises(StorageError):io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
  assert p.read_bytes()==old
 
 def test_local_author_role_cannot_be_used_by_a_ci_checkout(tmp_path,monkeypatch):
  v=vault(tmp_path);monkeypatch.setenv('GITHUB_ACTIONS','true')
- with pytest.raises(StorageError,match='local author'):io.initialize(v,storage=Storage({}),materialization_role='local_author')
+ with pytest.raises(StorageError,match='local author'):io.initialize(v,storage=Storage({}),materialization_role='local_author',selected_ticker='CPRT')
  assert not (v/io.MARKER).exists()
 
 def test_excluded_shared_build_record_cannot_be_returned_as_current(tmp_path):
@@ -62,13 +62,13 @@ def test_unknown_materialization_roles_fail_closed(tmp_path,role):
 @pytest.mark.parametrize('path',[BATCH,'valuation-underwriting/runtime/states/CPRT.json','valuation-underwriting/runtime/stage-cache/old/receipt.json'])
 def test_absent_or_existing_build_inputs_are_inaccessible_to_author_view(tmp_path,path):
  v=vault(tmp_path);store=Storage({path:b'{"unused":true}'})
- io.initialize(v,storage=store,materialization_role='local_author')
+ io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
  assert not (v/path).exists() and store.restored==[]
  with pytest.raises(StorageError,match='shared build control'):io.materialize(v,path,storage=store)
 
 def test_author_view_materializes_and_reads_the_shared_ledger(tmp_path):
  v=vault(tmp_path);raw=b'{"reservation_id":"existing shared charge"}\n';store=Storage({LEDGER:raw})
- io.initialize(v,storage=store,materialization_role='local_author')
+ io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
  assert io.materialize(v,LEDGER,storage=store).read_bytes()==raw
  with pytest.raises(StorageError,match='shared build control'):io.publish_paths(v,{LEDGER:v/LEDGER},storage=store)
 
@@ -79,7 +79,7 @@ def test_default_view_still_materializes_shared_build_inputs(tmp_path):
 
 def test_preserved_shared_control_cannot_be_a_directory(tmp_path):
  v=vault(tmp_path);(v/BATCH).mkdir(parents=True)
- with pytest.raises(StorageError,match='Invalid preserved'):io.initialize(v,storage=Storage({BATCH:b'{}'}),materialization_role='local_author')
+ with pytest.raises(StorageError,match='Invalid preserved'):io.initialize(v,storage=Storage({BATCH:b'{}'}),materialization_role='local_author',selected_ticker='CPRT')
 
 def test_clone_vault_selects_author_view_without_reset_or_shared_checkout(tmp_path,monkeypatch):
  import underwriting_local as local,private_storage
@@ -89,5 +89,5 @@ def test_clone_vault_selects_author_view_without_reset_or_shared_checkout(tmp_pa
   return ('https://github.com/'+local.VAULT+'.git\n').encode() if args==('remote','get-url','origin') else b''
  monkeypatch.setattr(local,'git',git);monkeypatch.setattr(private_storage,'enabled',lambda:True)
  monkeypatch.setattr(io,'initialize',lambda v,**kw:roles.append(kw))
- assert local.clone_vault(tmp_path)==v and roles==[{'materialization_role':'local_author'}]
+ assert local.clone_vault(tmp_path,tickers=['CPRT'])==v and roles==[{'materialization_role':'local_author','selected_ticker':'CPRT'}]
  assert calls==[('remote','get-url','origin'),('fetch','-q','origin','main')]

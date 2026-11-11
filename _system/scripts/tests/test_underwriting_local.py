@@ -76,14 +76,14 @@ def test_local_run_publishes_private_proof_before_single_company_dispatch(tmp_pa
     result = {'selected': ['V'], 'approved': ['V'], 'completed': [], 'blocked': []}
     batch_options, publication = {}, []
     monkeypatch.setattr(underwriting_codex, 'preflight', lambda: {})
-    monkeypatch.setattr(local, 'clone_vault', lambda home: home / 'vault')
+    monkeypatch.setattr(local, 'clone_vault', lambda home, **kw: home / 'vault')
     monkeypatch.setattr(local, 'data_root', lambda *args: tmp_path)
     monkeypatch.setattr(local, 'stage_model', lambda *args: {'provider': 'codex-local'})
     def batch(*args, **kwargs):
         batch_options.update(kwargs)
         return result
     monkeypatch.setattr(local, 'run_batch', batch)
-    monkeypatch.setattr(local, 'publish_runtime', lambda *args: publication.append('private-proof-pushed'))
+    monkeypatch.setattr(local, 'publish_runtime', lambda *args, **kw: publication.append('private-proof-pushed'))
     def dispatch(args, **kwargs):
         publication.append(json.loads(kwargs['input']))
         return subprocess.CompletedProcess(args, 0)
