@@ -112,6 +112,8 @@ def merge_related_packet(parent, target):
     ticker = target['ticker']
     result.setdefault('related_issuers', {})[ticker] = {k:target.get(k) for k in ('company','cik','latest_report','evidence_hash','source_hash')}
     result['related_issuers'][ticker]['parent_transaction_binding'] = binding
+    if target.get('facts_provenance'):
+        result['related_issuers'][ticker]['facts_provenance'] = copy.deepcopy(target['facts_provenance'])
     known = {o['id'] for o in result['observations']}
     for point in target['observations']:
         if point.get('unit') == 'shares':
@@ -133,38 +135,43 @@ def merge_related_packet(parent, target):
     if target.get('primary_reference_usage'):
         result['primary_reference_usage'] = copy.deepcopy(target['primary_reference_usage'])
     result['evidence_hash'] = digest({'parent_evidence_hash':parent['evidence_hash'], 'related_issuers':result['related_issuers']})
+    from underwriting_evidence import evidence_readiness
+    result['readiness'] = evidence_readiness(result,require_documents=True)
     result['packet_hash'] = digest({k:v for k,v in result.items() if k != 'packet_hash'})
     return result
 
 
 @bounded_sources
-def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None):
+def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None, *, fact_source="companyfacts"):
     from sec_client import SecClient
     from underwriting_evidence import EXTRA_TAGS, _observation, document_record, filing_bytes
     client = client or SecClient(max_attempts=2)
     require(str(cik).isdigit(), 'SEC issuer identity must be numeric')
     base = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
-    raw = client.get_json(base,timeout=30)
+    require(fact_source in ('companyfacts','filing_inline'), 'Unknown related primary fact source')
+    raw = client.get_json(base,timeout=30) if fact_source == 'companyfacts' else {}
     submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json',timeout=30)
-    if keywords:
+    if keywords or fact_source == 'filing_inline':
         submitted = str(submission.get('cik') or '')
         require(submitted.isdigit() and int(submitted)==int(cik),
                 'Requested related submissions issuer CIK mismatch')
         require(name_tokens(submission.get('name') or ''),
                 'Requested related submissions issuer name is missing')
-        reported = str(raw.get('cik') or '')
-        require(reported.isdigit() and int(reported)==int(cik),
-                'Requested related companyfacts issuer CIK mismatch or missing')
-        require(isinstance(raw.get('entityName'),str) and name_tokens(raw['entityName'])
-                and name_tokens(raw['entityName'])==name_tokens(submission['name']),
-                'Requested related primary issuer names disagree or are missing')
+        if fact_source == 'companyfacts':
+            reported = str(raw.get('cik') or '')
+            require(reported.isdigit() and int(reported)==int(cik),
+                    'Requested related companyfacts issuer CIK mismatch or missing')
+            require(isinstance(raw.get('entityName'),str) and name_tokens(raw['entityName'])
+                    and name_tokens(raw['entityName'])==name_tokens(submission['name']),
+                    'Requested related primary issuer names disagree or are missing')
     recent = submission['filings']['recent']
     selected = {}
     for i,form in enumerate(recent['form']):
         if form in ('10-K','10-Q','20-F','40-F','6-K') and form not in selected and recent['filingDate'][i] <= as_of:
             selected[form] = i
-    documents, formal_sources = [], []
+    documents, formal_sources, filed_observations, filing_proofs = [], [], [], []
     foreign = next((form for form in selected if form in ('10-K','20-F','40-F')), None) in ('20-F','40-F')
+    require(not foreign or fact_source == 'companyfacts','Filing-native related facts require domestic SEC forms')
     for form,i in list(selected.items())[:3]:
         filename = recent['primaryDocument'][i]
         require(re.fullmatch(r'[A-Za-z0-9_.-]+',filename), 'Unsafe SEC document path')
@@ -174,13 +181,18 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
             filing_raw = (source_budget().fetch(url,0,
                 lambda value:client.get_bytes(value,timeout=40))
                 if foreign else filing_bytes(root,ticker,accession,client,url))
-            doc = document_record(url,filing_raw,keywords,form=form)
+            doc = document_record(url,filing_raw,keywords,form=form,prefer_complete=fact_source == 'filing_inline')
             period = recent['reportDate'][i]
             if form == '6-K':
                 from valuation_earnings import foreign_reporting_period
                 period = foreign_reporting_period(filing_raw,as_of)
                 doc['reported_event_date'] = recent['reportDate'][i]
             doc.update(form=form,filed=recent['filingDate'][i],period=period)
+            if fact_source == 'filing_inline':
+                from underwriting_filing_facts import filing_monetary_observations
+                points, proof = filing_monetary_observations(filing_raw,url,cik=cik,name=submission['name'],
+                    form=form,period=doc['period'],filed=doc['filed'],as_of=as_of,currency=currency)
+                filed_observations.extend(points);filing_proofs.append(proof)
             documents.append(doc)
             formal_sources.append({'source_url':url,'raw':filing_raw,'filed':doc['filed'],'form':form})
         except (OSError,ValueError):
@@ -227,7 +239,7 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
                 reference_errors.append({'source':'requested_primary_reference',
                     'source_url':document['source_url'],
                     'error':'Complete requested related document exceeds bounded context capacity or lacks complete source coverage'})
-    observations = {}
+    observations = {point['id']:point for point in filed_observations}
     for tag,concept in raw.get('facts',{}).get('us-gaap',{}).items():
         if tag not in EXTRA_TAGS:
             continue
@@ -244,13 +256,16 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
     target = {'ticker':ticker,'cik':str(cik),'company':submission.get('name') or raw.get('entityName'), 'currency':currency, 'status':'ready',
               'as_of':as_of,'latest_report':{k:latest[k] for k in ('period','filed','source_url')},
               'observations':list(observations.values()),'documents':documents}
+    if fact_source == 'filing_inline':
+        target['facts_provenance'] = {'method':'filing_inline','companyfacts_used':False,'filings':filing_proofs}
     if reference_errors:
         target.update(status='evidence_gap',collection_errors=reference_errors)
     if any(source_budget().snapshot()['counts']):
         target['primary_reference_usage'] = source_budget().snapshot()
     target['source_hash'] = digest({'observations':target['observations'],'latest_report':target['latest_report'],
                                     'documents':[(d['source_url'],d['content_hash']) for d in documents],
-                                    **({'collection_errors':reference_errors} if reference_errors else {})})
+                                    **({'collection_errors':reference_errors} if reference_errors else {}),
+                                    **({'facts_provenance':target['facts_provenance']} if 'facts_provenance' in target else {})})
     target['evidence_hash'] = digest({'source_hash':target['source_hash'],'contexts':[d['contexts'] for d in documents]})
     target['packet_hash'] = digest(target)
     return target
@@ -304,12 +319,27 @@ def discover_historical_targets(packet, requested, as_of, client, parent_cik=Non
     return identities
 
 
+def related_fact_source(root, parent_ticker, target_cik):
+    """Only an explicit trusted source policy selects filing-owned facts."""
+    from underwriting_pipeline import read
+    policy=read(root/'_system/config/underwriting_policy.json')
+    modes=policy.get('related_fact_sources') or {}
+    require(isinstance(modes,dict),'Related fact-source policy must be a mapping')
+    parent=modes.get(parent_ticker) or {}
+    require(isinstance(parent,dict),'Parent fact-source policy must be a mapping')
+    mode=parent.get(str(int(target_cik)),'companyfacts')
+    require(mode in ('companyfacts','filing_inline'),'Unknown configured related primary fact source')
+    return mode
+
+
 @bounded_sources
 def augment_requested_targets(root, packet, gaps, as_of, client=None):
     from sec_client import SecClient
     from underwriting_evidence import requested_keywords, source_fingerprint
     from underwriting_pipeline import read, write
     client = client or SecClient(max_attempts=2)
+    from underwriting_source_profiles import configure_source_budget
+    configure_source_budget(root,packet['ticker'])
     requested = ' '.join(str(g.get('detail') or '') for g in gaps).lower()
     if not re.search(r'acquisit|acquir|merger',requested):
         return packet
@@ -333,7 +363,10 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
         unique.setdefault(str(int(identity['cik_str'])), identity)
     candidates = list(unique.values())
     for identity in candidates[:2]:
-        target = collect_target(root,identity['ticker'],identity['cik_str'],as_of,packet['currency'],requested_keywords(gaps),client)
+        mode = related_fact_source(root,packet['ticker'],identity['cik_str'])
+        options = {'fact_source':mode} if mode != 'companyfacts' else {}
+        with source_budget().target_scope(packet['ticker'],str(identity['cik_str'])):
+            target = collect_target(root,identity['ticker'],identity['cik_str'],as_of,packet['currency'],requested_keywords(gaps),client,**options)
         if identity.get('identity_discovery'):
             target['identity_discovery'] = identity['identity_discovery']
             target['packet_hash'] = digest({k:v for k,v in target.items() if k != 'packet_hash'})

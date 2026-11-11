@@ -546,6 +546,12 @@ def _complete_layouts(payload):
         if grouped:
             yield GROUPED_INSTRUCTIONS, grouped
 
+    from underwriting_token_transport import eligible, pack as pack_tokens, INSTRUCTIONS as TOKEN_INSTRUCTIONS
+    if eligible(payload):
+        tokens = pack_tokens(payload)
+        if tokens:
+            yield TOKEN_INSTRUCTIONS, tokens
+
 
 def pack(payload):
     return min((envelope for _, envelope in _complete_layouts(payload)),
@@ -553,6 +559,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/5':
+        from underwriting_token_transport import unpack as unpack_tokens
+        return unpack_tokens(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/1': return _unpack_legacy(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/3': return _unpack_inline(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/4': return _unpack_grouped(envelope)

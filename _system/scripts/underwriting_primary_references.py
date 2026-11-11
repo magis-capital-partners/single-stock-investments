@@ -170,6 +170,15 @@ def linked_references(raw, parent_url, cik, keywords):
             score += 3 * bool(indentures_requested and re.search(r'\bindenture\b|\bguarantee agreement\b', body))
         if transaction:
             score += 20 * bool(re.search(r'\bmerger\b|\bacquisition agreement\b|\btender offer\b|\bpurchase agreement\b', body))
+        # The CPRT owner profile explicitly requires these source-own warehouse
+        # instruments. Other companies and arbitrary neighboring labels do not route.
+        from underwriting_foreign_financials import source_budget
+        try: profile=source_budget().owner_profile(cik)
+        except ValueError: profile=None
+        if profile and target in profile.get('target_reference_urls',[]) and str(cik)=='1637873':
+            title=re.sub(r'^(?:(?:exhibit\s+)?\d{1,3}\.\d{1,3}\s*[*+†]*\s*){0,3}','',body)
+            if re.match(r'^(?:purchase\s+and\s+sale\s+agreement|servicing\s+agreement|(?:limited\s+)?indemnity\s+agreement|performance\s+guaranty)\b',title):
+                score+=20
         # An explicit exhibit number binds to this row's opening label,
         # after its own legal-title classifier has passed.
         if score and any(re.fullmatch(r'exhibit \d{1,3}\.\d{1,3}', term)
@@ -209,6 +218,8 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
     if not credit and not transaction and not licensing:
         return [], []
     budget = source_budget()
+    from underwriting_primary_packages import package_spec, package_url, metadata as package_metadata, documents as package_documents, operative_references, validate_operative_member
+    owner_profile = budget.owner_profile(cik)
     inherited_capacity = any(budget.snapshot()['counts'])
     focus = list(dict.fromkeys(list(keywords)+(['credit agreement', 'covenant'] if credit else [])
                               + (['merger', 'acquisition', 'tender offer', 'purchase price'] if transaction else [])))[:18]
@@ -232,13 +243,32 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
                 continue
             url = f'https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace("-", "")}/{name}'
             candidates.append((filed, accession, url, form))
-        for filed, accession, url, form in sorted(candidates, reverse=True)[:2]:
+        selected_candidates = sorted(candidates, reverse=True)[:2]
+        for spec in (owner_profile or {}).get('complete_legal_packages',[]):
+            if spec.get('mandatory') and spec.get('cik')==str(cik):
+                try:
+                    meta=package_metadata(submissions,cik,spec)
+                    if meta['filed']>as_of:raise ValueError('Required current disclosure is future dated')
+                    url=package_url(cik,meta['accession']).rsplit('/',1)[0]+'/'+meta['primary_document']
+                    row=(meta['filed'],meta['accession'],url,meta['form'])
+                    if row not in selected_candidates:selected_candidates.append(row)
+                except ValueError as exc:
+                    errors.append({'source':'requested_primary_disclosure','error':str(exc)})
+        for filed, accession, url, form in selected_candidates:
             try:
-                raw = budget.fetch(url, 0, fetch)
-                doc = document_record(url, raw, focus, form=form, prefer_complete=True)
-                doc.update(form=form, filed=filed, accession=accession, document_kind='material_transaction_disclosure')
-                documents.append(doc)
-                parents.append({'source_url': url, 'raw': raw, 'filed': filed})
+                spec=package_spec(budget,cik,url)
+                if spec:
+                    meta=package_metadata(submissions,cik,spec)
+                    transport_url=package_url(cik,accession)
+                    raw=budget.fetch(transport_url,0,fetch)
+                    complete,member_sources=package_documents(transport_url,raw,cik,meta,spec['required_members'])
+                    documents.extend(complete);parents.extend(member_sources)
+                else:
+                    raw = budget.fetch(url, 0, fetch)
+                    doc = document_record(url, raw, focus, form=form, prefer_complete=True)
+                    doc.update(form=form, filed=filed, accession=accession, document_kind='material_transaction_disclosure')
+                    documents.append(doc)
+                    parents.append({'source_url': url, 'raw': raw, 'filed': filed})
             except (OSError, ValueError) as exc:
                 errors.append({'source': 'requested_primary_disclosure', 'source_url': url, 'error': str(exc)[:500]})
     existing = {s['source_url'] for s in parents}
@@ -283,11 +313,15 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
                 old = references.get(reference['source_url'])
                 if old is None or reference['_score'] > old['_score']:
                     references[reference['source_url']] = reference
+        for reference in operative_references(parents,cik,owner_profile):
+            if reference['source_url'] not in existing:
+                references[reference['source_url']]=reference
+                current_layer.add(reference['source_url'])
         following = []
         # Selected announcing filings keep priority for their executed children.
         # Unused second-layer slots can then follow pending index citations.
         usage = budget.snapshot()
-        remaining = 4-usage['counts'][layer]
+        remaining = budget.remaining(layer)
         obtained = {url for urls in usage['urls_by_layer'] for url in urls}
         selected = []
         for reference in sorted(references.values(), key=lambda row: (
@@ -297,24 +331,39 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
                     continue  # Retain the citation for unused second-layer capacity.
                 remaining -= 1
             selected.append(reference)
-            if len(selected)==4:
+            if len(selected)==budget.layer_limit(layer):
                 break
         for reference in selected:
             url = reference['source_url']
-            references.pop(url)
+            if url in existing:references.pop(url,None);continue
+            references.pop(url,None)
             existing.add(url)
             try:
+                spec=package_spec(budget,cik,url)
+                if spec:
+                    meta=package_metadata(submissions,cik,spec)
+                    transport_url=package_url(cik,meta['accession'])
+                    raw=budget.fetch(transport_url,layer,fetch)
+                    complete,member_sources=package_documents(transport_url,raw,cik,meta,spec['required_members'])
+                    documents.extend(complete);following.extend(member_sources)
+                    existing.update(s['source_url'] for s in member_sources)
+                    for source in member_sources:references.pop(source['source_url'],None)
+                    continue
                 raw = budget.fetch(url, layer, fetch)
                 if reference.get('_submission'):
                     # The authenticated package contains every EX-4 member;
                     # no per-note requests or truncated contract windows needed.
                     documents.extend(financing_documents(url, raw, cik, reference['_submission']))
                     continue
+                if reference.get('_operative_registry'):
+                    validate_operative_member(raw,reference['_operative_registry'])
                 license_options = ({'expected_license_title': reference['_requested_license']}
                                    if reference.get('_requested_license') else {})
                 doc = document_record(url, raw, focus, prefer_complete=True, **license_options)
                 if reference.get('_requested_license') and doc.get('coverage') != 'complete_requested_primary_document':
                     raise ValueError('Requested license instrument is not retained completely')
+                if owner_profile and doc.get('coverage')!='complete_requested_primary_document':
+                    raise ValueError('Required CPRT legal source exceeds the complete-context limit or is incomplete')
                 doc.update(document_kind='incorporated_primary_document', referenced_by=reference['referenced_by'],
                            reference_text=reference['reference_text'])
                 documents.append(doc)
@@ -339,4 +388,10 @@ def collect_requested_documents(submissions, cik, as_of, sources, keywords, fetc
         errors.append({'source': 'requested_financing_source_budget',
                        'error': 'Dated financing candidates exceed the bounded primary-reference fetch capacity',
                        'source_urls': missing})
+    if owner_profile and str(cik)==owner_profile['target_cik']:
+        obtained={url for layer_urls in budget.snapshot()['urls_by_layer'] for url in layer_urls}
+        missing=set(owner_profile['target_reference_urls'])-obtained
+        already={row.get('source_url') for row in errors}
+        for url in sorted(missing-already):
+            errors.append({'source':'requested_primary_reference','source_url':url,'error':'Required owner-scoped target instrument is unavailable in the complete shared source graph'})
     return documents, errors

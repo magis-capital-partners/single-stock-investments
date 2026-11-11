@@ -48,6 +48,23 @@ def local_lock(home):
                 msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
 
 
+def ensure_private_archive_configuration(home,source,tickers):
+    """The first upgraded CPRT run must initialize current storage before paid work."""
+    policy=read(source/'_system/config/underwriting_policy.json')
+    if tickers!=['CPRT'] or not (policy.get('owner_source_exceptions') or {}).get('CPRT'):
+        return
+    require(source.resolve()==(home/'source').resolve() and (source/'.git').exists(),
+            'Private archive bootstrap requires the clean owned runtime source')
+    owner=read(home/'runtime-owner.json')
+    require(owner.get('repository')==OPS and owner.get('purpose')=='local-codex-underwriting',
+            'Private archive bootstrap owner mismatch')
+    require(git(source,'remote','get-url','origin').decode().strip()=='https://github.com/'+OPS+'.git',
+            'Private archive bootstrap source remote mismatch')
+    git(source,'sparse-checkout','add','--stdin',data=b'/_system/config/private_storage.json\n')
+    from private_storage import load_config
+    load_config(source,require_enabled=True)
+
+
 def clone_vault(home):
     vault = home/'vault'
     if not (vault/'.git').is_dir():
@@ -59,18 +76,16 @@ def clone_vault(home):
     git(vault, 'fetch', '-q', 'origin', 'main')
     # Never reset the private working tree: unpublished paid receipts must
     # survive a push failure. Only import the remote worker's shared ledger.
-    ledger_name = 'valuation-underwriting/runtime/ledger.jsonl'
-    # cat-file -e can lazily fetch the blob in a partial clone. Inspect the
-    # tree first, then import the bytes through the normal bounded Git read.
-    names = git(vault, 'ls-tree', '--name-only', 'origin/main', '--', ledger_name).decode().splitlines()
-    if ledger_name in names:
-        path = vault/ledger_name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(git(vault, 'show', 'origin/main:'+ledger_name))
     from private_storage import enabled
     if enabled():
         from private_storage_io import initialize
         initialize(vault)
+    else:
+        ledger_name = 'valuation-underwriting/runtime/ledger.jsonl'
+        names = git(vault,'ls-tree','--name-only','origin/main','--',ledger_name).decode().splitlines()
+        if ledger_name in names:
+            path=vault/ledger_name;path.parent.mkdir(parents=True,exist_ok=True)
+            path.write_bytes(git(vault,'show','origin/main:'+ledger_name))
     return vault
 
 
@@ -224,6 +239,7 @@ def run_once(home, source=ROOT, tickers=None, launch=False):
     require(owner.get('repository') == OPS and owner.get('purpose') == 'local-codex-underwriting',
             'Initialize a fresh owned runtime with underwriting_local.ps1 first')
     with local_lock(home):
+        ensure_private_archive_configuration(home,source,tickers)
         preflight()
         vault = clone_vault(home)
         os.environ['RESEARCH_VAULT_ROOT'] = str(vault)
