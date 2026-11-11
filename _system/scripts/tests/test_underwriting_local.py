@@ -204,3 +204,32 @@ def test_first_updated_worker_materializes_new_trusted_workflow_inputs(tmp_path,
         assert not collected.exists()
         assert not (source / '_system/reference/new_primary_input.json').exists()
     assert git('status', '--porcelain') == ''
+
+
+def test_cprt_first_upgrade_materializes_private_configuration_in_owned_source(tmp_path,monkeypatch):
+    import underwriting_local as local
+    import private_storage
+    source=tmp_path/'source';(source/'.git').mkdir(parents=True)
+    policy=source/'_system/config/underwriting_policy.json';policy.parent.mkdir(parents=True)
+    policy.write_text(json.dumps({'owner_source_exceptions':{'CPRT':{'id':'explicit-owner'}}}))
+    (tmp_path/'runtime-owner.json').write_text(json.dumps({'repository':local.OPS,'purpose':'local-codex-underwriting'}))
+    calls=[]
+    def git(directory,*args,**kwargs):
+        calls.append((args,kwargs))
+        if args==('remote','get-url','origin'):return ('https://github.com/'+local.OPS+'.git\n').encode()
+        return b''
+    monkeypatch.setattr(local,'git',git)
+    monkeypatch.setattr(private_storage,'load_config',lambda directory,**kwargs:calls.append(('validated_enabled_current_storage',directory,kwargs)))
+    local.ensure_private_archive_configuration(tmp_path,source,['CPRT'])
+    assert calls[1]==(('sparse-checkout','add','--stdin'),{'data':b'/_system/config/private_storage.json\n'})
+    assert calls[2][0]=='validated_enabled_current_storage' and calls[2][2]=={'require_enabled':True}
+
+
+def test_private_archive_upgrade_never_targets_ordinary_checkout_or_other_company(tmp_path,monkeypatch):
+    import underwriting_local as local
+    source=tmp_path/'ordinary-project';(source/'_system/config').mkdir(parents=True)
+    (source/'_system/config/underwriting_policy.json').write_text(json.dumps({'owner_source_exceptions':{'CPRT':{}}}))
+    monkeypatch.setattr(local,'git',lambda *a,**k:pytest.fail('ordinary project was touched'))
+    local.ensure_private_archive_configuration(tmp_path,source,['V'])
+    (source/'_system/config/underwriting_policy.json').write_text(json.dumps({'owner_source_exceptions':{'CPRT':{'id':'explicit-owner'}}}))
+    with pytest.raises(ValueError,match='owned runtime source'):local.ensure_private_archive_configuration(tmp_path,source,['CPRT'])

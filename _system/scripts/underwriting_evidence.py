@@ -19,7 +19,7 @@ from pathlib import Path
 from atomic_io import semantic_json_sha256
 from sec_client import SecClient
 from underwriting_contract import ContractError, digest, numeric, require
-from underwriting_foreign_financials import bounded_sources, source_budget
+from underwriting_foreign_financials import bounded_sources, source_budget, context_limit_for
 from valuation_share_basis import (
     BasisGap,
     declaration,
@@ -242,6 +242,7 @@ def registered_securities(source):
 
 
 def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=False, expected_license_title=None):
+    context_cap = context_limit_for(url)
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = primary_text(raw)
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
@@ -301,15 +302,15 @@ def document_record(url, raw, focus_keywords=(), *, form=None, prefer_complete=F
                  and 'order '+license_order[1] in focus
                  and re.search(r'\bmaster\s+license\s+agreement\b', license_opening, re.I))))
     if expected_license_title is not None:
-        require(500 <= len(body) <= 350000 and requested_license,
+        require(500 <= len(body) <= context_cap and requested_license,
                 'Requested license source lacks a matching complete executed instrument: '+url)
-    if ((form == '10-Q' or prefer_complete) and 500 <= len(body) <= 350000
+    if ((form == '10-Q' or prefer_complete) and 500 <= len(body) <= context_cap
             and (sum(w in body.lower() for w in words) >= 3 or requested_supplement or requested_license)):
         # Complete bounded reports/agreements retain contractual footnotes
         # that could otherwise fall outside selected search windows.
         return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),
                 'contexts':[body],'coverage':'complete_quarterly_filing' if form == '10-Q' else 'complete_requested_primary_document', **registration}
-    budget = 350000 if focus else 150000
+    budget = context_cap if focus else 150000
     def add_context(text):
         nonlocal size
         if text and text not in seen and size+len(text) <= budget:
@@ -694,6 +695,8 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
         refresh_quote,
         universe,
     )
+    from underwriting_source_profiles import configure_source_budget
+    configure_source_budget(root,ticker)
     rows = universe(root)
     require(ticker in rows, 'Unknown coverage ticker')
     registry = read(root/'_system/portfolio/registry.json').get('holdings') or {}
@@ -843,7 +846,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     raw = (source_budget().fetch(url, 0,
                         lambda value: client.get_bytes(value, timeout=40))
                         if foreign_eligible else filing_bytes(root, ticker, recent['accessionNumber'][i], client, url))
-                    document = document_record(url, raw, focus_keywords, form=form)
+                    document = document_record(url, raw, focus_keywords, form=form, prefer_complete=bool(ticker=='CPRT' and source_budget().owner_profile(cik)))
                     event_date = (recent.get('reportDate') or ['']*len(recent['form']))[i]
                     period = event_date
                     if form == '6-K':

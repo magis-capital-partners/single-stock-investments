@@ -245,3 +245,17 @@ def test_current_companyfacts_identity_conflict_stays_held(monkeypatch,tmp_path,
 def test_query_limit_remains_eighteen_with_many_explicit_exhibit_labels():
     detail='Retrieve Exhibits '+', '.join('10.'+str(i) for i in range(1,25))+'. Search terms: cash, debt.'
     assert len(requested_keywords([{'detail':detail}]))==18
+
+def test_parent_ready_field_cannot_survive_unavailable_target_sources():
+    from underwriting_evidence import evidence_readiness
+    parent={'ticker':'PARENT','cik':'999','company':'Synthetic Parent Inc.','currency':'USD',
+      'as_of':AS_OF,'financial_period':'2025-12-31','observations':[],'evidence_hash':'a'*64,
+      'readiness':{'status':'ready','gaps':[]},'documents':[{'id':'parent',
+      'source_url':'https://www.sec.gov/Archives/edgar/data/999/000000099926000001/annual.htm',
+      'content_hash':'b'*64,'contexts':['We completed the acquisition of Synthetic Target Inc.']}]}
+    target={'ticker':'TARGET','company':'Synthetic Target Inc.','cik':'123','currency':'USD',
+      'observations':[],'documents':[],'source_hash':'c'*64,'evidence_hash':'d'*64,
+      'collection_errors':[{'source':'requested_primary_reference','source_url':CREDIT,'error':'Required source remains held'}]}
+    merged=merge_related_packet(parent,target)
+    assert merged['readiness']==evidence_readiness(merged,require_documents=True)
+    assert merged['readiness']['status']=='evidence_gap'

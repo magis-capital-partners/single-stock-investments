@@ -45,12 +45,50 @@ def write_new(path, raw):
         output.write(raw)
 
 
+def _strict_json(raw):
+    def pairs(rows):
+        value={}
+        for k,v in rows:
+            if k in value:raise StorageError('Duplicate JSON key in preserved private bytes')
+            value[k]=v
+        return value
+    def invalid(value):raise StorageError('Invalid nonfinite JSON in preserved private bytes')
+    return json.loads(raw,object_pairs_hook=pairs,parse_constant=invalid)
+
+def _retain_or_advance_private_bytes(path,relative,incoming):
+    """Retain equivalent original bytes; real ledgers may only append verified remote rows."""
+    original=path.read_bytes()
+    if relative.endswith('/ledger.jsonl'):
+        old=[_strict_json(line) for line in original.splitlines() if line.strip()]
+        lines=[line for line in incoming.splitlines(keepends=True) if line.strip()]
+        new=[_strict_json(line) for line in lines]
+        if any(not isinstance(r,dict) for r in old+new):raise StorageError('Invalid real admission ledger')
+        old_identity=[encoded_json(r) for r in old];new_identity=[encoded_json(r) for r in new]
+        if new_identity[:len(old_identity)]!=old_identity:
+            raise StorageError('Refusing divergent or older private ledger; original local bytes retained')
+        if len(new)>len(old):
+            with path.open('ab') as output:
+                if original and not original.endswith((b'\n',b'\r')):output.write(b'\n')
+                output.write(b''.join(lines[len(old):]));output.flush();os.fsync(output.fileno())
+        return {'path':relative,'action':'append_verified_rows' if len(new)>len(old) else 'retain_original_serialization',
+                'original_sha256':sha(original),'private_sha256':sha(incoming),'final_sha256':sha(path.read_bytes()),
+                'original_rows':len(old),'final_rows':len(new),'original_raw_bytes_remain_exact_prefix':path.read_bytes().startswith(original)}
+    if relative.endswith('.json'):
+        try:equal=encoded_json(_strict_json(original))==encoded_json(_strict_json(incoming))
+        except (ValueError,UnicodeError):equal=False
+        if equal:
+            return {'path':relative,'action':'retain_original_serialization','original_sha256':sha(original),
+                    'private_sha256':sha(incoming),'final_sha256':sha(original),'typed_JSON_values_equal':True}
+    return None
+
+
 def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False):
     vault = owned(vault)
     prefixes = tuple(relative_path(p.rstrip("/"))+"/" for p in prefixes)
     storage = storage or PrivateStorage()
     commit, records = storage.snapshot()
     restored = 0
+    preserved_serializations = []
     # Bulk objects and source parts are demand-loaded; control/current records
     # are small and must override only a verified, clean legacy checkout.
     for relative, entry in records.items():
@@ -63,11 +101,18 @@ def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False):
         path = path_in(vault, relative)
         if path.is_file() and sha(path.read_bytes()) == entry['sha256']:
             continue
+        incoming = None
+        if path.is_file() and relative.endswith(('.json','.jsonl')):
+            incoming = storage.restore(relative,records=records)
+            preservation = _retain_or_advance_private_bytes(path,relative,incoming)
+            if preservation is not None:
+                preserved_serializations.append(preservation)
+                continue
         if path.exists():
             baseline = run_git(vault, 'show', 'HEAD:'+relative, check=False)
             if baseline.returncode or baseline.stdout != path.read_bytes():
                 raise StorageError('Refusing differing unpublished private bytes: '+relative)
-        raw = storage.restore(relative, records=records)
+        raw = incoming if incoming is not None else storage.restore(relative, records=records)
         if path.exists():
             # The exact replaced baseline remains immutable in legacy Git.
             path.write_bytes(raw)
@@ -76,9 +121,9 @@ def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False):
         restored += 1
     marker = {'schema_version':'private-storage-view/1', 'catalog_commit':commit,
               'catalog_repository_id':storage.config['catalog_repository_id'],
-              'read_only':bool(prefixes) or snapshot_only, 'snapshot_validation_only':snapshot_only, 'materialized_prefixes':list(prefixes)}
+              'read_only':bool(prefixes) or snapshot_only, 'snapshot_validation_only':snapshot_only, 'materialized_prefixes':list(prefixes), 'preserved_original_serializations':preserved_serializations}
     (vault/MARKER).write_bytes(encoded_json(marker))
-    return {'catalog_commit':commit, 'control_files_restored':restored}
+    return {'catalog_commit':commit, 'control_files_restored':restored, 'preserved_original_serializations':preserved_serializations}
 
 
 def view(vault, storage):

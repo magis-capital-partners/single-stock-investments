@@ -6,6 +6,7 @@ A budget is shared by callers; failed fetches retain their reservations.
 from __future__ import annotations
 
 import calendar
+import copy
 import hashlib
 import re
 from contextvars import ContextVar
@@ -38,54 +39,115 @@ def bounded_sources(function):
 
 
 class ReferenceBudget:
-    """One four-reference/two-layer allowance, including failures."""
+    """Shared capacity including failures; only an explicit dated owner profile differs."""
     def __init__(self):
-        self._urls = [[], []]
-        self._responses = {}
-
-    def fetch(self, url, layer, fetch):
-        if type(layer) is not int or layer not in (0, 1):
-            raise ValueError('Primary reference layer must be zero or one')
+        self._urls=[[],[]];self._responses={};self._profile=None;self._target_active=False
+    def configure_owner_profile(self,profile):
+        if (profile.get('id')!='CPRT-owner-20261111-v3' or profile.get('parent_cik')!='900075'
+                or profile.get('target_cik')!='1637873' or profile.get('document_context_characters')!=450000
+                or profile.get('parent_references')!=4 or profile.get('target_references')!=13
+                or profile.get('total_references')!=17 or profile.get('layers')!=2):
+            raise ValueError('Unrecognized owner-authorized source profile')
+        exceptions=profile.get('document_context_exceptions',{})
+        expected={'https://www.sec.gov/Archives/edgar/data/900075/000119312526022730/d64083dex101.htm':750000}
+        if exceptions not in ({},expected):
+            raise ValueError('Unknown document-specific owner exception')
+        urls=profile.get('target_reference_urls')
+        if (not isinstance(urls,list) or len(urls)!=13 or len(set(urls))!=13
+                or any(not re.fullmatch(r'https://www\.sec\.gov/Archives/edgar/data/1637873/[0-9]{18}/[A-Za-z0-9_.-]+\.(?:html?|txt)',u) for u in urls)):
+            raise ValueError('Owner target references must be thirteen exact same-issuer primary URLs')
+        if self._profile is not None:
+            if self._profile!=profile:raise ValueError('Cannot replace a consumed source profile')
+            return
+        if sum(map(len,self._urls))>4 or self._urls[1]:
+            raise ValueError('Consumed parent capacity cannot be reset or relabelled')
+        self._profile=copy.deepcopy(profile)
+    @staticmethod
+    def _layer(layer):
+        if type(layer) is not int or layer not in (0,1):raise ValueError('Primary reference layer must be zero or one')
+    def mapped_layer(self,layer):
+        self._layer(layer);return 1 if self._target_active else layer
+    def layer_limit(self,layer):
+        self._layer(layer);return 13 if self._profile and self._target_active else 4
+    def remaining(self,layer):
+        actual=self.mapped_layer(layer)
+        remaining=self.layer_limit(layer)-len(self._urls[actual])
+        if self._profile:
+            phase=13-len(self._urls[1]) if self._target_active else 4-sum(map(len,self._urls))
+            remaining=min(remaining,phase,17-sum(map(len,self._urls)))
+        return max(0,remaining)
+    def target_scope(self,parent,target_cik):
+        from contextlib import contextmanager
+        @contextmanager
+        def scope():
+            previous=self._target_active
+            if self._profile:
+                if parent!='CPRT' or str(target_cik)!=self._profile['target_cik']:
+                    raise ValueError('Owner source exception cannot transfer to another company or target')
+                if self._urls[1] and not previous and any(u not in self._profile['target_reference_urls'] for u in self._urls[1]):
+                    raise ValueError('Unknown consumed target capacity')
+                self._target_active=True
+            try:yield self
+            finally:self._target_active=previous
+        return scope()
+    def owner_profile(self,cik):
+        if not self._profile:return None
+        expected=self._profile['target_cik'] if self._target_active else self._profile['parent_cik']
+        return copy.deepcopy(self._profile) if str(cik)==expected else None
+    def context_limit(self,url):
+        if self._profile and not self._target_active and url in self._profile.get('document_context_exceptions',{}):
+            return self._profile['document_context_exceptions'][url]
+        cik=self._profile['target_cik'] if self._profile and self._target_active else '900075'
+        if (self._profile and re.fullmatch(r'https://www\.sec\.gov/Archives/edgar/data/'+cik+r'/[0-9]{18}/[A-Za-z0-9_.-]+\.(?:html?|txt)',url)):
+            return 450000
+        return 350000
+    def fetch(self,url,layer,fetch):
+        actual=self.mapped_layer(layer)
         if url in self._responses:
-            result = self._responses[url]
-            if isinstance(result, Exception):
-                raise result
+            result=self._responses[url]
+            if isinstance(result,Exception):raise result
             return result
-        if len(self._urls[layer]) >= 4:
-            raise ValueError('Primary reference capacity exhausted for this layer')
-        self._urls[layer].append(url)
+        if not self.remaining(layer):raise ValueError('Primary reference capacity exhausted for this layer')
+        self._urls[actual].append(url)
         try:
-            raw = fetch(url)
-            if not isinstance(raw, bytes):
-                raise ValueError('Primary reference response must be complete bytes')
-            self._responses[url] = raw
-            return raw
-        except Exception as exc:
-            self._responses[url] = exc
-            raise
-
+            if self._profile and self._target_active and url not in self._profile['target_reference_urls']:
+                raise ValueError('Reference is outside the explicitly authorized target source graph')
+            raw=fetch(url)
+            if not isinstance(raw,bytes):raise ValueError('Primary reference response must be complete bytes')
+            self._responses[url]=raw;return raw
+        except Exception as exc:self._responses[url]=exc;raise
     def snapshot(self):
-        return {'counts': [len(urls) for urls in self._urls],
-                'urls_by_layer': [list(urls) for urls in self._urls],
-                'maximum_references_per_layer': 4, 'maximum_layers': 2}
-
-    def resume(self, snapshot):
-        """Carry consumed capacity into a later target phase, never reset it."""
-        urls = snapshot.get('urls_by_layer')
-        if (not isinstance(urls, list) or len(urls) != 2
-                or any(not isinstance(u, list) or len(u) > 4 for u in urls)
-                or snapshot.get('counts') != [len(u) for u in urls]
-                or any(not isinstance(url, str) for u in urls for url in u)
-                or len({url for u in urls for url in u}) != sum(map(len, urls))):
+        result={'counts':[len(u) for u in self._urls],'urls_by_layer':[list(u) for u in self._urls],
+            'maximum_references_per_layer':4,'maximum_layers':2}
+        if self._profile:
+            result.update(maximum_references_per_layer=13,maximum_references_by_layer=[4,13],maximum_total_references=17,
+                owner_authorized_scope={'id':self._profile['id'],'parent':'CPRT','target_cik':self._profile['target_cik'],
+                    'parent_limit':4,'target_limit':13,'document_context_characters':450000,
+                    **({'document_context_exceptions':copy.deepcopy(self._profile['document_context_exceptions'])} if self._profile.get('document_context_exceptions') else {})})
+        return result
+    def resume(self,snapshot):
+        urls=snapshot.get('urls_by_layer');limits=[4,13] if self._profile else [4,4]
+        if (not isinstance(urls,list) or len(urls)!=2
+                or any(not isinstance(u,list) or len(u)>limits[i] for i,u in enumerate(urls))
+                or snapshot.get('counts')!=[len(u) for u in urls]
+                or any(not isinstance(url,str) for u in urls for url in u)
+                or len({url for u in urls for url in u})!=sum(map(len,urls))):
             raise ValueError('Invalid consumed primary reference allowance')
-        for layer, prior in enumerate(urls):
+        if self._profile and urls[1] and (
+                (snapshot.get('owner_authorized_scope') or {}).get('id')!=self._profile['id']
+                or any(u not in self._profile['target_reference_urls'] for u in urls[1])):
+            raise ValueError('Consumed target allowance lacks its checked owner source profile')
+        for layer,prior in enumerate(urls):
             for url in prior:
-                if url in self._responses:
-                    continue
-                if len(self._urls[layer]) >= 4:
-                    raise ValueError('Consumed primary reference capacity cannot be reset')
+                if url in self._responses:continue
+                if len(self._urls[layer])>=limits[layer]:raise ValueError('Consumed primary reference capacity cannot be reset')
                 self._urls[layer].append(url)
-                self._responses[url] = ValueError('Earlier reference bytes require their original collection scope')
+                self._responses[url]=ValueError('Earlier reference bytes require their original collection scope')
+
+
+def context_limit_for(url):
+    budget=_COLLECTION_BUDGET.get()
+    return budget.context_limit(url) if budget is not None else 350000
 
 
 def _issuer_text(value):
@@ -113,7 +175,7 @@ def _current_covers(submissions, cik, as_of):
             continue
         accession, name = value('accessionNumber'), value('primaryDocument')
         if (not re.fullmatch(r'\d{10}-\d{2}-\d{6}', accession)
-                or not re.fullmatch(r'[A-Za-z0-9_.-]+\.htm[l]?', name)):
+                or not re.fullmatch(r'[A-Za-z0-9_.-]+\.(?:html?|txt)', name)):
             raise ValueError('Foreign official accession or primary document path is unsafe')
         parent = {'form': form, 'filed': filed, 'accession': accession,
             'reported_event_date': value('reportDate'),
