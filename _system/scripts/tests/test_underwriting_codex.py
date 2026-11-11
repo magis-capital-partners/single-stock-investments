@@ -10,6 +10,20 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import underwriting_codex as codex
 
 
+@pytest.fixture(autouse=True)
+def isolated_native_catalog_fixture(tmp_path,monkeypatch):
+    home=tmp_path/'native-home'
+    home.mkdir()
+    catalog={'models':[{'slug':'gpt-6.1-sol','context_window':500000,'max_context_window':872000,
+        'tool_mode':'code_mode_only','experimental_supported_tools':['clock','send_user_message_async'],
+        'apply_patch_tool_type':'freeform','supports_search_tool':True,
+        'web_search_tool_type':'text','base_instructions':'Original native instructions',
+        'supported_reasoning_levels':[{'effort':'high','description':'High'}]}]}
+    (home/'models_cache.json').write_text(json.dumps(catalog),encoding='utf-8')
+    monkeypatch.setenv('CODEX_HOME',str(home))
+    return home,catalog
+
+
 def test_tool_free_local_command_uses_the_exact_model_and_keeps_user_auth():
     args = codex.command('codex',Path('empty-workspace'),Path('answer.json'))
     assert args[args.index('--model')+1] == 'gpt-6.1-sol'
@@ -232,3 +246,80 @@ def test_progress_cannot_hide_final_order_or_native_source_identity_errors(chang
         file = '{"ok":false}'
     with pytest.raises(ValueError):
         codex.completed_output(rows, file)
+
+
+def test_catalog_copy_changes_only_explicit_tool_surface_fields(tmp_path,isolated_native_catalog_fixture):
+    home,original=isolated_native_catalog_fixture
+    original['models'].append({'slug':'other-model','tool_mode':'code_mode_only','context_window':17})
+    (home/'models_cache.json').write_text(json.dumps(original),encoding='utf-8')
+    before=(home/'models_cache.json').read_bytes()
+    path,proof=codex.isolated_tool_catalog(tmp_path)
+    copy=json.loads(path.read_text(encoding='utf-8'))
+    allowed={'tool_mode','experimental_supported_tools','apply_patch_tool_type','supports_search_tool'}
+    assert {k:v for k,v in copy['models'][0].items() if k not in allowed} == {k:v for k,v in original['models'][0].items() if k not in allowed}
+    assert copy['models'][1:]==original['models'][1:]
+    assert copy['models'][0]['tool_mode']=='direct'
+    assert copy['models'][0]['experimental_supported_tools']==[]
+    assert copy['models'][0]['apply_patch_tool_type'] is None
+    assert (home/'models_cache.json').read_bytes()==before
+    assert proof['source_catalog_hash']==codex.digest(original)
+    assert proof['isolated_catalog_hash']==codex.digest(copy)
+    assert proof['model_identity_context_and_instructions_unchanged']
+
+
+@pytest.mark.parametrize('role',['author','challenger'])
+def test_both_native_roles_receive_isolated_catalog_before_any_model_call(tmp_path,monkeypatch,role):
+    monkeypatch.setattr(codex,'executable',lambda:'codex')
+    prompt=tmp_path/'prompt.txt';prompt.write_text('All original evidence',encoding='utf-8')
+    def run(args,**kw):
+        option=next(v for v in args if v.startswith('model_catalog_json='))
+        path=Path(json.loads(option.split('=',1)[1]))
+        model=json.loads(path.read_text(encoding='utf-8'))['models'][0]
+        assert model['slug']=='gpt-6.1-sol' and model['tool_mode']=='direct'
+        assert model['experimental_supported_tools']==[] and model['apply_patch_tool_type'] is None
+        assert model['context_window']==500000 and model['max_context_window']==872000
+        assert kw['input']=='All original evidence'
+        assert 'tools.experimental_request_user_input.enabled=false' in args
+        assert 'tools.update_plan.enabled=false' in args
+        assert all(name in args for name in ('goals','remote_plugin','code_mode_host'))
+        rows=completed_rows({'ok':True})
+        return subprocess.CompletedProcess(args,0,'\n'.join(map(json.dumps,rows)),'')
+    receipt=tmp_path/'receipt.json'
+    codex.execute_stage(model='gpt-6.1-sol',effort='high',stage=role,prompt_path=prompt,
+        output_path=tmp_path/'answer.json',receipt_path=receipt,run=run)
+    saved=json.loads(receipt.read_text())
+    assert saved['tool_isolation']['model']=='gpt-6.1-sol'
+    assert (tmp_path/'receipt.tools-catalog.json').is_file()
+
+
+@pytest.mark.parametrize('defect',['missing','malformed','wrong_model','duplicate'])
+def test_catalog_identity_failure_stops_before_model_execution(tmp_path,isolated_native_catalog_fixture,defect):
+    home,catalog=isolated_native_catalog_fixture
+    path=home/'models_cache.json'
+    if defect=='missing':path.unlink()
+    elif defect=='malformed':path.write_text('{')
+    else:
+        if defect=='wrong_model':catalog['models'][0]['slug']='different-model'
+        else:catalog['models'].append(dict(catalog['models'][0]))
+        path.write_text(json.dumps(catalog))
+    prompt=tmp_path/'prompt.txt';prompt.write_text('Evidence')
+    with pytest.raises((ValueError,json.JSONDecodeError)):
+        codex.execute_stage(model='gpt-6.1-sol',effort='high',stage='author',prompt_path=prompt,
+            output_path=tmp_path/'out.json',receipt_path=tmp_path/'receipt.json',
+            run=lambda *a,**kw:pytest.fail('Invalid catalog launched a native session'))
+
+
+@pytest.mark.parametrize('tool',['list_mcp_resources','list_mcp_resource_templates'])
+def test_empty_mcp_discovery_is_still_rejected_and_usage_preserved(tmp_path,monkeypatch,tool):
+    monkeypatch.setattr(codex,'executable',lambda:'codex')
+    prompt=tmp_path/'prompt.txt';prompt.write_text('Evidence')
+    rows=completed_rows({'status':'evidence_gap','gaps':[]})
+    rows.insert(1,{'type':'item.completed','item':{'type':'mcp_tool_call','server':'codex','tool':tool,
+        'result':{'content':[{'type':'text','text':'{"resources":[]}'}]}}})
+    with pytest.raises(ValueError,match='without tools'):
+        codex.execute_stage(model='gpt-6.1-sol',effort='high',stage='author',prompt_path=prompt,
+            output_path=tmp_path/'out.json',receipt_path=tmp_path/'receipt.json',
+            run=lambda args,**kw:subprocess.CompletedProcess(args,0,'\n'.join(map(json.dumps,rows)),''))
+    saved=json.loads((tmp_path/'receipt.json').read_text())
+    assert saved['status']=='failed' and saved['usage']=={'output_tokens':12}
+    assert not (tmp_path/'out.json').exists()
