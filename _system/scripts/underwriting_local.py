@@ -65,7 +65,7 @@ def ensure_private_archive_configuration(home,source,tickers):
     load_config(source,require_enabled=True)
 
 
-def clone_vault(home):
+def clone_vault(home, *, tickers=None):
     vault = home/'vault'
     if not (vault/'.git').is_dir():
         require(not vault.exists(), 'Choose a new isolated local vault directory')
@@ -79,7 +79,8 @@ def clone_vault(home):
     from private_storage import enabled
     if enabled():
         from private_storage_io import initialize
-        initialize(vault, materialization_role='local_author')
+        require(isinstance(tickers, list) and len(tickers) == 1, 'A private author view requires exactly one selected ticker')
+        initialize(vault, materialization_role='local_author', selected_ticker=tickers[0])
     else:
         ledger_name = 'valuation-underwriting/runtime/ledger.jsonl'
         names = git(vault,'ls-tree','--name-only','origin/main','--',ledger_name).decode().splitlines()
@@ -168,7 +169,7 @@ def prefer_local_facts(local, incoming):
                 >= (incoming_report.get('period') or '', incoming_report.get('filed') or ''))
 
 
-def publish_runtime(vault, home):
+def publish_runtime(vault, home, *, tickers=None):
     """Overlay only owned private JSON; preserve every remote worker's files."""
     files = []
     for folder in ('local-runtime', 'handoffs'):
@@ -177,8 +178,11 @@ def publish_runtime(vault, home):
         return False
     from private_storage import enabled
     if enabled():
-        from private_storage_io import publish_paths
-        result = publish_paths(vault, {p.relative_to(vault).as_posix():p for p in files})
+        from private_storage_io import publish_paths, selected_author_ticker, author_publication_paths
+        ticker = selected_author_ticker(vault)
+        require(tickers is None or tickers == [ticker], 'Private publication must match its one selected ticker')
+        paths = author_publication_paths(vault, {p.relative_to(vault).as_posix():p for p in files}, ticker)
+        result = publish_paths(vault, paths)
         return bool(result['files_preserved'])
     for _ in range(3):
         git(vault, 'fetch', '-q', 'origin', 'main')
@@ -241,7 +245,7 @@ def run_once(home, source=ROOT, tickers=None, launch=False):
     with local_lock(home):
         ensure_private_archive_configuration(home,source,tickers)
         preflight()
-        vault = clone_vault(home)
+        vault = clone_vault(home, tickers=tickers)
         os.environ['RESEARCH_VAULT_ROOT'] = str(vault)
         os.environ['UNDERWRITING_ARCHIVE_ROOT'] = str(source)
         root = data_root(source, home, vault)
@@ -250,7 +254,7 @@ def run_once(home, source=ROOT, tickers=None, launch=False):
         result = run_batch(root, work=home/'work', vault=vault, tickers=tickers, limit=1, phase='author', launch=launch)
         write(home/'last-run.json', result)
         if launch:
-            publish_runtime(vault, home)
+            publish_runtime(vault, home, tickers=tickers)
             # Only a successful private push can make a handoff visible to CI.
             if result['selected']:
                 payload = {'event_type': 'valuation-underwriting-run',
