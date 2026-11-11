@@ -38,3 +38,49 @@ def test_challenger_is_not_required_to_receive_owner_preference(tmp_path):
  setup(tmp_path);p={'contract':{'actual':'independently reviewed'}};before=copy.deepcopy(p)
  pipeline.validate_owner_task(tmp_path,'CPRT','challenger',p)
  assert p==before
+
+
+@pytest.mark.parametrize('failure',['compiler','independent_review','native_failure'])
+def test_owner_instruction_survives_the_real_author_revision_loop(tmp_path,monkeypatch,failure):
+    # Synthetic fixtures exercise control flow; no CPRT economics are authored.
+    from test_underwriting_pipeline import company_root,packet,contract,review
+    from underwriting_contract import digest
+    company_root(tmp_path)
+    policy=pipeline.read(tmp_path/pipeline.POLICY)
+    policy['owner_task_requests']={'CPRT':REQUEST}
+    pipeline.write(tmp_path/pipeline.POLICY,policy)
+    p=packet();p['ticker']='CPRT';p['share_basis']['symbol']='CPRT';p.pop('packet_hash');p['packet_hash']=digest(p)
+    c=contract(p);c['ticker']='CPRT'
+    initial=payload()['revision_feedback']
+    progress={'scope':'underwriting','packet_hash':p['packet_hash'],'history':[],
+              'feedback':copy.deepcopy(initial)}
+    monkeypatch.setattr(pipeline,'load_progress',lambda *a:progress)
+    monkeypatch.setattr(pipeline,'evaluate',lambda **kw:{'approved':True})
+    if failure=='compiler':
+        def bad_compiler(*a):raise ContractError('Synthetic unresolved compiler node')
+        monkeypatch.setattr(pipeline,'compile_contract',bad_compiler)
+    authors=[];challengers=[];calls=[]
+    def execute(stage,provided,output,receipt):
+        calls.append(stage)
+        if stage=='author':
+            authors.append(copy.deepcopy(provided))
+            if failure=='native_failure' and len(authors)==1:
+                raise ContractError('Synthetic native failure')
+            answer=c
+        else:
+            challengers.append(copy.deepcopy(provided))
+            answer=review(c)
+            answer.update(verdict='revise',findings=[{'severity':'major','detail':'Synthetic unresolved financing path'}])
+        pipeline.write(output,answer)
+        pipeline.write(receipt,{'agent_id':stage+'-'+str(len(calls)),'status':'finished'})
+    with pytest.raises(pipeline.StageBlocked):
+        pipeline.run_company(tmp_path,tmp_path/'work','CPRT',p['as_of'],{},tmp_path/'vault',
+                             prepare=lambda *a:p,execute=execute)
+    assert len(authors)==2
+    assert authors[1]['revision_feedback']['owner_direction']==initial['owner_direction']
+    assert all('owner_direction' not in json.dumps(q) for q in challengers)
+    if failure=='independent_review':
+        assert authors[1]['revision_feedback'].get('independent_challenge',{}).get('findings',[{}])[0].get('detail')=='Synthetic unresolved financing path', authors[1]['revision_feedback'].get('required_correction')
+    elif failure=='compiler':
+        assert 'Synthetic unresolved compiler node' in authors[1]['revision_feedback']['required_correction']
+    assert progress['history']
