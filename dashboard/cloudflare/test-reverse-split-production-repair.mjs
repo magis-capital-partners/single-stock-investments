@@ -118,3 +118,10 @@ test('verified raw-symbol mapping can identify a common share without inventing 
  c.stdout.write(JSON.stringify({...row,mapping_verified:false})+'\n');await assert.rejects(market.quote('QA',{quote_feed:'databento_mini'}),/identity/);
  c.stdout.write(JSON.stringify(row)+'\n');const q=await market.quote('QA',{quote_feed:'databento_mini'});assert.equal(q.security_id,'databento:EQUS.MINI:12345');assert.equal(q.identity_basis,'exact_reference_ticker_CIK_type_and_live_raw_mapping');assert.equal(q.cik,'123');
 });
+
+test('a FIGI alone cannot turn an invalid issuer or inactive reference into a verified common share',async t=>{
+ for(const extra of [{cik:'NaN'},{cik:'0'},{active:false}]){
+  const now='2026-11-11T15:00:00Z';let c;const reference={ticker:'QA',cik:'123',active:true,security_id:'actual-reference-figi',type:'CS',currency:'usd',...extra};
+  const market=makeDatabentoMarket({key:'offline-test',clock:()=>now,reference:{health:{},identity:async()=>reference},spawnProcess:()=>{c=new EventEmitter();c.stdin=new PassThrough();c.stdout=new PassThrough();c.stderr=new PassThrough();c.kill=()=>{};return c;}});t.after(()=>market.close());market.warm('QA');await market.verifyIdentity('QA');c.stdout.write(JSON.stringify({kind:'quote',ticker:'QA',dataset:'EQUS.MINI',schema:'mbp-1',quote_at:now,observed_at:now,bid:10,ask:10.1,bid_size:100,ask_size:200,flags:0,instrument_id:123,mapping_verified:true,raw_symbol:'QA'})+'\n');assert.equal(market.peek('QA').identity_verified,false);await assert.rejects(market.quote('QA',{quote_feed:'databento_mini'}),/identity/);
+ }
+});
