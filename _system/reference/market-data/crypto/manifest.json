@@ -1,6 +1,7 @@
 {
-  "generated_at": "2026-10-11T20:17:04Z",
-  "as_of": "2026-10-11",
+  "hashprice_units_version": 2,
+  "generated_at": "2026-11-11T21:16:17Z",
+  "as_of": "2026-11-11",
   "staleness_max_days": 7,
   "disclaimer": "Context only. Crypto metrics inform stance and overlays; never auto-inflate Lawrence base IRR.",
   "themes": {
@@ -10,10 +11,10 @@
       "series": {
         "btc_spot_usd": {
           "label": "Bitcoin spot (USD)",
-          "latest": 83631.5625,
-          "as_of": "2026-10-11",
-          "prior_year": 110807.8828125,
-          "yoy_pct": -24.5,
+          "latest": 74645.8203125,
+          "as_of": "2026-11-11",
+          "prior_year": 102997.46875,
+          "yoy_pct": -27.5,
           "direction": "down",
           "good_for": "btc_price",
           "source": "yahoo:BTC-USD+seed_pre_yahoo+blockchain.info",
@@ -24,11 +25,11 @@
         },
         "btc_hash_rate_eh": {
           "label": "Network hash rate (EH/s)",
-          "latest": 1024.763228930608,
-          "as_of": "2026-10-11",
-          "prior_year": 983.3225179867896,
-          "yoy_pct": 4.2,
-          "direction": "up",
+          "latest": 984.4722566552757,
+          "as_of": "2026-11-11",
+          "prior_year": 1082.044639903291,
+          "yoy_pct": -9.0,
+          "direction": "down",
           "good_for": "mining_supply",
           "source": "mempool.space+blockchain.info",
           "optional": false,
@@ -38,8 +39,8 @@
         },
         "btc_difficulty": {
           "label": "Mining difficulty (index)",
-          "latest": 132716002350731.3,
-          "as_of": "2026-10-11",
+          "latest": 148364561003867.4,
+          "as_of": "2026-11-11",
           "prior_year": null,
           "yoy_pct": null,
           "direction": "flat",
@@ -52,22 +53,22 @@
         },
         "btc_avg_fee_per_block_usd": {
           "label": "Avg transaction fees per block (USD)",
-          "latest": 583.3431,
-          "as_of": "2026-10-11",
+          "latest": 1873.1526,
+          "as_of": "2026-11-11",
           "prior_year": null,
           "yoy_pct": null,
           "direction": "flat",
           "good_for": "miner_revenue",
-          "source": "mempool.space:fees",
+          "source": "mempool.space:mined_blocks_avgFees_satoshis+dated_USD",
           "optional": false,
           "stale": false,
           "error": null,
-          "note": null
+          "note": "Mined-block history is observed from the current API download window. Older committed fee history may contain legacy projected mempool estimates; it is not used as an observed fee backtest."
         },
         "btc_hashprice_usd_ph_day": {
           "label": "Hashprice (USD/PH/day)",
-          "latest": 36.807,
-          "as_of": "2026-10-11",
+          "latest": 34.394421,
+          "as_of": "2026-11-11",
           "prior_year": null,
           "yoy_pct": null,
           "direction": "flat",
@@ -80,8 +81,8 @@
         },
         "btc_breakeven_power_30jth": {
           "label": "Breakeven power cost at 30 J/TH ($/kWh)",
-          "latest": 0.0511,
-          "as_of": "2026-10-11",
+          "latest": 0.0478,
+          "as_of": "2026-11-11",
           "prior_year": null,
           "yoy_pct": null,
           "direction": "flat",
@@ -146,15 +147,54 @@
   "amzn_weekly_path": "_system/reference/market-data/equity/amzn_weekly_usd.csv",
   "btc_cost_of_production": {
     "ok": true,
-    "n_all_in": 1990,
-    "latest_all_in": 66776.65,
-    "latest_date": "2026-10-11",
-    "latest_fleet_jth": 14.6617,
-    "latest_electricity_only": 40065.99,
-    "latest_sota_cash": 50099.54,
-    "latest_sota_roic": 104691.18,
+    "n_all_in": 197,
+    "latest_all_in": 61313.63,
+    "latest_date": "2026-11-11",
+    "latest_fleet_jth": 14.0132,
+    "latest_electricity_only": 36788.18,
+    "latest_sota_cash": 42835.48,
+    "latest_sota_roic": 95280.73,
     "fleet_source": "asic_vintage_mix",
-    "cbeci_through": "2026-09-28"
-  },
-  "hashprice_units_version": 2
+    "cbeci_through": "2026-11-10",
+    "power_history": {
+      "kind": "reconstructed_proxy",
+      "observed_global_series": false,
+      "label": "Miner power proxy: US industrial index \u00d7 Cambridge survey anchor",
+      "method": "0.045 \u00d7 EIA industrial USD/kWh / June-2024 EIA industrial USD/kWh",
+      "anchor_usd_kwh": 0.045,
+      "anchor_period": "2024-06-30",
+      "anchor_published": "2025-04-28",
+      "anchor_is_future_information": false,
+      "release_lag_assumption": "EIA period plus two months; revisions are not vintage controlled.",
+      "limitations": "Retrospective US-indexed proxy, not observed global miner tariffs. Cambridge median is not a hashrate-weighted mean. Historical backtests must not treat the later survey anchor as known in advance.",
+      "sources": [
+        {
+          "url": "https://www.eia.gov/totalenergy/data/browser/csv.php?tbl=T09.08",
+          "series": "ESICUUS",
+          "unit": "USD/kWh"
+        },
+        {
+          "url": "https://www.jbs.cam.ac.uk/wp-content/uploads/2025/04/2025-04-cambridge-digital-mining-industry-report.pdf",
+          "page": 9,
+          "unit": "45 USD/MWh electricity only"
+        }
+      ],
+      "through": "2026-07-31",
+      "retrieved_on": "2026-11-11",
+      "start": "2015-01-31",
+      "latest_usd_kwh": 0.0522770511296076,
+      "point_in_time_validated": false,
+      "refresh_status": "refreshed",
+      "refresh_error": null,
+      "attempted_on": "2026-11-11"
+    },
+    "cbeci_refresh": {
+      "source_url": "https://ccaf.io/cbeci/api/v1.8.0/download/data",
+      "version": "1.8.0",
+      "status": "refreshed",
+      "attempted_on": "2026-11-11",
+      "error": null,
+      "observed_through": "2026-11-10"
+    }
+  }
 }

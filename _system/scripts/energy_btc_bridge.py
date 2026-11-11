@@ -7,6 +7,7 @@ from pathlib import Path
 
 from energy_common import ROOT, finite, month_end
 from power_cost_model import contract_cost
+from btc_mining_economics import fee_adjusted_breakeven
 
 CRYPTO = ROOT / '_system/reference/market-data/crypto'
 
@@ -56,7 +57,7 @@ def cost_layers(electricity_daily: float, other_daily: float, issuance_daily: fl
             'total_cost_usd_btc': total / issuance_daily,
             'cash_margin_daily_usd': revenue - operating,
             'economic_margin_daily_usd': revenue - total,
-            'revenue_breakeven_btc_usd': max(0, total - fee_daily) / issuance_daily}
+            'revenue_breakeven_btc_usd': fee_adjusted_breakeven(total, issuance_daily, fee_daily)}
 
 
 def snapshot(as_of: date, config: dict, crypto_dir=CRYPTO) -> dict:

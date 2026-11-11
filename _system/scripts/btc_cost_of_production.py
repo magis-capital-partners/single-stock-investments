@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import csv
 import gzip
+import io
 import json
 import urllib.request
 from dataclasses import dataclass
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,7 +23,7 @@ SCRIPTS = Path(__file__).resolve().parent
 CRYPTO_DIR = ROOT / "_system" / "reference" / "market-data" / "crypto"
 ASIC_PATH = CRYPTO_DIR / "asic_generations.json"
 UA = "MarvinResearch/1.0 (crypto-panel)"
-CBECI_URL = "https://cbeci.org/api/v1.0.5/download/data"
+CBECI_URL = "https://ccaf.io/cbeci/api/v1.8.0/download/data"
 HOURS_PER_YEAR = 24.0 * 365.0  # CBECI annualises with 8.76 TWh per GW
 BLOCKS_PER_DAY = 144.0
 HALVING_2028 = date(2028, 4, 15)
@@ -208,6 +209,9 @@ def sota_usd_per_th(d: date, catalog: dict) -> float:
             continue
         if rel > d or jth <= 0:
             continue
+        observations = [p for p in m.get("price_observations", []) if p["date"] <= d.isoformat()]
+        if observations:
+            usd = float(sorted(observations, key=lambda p: p["date"])[-1]["usd_per_th"])
         if best_jth is None or jth < best_jth:
             best_jth = jth
             px = usd
@@ -224,7 +228,11 @@ def sota_roic_all_in(
     usd_per_th: float,
     roic: float = 0.25,
 ) -> float | None:
-    """Cash all-in plus required profit so new ASICs earn `roic` on $/TH capital."""
+    """Legacy 60%-power all-in gross-up plus annual return on equipment capital.
+
+    The gross-up includes normalized equipment expense; this is not cash cost.
+    Explicit depreciation/installed-capital economics are shown separately.
+    """
     cash = all_in_cost_usd(hash_eh, sota_j_th, electricity_usd_kwh, subsidy_btc, power_share)
     if cash is None or hash_eh <= 0 or subsidy_btc <= 0 or usd_per_th <= 0:
         return None
@@ -336,6 +344,43 @@ def forward_scenarios(now: CostState) -> dict:
             ),
         },
     }
+    from btc_model_context import HORIZON, monthly_dates
+
+    # Endpoint assumptions are scenarios, not forecasts of future electricity or
+    # network power. Preserve prior 2028/2032 endpoints, then extend to 2033.
+    multipliers = {
+        "naive_hk": [(1., 1.), (1., 1.), (1., 1.)],
+        "efficiency_deflation": [(.85, 1.), (.70, 1.), (.65, 1.)],
+        "power_inflation": [(1., 1.20), (1., 1.40), (1., 1.50)],
+        "mixed_base": [(1.10, 1.10), (1.25, 1.20), (1.30, 1.25)],
+    }
+    for label, factors in multipliers.items():
+        wm, km = factors[-1]
+        out[label]["2033"] = _scenario_point(
+            watts=w0 * wm, kwh=k0 * km, subsidy=block_subsidy_on(HORIZON),
+            power_share=share, premium=prem, horizon=HORIZON, label=label)
+        knots = [(now.as_of, 1., 1.)] + [
+            (day, *pair) for day, pair in zip((HALVING_2028, HALVING_2032, HORIZON), factors)
+            if day > now.as_of]
+        days = set(monthly_dates(now.as_of, HORIZON)) if now.as_of <= HORIZON else set()
+        for halving in (HALVING_2028, HALVING_2032):
+            if now.as_of < halving <= HORIZON:
+                days.update((halving - timedelta(days=1), halving))
+        path = []
+        for day in sorted(days):
+            left, right = knots[0], knots[-1]
+            for a, b in zip(knots, knots[1:]):
+                if a[0] <= day <= b[0]:
+                    left, right = a, b
+                    break
+            frac = (day - left[0]).days / max((right[0] - left[0]).days, 1)
+            watts_factor = left[1] + frac * (right[1] - left[1])
+            price_factor = left[2] + frac * (right[2] - left[2])
+            path.append(_scenario_point(watts=w0 * watts_factor, kwh=k0 * price_factor,
+                                       subsidy=block_subsidy_on(day), power_share=share,
+                                       premium=prem, horizon=day, label=label))
+        out[label]["path"] = path
+        out[label]["assumption"] = "Piecewise-linear watts/power-price scenario; subsidy changes discretely at estimated halving dates. No forced price floor."
     return out
 
 
@@ -435,16 +480,26 @@ def miner_stance(
 def parse_cbeci_csv(text: str) -> list[dict]:
     """CBECI download: annualised TWh MAX / MIN / GUESS."""
     rows: list[dict] = []
-    for line in text.splitlines():
-        if not line or line.startswith("Average") or line.startswith("Timestamp"):
+    columns = None
+    for parts in csv.reader(io.StringIO(text)):
+        if not parts or parts[0].startswith("Average"):
             continue
-        parts = line.split(",")
+        if parts[0] == "Timestamp":
+            columns = [c.lower().replace(' ', '') for c in parts]
+            continue
         if len(parts) < 5:
             continue
         try:
             d = date.fromisoformat(parts[1][:10])
-            mx, mn, guess = float(parts[2]), float(parts[3]), float(parts[4])
-        except (TypeError, ValueError):
+            if columns and any('twh' in c for c in columns):
+                # New downloads contain BOTH GW and annual TWh. Mixing these
+                # units understates fleet J/TH by 8.76x.
+                indices = [next(i for i,c in enumerate(columns) if 'twh' in c and tag in c)
+                           for tag in ('max', 'min', 'guess')]
+            else:
+                indices = [2, 3, 4]  # historical TWh-only downloads/fixtures
+            mx, mn, guess = (float(parts[i]) for i in indices)
+        except (TypeError, ValueError, IndexError, StopIteration):
             continue
         if guess <= 0:
             continue
@@ -455,6 +510,8 @@ def parse_cbeci_csv(text: str) -> list[dict]:
 
 def fetch_cbeci_twh(*, offline: bool = False) -> list[dict]:
     cache = CRYPTO_DIR / "cbeci_twh_raw.csv"
+    status = {"source_url": CBECI_URL, "version": "1.8.0", "status": "cached_offline" if offline else "cached_after_failure",
+              "attempted_on": datetime.now(timezone.utc).date().isoformat(), "error": None}
     if not offline:
         raw = _get_bytes(CBECI_URL)
         if raw:
@@ -464,9 +521,17 @@ def fetch_cbeci_twh(*, offline: bool = False) -> list[dict]:
             parsed = parse_cbeci_csv(text)
             if parsed:
                 _write_cbeci_raw(cache, parsed)
+                status.update(status="refreshed", observed_through=parsed[-1]["d"].isoformat())
+                (CRYPTO_DIR / "cbeci_refresh.json").write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
                 return parsed
+        status["error"] = "Cambridge download unavailable or invalid; original observation dates retained"
     if cache.exists():
-        return _read_cbeci_raw(cache)
+        rows = _read_cbeci_raw(cache)
+        status["observed_through"] = rows[-1]["d"].isoformat() if rows else None
+        # Offline rebuilds preserve the actual previous retrieval status.
+        if not offline:
+            (CRYPTO_DIR / "cbeci_refresh.json").write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
+        return rows
     return []
 
 
@@ -550,6 +615,9 @@ def build_and_write(*, offline: bool = False) -> dict:
     """Rebuild fleet J/TH, kWh scenarios, electricity-only and all-in cost CSVs."""
     hash_eh = read_csv_dates(CRYPTO_DIR / "btc_hash_rate_eh.csv")
     catalog = load_asic_catalog()
+    import btc_power_history as power_history
+    power_meta = power_history.refresh(offline=offline, directory=CRYPTO_DIR)
+    power_rows = power_history.load_rows(CRYPTO_DIR)
     cbeci = fetch_cbeci_twh(offline=offline)
     if not hash_eh:
         return {"ok": False, "error": "missing_hashrate"}
@@ -579,6 +647,7 @@ def build_and_write(*, offline: bool = False) -> dict:
     sota_roic_rows: list[tuple[date, float]] = []
     kwh_rows: list[dict] = []
     source_rows: list[dict] = []
+    proxy_cost_rows: list[tuple[date, float]] = []
 
     # Monthly sample of hashrate dates plus month-ends, keep daily if short
     sample = hash_eh
@@ -611,7 +680,11 @@ def build_and_write(*, offline: bool = False) -> dict:
         fleet_rows.append((d, fleet))
         elec_rows.append((d, elec))
         all_in_rows.append((d, all_in))
-        kwh_rows.append(kwh_scenario_row(d))
+        proxy_kwh = power_history.proxy_on(d, power_rows)
+        kwh_rows.append({**kwh_scenario_row(d), "value": KWH_HK, "survey": proxy_kwh,
+                         "proxy": proxy_kwh})
+        if proxy_kwh is not None:
+            proxy_cost_rows.append((d, all_in * proxy_kwh / KWH_HK))
         source_rows.append({"date": d.isoformat(), "source": src, "fleet_jth": round(fleet, 4)})
         if sota:
             sota_rows.append((d, sota))
@@ -637,13 +710,17 @@ def build_and_write(*, offline: bool = False) -> dict:
     write_csv(CRYPTO_DIR / "btc_all_in_cost_usd.csv", all_in_rows)
     write_csv(CRYPTO_DIR / "btc_sota_cash_cost_usd.csv", sota_cash_rows)
     write_csv(CRYPTO_DIR / "btc_sota_roic_cost_usd.csv", sota_roic_rows)
+    write_csv(CRYPTO_DIR / "btc_proxy_all_in_cost_usd.csv", proxy_cost_rows)
     write_csv(CRYPTO_DIR / "btc_cbeci_guess_jth.csv", cbeci_guess_jth)
     write_csv(CRYPTO_DIR / "btc_cbeci_min_jth.csv", cbeci_min_jth)
     write_csv_multi(
         CRYPTO_DIR / "btc_miner_kwh_usd.csv",
-        ["date", "hk_005", "low_004", "high_006", "survey"],
+        ["date", "value", "hk_005", "low_004", "high_006", "survey", "proxy"],
         kwh_rows,
     )
+    (CRYPTO_DIR / "btc_fleet_sources.json").write_text(
+        json.dumps({"method": "Assumed hashrate-at-release weights × linear survival; not observed fleet shares.",
+                    "observations": source_rows}, indent=2) + "\n", encoding="utf-8")
     latest = all_in_rows[-1] if all_in_rows else None
     return {
         "ok": True,
@@ -656,6 +733,8 @@ def build_and_write(*, offline: bool = False) -> dict:
         "latest_sota_roic": round(sota_roic_rows[-1][1], 2) if sota_roic_rows else None,
         "fleet_source": "asic_vintage_mix",
         "cbeci_through": last_cbeci.isoformat() if last_cbeci else None,
+        "power_history": power_meta,
+        "cbeci_refresh": json.loads((CRYPTO_DIR / "cbeci_refresh.json").read_text(encoding="utf-8")) if (CRYPTO_DIR / "cbeci_refresh.json").exists() else {"status": "unavailable"},
     }
 
 

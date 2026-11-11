@@ -1,0 +1,28 @@
+/* Real published-data render contract, escaping and old-cache freshness. */
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'../../..');
+const viz=require(path.join(root,'dashboard/btc-model-viz.js'));
+const doc=JSON.parse(fs.readFileSync(path.join(root,'dashboard/data/hk_snowball_model.json'),'utf8'));
+const html=viz.render(doc);
+for(const needle of ['≈ $1 million','Supply through 2028','Demand through 2033','HK Q2 2026','HK Q3 2026','$117,000','Current at publication','Unconstrained','Historical miner power proxy','Security revenue / day','Not in base IRR'])assert.ok(html.includes(needle),needle);
+assert.ok(!/NaN|Infinity/.test(html),'Nonfinite chart coordinates');
+const near=viz.chart(doc,{horizon:'near'}),far=viz.chart(doc,{horizon:'long',free:true,power:'proxy'});
+assert.ok(!near.includes('HK Q3 ≈ $1M · 2033'));
+assert.ok(far.includes('HK Q3 ≈ $1M · 2033'));
+assert.ok(far.includes('Unconstrained demand diagnostic'));
+assert.ok(far.includes('Production cost · power proxy'));
+assert.ok(!far.includes('NaN'));
+assert.equal(viz.ageStatus({observed_through:'2026-01-01',max_age_days:7},Date.parse('2026-11-11')).stale,true);
+assert.equal(viz.ageStatus({observed_through:null,max_age_days:7},Date.now()).stale,true);
+const bad=structuredClone(doc);
+bad.hk_reference.vintages[0].label='<img src=x onerror=alert(1)>';
+bad.supply.rig_comparison.rigs[0].name='<svg onload=alert(1)>';
+const escaped=viz.render(bad);
+assert.ok(!escaped.includes('<img src=x'));
+assert.ok(!escaped.includes('<svg onload='));
+assert.ok(escaped.includes('&lt;img'));
+assert.ok(viz.render(null).includes('temporarily unavailable'));
+assert.ok(viz.render({demand:{}}).includes('temporarily unavailable'));
+console.log('BTC UI: 2033 references, horizon/power/free-fit rendering, freshness and escaping passed');

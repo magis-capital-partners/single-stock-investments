@@ -20,6 +20,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 import btc_cost_of_production as cop  # noqa: E402
+import btc_model_context as context  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 CRYPTO_DIR = ROOT / "_system" / "reference" / "market-data" / "crypto"
@@ -244,6 +245,7 @@ def fit_power_law(
     *,
     origin: date = BTC_ORIGIN,
     k_fixed: float | None = None,
+    constrain: bool = True,
 ) -> dict:
     """OLS on log P = log A + k log(t), optionally constrain k to [K_LO, K_HI]."""
     xs: list[float] = []
@@ -269,8 +271,10 @@ def fit_power_law(
 
     if k_fixed is not None:
         k = float(k_fixed)
-    else:
+    elif constrain:
         k = min(max(k_free, K_LO), K_HI)
+    else:
+        k = k_free
     # Re-estimate A at chosen k: minimize sum (log P - log A - k log t)^2
     log_a = mean_y - k * mean_x
     a = math.exp(log_a)
@@ -289,7 +293,8 @@ def fit_power_law(
         "A": a,
         "log_A": log_a,
         "r2_log": round(r2, 6) if r2 is not None else None,
-        "k_constrained": k_fixed is None and (k != k_free),
+        "k_constrained": constrain and k_fixed is None and (k != k_free),
+        "fit_kind": "fixed" if k_fixed is not None else ("constrained" if constrain else "unconstrained"),
     }
 
 
@@ -437,8 +442,8 @@ def _append_forward_points(path: list[dict], fan: dict, *, premium_multiple: flo
     mixed = fan.get("mixed_base") or {}
     out = list(path)
     seen = {p.get("d") for p in out}
-    for key in ("2028", "2032"):
-        pt = mixed.get(key) or {}
+    points = mixed.get("path") or [mixed.get(key) or {} for key in ("2028", "2032", "2033")]
+    for pt in points:
         d = pt.get("date")
         if not d or d in seen:
             continue
@@ -449,7 +454,9 @@ def _append_forward_points(path: list[dict], fan: dict, *, premium_multiple: flo
                 "v": round(all_in, 2),
                 "all_in_cost_usd": round(all_in, 2),
                 "premium_band_usd": round(all_in * premium_multiple, 2),
-                "event": f"forward_mixed_{key}",
+                "electricity_only_usd": pt.get("electricity_only_usd"),
+                "subsidy_btc": pt.get("subsidy_btc"),
+                "event": "forward_mixed_scenario",
             }
         )
         seen.add(d)
@@ -506,7 +513,7 @@ def build(*, as_of: date | None = None) -> Path:
     sota_roic_series = _read_csv(CRYPTO_DIR / "btc_sota_roic_cost_usd.csv")
     sota_cash_series = _read_csv(CRYPTO_DIR / "btc_sota_cash_cost_usd.csv")
     sota_jth_series = _read_csv(CRYPTO_DIR / "btc_sota_jth.csv")
-    as_of = as_of or (btc[-1][0] if btc else date.today())
+    as_of = as_of or datetime.now(timezone.utc).date()
     btc, amzn, hash_eh, fleet_jth_series, all_in_series, elec_series, sota_roic_series, sota_cash_series, sota_jth_series = (
         [(d, v) for d, v in rows if d <= as_of] for rows in
         (btc, amzn, hash_eh, fleet_jth_series, all_in_series, elec_series, sota_roic_series, sota_cash_series, sota_jth_series)
@@ -534,27 +541,7 @@ def build(*, as_of: date | None = None) -> Path:
 
     fit = fit_power_law(fit_series, origin=BTC_ORIGIN)
 
-    # Unconstrained diagnostic (any k) for transparency vs HK ~t^6 claim
-    def _fit_unconstrained() -> dict:
-        xs, ys = [], []
-        for d, p in fit_series:
-            t = years_since(BTC_ORIGIN, d)
-            if t < 0.25 or p <= 0:
-                continue
-            xs.append(math.log(t))
-            ys.append(math.log(p))
-        n = len(xs)
-        if n < 30:
-            return {"ok": False}
-        mx, my = sum(xs) / n, sum(ys) / n
-        vx = sum((x - mx) ** 2 for x in xs)
-        if vx <= 0:
-            return {"ok": False}
-        k = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / vx
-        log_a = my - k * mx
-        return {"ok": True, "k": round(k, 6), "A": math.exp(log_a), "n": n}
-
-    fit_raw = _fit_unconstrained()
+    fit_raw = fit_power_law(fit_series, origin=BTC_ORIGIN, constrain=False)
 
     model_now = model_price(fit, as_of)
     model_2028 = model_price(fit, NEXT_HALVING)
@@ -562,16 +549,12 @@ def build(*, as_of: date | None = None) -> Path:
     # Theoretical path (monthly samples)
     theo: list[dict] = []
     if fit.get("ok") and fit_series:
-        d0, d1 = fit_series[0][0], max(fit_series[-1][0], NEXT_HALVING)
-        cursor = date(d0.year, d0.month, 1)
-        while cursor <= d1:
+        d0, d1 = fit_series[0][0], max(fit_series[-1][0], context.HORIZON)
+        for cursor in context.monthly_dates(d0, d1):
             mp = model_price(fit, cursor)
             if mp is not None:
-                theo.append({"d": cursor.isoformat(), "v": round(mp, 4)})
-            if cursor.month == 12:
-                cursor = date(cursor.year + 1, 1, 1)
-            else:
-                cursor = date(cursor.year, cursor.month + 1, 1)
+                theo.append({"d": cursor.isoformat(), "v": float(f"{mp:.9g}"),
+                             "projected": cursor > as_of})
 
     current_all_in, cost_source = resolve_current_all_in(
         hash_eh,
@@ -642,6 +625,33 @@ def build(*, as_of: date | None = None) -> Path:
         "premium_usd": round(current_all_in * premium_multiple, 2),
     }
     catalog = cop.load_asic_catalog()
+    supply["rig_comparison"] = context.rig_comparison(
+        catalog, hash_eh[-1][1] if hash_eh else 0., as_of, block_subsidy_on(as_of))
+    supply["electricity_history"] = context.power.metadata(as_of, CRYPTO_DIR)
+    proxy_cost = _read_csv(CRYPTO_DIR / "btc_proxy_all_in_cost_usd.csv")
+    proxy_cost = [(d, v) for d, v in proxy_cost if d <= as_of]
+    supply["electricity_history"]["cost_path"] = downsample(proxy_cost, max_points=250)
+    latest_proxy = supply["electricity_history"].get("latest_usd_kwh")
+    if latest_proxy and hash_eh:
+        proxy_fan = cop.forward_scenarios(cop.CostState(
+            as_of=as_of, hash_eh=hash_eh[-1][1], fleet_jth=efficiency_j_th,
+            electricity_usd_kwh=latest_proxy, subsidy_btc=block_subsidy_on(as_of),
+            power_share=power_share, premium_multiple=premium_multiple))
+        supply["electricity_history"]["cost_path"] += [
+            {"d": pt["date"], "v": pt["all_in_usd"], "projected": True}
+            for pt in proxy_fan["mixed_base"]["path"] if pt["date"] > as_of.isoformat()]
+    supply["fees"] = context.fee_context(
+        CRYPTO_DIR / "btc_avg_fee_per_block_usd.csv", as_of, btc, current_all_in, fan,
+        lambda day: model_price(fit, day))
+    supply["dynamic_support_note"] = "Production cost is dynamic economic support, not a guaranteed price floor. Miner shutdowns and difficulty adjustment can change costs; raw demand paths are never clamped to supply cost."
+    if hash_eh:
+        supply["fleet_survival_sensitivity"] = {
+            str(life): cop.asic_fleet_jth(as_of, {**catalog, "life_years": life}, hash_eh)
+            for life in (3, 5, 7)}
+        cbeci_points = [(d, v) for d, v in _read_csv(CRYPTO_DIR / "btc_cbeci_guess_jth.csv") if d <= as_of]
+        supply["cbeci_comparison"] = {"date": cbeci_points[-1][0].isoformat() if cbeci_points else None,
+                                       "j_th": cbeci_points[-1][1] if cbeci_points else None,
+                                       "same_date_mix_j_th": cop.asic_fleet_jth(cbeci_points[-1][0], catalog, hash_eh) if cbeci_points else None}
     supply["sensitivities"] = cop.live_sensitivities(
         hash_eh=hash_eh[-1][1] if hash_eh else 0.0,
         fleet_jth=efficiency_j_th,
@@ -673,23 +683,26 @@ def build(*, as_of: date | None = None) -> Path:
     hash_points = downsample(hash_eh, max_points=200) if hash_eh else []
 
     payload = {
-        "schema_version": "1.2",
+        "schema_version": "2.0",
+        "research_only": True,
+        "in_base_irr": False,
+        "valuation_authority": "none",
+        "horizon": context.HORIZON.isoformat(),
+        "freshness": context.input_freshness(CRYPTO_DIR, as_of, catalog),
+        "presentation": {"near_term": "Supply economics through the estimated 2028 halving",
+                         "long_term": "Demand scenarios through 2033, with production-cost support visible",
+                         "transition_is_assumption": True},
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "as_of": as_of.isoformat(),
         "disclaimer": DISCLAIMER,
         "source_commentary": (
-            "Horizon Kinetics Q2 2026 Commentary: "
-            "Math Model of Compounding / What's With the Price of Bitcoin?"
+            "Horizon Kinetics Q2 2026 Commentary pp. 32–36; Q3 2026 Commentary pp. 5–6"
         ),
-        "hk_reference": {
-            "model_2028": HK_MODEL_2028,
-            "supply_low": 150000,
-            "supply_high": 250000,
-            "current_all_in_commentary": DEFAULT_CURRENT_ALL_IN,
-        },
+        "hk_reference": context.hk_references(),
         "spot": {
             "btc_usd": round(spot, 4),
             "source": "btc_spot_usd.csv",
+            "observed_on": btc[-1][0].isoformat(),
         },
         "milestones": {
             "btc": {
@@ -717,7 +730,13 @@ def build(*, as_of: date | None = None) -> Path:
             "next_10x": next_10x_date(fit, spot, as_of),
             "actual_path": downsample(fit_series, max_points=450),
             "model_path": theo,
-            "interpretation": "Demand ~ t^k near t^6. Each 10x takes longer.",
+            "unconstrained_path": [{"d": p["d"], "v": float(f"{model_price(fit_raw, date.fromisoformat(p['d'])):.9g}"),
+                                    "projected": p["projected"]} for p in theo] if fit_raw.get("ok") else [],
+            "horizon_values": [{"date": day.isoformat(), "constrained_usd": model_price(fit, day),
+                                "unconstrained_usd": model_price(fit_raw, day)}
+                               for day in (NEXT_HALVING, HALVING_2032, date(2033, 4, 15), context.HORIZON)],
+            "diagnostics": context.demand_diagnostics(fit_series, as_of, fit_power_law, model_price),
+            "interpretation": "Our constrained historical fit and free-fit diagnostic are independent of HK's published references. Exponent bounds are assumptions, not evidence of network adoption.",
         },
         "supply": supply,
         "hashrate": {
@@ -736,10 +755,10 @@ def build(*, as_of: date | None = None) -> Path:
                 else None
             ),
             "plain_english": {
-                "on_schedule": "Near the long demand path. Drawdowns along a rising cost floor are normal.",
-                "below_model": "Below the long demand path. Normal mid-cycle drawdown.",
+                "on_schedule": "Near our constrained demand scenario. This is context, not forecast validation.",
+                "below_model": "Below our constrained demand scenario; the historical fit does not establish a required price.",
                 "above_model": "Above the long demand path.",
-                "below_cost_floor": "Near or under the production-cost floor. Stressed miner economics.",
+                "below_cost_floor": "Near or under modeled production cost. Miner shutdowns and difficulty adjustment can change this support level.",
                 "insufficient_model": "Not enough history to fit the demand path.",
             }.get(label, ""),
         },
@@ -765,9 +784,12 @@ def build(*, as_of: date | None = None) -> Path:
 
     OUT_DASHBOARD.parent.mkdir(parents=True, exist_ok=True)
     CRYPTO_DIR.mkdir(parents=True, exist_ok=True)
-    text = json.dumps(payload, indent=2) + "\n"
-    OUT_DASHBOARD.write_text(text, encoding="utf-8")
-    OUT_REF.write_text(text, encoding="utf-8")
+    text = json.dumps(payload, indent=2, allow_nan=False) + "\n"
+    for target in (OUT_DASHBOARD, OUT_REF):
+        temporary = target.with_suffix('.tmp')
+        temporary.write_text(text, encoding="utf-8")
+    for target in (OUT_DASHBOARD, OUT_REF):
+        target.with_suffix('.tmp').replace(target)
     return OUT_DASHBOARD
 
 

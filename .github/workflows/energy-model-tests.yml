@@ -7,6 +7,11 @@ on:
       - '_system/scripts/power_cost_model.py'
       - '_system/scripts/fetch_crypto_panel.py'
       - '_system/scripts/build_hk_snowball_model.py'
+      - '_system/scripts/btc_*.py'
+      - '_system/scripts/validate_btc_model.py'
+      - '_system/scripts/tests/test_btc*'
+      - '_system/reference/market-data/crypto/**'
+      - 'dashboard/btc-model*'
       - '_system/scripts/tests/test_energy*'
       - 'dashboard/energy-model*'
       - 'dashboard/data/energy*'
@@ -36,6 +41,8 @@ jobs:
             /_system/reference/market-data/crypto/
             /dashboard/energy-model-viz.js
             /dashboard/energy-model.css
+            /dashboard/btc-model-viz.js
+            /dashboard/btc-model.css
             /dashboard/insights-viz.js
             /dashboard/data/energy_model.json
             /dashboard/data/energy_btc_bridge.json
@@ -49,12 +56,17 @@ jobs:
           node-version: '22'
       - name: Model invariants and BTC regressions
         run: |
+          python -m pip install pytest
           python -m unittest discover -s _system/scripts/tests -p test_energy_model.py -v
           python _system/scripts/test_btc_cost_of_production.py
           python _system/scripts/test_hk_snowball_model.py
+          python -m pytest _system/scripts/tests/test_btc_model_context.py _system/scripts/tests/test_btc_units_and_dates.py -q
+          python _system/scripts/validate_btc_model.py
           python _system/scripts/validate_energy_model.py
       - name: Optional UI and syntax
         run: |
           node --check dashboard/energy-model-viz.js
           node --check dashboard/insights-viz.js
+          node --check dashboard/btc-model-viz.js
+          node _system/scripts/tests/test_btc_model_ui.cjs
           node _system/scripts/tests/test_energy_model_ui.cjs

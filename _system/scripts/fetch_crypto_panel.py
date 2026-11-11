@@ -285,25 +285,23 @@ def fetch_mempool_difficulty() -> tuple[list[tuple[str, float]], str | None]:
 
 
 def fetch_mempool_fees_usd(btc_price: float) -> tuple[list[tuple[str, float]], str | None]:
-    blocks = _get_json(f"{MEMPOOL}/blocks/tip/height")
-    if not blocks:
-        return [], "network"
-    # use recommended fees * avg tx as rough proxy; fallback fixed estimate from mempool
-    fees = _get_json(f"{MEMPOOL}/v1/fees/mempool-blocks")
-    if not fees or not isinstance(fees, list):
-        return [(TODAY, 0.05 * btc_price)], "estimate"
-    total_fee_sat = 0
-    n = 0
-    for blk in fees[:6]:
+    # Mined-block history, not proposed mempool blocks. Each observation carries
+    # its own historical USD conversion price from the mining-history API.
+    fees = _get_json(f"{MEMPOOL}/v1/mining/blocks/fees/1m")
+    if not isinstance(fees, list):
+        return [], "mined_fee_history_unavailable"
+    daily: dict[str, list[float]] = {}
+    for block in fees:
         try:
-            total_fee_sat += float(blk.get("totalFees") or 0)
-            n += 1
-        except (TypeError, ValueError):
+            day = datetime.fromtimestamp(float(block["timestamp"]), timezone.utc).date().isoformat()
+            sats, usd = float(block["avgFees"]), float(block["USD"])
+            if sats < 0 or usd <= 0 or day > TODAY or not math.isfinite(sats * usd):
+                continue
+            daily.setdefault(day, []).append(sats / 1e8 * usd)
+        except (KeyError, TypeError, ValueError):
             continue
-    if n == 0:
-        return [(TODAY, 0.05 * btc_price)], "estimate"
-    avg_fee_btc = (total_fee_sat / n) / 1e8
-    return [(TODAY, round(avg_fee_btc * btc_price, 4))], None
+    rows = [(d, round(sum(v) / len(v), 4)) for d, v in sorted(daily.items())]
+    return rows, None if rows else "mined_fee_history_empty"
 
 
 def fetch_coingecko(coin_id: str, metric: str) -> tuple[list[tuple[str, float]], str | None]:
@@ -451,23 +449,36 @@ def process_series(spec: dict, ctx: dict, offline: bool) -> dict:
     elif src == "mempool_fees":
         btc = ctx.get("btc_spot_usd") or 0.0
         rows, err = fetch_mempool_fees_usd(btc)
-        source_label = "mempool.space:fees"
+        source_label = "mempool.space:mined_blocks_avgFees_satoshis+dated_USD"
     elif src == "coingecko":
         rows, err = fetch_coingecko(spec.get("coin_id", ""), spec.get("metric", ""))
         source_label = f"coingecko:{spec.get('coin_id')}:{spec.get('metric')}"
     elif src == "computed_hashprice":
+        required = [ctx.get("_dates", {}).get(key) for key in
+                    ("btc_spot_usd", "btc_hash_rate_eh", "btc_avg_fee_per_block_usd")]
+        common_day = min(required) if all(required) else None
+        aligned = {}
+        if common_day:
+            for key in ("btc_spot_usd", "btc_hash_rate_eh", "btc_avg_fee_per_block_usd"):
+                observed = [(d,v) for d,v in read_csv_series(CRYPTO_DIR / f"{key}.csv") if d <= common_day]
+                if observed:
+                    aligned[key] = observed[-1][1]
         hp = compute_hashprice(
-            ctx.get("btc_spot_usd") or 0.0,
-            ctx.get("btc_hash_rate_eh") or 0.0,
-            ctx.get("btc_avg_fee_per_block_usd") or 0.0,
+            aligned.get("btc_spot_usd") or 0.0,
+            aligned.get("btc_hash_rate_eh") or 0.0,
+            aligned.get("btc_avg_fee_per_block_usd") or 0.0,
             float(ctx.get("block_subsidy_btc") or 3.125),
         )
-        rows = [(TODAY, hp)]
+        # A calculation with cached inputs is not a new market observation.
+        rows = [(common_day, hp)] if common_day and len(aligned) == 3 else []
+        if not rows:
+            err = "missing_dated_inputs"
         source_label = "computed:hashprice"
     elif src == "computed_breakeven":
         hp = ctx.get("btc_hashprice_usd_ph_day") or 0.0
         eff = float(spec.get("efficiency_j_th") or 30)
-        rows = [(TODAY, compute_breakeven_kwh(hp, eff))]
+        hp_date = ctx.get("_dates", {}).get("btc_hashprice_usd_ph_day")
+        rows = [(hp_date, compute_breakeven_kwh(hp, eff))] if hp_date else []
         source_label = f"computed:breakeven_{eff}jth"
     else:
         err = f"unknown_source:{src}"
@@ -482,6 +493,8 @@ def process_series(spec: dict, ctx: dict, offline: bool) -> dict:
         write_csv(csv_path, rows)
 
     latest, as_of = latest_from_rows(rows)
+    if as_of:
+        ctx.setdefault("_dates", {})[sid] = as_of
     prior, yoy_pct = yoy(rows)
     stale_days = int(spec.get("staleness_max_days") or 7)
     stale = False
@@ -521,14 +534,15 @@ def process_series(spec: dict, ctx: dict, offline: bool) -> dict:
         "optional": bool(spec.get("optional")),
         "stale": stale,
         "error": err,
-        "note": spec.get("note"),
+        "note": ("Mined-block history is observed from the current API download window. Older committed fee history may contain legacy projected mempool estimates; it is not used as an observed fee backtest." if sid == "btc_avg_fee_per_block_usd" else spec.get("note")),
     }
 
 
 def build(theme_filter: str | None = None, offline: bool = False) -> dict:
     migrate_hashprice_units()
     cfg = load_config()
-    ctx: dict = {"block_subsidy_btc": cfg.get("block_subsidy_btc", 3.125)}
+    import btc_cost_of_production as cop
+    ctx: dict = {"block_subsidy_btc": cop.block_subsidy_on(date.fromisoformat(TODAY))}
     manifest: dict = {
         "hashprice_units_version": 2,
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -571,7 +585,12 @@ def build(theme_filter: str | None = None, offline: bool = False) -> dict:
         manifest["btc_cost_of_production"] = cost_out
     except Exception as exc:  # noqa: BLE001
         manifest["btc_cost_of_production_error"] = str(exc)
-    (CRYPTO_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    # A theme-specific refresh must preserve status for the other themes.
+    manifest_path = CRYPTO_DIR / "manifest.json"
+    if theme_filter and manifest_path.exists():
+        previous = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["themes"] = {**previous.get("themes", {}), **manifest["themes"]}
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
 
 
@@ -590,7 +609,7 @@ def main() -> int:
             out = build_snowball()
             print(f"Wrote {out}")
         except Exception as exc:  # noqa: BLE001
-            print(f"hk_snowball_model skipped: {exc}")
+            raise SystemExit(f"BTC model build failed; previous snapshot retained: {exc}") from exc
     return 0
 
 
