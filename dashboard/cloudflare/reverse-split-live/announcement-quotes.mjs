@@ -24,11 +24,15 @@ export async function announcementQuoteTick(env,now=new Date().toISOString()){
  env.nextAnnouncementQuotes=at(now)+5000;
  const rows=(await env.DB.prepare("SELECT payload FROM rs_announcement_watches WHERE watch_until>=? ORDER BY CASE WHEN json_extract(payload,'$.announcement_status')='scheduled' THEN 0 ELSE 1 END,first_seen_at DESC").bind(now).all()).results.map(r=>JSON.parse(r.payload));
  const names=[...new Set(rows.map(r=>r.ticker).filter(t=>/^[A-Z][A-Z0-9.]{0,11}$/.test(t||'')))];env.announcementQuoteSymbols=names;
- const errors=new Map(),quotes=new Map();let identityRequests=0;
+ const errors=new Map(),quotes=new Map();
+ // Refresh subscribed names fairly. Repeated unknown/stale identities at the
+ // front must not consume the two-request budget forever.
+ const subscribed=new Set((env.market.health?.per_symbol||[]).map(r=>r.ticker)),identityNames=names.filter(t=>subscribed.has(t));let scanned=0,identityRequests=0,cursor=env.announcementIdentityCursor||0;
+ while(scanned<identityNames.length&&identityRequests<2){const ticker=identityNames[(cursor+scanned)%identityNames.length];scanned++;if(!env.market.identityKnown?.(ticker)&&env.market.verifyIdentity){identityRequests++;env.market.verifyIdentity(ticker).catch(()=>{});}}
+ env.announcementIdentityCursor=identityNames.length?(cursor+scanned)%identityNames.length:0;
  // Read the existing shared subscription. No additional market-data session.
  for(const ticker of names){try{
   const q=env.market.peek?env.market.peek(ticker):await env.market.observe(ticker);
-  if(!env.market.identityKnown?.(ticker)&&identityRequests<2&&env.market.verifyIdentity){identityRequests++;env.market.verifyIdentity(ticker).catch(()=>{});}
   if(!q&&env.market.health?.symbol_budget_remaining===0&&!env.market.health.per_symbol?.some(r=>r.ticker===ticker))throw new Error('Databento symbol budget exhausted; observation missing');
   if(!q||q.dataset!=='EQUS.MINI'||q.size_units!=='shares'||![q.bid,q.ask,q.bid_size,q.ask_size].every(finite)||q.bid<=0||q.ask<q.bid||q.bid_size<=0||q.ask_size<=0||at(q.quote_at)===null||at(q.observed_at)===null||at(now)-at(q.quote_at)>15000||at(q.quote_at)>at(now)+2000||at(q.observed_at)>at(now)+2000)throw new Error('Fresh identified two-sided displayed quote required');
   if(at(q.observed_at)===null||at(now)-at(q.observed_at)>15000)throw new Error('Fresh quote receipt required');

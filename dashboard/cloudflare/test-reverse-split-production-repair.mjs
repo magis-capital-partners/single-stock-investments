@@ -8,7 +8,7 @@ import {localAdapter} from './reverse-split-live/checkpoint.mjs';
 import {EventEmitter} from 'node:events';
 import {PassThrough} from 'node:stream';
 import {makeDatabentoMarket} from './reverse-split-live/databento-market.mjs';
-import {EXECUTION_POLICIES,DELAY_EXECUTION_POLICIES,BROAD_EXECUTION_POLICIES,brokerGates} from './reverse-split-live/execution-core.mjs';
+import {EXECUTION_POLICIES,DELAY_EXECUTION_POLICIES,BROAD_EXECUTION_POLICIES,brokerGates,matchedThresholdStudy} from './reverse-split-live/execution-core.mjs';
 import {signalGate} from './reverse-split-live/shadow-core.mjs';
 import {initializeExecution,enrollExecution} from './reverse-split-live/execution-service.mjs';
 import {financialDisclosureGap} from './reverse-split-live/disclosure-gaps.mjs';
@@ -16,6 +16,14 @@ import {financialAssessment} from './reverse-split-live/financial-assessment.mjs
 import {repairNewsBindingFailures,consume,SOURCES,sha,replayAnnouncement} from './reverse-split-live/worker.mjs';
 import {installFinancialImport} from './reverse-split-live/financials-import.mjs';
 import {FINANCIAL_VERSION} from './reverse-split-live/financials-core.mjs';
+import {registerAnnouncement,announcementQuoteTick} from './reverse-split-live/announcement-quotes.mjs';
+
+test('unresolved identities at the front cannot starve the rest of the subscribed names',async t=>{
+ const db=new DatabaseSync(':memory:');for(const f of readdirSync(new URL('./reverse-split-live/migrations/',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./reverse-split-live/migrations/'+f,import.meta.url),'utf8'));t.after(()=>db.close());
+ const names=Array.from({length:128},(_,i)=>'QA'+String(i)),seen=[],start='2026-11-11T15:00:00Z',env={DB:localAdapter(db),market:{health:{per_symbol:names.map(ticker=>({ticker})),symbol_budget_remaining:0},peek:()=>null,identityKnown:()=>false,verifyIdentity:async t=>seen.push(t)}};
+ for(const ticker of names)await registerAnnouncement(env,{id:ticker,ticker,cik:'123',status:'needs_review',first_seen_at:start},start);
+ for(let i=0;i<64;i++)await announcementQuoteTick(env,new Date(Date.parse(start)+i*5000).toISOString());assert.equal(seen.length,128);assert.equal(new Set(seen).size,128);
+});
 
 test('broader portfolios differ only by explicit threshold and comparison identity',()=>{
  const originals=[...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES];assert.equal(BROAD_EXECUTION_POLICIES.length,32);
@@ -24,6 +32,11 @@ test('broader portfolios differ only by explicit threshold and comparison identi
  assert.equal(signalGate(e,EXECUTION_POLICIES[0],now).reason,'score_below_threshold');assert.equal(signalGate(e,BROAD_EXECUTION_POLICIES[0],now).state,'eligible');
  for(const f of [{score:null,signal_count:5,period:'2026-06-30'},{score:34,signal_count:2,period:'2026-06-30'},{score:34,signal_count:5,period:'2025-09-30'}])for(const p of [EXECUTION_POLICIES[0],BROAD_EXECUTION_POLICIES[0]])assert.equal(signalGate({...e,financials:f},p,now).state,'waiting');
  assert.ok(brokerGates([],now).reasons.includes('ibkr_locate_approval_missing'));
+});
+
+test('matched threshold comparisons exclude the original portfolio earlier observation window',()=>{
+ const p=BROAD_EXECUTION_POLICIES[0],start='2026-11-11T21:00:00Z',now='2026-11-11T22:00:00Z',registrations=[{id:p.id,registered_at:start},{id:p.threshold_comparison_parent,registered_at:'2026-11-05T14:00:00Z'}],trade={cik:'123',entry_shares:100,remaining_shares:100,entry_proceeds:1000,state:'open',pnl:{estimated_net_pnl:100,complete_net_pnl:null}};
+ const rows=[{...trade,policy_id:p.threshold_comparison_parent,first_seen_at:'2026-11-06T15:00:00Z'},{...trade,policy_id:p.threshold_comparison_parent,first_seen_at:start},{...trade,policy_id:p.id,first_seen_at:start},{...trade,policy_id:p.id,first_seen_at:'2026-11-06T15:00:00Z',state:'retrospective'}],pair=matchedThresholdStudy(rows,registrations,now)[0];assert.equal(pair.score60.entries,1);assert.equal(pair.all_scoreable.entries,1);assert.equal(pair.score60.entry_notional,pair.all_scoreable.entry_notional);assert.equal(pair.common_forward_start,start);assert.equal(pair.all_scoreable.incomplete_cost_positions,1);assert.equal(pair.alternative_portfolios_not_additive,true);
 });
 
 test('new portfolio registration preserves originals and cannot backdate old detections',async t=>{
