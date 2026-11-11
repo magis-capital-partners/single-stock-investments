@@ -19,11 +19,11 @@ def release(workspace: Path, vault: Path) -> dict:
         return subprocess.run(['git', '-c', 'submodule.recurse=false', '-C', str(vault), *args],
                               capture_output=True, check=True, **kwargs)
     git('rev-parse', '--git-dir')
-    # Staging hardlinks changes ctime without changing source bytes. Refresh
-    # cached stats before excluding those paths, and refuse genuinely dirty
-    # tracked inputs before any recursive cleanup can remove them.
-    git('update-index', '--refresh')
     omitted = ('dashboard-private/company-source-backfill-v2', 'dashboard-private/company-research-cache')
+    # Compare complete tracked target bytes to their preserved commit. Hardlink
+    # stat changes are harmless; staged or unstaged target changes must stay.
+    # New private control overlays outside these two targets are never removed.
+    git('diff', '--quiet', 'HEAD', '--', *omitted)
     targets = [vault / relative for relative in omitted]
     if any(path.resolve() != path or not path.resolve().is_relative_to(vault) for path in targets):
         raise ValueError('Build cache escapes its deployment checkout')

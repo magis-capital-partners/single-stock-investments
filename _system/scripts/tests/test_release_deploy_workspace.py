@@ -86,3 +86,27 @@ def test_release_requires_successfully_staged_company_documents(tmp_path):
         release(tmp_path, vault)
     for relative, raw in files.items():
         assert (vault / relative).read_bytes() == raw
+
+
+@pytest.mark.parametrize("staged", [False, True])
+def test_release_preserves_unrelated_private_overlay_changes(tmp_path, staged):
+    vault, site, files = fixture(tmp_path)
+    outside=vault / "valuation-underwriting/packets/a.json"
+    original=b"newer verified private overlay must survive"
+    outside.write_bytes(original)
+    if staged:git(vault,"add","valuation-underwriting/packets/a.json")
+    release(tmp_path,vault)
+    assert outside.read_bytes()==original
+    assert (site/"published.json").read_bytes()==b"complete source text"
+    assert not (vault/"dashboard-private/company-source-backfill-v2").exists()
+    assert git(vault,"show","HEAD:valuation-underwriting/packets/a.json")==files["valuation-underwriting/packets/a.json"]
+
+
+def test_release_refuses_staged_changed_target_before_any_removal(tmp_path):
+    vault, site, files=fixture(tmp_path)
+    source=vault/"dashboard-private/company-source-backfill-v2/part.zip"
+    source.write_bytes(b"new unique archive bytes")
+    git(vault,"add","dashboard-private/company-source-backfill-v2/part.zip")
+    with pytest.raises(subprocess.CalledProcessError):release(tmp_path,vault)
+    assert source.read_bytes()==b"new unique archive bytes"
+    assert (vault/"dashboard-private/company-research-cache").exists()
