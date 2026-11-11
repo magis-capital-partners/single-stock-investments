@@ -21,3 +21,17 @@ def configure_source_budget(root,ticker):
     require(actual.isdigit() and int(actual)==int(profile['parent_cik']),'Owner source exception parent identity mismatch')
     from underwriting_foreign_financials import source_budget
     source_budget().configure_owner_profile(profile)
+
+
+def native_context_tokens(root,ticker,packet):
+    """A dated CPRT-only context decision, distinct from evidence character limits."""
+    scope=(packet.get('primary_reference_usage') or {}).get('owner_authorized_scope') or {}
+    if ticker!='CPRT' or scope.get('id')!='CPRT-owner-20261111-v3':return None
+    require(packet.get('ticker')=='CPRT' and scope.get('parent')=='CPRT' and scope.get('target_cik')=='1637873',
+            'Native context exception cannot transfer between companies')
+    policy=json.loads((Path(root)/'_system/config/underwriting_policy.json').read_text(encoding='utf8'))
+    profile=(policy.get('owner_source_exceptions') or {}).get('CPRT') or {}
+    requested=profile.get('native_context_exception')
+    require(requested=={'id':'CPRT-native-context-owner-20261111','model':'gpt-6.1-sol',
+        'reasoning_effort':'high','context_tokens':872000},'CPRT complete evidence requires an explicit native context decision before admission')
+    return requested['context_tokens']
