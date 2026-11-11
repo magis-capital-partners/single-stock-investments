@@ -17,7 +17,9 @@ historical average for its (tenor bucket, delta, score) cell in _system/data/dar
 Inputs
   * chains: Cboe delayed quotes (keyless, ~15 min delayed), one request per symbol
   * stock state: dashboard/data/technical_signals.json (beta, 52-week drawdown, vol forecast)
-  * earnings: Nasdaq earnings calendar, one request per business day for the next ~7 weeks
+  * earnings: Nasdaq earnings calendar, one request per business day for the next ~7 weeks. If it
+    does not load, the calendar published with the previous signal is reused when under 24 hours
+    old; otherwise the run refuses to publish.
   * universe: _system/reference/market-data/index/sp500_constituents.json
 
 Output: dashboard/data/darwin_cc.json -- derived values only (scores, flags, strikes, rounded premium
@@ -29,12 +31,15 @@ from __future__ import annotations
 import argparse
 import concurrent.futures as cf
 import json
+import math
+import random
 import re
 import statistics
 import sys
 import time
 import urllib.error
 import urllib.request
+from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -48,6 +53,14 @@ CBOE_URL = "https://cdn-api.cboe.com/api/global/delayed_quotes/options/{symbol}.
 NASDAQ_URL = "https://api.nasdaq.com/api/calendar/earnings?date={day}"
 USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/126 Safari/537.36")
+NASDAQ_HEADERS = {"User-Agent": USER_AGENT, "Accept": "application/json, text/plain, */*",
+                  "Accept-Language": "en-US,en;q=0.9", "Origin": "https://www.nasdaq.com",
+                  "Referer": "https://www.nasdaq.com/"}
+EARNINGS_ATTEMPTS = 4          # per calendar day
+EARNINGS_BACKOFF_BASE = 2.0    # seconds, doubled per retry plus up to the same again in jitter
+EARNINGS_BACKOFF_CAP = 30.0
+MIN_EARNINGS_DAYS = 0.80       # refuse to publish if fewer calendar days than this loaded
+FALLBACK_MAX_AGE = timedelta(hours=24)
 
 # Research windows from lookup_v1.json. They are contiguous except 25-29 days, the hole
 # between the 21-day and 35-day buckets. tenor_for_dte fills that hole; do not widen these
@@ -117,26 +130,145 @@ def _norm(sym: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", str(sym).upper())
 
 
-def fetch_earnings(start: date, days: int = 50) -> tuple[dict[str, str], dict]:
+def _calendar_attempt(url: str, timeout: float) -> tuple[dict | None, str, float | None]:
+    """One Nasdaq request: (data, outcome, Retry-After seconds). data is set only for a usable day,
+    which includes a day with no reports (Nasdaq answers rows: null)."""
+    try:
+        req = urllib.request.Request(url, headers=NASDAQ_HEADERS)
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = resp.read()
+    except urllib.error.HTTPError as exc:
+        retry_after = None
+        try:
+            retry_after = float(exc.headers.get("Retry-After") or 0) or None
+        except (TypeError, ValueError, AttributeError):
+            pass
+        return None, f"http_{exc.code}", retry_after
+    except TimeoutError:
+        return None, "timeout", None
+    except urllib.error.URLError as exc:
+        return None, "timeout" if isinstance(exc.reason, TimeoutError) else "network", None
+    except Exception:  # connection reset mid-body and similar
+        return None, "network", None
+    if not body or not body.strip():
+        return None, "empty_body", None
+    try:
+        payload = json.loads(body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None, "bad_json", None
+    data = payload.get("data") if isinstance(payload, dict) else None
+    r_code = ((payload.get("status") or {}).get("rCode") if isinstance(payload, dict) else None)
+    if not isinstance(data, dict) or (r_code is not None and r_code != 200):
+        return None, "no_data", None
+    return data, "ok", None
+
+
+def _backoff(attempt: int, retry_after: float | None = None) -> float:
+    delay = min(EARNINGS_BACKOFF_CAP, EARNINGS_BACKOFF_BASE * 2 ** attempt)
+    delay += random.uniform(0, delay)
+    if retry_after:
+        delay = max(delay, retry_after)
+    return min(delay, EARNINGS_BACKOFF_CAP)
+
+
+def fetch_calendar_day(url: str, *, attempts: int = EARNINGS_ATTEMPTS, timeout: float = 30.0,
+                       sleep=time.sleep) -> tuple[dict | None, list[str]]:
+    """One calendar day with retries (exponential backoff plus jitter). Returns the data block
+    and the outcome of every attempt, so a failing run says what Nasdaq actually answered."""
+    outcomes: list[str] = []
+    for attempt in range(attempts):
+        data, outcome, retry_after = _calendar_attempt(url, timeout)
+        outcomes.append(outcome)
+        if data is not None:
+            return data, outcomes
+        if outcome == "http_404" or attempt == attempts - 1:
+            break
+        sleep(_backoff(attempt, retry_after))
+    return None, outcomes
+
+
+def fetch_earnings(start: date, days: int = 50, *, sleep=time.sleep,
+                   now: datetime | None = None) -> tuple[dict[str, str], dict]:
     """Next report date per symbol from the Nasdaq calendar (business days only)."""
+    business_days = [start + timedelta(days=i) for i in range(days) if (start + timedelta(days=i)).weekday() < 5]
+    requested = len(business_days)
+    # Past this many failed days the publish guard cannot pass, so stop instead of spending the
+    # step's time budget on a calendar that is blocked.
+    max_failed = requested - math.ceil(MIN_EARNINGS_DAYS * requested)
     found: dict[str, str] = {}
-    requested = ok = 0
-    for i in range(days):
-        day = start + timedelta(days=i)
-        if day.weekday() >= 5:
-            continue
-        requested += 1
-        payload = _get_json(NASDAQ_URL.format(day=day.isoformat()), timeout=30, attempts=2)
-        rows = (((payload or {}).get("data") or {}).get("rows")) or []
-        if payload is not None:
+    ok = failed = 0
+    outcomes: Counter = Counter()
+    for day in business_days:
+        data, tried = fetch_calendar_day(NASDAQ_URL.format(day=day.isoformat()), sleep=sleep)
+        outcomes.update(tried)
+        if data is None:
+            failed += 1
+            print(f"  nasdaq earnings {day}: no data after {len(tried)} attempts ({', '.join(tried)})",
+                  file=sys.stderr, flush=True)
+            if failed > max_failed:
+                print(f"  nasdaq earnings: {failed} days failed, the calendar cannot pass the publish guard; "
+                      "stopping early", file=sys.stderr, flush=True)
+                break
+        else:
             ok += 1
-        for row in rows:
-            key = _norm(row.get("symbol", ""))
-            if key and key not in found:
-                found[key] = day.isoformat()
-        time.sleep(0.2)
+            for row in data.get("rows") or []:
+                key = _norm((row or {}).get("symbol", ""))
+                if key and key not in found:
+                    found[key] = day.isoformat()
+        sleep(0.2)
+    fetched_at = (now or datetime.now(timezone.utc)).strftime("%Y-%m-%dT%H:%M:%SZ")
     return found, {"source": "nasdaq_earnings_calendar", "days_requested": requested, "days_ok": ok,
-                   "symbols": len(found)}
+                   "symbols": len(found), "fetched_at": fetched_at, "attempts": dict(sorted(outcomes.items()))}
+
+
+def calendar_loaded(meta: dict) -> bool:
+    """The publish guard: most requested days must have answered, or the earnings veto is blind."""
+    return meta.get("days_ok", 0) >= MIN_EARNINGS_DAYS * max(meta.get("days_requested", 1), 1)
+
+
+def _parse_utc(stamp) -> datetime | None:
+    try:
+        return datetime.strptime(str(stamp), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def previous_calendar(previous: dict | None, universe: list[str],
+                      now: datetime) -> tuple[dict[str, str], dict] | None:
+    """The calendar inside the last published signal, if it was a full load fetched under 24 hours
+    ago and covers every symbol in today's universe.
+
+    Age runs from the original Nasdaq fetch (earnings.fetched_at), which a fallback run carries
+    forward unchanged, so falling back twice can never stretch a calendar past 24 hours. A symbol
+    the previous signal never listed has no known date, so its veto would be blind: refuse."""
+    meta = (previous or {}).get("earnings") or {}
+    fetched = _parse_utc(meta.get("fetched_at"))
+    if fetched is None or not calendar_loaded(meta):
+        return None
+    age = now - fetched
+    if age < timedelta(0) or age >= FALLBACK_MAX_AGE:
+        return None
+    names = [n for n in previous.get("names") or [] if n.get("symbol")]
+    if {_norm(s) for s in universe} - {_norm(n["symbol"]) for n in names}:
+        return None
+    dates = {_norm(n["symbol"]): n["next_earnings"] for n in names if n.get("next_earnings")}
+    fallback_meta = {k: meta[k] for k in ("days_requested", "days_ok", "symbols", "fetched_at") if k in meta}
+    fallback_meta.update(source=meta.get("source", "nasdaq_earnings_calendar"),
+                         fallback="previous_publish", age_hours=round(age.total_seconds() / 3600, 1))
+    return dates, fallback_meta
+
+
+def choose_earnings(live: dict[str, str], live_meta: dict, previous: dict | None, universe: list[str],
+                    now: datetime) -> tuple[dict[str, str], dict] | None:
+    """Live calendar if it loaded, else a fresh previous one, else None (refuse to publish)."""
+    if calendar_loaded(live_meta):
+        return live, live_meta
+    cached = previous_calendar(previous, universe, now)
+    if cached is None:
+        return None
+    dates, meta = cached
+    meta["live_attempt"] = {k: live_meta.get(k) for k in ("days_requested", "days_ok", "attempts")}
+    return dates, meta
 
 
 # --------------------------------------------------------------------------- #
@@ -388,15 +520,33 @@ def main(argv=None) -> int:
         if cache:
             cache.write_text(json.dumps(chains), encoding="utf-8")
     print(f"  {len(chains)} chains in {time.time() - t0:.0f}s", flush=True)
-    earnings, meta = fetch_earnings(today)
+    earnings, meta = fetch_earnings(today, now=now)
     print(f"  earnings calendar: {meta}", flush=True)
+    previous = None
+    if Path(args.output).exists():
+        try:
+            previous = json.loads(Path(args.output).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"  previous signal unreadable, no calendar fallback: {exc}", file=sys.stderr)
+    chosen = choose_earnings(earnings, meta, previous, universe, now)
+    if chosen is not None and chosen[1].get("fallback"):
+        earnings, meta = chosen
+        print(f"::warning title=Darwin CC earnings fallback::Nasdaq calendar loaded "
+              f"{meta['live_attempt']['days_ok']}/{meta['live_attempt']['days_requested']} days "
+              f"(attempts {meta['live_attempt']['attempts']}); using the calendar published with the previous "
+              f"signal, fetched {meta['fetched_at']} ({meta['age_hours']}h old, limit "
+              f"{FALLBACK_MAX_AGE.total_seconds() / 3600:.0f}h)", flush=True)
     payload = build_payload(universe, technicals, chains, earnings, lookup, today=today, now=now, earnings_meta=meta)
     cov = payload["universe"]["coverage"]
     if cov < MIN_COVERAGE and not args.limit:
         print(f"refusing to publish: only {cov:.0%} of the universe scored (need {MIN_COVERAGE:.0%})", file=sys.stderr)
         return 1
-    if meta.get("days_ok", 0) < 0.8 * max(meta.get("days_requested", 1), 1):
+    if chosen is None:
+        prev_at = ((previous or {}).get("earnings") or {}).get("fetched_at")
         print("refusing to publish: the earnings calendar did not load, so the earnings veto would be blind",
+              file=sys.stderr)
+        print(f"  no fallback: the previous signal's calendar (fetched_at {prev_at}) is missing, older than "
+              f"{FALLBACK_MAX_AGE.total_seconds() / 3600:.0f}h, incomplete, or does not cover today's universe",
               file=sys.stderr)
         return 1
     Path(args.output).write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")

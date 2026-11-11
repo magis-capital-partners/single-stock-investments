@@ -1,11 +1,14 @@
 """Darwin Covered Call builder: parsing, contract selection, scoring and the public-data rule."""
 from __future__ import annotations
 
+import io
 import json
 import math
 import sys
+import urllib.error
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 SCRIPTS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPTS))
@@ -169,6 +172,186 @@ def test_premium_is_rounded_to_five_basis_points():
     for n in out["names"]:
         for c in n.get("calls", []):
             assert abs(c["premium_pct"] / 0.05 - round(c["premium_pct"] / 0.05)) < 1e-6
+
+
+class _FakeNasdaq:
+    """Stands in for urlopen: each call pops the next scripted answer (an HTTP status or a body)."""
+
+    def __init__(self, script):
+        self.script = list(script)
+        self.requests = []
+
+    def __call__(self, req, timeout=None):
+        self.requests.append(req)
+        answer = self.script.pop(0) if self.script else self.default
+        if isinstance(answer, int):
+            raise urllib.error.HTTPError(req.full_url, answer, "blocked", {}, None)
+        if isinstance(answer, Exception):
+            raise answer
+        return io.BytesIO(answer if isinstance(answer, bytes) else json.dumps(answer).encode())
+
+    default = 403
+
+
+def _day(*symbols):
+    rows = [{"symbol": s} for s in symbols] or None
+    return {"data": {"rows": rows}, "status": {"rCode": 200}}
+
+
+def test_calendar_day_retries_through_transient_failures(monkeypatch):
+    fake = _FakeNasdaq([403, 429, b"", _day("AAPL")])
+    monkeypatch.setattr(cc.urllib.request, "urlopen", fake)
+    sleeps = []
+    data, tried = cc.fetch_calendar_day("https://api.nasdaq.com/x", sleep=sleeps.append)
+    assert data == {"rows": [{"symbol": "AAPL"}]}
+    assert tried == ["http_403", "http_429", "empty_body", "ok"]
+    assert len(sleeps) == 3
+    for attempt, wait in enumerate(sleeps):
+        base = min(cc.EARNINGS_BACKOFF_CAP, cc.EARNINGS_BACKOFF_BASE * 2 ** attempt)
+        assert base <= wait <= min(2 * base, cc.EARNINGS_BACKOFF_CAP), "exponential backoff with jitter"
+    headers = {k.lower(): v for k, v in fake.requests[0].header_items()}
+    assert "mozilla" in headers["user-agent"].lower()
+    assert headers["referer"] == "https://www.nasdaq.com/" and "accept-language" in headers
+
+
+def test_calendar_day_gives_up_after_the_attempt_budget(monkeypatch):
+    monkeypatch.setattr(cc.urllib.request, "urlopen", _FakeNasdaq([]))
+    data, tried = cc.fetch_calendar_day("https://api.nasdaq.com/x", sleep=lambda s: None)
+    assert data is None and tried == ["http_403"] * cc.EARNINGS_ATTEMPTS
+
+
+def test_a_blocked_answer_with_no_data_block_is_not_a_loaded_day(monkeypatch):
+    monkeypatch.setattr(cc.urllib.request, "urlopen",
+                        _FakeNasdaq([{"data": None, "status": {"rCode": 400}}] * cc.EARNINGS_ATTEMPTS))
+    data, tried = cc.fetch_calendar_day("https://api.nasdaq.com/x", sleep=lambda s: None)
+    assert data is None and set(tried) == {"no_data"}
+
+
+def test_fetch_earnings_recovers_from_a_transient_failure(monkeypatch):
+    start = date(2026, 11, 9)  # Monday: 5 business days in the first week
+    script = [403, _day("AAPL", "BRK.B"), _day(), _day("MSFT"), _day("AAPL"), _day()]
+    monkeypatch.setattr(cc.urllib.request, "urlopen", _FakeNasdaq(script))
+    found, meta = cc.fetch_earnings(start, days=5, sleep=lambda s: None, now=NOW)
+    assert meta["days_requested"] == 5 and meta["days_ok"] == 5
+    assert found == {"AAPL": "2026-11-09", "BRKB": "2026-11-09", "MSFT": "2026-11-11"}
+    assert meta["attempts"] == {"http_403": 1, "ok": 5}
+    assert meta["fetched_at"] == "2026-10-16T20:00:00Z"
+    assert cc.calendar_loaded(meta)
+
+
+def test_fetch_earnings_stops_once_the_guard_cannot_pass(monkeypatch):
+    fake = _FakeNasdaq([])
+    monkeypatch.setattr(cc.urllib.request, "urlopen", fake)
+    found, meta = cc.fetch_earnings(date(2026, 11, 10), days=50, sleep=lambda s: None, now=NOW)
+    requested = meta["days_requested"]
+    allowed_failures = requested - math.ceil(cc.MIN_EARNINGS_DAYS * requested)
+    assert found == {} and meta["days_ok"] == 0
+    assert len(fake.requests) == (allowed_failures + 1) * cc.EARNINGS_ATTEMPTS
+    assert not cc.calendar_loaded(meta)
+
+
+def _published(fetched_at: str, names: dict[str, str | None], **meta) -> dict:
+    earnings = {"source": "nasdaq_earnings_calendar", "days_requested": 36, "days_ok": 36,
+                "symbols": 1800, "fetched_at": fetched_at, **meta}
+    return {"earnings": earnings,
+            "names": [{"symbol": s, "status": "ok", "next_earnings": d} for s, d in names.items()]}
+
+
+BLIND = {"source": "nasdaq_earnings_calendar", "days_requested": 36, "days_ok": 0, "symbols": 0,
+         "fetched_at": "2026-10-16T20:00:00Z", "attempts": {"http_403": 144}}
+
+
+def test_fresh_previous_calendar_is_used_when_nasdaq_is_blind():
+    previous = _published("2026-10-16T02:00:00Z", {"AAPL": "2026-10-30", "BRK.B": "2026-11-01", "KO": None})
+    chosen = cc.choose_earnings({}, BLIND, previous, ["AAPL", "BRK.B", "KO"], NOW)
+    assert chosen is not None
+    dates, meta = chosen
+    assert dates == {"AAPL": "2026-10-30", "BRKB": "2026-11-01"}
+    assert meta["fallback"] == "previous_publish" and meta["age_hours"] == 18.0
+    assert meta["fetched_at"] == "2026-10-16T02:00:00Z", "age keeps counting from the original fetch"
+    assert meta["live_attempt"]["attempts"] == {"http_403": 144}
+
+    # The fallback still drives the veto exactly as a live calendar would.
+    out = cc.build_payload(["AAPL"], {"AAPL": tech(0.5, -3)}, {"AAPL": chain("AAPL")}, dates, LOOKUP,
+                           today=TODAY, now=NOW, earnings_meta=meta)
+    aapl = out["names"][0]
+    assert aapl["next_earnings"] == "2026-10-30" and aapl["vetoed_calls"] > 0
+    assert out["earnings"]["fallback"] == "previous_publish"
+
+    # A run that published from the fallback cannot extend it: the next run measures from 02:00.
+    republished = {"earnings": meta, "names": previous["names"]}
+    later = NOW + timedelta(hours=6)
+    assert cc.choose_earnings({}, BLIND, republished, ["AAPL"], later) is None
+
+
+def test_live_calendar_wins_over_the_fallback():
+    previous = _published("2026-10-16T19:00:00Z", {"AAPL": "2026-10-30"})
+    live_meta = dict(BLIND, days_ok=36, symbols=1)
+    assert cc.choose_earnings({"AAPL": "2026-10-29"}, live_meta, previous, ["AAPL"], NOW) == (
+        {"AAPL": "2026-10-29"}, live_meta)
+
+
+def test_guard_still_refuses_when_calendar_is_empty_and_fallback_stale_or_missing():
+    universe = ["AAPL"]
+    assert cc.choose_earnings({}, BLIND, None, universe, NOW) is None, "no previous signal"
+    stale = _published("2026-10-15T20:00:00Z", {"AAPL": "2026-10-30"})  # exactly 24 hours old
+    assert cc.choose_earnings({}, BLIND, stale, universe, NOW) is None
+    legacy = _published("2026-10-16T19:00:00Z", {"AAPL": "2026-10-30"})
+    del legacy["earnings"]["fetched_at"]
+    assert cc.choose_earnings({}, BLIND, legacy, universe, NOW) is None, "no fetch time, no fallback"
+    partial = _published("2026-10-16T19:00:00Z", {"AAPL": "2026-10-30"}, days_ok=10)
+    assert cc.choose_earnings({}, BLIND, partial, universe, NOW) is None, "previous load was itself blind"
+    future = _published("2026-10-16T21:00:00Z", {"AAPL": "2026-10-30"})
+    assert cc.choose_earnings({}, BLIND, future, universe, NOW) is None
+    fresh = _published("2026-10-16T19:00:00Z", {"AAPL": "2026-10-30"})
+    assert cc.choose_earnings({}, BLIND, fresh, ["AAPL", "NEWCO"], NOW) is None, "a new member has no date"
+
+
+def test_main_refuses_to_publish_without_a_fresh_fallback(monkeypatch, tmp_path, capsys):
+    out_path = tmp_path / "darwin_cc.json"
+    stale = _published("2026-10-14T20:00:00Z", {"AAA": "2026-10-30"})
+    out_path.write_text(json.dumps(stale), encoding="utf-8")
+    _patch_main(monkeypatch, BLIND)
+    assert cc.main(["--output", str(out_path)]) == 1
+    assert "refusing to publish: the earnings calendar did not load" in capsys.readouterr().err
+    assert json.loads(out_path.read_text(encoding="utf-8")) == stale, "nothing was published"
+
+
+def test_main_publishes_from_a_fresh_fallback_and_says_so(monkeypatch, tmp_path, capsys):
+    out_path = tmp_path / "darwin_cc.json"
+    fetched = (datetime.now(timezone.utc) - timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    out_path.write_text(json.dumps(_published(fetched, {"AAA": "2099-01-01"})), encoding="utf-8")
+    _patch_main(monkeypatch, BLIND)
+    assert cc.main(["--output", str(out_path)]) == 0
+    assert "::warning title=Darwin CC earnings fallback::" in capsys.readouterr().out
+    doc = json.loads(out_path.read_text(encoding="utf-8"))
+    assert doc["earnings"]["fallback"] == "previous_publish" and doc["earnings"]["fetched_at"] == fetched
+    assert doc["names"][0]["next_earnings"] == "2099-01-01"
+
+
+def _patch_main(monkeypatch, live_meta):
+    monkeypatch.setattr(cc, "load_universe", lambda: ["AAA"])
+    monkeypatch.setattr(cc, "fetch_chains", lambda symbols, workers=3: {"AAA": _live_chain("AAA")})
+    monkeypatch.setattr(cc, "fetch_earnings", lambda start, now=None: ({}, dict(live_meta)))
+    real_read = Path.read_text
+
+    def read_text(self, *a, **k):
+        if self == cc.TECHNICALS:
+            return json.dumps({"by_ticker": {"AAA": tech(0.5, -3)}})
+        return real_read(self, *a, **k)
+    monkeypatch.setattr(Path, "read_text", read_text)
+
+
+def _live_chain(symbol: str) -> dict:
+    """chain() dated from the real clock, since main() scores against today."""
+    today = datetime.now(ZoneInfo("America/New_York")).date()
+    out = chain(symbol)
+    shift = today - TODAY
+    for o in out["options"]:
+        m = cc.OCC.match(o["option"])
+        exp = date(2000 + int(m["yy"]), int(m["mm"]), int(m["dd"])) + shift
+        o["option"] = f"{m['root']}{exp:%y%m%d}{m['cp']}{m['strike']}"
+    return out
 
 
 def test_lookup_cells_cover_every_bucket_delta_and_score():
