@@ -71,3 +71,58 @@ def test_hosted_migration_has_no_model_or_automatic_trigger():
     assert 'schedule:' not in workflow and 'workflow_dispatch:' not in workflow
     assert 'migrate_private_storage.py' in workflow and '--release-staging-packs' in workflow
     assert 'ANTHROPIC_API_KEY' not in workflow and 'OPENAI_API_KEY' not in workflow
+
+
+def test_large_logical_batch_uses_bounded_exact_source_fetches(tmp_path, monkeypatch):
+    repo, pin, storage = fixture(tmp_path)
+    for number in range(20):
+        (repo / ('extra' + str(number))).write_bytes(('complete source ' + str(number)).encode())
+    subprocess.run(['git', '-C', str(repo), 'add', '--', *('extra' + str(i) for i in range(20))], capture_output=True, check=True)
+    subprocess.run(['git', '-C', str(repo), 'commit', '-m', 'Complete additional originals'], capture_output=True, check=True)
+    pin = subprocess.check_output(['git', '-C', str(repo), 'rev-parse', 'HEAD']).decode().strip()
+    storage.config['legacy_pin'] = pin
+    (repo / 'migration-owner.json').write_text(json.dumps({'purpose': 'verified-private-legacy-migration', 'source_commit': pin}))
+    rows, _ = migration.inventory(repo, pin)
+    expected = list(dict.fromkeys(row['git_blob'] for row in rows))
+    real = migration.run_git
+    fetched = []
+    def download(directory, *args, **kwargs):
+        if 'fetch' in args:
+            wants = list(args[args.index('origin') + 1:])
+            if len(wants) > 16:
+                raise subprocess.TimeoutExpired(['git', 'fetch'], 180)
+            fetched.extend(wants)
+            return type('Result', (), {'stdout': b''})()
+        return real(directory, *args, **kwargs)
+    monkeypatch.setattr(migration, 'run_git', download)
+    result = migration.migrate(repo, tmp_path / 'proof', storage=storage, batch_files=256)
+    assert result['complete'] and result['files_verified'] == len(rows)
+    assert fetched == expected
+    storage.config['legacy_archive_manifest'] = result['manifest_path']
+    for row in rows:
+        assert storage.restore(row['path']) == (repo / row['path']).read_bytes()
+
+
+def test_source_fetch_failure_preserves_prior_verified_checkpoint(tmp_path, monkeypatch):
+    repo, pin, storage = fixture(tmp_path)
+    real = migration.run_git
+    def download(directory, *args, **kwargs):
+        if 'fetch' in args:
+            return type('Result', (), {'stdout': b''})()
+        return real(directory, *args, **kwargs)
+    monkeypatch.setattr(migration, 'run_git', download)
+    output = tmp_path / 'proof'
+    assert not migration.migrate(repo, output, storage=storage, batch_files=1, max_batches=1)['complete']
+    before_journal = (output / 'migration-journal.json').read_bytes()
+    before_catalog = copy.deepcopy(storage.catalog.records)
+    def unavailable(directory, *args, **kwargs):
+        if 'fetch' in args:
+            raise subprocess.TimeoutExpired(['git', 'fetch'], 180)
+        return real(directory, *args, **kwargs)
+    monkeypatch.setattr(migration, 'run_git', unavailable)
+    with pytest.raises(subprocess.TimeoutExpired):
+        migration.migrate(repo, output, storage=storage, batch_files=256)
+    assert (output / 'migration-journal.json').read_bytes() == before_journal
+    assert storage.catalog.records == before_catalog
+    monkeypatch.setattr(migration, 'run_git', download)
+    assert migration.migrate(repo, output, storage=storage, batch_files=256)['complete']
