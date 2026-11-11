@@ -868,3 +868,59 @@ def test_a_saved_summary_of_an_unreadable_extract_is_blocked_and_loses_its_draft
     assert s.load_saved("abc")["status"] == "blocked_extraction" and not s.draft_path("abc").exists()
     os.utime(s.summary_path("abc"), (old, old))
     assert s.repair_existing()["current"] == 1
+
+
+def test_a_summary_too_big_for_one_record_keeps_every_statement_and_narrows_its_private_quotes(monkeypatch):
+    fixed_replies(monkeypatch)
+    payload = s.summarize_letter(RECORD, LETTER, None)
+    full, errors = s.summary_draft(payload, LETTER)
+    assert errors == []
+    # The size checked is that of the stored record: the draft, its overview a second time, and the fixed part.
+    stored = json.dumps(full, ensure_ascii=False, sort_keys=True)
+    assert s.revision_bytes(full) == len(stored.encode()) + stored.count("'") + len(full["overview"].encode()) + full["overview"].count("'") + s.STATEMENT_OVERHEAD
+    assert s.MAX_STATEMENT_BYTES + 1_000 < 100_000  # D1's limit, with room to spare
+    longest = max(len(entry["quote"]) for idea in full["ideas"] for entry in idea["evidence"])
+    # A limit this record just misses: the quotes are narrowed and nothing a reader sees changes.
+    monkeypatch.setattr(s, "MAX_STATEMENT_BYTES", s.revision_bytes(full) - 1)
+    narrowed, errors = s.summary_draft(payload, LETTER)
+    assert errors == [] and s.gate_errors(narrowed, LETTER) == []
+    assert max(len(entry["quote"]) for idea in narrowed["ideas"] for entry in idea["evidence"]) < longest
+    assert [(idea["summary"], idea["cites"]) for idea in narrowed["ideas"]] == [(idea["summary"], idea["cites"]) for idea in full["ideas"]]
+    assert narrowed["coverage"]["statements"] == full["coverage"]["statements"] and len(narrowed["checklist"]) == len(full["checklist"])
+    # A limit nothing can meet: the summary is reported as too large, still whole.
+    monkeypatch.setattr(s, "MAX_STATEMENT_BYTES", 1_000)
+    whole, errors = s.summary_draft(payload, LETTER)
+    assert errors == [s.TOO_LARGE]
+    assert [idea["summary"] for idea in whole["ideas"]] == [idea["summary"] for idea in full["ideas"]]
+
+
+def test_a_summary_that_was_too_large_is_not_attempted_again(tmp_path, monkeypatch):
+    monkeypatch.setattr(s, "output_dir", lambda: tmp_path)
+    path = s.summary_path("abc")
+    write_saved(path, prompt_version=s.PROMPT_VERSION, status="quarantine", errors=[s.TOO_LARGE], chunks_covered=2, chunks_total=2, attempts=1)
+    assert s.already_done("abc", True) is True
+    # Any other reason for quarantine is still retried.
+    write_saved(path, prompt_version=s.PROMPT_VERSION, status="quarantine", errors=[s.TOO_LARGE, "another"], chunks_covered=2, chunks_total=2, attempts=1)
+    assert s.already_done("abc", True) is False
+
+
+def test_a_letter_too_long_for_one_record_is_set_aside_without_a_model_call(tmp_path, monkeypatch):
+    import llm_local
+
+    source = tmp_path / "long.txt"
+    source.write_text(LETTER + " The fund held its positions through the quarter." * 30, encoding="utf-8")
+    words = len(source.read_text(encoding="utf-8").split())
+    monkeypatch.setattr(s, "output_dir", lambda: tmp_path)
+    monkeypatch.setattr(s, "load_records", lambda: [{**RECORD, "source_file": "long.txt"}])
+    monkeypatch.setattr(s, "letter_path", lambda record: source)
+    monkeypatch.setattr(llm_local, "models", lambda: ["local"])
+    monkeypatch.setattr(s, "ask_json", lambda *args, **kwargs: pytest.fail("the model was asked about a letter that cannot be stored"))
+    monkeypatch.setattr(s, "MAX_SOURCE_WORDS", words - 1)
+    counts = s.run(1, True, None)
+    assert counts["blocked"] == 1 and counts["written"] == 0
+    saved = s.load_saved(s.digest(source.read_bytes()))
+    assert saved["status"] == "blocked_length" and saved["source_words"] == words and "too long" in saved["reason"]
+    assert s.already_done(s.digest(source.read_bytes()), True) is True
+    # Once longer letters can be stored it is taken up again.
+    monkeypatch.setattr(s, "MAX_SOURCE_WORDS", words)
+    assert s.already_done(s.digest(source.read_bytes()), True) is False

@@ -54,7 +54,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 PROMPT_VERSION = "letter_detail_v6"
-PIPELINE_VERSION = "fund-reader-local.8"
+PIPELINE_VERSION = "fund-reader-local.9"
 # Finished summaries from these versions stay valid: they are not redone unless
 # asked for with --refresh-older, and a verified one may still publish.
 LEGACY_VERSIONS = frozenset({"letter_detail_v5", "letter_detail_v4"})
@@ -87,8 +87,20 @@ OVERVIEW_TARGET = "4 to 6 paragraphs of 2 to 5 statements each"
 OVERVIEW_STATEMENTS = 24
 # The closing call sees the notes, not the letter. Long letters are trimmed to fit.
 DIGEST_CHARS = 26000
-# D1 refuses an SQL statement over 100,000 bytes, and a revision is one statement.
-MAX_DRAFT_BYTES = 72_000
+# D1 refuses an SQL statement over 100,000 bytes, and a revision is one
+# statement: the draft, its overview a second time in a column of its own, and
+# about a kilobyte of ids, dates and the record of the machine checks.
+MAX_STATEMENT_BYTES = 98_000
+STATEMENT_OVERHEAD = 2_000
+TOO_LARGE = "summary is larger than one archive record can hold"
+# How far the private quotes are narrowed, in characters and quotes per
+# statement, before a long letter's summary is given up as too large.
+QUOTE_STAGES = ((200, MAX_CITES), (140, 1), (90, 1), (60, 1), (40, 1))
+# A letter longer than this cannot fit one record even with the narrowest
+# quotes (a long summary takes about seven bytes per word of its letter), so
+# no model time is spent on it until summaries can span more than one record.
+MAX_SOURCE_WORDS = 18_000
+TOO_LONG = "the letter is too long for its summary to fit one archive record"
 OUTPUT_NAME = "_reader_summaries"
 # Same vocabulary as the dashboard archive, so a draft needs no translation at import.
 KINDS = {
@@ -2318,6 +2330,14 @@ def _shorten(quote: str, numbers: list[str], limit: int) -> str:
     return " ".join(words[low:high])
 
 
+def revision_bytes(draft: dict) -> int:
+    """The length of the SQL statement that stores this draft as a revision."""
+    def quoted(value: str) -> int:
+        return len(value.replace("'", "''").encode("utf-8"))
+    return (quoted(json.dumps(draft, ensure_ascii=False, sort_keys=True))
+            + quoted(draft.get("overview") or "") + STATEMENT_OVERHEAD)
+
+
 def summary_draft(summary: dict, text: str) -> tuple[dict, list[str]]:
     """The dashboard draft for a v6 summary.
 
@@ -2326,7 +2346,6 @@ def summary_draft(summary: dict, text: str) -> tuple[dict, list[str]]:
     The quoted source words stay in `evidence`, which only owners can open;
     `line` ties each quote to the statement it supports."""
     parts = sections(text, size=SECTION_CHARS)
-    covered: dict[str, list[str]] = {part["id"]: [] for part in parts}
 
     def build(limit: int | None, per_line: int) -> list[dict]:
         ideas = []
@@ -2371,48 +2390,51 @@ def summary_draft(summary: dict, text: str) -> tuple[dict, list[str]]:
         "ideas": ideas,
     }
 
-    def size() -> int:
-        return len(json.dumps(draft, ensure_ascii=False).encode("utf-8"))
+    def fill() -> int:
+        """Complete the draft from its current ideas and tables; the size of its record."""
+        covered: dict[str, list[str]] = {part["id"]: [] for part in parts}
+        for idea in draft["ideas"]:
+            for section_id in dict.fromkeys(entry["section_id"] for entry in idea["evidence"]):
+                covered[section_id].append(idea["id"])
+        tabled = {table["section_id"] for table in draft["tables"]}
+        draft["checklist"] = [
+            {
+                "section_id": part["id"],
+                "idea_ids": covered[part["id"]],
+                "disposition": "covered" if covered[part["id"]] else "non_substantive",
+                "reason": "Investment discussion summarized in the listed ideas." if covered[part["id"]]
+                          else "The figures in this passage are transcribed as a table; no further discussion was identified." if part["id"] in tabled
+                          else "No substantive investment discussion identified in this passage during the full-document inventory.",
+            }
+            for part in parts
+        ]
+        summary_words = len(draft["overview"].split()) + sum(len(idea["summary"].split()) for idea in draft["ideas"])
+        draft["coverage"] = {
+            "sections": len(parts),
+            "sections_cited": sum(1 for part in parts if covered[part["id"]] or part["id"] in tabled),
+            "topics": len(draft["ideas"]),
+            "statements": sum(len(idea["cites"]) for idea in draft["ideas"]),
+            "tables": len(draft["tables"]),
+            "tables_omitted": int((summary.get("stats") or {}).get("tables_omitted") or 0),
+            "figures": sum(len(row["values"]) for table in draft["tables"] for row in table["rows"]),
+            "source_words": len(text.split()),
+            "summary_words": summary_words,
+        }
+        return revision_bytes(draft)
 
     # A very long letter can outgrow one D1 statement. Its private quotes are
     # narrowed to the words around each figure first, and its later tables go
     # only if that is still not enough. Statements are never cut for size.
-    for limit, per_line in ((200, MAX_CITES), (140, 1), (90, 1)):
-        if size() <= MAX_DRAFT_BYTES:
+    size = fill()
+    for limit, per_line in QUOTE_STAGES:
+        if size <= MAX_STATEMENT_BYTES:
             break
         draft["ideas"] = build(limit, per_line)
-    while size() > MAX_DRAFT_BYTES and draft["tables"]:
+        size = fill()
+    while size > MAX_STATEMENT_BYTES and draft["tables"]:
         draft["tables"].pop()
-    for idea in draft["ideas"]:
-        for section_id in dict.fromkeys(entry["section_id"] for entry in idea["evidence"]):
-            covered[section_id].append(idea["id"])
-    tabled = {table["section_id"] for table in draft["tables"]}
-    draft["checklist"] = [
-        {
-            "section_id": part["id"],
-            "idea_ids": covered[part["id"]],
-            "disposition": "covered" if covered[part["id"]] else "non_substantive",
-            "reason": "Investment discussion summarized in the listed ideas." if covered[part["id"]]
-                      else "The figures in this passage are transcribed as a table; no further discussion was identified." if part["id"] in tabled
-                      else "No substantive investment discussion identified in this passage during the full-document inventory.",
-        }
-        for part in parts
-    ]
-    summary_words = len(draft["overview"].split()) + sum(len(idea["summary"].split()) for idea in draft["ideas"])
-    draft["coverage"] = {
-        "sections": len(parts),
-        "sections_cited": sum(1 for part in parts if covered[part["id"]] or part["id"] in tabled),
-        "topics": len(draft["ideas"]),
-        "statements": sum(len(idea["cites"]) for idea in draft["ideas"]),
-        "tables": len(draft["tables"]),
-        "tables_omitted": int((summary.get("stats") or {}).get("tables_omitted") or 0),
-        "figures": sum(len(row["values"]) for table in draft["tables"] for row in table["rows"]),
-        "source_words": len(text.split()),
-        "summary_words": summary_words,
-    }
-    errors = []
-    if size() > MAX_DRAFT_BYTES:
-        errors.append("summary is larger than one archive record can hold")
+        size = fill()
+    errors = [TOO_LARGE] if size > MAX_STATEMENT_BYTES else []
     return draft, errors
 
 
@@ -2887,6 +2909,12 @@ def already_done(content_hash: str, retry_failed: bool) -> bool:
     if saved is None or saved.get("prompt_version") not in PUBLISHABLE_VERSIONS:
         return False
     status = saved.get("status")
+    if status == "blocked_length":
+        # Taken up again when a longer letter can be stored.
+        return int(saved.get("source_words") or 0) > MAX_SOURCE_WORDS
+    if status == "quarantine" and saved.get("errors") == [TOO_LARGE]:
+        # Another attempt would be as long, and costs half an hour of model time.
+        return True
     if status == "failed" or (status == "quarantine" and retry_failed):
         return attempts_so_far(saved) >= MAX_ATTEMPTS
     if saved.get("chunks_covered") != saved.get("chunks_total"):
@@ -2988,18 +3016,22 @@ def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | No
                 continue
             attempt = attempts_so_far(saved) + 1
             text = raw.decode("utf-8", errors="replace")
-            too_short = len(text.strip()) < 400
-            if too_short or needs_new_extract(text):
-                # No model call: a summary of an extract like this would cover only stray fragments.
+            # No model call for a letter that cannot yield a publishable summary: an extract
+            # that is too short or unreadable, or a letter too long for one record.
+            blocked = (("blocked_extraction", "extract is empty or too short") if len(text.strip()) < 400
+                       else ("blocked_extraction", UNREADABLE_EXTRACT) if needs_new_extract(text)
+                       else ("blocked_length", TOO_LONG) if len(text.split()) > MAX_SOURCE_WORDS
+                       else None)
+            if blocked:
                 write_summary(content_hash, {
-                    "prompt_version": PROMPT_VERSION, "status": "blocked_extraction", "published": False,
+                    "prompt_version": PROMPT_VERSION, "status": blocked[0], "published": False,
                     "source_ref": record.get("source_file"), "fund_id": record.get("fund_id"),
-                    "reporting_period": record.get("quarter"),
-                    "reason": "extract is empty or too short" if too_short else UNREADABLE_EXTRACT,
+                    "reporting_period": record.get("quarter"), "reason": blocked[1],
+                    "source_words": len(text.split()),
                     "chunks_total": 0, "chunks_covered": 0, "created_at": now(),
                 })
                 counts["blocked"] += 1
-                append_index({"hash": content_hash, "status": "blocked_extraction", "fund_id": record.get("fund_id"), "at": now()})
+                append_index({"hash": content_hash, "status": blocked[0], "fund_id": record.get("fund_id"), "at": now()})
                 continue
             try:
                 payload = summarize_letter(record, text, selected)
