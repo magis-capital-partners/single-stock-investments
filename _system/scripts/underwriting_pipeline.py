@@ -657,6 +657,11 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
             feedback = revision_feedback(author, challenger, exc, packet=packet)
             if not author:
                 feedback = {**previous_feedback, **feedback}
+            elif (read(root/POLICY).get('owner_task_requests') or {}).get(ticker):
+                # Keep the admission-bound task across a real compiler/review revision.
+                # Challenger payloads still receive no owner preference.
+                if 'owner_direction' in previous_feedback:
+                    feedback['owner_direction'] = previous_feedback['owner_direction']
             progress['feedback'] = feedback
             progress['history'].append({'contract_hash': digest(author) if author else None,
                                         'required_correction': str(exc), 'findings': unresolved_findings(feedback)})
