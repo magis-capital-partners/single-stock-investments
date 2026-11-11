@@ -209,6 +209,45 @@ def test_strict_validation_reads_trusted_storage_before_replay():
     restore=next(s for s in job['steps'] if s.get('name')=='Restore named immutable packets from the private catalog')
     assert '--prefix valuation-underwriting/packets/' in restore['run']
 
+def test_investor_checkpoint_published_only_to_private_storage_restores(environment,monkeypatch,tmp_path):
+    import shutil
+    import investor_history as history
+    import investor_history_checkpoint as checkpoint
+    vault,fake=environment
+    cache=tmp_path/'cache'
+    history.connect(cache/'archive.sqlite').close()
+    history.write_json(cache/'universe.json',{'revision':'published after activation'})
+    source=vault/'dashboard-private/investor-history'
+    manifest=checkpoint.pack(cache,source)
+    fake.publish({p.relative_to(vault).as_posix():p.read_bytes() for p in source.rglob('*') if p.is_file()})
+    shutil.rmtree(source)
+    io.initialize(vault,storage=fake)
+    assert (source/'manifest.json').is_file() and not (source/'objects').exists()
+    (source/manifest['identity']/'manifest.json').unlink()
+    monkeypatch.setattr(io,'enabled',lambda:True)
+    monkeypatch.setattr(io,'_LAZY_STORAGE',fake)
+    subprocess.run(['git','-C',str(vault),'sparse-checkout','set','--no-cone','--stdin'],input='/*\n',text=True,check=True,capture_output=True)
+    selected=checkpoint.materialize(source,identity=manifest['identity'])
+    assert selected['sparse'] is True and selected['parts']==len(manifest['parts'])
+    assert checkpoint.restore(source,tmp_path/'restored',identity=manifest['identity'])
+    assert json.loads((tmp_path/'restored/universe.json').read_text())=={'revision':'published after activation'}
+    assert checkpoint.restore(source,tmp_path/'latest')
+    assert all((source/part['name']).is_file() for part in manifest['parts'])
+
+
+def test_investor_checkpoint_outside_private_view_still_requires_local_parts(tmp_path,monkeypatch):
+    import investor_history as history
+    import investor_history_checkpoint as checkpoint
+    monkeypatch.setattr(io,'enabled',lambda:True)
+    cache=tmp_path/'cache'
+    history.connect(cache/'archive.sqlite').close()
+    source=tmp_path/'vault/dashboard-private/investor-history'
+    manifest=checkpoint.pack(cache,source)
+    (source/manifest['parts'][0]['name']).unlink()
+    with pytest.raises(FileNotFoundError):
+        checkpoint.restore(source,tmp_path/'restored')
+
+
 def test_read_only_snapshot_view_skips_unrelated_control_and_restores_full_object(environment,monkeypatch):
     vault,fake=environment;relative='dashboard-private/objects/'+'a'*64
     fake.publish({'valuation-underwriting/local-runtime/states/V.json':b'paid state',relative:b'complete snapshot\r\n'})

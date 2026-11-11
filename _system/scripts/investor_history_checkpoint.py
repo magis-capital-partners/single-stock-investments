@@ -136,6 +136,25 @@ def part_path(source, manifest, part):
     return source / manifest["identity"] / part["name"]
 
 
+def private_file(source, relative):
+    """Return a checkpoint file, fetching it from private object storage if needed.
+
+    Checkpoints written after private storage activation exist only in the
+    catalog, never in vault Git. Outside an initialized vault view this is a
+    plain path lookup.
+    """
+    path = Path(source) / relative
+    if path.is_file():
+        return path
+    root = Path(source).resolve()
+    vault = root.parent.parent
+    if root == vault / "dashboard-private/investor-history":
+        from private_storage_io import materialize as restore_private
+
+        restore_private(vault, "dashboard-private/investor-history/" + relative)
+    return path
+
+
 def materialize(source, *, identity, additional_identities=()):
     """Select one immutable checkpoint in a sparse publication checkout."""
     identities = list(dict.fromkeys([identity, *additional_identities]))
@@ -216,7 +235,7 @@ def materialize(source, *, identity, additional_identities=()):
     # Fetch the small pinned manifest before selecting its immutable objects.
     apply(selected)
     manifests = [
-        json.loads((source / value / "manifest.json").read_text())
+        json.loads(private_file(source, value + "/manifest.json").read_text())
         for value in identities
     ]
     if any(m.get("identity") != value for value, m in zip(identities, manifests)):
@@ -414,8 +433,9 @@ def restore(source, destination, *, identity=None):
         len(identity) != 64 or any(c not in "0123456789abcdef" for c in identity)
     ):
         raise ValueError("Unsafe checkpoint identity")
-    manifest_path = (
-        source / identity / "manifest.json" if identity else source / "manifest.json"
+    source = Path(source)
+    manifest_path = private_file(
+        source, identity + "/manifest.json" if identity else "manifest.json"
     )
     if not manifest_path.exists():
         return False
@@ -428,6 +448,7 @@ def restore(source, destination, *, identity=None):
     folder = source if manifest.get("schema_version") == 2 else source / identity
     for part in manifest["parts"]:
         path = part_path(source, manifest, part)
+        private_file(source, path.relative_to(source).as_posix())
         if path.stat().st_size != part["bytes"] or sha(path) != part["sha256"]:
             raise ValueError("Checkpoint checksum mismatch")
     destination.mkdir(parents=True, exist_ok=True)
