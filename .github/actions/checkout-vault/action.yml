@@ -88,17 +88,17 @@ runs:
     - name: Materialize publication objects
       shell: bash
       env:
-        HYDRATE_PUBLICATION: ${{ inputs.hydrate }}
+        SNAPSHOT_VALIDATION_ONLY: ${{ inputs.snapshot-validation-only }}
       run: |
         set -euo pipefail
         if [ ! -f dashboard/private-assets.json ]; then
           echo "::error::publication-only checkout needs dashboard/private-assets.json in the workspace."
           exit 1
         fi
-        # Hydration already reads only files selected in this workspace.
-        # Restore those same complete inputs, instead of unrelated snapshots.
+        # Builders can request additional managed inputs after checkout.
+        # Narrow only the explicitly read-only snapshot-validation view.
         scope=()
-        if [ "$HYDRATE_PUBLICATION" = "true" ]; then
+        if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
           scope=(--workspace "$GITHUB_WORKSPACE")
         fi
         python3 _system/scripts/vault_publication_sparse.py dashboard/private-assets.json "${scope[@]}" > "$RUNNER_TEMP/vault-object-patterns.txt"
@@ -118,7 +118,7 @@ runs:
         objects = Path("_external/research-vault/dashboard-private/objects")
         missing = 0
         total = 0
-        workspace = Path(os.environ["GITHUB_WORKSPACE"]) if os.environ["HYDRATE_PUBLICATION"] == "true" else None
+        workspace = Path(os.environ["GITHUB_WORKSPACE"]) if os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" else None
         for _, relative, entry in publication_entries(manifest, workspace):
             total += 1
             if not (objects / entry["private_sha256"]).is_file():
