@@ -79,7 +79,7 @@ def clone_vault(home):
     from private_storage import enabled
     if enabled():
         from private_storage_io import initialize
-        initialize(vault)
+        initialize(vault, materialization_role='local_author')
     else:
         ledger_name = 'valuation-underwriting/runtime/ledger.jsonl'
         names = git(vault,'ls-tree','--name-only','origin/main','--',ledger_name).decode().splitlines()

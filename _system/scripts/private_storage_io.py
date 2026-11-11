@@ -82,13 +82,27 @@ def _retain_or_advance_private_bytes(path,relative,incoming):
     return None
 
 
-def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False):
+def _shared_build_control(relative):
+    return relative.startswith('valuation-underwriting/runtime/') and relative != 'valuation-underwriting/runtime/ledger.jsonl'
+
+
+def _local_author_view(vault):
+    marker = Path(vault)/MARKER
+    return marker.is_file() and json.loads(marker.read_text()).get('materialization_role') == 'local_author'
+
+
+def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False, materialization_role=None):
     vault = owned(vault)
+    if materialization_role not in (None, 'local_author'):
+        raise StorageError('Unknown private materialization role')
+    if materialization_role == 'local_author' and os.environ.get('GITHUB_ACTIONS') == 'true':
+        raise StorageError('A local author view cannot be used by CI')
     prefixes = tuple(relative_path(p.rstrip("/"))+"/" for p in prefixes)
     storage = storage or PrivateStorage()
     commit, records = storage.snapshot()
     restored = 0
     preserved_serializations = []
+    preserved_shared_build_controls = []
     # Bulk objects and source parts are demand-loaded; control/current records
     # are small and must override only a verified, clean legacy checkout.
     for relative, entry in records.items():
@@ -99,6 +113,15 @@ def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False):
         if relative.startswith(('recovery/', 'audit/', 'legacy/')) or '/objects/' in relative or relative.endswith('.zip'):
             continue
         path = path_in(vault, relative)
+        if materialization_role == 'local_author' and _shared_build_control(relative):
+            # GitHub build controls are not author inputs. Preserve unpublished
+            # local bytes and pin their remote identity without selecting either.
+            if path.exists() and not path.is_file():
+                raise StorageError('Invalid preserved shared build control: '+relative)
+            preserved_shared_build_controls.append({'path':relative,
+                'original_sha256':sha(path.read_bytes()) if path.is_file() else None,
+                'snapshot_sha256':entry['sha256']})
+            continue
         if path.is_file() and sha(path.read_bytes()) == entry['sha256']:
             continue
         incoming = None
@@ -121,9 +144,10 @@ def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False):
         restored += 1
     marker = {'schema_version':'private-storage-view/1', 'catalog_commit':commit,
               'catalog_repository_id':storage.config['catalog_repository_id'],
+              'materialization_role':materialization_role, 'preserved_shared_build_controls':preserved_shared_build_controls,
               'read_only':bool(prefixes) or snapshot_only, 'snapshot_validation_only':snapshot_only, 'materialized_prefixes':list(prefixes), 'preserved_original_serializations':preserved_serializations}
     (vault/MARKER).write_bytes(encoded_json(marker))
-    return {'catalog_commit':commit, 'control_files_restored':restored, 'preserved_original_serializations':preserved_serializations}
+    return {'catalog_commit':commit, 'control_files_restored':restored, 'preserved_original_serializations':preserved_serializations, 'preserved_shared_build_controls':preserved_shared_build_controls}
 
 
 def view(vault, storage):
@@ -144,6 +168,8 @@ def view(vault, storage):
 def materialize(vault, relative, *, storage=None):
     vault = Path(vault).resolve()
     destination = path_in(vault, relative)
+    if _local_author_view(vault) and _shared_build_control(relative):
+        raise StorageError('A local author view cannot read a shared build control')
     if destination.is_file():
         return destination
     if not enabled() or not (vault/MARKER).is_file():
@@ -189,6 +215,8 @@ def selected_files(vault, pathspec):
 
 def publish_paths(vault, paths, *, storage=None):
     vault = owned(vault)
+    if _local_author_view(vault) and any(p.startswith('valuation-underwriting/runtime/') for p in paths):
+        raise StorageError('A local author view cannot publish a shared build control or ledger')
     storage = storage or PrivateStorage()
     if json.loads((vault/MARKER).read_text()).get("read_only"):
         raise StorageError("A packet-validation view cannot publish private files")
