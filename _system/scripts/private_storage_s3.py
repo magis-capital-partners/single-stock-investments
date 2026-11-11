@@ -7,7 +7,7 @@ https://developers.cloudflare.com/r2/api/tokens/#get-s3-api-credentials-from-an-
 from __future__ import annotations
 import hashlib,hmac,json,os,re,threading,time,urllib.error,urllib.parse,urllib.request
 from datetime import datetime,timezone
-from private_storage import HTTP,NoRedirect,StorageError
+from private_storage import HTTP,NoRedirect,StorageError,StorageHTTPError
 
 def signature_headers(method,host,path,body,access_id,secret,*,instant=None):
     if method not in ('GET','PUT'):raise StorageError('Unsupported immutable object operation')
@@ -26,20 +26,34 @@ def signature_headers(method,host,path,body,access_id,secret,*,instant=None):
 class S3HTTP:
     def __init__(self,config,*,identity_http=None,opener=None):
         self.config=config;self.host=config['account_id']+'.r2.cloudflarestorage.com'
-        self.identity_http=identity_http or HTTP(lambda:os.environ['CLOUDFLARE_API_TOKEN'],'api.cloudflare.com')
+        self.token_owner=config.get('s3_token_owner','auto')
+        if self.token_owner not in ('auto','account','user'):raise StorageError('Unsupported storage token owner')
+        self.identity_http=identity_http or HTTP(lambda:os.environ['CLOUDFLARE_API_TOKEN'].strip(),'api.cloudflare.com',content_type='application/json')
         self.opener=opener or urllib.request.build_opener(NoRedirect)
         self.interval=1/config.get('requests_per_second',2);self.lock=threading.Lock();self.next_request=0
         self._identity=None
 
     def credentials(self):
-        token=os.environ.get('CLOUDFLARE_API_TOKEN')
+        token=os.environ.get('CLOUDFLARE_API_TOKEN','').strip()
         if not token:raise StorageError('Existing authorized storage API token is required for S3')
         fingerprint=hashlib.sha256(token.encode()).hexdigest()
         if not self._identity or self._identity[0]!=fingerprint:
-            raw=self.identity_http.request('GET','/client/v4/user/tokens/verify',limit=1024*1024)
-            result=json.loads(raw or b'{}').get('result') or {}
-            if result.get('status')!='active' or not re.fullmatch(r'[0-9a-f]{32}',result.get('id','')):
-                raise StorageError('Existing storage token identity could not be verified')
+            # Legacy token values do not encode their owner. A wrong verification
+            # scope returns 400; only that response permits the other documented
+            # scope, on this same account. Authentication failures never fall back.
+            owners=([self.token_owner] if self.token_owner!='auto' else
+                    ['account'] if token.startswith('cfat_') else ['user','account'])
+            for index,owner in enumerate(owners):
+                path='/client/v4/accounts/'+self.config['account_id']+'/tokens/verify' if owner=='account' else '/client/v4/user/tokens/verify'
+                try:raw=self.identity_http.request('GET',path,limit=1024*1024)
+                except StorageHTTPError as error:
+                    if error.status==400 and index+1<len(owners):continue
+                    raise
+                response=json.loads(raw or b'{}');result=response.get('result') or {}
+                if response.get('success') is not True or result.get('status')!='active' or not re.fullmatch(r'[0-9a-f]{32}',result.get('id','')):
+                    raise StorageError('Existing storage token identity could not be verified')
+                self.verified_token_owner=owner
+                break
             self._identity=(fingerprint,result['id'])
         return self._identity[1],fingerprint
 
