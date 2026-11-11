@@ -45,7 +45,7 @@ def write_new(path, raw):
         output.write(raw)
 
 
-def initialize(vault, *, storage=None, prefixes=()):
+def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False):
     vault = owned(vault)
     prefixes = tuple(relative_path(p.rstrip("/"))+"/" for p in prefixes)
     storage = storage or PrivateStorage()
@@ -54,6 +54,8 @@ def initialize(vault, *, storage=None, prefixes=()):
     # Bulk objects and source parts are demand-loaded; control/current records
     # are small and must override only a verified, clean legacy checkout.
     for relative, entry in records.items():
+        if snapshot_only:
+            continue
         if prefixes and not any(relative.startswith(p) for p in prefixes):
             continue
         if relative.startswith(('recovery/', 'audit/', 'legacy/')) or '/objects/' in relative or relative.endswith('.zip'):
@@ -74,7 +76,7 @@ def initialize(vault, *, storage=None, prefixes=()):
         restored += 1
     marker = {'schema_version':'private-storage-view/1', 'catalog_commit':commit,
               'catalog_repository_id':storage.config['catalog_repository_id'],
-              'read_only':bool(prefixes), 'materialized_prefixes':list(prefixes)}
+              'read_only':bool(prefixes) or snapshot_only, 'snapshot_validation_only':snapshot_only, 'materialized_prefixes':list(prefixes)}
     (vault/MARKER).write_bytes(encoded_json(marker))
     return {'catalog_commit':commit, 'control_files_restored':restored}
 
@@ -187,12 +189,13 @@ def main():
     parser.add_argument('--vault',type=Path)
     parser.add_argument('--pathspec',default='-A')
     parser.add_argument('--prefix',action='append',default=[])
+    parser.add_argument('--snapshot-validation-only',action='store_true')
     args=parser.parse_args()
     if args.action == 'enabled':
         return 0 if enabled() else 1
     if not args.vault:
         parser.error('--vault required')
-    result = initialize(args.vault, prefixes=args.prefix) if args.action == 'initialize' else publish_paths(args.vault,selected_files(args.vault,args.pathspec))
+    result = initialize(args.vault, prefixes=args.prefix, snapshot_only=args.snapshot_validation_only) if args.action == 'initialize' else publish_paths(args.vault,selected_files(args.vault,args.pathspec))
     print(json.dumps(result))
     return 0
 

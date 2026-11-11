@@ -22,6 +22,10 @@ inputs:
     description: Checkout only the private snapshot objects named by dashboard/private-assets.json, plus the migration journal and manifest. Omits letters, transcripts, investor history, the company-research cache, and the extraction archive.
     required: false
     default: "false"
+  snapshot-validation-only:
+    description: Read-only validation of complete snapshot files selected in this workspace. Requires publication-only.
+    required: false
+    default: "false"
   extra-paths:
     description: Additional non-cone sparse-checkout patterns, one per line. Applied after publication-only materialization. Use with publication-only so the rest of the vault stays out.
     required: false
@@ -66,22 +70,35 @@ runs:
 
     - name: Materialize the verified private catalog view
       shell: bash
+      env:
+        SNAPSHOT_VALIDATION_ONLY: ${{ inputs.snapshot-validation-only }}
+        PUBLICATION_ONLY: ${{ inputs.publication-only }}
       run: |
         set -euo pipefail
-        git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /dashboard/private-assets.json
+        git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json
         if python _system/scripts/private_storage_io.py enabled; then
-          python _system/scripts/private_storage_io.py initialize --vault _external/research-vault
+          args=()
+          if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
+            test "$PUBLICATION_ONLY" = "true"
+            args+=(--snapshot-validation-only)
+          fi
+          python _system/scripts/private_storage_io.py initialize --vault _external/research-vault "${args[@]}"
         fi
 
     - name: Materialize publication objects
       shell: bash
+      env:
+        SNAPSHOT_VALIDATION_ONLY: ${{ inputs.snapshot-validation-only }}
       run: |
         set -euo pipefail
         if [ ! -f dashboard/private-assets.json ]; then
           echo "::error::publication-only checkout needs dashboard/private-assets.json in the workspace."
           exit 1
         fi
-        python3 _system/scripts/vault_publication_sparse.py dashboard/private-assets.json > "$RUNNER_TEMP/vault-object-patterns.txt"
+        # Hydration already reads only files selected in this workspace.
+        # Restore those same complete inputs, instead of unrelated snapshots.
+        scope=(--workspace "$GITHUB_WORKSPACE")
+        python3 _system/scripts/vault_publication_sparse.py dashboard/private-assets.json "${scope[@]}" > "$RUNNER_TEMP/vault-object-patterns.txt"
         if [ -s "$RUNNER_TEMP/vault-object-patterns.txt" ]; then
           git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-object-patterns.txt"
         fi
@@ -90,20 +107,22 @@ runs:
         import sys
         from pathlib import Path
         sys.path.insert(0, "_system/scripts")
+        import os
         from private_storage_io import materialize
+        from vault_publication_sparse import publication_entries
 
         manifest = json.loads(Path("dashboard/private-assets.json").read_text(encoding="utf-8"))
         objects = Path("_external/research-vault/dashboard-private/objects")
         missing = 0
         total = 0
-        for section in ("assets", "repository_assets"):
-            for relative, entry in (manifest.get(section) or {}).items():
-                total += 1
-                if not (objects / entry["private_sha256"]).is_file():
-                    materialize(Path("_external/research-vault"), "dashboard-private/objects/" + entry["private_sha256"])
-                if not (objects / entry["private_sha256"]).is_file():
-                    missing += 1
-                    print(f"::error::missing private object for {relative}")
+        workspace = Path(os.environ["GITHUB_WORKSPACE"])
+        for _, relative, entry in publication_entries(manifest, workspace):
+            total += 1
+            if not (objects / entry["private_sha256"]).is_file():
+                materialize(Path("_external/research-vault"), "dashboard-private/objects/" + entry["private_sha256"])
+            if not (objects / entry["private_sha256"]).is_file():
+                missing += 1
+                print(f"::error::missing private object for {relative}")
         print(f"publication objects present: {total - missing} of {total}")
         if missing:
             sys.exit(1)
