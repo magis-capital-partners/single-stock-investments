@@ -16,6 +16,11 @@ class NormalizationTest(unittest.TestCase):
         self.assertEqual(q['bid'], 10)
         self.assertEqual(q['ask_size'], 13)
         self.assertEqual(q['ts_recv_ns'], '1793804400000000000')
+        self.assertFalse(q['mapping_verified'])
+        verified = normalize_record(self.record(), 'QA', '2026-11-04T15:00:00Z', mapping_verified=True)
+        self.assertTrue(verified['mapping_verified'])
+        self.assertEqual(verified['raw_symbol'], 'QA')
+        self.assertEqual(verified['instrument_id'], 123)
 
     def test_bad_book_or_capture_time_is_rejected(self):
         for flags in (4, 8, 12):

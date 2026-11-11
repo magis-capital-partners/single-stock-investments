@@ -14,7 +14,10 @@ export const EXECUTION_POLICIES=Object.freeze(['capacity','executable'].flatMap(
 
 // Prospective sensitivity cohorts have independent registration and never alter v1.
 export const DELAY_EXECUTION_POLICIES=Object.freeze([30,60,300].flatMap(seconds=>EXECUTION_POLICIES.map(p=>Object.freeze({...p,id:p.id.replace('.v1','_delay'+seconds+'s.v1'),label:p.label+' · delay '+seconds+'s',entry_delay_seconds:seconds,sensitivity_parent:p.id}))));
-export const ALL_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES]);
+// Matched prospective threshold comparison. Original policy objects stay byte-identical.
+export const BROAD_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES].map(p=>Object.freeze({...p,id:p.id.replace('.v1','_all_scores.v1'),label:p.label+' · all usable scores',minimum_score:0,threshold_group:'all_scoreable',threshold_comparison_parent:p.id})));
+export const DEFAULT_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...BROAD_EXECUTION_POLICIES.filter(p=>!p.entry_delay_seconds)]);
+export const ALL_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES,...BROAD_EXECUTION_POLICIES]);
 
 export function currentEvidence(rows,kind,now){return rows.filter(e=>e.kind===kind&&e.broker==='IBKR'&&e.scope==='reverse_split'&&at(e.observed_at)!==null&&at(e.observed_at)<=at(now)&&at(e.valid_until)!==null&&at(e.valid_until)>=at(now)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];}
 export function marketEvidence(rows,kind,now,identity={}){

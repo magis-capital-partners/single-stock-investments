@@ -3,10 +3,11 @@ import {buildFinancialProfile,FINANCIAL_VERSION} from './financials-core.mjs';
 import {etDay,DAY} from './core.mjs';
 import {enqueue,sha} from './worker.mjs';
 import {loadPreparedFinancial} from './prepared-universe.mjs';
+import {financialDisclosureGap} from './disclosure-gaps.mjs';
 const read=async(env,key,signal,urgent=false)=>{const o=await env.EVIDENCE.get(key,{signal,urgent});return o?o.json():null;};
 const validCik=cik=>/^\d{1,10}$/.test(String(cik));
 const cacheKey=cik=>'financial_score_cache:'+cik;
-export const FINANCIAL_EVIDENCE_REVISION='primary_source_reconciliation.2026-11-10.v1';
+export const FINANCIAL_EVIDENCE_REVISION='primary_source_reconciliation.2026-11-11.v1';
 export const MAX_RETAINED_FINANCIAL_PROFILES=24;
 export function retainFinancialProfile(env,cik,saved){
   env.financialProfiles.delete(cik);env.financialProfiles.set(cik,saved);
@@ -24,7 +25,7 @@ async function rememberScore(env,cik,score,computed_at){
 }
 function calculate(saved,cik,cutoff){
   const p=buildFinancialProfile({cik,companyfacts:saved.raw,facts:saved.facts,sources:saved.profile.sources,as_of:cutoff,instrument:saved.profile.coverage.instrument});
-  return {...p.policy_financials,evidence_revision:FINANCIAL_EVIDENCE_REVISION,issuer_financials:p.issuer_financials,source_profile_version:saved.profile.version,coverage_status:p.coverage.status,source_url:saved.profile.sources[0]?.url,source_sha256:saved.profile.collection.api_source_sha256||saved.profile.sources[0]?.sha256};
+  return {...p.policy_financials,disclosure_gaps:[...(saved.profile.disclosure_gaps||[]),...(saved.reviewed_disclosure_gaps||[])].filter(g=>Date.parse(g.observed_at)<=Date.parse(cutoff)&&Date.parse(g.published_at)<=Date.parse(cutoff)),evidence_revision:FINANCIAL_EVIDENCE_REVISION,issuer_financials:p.issuer_financials,source_profile_version:saved.profile.version,coverage_status:p.coverage.status,source_url:saved.profile.sources[0]?.url,source_sha256:saved.profile.collection.api_source_sha256||saved.profile.sources[0]?.sha256};
 }
 async function loadEnhanced(env,cik,{version,signal,rescore=false,urgent=false}={}){
   const profile=await read(env,`financials/profiles/${cik}/${version||'latest'}.json`,signal,urgent);if(!profile)return false;
@@ -35,7 +36,10 @@ async function loadEnhanced(env,cik,{version,signal,rescore=false,urgent=false}=
   if(!ledger||ledger.schema!==FINANCIAL_VERSION||ledger.cik!==cik||ledger.source_profile_version!==profile.version||!Array.isArray(ledger.facts)||ledger.facts.length>15000||!profile.facts_sha256||await sha(JSON.stringify(ledger))!==profile.facts_sha256)throw new Error('Financial fact ledger integrity check failed');
   const raw=rawDoc||{cik,facts:{}};if(String(Number(raw.cik))!==cik||(profile.collection.api_source_sha256&&!rawDoc))throw new Error('Financial API cache identity mismatch');
   if(signal?.aborted)throw signal.reason;
-  const saved={profile,raw,facts:ledger.facts},at=new Date().toISOString(),score=calculate(saved,cik,at);retainFinancialProfile(env,cik,saved);await rememberScore(env,cik,score,at);env.financialProfileVersions.set(cik,profile.version);
+  const saved={profile,raw,facts:ledger.facts},at=new Date().toISOString();
+  const request=(await (env.controlDB||env.DB).prepare('SELECT value FROM rs_state WHERE key=?').bind('reviewed_disclosure_source:'+cik).first())?.value;
+  if(request){const s=JSON.parse(request),u=new URL(s.url);if(s.cik!==cik||u.origin!=='https://www.sec.gov'||!u.pathname.startsWith('/Archives/edgar/data/'+cik+'/')||!Number.isFinite(Date.parse(s.published_at))||!/^[a-f0-9]{64}$/.test(s.sha256||''))throw new Error('Reviewed financial disclosure binding is invalid');const o=await env.EVIDENCE.get('documents/'+s.sha256);if(!o)throw new Error('Reviewed financial disclosure is missing');const bytes=new Uint8Array(await o.arrayBuffer());if(bytes.length>5*1024*1024||await sha(bytes)!==s.sha256)throw new Error('Reviewed financial disclosure checksum mismatch');const gap=financialDisclosureGap(bytes,s,at);if(gap)saved.reviewed_disclosure_gaps=[gap];}
+  const score=calculate(saved,cik,at);retainFinancialProfile(env,cik,saved);await rememberScore(env,cik,score,at);env.financialProfileVersions.set(cik,profile.version);
   if(rescore)for(const e of (await env.DB.prepare('SELECT id FROM rs_events WHERE cik=?').bind(cik).all()).results)await enqueue(env,'rescore',{id:e.id},14,'financial-profile:'+FINANCIAL_EVIDENCE_REVISION+':'+profile.version+':'+e.id);
   return true;
 }

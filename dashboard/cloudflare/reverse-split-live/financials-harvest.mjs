@@ -4,6 +4,7 @@ import {parseArgs} from 'node:util';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {PIPELINE_VERSION} from './pipeline-version.mjs';
+import {financialDisclosureGap} from './disclosure-gaps.mjs';
 import {appendFileSync,readFileSync} from 'node:fs';
 import {remoteEnvironment,isolatedWriteFailure} from './collector.mjs';
 import {FinancialSources,extractFiling,hash,primaryURL,isSourceCooldown} from './financials-io.mjs';
@@ -110,6 +111,7 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
       if(source.source_sha256&&hash(doc.bytes)!==source.source_sha256)throw new Error('Financial recovery document hash mismatch');
       // Retain the captured document for owner review even if extraction fails.
       work.sources.push({sha256:doc.sha256,url:source.url,form:source.form,filed:source.filed,published_at:source.published_at,publication_basis:source.publication_basis||'SEC_disclosure',parent:source.trusted_parent||null});
+      const disclosureGap=financialDisclosureGap(doc.bytes,{...source,sha256:doc.sha256},now());if(disclosureGap){work.disclosure_gaps||=[];if(!work.disclosure_gaps.some(g=>g.source_sha256===disclosureGap.source_sha256))work.disclosure_gaps.push(disclosureGap);}
       const parsedKey='financials/parsed/'+doc.sha256+'-'+cik+'-'+PARSER_HASH+'.json';let parsed=await read(env,parsedKey);
       const meta={...source,cik,company:name,issuer_names:(sub.formerNames||[]).map(r=>r.name).filter(n=>typeof n==='string'),require_table_identity:true,require_company_identity:source.form==='IR_RELEASE'||doc.bytes.subarray(0,5).toString()==='%PDF-',currency_hint:currency,source_url:source.url,source_sha256:doc.sha256,observed_at:now()};
       if(!parsed){parsed=await extract(doc.bytes,meta);await put(env,parsedKey,parsed);}
@@ -129,6 +131,7 @@ export async function harvestIssuer(env,job,{client=new FinancialSources(env),ma
   profile.collection={status:deferDiscovery?'queued_for_filing_search':remaining?'in_progress':Object.keys(work.errors).length?'searched_with_errors':'searched',discovery_pending:deferDiscovery,remaining_documents:remaining,searched_documents:Object.keys(work.processed).length,candidates:work.candidates,issues:work.issues,api_source_sha256:companyDoc?.sha256||null};
   profile.coverage.recovery_plan=Object.entries(profile.coverage.metrics).filter(([,r])=>['not_recovered','insufficient_history'].includes(r.status)).map(([metric,r])=>({metric,reason:r.status,next_step:remaining?'pending_primary_document_extraction':'source_review_required',future_zeros_forbidden:true}));
   profile.coverage.sources_searched=Object.keys(work.processed).length;profile.coverage.pending_documents=remaining;
+  profile.disclosure_gaps=(work.disclosure_gaps||[]).slice(-12);
   const vendorKey='financials/vendor-comparison/'+cik+'.json';if(!await read(env,vendorKey)&&job.ticker)await put(env,vendorKey,await vendorComparison(env,job.ticker));profile.vendor_comparison_key=vendorKey;
   const material={...profile,observed_at:undefined,policy_financials:{...profile.policy_financials,cutoff:undefined},collection:{...profile.collection,issues:profile.collection.issues.map(({at,...r})=>r)}};
   await env.assertFinancialLease?.();

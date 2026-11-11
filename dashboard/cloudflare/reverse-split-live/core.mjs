@@ -1,4 +1,5 @@
 import {reviewedPriorHistory} from './split-history.mjs';
+import {selectedAnnouncementTerms} from './announcement-terms.mjs';
 // Pure, replayable research rules. No brokerage, market-data seat, or order dependencies.
 export const POLICY = Object.freeze({id:'reverse_split_live.v1',score_method:'as_filed_annual_or_matched_fiscal_ytd.v3',minimum_ordinal:2,minimum_score:60,minimum_signals:3,max_period_age_days:200,holding_sessions:5,timing:'observed_announcement_time',research_only:true,authority:'none'});
 export const DAY=86400000;
@@ -30,6 +31,8 @@ export function classifyAnnouncement(raw,{published_at,form}={}){
   const text=plain(raw),all=text.split(/\n/).filter(p=>SPLIT.test(p));
   const passages=all.length?all:[...text.matchAll(new RegExp(SPLIT.source,'gi'))].map(m=>text.slice(Math.max(0,m.index-220),m.index+1800));
   if(!passages.length)return null;
+  const selected=selectedAnnouncementTerms(text,published_at?etDay(published_at):null);
+  if(selected&&!/14[AC]/i.test(form||''))return selected;
   const action=passages.filter(p=>/will (?:effect|implement|become|begin)|(?:shall|will) take effect|announces?.{0,140}(?:reverse|consolidation)|has (?:determined|approved)|effective|begin trading/i.test(p));
   const candidates=action.length?action:passages,ratios=new Set(),effective=new Set();
   const words={two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,twelve:12,fifteen:15,twenty:20,thirty:30,forty:40,fifty:50,hundred:100};

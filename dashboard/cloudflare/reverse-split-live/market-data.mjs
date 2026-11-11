@@ -19,7 +19,7 @@ export function makeMarketData({key,fetcher=fetch,clock=()=>new Date().toISOStri
   }
   async function cached(id,ttl,load){const old=cache.get(id);if(old&&Date.now()-old.at<ttl)return old.value;const value=await load();cache.set(id,{at:Date.now(),value});return value;}
   const symbol=t=>{if(!/^[A-Z][A-Z0-9.-]{0,11}$/.test(t||''))throw new Error('Unsupported ticker');return encodeURIComponent(t);};
-  const identity=ticker=>cached('identity:'+ticker,6*3600000,async()=>{const r=(await get('/v3/reference/tickers/'+symbol(ticker))).results||{};return {cik:r.cik?String(Number(r.cik)):null,security_id:r.share_class_figi||r.composite_figi||null,type:r.type,currency:r.currency_name};});
+  const identity=ticker=>cached('identity:'+ticker,300000,async()=>{const path='/v3/reference/tickers/'+symbol(ticker),r=(await get(path)).results||{};if(r.ticker!==ticker)throw new Error('Reference ticker identity mismatch');return {ticker:r.ticker,cik:r.cik?String(Number(r.cik)):null,security_id:r.share_class_figi||r.composite_figi||null,type:r.type,currency:r.currency_name,active:r.active===true,source_url:BASE+path,observed_at:clock()};});
   return {
     health,identity,
     async quote(ticker){

@@ -1,4 +1,4 @@
-import {EXECUTION_POLICIES,ALL_EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy,completeCosts,marketEvidence} from './execution-core.mjs';
+import {EXECUTION_POLICIES,DEFAULT_EXECUTION_POLICIES,ALL_EXECUTION_POLICIES,EXECUTION_VERSION,availableCapacity,borrowAt,bookAvailable,spendBook,fill,accrueBorrow,executionPnl,cutoffStudy,completeCosts,marketEvidence} from './execution-core.mjs';
 import {signalGate,plannedEntry,plannedExit,sessionAt,quoteGate,at,finite} from './shadow-core.mjs';
 import {digest,putState} from './shadow-service.mjs';
 import {etDay} from './core.mjs';
@@ -7,13 +7,13 @@ const stamp=()=>new Date().toISOString(),parse=r=>JSON.parse(r.payload);
 async function audit(env,t,kind,now,data){const payload=JSON.stringify(data),id=await digest(t.id+':'+kind+':'+now+':'+payload);await env.DB.prepare('INSERT OR IGNORE INTO rs_execution_records VALUES(?,?,?,?,?)').bind(id,t.id,now,kind,payload).run();}
 async function save(env,t,now){t.updated_at=now;await env.DB.prepare('INSERT INTO rs_execution_tracks VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET ticker=excluded.ticker,state=excluded.state,updated_at=excluded.updated_at,payload=excluded.payload').bind(t.id,t.event_id,t.policy_id,t.ticker,t.state,now,JSON.stringify(t)).run();}
 export async function initializeExecution(env,now=stamp()){
-  env.executionPolicies ||= env.ENABLE_DELAY_STUDY?ALL_EXECUTION_POLICIES:EXECUTION_POLICIES;
+  env.executionPolicies ||= env.ENABLE_DELAY_STUDY?ALL_EXECUTION_POLICIES:DEFAULT_EXECUTION_POLICIES;
   for(const p of env.executionPolicies){const old=await env.DB.prepare('SELECT payload FROM rs_execution_policies WHERE id=?').bind(p.id).first();if(old&&JSON.stringify(parse(old))!==JSON.stringify(p))throw new Error('Executable policy changed; register a new version');if(!old)await env.DB.prepare('INSERT INTO rs_execution_policies VALUES(?,?,?)').bind(p.id,now,JSON.stringify(p)).run();}
   const registered=(await env.DB.prepare('SELECT min(registered_at) AS at FROM rs_execution_policies').first()).at;
   env.EXECUTION_REGISTRATION_DAY=registered.slice(0,10);
 }
 export async function enrollExecution(env,event,now=stamp()){
-  for(const p of env.executionPolicies||EXECUTION_POLICIES){
+  for(const p of env.executionPolicies||DEFAULT_EXECUTION_POLICIES){
     const id=p.id+':'+event.id,old=await env.DB.prepare('SELECT payload FROM rs_execution_tracks WHERE id=?').bind(id).first();
     const t=old?parse(old):{id,event_id:event.id,policy_id:p.id,lane:p.lane,broker:'IBKR',ticker:event.ticker,cik:event.cik,company:event.company,first_seen_at:event.first_seen_at,published_at:event.published_at,enrolled_at:now,state:'waiting',reason:'analysis_pending',entry_shares:0,remaining_shares:0,entry_proceeds:0,cover_cost:0,commissions:0,fills:[],borrow_ledger:[],daily_marks:[],applied_actions:[],research_only:true,authority:'none',broker_execution_verified:false};
     if(['retrospective','rejected','missed','closed'].includes(t.state))continue;
@@ -100,7 +100,7 @@ export async function executionTick(env,{now=stamp(),event,pricesOnly=false}={})
   if(env.SHADOW_ENABLED!=='true')return;
   if(event)await enrollExecution(env,event,now);
   else if(!pricesOnly){
-    for(const r of (await env.DB.prepare('SELECT payload FROM rs_events').all()).results){const e=parse(r),key='execution_enrolled:'+e.id,value=e.analyzed_at||e.first_seen_at,old=await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(key).first(),waiting=await env.DB.prepare("SELECT id FROM rs_execution_tracks WHERE event_id=? AND state='waiting' LIMIT 1").bind(e.id).first();if(old?.value!==JSON.stringify(value)||waiting){await enrollExecution(env,e,now);await putState(env,key,value,now);}}
+    for(const r of (await env.DB.prepare('SELECT payload FROM rs_events').all()).results){const e=parse(r),key='execution_enrolled:matched_thresholds.v1:'+e.id,value=e.analyzed_at||e.first_seen_at,old=await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(key).first(),waiting=await env.DB.prepare("SELECT id FROM rs_execution_tracks WHERE event_id=? AND state='waiting' LIMIT 1").bind(e.id).first();if(old?.value!==JSON.stringify(value)||waiting){await enrollExecution(env,e,now);await putState(env,key,value,now);}}
   }
   const tracks=(await env.DB.prepare('SELECT payload FROM rs_execution_tracks'+(pricesOnly?" WHERE state IN ('armed','partial_entry','open','exit_pending')":'')).all()).results.map(parse),quotes=new Map(),borrows=new Map(),evidenceCache=new Map(),actions=new Map();
   for(const t of tracks.filter(t=>['armed','partial_entry','open','exit_pending','closed'].includes(t.state))){
@@ -112,12 +112,12 @@ export async function executionTick(env,{now=stamp(),event,pricesOnly=false}={})
   }
   if(pricesOnly)return;
   const policies=[];
-  for(const p of env.executionPolicies||EXECUTION_POLICIES){
+  for(const p of env.executionPolicies||DEFAULT_EXECUTION_POLICIES){
     const rows=tracks.filter(t=>t.policy_id===p.id),entered=rows.filter(t=>t.entry_shares),closed=entered.filter(t=>t.state==='closed'),known=entered.filter(t=>finite(t.pnl?.estimated_net_pnl));
     const summary={...p,enrolled:rows.length,retrospective:rows.filter(t=>t.state==='retrospective').length,entered:entered.length,open:entered.filter(t=>t.remaining_shares).length,closed:closed.length,entry_notional:entered.reduce((n,t)=>n+t.entry_proceeds,0),estimated_net_pnl:known.length?known.reduce((n,t)=>n+t.pnl.estimated_net_pnl,0):null,complete_net_pnl:null,actual_net_pnl:null,stale_marks:entered.filter(t=>t.remaining_shares&&(t.mark_stale||at(now)-at(t.mark_at)>15000)).length,unresolved_cost_positions:entered.filter(t=>t.pnl?.cost_gaps?.length).length,cutoffs:cutoffStudy(rows),blocked_reasons:Object.entries(rows.filter(t=>['armed','partial_entry','missed','waiting'].includes(t.state)).reduce((a,t)=>(a[t.reason]=(a[t.reason]||0)+1,a),{})).map(([reason,count])=>({reason,count}))};policies.push(summary);
     if(entered.length)await env.DB.prepare('INSERT INTO rs_execution_daily VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload').bind(p.id+':'+etDay(now),p.id,etDay(now),JSON.stringify({policy_id:p.id,day:etDay(now),estimated_net_pnl:summary.estimated_net_pnl,stale_marks:summary.stale_marks,unresolved_cost_positions:summary.unresolved_cost_positions})).run();
   }
-  const capacity=tracks.filter(t=>t.lane==='capacity'&&t.entry_shares),days=new Set(capacity.map(t=>etDay(t.entry_at))),issuers=new Set(capacity.map(t=>t.cik)),enough=days.size>=30&&issuers.size>=20;
-  const curve=policies.filter(p=>p.lane==='capacity'),max=Math.max(0,...curve.map(p=>p.entry_notional)),recommendation=enough&&max?curve.find(p=>p.entry_notional>=max*.9)?.price_budget_bps:null;
+  const capacity=tracks.filter(t=>EXECUTION_POLICIES.some(p=>p.id===t.policy_id)&&t.lane==='capacity'&&t.entry_shares),days=new Set(capacity.map(t=>etDay(t.entry_at))),issuers=new Set(capacity.map(t=>t.cik)),enough=days.size>=30&&issuers.size>=20;
+  const curve=policies.filter(p=>EXECUTION_POLICIES.some(o=>o.id===p.id)&&p.lane==='capacity'),max=Math.max(0,...curve.map(p=>p.entry_notional)),recommendation=enough&&max?curve.find(p=>p.entry_notional>=max*.9)?.price_budget_bps:null;
   await putSummaryIfChanged(env,'execution_summary',{version:EXECUTION_VERSION,generated_at:now,broker:'IBKR',research_only:true,authority:'none',execution_ready:false,policies,price_budget_judgement:{recommended_bps:recommendation,status:recommendation?'research_candidate_needs_impact_validation':'insufficient_live_observations',sessions:days.size,issuers:issuers.size,minimum_sessions:30,minimum_issuers:20,rule:'Smallest tested budget retaining 90% of observed conditional notional; no causal market-impact claim.'},limits:{fixed_dollar_cap:null,fixed_name_count_cap:null,remaining_constraints:['observed displayed liquidity','arrival-mid price budget including 10bps modeled slippage','fresh IBKR public inventory and fee','executable lane additionally requires IBKR locate, margin, SSR and halt evidence']},borrow_source:'IBKR_public_indications_reconciled_to_unique_matching_account_and_conid_reported_rate_proxies',borrow_cost_engine:'ibkr_observed_daily.v2',impact_model:'unmeasured_selected_venue_L1',actual_broker_fills:0},now);
 }
