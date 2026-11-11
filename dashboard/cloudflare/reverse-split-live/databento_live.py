@@ -46,7 +46,7 @@ def stamp(ns=None):
     return datetime.fromtimestamp(ns / 1e9, timezone.utc).isoformat(timespec="milliseconds") if ns else datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
 
-def normalize_record(record, ticker, received_at):
+def normalize_record(record, ticker, received_at, *, mapping_verified=False):
     """Reject undefined prices, corrupt books and clocks; sizes are shares."""
     level = record.levels[0]
     values = [int(level.bid_px), int(level.ask_px)]
@@ -64,7 +64,8 @@ def normalize_record(record, ticker, received_at):
             "schema": "mbp-1", "quote_at": stamp(ns), "observed_at": received_at,
             "bid": bid, "ask": ask, "bid_size": bid_size, "ask_size": ask_size,
             "ts_recv_ns": str(ns), "ts_event_ns": str(record.ts_event),
-            "instrument_id": int(record.instrument_id), "flags": flags}
+            "instrument_id": int(record.instrument_id), "flags": flags,
+            "mapping_verified": mapping_verified, "raw_symbol": ticker}
 
 
 def main():
@@ -113,7 +114,7 @@ def main():
             ticker = mappings.get(int(record.instrument_id))
             if not ticker:
                 return
-            value = normalize_record(record, ticker, received_at)
+            value = normalize_record(record, ticker, received_at, mapping_verified=True)
             if value is None:
                 emit({"kind": "invalidate", "ticker": ticker})
                 return
@@ -133,7 +134,9 @@ def main():
                 emit({"kind": "heartbeat", "at": received_at})
         elif isinstance(record, dbn.ErrorMsg):
             # Do not forward arbitrary server text into logs or the dashboard.
-            emit({"kind": "health", "status": "subscription_error", "at": received_at})
+            text = str(record.msg).lower()
+            category = next((label for pattern, label in [(r"symbol|symbology", "symbol_resolution"), (r"auth|license|permission|entitle", "access_rejected"), (r"slow|buffer", "slow_reader"), (r"session|connection.*limit", "connection_limit")] if re.search(pattern, text)), "vendor_subscription_error")
+            emit({"kind": "health", "status": "subscription_error", "error_category": category, "at": received_at})
 
     threading.Thread(target=control, daemon=True).start()
     signal.signal(signal.SIGTERM, lambda *_: stopping.set())
@@ -183,13 +186,14 @@ def main():
             permanent = bool(re.search(r"auth|license|not.entitled|permission|not.authorized|subscription.*required", text, re.I))
             attempts += 1
             emit({"kind": "health", "status": "not_entitled" if permanent else "disconnected",
-                  "error_class": type(exc).__name__, "at": stamp()})
+                  "error_class": type(exc).__name__, "error_category": "access_rejected" if permanent else "transport_failure", "at": stamp()})
             if permanent or attempts >= 12:
                 return 2 if permanent else 3
         finally:
             if client:
                 client.terminate()
-        if stopping.wait(min(300, 30 * 2 ** min(attempts - 1, 4))):
+                client.block_for_close(timeout=5)
+        if stopping.wait(min(30, 2 ** min(attempts - 1, 5))):
             break
     return 0
 

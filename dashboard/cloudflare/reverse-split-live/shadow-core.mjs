@@ -36,6 +36,7 @@ export function signalGate(event,policy,now){
   if([event.first_seen_at,event.published_at,event.analyzed_at].filter(Boolean).some(x=>at(x)===null||at(x)>at(now)+2000))return {state:'waiting',reason:'source_or_analysis_clock_in_future'};
   if(!event.cik||!event.ticker||event.multiple_securities)return {state:'waiting',reason:'issuer_or_security_unresolved'};
   if(event.status!=='scheduled')return {state:['cancelled','authorization','historical'].includes(event.status)?'rejected':'waiting',reason:'announcement_'+(event.status||'unresolved')};
+  if(event.implementation_conditions?.length)return {state:'waiting',reason:'implementation_conditions_unresolved'};
   if(!event.effective_date)return {state:'waiting',reason:'split_date_unresolved'};
   const ordinal=Number(event.ordinal_min||0);if(ordinal<policy.minimum_ordinal)return {state:'waiting',reason:'prior_split_history_unresolved_or_below_threshold'};
   const f=event.financials||{},count=f.signal_count??Object.keys(f.signals||{}).length;

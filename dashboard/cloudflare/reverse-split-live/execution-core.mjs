@@ -14,7 +14,19 @@ export const EXECUTION_POLICIES=Object.freeze(['capacity','executable'].flatMap(
 
 // Prospective sensitivity cohorts have independent registration and never alter v1.
 export const DELAY_EXECUTION_POLICIES=Object.freeze([30,60,300].flatMap(seconds=>EXECUTION_POLICIES.map(p=>Object.freeze({...p,id:p.id.replace('.v1','_delay'+seconds+'s.v1'),label:p.label+' · delay '+seconds+'s',entry_delay_seconds:seconds,sensitivity_parent:p.id}))));
-export const ALL_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES]);
+// Matched prospective threshold comparison. Original policy objects stay byte-identical.
+export const BROAD_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES].map(p=>Object.freeze({...p,id:p.id.replace('.v1','_all_scores.v1'),label:p.label+' · all usable scores',minimum_score:0,threshold_group:'all_scoreable',threshold_comparison_parent:p.id})));
+export const DEFAULT_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...BROAD_EXECUTION_POLICIES.filter(p=>!p.entry_delay_seconds)]);
+export const ALL_EXECUTION_POLICIES=Object.freeze([...EXECUTION_POLICIES,...DELAY_EXECUTION_POLICIES,...BROAD_EXECUTION_POLICIES]);
+
+export function matchedThresholdStudy(tracks,registrations,now){
+ const registered=new Map(registrations.map(r=>[r.id,r.registered_at]));
+ const stats=rows=>{const entered=rows.filter(t=>t.entry_shares>0),known=entered.filter(t=>Number.isFinite(t.pnl?.estimated_net_pnl));return {decisions:rows.length,companies:new Set(rows.map(t=>t.cik).filter(Boolean)).size,entries:entered.length,entered_companies:new Set(entered.map(t=>t.cik)).size,open:entered.filter(t=>t.remaining_shares>0).length,entry_notional:entered.reduce((n,t)=>n+(t.entry_proceeds||0),0),estimated_net_pnl:known.length?known.reduce((n,t)=>n+t.pnl.estimated_net_pnl,0):null,incomplete_cost_positions:entered.filter(t=>t.pnl?.complete_net_pnl==null).length};};
+ return BROAD_EXECUTION_POLICIES.filter(p=>registered.has(p.id)&&registered.has(p.threshold_comparison_parent)).map(p=>{
+  const start=[registered.get(p.id),registered.get(p.threshold_comparison_parent)].sort().at(-1),rows=tracks.filter(t=>at(t.first_seen_at)>=at(start)&&at(t.first_seen_at)<=at(now)&&t.state!=='retrospective');
+  return {all_scoreable_policy:p.id,score60_policy:p.threshold_comparison_parent,lane:p.lane,price_budget_bps:p.price_budget_bps,entry_delay_seconds:p.entry_delay_seconds||0,common_forward_start:start,through:now,score60:stats(rows.filter(t=>t.policy_id===p.threshold_comparison_parent)),all_scoreable:stats(rows.filter(t=>t.policy_id===p.id)),execution_and_daily_borrow_assumptions:'identical',alternative_portfolios_not_additive:true};
+ });
+}
 
 export function currentEvidence(rows,kind,now){return rows.filter(e=>e.kind===kind&&e.broker==='IBKR'&&e.scope==='reverse_split'&&at(e.observed_at)!==null&&at(e.observed_at)<=at(now)&&at(e.valid_until)!==null&&at(e.valid_until)>=at(now)).sort((a,b)=>at(b.observed_at)-at(a.observed_at))[0];}
 export function marketEvidence(rows,kind,now,identity={}){
