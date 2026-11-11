@@ -1,8 +1,8 @@
 {
- "run_date": "2026-11-10",
- "git_head": "a4a6deb2c4861490d28d2d956ad3cb641c2d3bd0",
- "nodes": 8431,
- "edges": 7427,
+ "run_date": "2026-11-11",
+ "git_head": "20e42ec394fc53da02c79b9a7f4a4250101549d1",
+ "nodes": 8420,
+ "edges": 7431,
  "exit_code": 0,
  "ratchet": {
   "armed": [
@@ -120,9 +120,9 @@
    "severity": "hard",
    "base_severity": "hard",
    "count": 0,
-   "delta": "-1",
+   "delta": "0",
    "status": "OK",
-   "note": "14/14 feeds fresh (buyback_radar 17h, capitulation_daily 7h, criticality_summary 7h, desk_briefs 28h, market_risk_components_committed 13h, podcast_catalog 21h, reverse_splits 17h, separations 17h, short_alpha 41h, special_situations 98h, spx_surface 7h, technical_summary 7h, vol_metrics 7h, warrant_monitor 17h)",
+   "note": "14/14 feeds fresh (buyback_radar 7h, capitulation_daily 8h, criticality_summary 8h, desk_briefs 52h, market_risk_components_committed 18h, podcast_catalog 45h, reverse_splits 21h, separations 41h, short_alpha 65h, special_situations 20h, spx_surface 8h, technical_summary 8h, vol_metrics 8h, warrant_monitor 41h)",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -143,21 +143,23 @@
    "id": "P8",
    "severity": "report",
    "base_severity": "report",
-   "count": 8,
-   "delta": "-1",
+   "count": 10,
+   "delta": "+2",
    "status": "VIOLATIONS",
-   "note": "39 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
+   "note": "37 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
    "violations": [
-    "data-pipeline-activist: last work-done receipt 339.1h old (window 54h)",
-    "data-pipeline-intake-full: last work-done receipt 342.9h old (window 54h)",
-    "data-pipeline-world-model: last work-done receipt 716.8h old (window 342h)",
-    "letters: last work-done receipt 380.5h old (window 174h)",
-    "reverse-split-announcement-monitor: last work-done receipt 8.1h old (window 7h)",
-    "reverse-split-shadow-review: last work-done receipt 89.1h old (window 70h)",
-    "supervisor: last work-done receipt 12.8h old (window 12h)",
-    "valuation: last work-done receipt 340.1h old (window 56h)"
+    "data-pipeline-activist: last work-done receipt 363.3h old (window 54h)",
+    "data-pipeline-intake-full: last work-done receipt 367.2h old (window 54h)",
+    "data-pipeline-world-model: last work-done receipt 741.1h old (window 342h)",
+    "letters: last work-done receipt 404.7h old (window 174h)",
+    "ls-algo: last work-done receipt 54.6h old (window 54h)",
+    "reverse-split-announcement-monitor: last work-done receipt 8.4h old (window 7h)",
+    "reverse-split-financial-coverage: last work-done receipt 9.2h old (window 7h)",
+    "reverse-split-shadow-review: last work-done receipt 113.3h old (window 70h)",
+    "supervisor: last work-done receipt 14.9h old (window 12h)",
+    "valuation: last work-done receipt 364.4h old (window 56h)"
    ],
-   "violations_total": 8,
+   "violations_total": 10,
    "waived": []
   },
   {
@@ -369,14 +371,15 @@
    "id": "L3",
    "severity": "report",
    "base_severity": "report",
-   "count": 38,
-   "delta": "0",
+   "count": 40,
+   "delta": "+2",
    "status": "VIOLATIONS",
-   "note": "37 stale, 0 missing where required, 1 undatable, over 741 tickers x 2 artifacts",
+   "note": "38 stale, 0 missing where required, 2 undatable, over 741 tickers x 2 artifacts",
    "violations": [
     "BN: research/lenses.json behind research/valuation.json -- heal: python _system/scripts/persona_lens.py --all --skip-valuation (power-zone-universe lane; Makefile persona-lens for the f",
     "DNP.WA: research/lenses.json behind research/valuation.json -- heal: python _system/scripts/persona_lens.py --all --skip-valuation (power-zone-universe lane; Makefile persona-lens for the f",
     "MA: research/lenses.json behind research/valuation.json -- heal: python _system/scripts/persona_lens.py --all --skip-valuation (power-zone-universe lane; Makefile persona-lens for the f",
+    "V: research/lenses.json behind research/valuation.json -- heal: python _system/scripts/persona_lens.py --all --skip-valuation (power-zone-universe lane; Makefile persona-lens for the f",
     "AAOI: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "ABX: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "ACMR: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
@@ -392,10 +395,9 @@
     "AXP: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "BB: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "BBAI: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
-    "BIIB: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
-    "BTDR: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)"
+    "BIIB: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)"
    ],
-   "violations_total": 38,
+   "violations_total": 40,
    "waived": []
   },
   {
