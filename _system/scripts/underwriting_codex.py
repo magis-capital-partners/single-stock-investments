@@ -13,7 +13,9 @@ from pathlib import Path
 from underwriting_contract import digest, require
 
 DISABLED = ('shell_tool', 'apps', 'plugins', 'hooks', 'multi_agent', 'browser_use',
-            'browser_use_external', 'computer_use', 'image_generation', 'view_image', 'sleep_tool')
+            'browser_use_external', 'computer_use', 'image_generation', 'view_image', 'sleep_tool',
+            'goals', 'remote_plugin', 'send_message_to_user_async', 'current_time_reminder',
+            'request_permissions_tool', 'token_budget', 'code_mode', 'code_mode_host', 'code_mode_only')
 MAX_INPUT_CHARACTERS = 1_048_576
 
 
@@ -69,12 +71,40 @@ def validate_context_window(context_window,subject=None):
             'catalog_max_context_window':maximum,'catalog_hash':digest(catalog),'subject':'CPRT'}
 
 
-def command(binary, directory, output, *, context_window=None, subject=None):
+def isolated_tool_catalog(directory):
+    """Restrict only tool metadata in a per-session copy of the signed-in catalog."""
+    cache=Path(os.environ.get('CODEX_HOME') or Path.home()/'.codex')/'models_cache.json'
+    require(cache.is_file(),'Current native model catalog is required for tool isolation')
+    original=json.loads(cache.read_bytes())
+    catalog=json.loads(json.dumps(original))
+    models=catalog.get('models')
+    require(isinstance(models,list),'Invalid native model catalog')
+    selected=[m for m in models if isinstance(m,dict) and m.get('slug')=='gpt-6.1-sol']
+    require(len(selected)==1,'A unique GPT-6.1 Sol catalog entry is required')
+    model=selected[0]
+    # Code-mode-only catalogs expose MCP resource helpers even with no servers.
+    # These are tool-surface fields, never model identity, context or instructions.
+    changes={'tool_mode':'direct','experimental_supported_tools':[],
+             'apply_patch_tool_type':None,'supports_search_tool':False}
+    for key,value in changes.items():
+        model[key]=value
+    path=directory/'tool-free-model-catalog.json'
+    path.write_text(json.dumps(catalog,ensure_ascii=False),encoding='utf-8')
+    return path,{'source_catalog_hash':digest(original),'isolated_catalog_hash':digest(catalog),
+                 'model':'gpt-6.1-sol','changed_tool_fields':sorted(changes),
+                 'model_identity_context_and_instructions_unchanged':True}
+
+
+def command(binary, directory, output, *, context_window=None, subject=None, catalog_path=None):
     args = [binary, 'exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check',
             '--sandbox', 'read-only', '--model', 'gpt-6.1-sol', '--json', '--color', 'never',
             '--config', 'model_reasoning_effort="high"', '--config', 'forced_login_method="chatgpt"',
             '--config', 'approval_policy="never"', '--config', 'web_search="disabled"',
-            '--config', 'mcp_servers={}', '--cd', str(directory), '--output-last-message', str(output)]
+            '--config', 'mcp_servers={}',
+            '--config', 'tools.update_plan.enabled=false',
+            '--config', 'tools.experimental_request_user_input.enabled=false', '--cd', str(directory), '--output-last-message', str(output)]
+    if catalog_path is not None:
+        args += ['--config','model_catalog_json='+json.dumps(str(catalog_path))]
     if context_window is not None:
         validate_context_window(context_window,subject)
         args += ['--config','model_context_window='+str(context_window)]
@@ -167,7 +197,12 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
         require(directory.resolve().parent == Path(tempfile.gettempdir()).resolve()
                 and directory.name.startswith('ssi-codex-underwriting-'), 'Unsafe isolated session directory')
         answer = directory/'answer.json'
-        args = command(executable(), directory, answer, context_window=context_window, subject=subject)
+        catalog_path,isolation=isolated_tool_catalog(directory)
+        receipt['tool_isolation']=isolation
+        write(receipt_path.with_name(receipt_path.stem+'.tools-catalog.json'),json.loads(catalog_path.read_text(encoding='utf-8')))
+        write(receipt_path,receipt)
+        args = command(executable(), directory, answer, context_window=context_window, subject=subject,
+                       catalog_path=catalog_path)
         timed_out = False
         try:
             result = run(args, input=prompt, capture_output=True,
