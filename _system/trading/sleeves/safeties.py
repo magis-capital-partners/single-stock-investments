@@ -123,13 +123,16 @@ def check_safeties(
     }
     cls = classify_position(name_pos, blacklist_family=family, etf_ls_symbols=letf)
     gate_name = under_n or ticker_n
-    # SPY / QQQ / TSLA options and shares are etf-0dte's: its 0DTE executors trade
-    # the options in this account and an assignment delivers the shares overnight,
-    # for its 09:30 unwind to sell. A sleeve order on any of them could sell that
+    # SPY / QQQ / TSLA / NVDA / AMZN options and shares are etf-0dte's: its 0DTE
+    # executors trade the options in this account and an assignment delivers the
+    # shares overnight, for its 09:30 unwind to sell. A sleeve order on any of them could sell that
     # delivery out from under the unwind, or net against it. Neither owner may
     # submit one.
     if cls.bucket in ETF_0DTE_BUCKETS:
-        failures.append(f"{gate_name} belongs to etf-0dte (SPY/QQQ/TSLA 0DTE options and their deliveries); no sleeve trades it")
+        failures.append(
+            f"{gate_name} belongs to etf-0dte (SPY/QQQ/TSLA/NVDA/AMZN 0DTE options and their deliveries); "
+            "no sleeve trades it"
+        )
     if owner == "drew":
         if cls.bucket == "etf_ls":
             failures.append(f"{gate_name} is a systematic LETF name; Drew cannot trade it")

@@ -61,6 +61,13 @@ def test_embedded_registry_version_hash_and_host_facts_are_pinned():
     assert allocation_index(raw)[130].system == "etf-0dte"
     assert allocation_index(raw)[131].system == "etf-0dte"
     assert allocation_index(raw)[132].system == "etf-0dte"
+    for client_id, product in ((53, "NVDA"), (54, "AMZN"), (133, "NVDA"), (134, "AMZN")):
+        allocation = allocation_index(raw)[client_id]
+        assert (allocation.system, allocation.access) == ("etf-0dte", "transmit"), client_id
+        assert raw["systems"]["etf-0dte"]["clients"][str(client_id)]["role"].startswith(f"{product} ")
+    assert raw["systems"]["etf-0dte"]["order_ref_prefixes"] == [
+        "SPY0DTE|", "QQQ0DTE|", "TSLA0DTE|", "NVDA0DTE|", "AMZN0DTE|",
+    ]
 
 
 def test_duplicate_allocation_fails_even_with_a_recomputed_hash(tmp_path):
@@ -91,7 +98,7 @@ def test_embedded_hash_pin_rejects_a_self_consistent_local_fork(tmp_path):
         load_registry(path, expected_hash=EXPECTED_REGISTRY_HASH)
 
 
-@pytest.mark.parametrize("client_id", [0, 17, 50, 51, 52, 77, 90, 130, 132, 198, 100])
+@pytest.mark.parametrize("client_id", [0, 17, 50, 51, 52, 53, 54, 77, 90, 130, 132, 133, 134, 198, 100])
 def test_foreign_ids_fail_ssi_validation(client_id):
     with pytest.raises(RegistryError, match="belongs to"):
         assert_ssi_client_id(client_id, SSI_HUB_BRIDGE_ROLE, readonly=False)

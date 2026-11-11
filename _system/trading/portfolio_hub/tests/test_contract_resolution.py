@@ -160,6 +160,12 @@ class _RecordingService(_Service):
     ("STK", {"symbol": "TSLA", "sec_type": "STK", "local_symbol": "TSLA", "exchange": "NASDAQ"}),
     ("OPT", {"symbol": "TSLA", "sec_type": "OPT", "local_symbol": "TSLA  261113P00300000", "trading_class": "TSLA",
              "strike": 300.0, "right": "P", "expiry": "20261113", "multiplier": "100"}),
+    ("STK", {"symbol": "NVDA", "sec_type": "STK", "local_symbol": "NVDA", "exchange": "NASDAQ"}),
+    ("OPT", {"symbol": "NVDA", "sec_type": "OPT", "local_symbol": "NVDA  261113C00200000", "trading_class": "NVDA",
+             "strike": 200.0, "right": "C", "expiry": "20261113", "multiplier": "100"}),
+    ("STK", {"symbol": "AMZN", "sec_type": "STK", "local_symbol": "AMZN", "exchange": "NASDAQ"}),
+    ("OPT", {"symbol": "AMZN", "sec_type": "OPT", "local_symbol": "AMZN  261113P00230000", "trading_class": "AMZN",
+             "strike": 230.0, "right": "P", "expiry": "20261113", "multiplier": "100"}),
 ])
 def test_an_etf_0dte_ticket_is_refused_before_anything_is_drafted(sec_type, identity):
     """etf-0dte's options and delivered shares are never the hub's to ticket.

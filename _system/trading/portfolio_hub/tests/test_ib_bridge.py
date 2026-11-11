@@ -359,9 +359,9 @@ def test_bridge_never_binds_orders_created_by_other_clients():
     assert not re.search(r"\.reqAutoOpenOrders\s*\(", inspect.getsource(ib_bridge))
 
 
-# etf-0dte (spx-0dte's SPY / QQQ / TSLA 0DTE executors, clients 50/51/52, and
-# their dead-executor watchdogs 130/131/132) stamps every order SPY0DTE|,
-# QQQ0DTE| or TSLA0DTE|.
+# etf-0dte (spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN 0DTE executors, clients
+# 50-54, and their dead-executor watchdogs 130-134) stamps every order SPY0DTE|,
+# QQQ0DTE|, TSLA0DTE|, NVDA0DTE| or AMZN0DTE|.
 # Rule 7: an order is the hub's only with a MAGIS| ref, client 91 and the
 # configured account. These pin that every etf-0dte order is foreign to the
 # bridge -- visible, never modified, never cancelled, never resolved as ours --
@@ -375,6 +375,12 @@ ETF_0DTE_ORDERS = [
     ("TSLA0DTE|ORB|2026-11-09|t1", 52),
     ("TSLA0DTE|WATCHDOG|2026-11-09", 132),
     ("TSLA0DTE|UNWIND|2026-11-10", 52),
+    ("NVDA0DTE|ORB|2026-11-11|t1", 53),
+    ("NVDA0DTE|WATCHDOG|2026-11-11", 133),
+    ("NVDA0DTE|UNWIND|2026-11-12", 53),
+    ("AMZN0DTE|ORB|2026-11-11|t1", 54),
+    ("AMZN0DTE|WATCHDOG|2026-11-11", 134),
+    ("AMZN0DTE|UNWIND|2026-11-12", 54),
 ]
 
 

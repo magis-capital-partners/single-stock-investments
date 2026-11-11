@@ -1,4 +1,4 @@
-"""Reading spx-0dte's SPY / QQQ / TSLA delivery forecast, and what sync does with it."""
+"""Reading spx-0dte's etf-0dte delivery forecast, and what sync does with it."""
 
 from __future__ import annotations
 
@@ -166,3 +166,26 @@ def test_reads_the_tsla_forecast_beside_the_others(tmp_path):
     write_forecast(tmp_path, "spy", "2026-10-27", {"SPY": 100})
     write_forecast(tmp_path, "tsla", "2026-10-27", {"TSLA": -100})
     assert read_expected_delivery(tmp_path, ACCOUNT, today=TODAY) == {"SPY": 100.0, "TSLA": -100.0}
+
+
+# ---------------------------------------------------------------- NVDA / AMZN
+
+def test_reads_the_nvda_and_amzn_forecasts_beside_the_others(tmp_path):
+    for product in ("nvda", "amzn"):
+        assert forecast_path(tmp_path, product, "2026-10-27", ACCOUNT) == (
+            tmp_path / product / "2026-10-27" / "expected_delivery_U805366.json"
+        )
+    write_forecast(tmp_path, "tsla", "2026-10-27", {"TSLA": -100})
+    write_forecast(tmp_path, "nvda", "2026-10-27", {"NVDA": 200})
+    write_forecast(tmp_path, "amzn", "2026-10-26", {"AMZN": -100})
+    write_forecast(tmp_path, "amzn", "2026-10-27", {})      # newest: written, nothing expected
+    assert read_expected_delivery(tmp_path, ACCOUNT, today=TODAY) == {
+        "TSLA": -100.0, "NVDA": 200.0, "AMZN": 0.0,
+    }
+
+
+def test_a_product_reads_only_its_own_symbol(tmp_path):
+    # Each executor writes its own product's forecast; a symbol written under
+    # another product's folder is never read as that symbol's forecast.
+    write_forecast(tmp_path, "nvda", "2026-10-27", {"NVDA": 100, "AMZN": 100})
+    assert read_expected_delivery(tmp_path, ACCOUNT, today=TODAY) == {"NVDA": 100.0}

@@ -243,8 +243,8 @@ class PortfolioLedger:
                 dict(position), ls_symbols=ls_symbols, drew_symbols=drew_symbols,
                 etf_0dte_delivery=expected_delivery,
             )
-            # etf-0dte's SPY / QQQ / TSLA shares: an explicit Drew/Michael lot is another
-            # book's KNOWN holding and keeps its owner; only the remainder is
+            # etf-0dte's SPY / QQQ / TSLA / NVDA / AMZN shares: an explicit
+            # Drew/Michael lot is another book's KNOWN holding and keeps its owner; only the remainder is
             # attributed against spx-0dte's delivery forecast. Its options are
             # nobody's here, like SPX's.
             etf_0dte_shares = policy.strategy == ETF_0DTE_STRATEGY and policy.bucket != ETF_0DTE

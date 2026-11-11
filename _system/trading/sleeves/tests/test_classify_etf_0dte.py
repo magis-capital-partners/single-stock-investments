@@ -1,6 +1,6 @@
-"""etf-0dte: spx-0dte's SPY / QQQ / TSLA 0DTE executors (clients 50/51/52, watchdogs 130/131/132).
+"""etf-0dte: spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN 0DTE executors.
 
-Their options, the shares an assignment delivers into this shared account, and
+They are IB clients 50-54 with dead-executor watchdogs 130-134. Their options, the shares an assignment delivers into this shared account, and
 the 09:30 unwind of those shares belong to no SSI book. These tests pin each
 branch of that rule and its order against the XSP, SPX, LETF-overlay, LETF
 universe and owner rules.
@@ -34,9 +34,9 @@ from _system.trading.sleeves.classify_positions import (  # noqa: E402
 from _system.trading.sleeves.config_loader import load_etf_ls_universe  # noqa: E402
 from _system.trading.sleeves.realized import owner_policy  # noqa: E402
 
-# The real universe snapshot lists SPY, QQQ and TSLA (it predates ls-algo's
-# blacklists of them), so every test runs with them in it.
-LETF = {"SPY", "QQQ", "TSLA", "TQQQ", "NVDA", "APLD"}
+# The real universe snapshot lists SPY, QQQ, TSLA, NVDA and AMZN (it predates
+# ls-algo's blacklists of them), so every test runs with them in it.
+LETF = {"SPY", "QQQ", "TSLA", "NVDA", "AMZN", "TQQQ", "APLD"}
 
 
 def cls(pos, **kw):
@@ -60,10 +60,12 @@ def shares(symbol="SPY", qty=100, **overrides):
 
 def test_the_prefixes_are_the_executors_and_their_watchdogs():
     for ref in ("SPY0DTE|ORB|2026-10-27|t1", "QQQ0DTE|CLOSEOUT|x", "SPY0DTE|WATCHDOG|y", "spy0dte|lower",
-                "TSLA0DTE|ORB|2026-11-09|t1", "TSLA0DTE|WATCHDOG|y"):
+                "TSLA0DTE|ORB|2026-11-09|t1", "TSLA0DTE|WATCHDOG|y",
+                "NVDA0DTE|ORB|2026-11-11|t1", "NVDA0DTE|WATCHDOG|y", "AMZN0DTE|ORB|2026-11-11|t1",
+                "AMZN0DTE|UNWIND|y"):
         assert has_etf_0dte_ref(ref)
     for ref in ("", "MAGIS|single_stock|drew|1", "ETF_LS|ESTABLISH|NVDA", "B5P|XSP", "SPX0DTE|x", "XSPY0DTE|x",
-                "XTSLA0DTE|x"):
+                "XTSLA0DTE|x", "XNVDA0DTE|x", "NVD0DTE|x", "AMZ0DTE|x", "ETF_LS|MANUAL|SELLCALL|AMZN"):
         assert not has_etf_0dte_ref(ref)
 
 
@@ -112,8 +114,13 @@ def test_the_root_rule_runs_before_the_ls_overlay_rule():
     # etf-0dte contract a Drew overlay.
     assert cls(spy_opt()).bucket == ETF_0DTE
     assert cls(spy_opt(), etf_ls_symbols=set()).bucket == ETF_0DTE      # and not Michael's residual
+    # A universe underlying that is not a root keeps the overlay rule. NVDA was
+    # this example until it became a root on 2026-11-10.
+    msft = cls({"symbol": "MSFT  260821C00400000", "secType": "OPT", "underlyingSymbol": "MSFT"},
+               etf_ls_symbols=LETF | {"MSFT"})
+    assert (msft.bucket, msft.reason) == ("drew", "ls_algo_option_overlay")
     nvda = cls({"symbol": "NVDA  260821C00100000", "secType": "OPT", "underlyingSymbol": "NVDA"})
-    assert (nvda.bucket, nvda.reason) == ("drew", "ls_algo_option_overlay")
+    assert (nvda.bucket, nvda.reason) == (ETF_0DTE, "etf_0dte_root")
 
 
 def test_index_rules_still_win_for_index_contracts():
@@ -268,12 +275,13 @@ def test_every_etf_0dte_bucket_is_another_systems():
 def test_the_committed_universe_snapshot_still_lists_every_root():
     # Why the rules above must run before the universe rule. ls-algo has
     # blacklisted SPY and QQQ since 2026-09-10, but this mirror is a 2026-08-13
-    # snapshot, and TSLA has been a universe name throughout.
+    # snapshot, and TSLA, NVDA and AMZN have been universe names throughout.
     letf = load_etf_ls_universe()
     assert ETF_0DTE_ROOTS <= letf
     assert cls(spy_opt(), etf_ls_symbols=letf).bucket == ETF_0DTE
     assert cls(shares(), etf_ls_symbols=letf).bucket == ETF_0DTE_DELIVERY_UNATTRIBUTED
-    assert cls(shares("TSLA", 11), etf_ls_symbols=letf).bucket == ETF_0DTE_DELIVERY_UNATTRIBUTED
+    for root in ("TSLA", "NVDA", "AMZN"):
+        assert cls(shares(root, 11), etf_ls_symbols=letf).bucket == ETF_0DTE_DELIVERY_UNATTRIBUTED
 
 
 # ----------------------------------------------------------------------- TSLA
@@ -354,5 +362,111 @@ def test_realized_history_keeps_tsla_out_of_both_books():
     assert owner(stamped) == ("excluded", "etf_0dte", "order_ref")
     # ls-algo's own stamped fill keeps its label; only ref-less shares change it.
     fill = {"ticker": "TSLA", "symbol": "TSLA", "sec_type": "STK", "order_ref": "ETF_LS|ESTABLISH|TSLA"}
+    assert owner(fill) == ("excluded", "etf_ls", "executed_ls_order_reference")
+    assert owner({**fill, "order_ref": ""}) == ("excluded", ETF_0DTE_DELIVERY_UNATTRIBUTED, "quantity_unknown")
+
+
+# ---------------------------------------------------------------- NVDA / AMZN
+
+NEW_ROOTS = ("NVDA", "AMZN")
+
+
+def new_root_opt(root, **overrides):
+    base = {"symbol": root, "secType": "OPT", "underlyingSymbol": root,
+            "localSymbol": f"{root:<6}261113C00200000", "tradingClass": root, "qty": -1}
+    return {**base, **overrides}
+
+
+def test_nvda_and_amzn_are_roots_with_their_own_prefixes():
+    assert {"NVDA", "AMZN"} <= ETF_0DTE_ROOTS
+    assert {"NVDA0DTE|", "AMZN0DTE|"} <= set(ETF_0DTE_REF_PREFIXES)
+
+
+@pytest.mark.parametrize("root", NEW_ROOTS)
+@pytest.mark.parametrize("make", [
+    lambda r: new_root_opt(r),                                                  # IB API row
+    lambda r: {"symbol": f"{r:<6}261113P00180000", "localSymbol": f"{r:<6}261113P00180000",
+               "secType": "OPT", "tradingClass": "", "underlyingSymbol": ""},   # Flex: OCC, no underlying
+    lambda r: {"symbol": f"{r}--261113P00180000", "secType": "OPT"},            # norm_sym'd OCC (policy path)
+    lambda r: {"symbol": "X", "secType": "OPT", "tradingClass": r},             # trading class only
+    lambda r: new_root_opt(r, localSymbol=f"{r:<6}271217C00300000"),            # not 0DTE: still theirs
+], ids=["ib_api", "flex_occ", "normed_occ", "trading_class", "not_0dte"])
+def test_refless_nvda_and_amzn_options_are_etf_0dte_by_root(root, make):
+    # Before 2026-11-10 these were Drew's ls_algo_option_overlay (both roots are
+    # universe underlyings). No book held one at the 2026-08-28 Flex.
+    got = cls(make(root), drew_symbols={root})
+    assert (got.bucket, got.reason, got.ticker, got.owner) == (ETF_0DTE, "etf_0dte_root", root, None)
+
+
+@pytest.mark.parametrize("root", NEW_ROOTS)
+def test_a_stamped_nvda_or_amzn_order_is_etf_0dte_and_its_unwind_is_the_delivery(root):
+    option = cls(new_root_opt(root, orderRef=f"{root}0DTE|ORB|2026-11-11|t1"), drew_symbols={root})
+    assert (option.bucket, option.reason, option.ticker, option.owner) == (ETF_0DTE, "order_ref", root, None)
+    unwind = cls(shares(root, 100, orderRef=f"{root}0DTE|UNWIND|2026-11-12"), drew_symbols={root})
+    assert (unwind.bucket, unwind.reason) == (ETF_0DTE_DELIVERY, "order_ref")
+    watchdog = cls(new_root_opt(root, orderRef=f"{root}0DTE|WATCHDOG|2026-11-11"))
+    assert watchdog.bucket == ETF_0DTE
+
+
+@pytest.mark.parametrize("root", NEW_ROOTS)
+def test_an_nvda_or_amzn_delivery_is_attributed_against_its_forecast(root):
+    got = cls(shares(root, -100), etf_0dte_delivery={root: -100})
+    assert (got.bucket, got.reason, got.owner) == (ETF_0DTE_DELIVERY, "expected_delivery", None)
+    # Another product's forecast never explains these shares.
+    other = cls(shares(root, -100), etf_0dte_delivery={"TSLA": -100})
+    assert (other.bucket, other.reason) == (ETF_0DTE_DELIVERY_UNATTRIBUTED, "no_forecast")
+
+
+@pytest.mark.parametrize("root,qty", [("NVDA", 13), ("AMZN", 8)])
+def test_ls_algos_nvda_and_amzn_shares_read_unattributed_until_declared(root, qty):
+    # ls-algo held both as LETF-pair hedges at the 2026-08-28 Flex. No SSI book
+    # holds either, so known_share_holdings stays empty and they read as no
+    # book's (not ls-algo's, Drew's or Michael's) until the owner closes them.
+    got = cls(shares(root, qty), drew_symbols={root})
+    assert (got.bucket, got.reason, got.owner) == (ETF_0DTE_DELIVERY_UNATTRIBUTED, "no_forecast", None)
+    assert cls(shares(root, qty), etf_ls_symbols=set()).owner is None       # and not Michael's residual
+    held = cls(shares(root, qty), etf_0dte_known_holdings={root: qty})
+    assert (held.bucket, held.reason) == ("etf_ls", "etf_ls_universe")
+
+
+@pytest.mark.parametrize("root", NEW_ROOTS)
+def test_ls_stamped_nvda_and_amzn_orders_keep_their_owner(root):
+    stock = cls(shares(root, 10, orderRef=f"ETF_LS|ESTABLISH|{root}"))
+    assert (stock.bucket, stock.reason) == ("etf_ls", "executed_ls_order_reference")
+    # A documented manual overlay order is still Drew's: only ref-less rows move.
+    overlay = cls(new_root_opt(root, orderRef=f"ETF_LS|MANUAL|SELLCALL|{root}"))
+    assert (overlay.bucket, overlay.reason, overlay.owner) == ("drew", "ls_algo_option_overlay", "drew")
+
+
+@pytest.mark.parametrize("wrapper", [
+    "NVDL", "NVDU", "NVDQ", "NVDD", "NVDS", "NVDX", "NVDG", "NVDY", "NVD", "NVDB", "NVDO", "NVDW",
+    "AMZU", "AMZZ", "AMZD", "AMZY", "AMZO", "AMZG", "AMZW",
+])
+def test_nvda_and_amzn_wrappers_are_other_roots_and_stay_ls_algos(wrapper):
+    universe = LETF | {wrapper}
+    assert etf_0dte_root({"symbol": wrapper, "secType": "STK"}) == ""
+    stock = cls(shares(wrapper, -100), etf_ls_symbols=universe)
+    assert (stock.bucket, stock.reason) == ("etf_ls", "etf_ls_universe")
+    occ = f"{wrapper:<6}261120C00010000"
+    option = cls({"symbol": occ, "localSymbol": occ, "secType": "OPT", "underlyingSymbol": wrapper},
+                 etf_ls_symbols=universe)
+    assert (option.bucket, option.reason) == ("drew", "ls_algo_option_overlay")
+    flex = cls({"symbol": occ, "localSymbol": occ, "secType": "OPT"}, etf_ls_symbols=universe)
+    assert flex.bucket not in ETF_0DTE_BUCKETS
+
+
+@pytest.mark.parametrize("root", NEW_ROOTS)
+def test_realized_history_keeps_nvda_and_amzn_0dte_out_of_both_books(root):
+    def owner(event):
+        return owner_policy(event, ls_symbols=LETF, blacklist=set())
+
+    same_day = {"ticker": root, "symbol": f"{root:<6}261113P00180000", "sec_type": "OPT",
+                "expiry": "2026-11-13", "trade_date": "2026-11-13", "order_ref": ""}
+    assert owner(same_day) == ("excluded", "etf_0dte", "same_day_index_option")
+    stamped = {**same_day, "expiry": "2026-11-20", "order_ref": f"{root}0DTE|ORB|2026-11-13|t1"}
+    assert owner(stamped) == ("excluded", "etf_0dte", "order_ref")
+    overlay = {**same_day, "expiry": "2026-11-20", "order_ref": f"ETF_LS|MANUAL|SELLCALL|{root}"}
+    assert owner(overlay) == ("drew", "letf_option_overlay", "ls_algo_option_overlay")
+    fill = {"ticker": root, "symbol": root, "sec_type": "STK", "order_ref": f"ETF_LS|ESTABLISH|{root}"}
     assert owner(fill) == ("excluded", "etf_ls", "executed_ls_order_reference")
     assert owner({**fill, "order_ref": ""}) == ("excluded", ETF_0DTE_DELIVERY_UNATTRIBUTED, "quantity_unknown")

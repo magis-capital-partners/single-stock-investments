@@ -21,8 +21,9 @@ from _system.trading.sleeves.etf_0dte_delivery import DEFAULT_MAX_AGE_DAYS, read
 
 POLICY_SOURCE_PREFIX = "policy:owner-custody:v1"
 
-# etf-0dte (spx-0dte's SPY / QQQ / TSLA 0DTE executors) owns these lots. The owner is
-# always "unallocated": the hub never sizes, rebalances or tickets against them.
+# etf-0dte (spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN 0DTE executors) owns these
+# lots. The owner is always "unallocated": the hub never sizes, rebalances or
+# tickets against them.
 ETF_0DTE_STRATEGY = "etf_0dte"
 ETF_0DTE_POLICY_REASONS = {
     ETF_0DTE: "etf_0dte_option_exclusion",
@@ -76,12 +77,13 @@ def load_drew_symbols(path: str | Path | None = None) -> set[str]:
 def load_etf_0dte_expected_delivery(
     account_alias: str, *, as_of: str | None = None,
 ) -> dict[str, float] | None:
-    """spx-0dte's SPY / QQQ / TSLA delivery forecast for this account, or None.
+    """spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN delivery forecast for this account.
 
-    Read from ``ETF_0DTE_LIVE_DIR`` (spx-0dte's ``data/live`` on this host),
-    for the account in ``ETF_0DTE_ACCOUNT`` or else the alias (on NY4 the alias
-    is the account id). Unset means no forecast, and every SPY / QQQ / TSLA share no
-    other book is known to hold is then unattributed.
+    None when there is none. Read from ``ETF_0DTE_LIVE_DIR`` (spx-0dte's
+    ``data/live`` on this host), for the account in ``ETF_0DTE_ACCOUNT`` or else
+    the alias (on NY4 the alias is the account id). Unset means no forecast, and
+    every share on those roots no other book is known to hold is then
+    unattributed.
     """
     live_dir = os.environ.get("ETF_0DTE_LIVE_DIR")
     if not live_dir:
@@ -114,17 +116,19 @@ def _new_york_date(as_of: str | None) -> date | None:
 def etf_0dte_ticket_refusal(identity: Mapping[str, Any]) -> str | None:
     """Why the hub must refuse a ticket on this broker-qualified contract, or None.
 
-    Any SPY / QQQ / TSLA option or share is etf-0dte's: its executors trade the
-    options in this account, and an assignment delivers shares overnight for
-    its 09:30 unwind. The hub cannot tell a delivered share from any other on
-    a ticket -- the reduce-only check reads the account-wide position -- so a
-    hub SELL could sell the delivery out from under the unwind, and a BUY could
-    net against it. No hub ticket may name any of these roots.
+    Any SPY / QQQ / TSLA / NVDA / AMZN option or share is etf-0dte's: its
+    executors trade the options in this account, and an assignment delivers
+    shares overnight for its 09:30 unwind. The hub cannot tell a delivered share
+    from any other on a ticket -- the reduce-only check reads the account-wide
+    position -- so a hub SELL could sell the delivery out from under the unwind,
+    and a BUY could net against it. No hub ticket may name any of these roots.
 
-    TSLA is the one that is also a company this repo covers (stance "watch", no
-    target, no position), so research on it can reach the hub. It stops here
-    whatever the owner, side or route, and that includes a SELL of ls-algo's
-    +11 shares. Its wrappers are other roots and are not refused.
+    TSLA, NVDA and AMZN are also companies this repo covers (TSLA and NVDA
+    stance "watch", AMZN "hold"; no target, no SSI position), so research on
+    them can reach the hub. They stop here whatever the owner, side or route,
+    and that includes a SELL of ls-algo's TSLA, NVDA or AMZN shares and a
+    Drew overlay written on NVDA or AMZN. Their wrappers are other roots and
+    are not refused.
     """
     root = etf_0dte_root({
         "symbol": identity.get("symbol"),
@@ -135,8 +139,8 @@ def etf_0dte_ticket_refusal(identity: Mapping[str, Any]) -> str | None:
     if not root:
         return None
     return (
-        f"{root} belongs to etf-0dte (spx-0dte's SPY/QQQ/TSLA 0DTE executors: their options and the "
-        "shares an assignment delivers into this account). The hub never tickets it."
+        f"{root} belongs to etf-0dte (spx-0dte's SPY/QQQ/TSLA/NVDA/AMZN 0DTE executors: their options "
+        "and the shares an assignment delivers into this account). The hub never tickets it."
     )
 
 
@@ -148,9 +152,9 @@ def classify_policy_position(
     etf_0dte_delivery: Mapping[str, Any] | None = None,
 ) -> PolicyAllocation:
     """Owner custody rule: Michael's book is everything EXCEPT
-    SPX option strategies, etf-0dte's SPY / QQQ / TSLA options and delivered shares,
-    every ticker in ls-algo's universe (ETFs and underlyings alike), and Drew's
-    sleeve holdings."""
+    SPX option strategies, etf-0dte's SPY / QQQ / TSLA / NVDA / AMZN options and
+    delivered shares, every ticker in ls-algo's universe (ETFs and underlyings
+    alike), and Drew's sleeve holdings."""
     symbol = norm_sym(row.get("symbol") or row.get("local_symbol") or "")
     if not symbol:
         return PolicyAllocation("unallocated", "other", "missing_symbol_quarantine")

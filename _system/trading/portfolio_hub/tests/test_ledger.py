@@ -172,15 +172,16 @@ def test_ls_algo_option_overlay_gets_its_own_strategy_label() -> None:
     # Custody stays with Drew, but an overlay is written against a systematic
     # pair leg, so it must not be folded into the discretionary single-stock
     # book. The distinct strategy label is what keeps hub reporting honest.
+    # (NVDA was this example until it became an etf-0dte root on 2026-11-10.)
     from _system.trading.portfolio_hub.allocation_policy import classify_policy_position
 
     option = {
-        "symbol": "NVDA",
-        "local_symbol": "NVDA  260821C00100000",
+        "symbol": "MSFT",
+        "local_symbol": "MSFT  260821C00400000",
         "sec_type": "OPT",
-        "underlying": "NVDA",
+        "underlying": "MSFT",
     }
-    policy = classify_policy_position(option, ls_symbols={"NVDA"}, drew_symbols=set())
+    policy = classify_policy_position(option, ls_symbols={"MSFT"}, drew_symbols=set())
     assert (policy.owner, policy.strategy) == ("drew", "letf_option_overlay")
     assert policy.reason == "ls_algo_option_overlay"
 
@@ -211,8 +212,8 @@ def test_ls_algo_option_overlay_gets_its_own_strategy_label() -> None:
 
     # The share leg of the same ticker is untouched by the overlay branch.
     shares = classify_policy_position(
-        {"symbol": "NVDA", "local_symbol": "NVDA", "sec_type": "STK"},
-        ls_symbols={"NVDA"},
+        {"symbol": "MSFT", "local_symbol": "MSFT", "sec_type": "STK"},
+        ls_symbols={"MSFT"},
         drew_symbols=set(),
     )
     assert (shares.owner, shares.strategy) == ("unallocated", "letf")

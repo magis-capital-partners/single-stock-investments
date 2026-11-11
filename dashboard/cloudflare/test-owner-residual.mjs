@@ -138,12 +138,12 @@ test("residual rows keep broker market value by allocating the full quantity", (
   assert.equal(base * allocated / brokerQty, 1200);
 });
 
-// etf-0dte: spx-0dte's SPY / QQQ / TSLA 0DTE executors. The port must route exactly
-// as classify_positions.py / allocation_policy.py do. The live universe lists all
-// three, which is why these rules run before the LS rules.
+// etf-0dte: spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN 0DTE executors. The port must
+// route exactly as classify_positions.py / allocation_policy.py do. The live
+// universe lists every root, which is why these rules run before the LS rules.
 test("etf-0dte options and shares belong to no owner, ahead of the LS rules", () => {
   const ls = lsUniverseSymbols();
-  assert.equal(ls.has("SPY") && ls.has("QQQ") && ls.has("TSLA"), true);
+  assert.equal(["SPY", "QQQ", "TSLA", "NVDA", "AMZN"].every((root) => ls.has(root)), true);
   const policy = (row) => classifyPolicyPosition(row, { lsSymbols: ls, drewSymbols: new Set(["SPY", "QQQ"]) });
 
   for (const row of [
@@ -184,6 +184,34 @@ test("TSLA is an etf-0dte root and its wrappers are not", () => {
   }
   const stamped = classifyPosition({ symbol: "TSLA", secType: "STK", qty: 100, orderRef: "TSLA0DTE|UNWIND|x" }, { etfLsSymbols: ["TSLA"] });
   assert.deepEqual(stamped, { ticker: "TSLA", bucket: "etf_0dte_delivery", reason: "order_ref", owner: null });
+});
+
+test("NVDA and AMZN are etf-0dte roots and their wrappers are not", () => {
+  const ls = lsUniverseSymbols();
+  const policy = (row) => classifyPolicyPosition(row, { lsSymbols: ls, drewSymbols: new Set(["NVDA", "AMZN"]) });
+
+  for (const root of ["NVDA", "AMZN"]) {
+    const occ = `${root.padEnd(6)}261113C00200000`;
+    // Until 2026-11-10 a ref-less option here was Drew's letf_option_overlay.
+    assert.deepEqual(policy({ symbol: occ, local_symbol: occ, sec_type: "OPT" }), {
+      owner: "unallocated", strategy: "etf_0dte", reason: "etf_0dte_option_exclusion", bucket: "etf_0dte",
+    });
+    // ls-algo's shares (2026-08-28 Flex): no owner here, like any unattributed share.
+    assert.deepEqual(policy({ symbol: root, local_symbol: root, sec_type: "STK", quantity_decimal: "8" }), {
+      owner: "unallocated", strategy: "etf_0dte", reason: "etf_0dte_unattributed_shares",
+      bucket: "etf_0dte_delivery_unattributed",
+    });
+    const stamped = classifyPosition({ symbol: root, secType: "STK", qty: 100, orderRef: `${root}0DTE|UNWIND|x` }, { etfLsSymbols: [root] });
+    assert.deepEqual(stamped, { ticker: root, bucket: "etf_0dte_delivery", reason: "order_ref", owner: null });
+    const overlay = classifyPosition({ symbol: occ, secType: "OPT", underlyingSymbol: root, orderRef: `ETF_LS|MANUAL|SELLCALL|${root}` }, { etfLsSymbols: [root] });
+    assert.equal(overlay.bucket, "drew");
+  }
+  for (const wrapper of ["NVDL", "NVDU", "NVDQ", "NVDX", "NVDG", "NVD", "AMZU", "AMZZ", "AMZY", "AMZO"]) {
+    assert.equal(policy({ symbol: wrapper, local_symbol: wrapper, sec_type: "STK", quantity_decimal: "-100" }).strategy, "letf", wrapper);
+  }
+  // An overlay on a universe underlying that is not a root keeps Drew.
+  const msft = policy({ symbol: "MSFT  261113C00400000", local_symbol: "MSFT  261113C00400000", sec_type: "OPT" });
+  assert.deepEqual([msft.owner, msft.strategy], ["drew", "letf_option_overlay"]);
 });
 
 test("the port matches the Python share rule branch for branch", () => {

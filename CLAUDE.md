@@ -3,11 +3,11 @@
 ## IB Gateway coexistence (three systems, one Gateway) — DO NOT VIOLATE
 
 The NY4 Gateway is shared by **spx-0dte**, **ls-algo**, this repo, and
-**etf-0dte** (SPY/QQQ/TSLA 0DTE; yields to SPX). SPX 0DTE
+**etf-0dte** (SPY/QQQ/TSLA/NVDA/AMZN 0DTE; yields to SPX). SPX 0DTE
 is the protected party. The allocation source of truth is
 `_system/trading/ib_gateway_client_registry.v1.json`, registry version
-`2026-11-06.1`, canonical SHA-256
-`e01ec812195749504e7548ebcc0df5734416e75b961b8f9c4e46564b47f8016a`.
+`2026-11-10.1`, canonical SHA-256
+`6fabc701ce3de90f6d281c680201f2ff2f7181628d3020fac7bc2a80221b1cb5`.
 The same version/hash is mirrored in the other two repos. Prose is explanatory,
 not an allocation authority.
 
@@ -16,7 +16,7 @@ not an allocation authority.
 | spx-0dte | 17 live executor; 18 ibc_guard probe; 19 off-hours line probe; 87 basis sampler; 88 off-hours what-if; 97 emergency watchdog |
 | ls-algo | 0 disabled-reserved; 83 read-only stale-order interlock; 41 rebalance; 77 flow; 90 screener; 198 contract probe; leased pool 100–129 |
 | single-stock-investments | 71 Drew legacy sleeve; 72 Michael legacy sleeve; 73 legacy read-only sync; 81 disabled/reserved collector; 82 reserved/no-connect observer; **91 event-driven hub bridge and sole hub transmitter** |
-| etf-0dte | 50 SPY 0DTE live executor; 51 QQQ 0DTE live executor; 52 TSLA 0DTE live executor; 130 SPY dead-executor watchdog; 131 QQQ dead-executor watchdog; 132 TSLA dead-executor watchdog |
+| etf-0dte | 50 SPY 0DTE live executor; 51 QQQ 0DTE live executor; 52 TSLA 0DTE live executor; 53 NVDA 0DTE live executor; 54 AMZN 0DTE live executor; 130 SPY dead-executor watchdog; 131 QQQ dead-executor watchdog; 132 TSLA dead-executor watchdog; 133 NVDA dead-executor watchdog; 134 AMZN dead-executor watchdog. Order-ref prefixes `SPY0DTE|` / `QQQ0DTE|` / `TSLA0DTE|` / `NVDA0DTE|` / `AMZN0DTE|` |
 
 **Rule 0 — the one that governs the rest. During market hours on a market day
 (09:30–16:00 ET, Mon–Fri, US holidays excluded) no agent initiates anything that
@@ -66,8 +66,8 @@ Rules that keep SPX safe (test-enforced where noted):
 
    *Note (spx-0dte plan W7, 2026-10-27; a reading of the carve-out, not a
    change to it):* the executor-dead evidence is the **SPX** executor's
-   (client 17) and only its. The etf-0dte executors (50/51/52) and their
-   watchdogs (130/131/132) share this Gateway, and `ibc_guard` reads their lock
+   (client 17) and only its. The etf-0dte executors (50-54) and their
+   watchdogs (130-134) share this Gateway, and `ibc_guard` reads their lock
    and heartbeat for PAGING only: a dead ETF heartbeat, a missing ETF lock or
    a failed ETF connect never counts toward the one remedial restart, because
    the restart hits SPX (spx-0dte
