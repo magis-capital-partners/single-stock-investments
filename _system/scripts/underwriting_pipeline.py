@@ -163,8 +163,25 @@ def stage_hash(root, stage, payload):
     return digest({'stage': stage, 'model': model, 'payload': payload, 'instructions_hash': digest(runbook)})
 
 
+def validate_owner_task(root, ticker, stage, payload):
+    """Bind the dated CPRT reassessment to its actual preserved owner instruction."""
+    request = (read(root/POLICY).get('owner_task_requests') or {}).get(ticker)
+    if request is None:
+        return
+    expected = {'id': 'CPRT-owner-missing-annex-materiality-20261111T2007Z',
+                'requested_on': '2026-11-11',
+                'instruction': 'No find it if you can otherwise dont let it block'}
+    require(ticker == 'CPRT' and request == expected, 'Unrecognized owner underwriting task')
+    if stage == 'author':
+        direction = ((payload.get('revision_feedback') or {}).get('owner_direction') or {})
+        require(direction.get('id') == request['id'] and direction.get('verbatim') == request['instruction']
+                and direction.get('scope') == 'CPRT only',
+                'The owner reassessment requires its preserved exact instruction')
+
+
 def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execute=None):
     require(stage in ('author', 'challenger'), 'Only local judgment sessions may use model calls')
+    validate_owner_task(root, ticker, stage, payload)
     from underwriting_related_evidence import validate_related_identity
     validate_related_identity(payload.get('packet') or {})
     from underwriting_transport import render
