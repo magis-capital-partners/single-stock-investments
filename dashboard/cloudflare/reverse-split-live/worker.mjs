@@ -106,10 +106,12 @@ export async function dispatch(env,{minimumPriority=0,maximumPriority=10000}={})
   }
 }
 export async function repairNewsBindingFailures(env){
-  const marker='repair:news_sql_nulls.2026-11-11.v1';if(await state(env,marker))return;
-  const rows=(await env.DB.prepare("SELECT * FROM rs_jobs WHERE kind='news' AND state='failed' AND error='Provided value cannot be bound to SQLite parameter 2'").all()).results;
+  const marker='repair:news_sql_nulls.2026-11-11.v2';if(await state(env,marker))return;
+  // Node 24 includes a terminal period; Node 25 does not. Match the same
+  // narrowly identified failure without depending on that punctuation.
+  const rows=(await env.DB.prepare("SELECT * FROM rs_jobs WHERE state='failed' AND ((kind='news' AND rtrim(error,'. ')='Provided value cannot be bound to SQLite parameter 2') OR (kind='classification_replay' AND error='Announcement replay source is not an original primary document'))").all()).results;
   if(!rows.length){await state(env,marker,JSON.stringify({at:stamp(),requeued:[]}));return;}
-  const at=stamp(),raw=JSON.stringify({version:marker,at,original_jobs:rows,reason:'RSS source URLs are bound as HTTPS strings, content types explicitly set, and unknown dates stored as null; original failures retained.',not_original_clock_fills:true}),key='review/repairs/'+await sha(raw)+'.json';
+  const at=stamp(),raw=JSON.stringify({version:marker,at,original_jobs:rows,previous_retry:await state(env,'repair:news_sql_nulls.2026-11-11.v1'),reason:'Normalize Node error punctuation; preserve exact errors before retry. Incomplete primary replays finish with an explicit archived data gap and never infer terms.',not_original_clock_fills:true}),key='review/repairs/'+await sha(raw)+'.json';
   await env.EVIDENCE.put(key,new TextEncoder().encode(raw),{httpMetadata:{contentType:'application/json'}});
   for(const r of rows)await env.DB.prepare("UPDATE rs_jobs SET state='pending',attempts=0,token=NULL,available_at=?,updated_at=? WHERE id=? AND state='failed' AND error=?").bind(Date.now(),at,r.id,r.error).run();
   await state(env,marker,JSON.stringify({at,original_object_key:key,requeued:rows.map(r=>r.id),actual_completions_must_be_checked:true}));
@@ -167,13 +169,17 @@ async function recordEventSerial(env,event,{refresh=false,preserveEventId=false}
   return payload;
 }
 function filingText(raw,{includeCertificates=false}={}){const docs=[...raw.matchAll(/<DOCUMENT>([\s\S]*?)<\/DOCUMENT>/gi)];if(!docs.length)return raw;return docs.map(x=>x[1]).filter(t=>/<TYPE>\s*(?:8-K|6-K|10-[KQ]|20-F|40-F|EX-99)/i.test(t)||(includeCertificates&&/<TYPE>\s*EX-3/i.test(t))).join('\n');}
-export const ANNOUNCEMENT_TERMS_VERSION='announcement_terms.2026-11-11.v1';
+export const ANNOUNCEMENT_TERMS_VERSION='announcement_terms.2026-11-11.v2';
 export async function replayAnnouncement(env,id){
   const row=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(id).first();if(!row)return;
   const original=JSON.parse(row.payload);let sources=(original.sources||[]).filter(s=>s.sha256&&!/-index\.html(?:$|\?)/i.test(s.url)&&!s.url.startsWith('https://data.sec.gov/'));
   const amendments=sources.filter(s=>/\/A$/.test(s.form||''));if(amendments.length===1)sources=amendments;
   if(!['authorization','needs_review'].includes(original.status))return {changed:false};
   if(!sources.length||sources.length>8)throw new Error('Announcement replay needs bounded archived primary sources');
+  if(sources.some(s=>!['complete_submission','official_primary_report_and_exhibits','original_release'].includes(s.representation))){
+    const at=stamp(),gap={version:ANNOUNCEMENT_TERMS_VERSION,at,event_id:id,status:'blocked_primary_body_missing',original_event:original,requires_original_body:true,not_original_clock_fill:true},raw=JSON.stringify(gap),key='review/repairs/'+await sha(raw)+'.json';
+    await env.EVIDENCE.put(key,new TextEncoder().encode(raw),{httpMetadata:{contentType:'application/json'}});await state(env,'announcement_replay_gap:'+id,JSON.stringify({at,object_key:key,requires_original_body:true}));return {changed:false,source_gap:'incomplete_primary_representation',object_key:key};
+  }
   const text=[];
   for(const source of sources){sourceURL(source.url);if(!['complete_submission','official_primary_report_and_exhibits','original_release'].includes(source.representation))throw new Error('Announcement replay source is not an original primary document');const object=await env.EVIDENCE.get('documents/'+source.sha256);if(!object)throw new Error('Archived primary announcement is missing');const bytes=new Uint8Array(await object.arrayBuffer());if(bytes.length>96*1024*1024||await sha(bytes)!==source.sha256)throw new Error('Archived announcement integrity check failed');text.push(new TextDecoder().decode(bytes.slice(0,5))==='%PDF-'?await env.extractAnnouncementText(bytes,{pdfProfile:env.COLLECTOR_MODE==='external_collector'?'external_primary_report':'standard'}):filingText(new TextDecoder().decode(bytes),{includeCertificates:true}));}
   const parsed=classifyAnnouncement(text.join('\n'),{published_at:original.published_at,form:sources[0].form});
