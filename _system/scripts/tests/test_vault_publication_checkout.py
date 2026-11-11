@@ -279,3 +279,37 @@ def test_publication_checkout_materializes_named_objects_and_leaves_the_archive(
     _git(work, "add", "--force", "--", "dashboard-private")
     staged = _git(work, "diff", "--cached", "--name-status")
     assert staged.strip() == "M\tdashboard-private/manifest.json"
+
+def test_snapshot_scope_matches_existing_hydration_input_selection(tmp_path):
+    from vault_publication_sparse import publication_entries
+    selected=tmp_path/'dashboard/data/core.json';selected.parent.mkdir(parents=True);selected.write_text('{"private_snapshot":true}')
+    model=tmp_path/'_system/data/model.json';model.parent.mkdir(parents=True);model.write_text('{"private_snapshot":true}')
+    manifest={'assets':{'data/core.json':{'private_sha256':'a'*64},'data/tickers/OTHER.json':{'private_sha256':'b'*64}},'repository_assets':{'_system/data/model.json':{'private_sha256':'c'*64},'_system/data/unselected.json':{'private_sha256':'d'*64}}}
+    assert object_patterns(manifest,tmp_path)==['/dashboard-private/objects/'+'a'*64,'/dashboard-private/objects/'+'c'*64]
+    assert len(object_patterns(manifest))==4
+    assert {r[1] for r in publication_entries(manifest,tmp_path)}=={'data/core.json','_system/data/model.json'}
+
+def test_scoped_manifest_still_rejects_bad_receipts_and_escaped_paths(tmp_path):
+    import pytest
+    for name,identity in [('data/not-selected.json','bad'),('../escape.json','a'*64)]:
+        with pytest.raises(ValueError):object_patterns({'assets':{name:{'private_sha256':identity}}},tmp_path)
+
+def test_snapshot_validation_is_read_only_and_opt_in_for_hub():
+    action=_action();assert action['inputs']['snapshot-validation-only']['default']=='false'
+    step=next(s for s in action['runs']['steps'] if s.get('name')=='Materialize the verified private catalog view')
+    assert '--snapshot-validation-only' in step['run'] and 'test "$PUBLICATION_ONLY" = "true"' in step['run']
+    objects=next(s for s in action['runs']['steps'] if s.get('name')=='Materialize publication objects')
+    assert '--workspace "$GITHUB_WORKSPACE"' in objects['run'] and 'publication_entries(manifest, workspace)' in objects['run']
+    workflow=yaml.safe_load((WORKFLOWS/'python-tests.yml').read_text(encoding='utf-8'))
+    selected=[name for name,job in workflow['jobs'].items() for s in job.get('steps',[]) if (s.get('with') or {}).get('snapshot-validation-only')=='true']
+    assert selected==['hub-payloads']
+
+
+def test_full_manifest_validation_does_not_use_workspace_scope():
+    objects=next(s for s in _action()["runs"]["steps"] if s.get("name")=="Materialize publication objects")
+    assert objects["env"]["HYDRATE_PUBLICATION"]=="${{ inputs.hydrate }}"
+    assert 'if [ "$HYDRATE_PUBLICATION" = "true" ]; then' in objects["run"]
+    assert 'if os.environ["HYDRATE_PUBLICATION"] == "true" else None' in objects["run"]
+    workflow=yaml.safe_load((WORKFLOWS/"vault-publication-checkout.yml").read_text(encoding="utf-8"))
+    checkout=next(s for s in workflow["jobs"]["publication-objects"]["steps"] if s.get("uses")=="./.github/actions/checkout-vault")
+    assert checkout["with"]["hydrate"]=="false"

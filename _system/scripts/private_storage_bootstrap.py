@@ -79,8 +79,11 @@ def main():
     parser.add_argument("--ticker", required=True, choices=("V",))
     parser.add_argument("--limit", type=int, required=True, choices=(1,))
     parser.add_argument("--proof", type=Path)
+    parser.add_argument("--transport",choices=("rest","s3_existing_api_token"),default=None)
     args = parser.parse_args()
     config = load_config(ROOT)
+    if args.transport:
+        config = {**config, "object_transport": args.transport}
     approved = config["approved_recovery"][args.ticker]
     storage = PrivateStorage(config=config)
     if args.action == "register":
@@ -107,7 +110,7 @@ def main():
              "archive_sha256": approved["archive_sha256"], "contract_hash": approved["contract_hash"],
              "handoff_hash": approved["handoff_hash"], "complete_members_verified": len(files),
              "actual_ledger_rows": manifest["actual_ledger_rows"], "model_calls": 0,
-             "economic_or_compiler_checks_changed": False, "private_archive_verified": True}
+             "economic_or_compiler_checks_changed": False, "private_archive_verified": True, "object_transport":config.get("object_transport","rest")}
     if args.proof:
         args.proof.write_text(json.dumps(proof, indent=2) + "\n")
     print(json.dumps(proof))

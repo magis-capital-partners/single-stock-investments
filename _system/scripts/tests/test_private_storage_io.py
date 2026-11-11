@@ -208,3 +208,13 @@ def test_strict_validation_reads_trusted_storage_before_replay():
     assert names.index('Restore named immutable packets from the private catalog')<names.index('Recompile every reviewed candidate from its exact frozen evidence')
     restore=next(s for s in job['steps'] if s.get('name')=='Restore named immutable packets from the private catalog')
     assert '--prefix valuation-underwriting/packets/' in restore['run']
+
+def test_read_only_snapshot_view_skips_unrelated_control_and_restores_full_object(environment,monkeypatch):
+    vault,fake=environment;relative='dashboard-private/objects/'+'a'*64
+    fake.publish({'valuation-underwriting/local-runtime/states/V.json':b'paid state',relative:b'complete snapshot\r\n'})
+    result=io.initialize(vault,storage=fake,snapshot_only=True)
+    assert result['control_files_restored']==0 and not (vault/'valuation-underwriting').exists()
+    monkeypatch.setattr(io,'enabled',lambda:True)
+    assert io.materialize(vault,relative,storage=fake).read_bytes()==b'complete snapshot\r\n'
+    assert json.loads((vault/io.MARKER).read_text())['read_only'] is True
+    with pytest.raises(storage.StorageError,match='cannot publish'):io.publish_paths(vault,{},storage=fake)
