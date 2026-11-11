@@ -303,3 +303,13 @@ def test_snapshot_validation_is_read_only_and_opt_in_for_hub():
     workflow=yaml.safe_load((WORKFLOWS/'python-tests.yml').read_text(encoding='utf-8'))
     selected=[name for name,job in workflow['jobs'].items() for s in job.get('steps',[]) if (s.get('with') or {}).get('snapshot-validation-only')=='true']
     assert selected==['hub-payloads']
+
+
+def test_full_manifest_validation_does_not_use_workspace_scope():
+    objects=next(s for s in _action()["runs"]["steps"] if s.get("name")=="Materialize publication objects")
+    assert objects["env"]["HYDRATE_PUBLICATION"]=="${{ inputs.hydrate }}"
+    assert 'if [ "$HYDRATE_PUBLICATION" = "true" ]; then' in objects["run"]
+    assert 'if os.environ["HYDRATE_PUBLICATION"] == "true" else None' in objects["run"]
+    workflow=yaml.safe_load((WORKFLOWS/"vault-publication-checkout.yml").read_text(encoding="utf-8"))
+    checkout=next(s for s in workflow["jobs"]["publication-objects"]["steps"] if s.get("uses")=="./.github/actions/checkout-vault")
+    assert checkout["with"]["hydrate"]=="false"
