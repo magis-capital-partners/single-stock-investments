@@ -23,3 +23,9 @@ private_storage_retention.py plans only known runtime caches and redundant tempo
 Registered disposable successful logs expire after 14 days, reproducible previews after 30 days, and five recent rollback deployments plus all referenced deployments remain. Unknown or unregistered files and required evidence/paid audits never expire automatically. These age rules select candidates; they do not bypass archival, reference, ownership or exact-list gates.
 
 Legacy hosted history requires a separately authorized removal after a complete recoverable export. Removing files from a Git working tree does not reclaim old Git history.
+
+## Object transport verification
+
+REST remains supported. The optional `s3_existing_api_token` transport uses only the existing configured Cloudflare API token; signing values are derived in memory and never logged or saved. Verify the complete approved V archive and a real private audit write with the `private-storage-check` event before activation. A failed preflight leaves the configured default unchanged.
+
+Verification uses the documented token owner scope. The `cfat_` format identifies an account token. Legacy values can use `s3_token_owner` (`account` or `user`); automatic legacy scope discovery tries the other documented endpoint only after HTTP 400, with the same token and pinned account. Authentication, permission and server failures never switch scopes or transports. Token whitespace normalization matches the existing REST path. No credential, permission or security setting is created or modified.

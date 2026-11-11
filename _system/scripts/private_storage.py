@@ -36,6 +36,12 @@ class StorageError(RuntimeError):
     pass
 
 
+class StorageHTTPError(StorageError):
+    def __init__(self, method, status):
+        self.status = status
+        super().__init__(f"Private storage {method} failed: HTTP {status}")
+
+
 class ConcurrentUpdate(StorageError):
     pass
 
@@ -91,8 +97,8 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 class HTTP:
-    def __init__(self, token, host, *, requests_per_second=2):
-        self.token, self.host = token, host
+    def __init__(self, token, host, *, requests_per_second=2, content_type="application/octet-stream"):
+        self.token, self.host, self.content_type = token, host, content_type
         self.interval = 1 / requests_per_second
         self.lock, self.next_request = threading.Lock(), 0.0
         self.opener = urllib.request.build_opener(NoRedirect)
@@ -106,7 +112,7 @@ class HTTP:
         request = urllib.request.Request(
             "https://" + self.host + path, data=body, method=method,
             headers={"Authorization": "Bearer " + self.token(),
-                     "Content-Type": "application/octet-stream", "User-Agent": "Magis-private-storage/1"})
+                     "Content-Type": self.content_type, "User-Agent": "Magis-private-storage/1"})
         try:
             with self.opener.open(request, timeout=120) as response:
                 raw = response.read(limit + 1)
@@ -114,7 +120,7 @@ class HTTP:
             if exc.code == 404:
                 return None
             # Do not include credentials, signed URLs, or provider response bodies.
-            raise StorageError(f"Private storage {method} failed: HTTP {exc.code}") from None
+            raise StorageHTTPError(method, exc.code) from None
         if len(raw) > limit:
             raise StorageError("Private storage response exceeds its exact bounded size")
         return raw

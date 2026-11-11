@@ -9,7 +9,7 @@ import private_storage_s3 as s3
 CONFIG={'account_id':'a'*32,'bucket':'single-stock-investments-private','object_prefix':'research-archive/v1/objects','requests_per_second':2}
 class Identity:
     def __init__(self,status='active',identity='b'*32):self.calls=[];self.status=status;self.identity=identity
-    def request(self,*args,**kwargs):self.calls.append(args);return json.dumps({'result':{'id':self.identity,'status':self.status}}).encode()
+    def request(self,*args,**kwargs):self.calls.append(args);return json.dumps({'success':True,'result':{'id':self.identity,'status':self.status}}).encode()
 class Response:
     def __init__(self,data):self.data=data
     def read(self,limit):return self.data[:limit]
@@ -79,3 +79,52 @@ def test_transport_is_opt_in_and_local_existing_oauth_remains_supported(monkeypa
     assert isinstance(obj.http,store.HTTP)
     monkeypatch.setenv('CLOUDFLARE_API_TOKEN','existing token');obj=store.R2Objects({**CONFIG,'object_transport':'s3_existing_api_token'})
     assert isinstance(obj.http,s3.S3HTTP) and obj.base=='/'+CONFIG['bucket']+'/'
+
+
+def test_token_normalization_matches_existing_rest_credentials(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN","  existing token\n")
+    client=s3.S3HTTP(CONFIG,identity_http=Identity())
+    assert client.credentials()[1]==hashlib.sha256(store.cloudflare_token().encode()).hexdigest()
+
+@pytest.mark.parametrize("token,owner,path",[("cfat_existing","auto","/client/v4/accounts/"+"a"*32+"/tokens/verify"),("old-account-token","account","/client/v4/accounts/"+"a"*32+"/tokens/verify"),("existing-user-token","auto","/client/v4/user/tokens/verify")])
+def test_verification_endpoint_matches_explicit_or_documented_owner(monkeypatch,token,owner,path):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN",token);identity=Identity()
+    client=s3.S3HTTP({**CONFIG,"s3_token_owner":owner},identity_http=identity)
+    client.credentials();assert identity.calls==[("GET",path)]
+
+def test_identity_request_uses_json_and_does_not_create_new_tokens(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN","existing")
+    client=s3.S3HTTP(CONFIG)
+    assert client.identity_http.content_type=="application/json"
+
+def test_unknown_owner_fails_before_credentials_or_network(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN","existing")
+    with pytest.raises(store.StorageError):s3.S3HTTP({**CONFIG,"s3_token_owner":"unknown"},identity_http=Identity())
+
+
+def test_legacy_scope_mismatch_uses_only_other_documented_endpoint(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN","legacy token")
+    class Legacy(Identity):
+        def request(self,*args,**kwargs):
+            if not self.calls:self.calls.append(args);raise store.StorageHTTPError("GET",400)
+            return super().request(*args,**kwargs)
+    identity=Legacy();client=s3.S3HTTP(CONFIG,identity_http=identity)
+    client.credentials();assert client.verified_token_owner=="account"
+    assert [c[1] for c in identity.calls]==["/client/v4/user/tokens/verify","/client/v4/accounts/"+"a"*32+"/tokens/verify"]
+
+@pytest.mark.parametrize("code",[401,403,429,500])
+def test_identity_auth_or_server_error_never_tries_another_scope(monkeypatch,code):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN","legacy token")
+    class Rejected(Identity):
+        def request(self,*args,**kwargs):self.calls.append(args);raise store.StorageHTTPError("GET",code)
+    identity=Rejected();client=s3.S3HTTP(CONFIG,identity_http=identity)
+    with pytest.raises(store.StorageError):client.credentials()
+    assert len(identity.calls)==1
+
+def test_success_false_cannot_supply_active_identity(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN","existing token")
+    class Rejected(Identity):
+        def request(self,*args,**kwargs):self.calls.append(args);return json.dumps({"success":False,"result":{"id":"b"*32,"status":"active"}}).encode()
+    identity=Rejected();client=s3.S3HTTP(CONFIG,identity_http=identity)
+    with pytest.raises(store.StorageError):client.credentials()
+    assert len(identity.calls)==1
