@@ -29,6 +29,8 @@ on:
         required: false
       RESEARCH_VAULT_CLONE_TOKEN:
         required: false
+      CLOUDFLARE_API_TOKEN:
+        required: false
 
 permissions:
   contents: write
@@ -162,6 +164,8 @@ jobs:
       group: research-agent-${{ needs.select.outputs.ticker }}
       cancel-in-progress: true
     env:
+      # checkout-vault restores the private catalog view from R2.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
