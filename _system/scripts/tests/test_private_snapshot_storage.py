@@ -103,3 +103,67 @@ def test_search_can_read_a_compressed_private_jsonl_snapshot(workspace):
         '_system/data/chunks.jsonl': {'private_sha256': sha, 'public_sha256': 'unused'}}}), encoding='utf-8')
     path.write_text('{"private_snapshot":true}\n', encoding='utf-8')
     assert agent_search.restored_private_rows(root, path) == rows
+
+
+def _history_repo(root, relative, raw):
+    import subprocess
+    git = lambda *a: subprocess.run(['git', '-C', str(root), *a], check=True, capture_output=True, text=True).stdout.strip()
+    git('init', '-q', '-b', 'main')
+    for key, value in (('user.email', 't@example.com'), ('user.name', 't'), ('commit.gpgsign', 'false')):
+        git('config', key, value)
+    (root/relative).parent.mkdir(parents=True, exist_ok=True)
+    (root/relative).write_bytes(raw)
+    git('add', '-A')
+    git('commit', '-qm', 'full document published')
+    return git('rev-parse', 'HEAD')
+
+
+def _history_receipt(root, sha, public_sha, commit, path):
+    (root/'dashboard/private-assets.json').write_text(json.dumps({
+        'assets': {'data/insights/manifest.json': {'private_sha256': sha, 'public_sha256': public_sha}},
+        assets.HISTORY_SOURCES: {sha: {'commit': commit, 'path': path}},
+    }), encoding='utf-8')
+
+
+def test_receipt_object_left_only_in_public_history_is_recovered_by_its_hash(workspace, monkeypatch):
+    root, vault = workspace
+    monkeypatch.setattr(assets, 'ROOT', root)
+    relative = 'dashboard/data/insights/manifest.json'
+    raw = b'{"source_health":{"podcasts":{"items":9}},"provenance":{}}\n'
+    commit = _history_repo(root, relative, raw)
+    placeholder = b'{"private_snapshot":true,"source_shape":"object","entry_count":2,"collection_counts":{}}\n'
+    (root/relative).write_bytes(placeholder)
+    sha = hashlib.sha256(raw).hexdigest()
+    _history_receipt(root, sha, hashlib.sha256(placeholder).hexdigest(), commit, relative)
+    restored = assets.private_source(root/'dashboard', 'data/insights/manifest.json')
+    assert restored.read_bytes() == raw
+    assert assets.stored_object(vault, sha).read_bytes() == raw
+    (root/relative).write_bytes(raw + b' ')
+    with pytest.raises(RuntimeError, match='Managed dashboard asset changed'):
+        assets.private_source(root/'dashboard', 'data/insights/manifest.json')
+
+
+def test_history_bytes_that_do_not_hash_to_the_receipt_are_refused(workspace, monkeypatch):
+    root, vault = workspace
+    monkeypatch.setattr(assets, 'ROOT', root)
+    relative = 'dashboard/data/insights/manifest.json'
+    commit = _history_repo(root, relative, b'{"other":"bytes"}\n')
+    sha = hashlib.sha256(b'{"expected":"bytes"}\n').hexdigest()
+    _history_receipt(root, sha, 'unused', commit, relative)
+    with pytest.raises(RuntimeError, match='does not match its receipt'):
+        assets.private_object(vault, sha)
+    assert not assets.stored_object(vault, sha).exists()
+
+
+def test_history_source_the_receipt_no_longer_names_is_ignored(workspace, monkeypatch):
+    root, vault = workspace
+    monkeypatch.setattr(assets, 'ROOT', root)
+    relative = 'dashboard/data/insights/manifest.json'
+    raw = b'{"old":"snapshot"}\n'
+    commit = _history_repo(root, relative, raw)
+    sha = hashlib.sha256(raw).hexdigest()
+    _history_receipt(root, 'f'*64, 'unused', commit, relative)
+    receipt = json.loads((root/'dashboard/private-assets.json').read_text())
+    receipt[assets.HISTORY_SOURCES] = {sha: {'commit': commit, 'path': relative}}
+    (root/'dashboard/private-assets.json').write_text(json.dumps(receipt), encoding='utf-8')
+    assert not assets.private_object(vault, sha).exists()

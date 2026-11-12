@@ -5,9 +5,13 @@ import hashlib
 import gzip
 import io
 import json
+import os
 import re
 import shutil
+import subprocess
 import tempfile
+import urllib.parse
+import urllib.request
 import uuid
 from pathlib import Path
 
@@ -15,6 +19,8 @@ from vault_paths import research_vault_root
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_NAME = "private-assets.json"
+PUBLIC_REPOSITORY = "magis-capital-partners/single-stock-investments"
+HISTORY_SOURCES = "history_sources"
 COMPRESS_AFTER_BYTES = 80 * 1024 * 1024
 MAX_STORED_BYTES = 99 * 1024 * 1024
 MAX_UNPACKED_BYTES = 512 * 1024 * 1024
@@ -44,11 +50,73 @@ def decode_object_bytes(raw: bytes, sha256: str) -> bytes:
     return raw
 
 
+def _history_source(sha256: str) -> dict | None:
+    """The public commit that exposed a receipt's private bytes, when the receipt names one.
+
+    Only an object the receipt currently names can be recovered this way.
+    """
+    receipt = _receipt_manifest(ROOT / "dashboard")
+    source = (receipt.get(HISTORY_SOURCES) or {}).get(sha256)
+    named = {entry.get("private_sha256") for scope in ("assets", "repository_assets")
+             for entry in (receipt.get(scope) or {}).values() if isinstance(entry, dict)}
+    if not isinstance(source, dict) or sha256 not in named:
+        return None
+    if not re.fullmatch(r"[0-9a-f]{40}", str(source.get("commit", ""))):
+        raise ValueError("Invalid private snapshot history commit")
+    safe_relative(str(source.get("path", "")))
+    return source
+
+
+def _history_bytes(commit: str, path: str) -> bytes | None:
+    try:
+        shown = subprocess.run(["git", "-C", str(ROOT), "cat-file", "blob", f"{commit}:{path}"],
+                               capture_output=True, timeout=120, env={**os.environ, "GIT_NO_LAZY_FETCH": "1"})
+        if shown.returncode == 0:
+            return shown.stdout
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    url = f"https://raw.githubusercontent.com/{PUBLIC_REPOSITORY}/{commit}/{urllib.parse.quote(path)}"
+    try:
+        with urllib.request.urlopen(url, timeout=120) as response:
+            return response.read(MAX_UNPACKED_BYTES + 1)
+    except OSError:
+        return None
+
+
+def recover_from_history(vault: Path, sha256: str) -> bool:
+    """Rebuild a private object from the public commit whose blob already holds those bytes.
+
+    A publisher that committed the full document left the only copy in public
+    history. The content address is the receipt's private hash, so nothing
+    else is accepted. The object is written where storage materializes it, and
+    the next vault publication preserves it in private storage.
+    """
+    source = _history_source(sha256)
+    if source is None:
+        return False
+    raw = _history_bytes(source["commit"], source["path"])
+    if raw is None:
+        return False
+    if len(raw) > MAX_UNPACKED_BYTES or hashlib.sha256(raw).hexdigest() != sha256:
+        raise RuntimeError(f"Private snapshot history source does not match its receipt: {source['path']}")
+    stored = stored_object(vault, sha256)
+    stored.parent.mkdir(parents=True, exist_ok=True)
+    temporary = stored.with_name(stored.name + "." + uuid.uuid4().hex + ".tmp")
+    try:
+        temporary.write_bytes(raw)
+        temporary.replace(stored)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return True
+
+
 def private_object(vault: Path, sha256: str) -> Path:
     stored = stored_object(vault, sha256)
     if not stored.is_file():
         from private_storage_io import materialize
         materialize(vault, "dashboard-private/objects/" + sha256)
+    if not stored.is_file():
+        recover_from_history(vault, sha256)
     if not stored.is_file():
         return stored
     with stored.open('rb') as stream:
