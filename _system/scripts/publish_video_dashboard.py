@@ -84,11 +84,7 @@ def publish(root: Path | None = None) -> dict:
         manifest = prepare_published_manifest(base, events, mutate)
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
-    write_json(MANIFEST_PATH, manifest)
-    try:
-        youtube_lane.seal_insights_manifest(MANIFEST_PATH, videos=True, podcasts=False)
-    except RuntimeError as exc:
-        raise SystemExit(str(exc)) from exc
+    youtube_lane.write_sealed_manifest(MANIFEST_PATH, manifest, videos=True, podcasts=False)
     catalog["details"] = details
     return catalog
 
