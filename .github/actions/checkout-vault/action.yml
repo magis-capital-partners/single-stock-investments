@@ -27,7 +27,7 @@ inputs:
     required: false
     default: "false"
   extra-paths:
-    description: Additional non-cone sparse-checkout patterns, one per line. Applied after publication-only materialization. Use with publication-only so the rest of the vault stays out.
+    description: Additional non-cone sparse-checkout patterns, one per line. Applied before the private catalog view is restored, so each selected path receives its current private bytes. Use with publication-only so the rest of the vault stays out.
     required: false
     default: ""
   source-archive-current:
@@ -76,6 +76,24 @@ runs:
           ${{ inputs.publication-only != 'true' && inputs.include-investor-history != 'true' && '!/dashboard-private/investor-history/' || '' }}
         sparse-checkout-cone-mode: false
 
+    # The catalog view restores only the paths this checkout selects, and a
+    # tracked path selected afterwards would keep its legacy Git bytes.
+    - name: Add extra vault paths
+      if: inputs.extra-paths != '' || inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true')
+      shell: bash
+      env:
+        VAULT_EXTRA_PATHS: ${{ inputs.extra-paths }}
+        SOURCE_ARCHIVE: ${{ inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true') }}
+      run: |
+        set -euo pipefail
+        printf '%s\n' "$VAULT_EXTRA_PATHS" | sed '/^[[:space:]]*$/d' > "$RUNNER_TEMP/vault-extra-paths.txt"
+        if [ "$SOURCE_ARCHIVE" = "true" ]; then
+          echo /dashboard-private/company-source-backfill-v2/manifest.json >> "$RUNNER_TEMP/vault-extra-paths.txt"
+        fi
+        if [ -s "$RUNNER_TEMP/vault-extra-paths.txt" ]; then
+          git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-extra-paths.txt"
+        fi
+
     - name: Materialize the verified private catalog view
       shell: bash
       env:
@@ -86,7 +104,7 @@ runs:
         set -euo pipefail
         git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json
         if python _system/scripts/private_storage_io.py enabled; then
-          args=()
+          args=(--sparse-scope)
           if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
             test "$PUBLICATION_ONLY" = "true"
             args+=(--snapshot-validation-only)
@@ -155,18 +173,6 @@ runs:
             sys.exit(1)
         PY
         if [ "${{ inputs.publication-only }}" = "true" ]; then echo "VAULT_PUBLICATION_ONLY=true" >> "$GITHUB_ENV"; fi
-
-    - name: Add extra vault paths
-      if: inputs.extra-paths != ''
-      shell: bash
-      env:
-        VAULT_EXTRA_PATHS: ${{ inputs.extra-paths }}
-      run: |
-        set -euo pipefail
-        printf '%s\n' "$VAULT_EXTRA_PATHS" | sed '/^[[:space:]]*$/d' > "$RUNNER_TEMP/vault-extra-paths.txt"
-        if [ -s "$RUNNER_TEMP/vault-extra-paths.txt" ]; then
-          git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-extra-paths.txt"
-        fi
 
     - name: Materialize current source archive parts
       if: inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true')
