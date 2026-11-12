@@ -827,6 +827,25 @@ def _push_private_dashboard_objects(message: str) -> bool | None:
         return False
 
 
+def _refuse_restricted_stage(repo: Path, staged: list[str]) -> bool:
+    """Unstage and refuse when the staged commit would publish restricted bytes.
+
+    The same staged check CI runs before every lane commit. 9826d3fdc78 put
+    six managed snapshots on main in full with an unchanged receipt, and the
+    next Data Pipeline push was refused for it. Only paths and kinds are logged.
+    """
+    from audit_fund_letter_exposure import audit
+
+    report = audit(repo, staged=True)
+    if report["source_restriction_ready"]:
+        return False
+    for finding in report["findings"]:
+        log(f"main: restricted staged file {finding['path']} ({finding['kind']})")
+    log("main: refusing to publish; export the private snapshots before committing")
+    run_git(repo, "reset", "-q", "--", *staged, check=False, timeout=300)
+    return True
+
+
 def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
                           dirs: tuple[str, ...] = MAIN_DIRS) -> bool | None:
     """Commit the shard on a main checkout and push that, not the lane HEAD."""
@@ -851,6 +870,8 @@ def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
     if staged.returncode == 0:
         log("main: nothing to commit")
         return None
+    if _refuse_restricted_stage(repo, [*present, *dirs]):
+        return False
     run_git(repo, "commit", "-m", message, timeout=300)
     run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
             "origin", MAIN_BRANCH, timeout=900)
@@ -915,6 +936,8 @@ def push_main(message: str, paths: tuple[str, ...] = MAIN_PATHS,
         if staged.returncode == 0:
             log("main: nothing to commit")
             return None
+        if _refuse_restricted_stage(ROOT, [*present, *present_dirs]):
+            return False
         run_git(ROOT, "commit", "-m", message, timeout=300)
         run_git(ROOT, "-c", "rebase.autoStash=true", "pull", "--rebase",
                 "origin", MAIN_BRANCH, timeout=900)

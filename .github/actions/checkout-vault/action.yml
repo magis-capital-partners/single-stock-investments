@@ -75,7 +75,7 @@ runs:
         PUBLICATION_ONLY: ${{ inputs.publication-only }}
       run: |
         set -euo pipefail
-        git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json
+        git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json /_system/config/private_snapshot_recovery.json /_system/scripts/private_snapshot_recovery.py
         if python _system/scripts/private_storage_io.py enabled; then
           args=()
           if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
@@ -112,6 +112,7 @@ runs:
         sys.path.insert(0, "_system/scripts")
         import os
         from private_storage_io import materialize
+        from private_snapshot_recovery import recover
         from vault_publication_sparse import publication_entries
 
         manifest = json.loads(Path("dashboard/private-assets.json").read_text(encoding="utf-8"))
@@ -123,6 +124,9 @@ runs:
             total += 1
             if not (objects / entry["private_sha256"]).is_file():
                 materialize(Path("_external/research-vault"), "dashboard-private/objects/" + entry["private_sha256"])
+            if not (objects / entry["private_sha256"]).is_file() and recover(Path("_external/research-vault"), entry["private_sha256"]):
+                # The preserve step publishes this verified object to private storage.
+                print(f"recovered pinned private object for {relative}")
             if not (objects / entry["private_sha256"]).is_file():
                 missing += 1
                 print(f"::error::missing private object for {relative}")
