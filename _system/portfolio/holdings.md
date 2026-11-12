@@ -1,6 +1,6 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-12.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
@@ -29,6 +29,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | ACMR | ACMR/ | ACMR | US | 2026-07-26 | 2026-11-09 | unknown | watch |
 | ACN | ACN/ | Accenture | US | 2026-07-26 | 2026-11-09 | unknown | watch |
 | ADBE | ADBE/ | Adobe Inc. | US | 2026-07-26 | 2026-11-09 | unknown | watch |
+| ADDT.ST | ADDT.ST/ | Addtech AB | SE | — | 2026-11-12 | unknown | watch |
 | ADI | ADI/ | Analog Devices | US | 2026-07-26 | 2026-11-09 | unknown | watch |
 | ADM | ADM/ | Archer Daniels Midland | US | 2026-07-26 | 2026-11-09 | unknown | watch |
 | ADN.TO | ADN.TO/ | Acadian Timber Corp. | CA | 2026-07-26 | 2026-11-09 | optionality | watch |
@@ -70,6 +71,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | AOS | AOS/ | A. O. Smith | US | 2026-08-09 | 2026-11-09 | unknown | watch |
 | APA | APA/ | APA Corporation | US | 2026-08-12 | 2026-11-09 | unknown | watch |
 | APD | APD/ | Air Products | US | 2026-08-12 | 2026-11-09 | unknown | watch |
+| APG | APG/ | APi Group Corporation | US | — | 2026-11-12 | unknown | watch |
 | APH | APH/ | Amphenol | US | 2026-08-12 | 2026-11-09 | unknown | watch |
 | APLD | APLD/ | Applied Digital | US | 2026-08-12 | 2026-11-09 | optionality | watch |
 | APO | APO/ | Apollo Global Management | US | 2026-08-12 | 2026-11-09 | unknown | watch |
@@ -82,8 +84,11 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | ASHR | ASHR/ | ASHR | US | 2026-08-16 | 2026-11-09 | unknown | watch |
 | ASML | ASML/ | ASML | US | 2026-08-16 | 2026-11-09 | unknown | watch |
 | ASPN | ASPN/ | Aspen Aerogels, Inc. | US | 2026-08-16 | 2026-11-09 | unknown | watch |
+| ASSA.ST | ASSA.ST/ | ASSA ABLOY AB | SE | — | 2026-11-12 | unknown | watch |
 | ASTS | ASTS/ | AST SpaceMobile, Inc. | US | 2026-08-16 | 2026-11-09 | unknown | watch |
 | ASX.AX | ASX.AX/ | ASX Limited | AU | 2026-08-16 | 2026-11-09 | unknown | watch |
+| ATCO-A.ST | ATCO-A.ST/ | Atlas Copco AB | SE | — | 2026-11-12 | unknown | watch |
+| ATD.TO | ATD.TO/ | Alimentation Couche-Tard Inc. | CA | — | 2026-11-12 | unknown | watch |
 | ATO | ATO/ | Atmos Energy | US | 2026-08-19 | 2026-11-09 | unknown | watch |
 | AVAV | AVAV/ | AVAV | US | 2026-08-19 | 2026-11-09 | unknown | watch |
 | AVB | AVB/ | AvalonBay Communities | US | 2026-08-19 | 2026-11-09 | unknown | watch |
@@ -154,6 +159,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | CBRS | CBRS/ | Cerebras Systems | US | 2026-09-16 | 2026-11-09 | unknown | watch |
 | CCI | CCI/ | Crown Castle | US | 2026-09-16 | 2026-11-09 | unknown | watch |
 | CCL | CCL/ | Carnival Corporation | US | 2026-09-16 | 2026-11-09 | unknown | watch |
+| CCL-B.TO | CCL-B.TO/ | CCL Industries Inc. | CA | — | 2026-11-12 | unknown | watch |
 | CDNS | CDNS/ | Cadence Design Systems | US | 2026-09-16 | 2026-11-09 | unknown | watch |
 | CDW | CDW/ | CDW Corporation | US | 2026-09-20 | 2026-11-09 | unknown | watch |
 | CDZI | CDZI/ | Cadiz Inc. | US | 2026-09-20 | 2026-11-09 | unknown | watch |
@@ -168,6 +174,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | CI | CI/ | Cigna | US | 2026-09-23 | 2026-11-09 | unknown | watch |
 | CIEN | CIEN/ | Ciena | US | 2026-09-23 | 2026-11-09 | unknown | watch |
 | CIFR | CIFR/ | CIFR | US | 2026-09-23 | 2026-11-09 | unknown | watch |
+| CIGI | CIGI/ | Colliers International Group Inc. | US | — | 2026-11-12 | unknown | watch |
 | CINF | CINF/ | Cincinnati Financial | US | 2026-09-23 | 2026-11-09 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-09-23 | 2026-11-09 | optionality | watch |
 | CL | CL/ | Colgate-Palmolive | US | 2026-09-23 | 2026-11-09 | unknown | watch |
@@ -214,6 +221,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | CSGP | CSGP/ | CoStar Group | US | 2026-10-11 | 2026-11-09 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-11-09 | compounder | core |
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-11-09 | unknown | watch |
+| CSW | CSW/ | CSW Industrials, Inc. | US | — | 2026-11-12 | unknown | watch |
 | CSX | CSX/ | CSX Corporation | US | 2026-10-14 | 2026-11-09 | unknown | watch |
 | CTAS | CTAS/ | Cintas | US | 2026-10-14 | 2026-11-09 | unknown | watch |
 | CTSH | CTSH/ | Cognizant | US | 2026-10-18 | 2026-11-09 | unknown | watch |
@@ -247,10 +255,13 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | DOC | DOC/ | Healthpeak Properties | US | 2026-11-04 | 2026-11-09 | unknown | watch |
 | DOV | DOV/ | Dover Corporation | US | 2026-11-04 | 2026-11-09 | unknown | watch |
 | DOW | DOW/ | Dow Inc. | US | 2026-11-08 | 2026-11-09 | unknown | watch |
+| DPLM.L | DPLM.L/ | Diploma PLC | UK | — | 2026-11-12 | unknown | watch |
 | DPZ | DPZ/ | Domino's | US | 2026-11-08 | 2026-11-09 | unknown | watch |
 | DRI | DRI/ | Darden Restaurants | US | 2026-11-08 | 2026-11-09 | unknown | watch |
 | DRNZ | DRNZ/ | DRNZ | US | 2026-11-08 | 2026-11-09 | unknown | watch |
 | DRR.AX | DRR.AX/ | Deterra Royalties Limited | AU | 2026-06-02 | 2026-11-09 | unknown | watch |
+| DSG.TO | DSG.TO/ | The Descartes Systems Group Inc. | CA | — | 2026-11-12 | unknown | watch |
+| DSV.CO | DSV.CO/ | DSV A/S | EU | — | 2026-11-12 | unknown | watch |
 | DTE | DTE/ | DTE Energy | US | 2026-11-08 | 2026-11-09 | unknown | watch |
 | DUK | DUK/ | Duke Energy | US | 2026-11-08 | 2026-11-09 | unknown | watch |
 | DUOL | DUOL/ | DUOL | US | 2026-11-08 | 2026-11-09 | unknown | watch |
@@ -273,6 +284,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | EME | EME/ | Emcor | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | EMR | EMR/ | Emerson Electric | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | ENPH | ENPH/ | Enphase Energy, Inc. | US | 2026-07-29 | 2026-11-09 | unknown | watch |
+| ENSG | ENSG/ | The Ensign Group, Inc. | US | — | 2026-11-12 | unknown | watch |
 | ENTG | ENTG/ | ENTG | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | ENX.PA | ENX.PA/ | Euronext N.V. | EU | 2026-07-09 | 2026-11-09 | unknown | watch |
 | EOG | EOG/ | EOG Resources | US | 2026-07-29 | 2026-11-09 | unknown | watch |
@@ -338,6 +350,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | FRT | FRT/ | Federal Realty Investment Trust | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | FRU.TO | FRU.TO/ | Freehold Royalties Ltd. | CA | — | 2026-11-09 | unknown | watch |
 | FSLR | FSLR/ | First Solar | US | 2026-07-29 | 2026-11-09 | unknown | watch |
+| FSV | FSV/ | FirstService Corporation | US | — | 2026-11-12 | unknown | watch |
 | FTC.L | FTC.L/ | Filtronic plc | UK | — | 2026-11-09 | unknown | watch |
 | FTNT | FTNT/ | Fortinet | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | FTRE | FTRE/ | Fortrea Holdings Inc. | US | 2026-07-29 | 2026-11-09 | unknown | watch |
@@ -398,6 +411,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | HIMS | HIMS/ | Hims & Hers Health, Inc. | US | 2026-07-18 | 2026-11-09 | unknown | watch |
 | HKHC | HKHC/ | Horizon Kinetics Holding Corporation | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | HL | HL/ | Hecla Mining Company | US | 2026-07-29 | 2026-11-09 | unknown | watch |
+| HLMA.L | HLMA.L/ | Halma plc | UK | — | 2026-11-12 | unknown | watch |
 | HLT | HLT/ | Hilton Worldwide | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | HNFSA | HNFSA/ | Hanover Foods Corporation | OTC | 2026-07-09 | 2026-11-09 | optionality | watch |
 | HON | HON/ | Honeywell Technologies | US | 2026-07-29 | 2026-11-09 | unknown | watch |
@@ -423,6 +437,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-09 | 2026-11-09 | unknown | watch |
 | IFF | IFF/ | International Flavors & Fragrances | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | INCY | INCY/ | Incyte | US | 2026-07-30 | 2026-11-09 | unknown | watch |
+| INDT.ST | INDT.ST/ | Indutrade AB | SE | — | 2026-11-12 | unknown | watch |
 | INFQ | INFQ/ | INFQ | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | INTC | INTC/ | Intel | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | INTU | INTU/ | Intuit | US | 2026-07-30 | 2026-11-09 | unknown | watch |
@@ -430,6 +445,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | INVH | INVH/ | Invitation Homes | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | IONQ | IONQ/ | IonQ, Inc. | US | 2026-07-18 | 2026-11-09 | unknown | watch |
 | IP | IP/ | International Paper | US | 2026-07-30 | 2026-11-09 | unknown | watch |
+| IP.MI | IP.MI/ | Interpump Group S.p.A. | EU | — | 2026-11-12 | unknown | watch |
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | IQV | IQV/ | IQVIA | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | IR | IR/ | Ingersoll Rand | US | 2026-07-30 | 2026-11-09 | unknown | watch |
@@ -444,6 +460,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | JBHT | JBHT/ | J.B. Hunt | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | JBL | JBL/ | Jabil | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | JCI | JCI/ | Johnson Controls | US | 2026-07-30 | 2026-11-09 | unknown | watch |
+| JDG.L | JDG.L/ | Judges Scientific plc | UK | — | 2026-11-12 | unknown | watch |
 | JKHY | JKHY/ | Jack Henry & Associates | US | 2026-07-30 | 2026-11-09 | unknown | watch |
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-11-09 | unknown | watch |
 | JNJ | JNJ/ | Johnson & Johnson | US | 2026-07-30 | 2026-11-09 | unknown | watch |
@@ -465,13 +482,16 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | KO | KO/ | Coca-Cola Company (The) | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | KR | KR/ | Kroger | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-09 | 2026-11-09 | unknown | watch |
+| KRX.IR | KRX.IR/ | Kingspan Group plc | EU | — | 2026-11-12 | unknown | watch |
 | KTOS | KTOS/ | KTOS | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | KVUE | KVUE/ | Kenvue | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | KWEB | KWEB/ | KWEB | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | L | L/ | Loews Corporation | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | LAC | LAC/ | LAC | US | 2026-07-29 | 2026-11-09 | unknown | watch |
+| LAGR.ST | LAGR.ST/ | Lagercrantz Group AB | SE | — | 2026-11-12 | unknown | watch |
 | LAND | LAND/ | Gladstone Land Corporation | US | 2026-07-09 | 2026-11-09 | infrastructure | watch |
 | LASR | LASR/ | LASR | US | 2026-07-29 | 2026-11-09 | unknown | watch |
+| LATO.ST | LATO.ST/ | Investment AB Latour | SE | — | 2026-11-12 | unknown | watch |
 | LB | LB/ | LandBridge Company LLC | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | LBRDK | LBRDK/ | Liberty Broadband Corporation (Class C) | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | LCID | LCID/ | LCID | US | 2026-07-28 | 2026-11-09 | unknown | watch |
@@ -523,6 +543,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | MKC | MKC/ | McCormick & Company | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | MKL | MKL/ | Markel Group Inc. | US | — | 2026-11-09 | unknown | watch |
 | MLM | MLM/ | Martin Marietta Materials | US | 2026-09-07 | 2026-11-09 | unknown | watch |
+| MMGR.ST | MMGR.ST/ | Momentum Group AB | SE | — | 2026-11-12 | unknown | watch |
 | MMM | MMM/ | 3M | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | MNST | MNST/ | Monster Beverage | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | MO | MO/ | Altria | US | 2026-07-09 | 2026-11-09 | unknown | watch |
@@ -652,6 +673,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | QS | QS/ | QS | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | QUBT | QUBT/ | QUBT | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | RACE | RACE/ | Ferrari N.V. | US | — | 2026-11-09 | unknown | watch |
+| RBC | RBC/ | RBC Bearings Incorporated | US | — | 2026-11-12 | unknown | watch |
 | RBLX | RBLX/ | RBLX | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | RCAT | RCAT/ | Red Cat Holdings, Inc. | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | RCL | RCL/ | Royal Caribbean Group | US | 2026-07-10 | 2026-11-09 | unknown | watch |
@@ -683,6 +705,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | RTX | RTX/ | RTX Corporation | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | RVTY | RVTY/ | Revvity | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | RX.V | RX.V/ | BioSyent Inc. | CA | 2026-10-27 | 2026-11-09 | compounder | watch |
+| RYAN | RYAN/ | Ryan Specialty Holdings, Inc. | US | — | 2026-11-12 | unknown | watch |
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-09 | 2026-11-09 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-11-09 | unknown | watch |
 | SAF.PA | SAF.PA/ | Safran SA | EU | — | 2026-11-09 | unknown | watch |
@@ -696,6 +719,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | SHC | SHC/ | Sotera Health Company | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | SHOP | SHOP/ | SHOP | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | SHW | SHW/ | Sherwin-Williams | US | 2026-07-10 | 2026-11-09 | unknown | watch |
+| SIKA.SW | SIKA.SW/ | Sika AG | EU | — | 2026-11-12 | unknown | watch |
 | SIMO | SIMO/ | SIMO | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | SJM | SJM/ | J.M. Smucker Company (The) | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | SJT | SJT/ | San Juan Basin Royalty Trust | US | 2026-07-09 | 2026-11-09 | optionality | watch |
@@ -756,6 +780,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | TEQ.ST | TEQ.ST/ | Teqnion AB | SE | 2026-07-09 | 2026-11-09 | serial_acquirer | hold |
 | TER | TER/ | Teradyne | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | TFC | TFC/ | Truist Financial | US | 2026-07-10 | 2026-11-09 | unknown | watch |
+| TFII | TFII/ | TFI International Inc. | US | — | 2026-11-12 | unknown | watch |
 | TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | TGT | TGT/ | Target Corporation | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | THYP | THYP/ | THYP | US | 2026-07-29 | 2026-11-09 | unknown | watch |
@@ -787,6 +812,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | TTD | TTD/ | Trade Desk (The) | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | TTMI | TTMI/ | TTMI | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | TTWO | TTWO/ | Take-Two Interactive | US | 2026-07-10 | 2026-11-09 | unknown | watch |
+| TVK.TO | TVK.TO/ | TerraVest Industries Inc. | CA | — | 2026-11-12 | unknown | watch |
 | TXN | TXN/ | Texas Instruments | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | TXT | TXT/ | Textron | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | TYL | TYL/ | Tyler Technologies | US | 2026-07-10 | 2026-11-09 | unknown | watch |
@@ -821,6 +847,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | VELO | VELO/ | VELO | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | VIAV | VIAV/ | VIAV | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | VICI | VICI/ | Vici Properties | US | 2026-07-10 | 2026-11-09 | unknown | watch |
+| VIT.ST | VIT.ST/ | Vitec Software Group AB | SE | — | 2026-11-12 | unknown | watch |
 | VLO | VLO/ | Valero Energy | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | VLTO | VLTO/ | Veralto | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | VMC | VMC/ | Vulcan Materials Company | US | 2026-09-07 | 2026-11-09 | unknown | watch |
@@ -854,6 +881,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | WRB | WRB/ | W. R. Berkley Corporation | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | WRLC | WRLC/ | Windrock Land Company | OTC | 2026-07-09 | 2026-11-09 | optionality | watch |
 | WSM | WSM/ | Williams-Sonoma, Inc. | US | 2026-07-10 | 2026-11-09 | unknown | watch |
+| WSO | WSO/ | Watsco, Inc. | US | — | 2026-11-12 | unknown | watch |
 | WST | WST/ | West Pharmaceutical Services | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | WTW | WTW/ | Willis Towers Watson | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | WULF | WULF/ | WULF | US | 2026-07-29 | 2026-11-09 | unknown | watch |
@@ -880,4 +908,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 
-**873 holdings total.** Registry: `_system/portfolio/registry.json`
+**901 holdings total.** Registry: `_system/portfolio/registry.json`
