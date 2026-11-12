@@ -151,6 +151,7 @@ runs:
         from pathlib import Path
         sys.path.insert(0, "_system/scripts")
         import os
+        from private_dashboard_assets import recover_from_history
         from private_storage_io import materialize
         from vault_publication_sparse import publication_entries
 
@@ -165,6 +166,8 @@ runs:
             total += 1
             if not (objects / entry["private_sha256"]).is_file():
                 materialize(Path("_external/research-vault"), "dashboard-private/objects/" + entry["private_sha256"])
+            if not (objects / entry["private_sha256"]).is_file():
+                recover_from_history(Path("_external/research-vault"), entry["private_sha256"])
             if not (objects / entry["private_sha256"]).is_file():
                 missing += 1
                 print(f"::error::missing private object for {relative}")
