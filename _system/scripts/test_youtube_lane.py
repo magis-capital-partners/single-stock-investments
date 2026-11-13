@@ -649,5 +649,171 @@ class InPlaceManagedManifestTests(unittest.TestCase):
                 self.assertEqual(stored["event_count"], 2)
 
 
+class _MemoryObjects:
+    def __init__(self):
+        self.data = {}
+
+    def put(self, raw):
+        import private_storage
+
+        identity = private_storage.sha(raw)
+        self.data[identity] = raw
+        return identity
+
+    def get(self, identity, size):
+        raw = self.data.get(identity)
+        if raw is not None and len(raw) != size:
+            raise AssertionError("stored size changed")
+        return raw
+
+
+class _MemoryCatalog:
+    def __init__(self):
+        self.records = {}
+
+    def fetch(self):
+        return "c" * 40
+
+    def read(self, _commit):
+        return json.loads(json.dumps(self.records))
+
+    def publish(self, updates, expected):
+        self.records.update(json.loads(json.dumps(updates)))
+        return "d" * 40
+
+
+class PrivateStoragePublishTests(unittest.TestCase):
+    """Private storage is on, and research-vault refuses every push (its size quota).
+
+    9826d3fdc78, 5dd6115a436, f260661023a and 34b5c1af950 replaced the public
+    insights manifest without a receipt CI could resolve. A publish has to put
+    the new snapshot where CI reads it, R2 behind the private catalog, before
+    the receipt naming it reaches main.
+    """
+
+    def setUp(self):
+        import hashlib
+
+        import migrate_dashboard_sources as migration
+        from private_dashboard_assets import private_object
+
+        self._tmp = tempfile.TemporaryDirectory()
+        base = Path(self._tmp.name)
+        self.origin, self.repo = base / "origin.git", base / "ops"
+        self.vault_origin, self.vault = base / "vault.git", base / "vault"
+        for bare in (self.origin, self.vault_origin):
+            subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(bare)], check=True)
+        for clone, remote in ((self.repo, self.origin), (self.vault, self.vault_origin)):
+            subprocess.run(["git", "init", "-q", "-b", "main", str(clone)], check=True)
+            _configure(clone)
+            _git(clone, "remote", "add", "origin", str(remote))
+        self.env = mock.patch.dict(os.environ, {"RESEARCH_VAULT_ROOT": str(self.vault)})
+        self.env.start()
+        self.addCleanup(self.env.stop)
+        self.addCleanup(self._tmp.cleanup)
+
+        private_doc = {
+            "generated_at": "2026-10-20T09:30:36Z",
+            "event_count": 2,
+            "letter_count": 12,
+            "source_health": {"filing_facts": {"status": "ok"}, "videos": {"items": 1}},
+            "provenance": {"event_triage_summary": {"retained_event_count": 2}},
+            "shards": {"events": "data/insights/events.json"},
+        }
+        private_text = json.dumps(private_doc, separators=(",", ":")) + "\n"
+        self.private_hash = hashlib.sha256(private_text.encode()).hexdigest()
+        _write(private_object(self.vault, self.private_hash), private_text)
+        self.placeholder = json.dumps(migration.public_snapshot(private_doc), separators=(",", ":")) + "\n"
+        self.manifest_rel = "dashboard/data/insights/manifest.json"
+        _write(self.repo / self.manifest_rel, self.placeholder)
+        _write(self.repo / "dashboard/data/insights/events.json", json.dumps({"events": [
+            {"observed_at": "2026-01-01", "tier": "signal", "feed_eligible": True},
+            {"observed_at": "2026-01-02", "tier": "context", "feed_eligible": True},
+        ]}))
+        _write(self.repo / "dashboard/data/insights/videos.json", "{}\n")
+        _write(self.repo / "dashboard/private-assets.json", json.dumps({"assets": {
+            "data/insights/manifest.json": {
+                "private_sha256": self.private_hash,
+                "public_sha256": hashlib.sha256(self.placeholder.encode()).hexdigest(),
+            },
+        }}, sort_keys=True, separators=(",", ":")) + "\n")
+        _git(self.repo, "add", "-A")
+        _git(self.repo, "commit", "-qm", "seed")
+        _git(self.repo, "push", "-q", "origin", "main")
+        _git(self.vault, "add", "-A")
+        _git(self.vault, "commit", "-qm", "seed vault")
+        _git(self.vault, "push", "-q", "origin", "main")
+        hook = self.vault_origin / "hooks" / "pre-receive"
+        hook.write_text("#!/bin/sh\necho 'repository size quota exceeded' >&2\nexit 1\n")
+        hook.chmod(0o755)
+        self.vault_head = _git(self.vault_origin, "rev-parse", "main")
+
+        import private_storage
+
+        self.storage = private_storage.PrivateStorage(
+            config={}, objects=_MemoryObjects(), catalog=_MemoryCatalog())
+        self.lines: list[str] = []
+        for patch in (mock.patch.object(lane, "ROOT", self.repo),
+                      mock.patch.object(lane, "log", side_effect=self.lines.append),
+                      mock.patch.object(lane, "_private_storage_enabled", return_value=True),
+                      mock.patch.object(lane, "_private_storage", return_value=self.storage)):
+            patch.start()
+            self.addCleanup(patch.stop)
+
+    def _publish_update(self) -> None:
+        path = self.repo / self.manifest_rel
+        updated = lane._resolved_manifest(path)
+        updated["source_health"]["videos"] = {"items": 2, "note": "SECRET"}
+        lane.write_sealed_manifest(path, updated, videos=True, podcasts=False)
+
+    def test_publish_stores_the_snapshot_in_r2_and_never_pushes_the_vault(self):
+        self._publish_update()
+        pushed = lane.push_main("chore(videos): publish admitted research test")
+        self.assertIs(pushed, True, self.lines)
+        published = _git(self.origin, "show", "main:" + self.manifest_rel)
+        self.assertNotIn("SECRET", published)
+        self.assertEqual(published + "\n", self.placeholder)
+        receipt = json.loads(_git(self.origin, "show", "main:dashboard/private-assets.json"))
+        new_hash = receipt["assets"]["data/insights/manifest.json"]["private_sha256"]
+        self.assertNotEqual(new_hash, self.private_hash)
+        stored = self.storage.restore("dashboard-private/objects/" + new_hash)
+        self.assertEqual(json.loads(stored)["source_health"]["videos"]["note"], "SECRET")
+        self.assertEqual(json.loads(stored)["letter_count"], 12)
+        self.assertEqual(_git(self.vault_origin, "rev-parse", "main"), self.vault_head)
+        self.assertTrue(any("preserved 1 dashboard snapshot" in line for line in self.lines), self.lines)
+
+    def test_a_snapshot_r2_did_not_accept_keeps_the_receipt_off_main(self):
+        import private_storage
+
+        before = _git(self.origin, "rev-parse", "main")
+        self._publish_update()
+        with mock.patch.object(self.storage, "publish",
+                               side_effect=private_storage.StorageError("Private storage PUT failed: HTTP 403")):
+            pushed = lane.push_main("chore(videos): publish admitted research test")
+        self.assertIs(pushed, False)
+        self.assertEqual(_git(self.origin, "rev-parse", "main"), before)
+        self.assertTrue(any("not preserved" in line for line in self.lines), self.lines)
+
+    def test_an_unsealed_managed_file_is_never_committed(self):
+        before = _git(self.origin, "rev-parse", "main")
+        full = json.loads(json.dumps(lane._resolved_manifest(self.repo / self.manifest_rel)))
+        full["source_health"]["videos"] = {"note": "SECRET"}
+        _write(self.repo / self.manifest_rel, json.dumps(full) + "\n")
+        with mock.patch.object(lane, "_seal_in_place_publish"):
+            pushed = lane.push_main("chore(videos): publish admitted research test")
+        self.assertIs(pushed, False)
+        self.assertEqual(_git(self.origin, "rev-parse", "main"), before)
+        self.assertEqual(_git(self.repo, "diff", "--cached", "--name-only"), "")
+
+    def test_a_failed_seal_puts_the_previous_bytes_back(self):
+        path = self.repo / self.manifest_rel
+        updated = lane._resolved_manifest(path)
+        updated["source_health"]["videos"] = {"note": "SECRET"}
+        with mock.patch.object(lane, "seal_insights_manifest", side_effect=RuntimeError("no vault")):
+            with self.assertRaises(SystemExit):
+                lane.write_sealed_manifest(path, updated, videos=True, podcasts=False)
+        self.assertEqual(path.read_text(encoding="utf-8"), self.placeholder)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

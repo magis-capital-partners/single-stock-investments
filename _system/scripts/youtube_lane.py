@@ -587,6 +587,27 @@ def seal_insights_manifest(path: Path, *, videos: bool, podcasts: bool) -> bool:
     return True
 
 
+def write_sealed_manifest(path: Path, manifest: dict, *, videos: bool, podcasts: bool) -> None:
+    """Write a publisher's manifest and seal it, or leave the previous bytes in place.
+
+    A failed seal used to leave the full document on disk, where any later
+    commit of the insights directory would publish it.
+    """
+    previous = path.read_bytes() if path.is_file() else None
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(_canonical_json(manifest), encoding="utf-8")
+    temporary.replace(path)
+    try:
+        seal_insights_manifest(path, videos=videos, podcasts=podcasts)
+    except RuntimeError as exc:
+        if previous is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.write_bytes(previous)
+        raise SystemExit(str(exc)) from exc
+
+
 def _seal_managed_payload(path: Path) -> bool:
     """Keep a managed episode or shard file out of the public commit.
 
@@ -692,9 +713,9 @@ def _seal_in_place_publish(repo: Path, paths: tuple[str, ...], dirs: tuple[str, 
             if relative not in managed_keys:
                 continue
             exported = _seal_managed_payload(path) or exported
-    if exported or _vault_dashboard_private_dirty():
+    if exported or _vault_dashboard_private_dirty() or _receipt_dirty(repo):
         preserved = _push_private_dashboard_objects(
-            "Preserve restricted insights manifest snapshot")
+            "Preserve restricted insights manifest snapshot", repo)
         if preserved is False:
             raise RuntimeError(
                 "Private snapshot was not pushed; refusing to publish the public insights manifest"
@@ -795,10 +816,104 @@ def _sync_directory(source: Path, target: Path, repo: Path) -> None:
         shutil.copy2(path, dest)
 
 
-def _push_private_dashboard_objects(message: str) -> bool | None:
-    """Commit dashboard-private objects before the public receipt that names them."""
+def _refuse_unsealed_managed(repo: Path) -> None:
+    """Every staged managed dashboard file must be the placeholder its receipt names."""
+    from private_dashboard_assets import digest
+
+    staged = run_git(repo, "diff", "--cached", "--name-only", "--diff-filter=AM", "-z",
+                     check=False, timeout=120)
+    assets = _read_json(repo / "dashboard" / "private-assets.json").get("assets") or {}
+    for name in staged.stdout.split("\0"):
+        if not name.startswith("dashboard/"):
+            continue
+        entry = assets.get(name[len("dashboard/"):])
+        if isinstance(entry, dict) and digest(repo / name) != entry.get("public_sha256"):
+            raise RuntimeError(
+                "Managed dashboard asset changed; export its private snapshot before deployment: "
+                + name
+            )
+
+
+def _receipt_private_hashes(document: dict) -> set[str]:
+    return {
+        entry["private_sha256"]
+        for scope in ("assets", "repository_assets")
+        for entry in (document.get(scope) or {}).values()
+        if isinstance(entry, dict) and isinstance(entry.get("private_sha256"), str)
+    }
+
+
+def _new_receipt_objects(repo: Path) -> list[str]:
+    """Private objects the working receipt names that the committed receipt does not."""
+    current = _read_json(repo / "dashboard" / "private-assets.json")
+    shown = run_git(repo, "show", "HEAD:dashboard/private-assets.json", check=False, timeout=120)
+    try:
+        committed = json.loads(shown.stdout) if shown.returncode == 0 else {}
+    except json.JSONDecodeError:
+        committed = {}
+    if not isinstance(committed, dict):
+        committed = {}
+    return sorted(_receipt_private_hashes(current) - _receipt_private_hashes(committed))
+
+
+def _private_storage():
+    from private_storage import PrivateStorage
+
+    return PrivateStorage(ROOT)
+
+
+def _private_storage_enabled() -> bool:
+    from private_storage import enabled
+
+    return enabled(ROOT)
+
+
+def _preserve_in_private_storage(repo: Path) -> bool | None:
+    """Store every snapshot the new receipt names in R2 and read it back.
+
+    The research-vault push is refused by its size quota, and CI resolves
+    dashboard snapshots only through the private catalog. A receipt that names
+    an object R2 cannot return fails every deploy, so the public commit waits
+    for this.
+    """
+    from private_dashboard_assets import digest, private_object
     from vault_paths import research_vault_root
 
+    hashes = _new_receipt_objects(repo)
+    if not hashes:
+        return None
+    vault = research_vault_root()
+    if vault is None:
+        log("private storage: no vault checkout holds the new dashboard snapshot")
+        return False
+    files = {}
+    for identity in hashes:
+        path = private_object(vault, identity)
+        if not path.is_file() or digest(path) != identity:
+            log(f"private storage: snapshot {identity[:12]} is not in the local vault")
+            return False
+        files["dashboard-private/objects/" + identity] = path.read_bytes()
+    load_env_file(ROOT / "_secrets" / "private_storage.env")
+    try:
+        storage = _private_storage()
+        storage.publish(files)
+        _, records = storage.snapshot()
+        for relative, raw in files.items():
+            if storage.restore(relative, records=records) != raw:
+                raise RuntimeError(f"private snapshot did not read back: {relative}")
+    except (RuntimeError, OSError) as exc:
+        log(f"private storage: dashboard snapshot not preserved: {exc}")
+        return False
+    log(f"private storage: preserved {len(files)} dashboard snapshot(s)")
+    return True
+
+
+def _push_private_dashboard_objects(message: str, publish_repo: Path) -> bool | None:
+    """Preserve dashboard-private objects before the public receipt that names them."""
+    from vault_paths import research_vault_root
+
+    if _private_storage_enabled():
+        return _preserve_in_private_storage(publish_repo)
     repo = research_vault_root()
     if repo is None or not (repo / ".git").exists():
         log("vault: no checkout; cannot preserve the insight manifest")
@@ -834,7 +949,7 @@ def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
     _sync_published(ROOT, repo, paths, dirs)
     if INSIGHT_MANIFEST in paths:
         preserved = _push_private_dashboard_objects(
-            "Preserve restricted insights manifest snapshot")
+            "Preserve restricted insights manifest snapshot", repo)
         if preserved is False:
             return False
     present = [p for p in paths if (repo / p).is_file()]
@@ -851,6 +966,12 @@ def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
     if staged.returncode == 0:
         log("main: nothing to commit")
         return None
+    try:
+        _refuse_unsealed_managed(repo)
+    except RuntimeError as exc:
+        log(f"main: {exc}")
+        run_git(repo, "reset", "-q", timeout=120)
+        return False
     run_git(repo, "commit", "-m", message, timeout=300)
     run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
             "origin", MAIN_BRANCH, timeout=900)
@@ -915,6 +1036,12 @@ def push_main(message: str, paths: tuple[str, ...] = MAIN_PATHS,
         if staged.returncode == 0:
             log("main: nothing to commit")
             return None
+        try:
+            _refuse_unsealed_managed(ROOT)
+        except RuntimeError as exc:
+            log(f"main: {exc}")
+            run_git(ROOT, "reset", "-q", timeout=120)
+            return False
         run_git(ROOT, "commit", "-m", message, timeout=300)
         run_git(ROOT, "-c", "rebase.autoStash=true", "pull", "--rebase",
                 "origin", MAIN_BRANCH, timeout=900)

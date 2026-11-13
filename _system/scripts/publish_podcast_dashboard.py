@@ -122,11 +122,7 @@ def publish() -> dict:
         manifest = prepare_published_manifest(_manifest(), events, mutate)
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
-    write_json(MANIFEST_PATH, manifest)
-    try:
-        youtube_lane.seal_insights_manifest(MANIFEST_PATH, videos=False, podcasts=True)
-    except RuntimeError as exc:
-        raise SystemExit(str(exc)) from exc
+    youtube_lane.write_sealed_manifest(MANIFEST_PATH, manifest, videos=False, podcasts=True)
     from build_feed_status import write_feed_status
     write_feed_status(ROOT)
     return {
