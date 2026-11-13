@@ -102,7 +102,11 @@ runs:
         CATALOG_PREFIXES: ${{ inputs.catalog-prefixes }}
       run: |
         set -euo pipefail
-        git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json
+        # A full workspace checkout already holds these files and has no
+        # sparse-checkout to add to.
+        if [ "$(git config --bool core.sparseCheckout || true)" = "true" ]; then
+          git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json
+        fi
         if python _system/scripts/private_storage_io.py enabled; then
           args=(--sparse-scope)
           if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then

@@ -339,3 +339,18 @@ def test_catalog_view_restores_only_paths_selected_before_it():
     assert "inputs.source-archive-current == 'true'" in steps[extra]["if"]
     assert "inputs.include-source-archive == 'true'" in steps[extra]["if"]
     assert names.index("Materialize current source archive parts")>view
+
+
+def test_catalog_view_runs_in_a_full_workspace_checkout(tmp_path):
+    step=next(s for s in _action()["runs"]["steps"] if s.get("name")=="Materialize the verified private catalog view")
+    lines=step["run"].splitlines()
+    start=next(i for i,l in enumerate(lines) if "core.sparseCheckout" in l)
+    guard="\n".join(["set -euo pipefail",*lines[start:start+3]])
+    assert lines[start+2].strip()=="fi" and "sparse-checkout add" in lines[start+1]
+    for sparse in (False, True):
+        repo=tmp_path/str(sparse);repo.mkdir()
+        _git(repo,"init","-q")
+        if sparse:_git(repo,"sparse-checkout","set","--no-cone","/README")
+        subprocess.run(["bash","-c",guard],cwd=repo,check=True,capture_output=True)
+        if sparse:
+            assert "/_system/scripts/private_storage_io.py" in (repo/".git/info/sparse-checkout").read_text()
