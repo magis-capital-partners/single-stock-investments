@@ -318,7 +318,7 @@ jobs:
 
   unit-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
@@ -524,6 +524,61 @@ jobs:
           # The suites read only the snapshots hydrated into the files checked
           # out above; nothing selects managed inputs after this step.
           publication-scope: workspace
+      - name: TEMP measure catalog records by top-level directory
+        run: |
+          python3 - <<'PY'
+          import collections, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, "_system/scripts")
+          from private_storage import PrivateStorage
+          _, records = PrivateStorage().snapshot()
+          control, total = collections.Counter(), collections.Counter()
+          for rel in records:
+              top = rel.split("/")[0]
+              total[top] += 1
+              if not (rel.startswith(("recovery/", "audit/", "legacy/")) or "/objects/" in rel or rel.endswith(".zip")):
+                  control[top] += 1
+          for top in sorted(total):
+              print(f"catalog {top}: records={total[top]} control={control[top]}")
+          vault = Path("_external/research-vault")
+          tracked = collections.Counter(p.split("/")[0] for p in subprocess.run(["git", "-C", str(vault), "ls-files"], capture_output=True, text=True).stdout.splitlines())
+          disk = collections.Counter(p.relative_to(vault).parts[0] for p in vault.rglob("*") if p.is_file() and ".git" not in p.relative_to(vault).parts[:1])
+          for top in sorted(set(tracked) | set(disk)):
+              print(f"vault {top}: tracked={tracked[top]} on_disk={disk[top]}")
+          PY
+      - name: TEMP install vault read audit hook
+        run: |
+          mkdir -p "$RUNNER_TEMP/vault-audit/site" "$RUNNER_TEMP/vault-audit/hits"
+          cat > "$RUNNER_TEMP/vault-audit/site/sitecustomize.py" <<'PY'
+          import atexit, collections, os, sys
+          _ROOT = os.path.abspath(os.environ["VAULT_AUDIT_ROOT"]) + os.sep
+          _OUT = os.environ["VAULT_AUDIT_OUT"]
+          _hits = collections.Counter()
+          def _hook(event, args):
+              if event not in ("open", "os.listdir", "os.scandir", "glob.glob", "os.walk") or not args:
+                  return
+              path = args[0]
+              if path is None or isinstance(path, int):
+                  return
+              try:
+                  path = os.path.abspath(os.fsdecode(path))
+              except Exception:
+                  return
+              if path.startswith(_ROOT):
+                  top = path[len(_ROOT):].split(os.sep)[0]
+                  test = os.environ.get("PYTEST_CURRENT_TEST", "-").split("::")[0]
+                  _hits[(top, test)] += 1
+          def _dump():
+              if _hits:
+                  with open(os.path.join(_OUT, f"{os.getpid()}.txt"), "a") as out:
+                      for (top, test), n in _hits.items():
+                          out.write(f"{top}\t{test}\t{n}\n")
+          sys.addaudithook(_hook)
+          atexit.register(_dump)
+          PY
+          echo "VAULT_AUDIT_ROOT=$GITHUB_WORKSPACE/_external/research-vault" >> "$GITHUB_ENV"
+          echo "VAULT_AUDIT_OUT=$RUNNER_TEMP/vault-audit/hits" >> "$GITHUB_ENV"
+          echo "PYTHONPATH=$RUNNER_TEMP/vault-audit/site" >> "$GITHUB_ENV"
       - name: Trading and script test suites
         run: |
           set -euo pipefail
@@ -533,7 +588,7 @@ jobs:
           for test_file in $EXTRA_TEST_FILES; do
             if [ -f "$test_file" ]; then EXTRA+=("$test_file"); else echo "not present yet: $test_file"; fi
           done
-          python -m pytest -q -p no:cacheprovider "${DESELECT[@]}" \
+          python -m pytest -q -rs -p no:cacheprovider "${DESELECT[@]}" \
             _system/trading _system/scripts/tests "${EXTRA[@]}"
       - name: Known failures (reported, not gating)
         # One at a time: run together, one that still fails would hide one
@@ -550,3 +605,7 @@ jobs:
             fi
           done
           echo "${STILL} known failure(s) still fail; they stay deselected from the gate."
+      - name: TEMP report vault reads
+        if: always()
+        run: |
+          cat "$RUNNER_TEMP"/vault-audit/hits/*.txt 2>/dev/null | awk -F'\t' '{n[$1"\t"$2]+=$3} END {for (k in n) print k"\t"n[k]}' | sort
