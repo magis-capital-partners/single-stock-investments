@@ -95,7 +95,8 @@ def test_catalog_prefixes_become_read_only_prefix_arguments(tmp_path):
         result = _run_step(step, work, {**env, "CATALOG_PREFIXES": prefixes})
         assert result.returncode == 0, result.stdout + result.stderr
         args = (tmp_path / "initialize.txt").read_text().splitlines()
-        assert args == ["_system/scripts/private_storage_io.py", "initialize", "--vault", "_external/research-vault", *expected]
+        assert args == ["_system/scripts/private_storage_io.py", "initialize", "--vault", "_external/research-vault",
+                        "--sparse-scope", *expected]
 
 
 def test_only_unit_tests_narrow_their_restore():
