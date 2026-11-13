@@ -3562,7 +3562,7 @@ function loadLazyFile(key) {
       data.inflection_overview = doc;
     }),
     technical_signals: () => loadShardOnce('file:technical_signals', 'data/technical_signals.json', (doc) => { data.technical_signals = doc; }),
-    commodity_models: () => loadShardOnce('file:commodity_models','data/commodity_models.json',doc=>{data.commodity_models=doc;}),
+    commodity_models: () => loadShardOnce('file:commodity_models','data/commodity_models.json',doc=>{window.CommodityResolution?.recordFetch(doc.resolution);data.commodity_models=doc;}),
     world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = CommodityModelViz.cleanLegacyGold(doc); }),
     energy: loadEnergyFiles,
     hk_snowball: () => loadShardOnce('file:hk_snowball', 'data/hk_snowball_model.json', (doc) => { data.hk_snowball_model = doc; }),

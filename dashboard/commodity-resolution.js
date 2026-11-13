@@ -29,6 +29,11 @@
     company: "all",
   };
   let cached = null;
+  const fetchedTimes = new WeakMap(),
+    openedTimes = new WeakMap();
+  function recordFetch(doc, at = new Date().toISOString()) {
+    if (doc) fetchedTimes.set(doc, at);
+  }
   function rows(doc) {
     return (doc.datasets || []).flatMap((d) =>
       d.values.map(([period, value, basis]) => ({
@@ -401,6 +406,13 @@
   function render(doc) {
     if (!doc) return "";
     cached = doc;
+    if (!openedTimes.has(doc)) openedTimes.set(doc, new Date().toISOString());
+    const reader = {
+      label: fetchedTimes.has(doc)
+        ? "Retrieved by this reader"
+        : "First opened in this reader",
+      time: fetchedTimes.get(doc) || openedTimes.get(doc),
+    };
     const regions = [
       ...new Set(
         rows(doc)
@@ -437,7 +449,7 @@
       )
       .join(
         "",
-      )}</select></label><label>Company <select data-cm-filter="company"><option value="all">All pilots</option>${doc.companies.map((c) => `<option value="${esc(c.ticker)}" ${state.company === c.ticker ? "selected" : ""}>${esc(c.ticker)}</option>`).join("")}</select></label></div><div role="tabpanel" aria-live="polite">${views[state.view][1](doc)}</div><p class="cm-muted">Retrieved by this reader ${esc(new Date().toISOString())}. Original publication, observation, review and build dates remain distinct. ${link("data/commodity_models.json", "Download full published model")}</p></section>`;
+      )}</select></label><label>Company <select data-cm-filter="company"><option value="all">All pilots</option>${doc.companies.map((c) => `<option value="${esc(c.ticker)}" ${state.company === c.ticker ? "selected" : ""}>${esc(c.ticker)}</option>`).join("")}</select></label></div><div role="tabpanel" aria-live="polite">${views[state.view][1](doc)}</div><p class="cm-muted">${reader.label} ${esc(reader.time)}. Original publication, observation, review and build dates remain distinct. ${link("data/commodity_models.json", "Download full published model")}</p></section>`;
   }
   function bind(root) {
     root?.querySelectorAll("[data-cm-workspace]").forEach((host) => {
@@ -548,5 +560,6 @@
     chart,
     powerCase,
     powerProfiles,
+    recordFetch,
   };
 })(window);

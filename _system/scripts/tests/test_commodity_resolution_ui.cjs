@@ -19,6 +19,9 @@ test('resolution view exposes dated source lineage, five views and the valuation
   assert.match(api.renderCompany(doc,'WPM'),/FCF/);
   const hours=api.powerProfiles(doc);assert.ok(hours.length>=672&&hours.length<=745);
   assert.ok(hours.every(r=>r.metric==='native_hourly_load'&&r.weight_hours===1));
+  api.recordFetch(doc,'2026-11-13T12:34:56.000Z');
+  assert.match(api.render(doc),/Retrieved by this reader 2026-11-13T12:34:56.000Z/);
+  assert.match(api.render(doc),/Retrieved by this reader 2026-11-13T12:34:56.000Z/);
   assert.equal(api.renderCompany(doc,'UNKNOWN'),'');
 });
 test('hourly power response reconciles scarcity, weights and the fixed contract share',()=>{
