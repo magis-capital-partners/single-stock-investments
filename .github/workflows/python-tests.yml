@@ -521,6 +521,9 @@ jobs:
         uses: ./.github/actions/checkout-vault
         with:
           include-source-archive: "false"
+          # The suites read only the snapshots hydrated into the files checked
+          # out above; nothing selects managed inputs after this step.
+          publication-scope: workspace
       - name: Trading and script test suites
         run: |
           set -euo pipefail

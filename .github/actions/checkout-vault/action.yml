@@ -34,6 +34,14 @@ inputs:
     description: Include current source archive parts in a publication-only checkout. Full vault readers already select the current manifest by default; historical parts stay in Git.
     required: false
     default: "false"
+  publication-scope:
+    description: all materializes every private object dashboard/private-assets.json names. workspace materializes only the objects whose public file this workspace checked out, which is every object the final hydration reads. Use workspace only when the job selects no further managed inputs after checkout; other objects stay demand-loaded.
+    required: false
+    default: "all"
+  catalog-prefixes:
+    description: Vault-relative directory prefixes, one per line. When set, the private catalog view restores only records under these prefixes and is read-only, so it cannot publish. Empty restores the full view.
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -73,6 +81,7 @@ runs:
       env:
         SNAPSHOT_VALIDATION_ONLY: ${{ inputs.snapshot-validation-only }}
         PUBLICATION_ONLY: ${{ inputs.publication-only }}
+        CATALOG_PREFIXES: ${{ inputs.catalog-prefixes }}
       run: |
         set -euo pipefail
         git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json
@@ -82,6 +91,10 @@ runs:
             test "$PUBLICATION_ONLY" = "true"
             args+=(--snapshot-validation-only)
           fi
+          while IFS= read -r prefix; do
+            prefix="$(printf '%s' "$prefix" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+            if [ -n "$prefix" ]; then args+=(--prefix "$prefix"); fi
+          done <<< "$CATALOG_PREFIXES"
           python _system/scripts/private_storage_io.py initialize --vault _external/research-vault "${args[@]}"
         fi
 
@@ -89,16 +102,22 @@ runs:
       shell: bash
       env:
         SNAPSHOT_VALIDATION_ONLY: ${{ inputs.snapshot-validation-only }}
+        PUBLICATION_SCOPE: ${{ inputs.publication-scope }}
       run: |
         set -euo pipefail
         if [ ! -f dashboard/private-assets.json ]; then
           echo "::error::publication-only checkout needs dashboard/private-assets.json in the workspace."
           exit 1
         fi
+        case "$PUBLICATION_SCOPE" in
+          all|workspace) ;;
+          *) echo "::error::publication-scope must be all or workspace."; exit 1 ;;
+        esac
         # Builders can request additional managed inputs after checkout.
-        # Narrow only the explicitly read-only snapshot-validation view.
+        # Narrow only the read-only snapshot-validation view and jobs that
+        # explicitly declare their workspace complete.
         scope=()
-        if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
+        if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ] || [ "$PUBLICATION_SCOPE" = "workspace" ]; then
           scope=(--workspace "$GITHUB_WORKSPACE")
         fi
         python3 _system/scripts/vault_publication_sparse.py dashboard/private-assets.json "${scope[@]}" > "$RUNNER_TEMP/vault-object-patterns.txt"
@@ -118,7 +137,8 @@ runs:
         objects = Path("_external/research-vault/dashboard-private/objects")
         missing = 0
         total = 0
-        workspace = Path(os.environ["GITHUB_WORKSPACE"]) if os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" else None
+        scoped = os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" or os.environ["PUBLICATION_SCOPE"] == "workspace"
+        workspace = Path(os.environ["GITHUB_WORKSPACE"]) if scoped else None
         for _, relative, entry in publication_entries(manifest, workspace):
             total += 1
             if not (objects / entry["private_sha256"]).is_file():
