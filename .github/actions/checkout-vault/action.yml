@@ -114,10 +114,13 @@ runs:
           *) echo "::error::publication-scope must be all or workspace."; exit 1 ;;
         esac
         # Builders can request additional managed inputs after checkout.
-        # Narrow only the read-only snapshot-validation view and jobs that
-        # explicitly declare their workspace complete.
+        # Narrow only the explicitly read-only snapshot-validation view.
         scope=()
-        if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ] || [ "$PUBLICATION_SCOPE" = "workspace" ]; then
+        if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
+          scope=(--workspace "$GITHUB_WORKSPACE")
+        fi
+        # A job whose workspace is complete at checkout opts in explicitly.
+        if [ "$PUBLICATION_SCOPE" = "workspace" ]; then
           scope=(--workspace "$GITHUB_WORKSPACE")
         fi
         python3 _system/scripts/vault_publication_sparse.py dashboard/private-assets.json "${scope[@]}" > "$RUNNER_TEMP/vault-object-patterns.txt"
@@ -137,8 +140,9 @@ runs:
         objects = Path("_external/research-vault/dashboard-private/objects")
         missing = 0
         total = 0
-        scoped = os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" or os.environ["PUBLICATION_SCOPE"] == "workspace"
-        workspace = Path(os.environ["GITHUB_WORKSPACE"]) if scoped else None
+        workspace = Path(os.environ["GITHUB_WORKSPACE"]) if os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" else None
+        if os.environ["PUBLICATION_SCOPE"] == "workspace":
+            workspace = Path(os.environ["GITHUB_WORKSPACE"])
         for _, relative, entry in publication_entries(manifest, workspace):
             total += 1
             if not (objects / entry["private_sha256"]).is_file():

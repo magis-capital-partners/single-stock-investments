@@ -524,6 +524,10 @@ jobs:
           # The suites read only the snapshots hydrated into the files checked
           # out above; nothing selects managed inputs after this step.
           publication-scope: workspace
+          # The only vault tree the suites open is videos/ (CorpusShapeTests).
+          # Letters and underwriting records stay at their vault Git bytes; a
+          # read-only view also cannot publish from a test run.
+          catalog-prefixes: videos/
       - name: TEMP measure catalog records by top-level directory
         run: |
           python3 - <<'PY'
