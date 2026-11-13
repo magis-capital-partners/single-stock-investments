@@ -1,12 +1,13 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-13.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
 | 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | 2026-07-19 | 2026-11-09 | croupier | watch |
+| 0700.HK | 0700.HK/ | Tencent Holdings Limited | EU | — | 2026-11-13 | unknown | watch |
 | 1211.HK | 1211.HK/ | BYD Company Limited | EU | 2026-10-28 | 2026-11-09 | compounder | watch |
 | 319A.T | 319A.T/ | Next Generation Technology Group Inc. | JP | 2026-10-05 | 2026-11-09 | serial_acquirer | watch |
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-19 | 2026-11-09 | compounder | watch |
@@ -507,6 +508,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | MAR | MAR/ | Marriott International | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | MARA | MARA/ | MARA | US | 2026-07-29 | 2026-11-09 | unknown | watch |
 | MAS | MAS/ | Masco | US | 2026-07-10 | 2026-11-09 | unknown | watch |
+| MBGL | MBGL/ | Mobility Global, Inc. | US | — | 2026-11-13 | unknown | watch |
 | MCD | MCD/ | McDonald's | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 | MCHB | MCHB/ | Mechanics Bancorp | US | 2026-07-09 | 2026-11-09 | unknown | watch |
 | MCHP | MCHP/ | Microchip Technology | US | 2026-07-28 | 2026-11-09 | unknown | watch |
@@ -880,4 +882,84 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-11-09.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-11-09 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-11-09 | unknown | watch |
 
-**873 holdings total.** Registry: `_system/portfolio/registry.json`
+**875 holdings total.** Registry: `_system/portfolio/registry.json`
+
+## Owned
+
+Actual positions as of 2026-11-13. This is a tracking group. It does not change Stance. Stance stays the research action: core, accumulate, hold, watch, trim, or exit. Hold still means the research book wants to keep the name. It does not mean an account owns the shares. Share counts and market values are omitted.
+
+- The Roth IRA list on the 2026-11-13 broker snapshot was cut off, so more Roth longs may exist.
+- individual (owner TBD): the owner is unconfirmed. Only the Investing tab was captured. Joint, Roth, and Traditional tabs on that view were not captured.
+- MSFT is included as a long. The position is fractional and the size is omitted.
+- GOOGL is the Class A listing in this lot. GOOG is the separate Class C listing and is not part of this lot.
+
+| Ticker | Company | Accounts | Broker symbols |
+|--------|---------|----------|----------------|
+| 0700.HK | Tencent Holdings Limited | Client SMA A, Traditional IRA | TCEHY |
+| AMZN | Amazon.com | individual (owner TBD) | AMZN |
+| BN | Brookfield Corporation | Client SMA A, Traditional IRA | BN |
+| CBOE | Cboe Global Markets | Client SMA A, Traditional IRA | CBOE |
+| CPRT | Copart | Client SMA A, Traditional IRA; individual (owner TBD) | CPRT |
+| CSGP | CoStar Group | Client SMA A, Traditional IRA | CSGP |
+| CSU | Constellation Software | individual (owner TBD) | CNSWF |
+| GOOGL | Alphabet Inc. | individual (owner TBD) | GOOGL |
+| GYRO | Gyrodyne, LLC | Client SMA A, Roth IRA | GYRO |
+| HE | Hawaiian Electric Industries | Client SMA A, Traditional IRA | HE |
+| HGBL | Heritage Global Inc. | Client SMA A, Traditional IRA | HGBL |
+| MBGL | Mobility Global, Inc. | Client SMA A, Traditional IRA; Client SMA A, Roth IRA | MBGL |
+| MIAX | Miami International Holdings | Client SMA A, Traditional IRA; Client SMA A, Roth IRA; individual (owner TBD) | MIAX |
+| MSFT | Microsoft | individual (owner TBD) | MSFT |
+| NVDA | NVIDIA Corporation | individual (owner TBD) | NVDA |
+| OTCM | OTC Markets Group | Client SMA A, Traditional IRA | OTCM |
+| PURR | PURR | Client SMA A, Traditional IRA | PURR |
+| QDEL | QuidelOrtho | Client SMA A, Traditional IRA; Client SMA A, Roth IRA; individual (owner TBD) | QDEL |
+| RGLD | Royal Gold Inc. | Client SMA A, Traditional IRA | RGLD |
+| RMV.L | Rightmove PLC | Client SMA A, Traditional IRA | RMVEY |
+| SEVN | Seven Hills Realty Trust | Client SMA A, Traditional IRA; Client SMA A, Roth IRA | SEVN |
+| SNOW | Snowflake Inc | individual (owner TBD) | SNOW |
+| SPGI | S&P Global | Client SMA A, Traditional IRA; Client SMA A, Roth IRA | SPGI |
+| STHO | Star Holdings | Client SMA A, Traditional IRA; Client SMA A, Roth IRA | STHO |
+| TIPT | Tiptree Inc. | Client SMA A, Traditional IRA | TIPT |
+| WHK | WhiteHawk Minerals Corp. | Client SMA A, Traditional IRA | WHK |
+
+### Short option flags
+
+Open short puts and calls. Contract counts are omitted. A flag on a name that is not a long does not make that name a holding.
+
+| Ticker | Account | Contract |
+|--------|---------|----------|
+| APLD | Client SMA A, Traditional IRA | short put, strike 14, expiry 2026-11-20 |
+| NVDA | individual (owner TBD) | short put, strike 150, expiry 2026-12-24 |
+| PDD | Client SMA A, Traditional IRA | short put, strike 70, expiry 2026-11-27 |
+| PDD | Client SMA A, Roth IRA | short put, strike 72, expiry 2026-11-27 |
+| RGLD | Client SMA A, Traditional IRA | short call, strike 280, expiry 2026-11-20 |
+
+### Short hedges
+
+Leveraged or inverse ETF shorts. Recorded in the group and not given ticker folders.
+
+| Broker symbol | Account |
+|---------------|---------|
+| AAQZ | individual (owner TBD) |
+| AMZO | individual (owner TBD) |
+| AXTQ | individual (owner TBD) |
+| CBRZ | individual (owner TBD) |
+| CORD | individual (owner TBD) |
+| MSTZ | individual (owner TBD) |
+| NBIZ | individual (owner TBD) |
+| SNDQ | individual (owner TBD) |
+| SOXS | individual (owner TBD) |
+| SPXU | individual (owner TBD) |
+| SQQQ | individual (owner TBD) |
+| SSPC | individual (owner TBD) |
+| TSLQ | individual (owner TBD) |
+
+### Symbol aliases
+
+Broker symbols that point at an existing registry ticker. No second folder is created.
+
+| Broker symbol | Registry ticker |
+|---------------|-----------------|
+| CNSWF | CSU |
+| RMVEY | RMV.L |
+| TCEHY | 0700.HK |
