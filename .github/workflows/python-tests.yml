@@ -609,3 +609,5 @@ jobs:
         if: always()
         run: |
           cat "$RUNNER_TEMP"/vault-audit/hits/*.txt 2>/dev/null | awk -F'\t' '{n[$1"\t"$2]+=$3} END {for (k in n) print k"\t"n[k]}' | sort
+          echo "::error::Temporary measurement commit; fails on purpose so this head cannot merge."
+          exit 1
