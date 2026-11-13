@@ -105,7 +105,9 @@ def _retain_or_advance_private_bytes(path,relative,incoming):
 
 
 def _shared_build_control(relative):
-    return relative.startswith('valuation-underwriting/runtime/') and relative != 'valuation-underwriting/runtime/ledger.jsonl'
+    # Dashboard publication receipt indexes are not local author inputs either.
+    return (relative in RECEIPT_PATHS or
+            relative.startswith('valuation-underwriting/runtime/') and relative != 'valuation-underwriting/runtime/ledger.jsonl')
 
 
 def _local_author_view(vault):
@@ -313,7 +315,7 @@ def selected_files(vault, pathspec):
 
 def publish_paths(vault, paths, *, storage=None):
     vault = owned(vault)
-    if _local_author_view(vault) and any(p.startswith('valuation-underwriting/runtime/') for p in paths):
+    if _local_author_view(vault) and any(_shared_build_control(p) or p == 'valuation-underwriting/runtime/ledger.jsonl' for p in paths):
         raise StorageError('A local author view cannot publish a shared build control or ledger')
     if _local_author_view(vault):
         ticker = selected_author_ticker(vault)

@@ -91,3 +91,39 @@ def test_clone_vault_selects_author_view_without_reset_or_shared_checkout(tmp_pa
  monkeypatch.setattr(io,'initialize',lambda v,**kw:roles.append(kw))
  assert local.clone_vault(tmp_path,tickers=['CPRT'])==v and roles==[{'materialization_role':'local_author','selected_ticker':'CPRT'}]
  assert calls==[('remote','get-url','origin'),('fetch','-q','origin','main')]
+
+
+@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+def test_author_preserves_unpublished_dashboard_receipt_indexes_without_fetching(tmp_path,path):
+ v=vault(tmp_path);original=b'{"local_unpublished":"retain every byte"}\r\n';p=put(v,path,original);store=Storage({path:b'{"remote_current":"separate producer"}\n'})
+ result=io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
+ assert p.read_bytes()==original and store.restored==[]
+ record=next(r for r in result['preserved_shared_build_controls'] if r['path']==path)
+ assert record['original_sha256']==sha(original) and record['snapshot_sha256']==sha(store.files[path])
+ with pytest.raises(StorageError,match='shared build control'):io.materialize(v,path,storage=store)
+ with pytest.raises(StorageError,match='shared build control'):io.publish_paths(v,{path:p},storage=store)
+
+@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+def test_author_does_not_materialize_absent_dashboard_receipt_indexes(tmp_path,path):
+ v=vault(tmp_path);store=Storage({path:b'{"remote":true}\n'})
+ io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
+ assert not (v/path).exists() and store.restored==[]
+ with pytest.raises(StorageError,match='shared build control'):io.materialize(v,path,storage=store)
+
+@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+def test_default_view_still_refuses_differing_unpublished_receipt_indexes(tmp_path,monkeypatch,path):
+ v=vault(tmp_path);original=b'{"unpublished":true}\n';p=put(v,path,original);store=Storage({path:b'{"remote":true}\n'})
+ monkeypatch.setattr(io,'run_git',lambda *a,**k:subprocess.CompletedProcess(a,1,b'',b''))
+ with pytest.raises(StorageError,match='differing unpublished'):io.initialize(v,storage=store)
+ assert p.read_bytes()==original
+
+@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+def test_default_view_still_materializes_dashboard_receipt_indexes(tmp_path,path):
+ v=vault(tmp_path);store=Storage({path:b'{"remote":true}\n'})
+ io.initialize(v,storage=store)
+ assert (v/path).read_bytes()==store.files[path] and store.restored==[path]
+
+@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+def test_author_receipt_index_directory_remains_invalid(tmp_path,path):
+ v=vault(tmp_path);(v/path).mkdir(parents=True)
+ with pytest.raises(StorageError,match='Invalid preserved'):io.initialize(v,storage=Storage({path:b'{}'}),materialization_role='local_author',selected_ticker='CPRT')
