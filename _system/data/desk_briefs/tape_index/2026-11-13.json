@@ -1,0 +1,80 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "tape_index",
+  "as_of": "2026-11-13",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-11-11T09:43:41Z"
+    },
+    {
+      "path": "dashboard/data/portfolio_news.json",
+      "generated_at": "2026-11-11T20:15:58Z"
+    },
+    {
+      "path": "_system/data/desk_evals/tape_index/index_announcements.json",
+      "generated_at": "2026-11-13"
+    }
+  ],
+  "items": [
+    {
+      "ticker": "MSTR",
+      "headline": "MSTR ('STRATEGY A'), a portfolio-relevant name, is deleted from MSCI USA at the 2026-11-30 close; RSI 26.0, stress_building, 16.01% under the 50-day.",
+      "one_number": "effective 2026-11-30 close",
+      "lane": "index_event",
+      "evidence": [
+        {
+          "kind": "provider",
+          "ref": "MSCI Nov 2026 Index Review, MSCI USA deletions ('STRATEGY A'), announced 2026-11-11, effective close 2026-11-30; msci.com/eqb/gimi/stdindex/MSCI_Nov26_STPublicList.pdf",
+          "url": "https://www.msci.com/eqb/gimi/stdindex/MSCI_Nov26_STPublicList.pdf",
+          "as_of": "2026-11-11",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_evals/tape_index/index_announcements.json checked_through 2026-11-13 MSTR msci_usa delete effective 2026-11-30",
+          "url": null,
+          "as_of": "2026-11-13",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-11T09:43:41Z MSTR state=stress_building rsi14=26.0 distance_50d=-16.01% as_of 2026-11-10",
+          "url": null,
+          "as_of": "2026-11-10",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "TA-IDX-EVENT: deletion is effective at the 2026-11-30 close.",
+      "handoff": null
+    },
+    {
+      "ticker": "SNDK",
+      "headline": "SNDK 8-for-1 split is effective after the 2026-11-19 close; split-adjusted trading starts 2026-11-20 (carried from the 2026-11-04 brief).",
+      "one_number": "8-for-1, 2026-11-20",
+      "lane": "forced_flow",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_briefs/tape_index/2026-11-04.json as_of 2026-11-04: SNDK 8-for-1, split-adjusted trading from 2026-11-20",
+          "url": null,
+          "as_of": "2026-11-04",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Split-adjusted trading starts 2026-11-20. Read that print against the 8-for-1 ratio.",
+      "handoff": null
+    }
+  ],
+  "notes": "technical_summary.json NOT rebuilt since 2026-11-11T09:43:41Z (as_of 2026-11-10); no 11-12 or 11-13 refresh commit on main, so no new threshold crossings versus the 2026-11-11 digest; portfolio_news.json build_time 2026-11-11T20:15:58Z; Russell preliminary lists due after the 2026-11-13 close (not available); Russell updates Nov 20/27, Dec 4, lockdown Nov 30, effective after Dec 11 close; MSCI results otherwise show no other universe-related name. Live grading so far: 15 of 21 pass (71.4%) vs 50% baseline (n=114), from eval report_2026-11-13.json.",
+  "screens_empty": [
+    "confirmed_next_30d"
+  ],
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}
