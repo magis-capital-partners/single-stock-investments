@@ -103,6 +103,141 @@ def validate_related_identity(packet):
                 'Unknown related-issuer evidence scope')
 
 
+
+_TRANSACTION_PAYMENT_FIELD = 'completed_acquisition_cash_consideration_paid'
+
+
+def _transaction_party(text, company):
+    """A named legal entity's own definition, never an inferred ticker alias."""
+    phrase = _acquisition_name_pattern(company)
+    if not phrase:
+        return None
+    found = []
+    for start in re.finditer(phrase, text, re.I):
+        match = re.match(r'(?P<entity>[^;()]{1,180}?),\s+a\s+[A-Za-z ]{1,60}?\s+corporation\s*'
+                         r'\(\s*[“"]\s*(?P<alias>[A-Za-z][A-Za-z0-9 ]{0,30}?)\s*[”"]\s*\)',
+                         text[start.start():start.start()+300])
+        if match and name_tokens(match['entity']) == name_tokens(company):
+            found.append((match['alias'].strip(), match[0]))
+    return found[0] if len(found) == 1 else None
+
+
+def _transaction_item(text, number, title):
+    heading = list(re.finditer(r'\bItem\s+'+re.escape(number)+r'\.\s+'+re.escape(title)+r'\.', text, re.I))
+    if len(heading) != 1:
+        return ''
+    start = heading[0].end()
+    # References to the same item are not new sections. Any different item
+    # boundary closes this one, including titles outside this adapter's grammar.
+    following = next((m for m in re.finditer(r'\bItem\s+(\d+\.\d+)\.\s+[A-Z]', text[start:])
+                      if m[1] != number), None)
+    return text[start:start+following.start()] if following else text[start:]
+
+
+def completed_transaction_cash_observations(parent, target):
+    """Bind only reported paid cash consideration in a complete executed 8-K.
+
+    This is a cumulative transaction flow reported by the filing date, not a
+    new balance sheet, exact settlement date, remaining funding cap, or an
+    assumption about any acquired facility. No additional source is fetched.
+    """
+    from datetime import datetime, date
+    from decimal import Decimal
+    from urllib.parse import urlsplit
+    if parent.get('currency') != 'USD' or target.get('currency') != 'USD':
+        return []
+    if not acquisition_binding(parent, target.get('company') or ''):
+        return []
+    cik = str(target.get('cik') or '')
+    if not cik.isdigit():
+        return []
+    out = []
+    for source in target.get('documents') or []:
+        if (source.get('form') != '8-K' or source.get('document_kind') != 'material_transaction_disclosure'
+                or source.get('coverage') != 'complete_requested_primary_document'
+                or not re.fullmatch(r'[0-9a-f]{64}', str(source.get('content_hash') or ''))):
+            continue
+        url = urlsplit(source.get('source_url') or '')
+        path = re.fullmatch(r'/Archives/edgar/data/(\d+)/(\d{18})/[A-Za-z0-9_.-]+\.html?', url.path)
+        securities = source.get('registered_securities') or []
+        if (url.scheme != 'https' or url.netloc != 'www.sec.gov' or url.query or url.fragment or not path
+                or int(path[1]) != int(cik)
+                or not re.fullmatch(r'\d{10}-\d{2}-\d{6}', str(source.get('accession') or ''))
+                or path[2] != str(source.get('accession') or '').replace('-', '')
+                or not securities or any(not str(s.get('issuer_cik') or '').isdigit()
+                    or int(s['issuer_cik']) != int(cik) for s in securities)
+                or not any(s.get('symbol') == target.get('ticker') for s in securities)):
+            continue
+        contexts = source.get('contexts') or []
+        if len(contexts) != 1 or not isinstance(contexts[0], str):
+            continue
+        text = contexts[0]
+        payer = _transaction_party(text, parent.get('company') or '')
+        acquired = _transaction_party(text, target.get('company') or '')
+        if not payer or not acquired or payer[0] == acquired[0]:
+            continue
+        p, t = re.escape(payer[0]), re.escape(acquired[0])
+        subs = list(re.finditer(r'\band a wholly owned subsidiary of '+p+r'\s*'
+                               r'\(\s*[“"]\s*([A-Za-z][A-Za-z0-9 ]{0,30}?)\s*[”"]\s*\)', text))
+        if len(subs) != 1:
+            continue
+        sub = re.escape(subs[0][1].strip())
+        completion = _transaction_item(text, '2.01', 'Completion of Acquisition or Disposition of Assets')
+        control = _transaction_item(text, '5.01', 'Changes in Control of Registrant')
+        closed = list(re.finditer(r'\bon\s+([A-Z][a-z]+ \d{1,2}, \d{4}),\s+'+sub+
+                                 r'\s+merged with and into\s+'+t+r'\b(.{0,700}?)\.\s+'
+                                 r'The Merger was completed\b', completion))
+        paid = list(re.finditer(r'The aggregate consideration paid by '+p+r'(?: and '+sub+r')? '
+                               r'in connection with the acquisition of control of '+t+r' was '
+                               r'(approximately )?\$(\d{1,3}(?:,\d{3})+|\d+)(\.\d{2})?, which '+p+
+                               r' funded from cash on hand and available cash resources\.', control))
+        if len(closed) != 1 or len(paid) != 1:
+            continue
+        closed, paid = closed[0], paid[0]
+        prefixes = (completion[max(0, closed.start()-100):closed.start()],
+                    control[max(0, paid.start()-100):paid.start()])
+        if (any(re.search(r'\b(?:if|not|never|would|could|might|expected|expects|hypothetical|illustration|illustrative)\b|\bpro\s+forma\b', prefix, re.I)
+                for prefix in prefixes)
+                or not re.search(r'\bwith '+t+r' continuing as the surviving corporation and a wholly owned subsidiary of '+p+r'\b', closed[2])):
+            continue
+        try:
+            event = datetime.strptime(closed[1], '%B %d, %Y').date()
+            filed = date.fromisoformat(source.get('filed') or '')
+            baseline = date.fromisoformat((parent.get('latest_report') or {}).get('period') or parent['financial_period'])
+            as_of = date.fromisoformat(parent['as_of'])
+        except (ValueError, KeyError, TypeError):
+            continue
+        if not baseline < event <= filed <= as_of:
+            continue
+        token = paid[2]+(paid[3] or '')
+        amount = Decimal(token.replace(',', ''))
+        if not amount.is_finite() or amount <= 0:
+            continue
+        binding = {'payer_ticker':parent['ticker'], 'target_ticker':target['ticker'],
+                   'transaction_completion_date':event.isoformat(), 'source_url':source['source_url'],
+                   'document_hash':source['content_hash'], 'numeric_token':token}
+        out.append({'id':'transaction_cash_'+digest(binding)[:24], 'value':float(amount), 'unit':'USD',
+                    'period':filed.isoformat(), 'measurement_type':'flow', 'field':_TRANSACTION_PAYMENT_FIELD,
+                    'source_kind':'primary', 'source_url':source['source_url'], 'document_hash':source['content_hash'],
+                    'source_issuer_ticker':target['ticker'], 'payer_ticker':parent['ticker'], 'target_ticker':target['ticker'],
+                    'transaction_completion_date':event.isoformat(), 'payment_date':None,
+                    'reported_approximate':bool(paid[1]), 'numeric_token':token,
+                    'scope':parent['company']+' and its wholly owned merger subsidiary: consideration reported paid for '+target['company'],
+                    'locator':'Item 5.01 aggregate consideration paid; Item 2.01 completed merger; Introductory Note party definitions',
+                    'source_quote':paid[0], 'completion_quote':closed[0], 'payer_identity_quote':payer[1],
+                    'target_identity_quote':acquired[1],
+                    'currency_basis':'Same verified parent and target USD reporting currency and source dollar symbol',
+                    'flow_timing':'Cumulative consideration reported paid by filing date; exact payment date unspecified',
+                    'claim_scope':'Reported consideration only; not total acquisition funding or a liability cap'})
+    # Multiple disclosures cannot create duplicate payments or silently choose
+    # between changed amounts. Unsupported ambiguity remains unstructured.
+    groups = {}
+    for row in out:
+        key = (row['payer_ticker'], row['target_ticker'], row['transaction_completion_date'])
+        groups.setdefault(key, []).append(row)
+    return [rows[0] for rows in groups.values() if len(rows) == 1]
+
+
 def merge_related_packet(parent, target):
     binding = acquisition_binding(parent,target.get('company') or '')
     require(binding is not None, 'Primary parent evidence does not identify this acquisition')
@@ -134,11 +269,39 @@ def merge_related_packet(parent, target):
             {**copy.deepcopy(error), 'issuer_ticker':ticker} for error in target['collection_errors'])
     if target.get('primary_reference_usage'):
         result['primary_reference_usage'] = copy.deepcopy(target['primary_reference_usage'])
-    result['evidence_hash'] = digest({'parent_evidence_hash':parent['evidence_hash'], 'related_issuers':result['related_issuers']})
+    transaction_flows = completed_transaction_cash_observations(parent, target)
+    for point in transaction_flows:
+        existing_point = next((o for o in result['observations'] if o['id'] == point['id']), None)
+        require(existing_point is None or existing_point == point, 'Transaction cash observation collision')
+        if existing_point is None:
+            result['observations'].append(point)
+    binding = {'parent_evidence_hash':parent['evidence_hash'], 'related_issuers':result['related_issuers']}
+    if transaction_flows:
+        binding['completed_transaction_cash_observations'] = transaction_flows
+    result['evidence_hash'] = digest(binding)
     from underwriting_evidence import evidence_readiness
     result['readiness'] = evidence_readiness(result,require_documents=True)
     result['packet_hash'] = digest({k:v for k,v in result.items() if k != 'packet_hash'})
     return result
+
+
+
+def _require_requested_transaction_cash(packet, gaps):
+    """An explicit missing-payment request must improve before another call."""
+    if not any(g.get('code') == 'unbound_post_baseline_acquisition_cash_payment' for g in gaps):
+        return packet
+    documents = {d.get('source_url'):d for d in packet.get('documents') or []}
+    bound = [o for o in packet.get('observations') or [] if o.get('field') == _TRANSACTION_PAYMENT_FIELD
+             and o.get('payer_ticker') == packet.get('ticker') and o.get('source_kind') == 'primary'
+             and documents.get(o.get('source_url'),{}).get('content_hash') == o.get('document_hash')]
+    if not bound:
+        packet.setdefault('collection_errors', []).append({
+            'source':'requested_primary_disclosure', 'source_url':'',
+            'error':'Requested completed acquisition cash payment is not uniquely bound to a current frozen primary disclosure'})
+        from underwriting_evidence import evidence_readiness
+        packet['readiness'] = evidence_readiness(packet,require_documents=True)
+        packet['packet_hash'] = digest({k:v for k,v in packet.items() if k != 'packet_hash'})
+    return packet
 
 
 @bounded_sources
@@ -342,7 +505,7 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
     configure_source_budget(root,packet['ticker'])
     requested = ' '.join(str(g.get('detail') or '') for g in gaps).lower()
     if not re.search(r'acquisit|acquir|merger',requested):
-        return packet
+        return _require_requested_transaction_cash(packet, gaps)
     if packet.get('primary_reference_usage'):
         source_budget().resume(packet['primary_reference_usage'])
     identities = client.get_json('https://www.sec.gov/files/company_tickers.json',timeout=30)
@@ -382,7 +545,7 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
         write(path,data)
         packet['input_fingerprint'] = source_fingerprint(root,packet['ticker'])
         packet['packet_hash'] = digest({k:v for k,v in packet.items() if k != 'packet_hash'})
-    return packet
+    return _require_requested_transaction_cash(packet, gaps)
 
 
 @bounded_sources
