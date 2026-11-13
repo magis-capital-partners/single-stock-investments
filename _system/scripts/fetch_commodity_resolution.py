@@ -18,6 +18,7 @@ from commodity_observations import observation, pack, unpack
 
 OUTPUT = ROOT/'_system/reference/market-data/commodities/resolution_inputs.json'
 CACHE = ROOT/'_private/commodity/objects'
+ARCHIVE_DIR = ROOT/'_private/commodity/resolution-vintages-v2'
 STEO_PAGE = 'https://www.eia.gov/outlooks/steo/outlook.php'
 WGC_PAGE = 'https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q3-2026'
 ERCOT_PAGE = 'https://www.ercot.com/gridinfo/load/load_hist'
@@ -260,7 +261,7 @@ def refresh(output=OUTPUT, today=None, download=None):
               'sources': sources, 'observations': observations, 'errors': errors}
     save(output, {k: v for k, v in result.items() if k != 'observations'} | {'datasets': pack(observations)})
     # New captures never overwrite prior vintages, including revisions within one day.
-    save(ROOT/'_private/commodity/resolution-vintages-v2'/f'{today}-{digest(result)[:16]}.json',
+    save(ARCHIVE_DIR/f'{today}-{digest(result)[:16]}.json',
          {k: v for k, v in result.items() if k != 'observations'} | {'datasets': pack(observations)}, compact=True)
     return result
 

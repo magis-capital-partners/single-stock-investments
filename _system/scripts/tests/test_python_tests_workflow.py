@@ -50,7 +50,7 @@ def test_every_file_the_suites_read_triggers_the_workflow():
         assert not missing, f"{event} paths miss {missing}"
 
 
-def test_investor_identity_references_survive_the_reference_corpus_exclusion(tmp_path):
+def test_required_references_survive_the_reference_corpus_exclusion(tmp_path):
     """The broad _system entry alone does not override the reference exclusion."""
     import subprocess
 
@@ -62,6 +62,8 @@ def test_investor_identity_references_survive_the_reference_corpus_exclusion(tmp
         "_system/reference/investors/required_managers.json",
         "_system/reference/investors/disclosure_sources.json",
         "_system/reference/market-data/ownership/managers.json",
+        "_system/reference/market-data/commodities/company_bridges.json",
+        "_system/reference/market-data/commodities/resolution_inputs.json",
     )
     excluded = "_system/reference/unrelated-corpus/large.json"
     for relative in (*required, excluded):

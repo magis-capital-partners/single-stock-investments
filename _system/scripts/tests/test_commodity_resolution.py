@@ -206,7 +206,9 @@ def test_new_source_captures_preserve_intraday_ordering(tmp_path, monkeypatch):
     assert (tmp_path/src['sha256']).read_bytes() == b'original bytes'
 
 
-def test_fetch_failures_preserve_dated_ledger_not_freshness(tmp_path):
+def test_fetch_failures_preserve_dated_ledger_not_freshness(tmp_path, monkeypatch):
+    import fetch_commodity_resolution as collector
+    monkeypatch.setattr(collector, 'ARCHIVE_DIR', tmp_path/'vintages')
     path = tmp_path/'inputs.json'
     row = {**obs(), 'source_id': 'steo_monthly'}
     save(path, {'observations': [row], 'sources': [{**SOURCE, 'id': 'steo_monthly'}]})
