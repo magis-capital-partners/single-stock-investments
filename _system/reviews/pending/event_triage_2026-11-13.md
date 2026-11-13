@@ -1,13 +1,13 @@
 # Event triage — human review queue
 
-**Date:** 2026-11-09
-**Rows:** 2520
+**Date:** 2026-11-13
+**Rows:** 2466
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
-| 2026-11-02 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | [Major Banks] CMB International raises Microsoft’s (MSFT.US) |
-| 2026-11-02 | CSGP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | CoStar Group (CSGP) Could Be 16% Below Fair Value On Profit  |
-| 2026-11-02 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Declares Force Majeure On Freeport Butane  |
+| 2026-11-02 | MSFT | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | [Major Banks] CMB International raises Microsoft’s (MSFT.US) |
+| 2026-11-02 | CSGP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | CoStar Group (CSGP) Could Be 16% Below Fair Value On Profit  |
+| 2026-11-02 | PSX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Declares Force Majeure On Freeport Butane  |
 | 2026-11-01 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation (UNP) stock price, news, quote and |
 | 2026-11-01 | CHD | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Church & Dwight (CHD) Q3 Earnings Highlight Margin Strength  |
 | 2026-11-01 | CVNA | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Carvana (CVNA) Earnings And Guidance Put Its Valuation Narra |
