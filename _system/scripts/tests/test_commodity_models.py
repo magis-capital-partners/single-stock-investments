@@ -154,11 +154,14 @@ def test_missing_issuer_row_is_filled_from_the_registry(tmp_path):
 
 
 def test_compounder_roster_matches_owner_and_single_source():
-    expected='MA V AXP MCO SPGI MSCI CME ICE CBOE LSEG DB1.DE MIAX B3SA3.SA 8697.T CSU TOI.V LMN LIFCO.ST TEQ.ST HEI BRK.B BN MKL FRMO FNV WPM RGLD TPL PSK.TO DRR.AX TFPM OR PBT LB CP FER AENA.MC WCN GOOGL AMZN META ASML RMS.PA RACE COST CPRT'.split()
+    expected='MA V AXP MCO SPGI MSCI CME ICE CBOE LSEG DB1.DE MIAX B3SA3.SA 8697.T CSU TOI.V LMN LIFCO.ST TEQ.ST APH ROP ADDT.ST LAGR.ST VIT.ST HLMA.L HEI BRK.B BN MKL FRMO FNV WPM RGLD TPL PSK.TO DRR.AX TFPM OR PBT LB CP FER AENA.MC WCN GOOGL AMZN META ASML RMS.PA RACE COST CPRT'.split()
     doc=roster();cfg=load_config()
     assert [r['ticker'] for r in doc['companies']]==expected==cfg['tickers']
-    assert len(expected)==46
-    assert 'TDG' not in expected and 'TOI' not in expected and 'BRK-B' not in expected
+    assert len(expected)==52
+    assert 'TDG' not in expected and 'DHR' not in expected and 'AME' not in expected
+    assert 'TOI' not in expected and 'BRK-B' not in expected and 'JDG.L' not in expected
+    assert {c['ticker']: c['name'] for c in doc['companies'] if c['ticker'] in {'APH','ROP','ADDT.ST','LAGR.ST','VIT.ST','HLMA.L'}}=={
+        'APH':'Amphenol','ROP':'Roper Technologies','ADDT.ST':'Addtech','LAGR.ST':'Lagercrantz','VIT.ST':'Vitec Software Group','HLMA.L':'Halma'}
     assert doc==load(SCRIPTS.parents[1]/'dashboard/data/compounders.json')
     assert all('driver_to_fcf' in cfg['issuers'][t] and cfg['issuers'][t].get('display_name') for t in expected)
     registry=SCRIPTS.parents[1]/'_system/portfolio/registry.json'

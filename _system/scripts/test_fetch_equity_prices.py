@@ -125,6 +125,21 @@ def test_market_mark_does_not_rewrite_model_as_of(tmp_path) -> None:
         ("URB.A.TO", "CA", "TSX", "URB-A.TO"),
         ("CSU", "CA", "TSX", "CSU.TO"),
         ("SUM", "CA", "TSXV", "SUM.V"),
+        # Swedish class shares keep an unsuffixed folder and a class-B quote.
+        ("ADDT.ST", "SE", "Nasdaq Stockholm", "ADDT-B.ST"),
+        ("LAGR.ST", "SE", "Nasdaq Stockholm", "LAGR-B.ST"),
+        ("VIT.ST", "SE", "Nasdaq Stockholm", "VIT-B.ST"),
+        ("MMGR.ST", "SE", "Nasdaq Stockholm", "MMGR-B.ST"),
+        ("LATO.ST", "SE", "Nasdaq Stockholm", "LATO-B.ST"),
+        ("ASSA.ST", "SE", "Nasdaq Stockholm", "ASSA-B.ST"),
+        ("INDT.ST", "SE", "Nasdaq Stockholm", "INDT.ST"),
+        ("ATCO-A.ST", "SE", "Nasdaq Stockholm", "ATCO-A.ST"),
+        ("CCL-B.TO", "CA", "TSX", "CCL-B.TO"),
+        ("DSG.TO", "CA", "TSX", "DSG.TO"),
+        ("KRX.IR", "EU", "Euronext Dublin", "KRX.IR"),
+        ("IP.MI", "EU", "Euronext Milan", "IP.MI"),
+        ("IP", "US", "NYSE", "IP"),
+        ("CCL", "US", "NYSE", "CCL"),
     ],
 )
 def test_yahoo_symbol_for(ticker: str, market: str, exchange: str, expected: str) -> None:

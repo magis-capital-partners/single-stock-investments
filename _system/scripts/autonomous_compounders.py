@@ -62,7 +62,14 @@ SEC_TAGS = {
     'sbc': ['ShareBasedCompensation'],
     'net_income': ['NetIncomeLossAvailableToCommonStockholdersBasic', 'ProfitLossAttributableToOwnersOfParent', 'NetIncomeLoss'],
 }
-SYMBOLS = {'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L', 'BRK.B': 'BRK-B', 'BF.B': 'BF-B', 'HEI.A': 'HEI-A', 'BN': 'BN', 'FRMO': 'FRMO', 'BYMA': 'BYMA.BA', 'BMYS.KL': '1818.KL', 'PSH': 'PSHD.L'}
+SYMBOLS = {
+    'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L',
+    'BRK.B': 'BRK-B', 'BF.B': 'BF-B', 'HEI.A': 'HEI-A', 'BN': 'BN', 'FRMO': 'FRMO',
+    'BYMA': 'BYMA.BA', 'BMYS.KL': '1818.KL', 'PSH': 'PSHD.L',
+    # Folder ids stay unsuffixed, matching LIFCO.ST. Yahoo quotes the listed class.
+    'ADDT.ST': 'ADDT-B.ST', 'LAGR.ST': 'LAGR-B.ST', 'VIT.ST': 'VIT-B.ST',
+    'MMGR.ST': 'MMGR-B.ST', 'LATO.ST': 'LATO-B.ST', 'ASSA.ST': 'ASSA-B.ST',
+}
 # Bursa listing identity: https://bursa.listedcompany.com/interactive_chart.html (stock code 1818).
 # BYMA provider symbol is also recorded in BYMA/research/valuation.json inputs.price_source.
 # PSH USD listing: https://www.londonstockexchange.com/stock/PSHD/pershing-square-holdings-ltd

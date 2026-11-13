@@ -99,8 +99,21 @@ def _yahoo_base(base: str) -> str:
     return base.replace(".", "-")
 
 
+# Folder ids stay unsuffixed (LIFCO.ST). Yahoo quotes the listed share class.
+LISTING_ALIAS = {
+    "ADDT.ST": "ADDT-B.ST",
+    "LAGR.ST": "LAGR-B.ST",
+    "VIT.ST": "VIT-B.ST",
+    "MMGR.ST": "MMGR-B.ST",
+    "LATO.ST": "LATO-B.ST",
+    "ASSA.ST": "ASSA-B.ST",
+}
+
+
 def yahoo_symbol_for(ticker: str, market: str, exchange: str) -> str:
     t = ticker.upper()
+    if t in LISTING_ALIAS:
+        return LISTING_ALIAS[t]
     m = (market or "US").upper()
     base, _, suffix = t.rpartition(".")
     if base and (
