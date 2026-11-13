@@ -318,9 +318,14 @@
     )}<p class="cm-muted">Registry membership does not establish a funded position. Capital-weighted priority awaits reconciled position reports.</p><ul>${doc.entitlements.map((e) => `<li>${esc(e.dataset)} · ${esc(human(e.status))}</li>`).join("")}</ul>`;
   }
   function powerProfiles(doc) {
-    const profile = rows(doc).filter(
-      (r) => r.metric === "hourly_load" && r.region === "ERCOT",
+    const native = rows(doc).filter(
+      (r) => r.metric === "native_hourly_load" && r.region === "ERCOT",
     );
+    const profile = native.length
+      ? native
+      : rows(doc).filter(
+          (r) => r.metric === "hourly_load" && r.region === "ERCOT",
+        );
     const latest = profile
       .map((r) => r.period.slice(0, 7))
       .sort()
@@ -357,7 +362,7 @@
     const profile = powerProfiles(doc);
     if (!profile.length)
       return "<p>Measured hourly load is unavailable. Dispatch is withheld.</p>";
-    return `<p>Measured ERCOT load · ${esc(profile[0].period.slice(0, 7))} · ${fmt(profile.length)} representative month/hour/day-type cells. Weather-zone observations and monthly ERCOT/PJM hub prices are available in Where tight.</p><p class="cm-status">Conditional dispatch using measured load and your supply assumptions. Renewable output, outages and congestion are not inferred from annual totals; this is not a verified nodal price forecast.</p>${table(
+    return `<p>Measured ERCOT load · ${esc(profile[0].period.slice(0, 7))} · ${fmt(profile.length)} ${profile[0].metric === "native_hourly_load" ? "native settlement hours" : "representative month/hour/day-type cells"}. Weather-zone profiles and monthly ERCOT/PJM hub prices are available in Where tight.</p><p class="cm-status">Conditional dispatch using measured load and your supply assumptions. Renewable output, outages and congestion are not inferred from annual totals; this is not a verified nodal price forecast.</p>${table(
       profile,
       [
         ["period", "Local settlement-hour group"],
@@ -542,5 +547,6 @@
     rows,
     chart,
     powerCase,
+    powerProfiles,
   };
 })(window);

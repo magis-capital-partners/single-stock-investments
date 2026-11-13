@@ -1,6 +1,8 @@
 """Publication contract for detailed commodity evidence and cash sensitivities."""
+from datetime import date
+
 from commodity_common import finite
-from commodity_observations import IDENTITY, unpack
+from commodity_observations import IDENTITY, period_end, unpack
 
 
 def validate(doc, as_of):
@@ -19,6 +21,8 @@ def validate(doc, as_of):
         ids.add(r['id'])
         if r['known_at'][:10] > as_of or (r.get('published_at') or '')[:10] > as_of:
             errors.append('resolution: future availability leakage')
+        if r['basis'].startswith('observed') and period_end(r['period']) > date.fromisoformat(r['known_at'][:10]):
+            errors.append('resolution: future economic observation')
         if r['source_id'] not in source_ids or not r['source_url'].startswith('https://'):
             errors.append('resolution: missing original source')
     for name, readiness in doc.get('readiness', {}).items():

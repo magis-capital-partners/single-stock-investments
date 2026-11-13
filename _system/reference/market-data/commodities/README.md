@@ -22,6 +22,9 @@ reconciled SJT and WPM sensitivities. Everything is research context:
   retain settlement/DST weighting. The power calculator combines measured load
   with explicitly entered supply, heat-rate, scarcity and contract assumptions.
   It does not claim to reproduce nodal prices without renewables/congestion data.
+  Dispatch uses every native settlement hour of the latest source month rather
+  than profile averages. Local hour-ending labels and repeated DST occurrences
+  are retained, preserving peak demand and scarcity effects.
 * Copper keeps concentrate and refined balances separate. Matched preliminary
   ICSG refined balances and dated Cochilco exchange holdings retain their original
   scope. Mine/project calculations support throughput, grade, recovery, ramp,

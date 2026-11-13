@@ -35,6 +35,8 @@ def parse_ercot(body, src):
     if header[0] != 'Hour Ending' or 'ERCOT' not in header:
         raise ValueError('ERCOT hourly schema changed')
     buckets = defaultdict(list)
+    native = []
+    occurrences = defaultdict(int)
     for row in values:
         label = str(row[0])
         if not re.match(r'\d{2}/\d{2}/20\d{2} ', label):
@@ -47,6 +49,11 @@ def parse_ercot(body, src):
         # no fabricated UTC timestamp is assigned to the ERCOT settlement hour.
         kind = 'weekend' if day.weekday() >= 5 else 'weekday'
         period = f'{day:%Y-%m}|{kind}|HE{hour:02d}'
+        value = row[header.index('ERCOT')]
+        if isinstance(value, (int, float)) and value >= 0:
+            label = f'{day:%Y-%m-%d}|HE{hour:02d}'
+            occurrences[label] += 1
+            native.append((f'{label}|{occurrences[label]}', value))
         for region in ('ERCOT', 'COAST', 'FWEST'):
             value = row[header.index(region)]
             if isinstance(value, (int, float)) and value >= 0:
@@ -54,11 +61,21 @@ def parse_ercot(body, src):
     book.close()
     if len(buckets) < 500:
         raise ValueError('ERCOT load archive unexpectedly incomplete')
-    return [observation(value=sum(v)/len(v), source=src, period=period, metric='hourly_load',
+    profiles = [observation(value=sum(v)/len(v), source=src, period=period, metric='hourly_load',
                         commodity='power', unit='MW', frequency='hourly', basis='observed_profile',
                         region=region, product='native electric load', weight_hours=len(v),
                         transformation='Mean load by calendar month, local hour ending and weekday/weekend; count retains settlement hours',
                         extraction='Native Load Report; ERCOT/COAST/FWEST') for (period, region), v in sorted(buckets.items())]
+    # Preserve every actual settlement hour for dispatch in the latest month.
+    # Source occurrences distinguish repeated DST local hours; HE24 stays HE24.
+    latest = max(period[:7] for period, _ in native)
+    hours = [observation(value=value, source=src, period=period, metric='native_hourly_load',
+                         commodity='power', unit='MW', frequency='hourly', basis='observed_revised',
+                         region='ERCOT', product='native electric load', weight_hours=1,
+                         transformation='Identity; local hour ending and repeated-hour occurrence retained',
+                         extraction='Native Load Report; every ERCOT settlement hour in latest source month')
+             for period, value in native if period.startswith(latest)]
+    return profiles+hours
 
 
 def source(key, url, body, published, today, days, next_release=None):

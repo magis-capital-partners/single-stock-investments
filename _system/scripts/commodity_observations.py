@@ -15,6 +15,19 @@ IDENTITY = ('commodity', 'product', 'quality', 'region', 'delivery', 'asset',
 FREQUENCIES = {'hourly', 'daily', 'weekly', 'monthly', 'quarterly', 'annual', 'milestone'}
 
 
+def period_end(period):
+    year = int(period[:4])
+    if '-Q' in period:
+        month = int(period[-1])*3
+    elif len(period) >= 10 and period[7] == '-':
+        return date.fromisoformat(period[:10])
+    elif len(period) >= 7:
+        month = int(period[5:7])
+    else:
+        month = 12
+    return date(year, month, calendar.monthrange(year, month)[1])
+
+
 def pack(rows):
     """Normalize repeated identity/provenance fields without losing ledger precision."""
     datasets = {}
@@ -86,8 +99,7 @@ def source_state(source, as_of):
     observation_age = None
     if source.get('latest_observation'):
         period = source['latest_observation']
-        year, month = int(period[:4]), int(period[5:7])
-        observed = date.fromisoformat(period) if len(period) == 10 else date(year, month, calendar.monthrange(year, month)[1])
+        observed = period_end(period)
         observation_age = (end-observed).days
         stale = stale or observation_age > source.get('max_observation_age_days', source['max_age_days'])
     state = ('retained_after_failure' if source.get('error') else
@@ -104,16 +116,7 @@ def weighted_readiness(requirements, rows, sources, as_of):
         matches = [r for r in usable if all(r.get(k) == v for k, v in req['match'].items())]
         def fresh_observation(r):
             period = r['period']
-            year = int(period[:4])
-            if '-Q' in period:
-                month = int(period[-1])*3
-            elif len(period) >= 7:
-                month = int(period[5:7])
-            else:
-                month = 12
-            end = date(year, month, calendar.monthrange(year, month)[1])
-            if len(period) == 10:
-                end = date.fromisoformat(period)
+            end = period_end(period)
             source = states.get(r['source_id'], {})
             return (as_of-end).days <= source.get('max_observation_age_days', source.get('max_age_days', 45))
         observed = [r for r in matches if r['basis'].startswith('observed') and

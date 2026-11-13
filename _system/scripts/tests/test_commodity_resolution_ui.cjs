@@ -17,6 +17,8 @@ test('resolution view exposes dated source lineage, five views and the valuation
   const safe=api.render(bad);assert.ok(!safe.includes('<script>'));assert.ok(!safe.includes('href="javascript:'));
   assert.match(api.renderCompany(doc,'SJT'),/Remaining gross deficit/);
   assert.match(api.renderCompany(doc,'WPM'),/FCF/);
+  const hours=api.powerProfiles(doc);assert.ok(hours.length>=672&&hours.length<=745);
+  assert.ok(hours.every(r=>r.metric==='native_hourly_load'&&r.weight_hours===1));
   assert.equal(api.renderCompany(doc,'UNKNOWN'),'');
 });
 test('hourly power response reconciles scarcity, weights and the fixed contract share',()=>{
@@ -25,4 +27,6 @@ test('hourly power response reconciles scarcity, weights and the fixed contract 
   assert.equal(result.unserved,480);assert.equal(result.hours,24);assert.ok(Math.abs(result.price-240)<1e-8);
   assert.throws(()=>api.powerCase([],{...params,fixed:1.1}));
   assert.equal(api.powerCase([],params).price,null);
+  const peaks=api.powerCase([{value:50,weight_hours:1},{value:150,weight_hours:1}],{...params,nonGas:100,gasMW:0,fixed:0});
+  assert.equal(peaks.unserved,50);assert.equal(peaks.price,500);
 });
