@@ -85,7 +85,7 @@ def source(key, url, body, published, today, days, next_release=None):
     if not path.exists():
         path.write_bytes(body)
     return {'id': key, 'url': url, 'sha256': sha, 'reviewed_sha256': sha,
-            'published_at': published, 'retrieved_at': today.isoformat(),
+            'published_at': published, 'retrieved_at': datetime.now(timezone.utc).isoformat(),
             'reviewed_at': today.isoformat(), 'review_basis': 'validated_parser_and_accounting',
             'max_age_days': days, 'next_release': next_release, 'error': None}
 

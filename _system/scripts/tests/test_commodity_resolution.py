@@ -189,6 +189,23 @@ def test_backtest_never_uses_economic_date_as_historical_availability():
     assert {r['model'] for r in result['summary']} == {'no_change'}
 
 
+def test_month_end_origins_include_information_captured_after_day_28():
+    row = obs()
+    history = [{**row, 'period': '2025-01', 'known_at': '2025-01-31T12:00:00+00:00', 'value': 1},
+               {**row, 'period': '2025-02', 'known_at': '2025-02-28T12:00:00+00:00', 'value': 2}]
+    result = score(history, horizons=(1,))
+    assert result['status'] == 'scored'
+    assert result['samples'][0]['error'] == -1
+
+
+def test_new_source_captures_preserve_intraday_ordering(tmp_path, monkeypatch):
+    import fetch_commodity_resolution as collector
+    monkeypatch.setattr(collector, 'CACHE', tmp_path)
+    src = collector.source('fixture', SOURCE['url'], b'original bytes', SOURCE['published_at'], ASOF, 45)
+    assert 'T' in src['retrieved_at'] and src['retrieved_at'].endswith('+00:00')
+    assert (tmp_path/src['sha256']).read_bytes() == b'original bytes'
+
+
 def test_fetch_failures_preserve_dated_ledger_not_freshness(tmp_path):
     path = tmp_path/'inputs.json'
     row = {**obs(), 'source_id': 'steo_monthly'}

@@ -1,6 +1,7 @@
 """Rolling-origin evaluation with availability checks and explicit benchmarks."""
 from __future__ import annotations
 
+import calendar
 import math
 from collections import defaultdict
 from statistics import mean
@@ -30,7 +31,9 @@ def score(rows, forecasts=(), horizons=(1, 3, 6, 12)):
         # Availability months, rather than economic observation months, are origins.
         origins = sorted({r['known_at'][:7] for r in history})
         for origin in origins:
-            known = sorted(available(history, origin + '-28', observed_only=True), key=lambda r: r['period'])
+            year, month = map(int, origin.split('-'))
+            boundary = f'{origin}-{calendar.monthrange(year, month)[1]:02d}'
+            known = sorted(available(history, boundary, observed_only=True), key=lambda r: r['period'])
             if not known:
                 continue
             for horizon in horizons:
@@ -44,7 +47,7 @@ def score(rows, forecasts=(), horizons=(1, 3, 6, 12)):
                 for f in forecasts:
                     if (tuple(f[k] for k in ('commodity', 'metric', 'region', 'unit')) == identity and
                             f['target'] == target and f['origin'] == origin and
-                            f['known_at'][:7] <= origin):
+                            f['known_at'][:10] <= boundary):
                         predictions[f['model']] = f['value']
                 for model, value in predictions.items():
                     samples.append({'commodity': identity[0], 'metric': identity[1], 'region': identity[2],
