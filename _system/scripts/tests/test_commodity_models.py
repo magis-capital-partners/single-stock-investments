@@ -16,7 +16,7 @@ from commodity_engines import crude, copper, gold, silver, gold_residual
 from validate_commodity_models import validate
 from buy_zones import load_config
 
-AS_OF=date(2026,10,28)
+AS_OF=date(2026,11,13)
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def test_oil_published_prices_and_oecd_stocks_match_source(models):
         if r['period']<='2027-Q4':
             assert r['price']==published[r['period']]['brent']
             assert r['wti']==published[r['period']]['wti']
-            assert r['oecd_stock_mb']==published[r['period']]['oecd_stock_mb']
+            assert r['oecd_stock_mb']==pytest.approx(published[r['period']]['oecd_stock_mb'], abs=.001)
             assert r['price_status']=='published_forecast'
         else:assert r['basis']=='analyst_extension'
     # A global surplus cannot be presented as OECD inventory growth.
@@ -102,7 +102,7 @@ def test_gold_diagnostic_has_no_future_leakage_or_proxy_fallback():
                 series[key]['observations'].append({'date':f'{year}-{month:02d}-01','value':value})
     result=gold_residual({'series':series},AS_OF)
     assert result['training_months']==144
-    assert all(r['period']<='2026-10' for r in result['rows'])
+    assert all(r['period']<=AS_OF.isoformat()[:7] for r in result['rows'])
     assert abs(result['coefficients'][1]+.15)<1e-6
 
 

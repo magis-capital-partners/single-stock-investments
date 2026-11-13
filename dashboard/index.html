@@ -23,6 +23,7 @@
 <link href="aggregates.css?v=20261023" rel="stylesheet">
 <link href="ideas.css?v=20261011-separations" rel="stylesheet">
 <link href="energy-model.css?v=20261015-energy" rel="stylesheet">
+<link href="commodity-resolution.css?v=20261113" rel="stylesheet">
 <link rel="stylesheet" href="btc-model.css?v=20261111-btc2033">
 <style>
   html { color-scheme: dark; }
@@ -2061,7 +2062,8 @@
 <script src="oauth.js"></script>
 <script src="compounders.js?v=20261029"></script>
 <script src="company-models.js?v=20261028"></script>
-<script src="commodity-model-viz.js?v=20261028"></script>
+<script src="commodity-resolution.js?v=20261113"></script>
+<script src="commodity-model-viz.js?v=20261113"></script>
 <script src="research-workspace.js?v=20261027-market-sync"></script>
 <script src="company-research.js?v=20261028"></script>
 <script>
@@ -3560,7 +3562,7 @@ function loadLazyFile(key) {
       data.inflection_overview = doc;
     }),
     technical_signals: () => loadShardOnce('file:technical_signals', 'data/technical_signals.json', (doc) => { data.technical_signals = doc; }),
-    commodity_models: () => loadShardOnce('file:commodity_models','data/commodity_models.json',doc=>{data.commodity_models=doc;}),
+    commodity_models: () => loadShardOnce('file:commodity_models','data/commodity_models.json',doc=>{window.CommodityResolution?.recordFetch(doc.resolution);data.commodity_models=doc;}),
     world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = CommodityModelViz.cleanLegacyGold(doc); }),
     energy: loadEnergyFiles,
     hk_snowball: () => loadShardOnce('file:hk_snowball', 'data/hk_snowball_model.json', (doc) => { data.hk_snowball_model = doc; }),

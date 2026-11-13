@@ -20,11 +20,15 @@ def build(as_of=None, config_dir=CONFIG_DIR, panel_path=DEFAULT_PANEL):
             raise ValueError('Commodity contexts must be excluded from base IRR')
         extra=[models[-1]] if name=='silver' else []
         models.append(getattr(engines,name)(config,panel,as_of,*extra))
-    return {'schema_version':VERSION,'as_of':as_of.isoformat(),'in_base_irr':False,'models':models,
+    doc = {'schema_version':VERSION,'as_of':as_of.isoformat(),'in_base_irr':False,'models':models,
             'refresh_policy':{'oil_days':45,'copper_days':45,'gold_days':120,'silver_days':400},
             'bridges':[{'from':'gold','to':'silver','included_in_balance':True,'reason':'Silver price reads the named gold scenario and an explicit assumed ratio.'},
                        {'from':'copper','to':'silver','included_in_balance':False,'reason':'Byproduct sensitivity is already represented in silver assumptions; no additive supply term.'},
                        {'from':'energy','to':'metals','included_in_balance':False,'reason':'Operating-cost context only; no duplicate physical demand.'}]}
+    from commodity_resolution import build as resolution
+    prior = load(ROOT/'dashboard/data/commodity_models.json', {}).get('resolution', {})
+    doc['resolution'] = resolution(doc, as_of, prior, panel=panel)
+    return doc
 
 
 if __name__=='__main__':
@@ -37,5 +41,5 @@ if __name__=='__main__':
     from validate_commodity_models import validate
     errors=validate(doc)
     if errors:raise SystemExit('\n'.join(errors))
-    save(args.output,doc)
+    save(args.output,doc,compact=True)
     print(f"Built {len(doc['models'])} context models through 2032; base IRR unchanged")

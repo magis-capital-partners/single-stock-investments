@@ -40,6 +40,9 @@ def validate(doc):
                     if abs(r['refined_kt']-r['use_kt']-r['balance_kt'])>.011:
                         errors.append('copper: refined identity')
             if periods!=sorted(set(periods)):errors.append(prefix+': unordered or duplicate periods')
+    if 'resolution' in doc:
+        from validate_commodity_resolution import validate as validate_resolution
+        errors.extend(validate_resolution(doc['resolution'], doc['as_of']))
     return errors
 
 

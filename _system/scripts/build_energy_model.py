@@ -113,6 +113,7 @@ def build(as_of=None, *, data_dir=DATA_DIR, asset_dir=ASSET_DIR, output_dir=None
     if weekly:
         weekly['stale'] = (as_of - date.fromisoformat(weekly['published_at'])).days > 14
     model_id = digest({'as_of': as_of.isoformat(), 'config': config, 'panel': [(s['id'], s['source_sha256']) for s in sources],
+                       'resolution_inputs': load_json(ROOT/'_system/reference/market-data/commodities/resolution_inputs.json', {}),
                        'weekly': weekly.get('source_sha256') if weekly else None,
                        'assets': [(k, digest({field: value for field, value in v.items() if field != 'retrieved_at'})) for k, v in assets.items() if isinstance(v, dict)], 'btc': snap})
     common = {'schema_version': '1.0', 'model_version': MODEL_VERSION, 'model_id': model_id,
@@ -140,13 +141,15 @@ def build(as_of=None, *, data_dir=DATA_DIR, asset_dir=ASSET_DIR, output_dir=None
                              'Gas price paths and regional pass-through are assumptions, not equilibrium price forecasts.',
                              'No predictive skill is claimed; observed history is the latest revised vintage.',
                              'Miner contracts and geographic shares are illustrative, with zero verified contract coverage.']}
+    from commodity_resolution import energy_detail
+    model['resolution'] = energy_detail(model, assets, as_of)
     # Validate both fully before publishing. Matching content IDs prevent a
     # reader from combining artifacts from different runs during deployment.
     digest(model); digest(bridge)
     from validate_energy_model import validate
     validate(model, bridge)
     atomic_json(output_dir / 'energy_btc_bridge.json', bridge)
-    atomic_json(output_dir / 'energy_model.json', model)
+    atomic_json(output_dir / 'energy_model.json', model, compact=True)
     from energy_exports import scenario_csv, write_csv
     for scenario in scenarios:
         write_csv(output_dir / 'energy_exports' / f"{scenario['id']}.csv", scenario_csv(model, bridge, scenario))
