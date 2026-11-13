@@ -13,7 +13,8 @@ Replace the old single **thesis status** (intact / weakening / strengthening / u
 | **Archetype** | Stahl | `croupier`, `compounder`, `serial_acquirer`, `platform`, `holding_co`, `optionality`, `turnaround`, `infrastructure`, `special_situation` | What *is* this business in the pecuniary economy? |
 | **Moat** | Munger | `widening`, `stable`, `eroding`, `unproven`, `n/a` | Is competitive advantage durable? |
 | **Dhando** | Pabrai | `full`, `partial`, `none`, `pending` | Heads I win, tails I don't lose much? |
-| **Stance** | Human (IC recommends) | `core`, `accumulate`, `hold`, `watch`, `trim`, `exit` | What do we *do* with capital? Only `human_decision.json` is actionable |
+| **Stance** | Human (IC recommends) | `core`, `accumulate`, `hold`, `watch`, `trim`, `exit` | What do we *do* with capital? Only `human_decision.json` is actionable. Stance is not ownership. |
+| **Owned group** | Accounts | `groups.owned` in `registry.json` | Which accounts hold the long equity? Membership is tracking coverage. It does not change stance, and it stores no share counts or market values. `hold` remains the research action. |
 | **Cycle** | Stahl (croupiers) | `peak`, `mid`, `trough`, `—` | Normalized earnings vs current activity |
 | **Intrinsic value / margin of safety** | Contract v3 | Low/base/high present value today plus `(value - price) / value` | What is the security worth today, and how far is price below that value? |
 | **Forward return** | Contract v3 | Low/base/high `forward_return_at_price_pct`, or unavailable | What return follows from a dated future payoff or cash-flow schedule? Never annualize a present value |

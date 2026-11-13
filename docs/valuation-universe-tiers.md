@@ -47,12 +47,16 @@ limits. The summary reports counts by tier and by assignment reason.
 3. Tier 2 is assigned from explicit watchlist evidence:
    - registry `watchlist` membership;
    - membership in `valuation_followups.json`;
-   - a `core`, `hold`, or `accumulate` classification stance; or
+   - a `core`, `hold`, or `accumulate` classification stance;
+   - a long equity in `registry.json` `groups.owned` (tracking coverage; not a stance and not a share count); or
    - a positive weight in a proposed target-weight plan.
 4. All other registry names default to Tier 3.
 
 The registry's `holdings` object contains the full research universe. It is not
-evidence of an active position and is deliberately ignored for Tier 1.
+evidence of an active position and is deliberately ignored for Tier 1. Account
+longs live in `groups.owned` and are a Tier 2 tracking signal. Paper books in
+`_system/portfolio/paper/` remain the Tier 1 position source. Short option
+flags and short ETF hedges in the owned group do not promote a tier.
 
 ## Promotion and demotion
 
@@ -61,8 +65,8 @@ directly to Tier 1 only after a positive canonical position, an imminent decisio
 workflow, a human capital decision, or an approved capital plan.
 
 Tier 2 moves to Tier 1 through the same Tier 1 gates. Removing its watchlist,
-follow-up, stance, and proposed-plan signals demotes it to Tier 3 if no Tier 1
-gate exists.
+follow-up, stance, owned-group, and proposed-plan signals demotes it to Tier 3
+if no Tier 1 gate exists.
 
 Tier 1 demotes only after all positive positions, active decision workflows,
 human-decision review obligations, and approved-plan signals are gone. The

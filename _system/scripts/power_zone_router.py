@@ -40,6 +40,17 @@ def canonical_hash(value: dict) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def _priority_holding(holding: dict | None) -> bool:
+    """Research-priority names, plus longs in the owned tracking group.
+
+    Stance is unchanged. ``tracking_groups`` contains ``owned`` only for a
+    long equity in ``groups.owned``.
+    """
+    stance = str(((holding or {}).get("classification") or {}).get("stance") or "").lower()
+    groups = (holding or {}).get("tracking_groups") or []
+    return stance in {"core", "hold", "accumulate"} or "owned" in groups
+
+
 def registry_entries() -> dict[str, dict]:
     registry = read_json(REGISTRY_PATH)
     return {**(registry.get("watchlist") or {}), **(registry.get("holdings") or {})}
@@ -175,8 +186,7 @@ def universe_tickers(scope: str) -> list[str]:
         portfolio_names = {
             ticker
             for ticker, holding in entries.items()
-            if str(((holding or {}).get("classification") or {}).get("stance") or "").lower()
-            in {"core", "hold", "accumulate"}
+            if _priority_holding(holding)
         }
         return sorted(followup_names | portfolio_names)
     return sorted(entries)

@@ -3011,6 +3011,7 @@ def build_ticker_row(
     memory_doc: dict | None = None,
     watchlist: dict | None = None,
     registry_docs: list[dict] | None = None,
+    owned_views: dict | None = None,
 ) -> dict:
     ticker_dir = ROOT / ticker
     meta = {**TICKER_META.get(ticker, {}), **holdings.get(ticker, {})}
@@ -3066,6 +3067,9 @@ def build_ticker_row(
         "in_holdings": ticker in holdings,
         "in_watchlist": bool((watchlist or {}).get(ticker)),
     }
+    owned_view = (owned_views or {}).get(ticker)
+    if owned_view:
+        row["owned"] = owned_view
     row["valuation_decision"] = valuation_decision_summary(
         ticker,
         ticker_dir,
@@ -3378,6 +3382,8 @@ def activist_summary_for_ticker(ticker: str) -> dict:
 
 def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
     reg = load_registry()
+    from portfolio_registry import owned_views_by_ticker
+    owned_views = owned_views_by_ticker(reg)
     holdings = parse_holdings()
     portfolio_class = load_classification()
     tickers = list_tickers()
@@ -3396,6 +3402,7 @@ def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
             memory_doc,
             reg.get("watchlist") or {},
             registry_docs,
+            owned_views,
         )
         licensed = licensed_by_ticker.get(ticker)
         if licensed:
@@ -3541,6 +3548,8 @@ def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
             "valuation_tier_counts": dict(sorted(valuation_tier_counts.items())),
             "valuation_model_level_counts": dict(sorted(model_level_counts.items())),
             "valuation_tiers_as_of": load_valuation_universe_tiers().get("as_of"),
+            "owned_long_count": sum(1 for view in owned_views.values() if view.get("role") == "long"),
+            "owned_as_of": next((view.get("as_of") for view in owned_views.values() if view.get("as_of")), None),
         },
         "watchlist": watchlist,
         "tickers": rows,
@@ -3806,8 +3815,10 @@ def sync_registered_coverage_inputs() -> list[str]:
         else:
             row = bundle_rows.get(ticker)
             if row is None:
+                from portfolio_registry import owned_views_by_ticker
                 row = build_ticker_row(ticker, parsed_holdings, classifications,
-                                       watchlist=registry.get("watchlist") or {})
+                                       watchlist=registry.get("watchlist") or {},
+                                       owned_views=owned_views_by_ticker(registry))
             new_details.append((path, row))
         if row.get("ticker") != ticker:
             raise ValueError("Coverage detail listing identity disagrees with registry: " + ticker)
