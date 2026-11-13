@@ -234,6 +234,19 @@ def test_strict_validation_reads_trusted_storage_before_replay():
     restore=next(s for s in job['steps'] if s.get('name')=='Restore named immutable packets from the private catalog')
     assert '--prefix valuation-underwriting/packets/' in restore['run']
 
+def test_research_dispatch_job_carries_the_existing_storage_secret():
+    import yaml
+    root=Path(__file__).resolve().parents[3]
+    dispatch=yaml.safe_load((root/'.github/workflows/research-agent-dispatch.yml').read_text())
+    assert 'CLOUDFLARE_API_TOKEN' in dispatch[True]['workflow_call']['secrets']
+    job=dispatch['jobs']['research']
+    assert job['env']['CLOUDFLARE_API_TOKEN']=='${{ secrets.CLOUDFLARE_API_TOKEN }}'
+    assert any(s.get('uses')=='./.github/actions/marvin-agent' for s in job['steps'])
+    for name in ('marvin-deep-dive.yml','daily-sync.yml'):
+        caller=yaml.safe_load((root/'.github/workflows'/name).read_text())
+        calls=[j for j in caller['jobs'].values() if j.get('uses')=='./.github/workflows/research-agent-dispatch.yml']
+        assert calls and all(j.get('secrets')=='inherit' for j in calls),name
+
 def test_investor_checkpoint_published_only_to_private_storage_restores(environment,monkeypatch,tmp_path):
     import shutil
     import investor_history as history
