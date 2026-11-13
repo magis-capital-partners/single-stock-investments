@@ -9,10 +9,13 @@ import shlex
 import subprocess
 from pathlib import Path
 
-from private_storage import (ROOT, PrivateStorage, StorageError, enabled, encoded_json,
-                             relative_path, restore_file, run_git, sha, store_file)
+from private_storage import (ROOT, ConcurrentUpdate, PrivateStorage, StorageError, enabled, encoded_json,
+                             relative_path, restore_file, run_git, sha, store_bytes, store_file)
 
 MARKER = '.private-storage-view.json'
+# The shared receipt index every dashboard producer updates; the legacy vault
+# rebase merged exactly these two paths and nothing else.
+RECEIPT_PATHS = frozenset({'dashboard-private/manifest.json', 'dashboard-private/migration-journal.jsonl'})
 _LAZY_STORAGE = None
 _VIEW_CACHE = {}
 
@@ -44,6 +47,24 @@ def write_new(path, raw):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('xb') as output:
         output.write(raw)
+
+
+def write_replacing(path, raw):
+    temporary = path.with_name(path.name + '.' + os.urandom(6).hex() + '.tmp')
+    try:
+        write_new(temporary, raw)
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _merge_receipt_index(relative, base, upstream, incoming):
+    """Absorb another producer's receipts exactly as the legacy vault rebase did."""
+    from resolve_vault_manifest_conflict import JOURNAL, MISSING, merge_journal, reconcile
+    if relative == JOURNAL:
+        return merge_journal(upstream.decode(), incoming.decode()).encode()
+    versions = [MISSING if base is None else _strict_json(base), _strict_json(upstream), _strict_json(incoming)]
+    return (json.dumps(reconcile(*versions), sort_keys=True, separators=(',', ':')) + '\n').encode()
 
 
 def _strict_json(raw):
@@ -322,14 +343,33 @@ def publish_paths(vault, paths, *, storage=None):
         if prior and immutable and prior['sha256'] != entry['sha256']:
             raise StorageError('An immutable private artifact cannot be replaced')
         if prior and relative.endswith('/ledger.jsonl'):
-            from private_storage import merge_ledger, store_bytes
+            from private_storage import merge_ledger
             old = storage.restore(relative, records=expected)
             merged = merge_ledger(old, path.read_bytes())
             entry = store_bytes(storage.objects, merged)
         updates[relative] = entry
-    commit = storage.catalog.publish(updates, expected, **({"control_files":control} if control else {}))
+    absorbed = {}
+    for attempt in range(3):
+        try:
+            commit = storage.catalog.publish(updates, expected, **({"control_files":control} if control else {}))
+            break
+        except ConcurrentUpdate:
+            current = storage.catalog.read(storage.catalog.fetch())
+            moved = {r for r in updates if current.get(r) not in (expected.get(r), updates[r])}
+            if attempt == 2 or not moved or not moved <= RECEIPT_PATHS or any(r not in current for r in moved):
+                raise
+            for relative in moved:
+                base = storage.restore(relative, records=expected) if relative in expected else None
+                raw = _merge_receipt_index(relative, base, storage.restore(relative, records=current),
+                                           path_in(vault, relative).read_bytes())
+                updates[relative] = store_bytes(storage.objects, raw)
+                expected[relative] = current[relative]
+                absorbed[relative] = raw
+    for relative, raw in absorbed.items():
+        write_replacing(path_in(vault, relative), raw)
     # Refresh the view revision only after successful publication. No checkout
-    # or paid source bytes are rewritten by the publisher.
+    # or paid source bytes are rewritten by the publisher, only the shared
+    # receipt index when it had to absorb another producer's receipts.
     marker = json.loads((vault/MARKER).read_text())
     marker.setdefault('published_entries', {}).update(updates)
     marker['last_published_commit'] = commit

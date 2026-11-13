@@ -86,6 +86,65 @@ def test_publication_uses_original_view_for_concurrent_updates(environment):
     with pytest.raises(storage.ConcurrentUpdate):
         io.publish_paths(vault,{'b.json':vault/'b.json'},storage=fake)
 
+RECEIPTS = 'dashboard-private/manifest.json'
+JOURNAL = 'dashboard-private/migration-journal.jsonl'
+
+
+def receipts(assets):
+    return (json.dumps({'assets': assets}, sort_keys=True, separators=(',', ':')) + '\n').encode()
+
+
+def receipt(tag):
+    return {'private_sha256': tag * 64, 'public_sha256': tag.upper() * 64}
+
+
+def test_concurrent_receipt_index_absorbs_another_producers_receipts(environment):
+    vault,fake=environment
+    fake.publish({RECEIPTS: receipts({'shared.json': receipt('a')})})
+    io.initialize(vault,storage=fake)
+    # Another producer seals its own asset while this job seals a different one.
+    fake.publish({RECEIPTS: receipts({'shared.json': receipt('a'), 'theirs.json': receipt('b')})})
+    (vault/RECEIPTS).write_bytes(receipts({'shared.json': receipt('a'), 'ours.json': receipt('c')}))
+    io.publish_paths(vault,{RECEIPTS:vault/RECEIPTS},storage=fake)
+    expected = receipts({'shared.json': receipt('a'), 'theirs.json': receipt('b'), 'ours.json': receipt('c')})
+    assert fake.restore(RECEIPTS) == expected
+    assert (vault/RECEIPTS).read_bytes() == expected
+    assert io.view(vault,fake)[RECEIPTS]['sha256'] == storage.sha(expected)
+
+
+def test_concurrent_receipt_pair_keeps_the_newer_upstream_pointer(environment):
+    vault,fake=environment
+    fake.publish({RECEIPTS: receipts({'shared.json': receipt('a')})})
+    io.initialize(vault,storage=fake)
+    fake.publish({RECEIPTS: receipts({'shared.json': receipt('b')})})
+    (vault/RECEIPTS).write_bytes(receipts({'shared.json': receipt('c')}))
+    io.publish_paths(vault,{RECEIPTS:vault/RECEIPTS},storage=fake)
+    assert fake.restore(RECEIPTS) == receipts({'shared.json': receipt('b')})
+
+
+def test_concurrent_journal_keeps_every_line(environment):
+    vault,fake=environment
+    fake.publish({JOURNAL: b'one\n'})
+    io.initialize(vault,storage=fake)
+    fake.publish({JOURNAL: b'one\ntheirs\n'})
+    (vault/JOURNAL).write_bytes(b'one\nours\n')
+    io.publish_paths(vault,{JOURNAL:vault/JOURNAL},storage=fake)
+    assert fake.restore(JOURNAL) == b'one\ntheirs\nours\n'
+
+
+def test_concurrent_source_change_still_refuses_beside_the_receipt_index(environment):
+    vault,fake=environment
+    fake.publish({RECEIPTS: receipts({}), 'source.json': b'old'})
+    io.initialize(vault,storage=fake)
+    fake.publish({RECEIPTS: receipts({'theirs.json': receipt('b')}), 'source.json': b'theirs'})
+    (vault/RECEIPTS).write_bytes(receipts({'ours.json': receipt('c')}))
+    (vault/'source.json').write_bytes(b'ours')
+    with pytest.raises(storage.ConcurrentUpdate):
+        io.publish_paths(vault,{RECEIPTS:vault/RECEIPTS,'source.json':vault/'source.json'},storage=fake)
+    assert (vault/RECEIPTS).read_bytes() == receipts({'ours.json': receipt('c')})
+    assert fake.restore('source.json') == b'theirs'
+
+
 def test_successive_publications_keep_own_expected_revision(environment):
     vault,fake=environment
     io.initialize(vault,storage=fake)
