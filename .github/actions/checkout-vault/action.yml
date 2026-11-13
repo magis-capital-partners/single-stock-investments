@@ -27,13 +27,21 @@ inputs:
     required: false
     default: "false"
   extra-paths:
-    description: Additional non-cone sparse-checkout patterns, one per line. Applied after publication-only materialization. Use with publication-only so the rest of the vault stays out.
+    description: Additional non-cone sparse-checkout patterns, one per line. Applied before the private catalog view is restored, so each selected path receives its current private bytes. Use with publication-only so the rest of the vault stays out.
     required: false
     default: ""
   source-archive-current:
     description: Include current source archive parts in a publication-only checkout. Full vault readers already select the current manifest by default; historical parts stay in Git.
     required: false
     default: "false"
+  publication-scope:
+    description: all materializes every private object dashboard/private-assets.json names. workspace materializes only the objects whose public file this workspace checked out, which is every object the final hydration reads. Use workspace only when the job selects no further managed inputs after checkout; other objects stay demand-loaded.
+    required: false
+    default: "all"
+  catalog-prefixes:
+    description: Vault-relative directory prefixes, one per line. When set, the private catalog view restores only records under these prefixes and is read-only, so it cannot publish. Empty restores the full view.
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -68,20 +76,43 @@ runs:
           ${{ inputs.publication-only != 'true' && inputs.include-investor-history != 'true' && '!/dashboard-private/investor-history/' || '' }}
         sparse-checkout-cone-mode: false
 
+    # The catalog view restores only the paths this checkout selects, and a
+    # tracked path selected afterwards would keep its legacy Git bytes.
+    - name: Add extra vault paths
+      if: inputs.extra-paths != '' || inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true')
+      shell: bash
+      env:
+        VAULT_EXTRA_PATHS: ${{ inputs.extra-paths }}
+        SOURCE_ARCHIVE: ${{ inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true') }}
+      run: |
+        set -euo pipefail
+        printf '%s\n' "$VAULT_EXTRA_PATHS" | sed '/^[[:space:]]*$/d' > "$RUNNER_TEMP/vault-extra-paths.txt"
+        if [ "$SOURCE_ARCHIVE" = "true" ]; then
+          echo /dashboard-private/company-source-backfill-v2/manifest.json >> "$RUNNER_TEMP/vault-extra-paths.txt"
+        fi
+        if [ -s "$RUNNER_TEMP/vault-extra-paths.txt" ]; then
+          git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-extra-paths.txt"
+        fi
+
     - name: Materialize the verified private catalog view
       shell: bash
       env:
         SNAPSHOT_VALIDATION_ONLY: ${{ inputs.snapshot-validation-only }}
         PUBLICATION_ONLY: ${{ inputs.publication-only }}
+        CATALOG_PREFIXES: ${{ inputs.catalog-prefixes }}
       run: |
         set -euo pipefail
         git sparse-checkout add --skip-checks -- /_system/config/private_storage.json /_system/scripts/private_storage.py /_system/scripts/private_storage_io.py /_system/scripts/private_storage_s3.py /dashboard/private-assets.json
         if python _system/scripts/private_storage_io.py enabled; then
-          args=()
+          args=(--sparse-scope)
           if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
             test "$PUBLICATION_ONLY" = "true"
             args+=(--snapshot-validation-only)
           fi
+          while IFS= read -r prefix; do
+            prefix="$(printf '%s' "$prefix" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+            if [ -n "$prefix" ]; then args+=(--prefix "$prefix"); fi
+          done <<< "$CATALOG_PREFIXES"
           python _system/scripts/private_storage_io.py initialize --vault _external/research-vault "${args[@]}"
         fi
 
@@ -89,16 +120,25 @@ runs:
       shell: bash
       env:
         SNAPSHOT_VALIDATION_ONLY: ${{ inputs.snapshot-validation-only }}
+        PUBLICATION_SCOPE: ${{ inputs.publication-scope }}
       run: |
         set -euo pipefail
         if [ ! -f dashboard/private-assets.json ]; then
           echo "::error::publication-only checkout needs dashboard/private-assets.json in the workspace."
           exit 1
         fi
+        case "$PUBLICATION_SCOPE" in
+          all|workspace) ;;
+          *) echo "::error::publication-scope must be all or workspace."; exit 1 ;;
+        esac
         # Builders can request additional managed inputs after checkout.
         # Narrow only the explicitly read-only snapshot-validation view.
         scope=()
         if [ "$SNAPSHOT_VALIDATION_ONLY" = "true" ]; then
+          scope=(--workspace "$GITHUB_WORKSPACE")
+        fi
+        # A job whose workspace is complete at checkout opts in explicitly.
+        if [ "$PUBLICATION_SCOPE" = "workspace" ]; then
           scope=(--workspace "$GITHUB_WORKSPACE")
         fi
         python3 _system/scripts/vault_publication_sparse.py dashboard/private-assets.json "${scope[@]}" > "$RUNNER_TEMP/vault-object-patterns.txt"
@@ -119,6 +159,8 @@ runs:
         missing = 0
         total = 0
         workspace = Path(os.environ["GITHUB_WORKSPACE"]) if os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" else None
+        if os.environ["PUBLICATION_SCOPE"] == "workspace":
+            workspace = Path(os.environ["GITHUB_WORKSPACE"])
         for _, relative, entry in publication_entries(manifest, workspace):
             total += 1
             if not (objects / entry["private_sha256"]).is_file():
@@ -131,18 +173,6 @@ runs:
             sys.exit(1)
         PY
         if [ "${{ inputs.publication-only }}" = "true" ]; then echo "VAULT_PUBLICATION_ONLY=true" >> "$GITHUB_ENV"; fi
-
-    - name: Add extra vault paths
-      if: inputs.extra-paths != ''
-      shell: bash
-      env:
-        VAULT_EXTRA_PATHS: ${{ inputs.extra-paths }}
-      run: |
-        set -euo pipefail
-        printf '%s\n' "$VAULT_EXTRA_PATHS" | sed '/^[[:space:]]*$/d' > "$RUNNER_TEMP/vault-extra-paths.txt"
-        if [ -s "$RUNNER_TEMP/vault-extra-paths.txt" ]; then
-          git -C _external/research-vault sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/vault-extra-paths.txt"
-        fi
 
     - name: Materialize current source archive parts
       if: inputs.source-archive-current == 'true' || (inputs.publication-only != 'true' && inputs.include-source-archive == 'true')

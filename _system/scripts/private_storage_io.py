@@ -132,7 +132,19 @@ def author_publication_paths(vault, paths, ticker):
     return {relative:path for relative,path in paths.items() if _author_path_owned(vault, relative, ticker)}
 
 
-def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False, materialization_role=None, selected_ticker=None):
+def sparse_selection(vault, relatives):
+    """The catalog paths a sparse checkout selects; every path when the checkout is not sparse."""
+    relatives = list(relatives)
+    enabled_sparse = run_git(vault, 'config', '--bool', 'core.sparseCheckout', check=False)
+    if enabled_sparse.returncode or enabled_sparse.stdout.strip() != b'true':
+        return set(relatives)
+    result = run_git(vault, 'sparse-checkout', 'check-rules', '-z',
+                     data=b''.join(r.encode() + b'\0' for r in relatives))
+    return {r.decode() for r in result.stdout.split(b'\0') if r}
+
+
+def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False, materialization_role=None, selected_ticker=None,
+               sparse_scoped=False):
     vault = owned(vault)
     if materialization_role not in (None, 'local_author'):
         raise StorageError('Unknown private materialization role')
@@ -146,6 +158,10 @@ def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False, materia
     prefixes = tuple(relative_path(p.rstrip("/"))+"/" for p in prefixes)
     storage = storage or PrivateStorage()
     commit, records = storage.snapshot()
+    # A checkout that excludes a path must not receive it from the catalog.
+    # A tracked path selected afterwards keeps its legacy Git bytes, so every
+    # path a job reads must be selected before the view is initialized.
+    selected = sparse_selection(vault, records) if sparse_scoped and not snapshot_only else None
     restored = 0
     preserved_serializations = []
     preserved_shared_build_controls = []
@@ -156,6 +172,8 @@ def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False, materia
         if snapshot_only:
             continue
         if prefixes and not any(relative.startswith(p) for p in prefixes):
+            continue
+        if selected is not None and relative not in selected:
             continue
         if relative.startswith(('recovery/', 'audit/', 'legacy/')) or '/objects/' in relative or relative.endswith('.zip'):
             continue
@@ -201,7 +219,10 @@ def initialize(vault, *, storage=None, prefixes=(), snapshot_only=False, materia
               'materialization_role':materialization_role, 'selected_ticker':selected_ticker, 'preserved_shared_build_controls':preserved_shared_build_controls, 'preserved_unselected_author_controls':preserved_unselected_author_controls,
               'read_only':bool(prefixes) or snapshot_only, 'snapshot_validation_only':snapshot_only, 'materialized_prefixes':list(prefixes), 'preserved_original_serializations':preserved_serializations}
     (vault/MARKER).write_bytes(encoded_json(marker))
-    return {'catalog_commit':commit, 'control_files_restored':restored, 'preserved_original_serializations':preserved_serializations, 'preserved_shared_build_controls':preserved_shared_build_controls}
+    result = {'catalog_commit':commit, 'control_files_restored':restored, 'preserved_original_serializations':preserved_serializations, 'preserved_shared_build_controls':preserved_shared_build_controls}
+    if selected is not None:
+        result['catalog_records_outside_checkout'] = len(records) - len(selected)
+    return result
 
 
 def view(vault, storage):
@@ -323,12 +344,14 @@ def main():
     parser.add_argument('--pathspec',default='-A')
     parser.add_argument('--prefix',action='append',default=[])
     parser.add_argument('--snapshot-validation-only',action='store_true')
+    parser.add_argument('--sparse-scope',action='store_true')
     args=parser.parse_args()
     if args.action == 'enabled':
         return 0 if enabled() else 1
     if not args.vault:
         parser.error('--vault required')
-    result = initialize(args.vault, prefixes=args.prefix, snapshot_only=args.snapshot_validation_only) if args.action == 'initialize' else publish_paths(args.vault,selected_files(args.vault,args.pathspec))
+    result = initialize(args.vault, prefixes=args.prefix, snapshot_only=args.snapshot_validation_only,
+                        sparse_scoped=args.sparse_scope) if args.action == 'initialize' else publish_paths(args.vault,selected_files(args.vault,args.pathspec))
     print(json.dumps(result))
     return 0
 
