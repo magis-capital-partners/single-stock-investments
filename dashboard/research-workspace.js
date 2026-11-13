@@ -84,7 +84,13 @@
     const d = decision(t), committee = t.valuation_workbench?.committee || {}, e = h.escapeHtml;
     const meta = global.ValuationViz?.modelLevelMeta(d.model_level,d.status) || {label:text(d.model_level || d.status || 'unmodeled'),cls:'badge-warn'};
     const owner = committee.owner_status || 'pending';
-    return `<div class="rw-status"><span>Stance <strong>${e(t.classification?.stance || 'unassigned')}</strong></span>${t.human_review?.approved_stance ? `<span>Owner stance <strong>${e(t.human_review.approved_stance)}</strong></span>` : ''}<span>Model <strong class="badge ${meta.cls}">${e(meta.label)}</strong></span><span>IRR <strong>${d.calculation_status ? (d.research_return_available ? 'Same model as PV' : 'Automatic repair pending') : t.autonomous_irr?.status === 'available' ? 'Automatic estimate available' : t.autonomous_irr ? 'Automatic data retry' : t.irr_readiness?.status === 'ready' ? 'Ready' : 'Inputs or review missing'}</strong></span><span>Owner <strong>${e(text(owner))}</strong></span></div>`;
+    const held = t.owned?.role === 'long'
+      ? `<span>Held <strong>${e((t.owned.accounts || []).map(a => a.label).filter(Boolean).join('; ') || 'owned')}</strong></span>`
+      : '';
+    const shortOption = (t.owned?.short_options || []).length
+      ? `<span>Short option <strong>${e(t.owned.short_options.map(o => `${o.side} ${o.right} strike ${o.strike} exp ${o.expiry}`).join('; '))}</strong></span>`
+      : '';
+    return `<div class="rw-status"><span>Stance <strong>${e(t.classification?.stance || 'unassigned')}</strong></span>${held}${shortOption}${t.human_review?.approved_stance ? `<span>Owner stance <strong>${e(t.human_review.approved_stance)}</strong></span>` : ''}<span>Model <strong class="badge ${meta.cls}">${e(meta.label)}</strong></span><span>IRR <strong>${d.calculation_status ? (d.research_return_available ? 'Same model as PV' : 'Automatic repair pending') : t.autonomous_irr?.status === 'available' ? 'Automatic estimate available' : t.autonomous_irr ? 'Automatic data retry' : t.irr_readiness?.status === 'ready' ? 'Ready' : 'Inputs or review missing'}</strong></span><span>Owner <strong>${e(text(owner))}</strong></span></div>`;
   }
   function automaticIRR(t,h) {
     const a=t.autonomous_irr,e=h.escapeHtml;

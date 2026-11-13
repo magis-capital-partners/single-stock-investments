@@ -1,23 +1,24 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-11-09",
+  "as_of": "2026-11-13",
   "policy_id": "valuation_universe_tiers_v1",
   "policy_ref": "_system/portfolio/valuation_universe_policy.json",
   "universe_semantics": {
     "registry_holdings": "research universe membership only; never treated as owned positions",
+    "owned_group": "groups.owned long members are a tier-2 tracking signal. They are not a stance and they do not authorize capital.",
     "tier_purpose": "research depth and workflow priority, not capital authorization",
     "capital_authority": "human_decision_only",
     "automated_and_generic_models": "screening only; never authorize capital"
   },
   "summary": {
-    "security_count": 873,
+    "security_count": 875,
     "tier_counts": {
       "tier_1": 40,
-      "tier_2": 12,
-      "tier_3": 821
+      "tier_2": 26,
+      "tier_3": 809
     },
     "owner_override_count": 0,
-    "automatic_assignment_count": 873
+    "automatic_assignment_count": 875
   },
   "source_health": {
     "status": "healthy",
@@ -48,8 +49,8 @@
       },
       "committee_workbenches": {
         "required": false,
-        "files_seen": 866,
-        "valid_files": 866,
+        "files_seen": 868,
+        "valid_files": 868,
         "record_count": 40,
         "missing_files": [],
         "invalid_files": []
@@ -59,6 +60,14 @@
         "files_seen": 0,
         "valid_files": 0,
         "record_count": 0,
+        "missing_files": [],
+        "invalid_files": []
+      },
+      "owned_group": {
+        "required": false,
+        "files_seen": 1,
+        "valid_files": 1,
+        "record_count": 26,
         "missing_files": [],
         "invalid_files": []
       },
@@ -82,7 +91,7 @@
         "required": true,
         "files_seen": 1,
         "valid_files": 1,
-        "record_count": 873,
+        "record_count": 875,
         "missing_files": [],
         "invalid_files": []
       },
@@ -131,6 +140,48 @@
       ],
       "demotion_conditions": [
         "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "0700.HK": {
+      "ticker": "0700.HK",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 2,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
+      ],
+      "demotion_conditions": [
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -2276,6 +2327,12 @@
           "code": "active_committee_manifest",
           "detail": "Latest committee manifest remains active at stage round_one_open.",
           "source_ref": "AMZN/research/committee_work/2026-07-20/manifest.json"
+        },
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
         },
         {
           "qualifying_tier": 2,
@@ -4433,6 +4490,12 @@
         },
         {
           "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 2,
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
@@ -5412,17 +5475,23 @@
     },
     "CBOE": {
       "ticker": "CBOE",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -5431,11 +5500,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -7172,6 +7242,12 @@
         },
         {
           "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 2,
           "code": "priority_classification",
           "detail": "Portfolio classification stance is core.",
           "source_ref": "_system/portfolio/classification.json"
@@ -7642,17 +7718,23 @@
     },
     "CSGP": {
       "ticker": "CSGP",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -7661,11 +7743,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -7711,6 +7794,12 @@
           "code": "positive_paper_position",
           "detail": "Positive position in the taxable paper portfolio.",
           "source_ref": "_system/portfolio/paper/taxable.json"
+        },
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
         },
         {
           "qualifying_tier": 2,
@@ -13430,6 +13519,12 @@
         },
         {
           "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 2,
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
@@ -13841,6 +13936,12 @@
         },
         {
           "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 2,
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
@@ -14088,17 +14189,23 @@
     },
     "HE": {
       "ticker": "HE",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -14107,11 +14214,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -14239,6 +14347,12 @@
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 2,
           "code": "valuation_followup",
@@ -18350,6 +18464,48 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "MBGL": {
+      "ticker": "MBGL",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 2,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
+      ],
+      "demotion_conditions": [
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "MCD": {
       "ticker": "MCD",
       "tier": 3,
@@ -18772,17 +18928,23 @@
     },
     "MIAX": {
       "ticker": "MIAX",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -18791,11 +18953,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -19463,17 +19626,23 @@
     },
     "MSFT": {
       "ticker": "MSFT",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -19482,11 +19651,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -20574,17 +20744,23 @@
     },
     "NVDA": {
       "ticker": "NVDA",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -20593,11 +20769,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -21405,17 +21582,23 @@
     },
     "OTCM": {
       "ticker": "OTCM",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -21424,11 +21607,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -23092,17 +23276,23 @@
     },
     "PURR": {
       "ticker": "PURR",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -23111,11 +23301,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -23336,6 +23527,12 @@
           "code": "positive_paper_position",
           "detail": "Positive position in the taxable paper portfolio.",
           "source_ref": "_system/portfolio/paper/taxable.json"
+        },
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
         },
         {
           "qualifying_tier": 2,
@@ -23843,6 +24040,12 @@
       "assignment_reasons": [
         {
           "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 2,
           "code": "valuation_followup",
           "detail": "The curated valuation follow-up ledger includes this security.",
           "source_ref": "_system/reference/valuation_followups.json"
@@ -24264,17 +24467,23 @@
     },
     "RMV.L": {
       "ticker": "RMV.L",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -24283,11 +24492,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -24964,17 +25174,23 @@
     },
     "SEVN": {
       "ticker": "SEVN",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -24983,11 +25199,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -25524,17 +25741,23 @@
     },
     "SNOW": {
       "ticker": "SNOW",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -25543,11 +25766,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -25946,6 +26170,12 @@
         },
         {
           "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
+        {
+          "qualifying_tier": 2,
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
@@ -26238,6 +26468,12 @@
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 2,
           "code": "valuation_followup",
@@ -27392,17 +27628,23 @@
     },
     "TIPT": {
       "ticker": "TIPT",
-      "tier": 3,
-      "tier_id": "tier_3",
-      "label": "Broad screening universe",
-      "research_depth": "automated screening and lightweight monitoring only",
-      "actionability_cap": "screening_only",
+      "tier": 2,
+      "tier_id": "tier_2",
+      "label": "Curated research queue",
+      "research_depth": "focused evidence closure and stock-specific model development before any committee work",
+      "actionability_cap": "research_priority_only",
       "assignment_source": "automatic",
-      "automatic_tier": 3,
+      "automatic_tier": 2,
       "override_reason": null,
       "review_by": null,
       "review_overdue": false,
       "assignment_reasons": [
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
+        },
         {
           "qualifying_tier": 3,
           "code": "research_universe_member",
@@ -27411,11 +27653,12 @@
         }
       ],
       "promotion_gates": [
-        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
-        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+        "Promote when a positive position, active committee, open material trigger, current or expired owner decision, or approved target allocation appears.",
+        "An owner override may promote the name with a documented reason and review date."
       ],
       "demotion_conditions": [
-        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+        "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
+        "The owner explicitly overrides the name to Tier 3."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -30525,6 +30768,12 @@
           "code": "active_committee_manifest",
           "detail": "Latest committee manifest remains active at stage round_one_open.",
           "source_ref": "WHK/research/committee_work/2026-08-11/manifest.json"
+        },
+        {
+          "qualifying_tier": 2,
+          "code": "owned_long",
+          "detail": "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+          "source_ref": "_system/portfolio/registry.json#groups.owned"
         },
         {
           "qualifying_tier": 2,

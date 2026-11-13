@@ -1900,6 +1900,7 @@
         <span id="valuation-filter-group" class="valuation-filter-group"></span>
         <span id="technical-filter-group" class="technical-filter-group"></span>
         <button class="filter-btn" data-filter="needs-work">Needs work</button>
+        <button class="filter-btn" data-filter="owned" type="button">Owned</button>
         <span id="col-group-toggles" class="col-group-toggles" title="Optional column groups"></span>
       </div>
     </details>
@@ -2229,6 +2230,7 @@ let sleevePrefill = { drew: null, michael: null };
 let valuationFilter = 'ALL';
 let fearFilter = 'ALL';
 let needsWork = false;
+let ownedOnly = false;
 
 function restoreHoldingsQuery() {
   const params = new URLSearchParams(window.location.search);
@@ -2237,6 +2239,7 @@ function restoreHoldingsQuery() {
   valuationFilter = params.get('valuation') || 'ALL';
   fearFilter = params.get('fear') || 'ALL';
   needsWork = params.get('needs') === '1';
+  ownedOnly = params.get('owned') === '1';
   const search = document.getElementById('search');
   if (search) search.value = params.get('q') || '';
 }
@@ -2250,6 +2253,7 @@ function syncHoldingsQuery() {
     valuation: valuationFilter === 'ALL' ? '' : valuationFilter,
     fear: fearFilter === 'ALL' ? '' : fearFilter,
     needs: needsWork ? '1' : '',
+    owned: ownedOnly ? '1' : '',
   };
   Object.entries(values).forEach(([key, value]) => {
     if (value) url.searchParams.set(key, value);
@@ -3623,6 +3627,15 @@ function applyBuyback(row) {
   };
 }
 
+function applyOwnedOverlay(overlay) {
+  if (!data || !overlay || overlay.private_snapshot || !overlay.by_ticker) return;
+  data.owned_holdings = overlay;
+  for (const row of data.tickers || []) {
+    const view = overlay.by_ticker[row.ticker];
+    if (view) row.owned = view;
+  }
+}
+
 function loadTickerDetail(ticker) {
   const row = data.tickers.find((x) => x.ticker === ticker);
   if (!row || row.__detail) return Promise.resolve(row);
@@ -3644,6 +3657,8 @@ function loadTickerDetail(ticker) {
       if (fullTechnical) data.tickers[idx].technicals = fullTechnical;
       const licensed = data.licensed_sources?.by_ticker?.[ticker];
       if (licensed) data.tickers[idx].licensed_sources = licensed;
+      const owned = data.owned_holdings?.by_ticker?.[ticker];
+      if (owned) data.tickers[idx].owned = owned;
       applyBuyback(data.tickers[idx]);
     }
     return data.tickers.find((x) => x.ticker === ticker);
@@ -3683,6 +3698,9 @@ async function load() {
   if (authButton) MarvinOAuth.refreshAuthUi(authButton);
   try {
     data = await fetchShardJson('data/core.json');
+    try {
+      applyOwnedOverlay(await fetchShardJson('data/owned_holdings.json'));
+    } catch (_) { /* public overlay is absent until the owned group is synced */ }
     try {
       data.feed_status = await fetchShardJson('data/feed_status.json');
       window.DashboardDisplay?.updatePublication(data.feed_status);
@@ -3807,6 +3825,7 @@ async function load() {
   document.getElementById('meta-updated').textContent =
     `Updated ${data.generated_at.replace('T', ' ').replace('Z', ' UTC')} · ${data.summary.ticker_count} tickers`;
   restoreHoldingsQuery();
+  renderOwnedFilter();
   renderMarketFilters();
   renderSleeveFilters();
   renderValuationFilters();
@@ -5730,7 +5749,7 @@ function renderSummary() {
     { label: 'PDF store', value: Number(catalog?.uploaded_count || 0).toLocaleString(), sub: `${Number(catalog?.pending_upload_count || 0).toLocaleString()} pending` },
   ];
   document.getElementById('summary').innerHTML = `
-    <details class="rw-coverage"><summary><strong>${Number(s.ticker_count || data.tickers.length)} stocks in coverage</strong>${tier1} priority · ${dueNow} evidence due · ${stale} stale · Coverage health</summary><div class="rw-summary-grid">
+    <details class="rw-coverage"><summary><strong>${Number(s.ticker_count || data.tickers.length)} stocks in coverage</strong>${tier1} priority · ${(data.tickers || []).filter(t => t.owned?.role === 'long').length} owned · ${dueNow} evidence due · ${stale} stale · Coverage health</summary><div class="rw-summary-grid">
     ${openNextCard}
     ${cards.map((c, index) => `
       <div class="summary-card decision-stage ${c.cls || ''}">
@@ -5772,6 +5791,7 @@ function filtered() {
         return false;
       }
     }
+    if (ownedOnly && t.owned?.role !== 'long') return false;
     if (needsWork) {
       const crit = Number(t.valuation_decision?.critical_gap_count || 0);
       const insightNeeds = !!t.essential_insights?.needs_work;
@@ -5920,7 +5940,7 @@ function renderHoldingsCell(colId, t) {
       return `<td>${trend?.has_trend_data ? `<span>${escapeHtml(trend.business_momentum?.label || 'Trend snapshot available')}</span><span class="irr-sub">${Number(trend.summary?.confirmed || 0)} confirmed · review dates in Business &amp; KPIs</span>` : '<span class="tier-sub">No trend snapshot</span>'}</td>`;
     }
     case 'ticker':
-      return `<td class="mono ticker-cell"><a data-open-research href="#/research/${researchScope}/${encodeURIComponent(t.ticker)}">${escapeHtml(t.display_ticker || t.ticker)}</a>${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}${window.FundHoldings ? FundHoldings.badgeHtml(t.ticker) : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button><span class="rw-stock-name">${escapeHtml(t.company || t.ticker)}</span></td>`;
+      return `<td class="mono ticker-cell"><a data-open-research href="#/research/${researchScope}/${encodeURIComponent(t.ticker)}">${escapeHtml(t.display_ticker || t.ticker)}</a>${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.owned?.role === 'long' ? ` <span class="badge badge-ok" title="${escapeHtml((t.owned.accounts || []).map(a => a.label).join('; '))}">Owned</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}${window.FundHoldings ? FundHoldings.badgeHtml(t.ticker) : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button><span class="rw-stock-name">${escapeHtml(t.company || t.ticker)}</span></td>`;
     case 'company':
       return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
     case 'market':
@@ -6515,7 +6535,7 @@ function renderMarketFilters() {
   if (!group || !data) return;
   const filters = data.summary.market_filters || DEFAULT_MARKET_FILTERS;
   group.innerHTML = filters.map(m => {
-    const active = marketFilter === m && !needsWork && sleeveFilter === 'ALL' && valuationFilter === 'ALL' && fearFilter === 'ALL' ? ' active' : '';
+    const active = marketFilter === m && !needsWork && !ownedOnly && sleeveFilter === 'ALL' && valuationFilter === 'ALL' && fearFilter === 'ALL' ? ' active' : '';
     return `<button type="button" class="filter-btn${active}" data-market="${m}">${m === 'ALL' ? 'All' : m}</button>`;
   }).join('');
 }
@@ -6529,7 +6549,7 @@ function renderSleeveFilters() {
     return;
   }
   group.innerHTML = filters.map(s => {
-    const active = sleeveFilter === s.id && !needsWork && valuationFilter === 'ALL' && fearFilter === 'ALL' ? ' active' : '';
+    const active = sleeveFilter === s.id && !needsWork && !ownedOnly && valuationFilter === 'ALL' && fearFilter === 'ALL' ? ' active' : '';
     const count = s.count != null ? ` (${s.count})` : '';
     return `<button type="button" class="filter-btn${active}" data-sleeve="${s.id}">${escapeHtml(s.label)}${count}</button>`;
   }).join('');
@@ -6552,7 +6572,7 @@ function renderValuationFilters() {
     { id: 'decision-grade', label: 'Decision-grade' },
   ];
   group.innerHTML = filters.map((f) => {
-    const active = valuationFilter === f.id && !needsWork && fearFilter === 'ALL' ? ' active' : '';
+    const active = valuationFilter === f.id && !needsWork && !ownedOnly && fearFilter === 'ALL' ? ' active' : '';
     return `<button type="button" class="filter-btn${active}" data-valuation-filter="${f.id}">${escapeHtml(f.label)}</button>`;
   }).join('');
 }
@@ -6567,7 +6587,7 @@ function renderTechnicalFilters() {
     { id: 'confirmed', label: 'Exhaustion confirmed' },
   ];
   group.innerHTML = filters.map((f) => {
-    const active = fearFilter === f.id && !needsWork ? ' active' : '';
+    const active = fearFilter === f.id && !needsWork && !ownedOnly ? ' active' : '';
     return `<button type="button" class="filter-btn${active}" data-fear-filter="${f.id}">${escapeHtml(f.label)}</button>`;
   }).join('');
 }
@@ -6581,6 +6601,7 @@ function onFilterClick(btn) {
     valuationFilter = 'ALL';
     fearFilter = 'ALL';
     needsWork = false;
+    ownedOnly = false;
   }
   if (btn.dataset.sleeve) {
     sleeveFilter = btn.dataset.sleeve;
@@ -6588,6 +6609,7 @@ function onFilterClick(btn) {
     valuationFilter = 'ALL';
     fearFilter = 'ALL';
     needsWork = false;
+    ownedOnly = false;
   }
   if (btn.dataset.valuationFilter) {
     valuationFilter = btn.dataset.valuationFilter;
@@ -6595,6 +6617,7 @@ function onFilterClick(btn) {
     sleeveFilter = 'ALL';
     fearFilter = 'ALL';
     needsWork = false;
+    ownedOnly = false;
   }
   if (btn.dataset.fearFilter) {
     fearFilter = btn.dataset.fearFilter;
@@ -6602,9 +6625,19 @@ function onFilterClick(btn) {
     sleeveFilter = 'ALL';
     valuationFilter = 'ALL';
     needsWork = false;
+    ownedOnly = false;
   }
   if (btn.dataset.filter === 'needs-work') {
     needsWork = true;
+    ownedOnly = false;
+    marketFilter = 'ALL';
+    sleeveFilter = 'ALL';
+    valuationFilter = 'ALL';
+    fearFilter = 'ALL';
+  }
+  if (btn.dataset.filter === 'owned') {
+    ownedOnly = true;
+    needsWork = false;
     marketFilter = 'ALL';
     sleeveFilter = 'ALL';
     valuationFilter = 'ALL';
@@ -6614,8 +6647,17 @@ function onFilterClick(btn) {
   renderSleeveFilters();
   renderValuationFilters();
   renderTechnicalFilters();
+  renderOwnedFilter();
   renderTable();
   syncHoldingsQuery();
+}
+
+function renderOwnedFilter() {
+  const btn = document.querySelector('#holdings-view [data-filter="owned"]');
+  if (!btn || !data) return;
+  const count = (data.tickers || []).filter(t => t.owned?.role === 'long').length;
+  btn.textContent = `Owned (${count})`;
+  btn.classList.toggle('active', ownedOnly);
 }
 
 document.getElementById('search').addEventListener('input', () => {

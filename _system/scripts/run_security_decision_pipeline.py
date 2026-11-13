@@ -45,7 +45,7 @@ from falsifier_specs import (  # noqa: E402
     spec_errors as falsifier_spec_errors,
 )
 from investment_committee_pipeline import initialize as initialize_committee  # noqa: E402
-from power_zone_router import build_route, registry_entries, write_json  # noqa: E402
+from power_zone_router import _priority_holding, build_route, registry_entries, write_json  # noqa: E402
 from universal_valuation_contract import build_universal_valuation_contract  # noqa: E402
 
 # Stages that mean a committee is still in flight or still owed a human, so no
@@ -97,8 +97,7 @@ def selected_tickers(
         portfolio_names = {
             ticker
             for ticker, holding in entries.items()
-            if str(((holding or {}).get("classification") or {}).get("stance") or "").lower()
-            in {"core", "hold", "accumulate"}
+            if _priority_holding(holding)
         }
         return sorted(followup_names | portfolio_names)
     return sorted(entries)

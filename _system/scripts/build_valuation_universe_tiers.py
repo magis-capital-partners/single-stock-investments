@@ -2,9 +2,10 @@
 """Build the governed Tier 1/2/3 valuation research universe.
 
 The registry is a research universe, not a position ledger.  A registry name is
-therefore Tier 3 unless another explicit source promotes it.  Tiers allocate
-research effort and workflow priority; only a signed ``human_decision.json``
-may authorize capital or sizing.
+therefore Tier 3 unless another explicit source promotes it.  Long membership
+in ``groups.owned`` is a Tier 2 tracking signal.  It is not a stance and it is
+not a share-count position.  Tiers allocate research effort and workflow
+priority; only a signed ``human_decision.json`` may authorize capital or sizing.
 """
 from __future__ import annotations
 
@@ -213,6 +214,40 @@ def _collect_registry(root: Path, health: dict, signals: dict, universe: set[str
                     "The security is on the curated registry watchlist.", ref)
     _record_count(health, "registry", len(holdings) + len(watchlist))
     return holdings
+
+
+def _collect_owned_group(root: Path, health: dict, signals: dict, universe: set[str]) -> None:
+    """Long equities in groups.owned are tracked at Tier 2.
+
+    Paper books remain the only Tier 1 position source. This signal does not
+    read share counts, and a missing group is not a source error.
+    """
+    path = root / "_system/portfolio/registry.json"
+    payload = _read_json(path, root, health, "owned_group")
+    payload = payload if isinstance(payload, dict) else {}
+    group = ((payload.get("groups") or {}).get("owned") or {})
+    if not isinstance(group, dict):
+        group = {}
+    members = group.get("members") or {}
+    if not isinstance(members, dict):
+        members = {}
+    ref = _relative(path, root) + "#groups.owned"
+    count = 0
+    for ticker in sorted(members):
+        row = members[ticker]
+        if not isinstance(row, dict) or row.get("role") != "long":
+            continue
+        count += 1
+        _add_signal(
+            signals,
+            universe,
+            ticker,
+            2,
+            "owned_long",
+            "Long equity in the owned holdings group. Tracking coverage only. Not a research stance and not a share-count position.",
+            ref,
+        )
+    _record_count(health, "owned_group", count)
 
 
 def _collect_positions(root: Path, health: dict, signals: dict, universe: set[str]) -> None:
@@ -435,6 +470,7 @@ def build(as_of: str, root: Path = ROOT) -> dict:
     signals: dict[str, list[dict]] = defaultdict(list)
     universe: set[str] = set()
     registry_holdings = _collect_registry(root, health, signals, universe)
+    _collect_owned_group(root, health, signals, universe)
     _collect_positions(root, health, signals, universe)
     _collect_followups(root, health, signals, universe)
     _collect_classifications(root, health, signals, universe, registry_holdings)
@@ -497,6 +533,7 @@ def build(as_of: str, root: Path = ROOT) -> dict:
         "policy_ref": POLICY_REL.as_posix(),
         "universe_semantics": {
             "registry_holdings": "research universe membership only; never treated as owned positions",
+            "owned_group": "groups.owned long members are a tier-2 tracking signal. They are not a stance and they do not authorize capital.",
             "tier_purpose": "research depth and workflow priority, not capital authorization",
             "capital_authority": "human_decision_only",
             "automated_and_generic_models": "screening only; never authorize capital",

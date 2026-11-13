@@ -185,6 +185,17 @@ class SecurityDecisionPipelineTests(unittest.TestCase):
         self.assertEqual(contract["status"], "evidence_blocked")
         self.assertEqual(contract["component_coverage"]["unvalued_component_count"], 1)
 
+    def test_priority_scope_includes_owned_longs_without_changing_stance(self):
+        old_entries = pipeline.registry_entries
+        pipeline.registry_entries = lambda: {
+            "WATCH": {"classification": {"stance": "watch"}, "tracking_groups": ["owned"]},
+            "OTHER": {"classification": {"stance": "watch"}},
+        }
+        try:
+            self.assertEqual(pipeline.selected_tickers("priority"), ["WATCH"])
+        finally:
+            pipeline.registry_entries = old_entries
+
     def test_priority_scope_is_core_hold_and_accumulate_only(self):
         old_entries = pipeline.registry_entries
         pipeline.registry_entries = lambda: {
