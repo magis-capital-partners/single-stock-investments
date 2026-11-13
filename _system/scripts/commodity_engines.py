@@ -169,8 +169,9 @@ def gold(config, panel, as_of):
             step=year-2026
             mine=ref['mine_annual_t']*(1+s['mine_growth_pct']/100)**step
             prior=stock
-            # End-Q2 stock anchor: the first year includes the intervening half year explicitly.
-            elapsed=1.5 if year==2027 else 1
+            # Use the dated stock anchor, including the intervening partial year.
+            anchor_year, anchor_month = map(int, ref['stock_date'][:7].split('-'))
+            elapsed=((year-anchor_year)*12+12-anchor_month)/12 if year==2027 else 1
             stock+=mine*elapsed
             rates=s['real_yield_change_pp']*min(step/2,1)
             dollar=s['dollar_change_pct']*min(step/2,1)/100

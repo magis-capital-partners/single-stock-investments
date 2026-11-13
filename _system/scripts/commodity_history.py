@@ -18,13 +18,13 @@ STEO_BULK='https://api.eia.gov/bulk/STEO.zip'
 CAPACITY_URL='https://www.eia.gov/petroleum/storagecapacity/crudeoilstorage.xlsx'
 LBMA_PAGE='https://www.lbma.org.uk/prices-and-data/london-vault-data'
 EIA_SERIES={
+    'wti_spot':('RWTC','d','USD/barrel'),
+    'brent_spot':('RBRTE','d','USD/barrel'),
     'cushing_stocks':('W_EPC0_SAX_YCUOK_MBBL','w','thousand barrels'),
     'east_coast_distillate_stocks':('WDISTP11','w','thousand barrels'),
     'east_coast_distillate_use':('MDIUPP11','m','thousand barrels/day'),
 }
 FRED_SERIES={
-    'wti_spot':('DCOILWTICO','USD/barrel'),
-    'brent_spot':('DCOILBRENTEU','USD/barrel'),
     'real_yield':('DFII10','percent'),
     'broad_dollar':('DTWEXBGS','index, January 2006=100'),
 }
@@ -170,7 +170,7 @@ def collect(download, prior, as_of, capture):
         url=f'https://www.eia.gov/dnav/pet/hist_xls/{sid}{freq}.xls'
         try:
             raw=download(url);capture(raw)
-            output[key]=metadata(raw,url,eia_xls(raw,sid,as_of),as_of,unit=unit,frequency='weekly' if freq=='w' else 'monthly',source_id=sid,max_age_days=120 if sid=='MDIUPP11' else None)
+            output[key]=metadata(raw,url,eia_xls(raw,sid,as_of),as_of,unit=unit,frequency={'d':'daily','w':'weekly','m':'monthly'}[freq],source_id=sid,max_age_days=120 if sid=='MDIUPP11' else None)
         except Exception as exc:failed(key,url,exc)
     try:
         # Resolve the current publisher link so a yearly document-id change

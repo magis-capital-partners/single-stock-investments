@@ -12,18 +12,26 @@ def refresh(offline=False):
     output=ROOT/'dashboard/data/commodity_models.json'
     previous=load(output)
     try:
-        if not offline:fetch()
+        if not offline:
+            fetch()
+            from fetch_commodity_resolution import refresh as fetch_resolution
+            fetch_resolution()
         doc=build()
         errors=validate(doc)
         if errors:raise ValueError('; '.join(errors))
         incomplete=[m['id'] for m in doc['models'] if not m['input_coverage']['required_ready'] or any(s['fetch_status']=='fetch_failed' for s in m['sources'] if s.get('required',True))]
-        doc['refresh']={'status':'partial' if incomplete else 'updated','attempted_at':date.today().isoformat(),'incomplete_models':incomplete}
-        save(output,doc)
-        return not incomplete
+        resolution = doc['resolution']
+        incomplete += [k for k, v in resolution['readiness'].items() if not v['core_ready']]
+        incomplete = sorted(set(incomplete))
+        failed_sources = [s['id'] for s in resolution['sources'] if s.get('required', True) and not s['usable']]
+        doc['refresh']={'status':'partial' if incomplete or failed_sources else 'updated','attempted_at':date.today().isoformat(),'incomplete_models':incomplete,'failed_sources':failed_sources}
+        save(output,doc,compact=True)
+        save(ROOT/'_private/commodity/model-vintages'/f"{doc['as_of']}-{resolution['publication']['model_id']}.json", doc, compact=True)
+        return not (incomplete or failed_sources)
     except Exception as exc:
         if previous:
             previous['refresh']={'status':'failed','attempted_at':date.today().isoformat(),'reason':type(exc).__name__}
-            save(output,previous)
+            save(output,previous,compact=True)
         print(f'Commodity model refresh failed: {type(exc).__name__}: {exc}')
         return False
 

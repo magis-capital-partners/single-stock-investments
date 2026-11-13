@@ -30,8 +30,9 @@ def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
     from vault_paths import research_vault_root
     vault=research_vault_root()
     preserved=vault/'dashboard-private/commodity-inputs' if vault else None
-    if not prior and preserved:
-        prior=load(preserved/'observations.json',{})
+    if preserved:
+        if not prior:
+            prior=load(preserved/'observations.json',{})
         if (preserved/'forecast-vintages').is_dir():
             shutil.copytree(preserved/'forecast-vintages',output.parent/'forecast-vintages',dirs_exist_ok=True)
         if (preserved/'free-vintages').is_dir():
@@ -40,6 +41,9 @@ def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
             shutil.copytree(preserved/'free-extractions',output.parent/'free-extractions',dirs_exist_ok=True)
         if (preserved/'objects').is_dir():
             shutil.copytree(preserved/'objects',output.parent/'objects',dirs_exist_ok=True)
+        for folder in ('resolution-vintages-v2', 'model-vintages'):
+            if (preserved/folder).is_dir():
+                shutil.copytree(preserved/folder,output.parent/folder,dirs_exist_ok=True)
     refs = {s['id']:s for p in CONFIG_DIR.glob('*.json') for s in load(p)['sources']}
     result = {'as_of':as_of.isoformat(), 'sources':{}, 'series':{}}
     def capture(item):

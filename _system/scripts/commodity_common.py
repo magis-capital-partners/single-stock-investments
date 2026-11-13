@@ -24,11 +24,12 @@ def digest(value):
     return hashlib.sha256(raw).hexdigest()
 
 
-def save(path, value):
+def save(path, value, *, compact=False):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + '.tmp')
-    temp.write_text(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + '\n', encoding='utf-8')
+    temp.write_text(json.dumps(value, indent=None if compact else 2, separators=(',', ':') if compact else None,
+                               ensure_ascii=False, allow_nan=False) + '\n', encoding='utf-8')
     temp.replace(path)
 
 

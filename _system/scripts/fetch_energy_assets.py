@@ -41,6 +41,41 @@ def timing(value):
     return f'{year.group(1)}-{month:02d}', 'reported_quarter_end' if quarter else 'reported_half_year_end' if half else 'reported_year_end'
 
 
+def parse_lng_trains(sheet):
+    rows = list(sheet.values)
+    headers = [' '.join(str(v or '').split()).lower() for v in rows[1]]
+    def column(label):
+        matches = [i for i, h in enumerate(headers) if h == label]
+        if len(matches) != 1:
+            raise ValueError(f'LNG column missing or ambiguous: {label}')
+        return matches[0]
+    cols = {k: column(v) for k, v in {
+        'project': 'project name', 'train': 'train', 'base': 'baseload nameplate capacity per train',
+        'peak': 'peak nameplate capacity per train', 'status': 'project status',
+        'start': 'in-service date', 'commercial': 'date of the start of commercial service',
+        'state': 'location (u.s. state)', 'operator': 'operator'}.items()}
+    if str(rows[2][cols['base']]).lower() != 'bcf/d':
+        raise ValueError('LNG capacity unit changed')
+    trains, project = [], ''
+    for row in rows[3:]:
+        capacity = number(row[cols['base']])
+        if not capacity:
+            continue
+        project = str(row[cols['project']] or project).strip()
+        reported = row[cols['start']] or row[cols['commercial']]
+        start, precision = timing(reported)
+        state = str(row[cols['state']] or '').strip()
+        if not re.fullmatch('[A-Z]{2}', state) and state != 'Offshore':
+            raise ValueError(f'LNG state is not a US state code: {project}: {state}')
+        trains.append({'id': f"{project} / {row[cols['train']]}", 'project': project,
+                       'train': str(row[cols['train']] or ''), 'baseload_bcf_day': capacity,
+                       'peak_bcf_day': number(row[cols['peak']]), 'status': str(row[cols['status']] or ''),
+                       'start_period': start, 'date_precision': precision, 'reported_start': str(reported or ''),
+                       'commercial_start': str(row[cols['commercial']] or ''), 'state': state,
+                       'operator': str(row[cols['operator']] or ''), 'evidence_status': 'reported_asset'})
+    return trains
+
+
 def fetch_lng():
     html = get_bytes(LNG_PAGE).decode(errors='replace')
     links = re.findall(r'href=["\']([^"\']+U\.S\.liquefactioncapacity_(\d{4})_Q([1-4])\.xlsx)["\']', html, re.I)
@@ -57,19 +92,7 @@ def fetch_lng():
             published = next((v.date().isoformat() for v in row if isinstance(v, datetime)), None)
     if not published or published > date.today().isoformat():
         raise ValueError('Missing or future LNG workbook publication date')
-    trains = []
-    project = ''
-    for row in book['Existing & Under Construction'].iter_rows(min_row=4, values_only=True):
-        capacity = number(row[2])
-        if capacity is None or capacity == 0:
-            continue
-        project = str(row[0] or project).strip()
-        start, precision = timing(row[8] or row[7])
-        trains.append({'id': f'{project} / {row[1]}', 'project': project, 'train': str(row[1] or ''),
-                       'baseload_bcf_day': capacity, 'peak_bcf_day': number(row[4]),
-                       'status': str(row[6] or ''), 'start_period': start, 'date_precision': precision,
-                       'reported_start': str(row[8] or row[7] or ''), 'state': str(row[9] or ''),
-                       'operator': str(row[20] or ''), 'evidence_status': 'reported_asset'})
+    trains = parse_lng_trains(book['Existing & Under Construction'])
     approved = []
     for row in book['Approved'].iter_rows(min_row=4, values_only=True):
         capacity = number(row[5])

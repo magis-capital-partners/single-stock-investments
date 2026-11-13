@@ -130,7 +130,13 @@ def forecast(history: list[dict], config: dict, scenario: dict) -> list[dict]:
         row['statistical_difference_bcf'] = 0.0
         row['capacity_bcf'] = interpolate({'2026': limits['working_capacity_bcf'], '2030': limits['capacity_2030_bcf']}, year + (month - 1) / 12)
         row['operating_minimum_bcf'] = limits['operating_minimum_bcf']
-        row.update(storage_step(storage, row['balance_bcf_day'], days, row['capacity_bcf'], limits['operating_minimum_bcf'], limits['max_injection_bcf_day'], limits['max_withdrawal_bcf_day']))
+        fill = max(0, min(1, (storage-limits['operating_minimum_bcf'])/(row['capacity_bcf']-limits['operating_minimum_bcf'])))
+        # Deliverability declines as working inventory empties; injection slows
+        # near capacity. Coefficients remain named operating assumptions.
+        row['withdrawal_limit_bcf_day'] = limits['max_withdrawal_bcf_day'] * fill**.5
+        row['injection_limit_bcf_day'] = limits['max_injection_bcf_day'] * (1-fill)**.5
+        row['deliverability_basis'] = 'assumed_sqrt_inventory_fraction'
+        row.update(storage_step(storage, row['balance_bcf_day'], days, row['capacity_bcf'], limits['operating_minimum_bcf'], row['injection_limit_bcf_day'], row['withdrawal_limit_bcf_day']))
         storage = row['working_storage']
         row['henry_hub_usd_mmbtu'] = interpolate(scenario['gas_price'], year + (month - 6.5) / 12)
         result.append({k: round(v, 8) if isinstance(v, float) else v for k, v in row.items()})
