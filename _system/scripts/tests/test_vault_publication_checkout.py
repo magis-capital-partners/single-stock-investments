@@ -324,3 +324,18 @@ def test_normal_publication_keeps_inputs_requested_after_checkout(tmp_path):
     step=next(s for s in action["runs"]["steps"] if s.get("name")=="Materialize publication objects")
     assert step["env"]["SNAPSHOT_VALIDATION_ONLY"]=="${{ inputs.snapshot-validation-only }}"
     assert 'if os.environ["SNAPSHOT_VALIDATION_ONLY"] == "true" else None' in step["run"]
+
+
+def test_catalog_view_restores_only_paths_selected_before_it():
+    steps=_action()["runs"]["steps"]
+    names=[s.get("name") for s in steps]
+    view=names.index("Materialize the verified private catalog view")
+    assert "args=(--sparse-scope)" in steps[view]["run"]
+    extra=names.index("Add extra vault paths")
+    assert names.index("Clone research vault")<extra<view
+    run=steps[extra]["run"]
+    assert "sparse-checkout add --skip-checks --stdin" in run
+    assert "/dashboard-private/company-source-backfill-v2/manifest.json" in run
+    assert "inputs.source-archive-current == 'true'" in steps[extra]["if"]
+    assert "inputs.include-source-archive == 'true'" in steps[extra]["if"]
+    assert names.index("Materialize current source archive parts")>view

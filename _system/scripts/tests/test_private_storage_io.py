@@ -191,6 +191,31 @@ def test_validation_view_restores_only_complete_packets_and_cannot_publish(envir
         io.publish_paths(vault,{packet:vault/packet},storage=fake)
 
 
+def test_sparse_scoped_view_restores_only_paths_the_checkout_selects(environment):
+    vault,fake=environment
+    excluded='dashboard-private/company-source-backfill-v2/manifest.json'
+    kept='dashboard-private/manifest.json'
+    extra='superinvestor-letters/drive_import_manifest.json'
+    fake.publish({'baseline.json':b'{"current":true}\n',excluded:b'{"parts":[]}',kept:b'{"current":1}',extra:b'{"current":2}',
+                  'superinvestor-letters/letters_index.json':b'{}'})
+    subprocess.run(['git','-C',str(vault),'sparse-checkout','set','--no-cone','--stdin'],check=True,capture_output=True,
+                   input='/baseline.json\n/dashboard-private/manifest.json\n/superinvestor-letters/drive_import_manifest.json\n',text=True)
+    result=io.initialize(vault,storage=fake,sparse_scoped=True)
+    assert result['control_files_restored']==3 and result['catalog_records_outside_checkout']==2
+    assert (vault/'baseline.json').read_bytes()==b'{"current":true}\n'
+    assert (vault/kept).read_bytes()==b'{"current":1}' and (vault/extra).read_bytes()==b'{"current":2}'
+    assert not (vault/'dashboard-private/company-source-backfill-v2').exists()
+    assert not (vault/'superinvestor-letters/letters_index.json').exists()
+
+
+def test_sparse_scope_keeps_every_record_in_a_full_checkout(environment):
+    vault,fake=environment
+    fake.publish({'baseline.json':b'{"current":true}\n','dashboard-private/investor-history/manifest.json':b'{}'})
+    result=io.initialize(vault,storage=fake,sparse_scoped=True)
+    assert result['control_files_restored']==2 and result['catalog_records_outside_checkout']==0
+    assert (vault/'dashboard-private/investor-history/manifest.json').is_file()
+
+
 def test_validation_view_rejects_unsafe_prefix(environment):
     vault,fake=environment
     with pytest.raises(storage.StorageError,match='Unsafe'):
