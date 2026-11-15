@@ -5,7 +5,7 @@ import test from 'node:test';
 import vm from 'node:vm';
 import { humanRole, requireHumanViewer, viewerFromAccessPayload } from '../functions/_lib/auth.js';
 import { accessDecision, onRequest } from '../functions/_middleware.js';
-import { parseSearchTokens, readerExtras, readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
+import { nearDuplicate, parseSearchTokens, readerExtras, readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
 import { onRequestGet, onRequestPost } from '../functions/api/fund-letters.js';
 
 function database() {
@@ -313,6 +313,7 @@ test('workspace state round-trips through the URL, keeps links stable and upgrad
   assert.equal(writeState(readState('view=funds&period=all')), 'period=all');
   assert.equal(readState('period=2012Q5').period, '');
   assert.equal(readState('ticker=GLUU, TMRK').ticker, '');
+  assert.deepEqual([readState('view=ticker&ticker=beta').view, writeState(readState('view=ticker&ticker=beta'))], ['ticker', 'view=ticker&ticker=BETA']);
   // Links written before the workspace still open the same filters.
   const legacy = readState('view=letters&activity=trim,cover&scope=book&tickers=AAPL,MSFT');
   assert.equal(legacy.view, 'funds');
@@ -375,7 +376,7 @@ test('position activity and first mention are separate filters: OR within a grou
   assert.deepEqual(flagged.results.filter(r => r.first_mentioned).map(r => r.ticker).sort(), ['BETA', 'GAMMA']);
 
   // Each fund counts once on the overlap strip, with its direction.
-  assert.deepEqual(workspace.overlap, [{ ticker: 'BETA', name: null, funds: 2, letters: 2, long: 1, short: 1 }]);
+  assert.deepEqual(workspace.overlap, [{ ticker: 'BETA', name: null, funds: 2, letters: 2, managers: 2, long: 1, short: 1 }]);
   const narrowed = await get({ action: 'workspace', f: 'new' });
   assert.deepEqual(narrowed.funds.map(f => [f.id, f.discussions]), [['a', 2]]);
   assert.deepEqual(narrowed.overlap, []);
@@ -395,7 +396,7 @@ test('the workspace explains empty results, compares with the fund\'s last discu
   const acme = all.results.find(r => r.ticker === 'ACME');
   assert.deepEqual(acme.prior, { letter_id: 'a1', reporting_period: '2020Q1', letter_date: '2020-04-15', title: 'ACME thesis', idea_type: 'long', activity: 'hold', summary: 'The fund discusses ACME in a1.\nA second statement.' });
   assert.equal(all.results.find(r => r.ticker === 'DELTA').prior, null);
-  assert.deepEqual(Object.keys(acme).sort(), ['activity', 'compared_letter_id', 'evolution', 'first_mentioned', 'fund', 'fund_id', 'id', 'idea_type', 'letter_date', 'letter_id', 'prior', 'reporting_period', 'summary', 'themes', 'ticker', 'tickers', 'title', 'unresolved']);
+  assert.deepEqual(Object.keys(acme).sort(), ['activity', 'compared_letter_id', 'evolution', 'first_mentioned', 'fund', 'fund_id', 'id', 'idea_type', 'letter_date', 'letter_id', 'managers', 'prior', 'reporting_period', 'summary', 'themes', 'ticker', 'tickers', 'title', 'unresolved']);
   assert.equal(JSON.stringify(all).includes('SECRET'), false);
   assert.equal(JSON.stringify(all).includes('private/path'), false);
 
@@ -466,3 +467,98 @@ test('theme chips use the current theme set only, OR within the group and AND wi
   const pane = await get({ action: 'letters', fund: 'a', period: '2020Q2', f: 'ma' });
   assert.deepEqual(pane.letters[0].ideas.filter(idea => idea.matches).map(idea => idea.id), ['delta']);
 });
+
+// BETA in 2020Q2: fund A long twice, B short, C long, D publishing C's letter in other words, E selling out;
+// and fund A watching it in 2020Q1.
+function companyArchive() {
+  const DB = workspaceArchive();
+  DB.db.exec("INSERT INTO fl_funds(id,name) VALUES('c','Gamma Partners'),('d','Gamma Feeder'),('e','Echo Capital');");
+  const letter = (id, fund, period, date) => {
+    DB.db.prepare('INSERT INTO fl_letters(id,fund_id,content_hash,pipeline_version,reporting_period,letter_date,ingested_at,source_ref,source_url,source_text,published_revision) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+      .run(id, fund, 'h-' + id, 'v1', period, date, '2026-10-23', 'private/path', 'https://drive.google.com/SECRET', source, 'r-' + id);
+    DB.db.prepare('INSERT INTO fl_revisions(id,letter_id,created_at,author,status,overview,content_json,checks_json) VALUES(?,?,?,?,?,?,?,?)')
+      .run('r-' + id, id, '2026-10-23', 'editor', 'published', 'Overview of ' + id, '{}', '{}');
+  };
+  const idea = (letterId, id, type, activity, ordinal, summary, quotes = []) => {
+    DB.db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES(?,?,?,?,?,?,?,?,?)')
+      .run(id, 'r-' + letterId, letterId, 'Beta Corp', 'BETA', type, activity, summary, ordinal);
+    if (quotes.length) DB.db.prepare('INSERT INTO fl_evidence(revision_id,idea_id,claims_json) VALUES(?,?,?)')
+      .run('r-' + letterId, id, JSON.stringify(quotes.map(quote => ({ claim: 'Beta', quote, section_id: 's1' }))));
+  };
+  const shared = ['Beta raised prices four times without losing a single large customer this year.', 'We think margins at Beta can double over the next three years as contracts reprice.'];
+  idea('a2', 'beta-again', 'long', 'hold', 4, 'The fund also discusses Beta management changes.\nA new chief executive started in June.');
+  letter('c2', 'c', '2020Q2', '2020-07-10');
+  idea('c2', 'beta-c', 'long', 'new', 0, 'The fund bought Beta for its pricing power.\nIt expects margins to double as contracts reprice.', shared);
+  letter('d2', 'd', '2020Q2', '2020-07-11');
+  idea('d2', 'beta-d', 'long', 'new', 0, 'Beta was purchased because of pricing power with large customers.\nThe manager sees margins doubling over three years.', [...shared, 'The feeder fund invests alongside the master fund.']);
+  letter('e2', 'e', '2020Q2', '2020-07-12');
+  idea('e2', 'beta-e', 'long', 'exit', 0, 'The fund sold its Beta position after the stock doubled.\nValuation no longer left a margin of safety.');
+  idea('a1', 'beta-early', 'sector', 'watch', 2, 'The fund is watching Beta as competitors cut prices.');
+  resolveTickers(DB);
+  return DB;
+}
+
+test('near-identical arguments are told apart from independent ones by shared quotes or wording', () => {
+  const quotes = text => JSON.stringify([{ quote: text }]);
+  const passage = 'Beta raised prices four times without losing a single large customer this year.';
+  assert.equal(nearDuplicate({ summary: 'Beta has pricing power.', claims: quotes(passage) }, { summary: 'Pricing power at Beta is strong.', claims: quotes(passage) }), true);
+  assert.equal(nearDuplicate({ summary: 'Beta has pricing power.', claims: quotes(passage) }, { summary: 'Pricing power at Beta is strong.', claims: quotes('Beta fell 20% after the company reported weaker orders in Europe.') }), false);
+  const argument = 'The fund bought Beta because its pricing power lets it raise prices every year while customers keep renewing their contracts at higher rates.';
+  assert.equal(nearDuplicate({ summary: argument }, { summary: argument.replace('The fund bought', 'The manager purchased') }), true);
+  assert.equal(nearDuplicate({ summary: argument }, { summary: 'The fund is short Beta because customers are leaving for cheaper rivals and the balance sheet carries too much debt to compete.' }), false);
+  // Short quotes and summaries carry too little to call two managers one.
+  assert.equal(nearDuplicate({ summary: 'Beta.', claims: quotes('Beta rose.') }, { summary: 'Beta.', claims: quotes('Beta rose.') }), false);
+});
+
+test('the ticker view counts independent managers, collapses repeats and near-duplicates, and puts longs apart from shorts and sellers', async () => {
+  const DB = companyArchive();
+  const get = async query => (await onRequestGet(context(query, reader, DB))).json();
+  const body = await get({ action: 'ticker', ticker: 'beta', period: '2020Q2' });
+  assert.equal(body.ticker, 'BETA');
+  assert.equal(body.current, '2020Q2');
+  // Five funds wrote about BETA; Gamma Feeder republished Gamma Partners' argument, so four managers.
+  assert.equal(body.managers, 4);
+  const [quarter, earlier] = body.quarters;
+  assert.equal(quarter.managers, 4);
+  const side = key => quarter[key].map(entry => entry.idea.fund_id).sort();
+  assert.deepEqual([side('long'), side('opposing'), side('other')], [['a', 'c'], ['b', 'e'], []]);
+  assert.deepEqual(quarter.opposing.map(entry => entry.stance).sort(), ['sell', 'short']);
+  const alpha = quarter.long.find(entry => entry.idea.fund_id === 'a');
+  assert.deepEqual([alpha.idea.id, alpha.more.map(idea => idea.id)], ['beta', ['beta-again']]);
+  const gamma = quarter.long.find(entry => entry.idea.fund_id === 'c');
+  assert.deepEqual(gamma.also, [{ fund_id: 'd', fund: 'Gamma Feeder', letter_id: 'd2' }]);
+  // Earlier quarters follow for context.
+  assert.equal(earlier.period, '2020Q1');
+  assert.deepEqual(earlier.other.map(entry => entry.idea.id), ['beta-early']);
+  // Evidence quotes decide the collapse but never reach a reader.
+  assert.equal(/claims|quote|Beta raised prices/.test(JSON.stringify(body)), false);
+
+  // Filters narrow the chosen quarter; earlier quarters stay whole.
+  const shorts = await get({ action: 'ticker', ticker: 'BETA', period: '2020Q2', f: 'short' });
+  assert.equal(shorts.managers, 1);
+  assert.deepEqual(shorts.quarters.map(q => [q.period, q.managers]), [['2020Q2', 1], ['2020Q1', 1]]);
+  const none = await get({ action: 'ticker', ticker: 'BETA', period: '2020Q2', f: 'quality' });
+  assert.equal(none.current, null);
+  assert.equal(none.emptied_by.find(step => !step.count).key, 'theme');
+  assert.deepEqual(none.quarters.map(q => q.period), ['2020Q1']);
+
+  // The overview and the overlap strip use the same count.
+  const overview = await get({ action: 'ticker', period: '2020Q2' });
+  assert.deepEqual(overview.companies[0], { ticker: 'BETA', name: null, funds: 5, letters: 5, managers: 4, long: 3, short: 2 });
+  const workspace = await get({ action: 'workspace', period: '2020Q2' });
+  assert.deepEqual(workspace.overlap.map(row => [row.ticker, row.managers, row.funds]), [['BETA', 4, 5]]);
+});
+
+test('the ideas feed puts companies more independent managers discussed first, each company together, then the most recent', async () => {
+  const DB = companyArchive();
+  DB.db.exec("INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES('acme-b','r-b2','b2','Acme','ACME','long','new','Fund B buys Acme.',1)");
+  resolveTickers(DB);
+  const get = async query => (await onRequestGet(context(query, reader, DB))).json();
+  const first = await get({ action: 'ideas', period: '2020Q2', limit: '5' });
+  const second = await get({ action: 'ideas', period: '2020Q2', limit: '5', offset: String(first.next_offset) });
+  const rows = [...first.results, ...second.results];
+  assert.deepEqual(rows.map(row => [row.ticker, row.managers]).slice(0, 9), [
+    ['BETA', 4], ['BETA', 4], ['BETA', 4], ['BETA', 4], ['BETA', 4], ['BETA', 4], ['ACME', 2], ['ACME', 2], ['GAMMA', 1],
+  ]);
+});
+

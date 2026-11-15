@@ -64,6 +64,16 @@ def test_a_letter_printing_the_ticker_resolves_it_when_the_master_has_no_better_
     assert resolve("VQ", "Venoco", "Venoco was the second strongest long.")[0][0] == "unresolved"
 
 
+def test_a_name_broken_up_in_the_letter_text_is_completed_from_the_idea_title():
+    source = "The fund owns Level 3 Communications (LVLT), the fiber network."
+    [row] = fe.resolve_idea("LVLT", "Level 3 Communications\nThe fund owns the fiber network.", source)
+    assert (row["status"], row["ticker"], row["name"]) == ("resolved", "LVLT", "Level 3 Communications")
+    assert fe.fuller_label("Netflix", "Short Netflix") == "Netflix"
+    assert fe.fuller_label("Netflix", "Netflix Short Position") == "Netflix"
+    assert fe.fuller_label("Walt Disney", "The Walt Disney Company") == "Walt Disney"
+    assert fe.fuller_label("Coffee Roasters", "Thoughts on Green Mountain Coffee Roasters") == "Coffee Roasters"
+
+
 def test_summarizer_keeps_tickers_only_where_the_resolver_would():
     assert reader.verified_ticker({"ticker": "ROIC", "subject": "Returns on capital"}, "Return on invested capital (ROIC) reached 18%.") is None
     assert reader.verified_ticker({"ticker": "RMBS", "subject": "Rambus"}, "The fund was short Rambus (RMBS).") == "RMBS"

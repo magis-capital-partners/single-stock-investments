@@ -142,7 +142,7 @@ export function readerPrior(row) {
     title: safe(row.title), idea_type: safe(row.idea_type), activity: safe(row.activity), summary: safe(row.summary) };
 }
 export function readerWorkspaceIdea(row, prior = null) {
-  return { ...readerSearchResult(row), first_mentioned: Boolean(row.first_mentioned), prior: readerPrior(prior) };
+  return { ...readerSearchResult(row), first_mentioned: Boolean(row.first_mentioned), managers: Number(row.managers || 0), prior: readerPrior(prior) };
 }
 export function readerWorkspaceFund(row) {
   return { id: safe(row.id), name: safe(row.name), letters: Number(row.letter_count || 0), discussions: Number(row.discussions || 0),
@@ -150,7 +150,7 @@ export function readerWorkspaceFund(row) {
 }
 export function readerOverlap(row) {
   return { ticker: safe(row.ticker).trim().toUpperCase(), name: safe(row.name).trim() || null, funds: Number(row.fund_count || 0), letters: Number(row.letter_count || 0),
-    long: Number(row.long_count || 0), short: Number(row.short_count || 0) };
+    managers: Number(row.managers || row.fund_count || 0), long: Number(row.long_count || 0), short: Number(row.short_count || 0) };
 }
 
 export function sourceSections(text) {
@@ -511,6 +511,8 @@ export const QUARTER = /^\d{4}Q[1-4]$/;
 export const FILTER_CHIPS = ["new", "add", "trim", "exit", "short", "first", "quality", "ma", "book"];
 export const LONG_SQL = "(i.idea_type='long' OR LOWER(COALESCE(i.activity,'')) IN ('new','add'))";
 export const SHORT_SQL = "(i.idea_type='short' OR LOWER(COALESCE(i.activity,''))='short')";
+// Short, or selling down a position: the views that oppose a long.
+export const OPPOSING_SQL = `(${SHORT_SQL} OR LOWER(COALESCE(i.activity,'')) IN ('exit','trim'))`;
 const ACTIVITY_CHIPS = {
   new: ["New position", "LOWER(COALESCE(i.activity,''))='new'"],
   add: ["Added", "LOWER(COALESCE(i.activity,''))='add'"],
@@ -599,4 +601,77 @@ export function workspaceScope(params, { only = null } = {}) {
     return { sql: [...base, ...chosen.map(g => g.sql)].join(" AND ") || "1", args: chosen.flatMap(g => g.args) };
   };
   return { groups, pick, ...pick() };
+}
+
+// Where a discussion leaves the fund on the company, in the same order as OPPOSING_SQL and LONG_SQL.
+export function stanceOf(idea) {
+  const activity = String(idea?.activity || "").toLowerCase();
+  if (idea?.idea_type === "short" || activity === "short") return "short";
+  if (activity === "exit" || activity === "trim") return "sell";
+  if (idea?.idea_type === "long" || activity === "new" || activity === "add") return "long";
+  return "other";
+}
+const shingles = (text) => {
+  const tokens = words(text);
+  const out = new Set();
+  for (let i = 0; i + 3 <= tokens.length; i += 1) out.add(tokens.slice(i, i + 3).join(" "));
+  return out;
+};
+const quotesOf = (row) => {
+  try {
+    return new Set(JSON.parse(row.claims || "[]").map(claim => words(claim?.quote).join(" ")).filter(quote => quote.split(" ").length >= 8));
+  } catch {
+    return new Set();
+  }
+};
+const overlap = (x, y) => [...x].filter(item => y.has(item)).length;
+// Two discussions make the same argument when they quote the same passages of a letter, or their summaries share
+// half their three-word phrases: in practice one letter filed under two fund names, or a feeder fund republishing it.
+export function nearDuplicate(a, b) {
+  const qa = quotesOf(a), qb = quotesOf(b);
+  if (qa.size && qb.size && overlap(qa, qb) >= Math.min(2, qa.size, qb.size)) return true;
+  const x = shingles(a.summary), y = shingles(b.summary);
+  if (x.size < 8 || y.size < 8) return false;
+  const shared = overlap(x, y);
+  return shared / (x.size + y.size - shared) >= 0.5;
+}
+// A fund's discussions of a company, newest first, stand for one view; a view whose argument nearly repeats an
+// earlier one joins it, so the count is of independent managers. Rows must arrive newest letter first, then in letter order.
+function independentViews(rows) {
+  const funds = new Map();
+  for (const row of rows) {
+    if (!funds.has(row.fund_id)) funds.set(row.fund_id, []);
+    funds.get(row.fund_id).push(row);
+  }
+  const entries = [];
+  for (const [primary, ...more] of funds.values()) {
+    const twin = entries.find(entry => nearDuplicate(entry.idea, primary));
+    // The earlier letter is the original, so it stands for the pair and the later copy is listed beside it.
+    if (twin) Object.assign(twin, { stance: stanceOf(primary), idea: primary, more, also: [...twin.also, twin.idea] });
+    else entries.push({ stance: stanceOf(primary), idea: primary, more, also: [] });
+  }
+  return entries;
+}
+export const independentCount = (rows) => independentViews(rows).length;
+export function companyQuarters(rows) {
+  const quarters = new Map();
+  for (const row of rows) {
+    const period = row.period_key || "";
+    if (!quarters.has(period)) quarters.set(period, []);
+    quarters.get(period).push(row);
+  }
+  return [...quarters].map(([period, list]) => {
+    const entries = independentViews(list);
+    return { period, managers: entries.length, entries };
+  });
+}
+const SECTIONS = { long: "long", short: "opposing", sell: "opposing", other: "other" };
+export function readerCompanyQuarter(quarter) {
+  const sections = { long: [], opposing: [], other: [] };
+  for (const entry of quarter.entries) {
+    sections[SECTIONS[entry.stance]].push({ stance: entry.stance, idea: readerWorkspaceIdea(entry.idea),
+      more: entry.more.map(row => readerWorkspaceIdea(row)),
+      also: entry.also.map(row => ({ fund_id: safe(row.fund_id), fund: safe(row.fund), letter_id: safe(row.letter_id) })) });
+  }
+  return { period: safe(quarter.period), managers: quarter.managers, ...sections };
 }

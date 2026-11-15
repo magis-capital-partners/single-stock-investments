@@ -43,7 +43,7 @@ REGISTRY_PATH = ROOT / "_system/portfolio/registry.json"
 SCHEMA = ROOT / "dashboard/cloudflare/migrations/0026_fund_letter_entities.sql"
 
 # Raise when the rules below change; a new value re-resolves every published idea.
-RULES = "entities-1"
+RULES = "entities-2"
 
 ACRONYMS = frozenset(
     lm.SYNTACTIC_STOPWORDS | lm.HARVEST_BLOCKLIST | lm.ROLE_COLLISION_CODES | lm.NON_SECURITY_CODES
@@ -207,6 +207,19 @@ def printed(symbol: str, evidence: dict[str, list[dict]], source: str) -> tuple[
     return strong, paren, exchange, position
 
 
+TITLE_STOPWORDS = frozenset({"the", "a", "an", "short", "long", "new", "exit", "exited", "sold", "bought", "added", "trimmed", "position", "update", "thesis", "investment", "on", "in", "of"})
+
+
+def fuller_label(label: str, title: str) -> str:
+    """Extracted PDF text breaks names apart ("Gr een Mountain Coffee Roasters"), and the phrase before a ticker
+    stops at a digit ("Level 3"), so a label can be a name's tail. The idea's title usually prints the whole name."""
+    at = title.lower().find(label.lower()) if label else -1
+    prefix = title[:at].split() if at > 0 else []
+    if prefix and len(prefix) <= 4 and all(re.fullmatch(r"[A-Z0-9][A-Za-z0-9&.'\-]*", w) and w.lower() not in TITLE_STOPWORDS for w in prefix):
+        return title[: at + len(label)].strip()
+    return label
+
+
 def resolve_mention(mention: str, idea_text: str, source: str, evidence: dict | None = None) -> dict:
     sm = master()
     evidence = letter_evidence(source) if evidence is None else evidence
@@ -227,6 +240,7 @@ def resolve_mention(mention: str, idea_text: str, source: str, evidence: dict | 
     nearby = nearby_company_phrase(source, position) if position is not None else ""
     # Shown only as a label, so "Ltd" or "Inc" alone is no name at all.
     label = nearby if any(len(w) >= 4 and w not in GENERIC for w in words(nearby)) else ""
+    label = fuller_label(label, (idea_text or "").split("\n", 1)[0])
     word = lm.is_word_collision(symbol)
     if ticker:
         meta = sm.by_ticker[ticker]
