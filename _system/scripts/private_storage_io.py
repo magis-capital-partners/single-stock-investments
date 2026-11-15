@@ -17,7 +17,12 @@ MARKER = '.private-storage-view.json'
 # rebase merged exactly these two paths and nothing else.
 RECEIPT_PATHS = frozenset({'dashboard-private/manifest.json', 'dashboard-private/migration-journal.jsonl'})
 # Import coordination belongs to its producer, never to a local company author.
-AUTHOR_PUBLICATION_INDEXES = RECEIPT_PATHS | frozenset({'superinvestor-letters/drive_import_manifest.json'})
+AUTHOR_PUBLICATION_INDEXES = RECEIPT_PATHS | frozenset({
+    'superinvestor-letters/drive_import_manifest.json',
+    'superinvestor-letters/drive_import_log.jsonl',
+    'dashboard-private/investor-history/manifest.json',
+    'dashboard-private/company-source-backfill-v2/manifest.json',
+})
 _LAZY_STORAGE = None
 _VIEW_CACHE = {}
 

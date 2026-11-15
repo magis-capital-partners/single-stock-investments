@@ -8,7 +8,8 @@ from private_storage import StorageError,sha,encoded_json
 BATCH='valuation-underwriting/runtime/batch.json'
 LEDGER='valuation-underwriting/runtime/ledger.jsonl'
 LOCAL_STATE='valuation-underwriting/local-runtime/states/CPRT.json'
-AUTHOR_INDEX_CASES=sorted(io.RECEIPT_PATHS)+['superinvestor-letters/drive_import_manifest.json']
+FOREIGN_INDEX_CASES=["superinvestor-letters/drive_import_manifest.json","superinvestor-letters/drive_import_log.jsonl","dashboard-private/investor-history/manifest.json","dashboard-private/company-source-backfill-v2/manifest.json"]
+AUTHOR_INDEX_CASES=sorted(io.RECEIPT_PATHS)+FOREIGN_INDEX_CASES
 @pytest.fixture(autouse=True)
 def local_environment(monkeypatch):monkeypatch.delenv('GITHUB_ACTIONS',raising=False)
 def vault(tmp_path):
