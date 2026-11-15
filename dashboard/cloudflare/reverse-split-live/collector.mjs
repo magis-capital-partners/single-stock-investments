@@ -51,6 +51,7 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
   const prefix=`/r2/buckets/${encodeURIComponent(bucket)}/objects/`;
   const EVIDENCE={
     async put(key,bytes,options={}){await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':safeContentType(options.httpMetadata?.contentType)},body:bytes});},
+    async delete(key){await environment?.assertCollectorLease?.();await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'DELETE'},true);},
     async get(key,{signal,urgent=false}={}){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal,urgent},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
   };
   environment={DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},extractAnnouncementText,ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};return environment;
