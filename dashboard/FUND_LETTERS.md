@@ -16,7 +16,7 @@ Local development bypass requires `PORTFOLIO_AUTH_MODE=development` **and** a lo
 
 ## Reader workspace
 
-The reader is one workspace with two views, **By fund** and **Ideas**, under one header: a quarter selector (the latest reporting quarter by default, or all quarters), one search box (fund, company, ticker or argument text, plus the `fund:`, `ticker:`, `type:`, `action:` and `focus:` tokens), and the view toggle. Switching views keeps every filter. A By ticker view follows once mentions resolve to securities.
+The reader is one workspace with two views, **By fund** and **Ideas**, under one header: a quarter selector (the latest reporting quarter by default, or all quarters), one search box (fund, company, ticker or argument text, plus the `fund:`, `ticker:`, `type:`, `action:` and `focus:` tokens), and the view toggle. Switching views keeps every filter. Companies are the securities each idea resolves to (see **Company identity** below), never the raw ticker text.
 
 Every choice lives in one state object written to the address: `view`, `period`, `q`, `f` (filter chips), `fund`, `letter`, `ticker`, `type` and `focus`. Defaults are left out, so a link to the latest quarter stays current. Back and forward restore the view, filters and list position. Inside the dashboard tab the same state is kept for the browser session instead of the page address. Older links using `activity=`, `scope=book` or `tickers=` still open the same filters.
 
@@ -27,16 +27,33 @@ The reporting quarter and the letter date are always shown separately. A letter 
 Filter chips (`f=`) combine with the search and with each other (AND); chips within one group are alternatives (OR):
 
 - **Position activity:** New position, Added, Reduced, Exited (includes covered shorts), Short.
-- **First mentioned this quarter:** the fund has a published letter from an earlier quarter and never named this ticker in an earlier quarter, holdings tables included. It is independent of activity: a new position can be a company the fund wrote about before, and a first mention can be a position the fund already held. A fund's first letter has nothing to compare against, so nothing in it counts as a first mention.
+- **First mentioned this quarter:** the fund has a published letter from an earlier quarter, and the idea names a resolved security the fund never named in an earlier quarter, holdings tables included. It is independent of activity: a new position can be a company the fund wrote about before, and a first mention can be a position the fund already held. A fund's first letter has nothing to compare against, so nothing in it counts as a first mention.
+- **Theme:** Quality compounders and M&A compounders. An idea carries a theme when it resolves to a company on our lists (`core_compounders.json` or a registry archetype of `compounder`; the `acquirers` watchlist group or a `serial_acquirer` archetype), or when a long, short, special-situation or private idea describes its own company that way ("a compounder", "a high-quality business"; "serial acquirer", "roll-up", "bolt-on acquisitions"). A fund saying it buys "high-quality companies" in general does not count.
 - **Our book** (owners only): companies in the current Magis holdings. Only names are used, never position sizes; the owner's dashboard sends the list to narrow the query and nothing about it is returned.
 
 When filters leave nothing, the reader names the filter that emptied the list and how many discussions were left before it, with a button to remove it (`emptied_by` in the API).
 
-An idea card shows the ticker, company, direction and activity, **First mention** and **Our book** badges, the headline with the next two or three statements, **Read full argument**, and **What changed**. What changed compares the card with the same fund's most recent discussion of the ticker in an earlier quarter and is hidden when there is none. The footer gives the fund, reporting quarter, letter date and source type.
+An idea card shows each resolved ticker, the company, direction and activity, **First mention**, theme and **Our book** badges, and any ticker text that resolved to nothing in muted type (not a link, not counted), the headline with the next two or three statements, **Read full argument**, and **What changed**. What changed compares the card with the same fund's most recent discussion of any of its securities in an earlier quarter and is hidden when there is none. The footer gives the fund, reporting quarter, letter date and source type.
 
-The overlap strip lists the tickers discussed by two or more funds in the quarter under the current filters, top eight first ("FICO 3 · ROL 2"), with **Show all**. Each fund counts once however many letters or ideas it has (independent managers), with longs and shorts counted apart. Selecting a ticker opens every fund's discussion of it.
+The overlap strip lists the tickers discussed by two or more funds in the quarter under the current filters, top eight first ("FICO 3 · ROL 2"), with **Show all**. Each fund counts once however many letters or ideas it has (independent managers), with longs and shorts counted apart. Selecting a ticker opens every fund's discussion of it. Mentions that resolved to no security are counted apart ("44 unmatched mentions not counted") and never join a fund to a company.
 
-API actions: `workspace` returns the quarters, the fund list with counts, totals, the overlap strip and `emptied_by`; `ideas` returns the cross-fund feed with `first_mentioned` and `prior` on each idea; `letters` adds `matches`, `first_mentioned` and `prior` to each idea. Ticker lists travel as one JSON parameter because D1 limits a statement to 100 bound parameters. All of this uses fields the lane already publishes (reporting period, verified letter date, ticker, idea type, activity), so the summarizer, export and sync are unchanged by it.
+API actions: `workspace` returns the quarters, the fund list with counts, totals (with `unresolved`), the overlap strip and `emptied_by`; `ideas` returns the cross-fund feed with `first_mentioned` and `prior` on each idea; `letters` adds `matches`, `first_mentioned` and `prior` to each idea. Every idea carries `tickers` (resolved, in the letter's order), `unresolved` (mention text) and `themes`; `ticker` is the resolved list joined for display. Ticker lists travel as one JSON parameter because D1 limits a statement to 100 bound parameters.
+
+## Company identity
+
+`_system/scripts/fund_letter_entities.py` resolves each idea's ticker text to securities (ticker plus exchange) and tags themes. It runs inside `fund_letters.export_release`, so every release the lane exports carries the rows; it only reads the security master, `core_compounders.json` and the company registry, and changes none of them.
+
+Each mention ends in one of three states:
+
+- **resolved**: the security master's company for the symbol is the one the idea discusses, or the letter prints the symbol as a ticker (`NYSE: X`, `$X`, `X US`, `(X, $10.78`) and the master has no conflicting company. Bloomberg forms become exchange tickers (`5019 JP` is `5019.T`, `TW LN` is `TW.L`, `14 HK` is `0014.HK`, `VIE.FP` is `VIE.PA`).
+- **unresolved**: kept for display and for `unresolved` counts, never matched. Ticker reuse is the usual reason: El Paso's EP is Empire Petroleum's today, Weight Watchers' WTW is Willis Towers Watson's, and SJM Holdings is not Smucker.
+- **dropped**: finance and macro acronyms (FCF, ROIC, EBITDA, NAV, AUM, CEO, RMBS meaning mortgage securities) unless the company the master gives the letters is the subject, as with Cheniere (LNG), Philip Morris (PM) or Rambus (RMBS). Dropped rows never leave the private archive. The summarizer applies the same test when it keeps a ticker.
+
+Schema: `dashboard/cloudflare/migrations/0026_fund_letter_entities.sql`. Rows are keyed by the rule version that produced them (`entities-N:<master digest>`), so a release never rewrites an accepted row and the release ledger can skip rows already sent. `fl_settings` names the current resolver and theme set; the two views `fl_idea_tickers` and `fl_themed_ideas` show only those rows, and `archive.sql` moves the pointers last. A new security master or rule version therefore adds a fresh set of rows and switches to it in one statement. The local archive also records which revisions each version has processed (`fl_entity_runs`), so a cycle resolves only new publications.
+
+```powershell
+python _system/scripts/fund_letter_entities.py --db _private/fund_letters/archive.sqlite --report
+```
 
 ## Canonical archive and editorial processing
 
@@ -111,7 +128,7 @@ The owner interface keeps its six explicit editorial checkboxes for manual publi
 
 Export refuses an existing release directory. It creates an immutable content-hashed manifest, append-only `archive.sql`, private source text objects, guarded `activate.sql`, and guarded `rollback.sql`. Full text is stored locally and in private R2, rather than duplicated in the remote D1 database. Sources are required for server-side editing/publication checks. Reader responses use explicit field allowlists and omit URLs, file paths, Drive IDs, raw extracts and evidence.
 
-Apply migration 0023 using the existing deployment’s migration step before importing data. Local import is the release tool’s default:
+Apply migrations 0023 and 0026 using the existing deployment’s migration step before importing data. Local import is the release tool’s default:
 
 ```powershell
 python _system/scripts/sync_fund_letters_release.py _private/fund_letters/releases/RELEASE_NAME --config _cf_project/wrangler.jsonc --max-batches 5

@@ -1269,14 +1269,22 @@ NOT_TICKERS = {
 
 def verified_ticker(raw: dict, source: str) -> str | None:
     """Keep only ticker text the source itself prints. Models invent plausible
-    tickers (APX for Approach Resources), so an unstated ticker becomes null."""
+    tickers (APX for Approach Resources), so an unstated ticker becomes null.
+    A finance acronym (FCF, ROIC) is kept only when the letter prints it with an
+    exchange or the topic names the company the security master gives it."""
+    import fund_letter_entities
+
+    topic = " ".join([str(raw.get("subject") or "")] + [str(p.get("text") if isinstance(p, dict) else p) for p in raw.get("points") or []])
     kept = []
     for part in re.split(r"[,;/]", str(raw.get("ticker") or "")):
         candidate = part.strip()
         if not TICKER_RE.match(candidate) or candidate in NOT_TICKERS:
             continue
-        if re.search(r"(?<![A-Za-z0-9])" + re.escape(candidate) + r"(?![A-Za-z0-9])", source or ""):
-            kept.append(candidate)
+        if not re.search(r"(?<![A-Za-z0-9])" + re.escape(candidate) + r"(?![A-Za-z0-9])", source or ""):
+            continue
+        if candidate.upper() in fund_letter_entities.ACRONYMS and not fund_letter_entities.keep_symbol(candidate, topic, source):
+            continue
+        kept.append(candidate)
     return ", ".join(dict.fromkeys(kept)) or None
 
 

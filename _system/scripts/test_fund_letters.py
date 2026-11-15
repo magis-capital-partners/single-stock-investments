@@ -156,7 +156,7 @@ def test_release_is_private_and_preserves_revision_history(archive, tmp_path, mo
     output = tmp_path / "_private/releases/test"
     manifest = fl.export_release(archive, output)
     replay = sqlite3.connect(":memory:")
-    replay.executescript(fl.SCHEMA.read_text(encoding="utf-8"))
+    replay.executescript(fl.SCHEMA.read_text(encoding="utf-8") + fl.ENTITY_SCHEMA.read_text(encoding="utf-8"))
     replay.executescript((output / "archive.sql").read_text(encoding="utf-8"))
     assert replay.execute("SELECT count(*) FROM fl_letters").fetchone()[0] == 1
     assert replay.execute("SELECT source_text FROM fl_letters").fetchone()[0] == ""
@@ -175,7 +175,7 @@ def test_release_activation_and_rollback_preserve_intervening_publication(archiv
     output = tmp_path / "_private/releases/one"
     fl.export_release(archive, output)
     replay = sqlite3.connect(":memory:")
-    replay.executescript(fl.SCHEMA.read_text(encoding="utf-8"))
+    replay.executescript(fl.SCHEMA.read_text(encoding="utf-8") + fl.ENTITY_SCHEMA.read_text(encoding="utf-8"))
     replay.executescript((output / "archive.sql").read_text(encoding="utf-8"))
     assert replay.execute("SELECT published_revision FROM fl_letters").fetchone()[0] is None
     replay.executescript((output / "activate.sql").read_text(encoding="utf-8"))
@@ -208,7 +208,7 @@ def test_drive_links_map_by_pdf_and_reach_rows_already_online(archive, tmp_path,
     output = tmp_path / "_private/releases/links"
     fl.export_release(archive, output)
     replay = sqlite3.connect(":memory:")
-    replay.executescript(fl.SCHEMA.read_text(encoding="utf-8"))
+    replay.executescript(fl.SCHEMA.read_text(encoding="utf-8") + fl.ENTITY_SCHEMA.read_text(encoding="utf-8"))
     replay.execute("INSERT INTO fl_funds(id,name) VALUES('test-capital','Test Capital')")
     replay.execute("INSERT INTO fl_letters(id,fund_id,content_hash,pipeline_version,ingested_at,source_ref) VALUES(?,?,?,?,?,?)",
                    (letter_id, "test-capital", "x", "v", "2026-10-28", "ref"))
@@ -316,7 +316,7 @@ def test_a_published_letter_with_an_unreadable_extract_is_withdrawn_here_and_onl
 
     def online(pointer):
         replay = sqlite3.connect(":memory:")
-        replay.executescript(fl.SCHEMA.read_text(encoding="utf-8"))
+        replay.executescript(fl.SCHEMA.read_text(encoding="utf-8") + fl.ENTITY_SCHEMA.read_text(encoding="utf-8"))
         replay.executescript((output / "archive.sql").read_text(encoding="utf-8"))
         replay.execute("UPDATE fl_letters SET published_revision=?,status='published'", (pointer,))
         replay.execute("UPDATE fl_reviews SET status='resolved' WHERE kind='extraction'")

@@ -27,8 +27,11 @@
     { id: 'exit', label: 'Exited', group: 'activity' },
     { id: 'short', label: 'Short', group: 'activity' },
     { id: 'first', label: 'First mentioned this quarter', group: 'history' },
+    { id: 'quality', label: 'Quality compounders', group: 'theme' },
+    { id: 'ma', label: 'M&A compounders', group: 'theme' },
     { id: 'book', label: 'Our book', group: 'book' },
   ];
+  const THEME_LABELS = { quality: 'Quality compounder', ma: 'M&A compounder' };
   const CHIP_IDS = CHIPS.map(chip => chip.id);
   const STATE_KEYS = ['view', 'period', 'q', 'f', 'fund', 'letter', 'idea', 'ticker', 'type', 'focus', 'stack', 'mode', 'review_q'];
   const TICKER = /^[A-Z0-9._-]{1,16}$/;
@@ -193,6 +196,11 @@
         <div class="fl-chip-group" role="group" aria-label="Letter history">
           <button type="button" class="fl-chip" data-chip="first" aria-pressed="false" title="No earlier letter from this fund in the archive names the company">First mentioned this quarter</button>
         </div>
+        <div class="fl-chip-group" role="group" aria-label="Theme">
+          <span class="fl-chip-label" aria-hidden="true">Theme</span>
+          <button type="button" class="fl-chip" data-chip="quality" aria-pressed="false" title="Companies on our compounder lists, or that the letter itself calls a compounder or a high-quality business">Quality compounders</button>
+          <button type="button" class="fl-chip" data-chip="ma" aria-pressed="false" title="Serial acquirers on our lists, or companies the letter describes as compounding through acquisitions">M&amp;A compounders</button>
+        </div>
         <div class="fl-chip-group" role="group" aria-label="Our holdings" data-owner-only hidden>
           <button type="button" class="fl-chip fl-chip--book" data-chip="book" aria-pressed="false" title="Companies we currently hold. Names only.">Our book</button>
         </div>
@@ -280,28 +288,37 @@
     }
     const scopeKey = () => JSON.stringify({ ...scopeArgs(), period: state.period, book: undefined });
 
+    // The securities an idea was matched to. Mentions that matched none are shown muted and never counted.
+    const tickersOf = item => (Array.isArray(item?.tickers) ? item.tickers : []);
+    const tickerButton = sym => `<button type="button" class="fl-ticker" data-pick-ticker="${escape(sym)}" title="Every fund's view of ${escape(sym)}">${escape(sym)}</button>`;
+    function unresolvedHtml(item) {
+      const mentions = Array.isArray(item?.unresolved) ? item.unresolved : [];
+      return mentions.length ? `<span class="fl-unresolved" title="Not matched to a security, so not counted in overlap, company or book filters">${escape(mentions.join(', '))}</span>` : '';
+    }
+    const themeBadges = item => (Array.isArray(item?.themes) ? item.themes : []).filter(theme => THEME_LABELS[theme]).map(theme => badgeHtml(THEME_LABELS[theme], 'neutral')).join('');
+
     function ideaMetaBadges(item) {
       const out = [];
       const [directionText, directionTone] = direction(item);
       if (directionText) out.push(badgeHtml(directionText, directionTone));
-      if (item.ticker) {
-        const sym = String(item.ticker).trim().toUpperCase();
-        out.push(`<button type="button" class="fl-ticker" data-pick-ticker="${escape(sym)}" title="Every fund's view of ${escape(sym)}">${escape(sym)}</button>`);
+      for (const sym of tickersOf(item)) {
+        out.push(tickerButton(sym));
         const overlap = overlapMap.get(sym);
         if (overlap) out.push(badgeHtml(`${overlap.funds} funds`, 'special'));
       }
+      out.push(unresolvedHtml(item));
       const activity = String(item.activity || '').toLowerCase();
       if (ACTIVITY_LABELS[activity] && !(activity === 'short' && directionText === 'Short')) out.push(badgeHtml(ACTIVITY_LABELS[activity], activityTone(activity)));
       if (item.first_mentioned) out.push(badgeHtml('First mention', 'macro'));
-      out.push(bookBadge(item.ticker));
+      out.push(themeBadges(item));
+      out.push(bookBadge(tickersOf(item)));
       return out.join('');
     }
 
-    function bookBadge(ticker) {
-      const sym = String(ticker || '').trim().toUpperCase();
-      if (role !== 'owner' || !sym) return '';
-      if (bookSet.has(sym)) return badgeHtml('Our book', 'add', 'fl-badge--book');
-      if (watchlistSet.has(sym)) return badgeHtml('Watchlist', 'macro');
+    function bookBadge(tickers) {
+      if (role !== 'owner' || !tickers.length) return '';
+      if (tickers.some(sym => bookSet.has(sym))) return badgeHtml('Our book', 'add', 'fl-badge--book');
+      if (tickers.some(sym => watchlistSet.has(sym))) return badgeHtml('Watchlist', 'macro');
       return '';
     }
 
@@ -513,15 +530,16 @@
       }
       const shown = overlapOpen ? rows : rows.slice(0, 8);
       overlapBar.hidden = false;
+      const unresolved = workspace?.totals?.unresolved || 0;
       overlapBar.innerHTML = `
-        <span class="fl-meta">Discussed by 2+ funds · ${escape(periodName())}</span>
+        <span class="fl-meta">Discussed by 2+ funds · ${escape(periodName())}${unresolved ? ` · <span title="Ticker text in these letters that matched no security, such as an acronym or a symbol another company uses today">${unresolved} unmatched ${unresolved === 1 ? 'mention' : 'mentions'} not counted</span>` : ''}</span>
         <ul class="fl-overlap-list">
           ${shown.map(row => {
             const contested = row.long > 0 && row.short > 0;
             const inBook = role === 'owner' && bookSet.has(row.ticker);
             return `<li><button type="button" class="fl-overlap-item${contested ? ' is-contested' : ''}${inBook ? ' is-book' : ''}${state.ticker === row.ticker ? ' is-active' : ''}"
               data-pick-ticker="${escape(row.ticker)}" aria-pressed="${state.ticker === row.ticker}"
-              title="${row.funds} independent funds · ${row.long} long · ${row.short} short${inBook ? ' · in our book' : ''}">
+              title="${row.name ? `${escape(row.name)} · ` : ''}${row.funds} independent funds · ${row.long} long · ${row.short} short${inBook ? ' · in our book' : ''}">
               <strong>${escape(row.ticker)}</strong> <span>${row.funds}</span></button></li>`;
           }).join('<li aria-hidden="true" class="fl-overlap-dot">·</li>')}
         </ul>
@@ -689,12 +707,12 @@
       const [headline, ...rest] = parts;
       const argument = rest.slice(0, 3);
       const longer = rest.length > 3;
-      const sym = item.ticker ? String(item.ticker).trim().toUpperCase() : '';
+      const tickers = tickersOf(item);
       return `
         <article class="fl-idea-card" id="fl-card-${escape(item.letter_id)}-${escape(item.id)}">
           <header class="fl-idea-card-head">
             <div class="fl-idea-card-id">
-              ${sym ? `<button type="button" class="fl-ticker" data-pick-ticker="${escape(sym)}" title="Every fund's view of ${escape(sym)}">${escape(sym)}</button>` : ''}
+              ${tickers.map(tickerButton).join('')}
               <h3><a href="${escape(link({ view: 'funds', fund: item.fund_id, letter: item.letter_id, idea: item.id }))}"
                 data-open-letter="${escape(item.letter_id)}" data-open-fund="${escape(item.fund_id)}" data-open-idea="${escape(item.id)}">${escape(item.title)}</a></h3>
             </div>
@@ -705,7 +723,9 @@
                 badgeHtml(directionText, directionTone),
                 ACTIVITY_LABELS[activity] && !(activity === 'short' && directionText === 'Short') ? badgeHtml(ACTIVITY_LABELS[activity], activityTone(activity)) : '',
                 item.first_mentioned ? badgeHtml('First mention', 'macro') : '',
-                bookBadge(sym),
+                themeBadges(item),
+                bookBadge(tickers),
+                unresolvedHtml(item),
               ].join('');
             })()}</div>
           </header>
@@ -732,7 +752,7 @@
       const primaryIdeas = ideas.filter(i => i.idea_type !== 'factual_note');
       const chipIdeas = (matched.length ? matched : primaryIdeas.length ? primaryIdeas : ideas).slice(0, 5);
       const previewParagraph = String(letter.overview || '').split(/\n\s*\n/).filter(Boolean)[0] || '';
-      const hasBookOverlap = role === 'owner' && ideas.some(i => i.ticker && bookSet.has(String(i.ticker).toUpperCase()));
+      const hasBookOverlap = role === 'owner' && ideas.some(i => tickersOf(i).some(sym => bookSet.has(sym)));
       return `
         <article class="fl-letter-card" id="fl-card-${escape(letter.id)}">
           <header class="fl-letter-card-head">
@@ -761,8 +781,8 @@
           ${chipIdeas.length ? `
           <div class="fl-card-ideas" aria-label="${matched.length ? 'Matching discussions' : 'Discussed in this letter'}">
             ${chipIdeas.map(i => {
-              const sym = i.ticker ? String(i.ticker).toUpperCase() : '';
-              const inBook = role === 'owner' && sym && bookSet.has(sym);
+              const sym = tickersOf(i).join(', ');
+              const inBook = role === 'owner' && tickersOf(i).some(t => bookSet.has(t));
               return `
               <a class="fl-idea-chip${inBook ? ' is-book' : ''}"
                  href="${escape(link({ fund: letter.fund_id, letter: letter.id, idea: i.id }))}"
@@ -1323,6 +1343,7 @@
       ticker: () => ({ ticker: '' }),
       activity: () => ({ chips: state.chips.filter(chip => CHIPS.find(c => c.id === chip)?.group !== 'activity') }),
       first: () => ({ chips: state.chips.filter(chip => chip !== 'first') }),
+      theme: () => ({ chips: state.chips.filter(chip => CHIPS.find(c => c.id === chip)?.group !== 'theme') }),
       book: () => ({ chips: state.chips.filter(chip => chip !== 'book') }),
       type: () => ({ type: '' }),
       focus: () => ({ focus: '' }),

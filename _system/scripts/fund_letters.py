@@ -28,6 +28,7 @@ from letter_date_parser import parse_letter_date_with_confidence  # noqa: E402
 VERSION = "fund-reader.1"
 DEFAULT_DB = ROOT / "_private/fund_letters/archive.sqlite"
 SCHEMA = ROOT / "dashboard/cloudflare/migrations/0023_fund_letters.sql"
+ENTITY_SCHEMA = ROOT / "dashboard/cloudflare/migrations/0026_fund_letter_entities.sql"
 IDEA_TYPES = {"long", "short", "update", "postmortem", "special_situation", "credit", "private", "unnamed", "sector", "macro", "portfolio", "factual_note"}
 EDITORIAL_CHECKS = ("complete_document", "idea_coverage", "claim_accuracy", "numerical_accuracy", "original_writing", "historical_dates")
 NUMBER_RE = re.compile(r"\d+(?:[,.]\d+)*(?:%|[xX])?")
@@ -109,6 +110,7 @@ def connect(path: Path = DEFAULT_DB) -> sqlite3.Connection:
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA foreign_keys=ON")
     db.executescript(SCHEMA.read_text(encoding="utf-8"))
+    db.executescript(ENTITY_SCHEMA.read_text(encoding="utf-8"))
     return db
 
 
@@ -720,6 +722,13 @@ def export_release(db, output: Path) -> dict:
                     + " AND kind=" + quote(data.get("kind"))
                     + " AND status='open';"
                 )
+    import fund_letter_entities
+
+    literal = lambda x: "NULL" if x is None else str(x) if isinstance(x, (int, float)) else "'" + str(x).replace("'", "''") + "'"
+    identity = fund_letter_entities.release_statements(db, literal)
+    counts["fl_idea_entities"] = sum(1 for line in identity if line.startswith("INSERT OR IGNORE INTO fl_idea_entities"))
+    counts["fl_idea_themes"] = sum(1 for line in identity if line.startswith("INSERT OR IGNORE INTO fl_idea_themes"))
+    sql.extend(identity)
     payload = "\n".join(sql) + "\n"
     release_id = hashlib.sha256(payload.encode()).hexdigest()[:24]
     (output / "archive.sql").write_text(payload, encoding="utf-8")
