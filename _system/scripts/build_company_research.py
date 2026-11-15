@@ -217,7 +217,11 @@ class Builder:
                 self.themes.append({"id": theme_id, "patterns": patterns, "tickers": tickers, "reason": theme["rationale"]})
         self.seen = set()
         identities = {t:{k:r.get(k) for k in ("company", "market", "exchange")} for t,r in self.companies.items()}
-        self.match_version = digest(json.dumps(identities, sort_keys=True) + json.dumps(master, sort_keys=True) + digest(Path(__file__).with_name("company_sources.py").read_bytes()))
+        rules = digest(Path(__file__).with_name("company_sources.py").read_bytes())
+        self.match_version = digest(json.dumps(identities, sort_keys=True) + json.dumps(master, sort_keys=True) + rules)
+        # Recorded beside the version so a stale snapshot can name what moved.
+        self.match_identities = identities
+        self.match_inputs = {"security_master": digest(json.dumps(master, sort_keys=True)), "company_sources": rules}
         match_manifest = load(cache / "matches.json")
         self.matches = {}
         if match_manifest.get("version") == self.match_version:
@@ -855,8 +859,10 @@ class Builder:
         records = self.previous.get("records", {})
         if not records or not self.previous.get("generated_at"):
             raise RuntimeError("A completed private company-source snapshot is required")
-        if load(self.cache / "matches.json").get("version") != self.match_version:
-            raise RuntimeError("Company identities or matching rules changed; refresh the source snapshot first")
+        stored = load(self.cache / "matches.json")
+        if stored.get("version") != self.match_version:
+            raise RuntimeError("Company identities or matching rules changed; refresh the source snapshot first"
+                               f" ({self.stale_match_detail(stored)})")
         for sha in {r.get("text_cache") for r in records.values()} - {None, ""}:
             if not re.fullmatch(r"[a-f0-9]{64}", sha) or not (self.cache / "published-text" / (sha + ".json")).is_file():
                 raise RuntimeError("The private source snapshot is missing a recovered text body")
@@ -867,6 +873,26 @@ class Builder:
         # new Drive sync and must not refresh its coverage timestamps.
         self.now = self.previous["generated_at"]
         return self.publish()
+
+    def stale_match_detail(self, stored):
+        """Name the identity inputs that differ from the cached snapshot's."""
+        snapshot = f"snapshot generated {self.previous.get('generated_at') or 'unknown'}"
+        before, inputs = stored.get("identities"), stored.get("inputs") or {}
+        if not isinstance(before, dict) or not inputs:
+            return snapshot + "; it predates recorded identity inputs"
+        changed = []
+        added = sorted(set(self.match_identities) - set(before))
+        removed = sorted(set(before) - set(self.match_identities))
+        edited = sorted(t for t in set(before) & set(self.match_identities) if before[t] != self.match_identities[t])
+        for label, tickers in (("added", added), ("removed", removed), ("changed", edited)):
+            if tickers:
+                shown = ", ".join(tickers[:10]) + (f" and {len(tickers) - 10} more" if len(tickers) > 10 else "")
+                changed.append(f"companies {label}: {shown}")
+        if inputs.get("security_master") != self.match_inputs["security_master"]:
+            changed.append("security master changed")
+        if inputs.get("company_sources") != self.match_inputs["company_sources"]:
+            changed.append("company_sources.py matching rules changed")
+        return snapshot + "; " + ("; ".join(changed) or "no recorded input differs")
 
     def publish(self):
         absent = {row["collection"] for row in self.receipts if row.get("status") == "absent"}
@@ -1078,7 +1104,9 @@ class Builder:
                 saved[key]["text_cache"] = sha
         parts = write_mapping(self.cache, "records", saved)
         write(self.cache / "index.json", {"record_parts": parts, "receipts": self.receipts, "generated_at": self.now})
-        write(self.cache / "matches.json", {"version": self.match_version, "parts": write_mapping(self.cache, "relationships", self.matches)})
+        write(self.cache / "matches.json", {"version": self.match_version, "identities": self.match_identities,
+                                            "inputs": self.match_inputs,
+                                            "parts": write_mapping(self.cache, "relationships", self.matches)})
         return report
 
 

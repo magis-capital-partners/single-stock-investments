@@ -63,6 +63,41 @@ def test_snapshot_refuses_missing_bodies_and_changed_identity_rules(tmp_path):
         b.publish_cached()
 
 
+def test_stale_snapshot_names_the_identity_inputs_that_changed(tmp_path):
+    old = snapshot(tmp_path)
+    grown = {**COMPANIES, "MBGL": {"company": "Mercedes-Benz Group AG", "market": "DE"}}
+    b = Builder(tmp_path, None, tmp_path / "second", old.cache, companies=grown)
+    with pytest.raises(RuntimeError, match="refresh the source snapshot first") as error:
+        b.publish_cached()
+    assert "snapshot generated 2026-10-28T00:00:00+00:00" in str(error.value)
+    assert "companies added: MBGL" in str(error.value)
+    assert "matching rules" not in str(error.value).split("(", 1)[1]
+
+
+def test_stale_snapshot_without_recorded_inputs_still_refuses(tmp_path):
+    old = snapshot(tmp_path)
+    matches = old.cache / "matches.json"
+    legacy = json.loads(matches.read_text())
+    legacy.pop("identities")
+    legacy.pop("inputs")
+    legacy["version"] = "older-identities"
+    matches.write_text(json.dumps(legacy))
+    b = Builder(tmp_path, None, tmp_path / "second", old.cache, companies=COMPANIES)
+    with pytest.raises(RuntimeError, match="predates recorded identity inputs"):
+        b.publish_cached()
+
+
+def test_match_version_formula_is_unchanged_for_existing_snapshots(tmp_path):
+    # Existing private snapshots store this exact digest; changing the formula
+    # would invalidate every one of them.
+    b = Builder(tmp_path, None, tmp_path / "out", tmp_path / "cache", companies=COMPANIES)
+    sources = Path(__file__).resolve().parents[1] / "company_sources.py"
+    rules = hashlib.sha256(sources.read_bytes()).hexdigest()
+    identities = {"CME": {"company": "CME Group Inc.", "market": "US", "exchange": None}}
+    expected = hashlib.sha256((json.dumps(identities, sort_keys=True) + json.dumps({}, sort_keys=True) + rules).encode()).hexdigest()
+    assert b.match_version == expected
+
+
 def test_snapshot_refuses_a_missing_record_partition(tmp_path):
     old = snapshot(tmp_path)
     b = Builder(tmp_path, None, tmp_path / "second", old.cache, companies=COMPANIES)
