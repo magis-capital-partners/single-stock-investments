@@ -19,7 +19,7 @@
 
   // Shared workspace state. Every view reads the same object, and it round-trips through the query string
   // (or session storage when embedded in the dashboard), so a view is linkable and back/forward restores it.
-  const VIEWS = ['funds', 'ideas'];
+  const VIEWS = ['funds', 'ideas', 'ticker'];
   const CHIPS = [
     { id: 'new', label: 'New position', group: 'activity' },
     { id: 'add', label: 'Added', group: 'activity' },
@@ -185,6 +185,7 @@
         <div class="fl-view-tabs" role="group" aria-label="View">
           <button type="button" class="fl-view-tab" data-view-mode="funds" aria-pressed="true">By fund</button>
           <button type="button" class="fl-view-tab" data-view-mode="ideas" aria-pressed="false">Ideas</button>
+          <button type="button" class="fl-view-tab" data-view-mode="ticker" aria-pressed="false">By ticker</button>
         </div>
         ${embedded ? '<div class="fl-owner-tools"></div>' : ''}
       </div>
@@ -314,6 +315,12 @@
       out.push(bookBadge(tickersOf(item)));
       return out.join('');
     }
+
+    // A fund's several letters count once, and funds publishing a near-identical argument count as one manager.
+    const managersText = n => `${n} independent ${Number(n) === 1 ? 'manager' : 'managers'}`;
+    const managersBadge = item => (Number(item?.managers) > 1
+      ? `<span class="fl-badge fl-badge--special" title="Independent managers discussing this company in the current view">${escape(managersText(item.managers))}</span>`
+      : '');
 
     function bookBadge(tickers) {
       if (role !== 'owner' || !tickers.length) return '';
@@ -532,15 +539,15 @@
       overlapBar.hidden = false;
       const unresolved = workspace?.totals?.unresolved || 0;
       overlapBar.innerHTML = `
-        <span class="fl-meta">Discussed by 2+ funds · ${escape(periodName())}${unresolved ? ` · <span title="Ticker text in these letters that matched no security, such as an acronym or a symbol another company uses today">${unresolved} unmatched ${unresolved === 1 ? 'mention' : 'mentions'} not counted</span>` : ''}</span>
+        <span class="fl-meta">Discussed by 2+ independent managers · ${escape(periodName())}${unresolved ? ` · <span title="Ticker text in these letters that matched no security, such as an acronym or a symbol another company uses today">${unresolved} unmatched ${unresolved === 1 ? 'mention' : 'mentions'} not counted</span>` : ''}</span>
         <ul class="fl-overlap-list">
           ${shown.map(row => {
             const contested = row.long > 0 && row.short > 0;
             const inBook = role === 'owner' && bookSet.has(row.ticker);
             return `<li><button type="button" class="fl-overlap-item${contested ? ' is-contested' : ''}${inBook ? ' is-book' : ''}${state.ticker === row.ticker ? ' is-active' : ''}"
               data-pick-ticker="${escape(row.ticker)}" aria-pressed="${state.ticker === row.ticker}"
-              title="${row.name ? `${escape(row.name)} · ` : ''}${row.funds} independent funds · ${row.long} long · ${row.short} short${inBook ? ' · in our book' : ''}">
-              <strong>${escape(row.ticker)}</strong> <span>${row.funds}</span></button></li>`;
+              title="${row.name ? `${escape(row.name)} · ` : ''}${managersText(row.managers)} · ${row.long} long · ${row.short} short or selling${inBook ? ' · in our book' : ''}">
+              <strong>${escape(row.ticker)}</strong> <span>${row.managers}</span></button></li>`;
           }).join('<li aria-hidden="true" class="fl-overlap-dot">·</li>')}
         </ul>
         ${rows.length > 8 ? `<button type="button" class="fl-overlap-more" data-overlap-toggle aria-expanded="${overlapOpen}">${overlapOpen ? 'Show fewer' : `Show all ${rows.length}`}</button>` : ''}`;
@@ -723,6 +730,7 @@
                 badgeHtml(directionText, directionTone),
                 ACTIVITY_LABELS[activity] && !(activity === 'short' && directionText === 'Short') ? badgeHtml(ACTIVITY_LABELS[activity], activityTone(activity)) : '',
                 item.first_mentioned ? badgeHtml('First mention', 'macro') : '',
+                managersBadge(item),
                 themeBadges(item),
                 bookBadge(tickers),
                 unresolvedHtml(item),
@@ -744,6 +752,117 @@
             <span class="fl-source-type">Fund letter</span>
           </footer>
         </article>`;
+    }
+
+    const STANCE_SECTIONS = [['long', 'Long'], ['opposing', 'Short or selling'], ['other', 'Other discussions']];
+    const entriesOf = quarter => STANCE_SECTIONS.flatMap(([key]) => quarter[key] || []);
+
+    function companyAlsoHtml(entry) {
+      if (!entry.also?.length) return '';
+      return `<p class="fl-company-also">Same argument also published by ${entry.also.map(other =>
+        `<button type="button" class="fl-fund-tag" data-fund="${escape(other.fund_id)}">${escape(other.fund)}</button>`).join(', ')}, so counted as one manager.</p>`;
+    }
+
+    // A fund's argument this quarter in full, with its other discussions of the company on demand.
+    function companyEntryHtml(entry, period) {
+      return `
+        <div class="fl-company-entry">
+          ${ideaCardHtml(entry.idea)}
+          ${companyAlsoHtml(entry)}
+          ${entry.more?.length ? `
+          <details class="fl-expander fl-company-more">
+            <summary>${entry.more.length} more ${entry.more.length === 1 ? 'discussion' : 'discussions'} from ${escape(entry.idea.fund)} in ${escape(period || 'this quarter')}</summary>
+            <div class="fl-expander-body fl-idea-card-list">${entry.more.map(ideaCardHtml).join('')}</div>
+          </details>` : ''}
+        </div>`;
+    }
+
+    // An earlier quarter's entry on one line: fund, stance and the argument's first statement.
+    function companyBriefHtml(entry) {
+      const item = entry.idea;
+      const [directionText, directionTone] = direction(item);
+      const activity = String(item.activity || '').toLowerCase();
+      const headline = statements(item.summary)[0] || item.title;
+      return `
+        <li class="fl-company-brief">
+          <button type="button" class="fl-fund-tag" data-fund="${escape(item.fund_id)}">${escape(item.fund)}</button>
+          ${badgeHtml(directionText, directionTone)}
+          ${ACTIVITY_LABELS[activity] && !(activity === 'short' && directionText === 'Short') ? badgeHtml(ACTIVITY_LABELS[activity], activityTone(activity)) : ''}
+          <a href="${escape(link({ view: 'funds', fund: item.fund_id, letter: item.letter_id, idea: item.id }))}"
+            data-open-letter="${escape(item.letter_id)}" data-open-fund="${escape(item.fund_id)}" data-open-idea="${escape(item.id)}">${escape(headline)}</a>
+          ${entry.also?.length ? `<span class="fl-company-brief-also">Also published by ${escape(entry.also.map(other => other.fund).join(', '))}</span>` : ''}
+        </li>`;
+    }
+
+    function companyOverviewHtml(data) {
+      const rows = data.companies || [];
+      const shared = rows.filter(row => row.managers > 1).length;
+      if (!rows.length) return `<div class="fl-empty"><h2>No companies match</h2>${emptyMessage(data.emptied_by, 'discussions')}</div>`;
+      return `
+        <header class="fl-section-head">
+          <div>
+            <div class="fl-meta">By ticker · ${escape(periodName())}</div>
+            <h2>${narrowed() ? 'Companies matching your filters' : 'Companies discussed'}</h2>
+          </div>
+          <span class="fl-date">${count(rows.length, 'company', 'companies')}${shared ? ` · ${shared} with 2+ managers` : ''}</span>
+        </header>
+        <section aria-label="Companies">
+        <p class="fl-notice">Ranked by independent managers. A fund's several letters count once, and funds publishing a near-identical argument count as one manager.</p>
+        <ol class="fl-company-list">
+          ${rows.map(row => `
+          <li><button type="button" class="fl-company-row${role === 'owner' && bookSet.has(row.ticker) ? ' is-book' : ''}" data-pick-ticker="${escape(row.ticker)}">
+            <strong class="fl-company-ticker">${escape(row.ticker)}</strong>
+            <span class="fl-company-name">${escape(row.name || '')}</span>
+            <span class="fl-company-counts">
+              <span>${escape(managersText(row.managers))}</span>
+              <span class="is-long">${row.long ? `${row.long} long` : ''}</span>
+              <span class="is-opposing">${row.short ? `${row.short} short or selling` : ''}</span>
+            </span>
+          </button></li>`).join('')}
+        </ol>
+        </section>`;
+    }
+
+    // Every manager's argument on one company: the chosen quarter split into longs, shorts or sellers and
+    // other mentions, then the company's earlier quarters for context.
+    function companyHtml(data) {
+      const quarters = data.quarters || [];
+      const current = data.current ? quarters[0] : null;
+      const earlier = current ? quarters.slice(1) : quarters;
+      const allQuarters = String(data.period).toUpperCase() === 'ALL';
+      const where = allQuarters ? 'across all quarters' : `in ${data.period}`;
+      const sideHtml = (key, title) => {
+        const entries = current?.[key] || [];
+        if (!entries.length) return key === 'other' ? '' : `<section class="fl-company-side is-${key}"><h4>${title}</h4><p class="fl-company-none">No fund ${key === 'long' ? 'argued the long case' : 'was short or selling'} ${escape(allQuarters ? `in ${current.period}` : where)}.</p></section>`;
+        return `<section class="fl-company-side is-${key}"><h4>${title} <span>(${entries.length})</span></h4>${entries.map(entry => companyEntryHtml(entry, current.period)).join('')}</section>`;
+      };
+      return `
+        <header class="fl-section-head fl-company-head">
+          <div>
+            <button type="button" class="fl-back-btn" data-ticker-overview>← All companies</button>
+            <div class="fl-meta">By ticker · ${escape(periodName())}</div>
+            <h2>${escape(data.ticker)}${data.name ? ` <span class="fl-company-title-name">${escape(data.name)}</span>` : ''}</h2>
+          </div>
+          <p class="fl-company-headline"><strong>${Number(data.managers || 0)}</strong> ${Number(data.managers) === 1 ? 'independent manager' : 'independent managers'} ${escape(where)}${state.q || activeChips().length || state.type || state.focus ? ' matching the filters' : ''}</p>
+        </header>
+        ${current ? `
+        <section class="fl-company-quarter" aria-label="${escape(current.period || 'Undated')}">
+          ${allQuarters ? `<h3 class="fl-group-heading">Latest: ${escape(current.period || 'Undated')} <span>(${escape(managersText(current.managers))})</span></h3>` : ''}
+          <div class="fl-company-columns">
+            ${sideHtml('long', 'Long')}
+            ${sideHtml('opposing', 'Short or selling')}
+          </div>
+          ${sideHtml('other', 'Other discussions')}
+        </section>` : `<div class="fl-empty"><h2>No fund discussed ${escape(data.ticker)} ${escape(where)}</h2>${emptyMessage(data.emptied_by, 'discussions')}</div>`}
+        ${earlier.length ? `
+        <section class="fl-company-earlier" aria-label="Earlier quarters">
+          <h3 class="fl-group-heading">${current ? 'Earlier quarters' : 'Other quarters'}</h3>
+          ${earlier.map(quarter => `
+          <div class="fl-company-earlier-quarter">
+            <h4>${escape(quarter.period || 'Undated')} <span>${escape(managersText(quarter.managers))}</span></h4>
+            <ul>${entriesOf(quarter).map(companyBriefHtml).join('')}</ul>
+          </div>`).join('')}
+        </section>` : ''}`;
     }
 
     function letterCardHtml(letter) {
@@ -981,6 +1100,11 @@
               </article>`).join('') || '<p>No unresolved reviews.</p>',
           );
           next = data.next_offset;
+        } else if (state.view === 'ticker') {
+          const data = await api({ action: 'ticker', ...scopeArgs() });
+          if (ticket !== sequence || disposed) return;
+          reading.innerHTML = data.ticker ? companyHtml(data) : companyOverviewHtml(data);
+          next = null;
         } else if (state.view === 'ideas') {
           const data = await api({ action: 'ideas', ...scopeArgs(), ...(state.fund ? { fund: state.fund } : {}), offset });
           if (ticket !== sequence || disposed) return;
@@ -1432,8 +1556,8 @@
       if (target.dataset.pickTicker !== undefined) {
         e.preventDefault();
         const ticker = target.dataset.pickTicker;
-        if (!ticker || ticker === state.ticker) navigate({ ticker: '', letter: '', idea: '' });
-        else navigate({ ticker, view: 'ideas', fund: '', letter: '', idea: '', mode: '' });
+        if (!ticker || (ticker === state.ticker && state.view === 'ticker')) navigate({ ticker: '', letter: '', idea: '' });
+        else navigate({ ticker, view: 'ticker', fund: '', letter: '', idea: '', mode: '', stack: '' });
         return;
       }
       if (target.dataset.dirSort) {
@@ -1454,10 +1578,15 @@
         navigate({ view: target.dataset.viewMode, letter: '', idea: '', mode: '', stack: '' });
         return;
       }
+      if (target.hasAttribute('data-ticker-overview')) {
+        e.preventDefault();
+        navigate({ ticker: '', letter: '', idea: '' });
+        return;
+      }
       if (target.hasAttribute('data-fund')) {
         e.preventDefault();
         const fromDrawer = drawerOpen();
-        navigate({ fund: target.dataset.fund, letter: '', idea: '', mode: '', stack: '' });
+        navigate({ fund: target.dataset.fund, letter: '', idea: '', mode: '', stack: '', ...(state.view === 'ticker' ? { view: 'funds' } : {}) });
         if (fromDrawer) {
           setDrawer(false);
           reading.focus({ preventScroll: true });
