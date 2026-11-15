@@ -11,6 +11,7 @@ import { onRequestGet, onRequestPost } from '../functions/api/fund-letters.js';
 function database() {
   const db = new DatabaseSync(':memory:');
   db.exec(readFileSync(new URL('./migrations/0023_fund_letters.sql',import.meta.url),'utf8'));
+  db.exec(readFileSync(new URL('./migrations/0026_fund_letter_entities.sql',import.meta.url),'utf8'));
   // Exercise production SQL, rather than maintaining query-specific mocked answers.
   const prepare = sql => ({ bind(...args) { return { async all() {return {results:db.prepare(sql).all(...args)};}, async first() {return db.prepare(sql).get(...args)||null;}, async run() {return {meta:{changes:db.prepare(sql).run(...args).changes}};} }; } });
   return { db, prepare, async batch(stmts) {db.exec('BEGIN');try{const rows=[];for(const stmt of stmts)rows.push(await stmt.run());db.exec('COMMIT');return rows;}catch(error){db.exec('ROLLBACK');throw error;}} };
@@ -21,6 +22,19 @@ const context = (query,viewer=reader,DB=database()) => ({request:new Request('ht
 const source = 'Acme earns subscription income from its customers. Revenue increased 20% this year. Management expects renewals to remain strong. Customer losses are a risk.';
 const draft = () => ({overview:'The manager examines an opportunity in recurring customer payments.',ideas:[{id:'acme',title:'Acme subscriptions',ticker:'ACME',idea_type:'long',summary:'The fund argues that customer payments create attractive recurring economics. It reports revenue growth of 20% and identifies customer retention as an uncertainty.',evidence:[{claim:'Economics, growth and risk',section_id:'s1',quote:source}]}],checklist:[{section_id:'s1',idea_ids:['acme'],disposition:'covered',reason:'Acme economics and risks summarized.'}]});
 
+// The pipeline's resolver reduced to fixtures: each mention in an idea's ticker text is one resolved security
+// unless the test marks it 'unresolved' or 'dropped'. Rows sit under resolver 'test-1', which fl_settings names.
+function resolveTickers(DB, status = {}) {
+  DB.db.exec("INSERT OR IGNORE INTO fl_settings(key,value) VALUES('entity_resolver','test-1'),('idea_themes','test-1')");
+  const insert = DB.db.prepare("INSERT OR IGNORE INTO fl_idea_entities(resolver,revision_id,idea_id,ordinal,mention,ticker,status) VALUES('test-1',?,?,?,?,?,?)");
+  for (const row of DB.db.prepare("SELECT revision_id,id,ticker FROM fl_ideas WHERE TRIM(COALESCE(ticker,''))!=''").all()) {
+    row.ticker.split(',').map(part => part.trim()).forEach((mention, ordinal) => {
+      const state = status[`${row.id}:${mention}`] ?? status[mention] ?? 'resolved';
+      if (state !== 'dropped') insert.run(row.revision_id, row.id, ordinal, mention, state === 'resolved' ? mention : null, state);
+    });
+  }
+}
+
 function seed(DB,count=1) {
   DB.db.exec("INSERT INTO fl_funds(id,name) VALUES('fund','Test Fund');");
   for(let i=0;i<count;i++) {
@@ -28,6 +42,7 @@ function seed(DB,count=1) {
     DB.db.prepare('INSERT INTO fl_revisions(id,letter_id,created_at,author,status,overview,content_json,checks_json) VALUES(?,?,?,?,?,?,?,?)').run('r'+i,'l'+i,'2026-10-23','editor','published',draft().overview,JSON.stringify(draft()),'{}');
     DB.db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,summary,ordinal) VALUES(?,?,?,?,?,?,?,?)').run('acme','r'+i,'l'+i,'Acme subscriptions','ACME','long',draft().ideas[0].summary,0);
   }
+  resolveTickers(DB);
 }
 
 test('only the two verified identities become owners; service tokens and revoked users cannot read',()=>{
@@ -230,6 +245,7 @@ test('smart search tokens, multi-fund overlap, battleground signals, and owner p
   DB.db.prepare('INSERT INTO fl_letters(id,fund_id,content_hash,pipeline_version,reporting_period,ingested_at,source_ref,source_url,source_text,published_revision) VALUES(?,?,?,?,?,?,?,?,?,?)').run('lbear','bear-fund','hbear','v1','2020Q2','2026-10-23','private/path','https://drive.google.com/SECRET',source,'rbear');
   DB.db.prepare('INSERT INTO fl_revisions(id,letter_id,created_at,author,status,overview,content_json,checks_json) VALUES(?,?,?,?,?,?,?,?)').run('rbear','lbear','2026-10-23','editor','published','Bearish view on Acme.','{"stance":{"focus":"macro"}}','{}');
   DB.db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES(?,?,?,?,?,?,?,?,?)').run('acme-short','rbear','lbear','Acme short thesis','ACME','short','short','Acme faces competitive pressure.',0);
+  resolveTickers(DB);
 
   const parsed = parseSearchTokens('ticker:ACME,MSFT type:short action:new focus:macro is:battleground recurring');
   assert.deepEqual(parsed.tickers, ['ACME', 'MSFT']);
@@ -331,6 +347,7 @@ function workspaceArchive() {
   idea('a2', 'delta', 'DELTA', 'long', 'new', 3);
   letter('b2', 'b', '2020Q2', '2020-07-20');
   idea('b2', 'beta-short', 'BETA', 'short', 'short', 0);
+  resolveTickers(DB);
   return DB;
 }
 const ids = body => body.results.map(r => `${r.fund_id}:${r.ticker}`).sort();
@@ -343,7 +360,7 @@ test('position activity and first mention are separate filters: OR within a grou
   assert.deepEqual(workspace.periods, [{ period: '2020Q2', count: 2 }, { period: '2020Q1', count: 1 }]);
   // Holdings-table mentions are not discussions.
   assert.deepEqual(workspace.funds.map(f => [f.id, f.discussions, f.letter_date]), [['a', 4, null], ['b', 1, '2020-07-20']]);
-  assert.deepEqual(workspace.totals, { funds: 2, letters: 2, discussions: 5 });
+  assert.deepEqual(workspace.totals, { funds: 2, letters: 2, discussions: 5, unresolved: 0 });
 
   // New position: what the fund opened, whether or not it named the company before.
   assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'new' })), ['a:BETA', 'a:DELTA']);
@@ -358,7 +375,7 @@ test('position activity and first mention are separate filters: OR within a grou
   assert.deepEqual(flagged.results.filter(r => r.first_mentioned).map(r => r.ticker).sort(), ['BETA', 'GAMMA']);
 
   // Each fund counts once on the overlap strip, with its direction.
-  assert.deepEqual(workspace.overlap, [{ ticker: 'BETA', funds: 2, letters: 2, long: 1, short: 1 }]);
+  assert.deepEqual(workspace.overlap, [{ ticker: 'BETA', name: null, funds: 2, letters: 2, long: 1, short: 1 }]);
   const narrowed = await get({ action: 'workspace', f: 'new' });
   assert.deepEqual(narrowed.funds.map(f => [f.id, f.discussions]), [['a', 2]]);
   assert.deepEqual(narrowed.overlap, []);
@@ -378,7 +395,7 @@ test('the workspace explains empty results, compares with the fund\'s last discu
   const acme = all.results.find(r => r.ticker === 'ACME');
   assert.deepEqual(acme.prior, { letter_id: 'a1', reporting_period: '2020Q1', letter_date: '2020-04-15', title: 'ACME thesis', idea_type: 'long', activity: 'hold', summary: 'The fund discusses ACME in a1.\nA second statement.' });
   assert.equal(all.results.find(r => r.ticker === 'DELTA').prior, null);
-  assert.deepEqual(Object.keys(acme).sort(), ['activity', 'compared_letter_id', 'evolution', 'first_mentioned', 'fund', 'fund_id', 'id', 'idea_type', 'letter_date', 'letter_id', 'prior', 'reporting_period', 'summary', 'ticker', 'title']);
+  assert.deepEqual(Object.keys(acme).sort(), ['activity', 'compared_letter_id', 'evolution', 'first_mentioned', 'fund', 'fund_id', 'id', 'idea_type', 'letter_date', 'letter_id', 'prior', 'reporting_period', 'summary', 'themes', 'ticker', 'tickers', 'title', 'unresolved']);
   assert.equal(JSON.stringify(all).includes('SECRET'), false);
   assert.equal(JSON.stringify(all).includes('private/path'), false);
 
@@ -403,4 +420,49 @@ test('long ticker lists stay within the D1 bound-parameter limit', async () => {
     assert.equal(response.status, 200, JSON.stringify(query).slice(0, 40));
   }
   assert.ok(most > 0 && most < 100, `largest bind was ${most} parameters`);
+});
+
+test('only resolved securities are matched or counted; unresolved mentions show on the card and in a separate count', async () => {
+  const DB = workspaceArchive();
+  const get = async (query, viewer = reader) => (await onRequestGet(context(query, viewer, DB))).json();
+  const add = (letterId, id, ticker, type, activity, ordinal) => DB.db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES(?,?,?,?,?,?,?,?,?)')
+    .run(id, 'r-' + letterId, letterId, `${id} thesis`, ticker, type, activity, `The fund discusses ${id}.`, ordinal);
+  // Both funds write FCF, which the resolver drops as an acronym. Fund B's "ACME" is a different company.
+  add('a2', 'cash', 'FCF', 'long', 'hold', 4);
+  add('b2', 'cash-b', 'FCF', 'long', 'hold', 1);
+  add('b2', 'acme-other', 'ACME', 'long', 'new', 2);
+  add('a2', 'pair', 'ACME, ZETA', 'long', 'new', 5);
+  resolveTickers(DB, { FCF: 'dropped', 'acme-other:ACME': 'unresolved' });
+  // An older resolver that did count FCF no longer matters once the pointer has moved on.
+  DB.db.exec("INSERT INTO fl_idea_entities(resolver,revision_id,idea_id,ordinal,mention,ticker,status) VALUES('test-0','r-a2','cash',0,'FCF','FCF','resolved'),('test-0','r-b2','cash-b',0,'FCF','FCF','resolved')");
+
+  const workspace = await get({ action: 'workspace' });
+  assert.deepEqual(workspace.overlap.map(row => row.ticker), ['BETA']);
+  assert.equal(workspace.totals.unresolved, 1);
+  assert.deepEqual(await get({ action: 'ideas', period: '2020Q2', ticker: 'FCF' }).then(body => body.results), []);
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', ticker: 'ACME' })), ['a:ACME', 'a:ACME, ZETA']);
+  const card = (await get({ action: 'ideas', period: '2020Q2' })).results.find(row => row.id === 'acme-other');
+  assert.deepEqual([card.ticker, card.tickers, card.unresolved], ['', [], ['ACME']]);
+  const catalog = await get({ action: 'funds' });
+  assert.equal(catalog.tickers.some(row => row.ticker === 'FCF'), false);
+  assert.equal(catalog.tickers.find(row => row.ticker === 'ACME').fund_count, 1);
+  // A first mention is any resolved security the fund has not named before: ZETA, alongside the familiar ACME.
+  const pair = (await get({ action: 'ideas', period: '2020Q2', f: 'first' })).results.map(row => row.id).sort();
+  assert.deepEqual(pair, ['beta', 'gamma', 'pair']);
+});
+
+test('theme chips use the current theme set only, OR within the group and AND with the others', async () => {
+  const DB = workspaceArchive();
+  const get = async query => (await onRequestGet(context(query, reader, DB))).json();
+  DB.db.exec("INSERT INTO fl_idea_themes(theme_set,revision_id,idea_id,theme) VALUES('test-1','r-a2','acme','quality'),('test-1','r-a2','delta','ma'),('test-0','r-a2','beta','ma')");
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'quality' })), ['a:ACME']);
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'ma' })), ['a:DELTA']);
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'quality,ma' })), ['a:ACME', 'a:DELTA']);
+  const empty = await get({ action: 'ideas', period: '2020Q2', f: 'quality,new' });
+  assert.deepEqual(empty.results, []);
+  assert.equal(empty.emptied_by.find(step => !step.count).key, 'theme');
+  const acme = (await get({ action: 'ideas', period: '2020Q2' })).results.find(row => row.id === 'acme');
+  assert.deepEqual(acme.themes, ['quality']);
+  const pane = await get({ action: 'letters', fund: 'a', period: '2020Q2', f: 'ma' });
+  assert.deepEqual(pane.letters[0].ideas.filter(idea => idea.matches).map(idea => idea.id), ['delta']);
 });

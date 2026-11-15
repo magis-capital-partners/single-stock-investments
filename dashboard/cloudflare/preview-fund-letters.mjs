@@ -13,6 +13,7 @@ const fixture=args.includes('--fixture');
 if(!fixture&&!args.includes('--db'))throw new Error('Use --db PATH for the private archive, or --fixture for a synthetic UI test.');
 const db=new DatabaseSync(fixture?':memory:':resolve(value('--db')));
 db.exec(readFileSync(new URL('./migrations/0023_fund_letters.sql',import.meta.url),'utf8'));
+db.exec(readFileSync(new URL('./migrations/0026_fund_letter_entities.sql',import.meta.url),'utf8'));
 const role=args.includes('--reader')?'reader':'owner';
 if(fixture){
   db.exec("INSERT INTO fl_funds(id,name,manager,strategy) VALUES('test-fund','Example Fund · UI test','Example manager','A synthetic fixture for testing archive navigation.');");
@@ -22,6 +23,8 @@ if(fixture){
     db.prepare('INSERT INTO fl_revisions(id,letter_id,created_at,published_at,author,status,overview,content_json,checks_json) VALUES(?,?,?,?,?,?,?,?,?)').run('revision-'+n,'letter-'+n,'2026-10-23','2026-10-23','UI fixture','published','This synthetic test letter describes an investment argument and a dated portfolio update.\n\nThe manager outlines selective additions to recurring-revenue compounders while maintaining cash discipline.',JSON.stringify({headline:'The fixture fund adds to recurring-revenue software while keeping cash reserves disciplined.',stance:{focus:'mixed',leaning_in:[{subject:'Recurring revenue equities',why:'The fixture fund favours durable customer payments over idle cash.',quote:'synthetic fixture'}],leaning_out:[{subject:'Cash',why:'The fixture fund keeps only a small cash balance.',quote:'synthetic fixture'}]}}),'{}');
     db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES(?,?,?,?,?,?,?,?,?)').run('idea-1','revision-'+n,'letter-'+n,'A recurring revenue investment argument','TEST','long','new','The example fund argues that recurring customer payments create durable economics. This text is a synthetic interface fixture.\n\nIts argument rests on customer retention, distribution advantages and disciplined reinvestment. The fund identifies customer losses and execution as uncertainties.\n\nA real published article would include only arguments and figures reconciled to the historical letter.',0);
   }
+  db.exec("INSERT INTO fl_settings(key,value) VALUES('entity_resolver','fixture'),('idea_themes','fixture')");
+  db.exec("INSERT INTO fl_idea_entities(resolver,revision_id,idea_id,ordinal,mention,ticker,exchange,status) SELECT 'fixture',revision_id,id,0,ticker,ticker,'US','resolved' FROM fl_ideas");
 }
 const DB={prepare(sql){return{bind(...args){return{async all(){return{results:db.prepare(sql).all(...args)};},async first(){return db.prepare(sql).get(...args)||null;},async run(){return{meta:{changes:db.prepare(sql).run(...args).changes}};}};}};},async batch(statements){db.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());db.exec('COMMIT');return results;}catch(error){db.exec('ROLLBACK');throw error;}}};
 // The whole committed dashboard is served, not only the reader files, so the
