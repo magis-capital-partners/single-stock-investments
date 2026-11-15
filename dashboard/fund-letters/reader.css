@@ -374,63 +374,69 @@
   color: var(--fl-ink);
 }
 
-.fl-date-range {
-  position: relative;
+.fl-quarter-field {
+  gap: 6px;
 }
 
-.fl-date-range > summary {
-  list-style: none;
-  cursor: pointer;
-  min-height: 34px;
-  padding: 5px 28px 5px 10px;
-  border: 1px solid var(--fl-line);
-  border-radius: 6px;
-  background-color: var(--fl-control-bg);
-  background-image: var(--fl-chevron);
-  background-repeat: no-repeat;
-  background-position: right 9px center;
-  background-size: 12px 12px;
-  font-size: 12.5px;
-  color: var(--fl-ink);
-  display: inline-flex;
-  align-items: center;
-  transition: border-color 0.12s ease, background-color 0.12s ease;
-}
-
-.fl-date-range > summary:hover,
-.fl-date-range[open] > summary {
-  border-color: var(--fl-blue);
-}
-
-.fl-date-range > summary::-webkit-details-marker {
-  display: none;
-}
-
-.fl-date-range-pop {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  z-index: 30;
-  background-color: var(--fl-menu-bg);
-  border: 1px solid var(--fl-line);
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
-  display: grid;
-  gap: 8px;
-  min-width: 210px;
-}
-
-.fl-date-range-pop input[type="date"] {
-  background-color: var(--fl-control-bg);
-  color: var(--fl-ink);
-}
-
-.fl-date-range-pop label {
-  display: grid;
-  gap: 3px;
-  font-size:var(--font-caption,12px);
+.fl-quarter-label {
+  font: 700 12px/1.3 var(--fl-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--fl-muted);
+}
+
+.fl-quarter-field select {
+  font-weight: 600;
+}
+
+/* Filter chips: OR within a group, AND across groups and with the search */
+.fl-chipbar {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 8px 28px;
+  border-bottom: 1px solid var(--fl-line);
+  background: var(--fl-paper);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.fl-chip-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.fl-chip-label {
+  margin-right: 2px;
+  font: 700 12px/1.3 var(--fl-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fl-muted);
+}
+
+.fl-chip {
+  min-height: 28px !important;
+  padding: 3px 11px !important;
+  border: 1px solid var(--fl-line) !important;
+  border-radius: 999px !important;
+  background-color: var(--fl-control-bg) !important;
+  color: var(--fl-ink) !important;
+  font-size: 12.5px !important;
+}
+
+.fl-chip[aria-pressed="true"] {
+  border-color: var(--fl-blue) !important;
+  background-color: var(--fl-blue) !important;
+  color: var(--fl-on-accent) !important;
+  font-weight: 600;
+}
+
+.fl-chip--book[aria-pressed="true"] {
+  border-color: var(--fl-good) !important;
+  background-color: var(--fl-good) !important;
 }
 
 .fl-reset {
@@ -489,73 +495,82 @@
   font-weight: 600;
 }
 
-/* Cross-Fund Signal & Overlap Strip */
-.fl-signal-strip {
-  margin-bottom: 18px;
-  padding: 12px 14px;
-  border: 1px solid var(--fl-line);
-  border-radius: 8px;
-  background: var(--fl-paper);
-  display: grid;
-  gap: 8px;
-}
-
-.fl-signal-strip-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-
-.fl-signal-pills {
+/* Companies several funds discuss in the current quarter and filters */
+.fl-overlap {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 7px 28px;
+  border-bottom: 1px solid var(--fl-line);
+  background: var(--fl-subtle);
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-}
-
-.fl-signal-pill {
-  min-height: 28px !important;
-  padding: 4px 9px !important;
-  border-radius: 6px !important;
-  background-color: var(--fl-control-bg) !important;
-  border: 1px solid var(--fl-line) !important;
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size:var(--font-caption,12px) !important;
+  gap: 6px 12px;
 }
 
-.fl-signal-pill strong {
+.fl-overlap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+}
+
+.fl-overlap-dot {
+  color: var(--fl-muted);
+}
+
+.fl-overlap-item {
+  min-height: 24px !important;
+  padding: 1px 6px !important;
+  border: 1px solid transparent !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 12.5px !important;
+}
+
+.fl-overlap-item strong {
   font: 700 12px var(--fl-mono);
   color: var(--fl-blue);
 }
 
-.fl-signal-pill span {
-  color: var(--fl-prose);
-}
-
-.fl-signal-pill small {
+.fl-overlap-item span {
   font: 600 12px var(--fl-mono);
   color: var(--fl-muted);
 }
 
-.fl-signal-pill.is-battleground {
-  border-color: color-mix(in srgb, var(--fl-warn) 50%, transparent) !important;
-}
-
-.fl-signal-pill.is-active {
+.fl-overlap-item:hover,
+.fl-overlap-item.is-active {
   border-color: var(--fl-blue) !important;
-  background-color: var(--fl-blue-soft) !important;
+  background: var(--fl-blue-soft) !important;
 }
 
-.fl-in-book-dot {
-  font-style: normal;
-  font: 700 12px var(--fl-mono);
-  text-transform: uppercase;
-  padding: 1px 5px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--fl-good) 14%, transparent);
+/* Funds on both sides of the company */
+.fl-overlap-item.is-contested {
+  border-bottom-color: color-mix(in srgb, var(--fl-warn) 70%, transparent) !important;
+}
+
+.fl-overlap-item.is-book strong {
   color: var(--fl-good);
+}
+
+.fl-overlap-more {
+  min-height: 24px !important;
+  padding: 1px 8px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--fl-blue) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+
+.fl-badge--book {
+  font-weight: 700;
 }
 
 /* Main Two-Column Grid */
@@ -580,6 +595,7 @@
 
 .fl-directory-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
@@ -689,8 +705,21 @@
   line-height: 1.25;
 }
 
-.fl-filters .fl-mobile-select {
-  display: none;
+/* The fund list is a drawer on narrow screens; these controls only exist there. */
+.fl-drawer-toggle,
+.fl-drawer-close,
+.fl-drawer-scrim {
+  display: none !important;
+}
+
+.fl-dir-empty {
+  padding: 10px 6px;
+  font-size: 12.5px;
+  color: var(--fl-muted);
+}
+
+.fl-dir-empty p {
+  margin: 0 0 8px;
 }
 
 /* Main Reading Pane */
@@ -1341,20 +1370,74 @@
   margin-bottom: 0;
 }
 
-.fl-evolution {
-  margin-top: 10px;
-  padding: 10px 14px;
-  border-left: 3px solid var(--fl-blue);
-  background: var(--fl-paper);
-  border-radius: 0 6px 6px 0;
+.fl-expander > summary {
+  width: fit-content;
+  cursor: pointer;
+  font: 600 12.5px/1.4 var(--fl-sans);
+  color: var(--fl-blue);
 }
 
-.fl-evolution h4 {
-  font: 700 12px/1.4 var(--fl-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.fl-idea .fl-expander {
+  margin-top: 10px;
+}
+
+.fl-expander-body {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--fl-line-strong);
+  border-radius: 0 6px 6px 0;
+  background: var(--fl-subtle);
+}
+
+.fl-idea .fl-expander-body {
+  background: var(--fl-paper);
+}
+
+.fl-what-changed .fl-expander-body {
+  border-left-color: var(--fl-blue);
+}
+
+.fl-expander-body p {
+  max-width: 72ch;
+  margin: 0 0 8px;
+  font: 14.5px/1.65 var(--fl-serif);
+  color: var(--fl-prose);
+}
+
+.fl-reader .fl-change-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font: 12.5px/1.5 var(--fl-sans);
   color: var(--fl-muted);
-  margin: 0 0 4px;
+}
+
+.fl-prior {
+  margin: 0 0 8px;
+  padding-left: 10px;
+  border-left: 2px solid var(--fl-line);
+}
+
+.fl-other-ideas {
+  margin-top: 18px;
+  padding: 10px 14px;
+  border: 1px dashed var(--fl-line-strong);
+  border-radius: 8px;
+}
+
+.fl-other-ideas > summary {
+  cursor: pointer;
+  font: 600 12.5px/1.4 var(--fl-sans);
+  color: var(--fl-muted);
+}
+
+.fl-match-heading {
+  margin-top: 20px;
+}
+
+.fl-idea.is-match {
+  border-color: color-mix(in srgb, var(--fl-blue) 45%, transparent);
 }
 
 .fl-factual-notes {
@@ -1398,50 +1481,90 @@
   border-top: 1px solid var(--fl-line);
 }
 
-/* Cross-Fund Idea Search Results */
-.fl-idea-result-list {
+/* Idea cards: one argument per card, with the full text and the change since the fund's last discussion on demand */
+.fl-idea-card-list {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
-.fl-result {
+.fl-idea-card {
   padding: 15px 18px;
   border: 1px solid var(--fl-line);
   border-radius: 8px;
   background: var(--fl-paper);
   box-shadow: var(--fl-shadow);
+  display: grid;
+  gap: 8px;
+  scroll-margin-top: 24px;
 }
 
-.fl-result:hover {
-  border-color: var(--fl-blue);
-}
-
-.fl-result-top {
+.fl-idea-card-head {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px 12px;
+}
+
+.fl-idea-card-id {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 8px;
+  min-width: 0;
 }
 
-.fl-result h3 {
-  font: 600 18px/1.35 var(--fl-serif);
-  margin: 2px 0 6px;
+.fl-reader .fl-idea-card h3 {
+  font: 600 18px/1.3 var(--fl-serif);
+  margin: 0;
 }
 
-.fl-result h3 a {
+.fl-idea-card h3 a {
   color: var(--fl-ink);
   text-decoration: none;
 }
 
-.fl-result h3 a:hover {
+.fl-idea-card h3 a:hover {
   color: var(--fl-blue);
 }
 
-.fl-result-body p {
-  font: 15px/1.7 var(--fl-serif);
+.fl-idea-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fl-idea-headline {
   margin: 0;
+  max-width: 72ch;
+  font: 600 15.5px/1.5 var(--fl-serif);
+  color: var(--fl-ink);
+}
+
+.fl-idea-argument p {
+  max-width: 72ch;
+  margin: 0 0 6px;
+  font: 15px/1.7 var(--fl-serif);
   color: var(--fl-prose);
+}
+
+.fl-idea-argument p:last-child {
+  margin-bottom: 0;
+}
+
+.fl-idea-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--fl-line);
+}
+
+.fl-source-type {
+  font: 600 12px/1.35 var(--fl-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fl-muted);
 }
 
 /* Empty, Status, Error, Dialogs */
@@ -1714,13 +1837,37 @@
   .fl-grid {
     grid-template-columns: 1fr;
   }
-  .fl-directory {
-    display: none;
+  .fl-chipbar,
+  .fl-overlap {
+    padding: 8px 16px;
   }
-  .fl-filters .fl-mobile-select {
-    display: inline-flex;
-    flex: 1;
-    min-width: 170px;
+  .fl-drawer-toggle,
+  .fl-drawer-close {
+    display: inline-flex !important;
+  }
+  .fl-directory {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    width: min(320px, 86vw);
+    max-height: none;
+    visibility: hidden;
+    transform: translateX(-102%);
+    transition: transform 0.18s ease;
+    box-shadow: 0 0 32px rgba(0, 0, 0, 0.35);
+  }
+  .fl-reader.is-drawer-open .fl-directory {
+    visibility: visible;
+    transform: none;
+  }
+  .fl-reader.is-drawer-open .fl-drawer-scrim {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(10, 18, 32, 0.55);
   }
   .fl-reading {
     padding: 18px 16px 48px;

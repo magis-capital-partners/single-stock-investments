@@ -1,11 +1,45 @@
 import { privateJson, requireHumanViewer } from "../_lib/auth.js";
 import { requireDatabase } from "../_lib/http.js";
-import { EDITORIAL_CHECKS, LETTER_SORT_SQL, letterWhere, pageArgs, readerArchiveEntry, readerExtras, readerFund, readerLetter, readerPeriod, readerSearchResult, readerTickerSignal, searchWhere, sourceSections, validateDraft } from "../_lib/fund-letters.js";
+import { EDITORIAL_CHECKS, FIRST_MENTIONED_SQL, LETTER_SORT_SQL, LONG_SQL, QUARTER, SHORT_SQL, letterSortSql, letterWhere, pageArgs, periodKeySql, readerArchiveEntry, readerExtras, readerFund, readerLetter, readerName, readerOverlap, readerPeriod, readerPrior, readerSearchResult, readerTickerSignal, readerWorkspaceFund, readerWorkspaceIdea, searchWhere, sourceSections, tickerKeySql, validateDraft, workspaceScope } from "../_lib/fund-letters.js";
 
 const all = async (db, sql, args = []) => (await db.prepare(sql).bind(...args).all()).results || [];
 const first = (db, sql, args = []) => db.prepare(sql).bind(...args).first();
 const run = (db, sql, args = []) => db.prepare(sql).bind(...args).run();
 const ORIGINAL_TEXT_BYTES = 20_000_000;
+const IDEA_FROM = `FROM fl_ideas i JOIN fl_letters l ON l.id=i.letter_id AND l.published_revision=i.revision_id
+  JOIN fl_funds f ON f.id=l.fund_id JOIN fl_revisions r ON r.id=l.published_revision`;
+const TICKER_SHAPE = /^[A-Z0-9._-]{1,16}$/;
+
+// For each idea naming a company, the same fund's latest discussion of it in an earlier quarter.
+async function priorDiscussions(db, ideas) {
+  const wanted = ideas.map(idea => [idea.fund_id, String(idea.ticker || "").trim().toUpperCase(), idea.period_key || ""]);
+  if (!wanted.some(([, ticker, key]) => ticker && key)) return new Map();
+  const rows = await all(db, `WITH wanted AS (SELECT CAST(key AS INTEGER) k,json_extract(value,'$[0]') fund_id,json_extract(value,'$[1]') ticker,json_extract(value,'$[2]') period_key FROM json_each(?))
+    SELECT w.k,p.id letter_id,p.reporting_period,p.letter_date,pi.title,pi.idea_type,pi.activity,pi.summary,pi.ordinal,${periodKeySql("p")} pk,${letterSortSql("p")} sk
+    FROM wanted w JOIN fl_letters p ON p.fund_id=w.fund_id AND p.published_revision IS NOT NULL
+    JOIN fl_ideas pi ON pi.letter_id=p.id AND pi.revision_id=p.published_revision AND ${tickerKeySql("pi")}=w.ticker AND pi.idea_type!='factual_note'
+    WHERE w.ticker!='' AND w.period_key!='' AND ${periodKeySql("p")}!='' AND ${periodKeySql("p")}<w.period_key`, [JSON.stringify(wanted)]);
+  const latest = new Map();
+  for (const row of rows) {
+    const best = latest.get(row.k);
+    if (!best || row.pk > best.pk || (row.pk === best.pk && (row.sk > best.sk || (row.sk === best.sk && row.ordinal < best.ordinal)))) latest.set(row.k, row);
+  }
+  return latest;
+}
+
+// Applies the scope's groups one at a time and reports how many discussions survive each, so an empty
+// view can name the filter that emptied it.
+async function emptiedBy(db, scope) {
+  const steps = [];
+  for (let n = 1; n <= scope.groups.length; n += 1) {
+    const kept = new Set(scope.groups.slice(0, n));
+    const part = scope.pick(group => kept.has(group));
+    const row = await first(db, `SELECT COUNT(*) n ${IDEA_FROM} WHERE ${part.sql}`, part.args);
+    steps.push({ key: scope.groups[n - 1].key, label: scope.groups[n - 1].label, count: Number(row?.n || 0) });
+    if (!row?.n) break;
+  }
+  return steps;
+}
 function httpsLink(value) {
   try {
     const url = new URL(String(value || ""));
@@ -72,17 +106,70 @@ export async function onRequestGet(context) {
         tickers: tickerRows.map(readerTickerSignal).filter(t => t.ticker),
       });
     }
+    if (action === "workspace") {
+      const periodRows = await all(db, `SELECT reporting_period,COUNT(id) letter_count FROM fl_letters WHERE published_revision IS NOT NULL AND reporting_period GLOB '[0-9][0-9][0-9][0-9]Q[1-4]' GROUP BY reporting_period ORDER BY reporting_period DESC`);
+      const requested = String(params.get("period") || "").trim().toUpperCase();
+      const period = requested === "ALL" || QUARTER.test(requested) ? requested : periodRows[0]?.reporting_period || "ALL";
+      const scoped = new URLSearchParams(params);
+      scoped.set("period", period);
+      scoped.delete("fund");
+      const scope = workspaceScope(scoped);
+      const letterLevel = scope.groups.filter(group => group.key === "period");
+      const filtered = scope.groups.some(group => group.key !== "period");
+      const ideaPart = scope.pick(group => group.key !== "period");
+      const letterSql = letterLevel.map(group => group.sql).join(" AND ") || "1";
+      const [fundRows, overlapRows] = await Promise.all([
+        all(db, `SELECT f.id,f.name,COUNT(DISTINCT l.id) letter_count,COUNT(i.id) discussions,MAX(l.reporting_period) reporting_period,
+          MAX(l.letter_date) letter_date FROM fl_letters l JOIN fl_funds f ON f.id=l.fund_id JOIN fl_revisions r ON r.id=l.published_revision
+          LEFT JOIN fl_ideas i ON i.letter_id=l.id AND i.revision_id=l.published_revision AND ${ideaPart.sql}
+          WHERE ${letterSql} GROUP BY f.id ${filtered ? "HAVING COUNT(i.id)>0" : ""} ORDER BY f.name,f.id`,
+          [...ideaPart.args, ...letterLevel.flatMap(group => group.args)]),
+        all(db, `SELECT ${tickerKeySql("i")} ticker,COUNT(DISTINCT l.fund_id) fund_count,COUNT(DISTINCT l.id) letter_count,
+          SUM(CASE WHEN ${LONG_SQL} AND NOT ${SHORT_SQL} THEN 1 ELSE 0 END) long_count,SUM(CASE WHEN ${SHORT_SQL} THEN 1 ELSE 0 END) short_count
+          ${IDEA_FROM} WHERE ${scope.sql} AND ${tickerKeySql("i")}!='' GROUP BY 1 HAVING COUNT(DISTINCT l.fund_id)>=2
+          ORDER BY fund_count DESC,letter_count DESC,ticker LIMIT 60`, scope.args),
+      ]);
+      const funds = fundRows.map(readerWorkspaceFund);
+      const totals = { funds: funds.length, letters: funds.reduce((n, fund) => n + fund.letters, 0), discussions: funds.reduce((n, fund) => n + fund.discussions, 0) };
+      return privateJson({
+        period,
+        periods: periodRows.map(readerPeriod).filter(p => p.period),
+        funds,
+        totals,
+        overlap: overlapRows.map(readerOverlap).filter(row => TICKER_SHAPE.test(row.ticker)).slice(0, 24),
+        ...(filtered && !totals.discussions ? { emptied_by: await emptiedBy(db, scope) } : {}),
+      });
+    }
+    if (action === "ideas") {
+      const scope = workspaceScope(params);
+      const rows = await all(db, `SELECT i.id,i.title,i.ticker,i.idea_type,i.activity,i.summary,i.evolution,i.compared_letter_id,i.letter_id,
+        l.fund_id,l.reporting_period,l.letter_date,f.name fund,${periodKeySql("l")} period_key,(${FIRST_MENTIONED_SQL}) first_mentioned
+        ${IDEA_FROM} WHERE ${scope.sql} ORDER BY period_key DESC,${LETTER_SORT_SQL} DESC,f.name,l.id,i.ordinal LIMIT ? OFFSET ?`, [...scope.args, limit+1, offset]);
+      const page = rows.slice(0, limit);
+      const priors = await priorDiscussions(db, page);
+      return privateJson({
+        results: page.map((row, index) => readerWorkspaceIdea(row, priors.get(index))),
+        next_offset: rows.length > limit ? offset+limit : null,
+        ...(!page.length && scope.groups.length ? { emptied_by: await emptiedBy(db, scope) } : {}),
+      });
+    }
     if (action === "archive") {
-      const letters = await all(db, `SELECT id,reporting_period,letter_date FROM fl_letters l WHERE fund_id=? AND published_revision IS NOT NULL ORDER BY ${LETTER_SORT_SQL} DESC,id`, [params.get("fund")]);
-      return privateJson({ letters: letters.map(readerArchiveEntry) });
+      const [letters, fund] = await Promise.all([
+        all(db, `SELECT id,reporting_period,letter_date FROM fl_letters l WHERE fund_id=? AND published_revision IS NOT NULL ORDER BY ${LETTER_SORT_SQL} DESC,id`, [params.get("fund")]),
+        first(db, "SELECT name FROM fl_funds WHERE id=?", [params.get("fund")]),
+      ]);
+      return privateJson({ letters: letters.map(readerArchiveEntry), fund_name: readerName(fund?.name) });
     }
     if (action === "letters") {
       const where = letterWhere(params);
-      const rows = await all(db, `SELECT l.id,l.fund_id,f.name fund,l.reporting_period,l.letter_date,l.publication_date,
+      const rows = await all(db, `SELECT l.id,l.fund_id,f.name fund,l.reporting_period,l.letter_date,l.publication_date,${periodKeySql("l")} period_key,
         r.id revision_id,r.overview,r.created_at,r.published_at,r.content_json FROM fl_letters l JOIN fl_funds f ON f.id=l.fund_id
         JOIN fl_revisions r ON r.id=l.published_revision WHERE ${where.sql}
         ORDER BY ${LETTER_SORT_SQL} DESC,l.id LIMIT ? OFFSET ?`, [...where.args, limit+1, offset]);
       const page = rows.slice(0, limit);
+      const letterScope = workspaceScope(params);
+      const matching = letterScope.pick(group => !["period", "fund"].includes(group.key));
+      const narrowed = letterScope.groups.some(group => !["period", "fund"].includes(group.key));
       const letters = await Promise.all(page.map(async row => {
         let stance = null, headline = null, extras = null;
         try {
@@ -95,7 +182,20 @@ export async function onRequestGet(context) {
           headline = null;
           extras = null;
         }
-        return readerLetter(row, await all(db, "SELECT * FROM fl_ideas WHERE letter_id=? AND revision_id=? ORDER BY ordinal", [row.id, row.revision_id]), stance, headline, extras);
+        const ideas = await all(db, `SELECT i.*,(${FIRST_MENTIONED_SQL}) first_mentioned FROM fl_ideas i JOIN fl_letters l ON l.id=i.letter_id
+          WHERE i.letter_id=? AND i.revision_id=? ORDER BY i.ordinal`, [row.id, row.revision_id]);
+        const [priors, matched] = await Promise.all([
+          priorDiscussions(db, ideas.map(idea => ({ fund_id: row.fund_id, ticker: idea.ticker, period_key: row.period_key }))),
+          narrowed ? all(db, `SELECT i.id ${IDEA_FROM} WHERE l.id=? AND ${matching.sql}`, [row.id, ...matching.args]) : null,
+        ]);
+        const letter = readerLetter(row, ideas, stance, headline, extras);
+        const matchedIds = matched ? new Set(matched.map(match => match.id)) : null;
+        letter.ideas.forEach((idea, index) => {
+          idea.first_mentioned = Boolean(ideas[index].first_mentioned);
+          idea.prior = readerPrior(priors.get(index));
+          if (matchedIds) idea.matches = matchedIds.has(ideas[index].id);
+        });
+        return letter;
       }));
       return privateJson({ letters, next_offset: rows.length > limit ? offset+limit : null });
     }

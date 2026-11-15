@@ -1,7 +1,13 @@
 export const EDITORIAL_CHECKS = ["complete_document", "idea_coverage", "claim_accuracy", "numerical_accuracy", "original_writing", "historical_dates"];
 export const IDEA_TYPES = new Set(["long", "short", "update", "postmortem", "special_situation", "credit", "private", "unnamed", "sector", "macro", "portfolio", "factual_note"]);
 // A period endpoint is an internal ordering fallback only, never a verified displayed date.
-export const LETTER_SORT_SQL = "COALESCE(l.letter_date,l.publication_date,CASE WHEN l.reporting_period GLOB '[0-9][0-9][0-9][0-9]Q[1-4]' THEN substr(l.reporting_period,1,4)||CASE substr(l.reporting_period,6,1) WHEN '1' THEN '-03-31' WHEN '2' THEN '-06-30' WHEN '3' THEN '-09-30' ELSE '-12-31' END ELSE l.reporting_period END,'')";
+export const letterSortSql = (a) => `COALESCE(${a}.letter_date,${a}.publication_date,CASE WHEN ${a}.reporting_period GLOB '[0-9][0-9][0-9][0-9]Q[1-4]' THEN substr(${a}.reporting_period,1,4)||CASE substr(${a}.reporting_period,6,1) WHEN '1' THEN '-03-31' WHEN '2' THEN '-06-30' WHEN '3' THEN '-09-30' ELSE '-12-31' END ELSE ${a}.reporting_period END,'')`;
+export const LETTER_SORT_SQL = letterSortSql("l");
+// The reporting quarter, else the quarter of a known letter date; '' when neither is known, so an
+// undated letter is never treated as earlier than another.
+export const periodKeySql = (a) => `COALESCE(CASE WHEN ${a}.reporting_period GLOB '[0-9][0-9][0-9][0-9]Q[1-4]' THEN ${a}.reporting_period END,`
+  + `CASE WHEN COALESCE(${a}.letter_date,${a}.publication_date) GLOB '[0-9][0-9][0-9][0-9]-[01][0-9]*' THEN substr(COALESCE(${a}.letter_date,${a}.publication_date),1,4)||'Q'||((CAST(substr(COALESCE(${a}.letter_date,${a}.publication_date),6,2) AS INTEGER)+2)/3) END,'')`;
+export const tickerKeySql = (a) => `UPPER(TRIM(COALESCE(${a}.ticker,'')))`;
 
 export const MULTI_FUND_TICKERS_SQL = `SELECT UPPER(TRIM(i2.ticker)) FROM fl_ideas i2
   JOIN fl_letters l2 ON l2.id=i2.letter_id AND l2.published_revision=i2.revision_id
@@ -106,11 +112,29 @@ export function readerTickerSignal(row) {
     battleground: bull_count > 0 && bear_count > 0,
   };
 }
+export const readerName = (value) => safe(value) || null;
 export function readerArchiveEntry(row) {
   return { id: safe(row.id), reporting_period: safe(row.reporting_period), letter_date: safe(row.letter_date) || null };
 }
 export function readerSearchResult(row) {
   return { ...readerIdea(row), fund_id: safe(row.fund_id), fund: safe(row.fund), letter_id: safe(row.letter_id), reporting_period: safe(row.reporting_period), letter_date: safe(row.letter_date) || null };
+}
+// The same fund's most recent earlier discussion of a company, shown as "What changed".
+export function readerPrior(row) {
+  if (!row) return null;
+  return { letter_id: safe(row.letter_id), reporting_period: safe(row.reporting_period), letter_date: safe(row.letter_date) || null,
+    title: safe(row.title), idea_type: safe(row.idea_type), activity: safe(row.activity), summary: safe(row.summary) };
+}
+export function readerWorkspaceIdea(row, prior = null) {
+  return { ...readerSearchResult(row), first_mentioned: Boolean(row.first_mentioned), prior: readerPrior(prior) };
+}
+export function readerWorkspaceFund(row) {
+  return { id: safe(row.id), name: safe(row.name), letters: Number(row.letter_count || 0), discussions: Number(row.discussions || 0),
+    reporting_period: safe(row.reporting_period) || null, letter_date: safe(row.letter_date) || null };
+}
+export function readerOverlap(row) {
+  return { ticker: safe(row.ticker).trim().toUpperCase(), funds: Number(row.fund_count || 0), letters: Number(row.letter_count || 0),
+    long: Number(row.long_count || 0), short: Number(row.short_count || 0) };
 }
 
 export function sourceSections(text) {
@@ -282,7 +306,7 @@ function appendPeriodAndDateFilters(params, tokenPeriods, clauses, args) {
   const periods = [
     ...(params.get("period") ? [params.get("period").trim()] : []),
     ...(tokenPeriods || []),
-  ].filter(Boolean);
+  ].filter(period => period && period.toLowerCase() !== "all");
   for (const period of periods) {
     if (/^\d{4}Q[1-4]$/i.test(period)) {
       clauses.push("UPPER(l.reporting_period)=?");
@@ -349,8 +373,8 @@ export function searchWhere(params) {
     clauses.push("UPPER(TRIM(COALESCE(i.ticker,'')))=?");
     args.push(tickers[0]);
   } else if (tickers.length > 1) {
-    clauses.push(`UPPER(TRIM(COALESCE(i.ticker,''))) IN (${tickers.map(() => "?").join(",")})`);
-    args.push(...tickers);
+    clauses.push("UPPER(TRIM(COALESCE(i.ticker,''))) IN (SELECT value FROM json_each(?))");
+    args.push(JSON.stringify(tickers));
   }
 
   const focuses = [
@@ -424,8 +448,13 @@ export function letterWhere(params) {
 
   const tickers = normalizeTickerList(params.get("tickers"), parsed.tickers);
   if (tickers.length) {
-    clauses.push(`EXISTS(SELECT 1 FROM fl_ideas i WHERE i.letter_id=l.id AND i.revision_id=l.published_revision AND UPPER(TRIM(COALESCE(i.ticker,''))) IN (${tickers.map(() => "?").join(",")}))`);
-    args.push(...tickers);
+    clauses.push("EXISTS(SELECT 1 FROM fl_ideas i WHERE i.letter_id=l.id AND i.revision_id=l.published_revision AND UPPER(TRIM(COALESCE(i.ticker,''))) IN (SELECT value FROM json_each(?)))");
+    args.push(JSON.stringify(tickers));
+  }
+  const chips = workspaceScope(params, { only: ["ticker", "activity", "first", "book"] });
+  if (chips.groups.length) {
+    clauses.push(`EXISTS(SELECT 1 FROM fl_ideas i WHERE i.letter_id=l.id AND i.revision_id=l.published_revision AND ${chips.sql})`);
+    args.push(...chips.args);
   }
 
   const focuses = [
@@ -458,4 +487,94 @@ export function letterWhere(params) {
   }
   appendPeriodAndDateFilters(params, parsed.periods, clauses, args);
   return { sql: clauses.join(" AND "), args };
+}
+
+// One filter definition for the workspace fund list, idea feed, letter pane and overlap strip. Each filter is a
+// labelled group in the order the reader applies it, so an empty result can name the group that emptied it.
+export const QUARTER = /^\d{4}Q[1-4]$/;
+export const FILTER_CHIPS = ["new", "add", "trim", "exit", "short", "first", "book"];
+export const LONG_SQL = "(i.idea_type='long' OR LOWER(COALESCE(i.activity,'')) IN ('new','add'))";
+export const SHORT_SQL = "(i.idea_type='short' OR LOWER(COALESCE(i.activity,''))='short')";
+const ACTIVITY_CHIPS = {
+  new: ["New position", "LOWER(COALESCE(i.activity,''))='new'"],
+  add: ["Added", "LOWER(COALESCE(i.activity,''))='add'"],
+  trim: ["Reduced", "LOWER(COALESCE(i.activity,''))='trim'"],
+  exit: ["Exited", "LOWER(COALESCE(i.activity,'')) IN ('exit','cover')"],
+  short: ["Short", SHORT_SQL],
+};
+// A company the fund has not named in any earlier quarter we hold. Without an earlier letter there is no
+// history to compare against, so nothing in a fund's first archived letter counts as first mentioned.
+export const FIRST_MENTIONED_SQL = `(${tickerKeySql("i")}!='' AND ${periodKeySql("l")}!=''
+  AND EXISTS(SELECT 1 FROM fl_letters p WHERE p.fund_id=l.fund_id AND p.published_revision IS NOT NULL AND ${periodKeySql("p")}!='' AND ${periodKeySql("p")}<${periodKeySql("l")})
+  AND NOT EXISTS(SELECT 1 FROM fl_letters p JOIN fl_ideas pi ON pi.letter_id=p.id AND pi.revision_id=p.published_revision
+    WHERE p.fund_id=l.fund_id AND ${periodKeySql("p")}!='' AND ${periodKeySql("p")}<${periodKeySql("l")} AND ${tickerKeySql("pi")}=${tickerKeySql("i")}))`;
+
+export function parseChips(raw) {
+  return [...new Set(String(raw || "").split(",").map(s => s.trim().toLowerCase()).filter(chip => FILTER_CHIPS.includes(chip)))];
+}
+
+const FOCUS_SQL = "LOWER(COALESCE(json_extract(r.content_json,'$.stance.focus'),json_extract(r.content_json,'$.letter_focus'),'micro'))";
+const likeArg = (text) => `%${text.replace(/[\\%_]/g, "\\$&")}%`;
+const jsonList = (values) => JSON.stringify(values);
+
+// Queries using the scope join fl_ideas i, fl_letters l (on the published revision), fl_funds f and fl_revisions r.
+export function workspaceScope(params, { only = null } = {}) {
+  const parsed = parseSearchTokens(params.get("q") || "");
+  const groups = [];
+  const group = (key, label, clauses, args = []) => {
+    if ((!only || only.includes(key)) && clauses.length) groups.push({ key, label, sql: clauses.join(" AND "), args });
+  };
+
+  const periods = [String(params.get("period") || "").trim().toUpperCase(), ...parsed.periods.map(p => p.toUpperCase())].filter(p => p && p !== "ALL");
+  const periodClauses = [], periodArgs = [];
+  for (const period of periods) {
+    if (QUARTER.test(period)) { periodClauses.push("l.reporting_period=?"); periodArgs.push(period); }
+    else if (/^\d{4}$/.test(period)) { periodClauses.push("(l.reporting_period LIKE ? OR COALESCE(l.letter_date,l.publication_date,'') LIKE ?)"); periodArgs.push(`${period}%`, `${period}%`); }
+    else throw new TypeError("Use a YYYY or YYYYQn period.");
+  }
+  group("period", periods.length === 1 ? `Quarter ${periods[0]}` : "Quarter", periodClauses, periodArgs);
+
+  const search = [], searchArgs = [];
+  for (const token of parsed.funds) { search.push("(LOWER(l.fund_id)=? OR LOWER(f.name) LIKE ? ESCAPE '\\')"); searchArgs.push(token, likeArg(token)); }
+  const tokenTickers = normalizeTickerList("", parsed.tickers);
+  if (tokenTickers.length) { search.push(`${tickerKeySql("i")} IN (SELECT value FROM json_each(?))`); searchArgs.push(jsonList(tokenTickers)); }
+  if (parsed.types.length) { search.push("i.idea_type IN (SELECT value FROM json_each(?))"); searchArgs.push(jsonList(parsed.types)); }
+  if (parsed.activities.length) { search.push("LOWER(COALESCE(i.activity,'')) IN (SELECT value FROM json_each(?))"); searchArgs.push(jsonList(parsed.activities)); }
+  if (parsed.focuses.length) { search.push(`${FOCUS_SQL} IN (SELECT value FROM json_each(?))`); searchArgs.push(jsonList(parsed.focuses)); }
+  if (parsed.signals.includes("multi")) search.push(`${tickerKeySql("i")} IN (${MULTI_FUND_TICKERS_SQL})`);
+  if (parsed.signals.includes("battleground")) search.push(`${tickerKeySql("i")} IN (${BATTLEGROUND_TICKERS_SQL})`);
+  if (parsed.signals.includes("evolution")) search.push("i.evolution IS NOT NULL AND TRIM(i.evolution)!=''");
+  if (parsed.freeText) {
+    const match = likeArg(parsed.freeText);
+    search.push("(i.title LIKE ? ESCAPE '\\' OR i.ticker LIKE ? ESCAPE '\\' OR i.summary LIKE ? ESCAPE '\\' OR f.name LIKE ? ESCAPE '\\')");
+    searchArgs.push(match, match, match, match);
+  }
+  group("search", `Search "${String(params.get("q") || "").trim()}"`, search, searchArgs);
+
+  const fund = String(params.get("fund") || "").trim();
+  if (fund) group("fund", "Selected fund", ["l.fund_id=?"], [fund]);
+  const ticker = normalizeTickerList(params.get("ticker"))[0];
+  if (ticker) group("ticker", `Company ${ticker}`, [`${tickerKeySql("i")}=?`], [ticker]);
+
+  const chips = parseChips(params.get("f"));
+  const activity = chips.filter(chip => ACTIVITY_CHIPS[chip]);
+  if (activity.length) group("activity", `Position activity: ${activity.map(chip => ACTIVITY_CHIPS[chip][0]).join(" or ")}`, [`(${activity.map(chip => ACTIVITY_CHIPS[chip][1]).join(" OR ")})`]);
+  if (chips.includes("first")) group("first", "First mentioned this quarter", [FIRST_MENTIONED_SQL]);
+  if (chips.includes("book")) {
+    const book = normalizeTickerList(params.get("book"));
+    group("book", "Our book", book.length ? [`${tickerKeySql("i")} IN (SELECT value FROM json_each(?))`] : ["0"], book.length ? [jsonList(book)] : []);
+  }
+
+  const types = String(params.get("type") || "").split(",").map(s => s.trim().toLowerCase()).filter(type => IDEA_TYPES.has(type));
+  if (types.length) group("type", "Category", ["i.idea_type IN (SELECT value FROM json_each(?))"], [jsonList(types)]);
+  const focuses = String(params.get("focus") || "").split(",").map(s => s.trim().toLowerCase()).filter(s => ["micro", "macro", "mixed"].includes(s));
+  if (focuses.length) group("focus", "Letter focus", [`${FOCUS_SQL} IN (SELECT value FROM json_each(?))`], [jsonList(focuses)]);
+
+  // Holdings-table mentions are listed in the letter but are not discussions, unless asked for by category.
+  const base = [...types, ...parsed.types].includes("factual_note") ? [] : ["i.idea_type!='factual_note'"];
+  const pick = (keep = () => true) => {
+    const chosen = groups.filter(keep);
+    return { sql: [...base, ...chosen.map(g => g.sql)].join(" AND ") || "1", args: chosen.flatMap(g => g.args) };
+  };
+  return { groups, pick, ...pick() };
 }
