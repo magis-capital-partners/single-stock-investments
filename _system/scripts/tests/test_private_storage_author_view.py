@@ -8,6 +8,7 @@ from private_storage import StorageError,sha,encoded_json
 BATCH='valuation-underwriting/runtime/batch.json'
 LEDGER='valuation-underwriting/runtime/ledger.jsonl'
 LOCAL_STATE='valuation-underwriting/local-runtime/states/CPRT.json'
+AUTHOR_INDEX_CASES=sorted(io.RECEIPT_PATHS)+['superinvestor-letters/drive_import_manifest.json']
 @pytest.fixture(autouse=True)
 def local_environment(monkeypatch):monkeypatch.delenv('GITHUB_ACTIONS',raising=False)
 def vault(tmp_path):
@@ -93,7 +94,7 @@ def test_clone_vault_selects_author_view_without_reset_or_shared_checkout(tmp_pa
  assert calls==[('remote','get-url','origin'),('fetch','-q','origin','main')]
 
 
-@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+@pytest.mark.parametrize('path', AUTHOR_INDEX_CASES)
 def test_author_preserves_unpublished_dashboard_receipt_indexes_without_fetching(tmp_path,path):
  v=vault(tmp_path);original=b'{"local_unpublished":"retain every byte"}\r\n';p=put(v,path,original);store=Storage({path:b'{"remote_current":"separate producer"}\n'})
  result=io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
@@ -103,27 +104,35 @@ def test_author_preserves_unpublished_dashboard_receipt_indexes_without_fetching
  with pytest.raises(StorageError,match='shared build control'):io.materialize(v,path,storage=store)
  with pytest.raises(StorageError,match='shared build control'):io.publish_paths(v,{path:p},storage=store)
 
-@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+@pytest.mark.parametrize('path', AUTHOR_INDEX_CASES)
 def test_author_does_not_materialize_absent_dashboard_receipt_indexes(tmp_path,path):
  v=vault(tmp_path);store=Storage({path:b'{"remote":true}\n'})
  io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
  assert not (v/path).exists() and store.restored==[]
  with pytest.raises(StorageError,match='shared build control'):io.materialize(v,path,storage=store)
 
-@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+@pytest.mark.parametrize('path', AUTHOR_INDEX_CASES)
 def test_default_view_still_refuses_differing_unpublished_receipt_indexes(tmp_path,monkeypatch,path):
  v=vault(tmp_path);original=b'{"unpublished":true}\n';p=put(v,path,original);store=Storage({path:b'{"remote":true}\n'})
  monkeypatch.setattr(io,'run_git',lambda *a,**k:subprocess.CompletedProcess(a,1,b'',b''))
  with pytest.raises(StorageError,match='differing unpublished'):io.initialize(v,storage=store)
  assert p.read_bytes()==original
 
-@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+@pytest.mark.parametrize('path', AUTHOR_INDEX_CASES)
 def test_default_view_still_materializes_dashboard_receipt_indexes(tmp_path,path):
  v=vault(tmp_path);store=Storage({path:b'{"remote":true}\n'})
  io.initialize(v,storage=store)
  assert (v/path).read_bytes()==store.files[path] and store.restored==[path]
 
-@pytest.mark.parametrize('path', sorted(io.RECEIPT_PATHS))
+@pytest.mark.parametrize('path', AUTHOR_INDEX_CASES)
 def test_author_receipt_index_directory_remains_invalid(tmp_path,path):
  v=vault(tmp_path);(v/path).mkdir(parents=True)
  with pytest.raises(StorageError,match='Invalid preserved'):io.initialize(v,storage=Storage({path:b'{}'}),materialization_role='local_author',selected_ticker='CPRT')
+
+
+@pytest.mark.parametrize('path',['superinvestor-letters/drive_import_manifest.jsonl','superinvestor-letters/another_manifest.json','valuation-underwriting/local-runtime/progress/CPRT.json'])
+def test_letter_index_exclusion_does_not_skip_other_private_conflicts(tmp_path,monkeypatch,path):
+ v=vault(tmp_path);original=b'{"unpublished":"preserve"}\n';p=put(v,path,original);store=Storage({path:b'{"remote":"different"}\n'})
+ monkeypatch.setattr(io,'run_git',lambda *a,**k:subprocess.CompletedProcess(a,1,b'',b''))
+ with pytest.raises(StorageError,match='differing unpublished'):io.initialize(v,storage=store,materialization_role='local_author',selected_ticker='CPRT')
+ assert p.read_bytes()==original
