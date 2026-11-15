@@ -46,6 +46,17 @@ test('overlapping saves from one checkpoint handle serialize upload and receipt 
  const restoredEnv={...env},restored=await openCheckpoint(restoredEnv);try{assert.equal((await restoredEnv.DB.prepare("SELECT value FROM rs_state WHERE key='late-record'").first()).value,'retained');}finally{restored.close();}
 });
 
+test('a timed-out PUT completing after the final save cannot replace that final checkpoint',async t=>{
+ const {env,objects}=fixture(t),cp=await openCheckpoint(env);t.after(()=>cp.close());await save(cp);
+ const put=env.EVIDENCE.put;let late;
+ env.EVIDENCE.put=async(k,b)=>{late={key:k,bytes:Buffer.from(b)};throw new Error('upload aborted before response');};
+ await env.DB.prepare("INSERT INTO rs_state VALUES('runtime-phase','starting','now')").run();await assert.rejects(save(cp),/upload aborted/);
+ env.EVIDENCE.put=put;await env.DB.prepare("UPDATE rs_state SET value='stopped' WHERE key='runtime-phase'").run();const final=await save(cp);
+ // The remote server may finish a timed-out request after its caller rejected.
+ await put(late.key,late.bytes);await restoreCheckpoint(objects.get(final.key),final);assert.notEqual(late.key,final.key);
+ const restoredEnv={...env},restored=await openCheckpoint(restoredEnv);try{assert.equal((await restoredEnv.DB.prepare("SELECT value FROM rs_state WHERE key='runtime-phase'").first()).value,'stopped');}finally{restored.close();}
+});
+
 test('a stale parent receipt cannot replace a newer committed checkpoint even under the same owner',async t=>{
  const {env}=fixture(t),initial=await openCheckpoint(env);await save(initial);initial.close();
  const oldEnv={...env},newEnv={...env},old=await openCheckpoint(oldEnv),current=await openCheckpoint(newEnv);t.after(()=>old.close());t.after(()=>current.close());
