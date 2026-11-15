@@ -1,1 +1,1 @@
-export const PIPELINE_VERSION='inclusive_repair.2026-11-11.v2';
+export const PIPELINE_VERSION='checkpoint_integrity.2026-11-15.v1';
