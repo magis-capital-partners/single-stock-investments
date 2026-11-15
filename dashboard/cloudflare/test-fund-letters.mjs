@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import vm from 'node:vm';
 import { humanRole, requireHumanViewer, viewerFromAccessPayload } from '../functions/_lib/auth.js';
 import { accessDecision, onRequest } from '../functions/_middleware.js';
 import { parseSearchTokens, readerExtras, readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
@@ -272,4 +273,134 @@ test('owner edits create revisions and publication requires six explicit attesta
   assert.equal((await post({action:'publish',letter_id:'l0',revision_id:saved.revision_id,expected_revision:'r0',attestations})).status,200);
   assert.equal(DB.db.prepare('SELECT published_revision FROM fl_letters').get().published_revision,saved.revision_id);
   assert.equal(DB.db.prepare('SELECT count(*) n FROM fl_revisions').get().n,2);
+});
+
+// The reader's shared workspace state, run from the shipped file so the URL contract is the one users get.
+function readerState() {
+  const sandbox = { URLSearchParams, document: { getElementById: () => null } };
+  sandbox.window = sandbox;
+  vm.runInNewContext(readFileSync(new URL('../fund-letters/reader.js', import.meta.url), 'utf8'), sandbox);
+  return sandbox.FundLettersReader.state;
+}
+test('workspace state round-trips through the URL, keeps links stable and upgrades older links', () => {
+  const { readState, writeState, statements, emptiedReason } = readerState();
+  const state = readState('view=ideas&period=2012q1&q=rambus&f=first,new,bogus&fund=tiger&ticker=rmbs&type=long');
+  assert.equal(state.view, 'ideas');
+  assert.equal(state.period, '2012Q1');
+  assert.deepEqual([...state.chips], ['new', 'first']);
+  assert.equal(state.ticker, 'RMBS');
+  const link = writeState(state);
+  assert.equal(link, 'view=ideas&period=2012Q1&q=rambus&f=new%2Cfirst&fund=tiger&ticker=RMBS&type=long');
+  assert.deepEqual(JSON.parse(JSON.stringify(readState(link))), JSON.parse(JSON.stringify(state)));
+  // Defaults stay out of links, so the latest quarter and the By fund view are implied.
+  assert.equal(writeState(readState('')), '');
+  assert.equal(writeState(readState('view=funds&period=all')), 'period=all');
+  assert.equal(readState('period=2012Q5').period, '');
+  assert.equal(readState('ticker=GLUU, TMRK').ticker, '');
+  // Links written before the workspace still open the same filters.
+  const legacy = readState('view=letters&activity=trim,cover&scope=book&tickers=AAPL,MSFT');
+  assert.equal(legacy.view, 'funds');
+  assert.deepEqual([...legacy.chips], ['trim', 'exit', 'book']);
+  assert.equal(legacy.ticker, 'AAPL');
+  assert.deepEqual([...statements('One line.\nSecond line.\n\nThird line.')], ['One line.', 'Second line.', 'Third line.']);
+  assert.deepEqual([...statements('The fund bought Acme. It trimmed Beta (BETA). 3.5% of NAV.')], ['The fund bought Acme.', 'It trimmed Beta (BETA).', '3.5% of NAV.']);
+  assert.equal(emptiedReason([{ key: 'period', label: 'Quarter 2020Q2', count: 5 }, { key: 'first', label: 'First mentioned this quarter', count: 0 }]).key, 'first');
+  assert.equal(emptiedReason([{ key: 'period', label: 'Quarter 2020Q2', count: 5 }, { key: 'first', label: 'First mentioned this quarter', count: 0 }]).before, 5);
+  assert.equal(emptiedReason([{ key: 'period', count: 5 }]), null);
+});
+
+// Fund A writes in 2020Q1 and 2020Q2; fund B's first letter is 2020Q2.
+function workspaceArchive() {
+  const DB = database();
+  DB.db.exec("INSERT INTO fl_funds(id,name) VALUES('a','Alpha Fund'),('b','Beta Fund');");
+  const letter = (id, fund, period, date) => {
+    DB.db.prepare('INSERT INTO fl_letters(id,fund_id,content_hash,pipeline_version,reporting_period,letter_date,ingested_at,source_ref,source_url,source_text,published_revision) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+      .run(id, fund, 'h-' + id, 'v1', period, date, '2026-10-23', 'private/path', 'https://drive.google.com/SECRET', source, 'r-' + id);
+    DB.db.prepare('INSERT INTO fl_revisions(id,letter_id,created_at,author,status,overview,content_json,checks_json) VALUES(?,?,?,?,?,?,?,?)')
+      .run('r-' + id, id, '2026-10-23', 'editor', 'published', 'Overview of ' + id, '{}', '{}');
+  };
+  const idea = (letterId, id, ticker, type, activity, ordinal) => DB.db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES(?,?,?,?,?,?,?,?,?)')
+    .run(id, 'r-' + letterId, letterId, `${ticker} thesis`, ticker, type, activity, `The fund discusses ${ticker} in ${letterId}.\nA second statement.`, ordinal);
+  letter('a1', 'a', '2020Q1', '2020-04-15');
+  idea('a1', 'acme', 'ACME', 'long', 'hold', 0);
+  idea('a1', 'delta-table', 'DELTA', 'factual_note', 'hold', 1);
+  letter('a2', 'a', '2020Q2', null);
+  idea('a2', 'acme', 'ACME', 'long', 'add', 0);
+  idea('a2', 'beta', 'BETA', 'long', 'new', 1);
+  idea('a2', 'gamma', 'GAMMA', 'update', 'hold', 2);
+  idea('a2', 'delta', 'DELTA', 'long', 'new', 3);
+  letter('b2', 'b', '2020Q2', '2020-07-20');
+  idea('b2', 'beta-short', 'BETA', 'short', 'short', 0);
+  return DB;
+}
+const ids = body => body.results.map(r => `${r.fund_id}:${r.ticker}`).sort();
+
+test('position activity and first mention are separate filters: OR within a group, AND across groups', async () => {
+  const DB = workspaceArchive();
+  const get = async query => (await onRequestGet(context(query, reader, DB))).json();
+  const workspace = await get({ action: 'workspace' });
+  assert.equal(workspace.period, '2020Q2');
+  assert.deepEqual(workspace.periods, [{ period: '2020Q2', count: 2 }, { period: '2020Q1', count: 1 }]);
+  // Holdings-table mentions are not discussions.
+  assert.deepEqual(workspace.funds.map(f => [f.id, f.discussions, f.letter_date]), [['a', 4, null], ['b', 1, '2020-07-20']]);
+  assert.deepEqual(workspace.totals, { funds: 2, letters: 2, discussions: 5 });
+
+  // New position: what the fund opened, whether or not it named the company before.
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'new' })), ['a:BETA', 'a:DELTA']);
+  // First mentioned: never named in an earlier quarter of the same fund, whatever the activity. DELTA was in a
+  // holdings table, and fund B has no earlier letter to compare against.
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'first' })), ['a:BETA', 'a:GAMMA']);
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'new,first' })), ['a:BETA']);
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'new,add' })), ['a:ACME', 'a:BETA', 'a:DELTA']);
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'short' })), ['b:BETA']);
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'new', q: 'delta' })), ['a:DELTA']);
+  const flagged = await get({ action: 'ideas', period: '2020Q2' });
+  assert.deepEqual(flagged.results.filter(r => r.first_mentioned).map(r => r.ticker).sort(), ['BETA', 'GAMMA']);
+
+  // Each fund counts once on the overlap strip, with its direction.
+  assert.deepEqual(workspace.overlap, [{ ticker: 'BETA', funds: 2, letters: 2, long: 1, short: 1 }]);
+  const narrowed = await get({ action: 'workspace', f: 'new' });
+  assert.deepEqual(narrowed.funds.map(f => [f.id, f.discussions]), [['a', 2]]);
+  assert.deepEqual(narrowed.overlap, []);
+});
+
+test('the workspace explains empty results, compares with the fund\'s last discussion and highlights matches in the letter', async () => {
+  const DB = workspaceArchive();
+  const get = async (query, viewer = reader) => (await onRequestGet(context(query, viewer, DB))).json();
+  const empty = await get({ action: 'workspace', q: 'zzz' });
+  assert.deepEqual(empty.emptied_by, [{ key: 'period', label: 'Quarter 2020Q2', count: 5 }, { key: 'search', label: 'Search "zzz"', count: 0 }]);
+  const book = await get({ action: 'ideas', period: '2020Q2', f: 'book,first' });
+  assert.deepEqual(book.results, []);
+  assert.equal(book.emptied_by.find(step => !step.count).key, 'book');
+  assert.deepEqual(ids(await get({ action: 'ideas', period: '2020Q2', f: 'book', book: 'GAMMA,ZZZZ' }, owner)), ['a:GAMMA']);
+
+  const all = await get({ action: 'ideas', period: '2020Q2' });
+  const acme = all.results.find(r => r.ticker === 'ACME');
+  assert.deepEqual(acme.prior, { letter_id: 'a1', reporting_period: '2020Q1', letter_date: '2020-04-15', title: 'ACME thesis', idea_type: 'long', activity: 'hold', summary: 'The fund discusses ACME in a1.\nA second statement.' });
+  assert.equal(all.results.find(r => r.ticker === 'DELTA').prior, null);
+  assert.deepEqual(Object.keys(acme).sort(), ['activity', 'compared_letter_id', 'evolution', 'first_mentioned', 'fund', 'fund_id', 'id', 'idea_type', 'letter_date', 'letter_id', 'prior', 'reporting_period', 'summary', 'ticker', 'title']);
+  assert.equal(JSON.stringify(all).includes('SECRET'), false);
+  assert.equal(JSON.stringify(all).includes('private/path'), false);
+
+  const pane = await get({ action: 'letters', fund: 'a', period: '2020Q2', f: 'new' });
+  assert.deepEqual(pane.letters.map(l => l.id), ['a2']);
+  assert.deepEqual(pane.letters[0].ideas.map(i => [i.ticker, i.matches, i.first_mentioned, i.prior?.reporting_period || null]),
+    [['ACME', false, false, '2020Q1'], ['BETA', true, true, null], ['GAMMA', false, true, null], ['DELTA', true, false, null]]);
+  const unfiltered = await get({ action: 'letters', fund: 'a', period: '2020Q2' });
+  assert.equal(unfiltered.letters[0].ideas.some(i => 'matches' in i), false);
+  assert.deepEqual((await get({ action: 'letters', fund: 'a', period: 'all' })).letters.map(l => l.id), ['a2', 'a1']);
+  const archive = await get({ action: 'archive', fund: 'a' });
+  assert.equal(archive.fund_name, 'Alpha Fund');
+});
+
+test('long ticker lists stay within the D1 bound-parameter limit', async () => {
+  const DB = workspaceArchive();
+  let most = 0;
+  const counting = { ...DB, prepare: sql => { const statement = DB.prepare(sql); return { bind: (...args) => { most = Math.max(most, args.length); return statement.bind(...args); } }; } };
+  const many = Array.from({ length: 250 }, (_, n) => `T${n}`).join(',');
+  for (const query of [{ action: 'workspace', f: 'book', book: many + ',BETA' }, { action: 'ideas', f: 'book', book: many }, { action: 'letters', tickers: many }, { action: 'search', tickers: many + ',BETA' }]) {
+    const response = await onRequestGet(context(query, owner, counting));
+    assert.equal(response.status, 200, JSON.stringify(query).slice(0, 40));
+  }
+  assert.ok(most > 0 && most < 100, `largest bind was ${most} parameters`);
 });

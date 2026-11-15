@@ -14,6 +14,30 @@ Configure `CF_ACCESS_TEAM_DOMAIN` and `CF_ACCESS_AUD` in both production and pre
 
 Local development bypass requires `PORTFOLIO_AUTH_MODE=development` **and** a localhost request. It cannot enable access on a deployed hostname.
 
+## Reader workspace
+
+The reader is one workspace with two views, **By fund** and **Ideas**, under one header: a quarter selector (the latest reporting quarter by default, or all quarters), one search box (fund, company, ticker or argument text, plus the `fund:`, `ticker:`, `type:`, `action:` and `focus:` tokens), and the view toggle. Switching views keeps every filter. A By ticker view follows once mentions resolve to securities.
+
+Every choice lives in one state object written to the address: `view`, `period`, `q`, `f` (filter chips), `fund`, `letter`, `ticker`, `type` and `focus`. Defaults are left out, so a link to the latest quarter stays current. Back and forward restore the view, filters and list position. Inside the dashboard tab the same state is kept for the browser session instead of the page address. Older links using `activity=`, `scope=book` or `tickers=` still open the same filters.
+
+**By fund** keeps the fund list on the left (name, discussions in the quarter, letter date or quarter) beside the reading pane. Choosing a fund replaces only the pane; the filters, search and list scroll stay put. Under 900 pixels wide the list becomes a drawer. When filters are on, a letter shows the discussions that match first and folds the rest under one line.
+
+The reporting quarter and the letter date are always shown separately. A letter with no verified printed date says **Letter date unavailable**; the reader never derives one from the quarter.
+
+Filter chips (`f=`) combine with the search and with each other (AND); chips within one group are alternatives (OR):
+
+- **Position activity:** New position, Added, Reduced, Exited (includes covered shorts), Short.
+- **First mentioned this quarter:** the fund has a published letter from an earlier quarter and never named this ticker in an earlier quarter, holdings tables included. It is independent of activity: a new position can be a company the fund wrote about before, and a first mention can be a position the fund already held. A fund's first letter has nothing to compare against, so nothing in it counts as a first mention.
+- **Our book** (owners only): companies in the current Magis holdings. Only names are used, never position sizes; the owner's dashboard sends the list to narrow the query and nothing about it is returned.
+
+When filters leave nothing, the reader names the filter that emptied the list and how many discussions were left before it, with a button to remove it (`emptied_by` in the API).
+
+An idea card shows the ticker, company, direction and activity, **First mention** and **Our book** badges, the headline with the next two or three statements, **Read full argument**, and **What changed**. What changed compares the card with the same fund's most recent discussion of the ticker in an earlier quarter and is hidden when there is none. The footer gives the fund, reporting quarter, letter date and source type.
+
+The overlap strip lists the tickers discussed by two or more funds in the quarter under the current filters, top eight first ("FICO 3 · ROL 2"), with **Show all**. Each fund counts once however many letters or ideas it has (independent managers), with longs and shorts counted apart. Selecting a ticker opens every fund's discussion of it.
+
+API actions: `workspace` returns the quarters, the fund list with counts, totals, the overlap strip and `emptied_by`; `ideas` returns the cross-fund feed with `first_mentioned` and `prior` on each idea; `letters` adds `matches`, `first_mentioned` and `prior` to each idea. Ticker lists travel as one JSON parameter because D1 limits a statement to 100 bound parameters. All of this uses fields the lane already publishes (reporting period, verified letter date, ticker, idea type, activity), so the summarizer, export and sync are unchanged by it.
+
 ## Canonical archive and editorial processing
 
 Schema: `dashboard/cloudflare/migrations/0023_fund_letters.sql`. Funds, canonical letters, source sections, idea discussions, evidence, immutable revisions, review issues, processing checkpoints and releases are separate records. Published pointers identify the reader-visible revision; a failed later attempt does not remove an existing publication.
