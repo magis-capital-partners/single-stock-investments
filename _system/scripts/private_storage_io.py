@@ -16,6 +16,13 @@ MARKER = '.private-storage-view.json'
 # The shared receipt index every dashboard producer updates; the legacy vault
 # rebase merged exactly these two paths and nothing else.
 RECEIPT_PATHS = frozenset({'dashboard-private/manifest.json', 'dashboard-private/migration-journal.jsonl'})
+# Import coordination belongs to its producer, never to a local company author.
+AUTHOR_PUBLICATION_INDEXES = RECEIPT_PATHS | frozenset({
+    'superinvestor-letters/drive_import_manifest.json',
+    'superinvestor-letters/drive_import_log.jsonl',
+    'dashboard-private/investor-history/manifest.json',
+    'dashboard-private/company-source-backfill-v2/manifest.json',
+})
 _LAZY_STORAGE = None
 _VIEW_CACHE = {}
 
@@ -105,8 +112,8 @@ def _retain_or_advance_private_bytes(path,relative,incoming):
 
 
 def _shared_build_control(relative):
-    # Dashboard publication receipt indexes are not local author inputs either.
-    return (relative in RECEIPT_PATHS or
+    # Shared producer indexes are not local author inputs.
+    return (relative in AUTHOR_PUBLICATION_INDEXES or
             relative.startswith('valuation-underwriting/runtime/') and relative != 'valuation-underwriting/runtime/ledger.jsonl')
 
 
