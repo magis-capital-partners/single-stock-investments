@@ -109,8 +109,8 @@ Documents in folder: **74** (all listed below; Tier 1–3 extracted or keyword-s
 - deep_dive: CRWD/research/deep_dive_2026-10-12.md (sha256 sha256:5e03003d16a1b59a...)
 - filing_digest: CRWD/research/evidence/filing_digest.md (sha256 sha256:5375acc530ccb181...)
 - adversarial: CRWD/research/adversarial_2026-10-12.md (sha256 sha256:0cbaeaf5701628ed...)
-- valuation: CRWD/research/valuation.json (sha256 sha256:d61c6c8bf53e3124...)
-- thesis_card: CRWD/research/thesis_card.json (sha256 sha256:787f508942c661fd...)
+- valuation: CRWD/research/valuation.json (sha256 sha256:df3ec320908a521f...)
+- thesis_card: CRWD/research/thesis_card.json (sha256 sha256:3b8df7faa8c44d9c...)
 - cross_check: CRWD/research/cross_check_third_party_2026-10-12.md (sha256 sha256:bef5ef8e4f391dc4...)
 
 ## Excluded from this pack
