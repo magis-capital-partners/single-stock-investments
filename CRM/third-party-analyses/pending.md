@@ -1,6 +1,6 @@
 # CRM — Pending third-party sources
 
-**Updated:** 2026-11-15
+**Updated:** 2026-11-16
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 
