@@ -290,16 +290,6 @@
       "subject_regex": "Refresh ValueLine and Expert Call labels|Ingest ValueLine and Expert Call text"
     },
     {
-      "name": "podcasts",
-      "workflow_file": "podcast-refresh.yml",
-      "job": "refresh",
-      "cadence_cron": [
-        "7 21 * * 1"
-      ],
-      "freshness_hours": 342,
-      "subject_regex": "^chore\\(podcasts\\)"
-    },
-    {
       "name": "security-scan",
       "workflow_file": "security-weekly.yml",
       "job": "analyze-*",
@@ -737,7 +727,7 @@
       "path": "dashboard/data/insights/podcasts.json",
       "stamp_field": "generated_at",
       "max_age_hours": 240,
-      "healer": "python _system/scripts/podcast_cloud_refresh.py --date YYYY-MM-DD (podcast-refresh.yml, cron 0 7 * * 1)"
+      "healer": "The Mac media lane publishes this shard after its reader-summary phase (media_lane_supervisor.py, publish_podcast_dashboard.py). podcast-refresh.yml rebuilds it from the GitHub vault on manual dispatch only."
     },
     "warrant_monitor": {
       "path": "dashboard/data/warrants.json",
