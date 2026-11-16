@@ -551,6 +551,8 @@ def _complete_layouts(payload):
         tokens = pack_tokens(payload)
         if tokens:
             yield TOKEN_INSTRUCTIONS, tokens
+            from underwriting_compact_transport import compact, INSTRUCTIONS as COMPACT_INSTRUCTIONS
+            yield COMPACT_INSTRUCTIONS, compact(tokens)
 
 
 def pack(payload):
@@ -559,6 +561,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/6':
+        from underwriting_compact_transport import unpack as unpack_compact
+        return unpack_compact(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/5':
         from underwriting_token_transport import unpack as unpack_tokens
         return unpack_tokens(envelope)
