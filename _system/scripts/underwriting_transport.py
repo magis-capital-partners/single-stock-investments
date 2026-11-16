@@ -561,7 +561,10 @@ def _complete_layouts(payload):
             marked = compact_markers(short)
             yield MARKER_INSTRUCTIONS, marked
             from underwriting_marker_transport import compact_strings, STRING_INSTRUCTIONS
-            yield STRING_INSTRUCTIONS, compact_strings(marked)
+            strings = compact_strings(marked)
+            yield STRING_INSTRUCTIONS, strings
+            from underwriting_dictionary_transport import compact as compact_rows, INSTRUCTIONS as ROW_INSTRUCTIONS
+            yield ROW_INSTRUCTIONS, compact_rows(strings)
 
 
 def pack(payload):
@@ -570,6 +573,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/9':
+        from underwriting_dictionary_transport import unpack as unpack_rows
+        return unpack_rows(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/8':
         from underwriting_marker_transport import unpack_strings
         return unpack_strings(envelope)
@@ -748,8 +754,13 @@ def render_for_budget(payload, maximum_characters):
         if tokens:
             from underwriting_compact_transport import compact as compact_tokens
             from underwriting_marker_transport import compact as compact_markers, compact_strings, STRING_INSTRUCTIONS
-            candidate=(_literal_source_quote_prefix(payload)+_literal_review_source_quote_prefix(payload)+STRING_INSTRUCTIONS+
-                       encoded(compact_strings(compact_markers(compact_tokens(tokens)))))
+            literal_prefix=_literal_source_quote_prefix(payload)+_literal_review_source_quote_prefix(payload)
+            strings=compact_strings(compact_markers(compact_tokens(tokens)))
+            candidate=literal_prefix+STRING_INSTRUCTIONS+encoded(strings)
+            if len(candidate)<=maximum_characters:
+                return candidate
+            from underwriting_dictionary_transport import compact as compact_rows, INSTRUCTIONS as ROW_INSTRUCTIONS
+            candidate=literal_prefix+ROW_INSTRUCTIONS+encoded(compact_rows(strings))
             if len(candidate)<=maximum_characters:
                 return candidate
     return render(payload)
