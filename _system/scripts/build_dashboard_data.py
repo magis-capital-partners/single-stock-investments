@@ -160,6 +160,7 @@ def parse_holdings() -> dict[str, dict]:
             "exchange": h.get("exchange", "—"),
             "display_ticker": h.get("display_ticker"),
             "quote_ticker": h.get("quote_ticker"),
+            "research_universes": h.get("research_universes") or [],
         }
     if meta:
         return meta
@@ -3028,6 +3029,7 @@ def build_ticker_row(
         "ticker": ticker,
         "display_ticker": display_ticker,
         "quote_ticker": quote_ticker,
+        "research_universes": list(meta.get("research_universes") or []),
         "company": meta.get("company", ticker),
         "market": meta.get("market", "—"),
         "exchange": meta.get("exchange", "—"),
@@ -3863,6 +3865,8 @@ def sync_registered_coverage_inputs() -> list[str]:
 
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    from build_compounder_roster import publish as publish_compounder_rosters
+    publish_compounder_rosters()
     short_alpha = build_short_alpha()
     equity_payload = build_equity_models()
     prior_by_ticker = load_prior_rows()
