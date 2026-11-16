@@ -53,13 +53,35 @@ def test_renewal_cannot_be_borrowed_by_a_different_consumer():
  p=copy.deepcopy(POLICY);p['consumers']['valuation_builder']={'daily_repo_limit':6,'per_subject_daily_limit':2}
  assert check(reservations(2,'valuation_builder'),consumer='valuation_builder',policy_doc=p)['gate_reason']=='per_subject_daily_limit'
 
-def test_checked_repo_grant_is_only_V_today_with_original_global_and_default_limits():
+def test_checked_repo_contains_only_dated_owner_grants_with_original_global_and_default_limits():
  import json
  from pathlib import Path
  p=json.loads((Path(__file__).resolve().parents[1]/'config/llm_usage_policy.json').read_bytes())
  author=p['consumers']['valuation_underwriter'];review=p['consumers']['valuation_challenger']
  assert (author['daily_repo_limit'],author['per_subject_daily_limit'])==(12,2)
  assert (review['daily_repo_limit'],review['per_subject_daily_limit'])==(6,2)
- assert author['dated_subject_daily_limits']=={'2026-11-10':{'V':4}}
- assert review['dated_subject_daily_limits']=={'2026-11-10':{'V':3}}
+ assert author['dated_subject_daily_limits']=={'2026-11-10':{'V':4},'2026-11-13':{'CPRT':4},'2026-11-16':{'CPRT':4}}
+ assert review['dated_subject_daily_limits']=={'2026-11-10':{'V':3},'2026-11-16':{'CPRT':3}}
  assert not p['consumers']['valuation_builder'].get('dated_subject_daily_limits')
+
+
+@pytest.mark.parametrize('consumer,used,expected',[('valuation_underwriter',3,True),('valuation_underwriter',4,False),('valuation_challenger',2,True),('valuation_challenger',3,False)])
+def test_current_CPRT_review_renewal_respects_each_separate_role_limit(consumer,used,expected):
+ import json
+ from pathlib import Path
+ p=json.loads((Path(__file__).resolve().parents[1]/'config/llm_usage_policy.json').read_bytes());at=datetime(2026,11,16,12,tzinfo=timezone.utc)
+ rows=reservations(used,consumer,'CPRT',at)
+ assert check(rows,consumer=consumer,subject='CPRT',at=at,policy_doc=p)['approved']==expected
+
+@pytest.mark.parametrize('day',[15,17])
+def test_current_CPRT_renewal_does_not_apply_on_neighboring_UTC_days(day):
+ import json
+ from pathlib import Path
+ p=json.loads((Path(__file__).resolve().parents[1]/'config/llm_usage_policy.json').read_bytes());at=datetime(2026,11,day,12,tzinfo=timezone.utc)
+ assert check(reservations(2,subject='CPRT',at=at),subject='CPRT',at=at,policy_doc=p)['gate_reason']=='per_subject_daily_limit'
+
+def test_current_CPRT_renewal_does_not_extend_another_company():
+ import json
+ from pathlib import Path
+ p=json.loads((Path(__file__).resolve().parents[1]/'config/llm_usage_policy.json').read_bytes());at=datetime(2026,11,16,12,tzinfo=timezone.utc)
+ assert check(reservations(2,subject='V',at=at),subject='V',at=at,policy_doc=p)['gate_reason']=='per_subject_daily_limit'
