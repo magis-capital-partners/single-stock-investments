@@ -27,7 +27,11 @@ class ContractError(ValueError):
 
 
 def digest(value):
-    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+    identity = hashlib.sha256()
+    encoder = json.JSONEncoder(sort_keys=True, separators=(',', ':'), allow_nan=False)
+    for chunk in encoder.iterencode(value):
+        identity.update(chunk.encode())
+    return identity.hexdigest()
 
 
 def require(ok, message):

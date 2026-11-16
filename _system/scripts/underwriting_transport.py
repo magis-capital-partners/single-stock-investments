@@ -511,18 +511,21 @@ def _prune_inline(envelope):
 
 
 def _pack_grouped(dense):
-    pool, candidates = _phrase_candidates(dense, 16384), []
+    pool, best, best_size = _phrase_candidates(dense, 16384), None, None
     for _ in range(8):
         candidate = _pack_inline(dense, phrases=pool, shortest=True)
         if not candidate:
             break
         pruned, remove = _prune_inline(candidate)
         if pruned['phrase_dictionary']:
-            candidates.append(_group_inline(pruned))
+            grouped = _group_inline(pruned)
+            size = len(encoded(grouped))
+            if best_size is None or size < best_size:
+                best, best_size = grouped, size
         if not remove:
             break
         pool = [phrase for phrase in pool if phrase not in remove]
-    return min(candidates, key=lambda e: len(encoded(e))) if candidates else None
+    return best
 
 
 def _complete_layouts(payload):
@@ -661,11 +664,16 @@ def _literal_source_quote_prefix(payload):
 
 def render(payload):
     literal_prefix = _literal_source_quote_prefix(payload)
-    candidates = [encoded(payload)]
-    candidates.extend(instructions + encoded(envelope)
-                      for instructions, envelope in _complete_layouts(payload))
+    best = encoded(payload)
+    has_reference = REFERENCE in best
+    for instructions, envelope in _complete_layouts(payload):
+        candidate = instructions + encoded(envelope)
+        if len(candidate) < len(best):
+            best = candidate
     # Retain the old, readable layout when it is smaller, and continue decoding
     # saved paid prompts without changing their evidence or session identities.
-    if REFERENCE not in encoded(payload):
-        candidates.append(INSTRUCTIONS+encoded(_pack_legacy(payload)))
-    return literal_prefix + min(candidates,key=len)
+    if not has_reference:
+        candidate = INSTRUCTIONS+encoded(_pack_legacy(payload))
+        if len(candidate) < len(best):
+            best = candidate
+    return literal_prefix + best
