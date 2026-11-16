@@ -196,3 +196,55 @@ def test_combined_limit_exception_still_records_both_real_accounting_events(env)
     assert [r['status'] for r in after[-2:]] == ['reserved', 'completed']
     assert all(r['owner_completion_grant'] == GRANT_ID for r in after[-2:])
     assert called == ['author']
+
+
+def cap_hold(env):
+    root,work,state,author,_=env
+    packet={'ticker':'CPRT','packet_hash':'a'*64,'evidence_hash':'b'*64}
+    put(work/'packets'/('a'*64+'.json'),packet)
+    feedback=json.loads((work/'progress/CPRT.json').read_text())['feedback']
+    from underwriting_evidence import supplemental_fact_diagnostics
+    payload={'packet':packet,'revision_feedback':{**feedback,'supplemental_fact_diagnostics':
+             supplemental_fact_diagnostics(packet,author.get('supplemental_facts') or [])},
+             'revision_base_hash':digest(author)}
+    identity=pipeline.stage_hash(root,'author',payload)
+    reason='local_input_too_large: 1060158 characters exceeds 1048576; complete evidence retained'
+    state['gaps']=[{'code':'StageBlocked','detail':reason}];state['processing_version']='f'*64
+    cache=work/'cache/CPRT'/identity
+    record={'status':'blocked','input_hash':identity,'payload_hash':digest(payload),'reason':reason,'model_calls':0}
+    put(cache/'input_admission.json',record)
+    return cache,record
+
+
+def test_verified_unpaid_author_cap_hold_can_retry_after_source_repair_without_reset(env):
+    cap_hold(env);before={p:p.read_bytes() for p in env[1].rglob('*') if p.is_file()};saved=copy.deepcopy(env[2])
+    assert proof(env) and pipeline.owner_review_continuation(env[0],env[1],['CPRT'],{'ticker':'CPRT','status':'needs_underwriting'},env[2])
+    assert env[2]==saved and all(p.read_bytes()==raw for p,raw in before.items())
+
+
+@pytest.mark.parametrize('mutation',['same_source','missing_old_source','record_hash','payload_hash','paid_receipt','paid_output',
+    'native_prompt','already_called','bool_count','missing_record','extra_record_field','wrong_cap','different_feedback',
+    'different_packet','mixed_source_gap','pending_review'])
+def test_unverified_or_unchanged_input_repair_keeps_retry_held(env,mutation):
+    root,work,state,*_=env;cache,record=cap_hold(env)
+    if mutation=='same_source':state['processing_version']=pipeline.processing_version(root)
+    elif mutation=='missing_old_source':state.pop('processing_version')
+    elif mutation=='record_hash':record['input_hash']='e'*64
+    elif mutation=='payload_hash':record['payload_hash']='e'*64
+    elif mutation=='paid_receipt':put(cache/'receipt.json',{'status':'finished'})
+    elif mutation=='paid_output':put(cache/'output.json',{})
+    elif mutation=='native_prompt':(cache/'prompt.txt').write_text('already sent')
+    elif mutation=='already_called':record['model_calls']=1
+    elif mutation=='bool_count':record['model_calls']=False
+    elif mutation=='missing_record':(cache/'input_admission.json').unlink()
+    elif mutation=='extra_record_field':record['extra']=True
+    elif mutation=='wrong_cap':state['gaps'][0]['detail']=record['reason']=record['reason'].replace('1048576','2000000')
+    elif mutation=='different_feedback':
+        p=json.loads((work/'progress/CPRT.json').read_text());p['feedback']['required_correction']='another input';put(work/'progress/CPRT.json',p)
+    elif mutation=='different_packet':
+        p=json.loads((work/'packets'/('a'*64+'.json')).read_text());p['unmatched']='source';put(work/'packets'/('a'*64+'.json'),p)
+    elif mutation=='mixed_source_gap':state['gaps'].append({'code':'StageBlocked','detail':'evidence_not_ready: source conflict'})
+    elif mutation=='pending_review':
+        p=json.loads((work/'progress/CPRT.json').read_text());p['pending_review']={'canonical_hash':'e'*64};put(work/'progress/CPRT.json',p)
+    if mutation!='missing_record':put(cache/'input_admission.json',record)
+    assert proof(env) is None
