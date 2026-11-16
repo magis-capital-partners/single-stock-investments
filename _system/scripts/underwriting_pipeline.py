@@ -499,11 +499,18 @@ def load_progress(root, work, ticker, packet):
             authors[digest(output)] = (output, receipt)
         elif receipt.get('stage') == 'challenger':
             reviews.append((output, receipt))
+    saved_author_hash = digest((saved.get('feedback') or {}).get('previous_contract') or {})
+    saved_author = authors.get(saved_author_hash)
     for challenger, challenger_receipt in sorted(reviews, key=lambda r: (r[1].get('finished_at') or '', r[1]['input_hash'])):
         author_pair = authors.get(challenger.get('contract_hash'))
         if not author_pair:
             continue
         author, author_receipt = author_pair
+        if (saved_author and digest(author) != saved_author_hash
+                and (author_receipt.get('finished_at') or '') < (saved_author[1].get('finished_at') or '')):
+            # Changed diagnostics can invalidate the newest review cache key.
+            # Do not replace its authentic paid correction with an older draft.
+            continue
         try:
             canonical = compile_contract(packet, author)
             expected = stage_hash(root, 'challenger', challenge_payload(packet, author, canonical))
@@ -669,8 +676,14 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                 require(author.get('schema_version') == read(root/POLICY).get('required_contract_schema', 'underwriting-contract/2'),
                         'Author must use the current economic underwriting contract')
                 canonical = compile_contract(packet, author)
+                challenge = challenge_payload(packet, author, canonical)
+                structural_failures = [{'id': test['id'], 'errors': test['errors']}
+                    for test in challenge['deterministic_value_driver_tests'].get('economic_diagnostics', {}).get('structural_tests', [])
+                    if test.get('errors')]
+                require(not structural_failures, 'Structural alternatives failed deterministic validation: '
+                        +json.dumps(structural_failures, ensure_ascii=False))
                 challenger, challenger_receipt = call_stage(root, work, ticker, 'challenger',
-                    challenge_payload(packet, author, canonical), state, execute=execute)
+                    challenge, state, execute=execute)
                 validate_review(author, challenger, canonical)
                 progress['approved'] = {'author': author, 'review': challenger, 'canonical_hash': digest(canonical),
                                         'receipts': {'author': author_receipt, 'challenger': challenger_receipt}}
