@@ -84,6 +84,19 @@ def _strict_json(raw):
     def invalid(value):raise StorageError('Invalid nonfinite JSON in preserved private bytes')
     return json.loads(raw,object_pairs_hook=pairs,parse_constant=invalid)
 
+def _identical_real_ledger_events(original, incoming):
+    """Serialization alone must not republish a real admission ledger or its control."""
+    def identities(raw):
+        try:
+            rows = [_strict_json(line) for line in raw.splitlines() if line.strip()]
+        except (ValueError, UnicodeError) as error:
+            raise StorageError('Invalid real admission ledger') from error
+        if any(not isinstance(row, dict) for row in rows):
+            raise StorageError('Invalid real admission ledger')
+        return [encoded_json(row) for row in rows]
+    return identities(original) == identities(incoming)
+
+
 def _retain_or_advance_private_bytes(path,relative,incoming):
     """Retain equivalent original bytes; real ledgers may only append verified remote rows."""
     original=path.read_bytes()
@@ -338,6 +351,13 @@ def publish_paths(vault, paths, *, storage=None):
     for relative, path in paths.items():
         path = path_in(vault, relative)
         prior = expected.get(relative)
+        if relative == 'valuation-underwriting/local-runtime/ledger.jsonl' and prior:
+            original = storage.restore(relative, records=expected)
+            if _identical_real_ledger_events(original, path.read_bytes()):
+                # CI retains legacy raw bytes while materializing newer events.
+                # An unchanged event stream is not a ledger publication, even
+                # when another author has since appended genuine remote events.
+                continue
         entry = store_file(storage.objects, path)
         if relative == 'valuation-underwriting/local-runtime/ledger.jsonl':
             from private_storage import merge_ledger
