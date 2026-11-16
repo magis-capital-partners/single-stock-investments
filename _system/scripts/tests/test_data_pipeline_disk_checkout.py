@@ -350,6 +350,30 @@ def test_activist_vault_checkout_fits_a_private_storage_restore():
     assert vault[0]["timeout-minutes"] >= 20
 
 
+def test_technicals_vault_checkout_is_publication_only():
+    """A whole-vault checkout restored every private catalog record serially:
+    41 minutes then failure on 2026-11-12/13, and the 75-minute job limit on
+    2026-11-16 (run 43841064008), so no technical feed refreshed."""
+    job = _job("technicals")
+    vault = _vault_steps(job)
+    assert len(vault) == 1
+    assert vault[0]["with"]["publication-only"] == "true"
+    assert "extra-paths" not in vault[0]["with"]
+    # A stalled restore fails this step red instead of the job being cancelled.
+    assert 20 <= vault[0]["timeout-minutes"] < job["timeout-minutes"]
+    assert "ci_checkout_workspace.sh dashboard" in _run(job)
+
+
+def test_technicals_model_install_cannot_be_skipped_by_a_vault_failure():
+    """The always() capitulation build ran without numpy after a failed vault
+    checkout skipped the install (runs 43194409803, 43401588127)."""
+    steps = _steps(_job("technicals"))
+    install = next(i for i, s in enumerate(steps) if "requirements-criticality.txt" in str(s.get("run") or ""))
+    vault = next(i for i, s in enumerate(steps) if str(s.get("uses") or "").endswith("checkout-vault"))
+    setup = next(i for i, s in enumerate(steps) if str(s.get("uses") or "").startswith("actions/setup-python"))
+    assert setup < install < vault
+
+
 def test_activist_paths_hold_what_the_scan_reads_and_writes_and_no_filings():
     paths = paths_for_profile("activist")
     holdings = json.loads((ROOT / "_system/portfolio/registry.json").read_text(encoding="utf-8"))["holdings"]
