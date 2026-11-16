@@ -69,3 +69,57 @@ def unpack(envelope):
     original={**copy.deepcopy(envelope),'schema_version':'underwriting-transport/6',
               'payload':restore(envelope['payload']),'string_dictionary':restore(envelope['string_dictionary'])}
     return unpack_old(original)
+
+
+STRING_SCHEMA='underwriting-transport/8'
+STRING_ESCAPE='~'
+STRING_INSTRUCTIONS=(
+    'The payload uses underwriting-transport/8 LOSSLESS storage, not a summary. '
+    'FIRST restore strings recursively in payload and string_dictionary ONLY: a string starting ~ '
+    'must have ^ or ~ immediately after it; remove exactly that first ~ and keep the result literal '
+    'without interpreting it again. A string starting ^ instead restores the one-key ^ object '
+    'whose value is every remaining character unchanged. Other strings stay literal. '
+    'Dictionary entries outside string_dictionary and all schema keys remain untouched. '
+    'Then apply the following unchanged container and source restoration rules.\n'
+    +INSTRUCTIONS.replace(SCHEMA,STRING_SCHEMA))
+
+
+def compact_strings(envelope):
+    from underwriting_transport import encoded
+    require(envelope.get('schema_version')==SCHEMA,'String source must use transport/7')
+    original=unpack(envelope)
+    def convert(value,depth=0):
+        require(depth<=MAX_CONTAINER_DEPTH,'String container depth exceeds bound')
+        if isinstance(value,dict):
+            if set(value)=={TOKEN}:
+                require(isinstance(value[TOKEN],str),'Invalid marker token string')
+                return TOKEN+value[TOKEN]
+            return {key:convert(item,depth+1) for key,item in value.items()}
+        if isinstance(value,list):return [convert(item,depth+1) for item in value]
+        if isinstance(value,str) and value.startswith((TOKEN,STRING_ESCAPE)):
+            return STRING_ESCAPE+value
+        return copy.deepcopy(value)
+    result={**copy.deepcopy(envelope),'schema_version':STRING_SCHEMA,
+            'payload':convert(envelope['payload']),'string_dictionary':convert(envelope['string_dictionary'])}
+    require(encoded(unpack_strings(result))==encoded(original),'String transport changed original characters, types or order')
+    return result
+
+
+def unpack_strings(envelope):
+    require(envelope.get('schema_version')==STRING_SCHEMA,'Unknown string transport')
+    def restore(value,depth=0):
+        require(depth<=MAX_CONTAINER_DEPTH,'String container depth exceeds bound')
+        if isinstance(value,str):
+            if value.startswith(STRING_ESCAPE):
+                require(len(value)>1 and value[1] in (TOKEN,STRING_ESCAPE),'Invalid string literal escape')
+                return value[1:]
+            if value.startswith(TOKEN):return {TOKEN:value[1:]}
+            return value
+        if isinstance(value,dict):
+            require(TOKEN not in value,'Unconverted string token container')
+            return {key:restore(item,depth+1) for key,item in value.items()}
+        if isinstance(value,list):return [restore(item,depth+1) for item in value]
+        return copy.deepcopy(value)
+    original={**copy.deepcopy(envelope),'schema_version':SCHEMA,
+              'payload':restore(envelope['payload']),'string_dictionary':restore(envelope['string_dictionary'])}
+    return unpack(original)
