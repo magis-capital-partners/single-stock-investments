@@ -11,11 +11,11 @@
       "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
       "pre_listing_share_basis_unverified": 102,
-      "new_earnings_disclosure_unresolved": 53,
       "positive_normalized_owner_cash_not_established": 109,
+      "new_earnings_disclosure_unresolved": 53,
       "realization_timing_missing": 15,
-      "annual_capex_missing": 72,
       "annual_operating_cash_flow_missing": 44,
+      "annual_capex_missing": 72,
       "annual_diluted_share_count_missing": 50,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
@@ -12217,26 +12217,18 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-16T12:21:28.424971+00:00",
+      "last_attempt": "2026-11-16T13:13:22.273886+00:00",
       "retry_after": "2026-11-17",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "author_or_challenger_unresolved: {\"severity\": \"major\", \"detail\": \"The mandatory structural alternative finance_withdrawal_customer_exit fails scenario ordering and returns no values. This is economically informative: target_revenue rises across cases, but target_pre_exit_earnings remains fixed when support is overridden. With 50% retention and 50% lost contribution, greater target revenue therefore creates greater losses without corresponding baseline earning power. ACV's revenue and expense tables in doc_62c275106e3bc0df distinguish auction, transport and financing economics. Reconcile baseline earnings and variable costs to target scale, then rerun the joint withdrawal tes; {\"severity\": \"major\", \"detail\": \"Annual reconciliation does not establish survival before payment deadlines. Year-one resources include the entire fiscal year's operating cash before paying target debt and recourse claims. The severe facility-failure test combines $350m debt settlement, $600m additional claims and a $1.4bn operating buffer plus $100m minority reserve against approximately $2.306bn opening cash. Opening resources cannot simultaneously cover those uses before later earnings arrive. doc_f10ce07f9bdee242 provides a three-business-day demand mechanism for covered obligations. Schedule claim demands and elective debt settlement aga; {\"severity\": \"major\", \"detail\": \"The base case distributes approximately $2.249bn in year one while electing to close ACV lending. doc_9b8366946fd8b140 describes whole-car expansion and the ACV acquisition, reports no historical cash dividends, and documents share repurchases. Cash-equivalent pro-rata treatment can substitute for repurchases, but it does not substantiate accelerated distribution of essentially all modeled excess resources or the lending-exit "
+          "detail": "local_input_too_large: 1053827 characters exceeds 1048576; complete evidence retained"
         }
       ],
       "unresolved_findings": [
         {
           "severity": "major",
-          "detail": "The mandatory structural alternative finance_withdrawal_customer_exit fails scenario ordering and returns no values. This is economically informative: target_revenue rises across cases, but target_pre_exit_earnings remains fixed when support is overridden. With 50% retention and 50% lost contribution, greater target revenue therefore creates greater losses without corresponding baseline earning power. ACV's revenue and expense tables in doc_62c275106e3bc0df distinguish auction, transport and financing economics. Reconcile baseline earnings and variable costs to target scale, then rerun the joint withdrawal test. Do not repair this by sorting outputs or weakening the shock."
-        },
-        {
-          "severity": "major",
-          "detail": "Annual reconciliation does not establish survival before payment deadlines. Year-one resources include the entire fiscal year's operating cash before paying target debt and recourse claims. The severe facility-failure test combines $350m debt settlement, $600m additional claims and a $1.4bn operating buffer plus $100m minority reserve against approximately $2.306bn opening cash. Opening resources cannot simultaneously cover those uses before later earnings arrive. doc_f10ce07f9bdee242 provides a three-business-day demand mechanism for covered obligations. Schedule claim demands and elective debt settlement against resources available by each deadline; execute payout deferral, delayed elective repayment, timely committed borrowing, or a failure waterfall where necessary."
-        },
-        {
-          "severity": "major",
-          "detail": "The base case distributes approximately $2.249bn in year one while electing to close ACV lending. doc_9b8366946fd8b140 describes whole-car expansion and the ACV acquisition, reports no historical cash dividends, and documents share repurchases. Cash-equivalent pro-rata treatment can substitute for repurchases, but it does not substantiate accelerated distribution of essentially all modeled excess resources or the lending-exit decision. Declare and support realization timing and capital-policy assumptions, and test continued retention and continued finance operations with matched funding and capital requirements. The existing tests vary withdrawal severity, not this competing strategic structure."
+          "detail": "The supplied diagnostics reject facility_failure_and_surviving_claims with business.low: alternative liquidity shortfall and reject finance_withdrawal_customer_exit with the same error twice. Both return null values. Their financing_failures arrays are empty, so these are unexplained shortfalls, not executed failure outcomes. The checklist nevertheless asserts survival. Repair the annual cash response and rerun both alternatives. Because target_debt_payment is explicitly elective, retaining or staging that payment may be defensible after reconciling contractual maturities and continuing interest; actual borrowing requires available facilities and debt accounting. If resources cannot fund the path, implement creditor payments, unpaid claims and cessation of common proceeds at the relevant deadline. Do not merely lower the operating buffer until validation passes. Sources: doc_62c275106e3bc0df, doc_e85a30a75ddf0406, doc_f10ce07f9bdee242 and doc_3f0da7f8c70b49fe."
         }
       ]
     }
