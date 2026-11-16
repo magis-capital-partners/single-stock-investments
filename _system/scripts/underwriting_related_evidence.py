@@ -305,15 +305,25 @@ def _require_requested_transaction_cash(packet, gaps):
 
 
 @bounded_sources
-def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None, *, fact_source="companyfacts"):
+def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None, *, fact_source="companyfacts", current_submissions=None):
     from sec_client import SecClient
     from underwriting_evidence import EXTRA_TAGS, _observation, document_record, filing_bytes
     client = client or SecClient(max_attempts=2)
     require(str(cik).isdigit(), 'SEC issuer identity must be numeric')
     base = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
     require(fact_source in ('companyfacts','filing_inline'), 'Unknown related primary fact source')
-    raw = client.get_json(base,timeout=30) if fact_source == 'companyfacts' else {}
-    submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json',timeout=30)
+    if current_submissions is not None:
+        profile = source_budget().owner_profile(str(cik))
+        require(fact_source == 'filing_inline' and isinstance(current_submissions, dict) and
+                profile and profile.get('id') == 'CPRT-owner-20261111-v3' and
+                profile.get('target_cik') == str(cik) and current_submissions.get('tickers') == [] and
+                isinstance(current_submissions.get('tickers'), list),
+                'Current retained target submissions require their exact owner scope')
+        raw = {}
+        submission = copy.deepcopy(current_submissions)
+    else:
+        raw = client.get_json(base,timeout=30) if fact_source == 'companyfacts' else {}
+        submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json',timeout=30)
     if keywords or fact_source == 'filing_inline':
         submitted = str(submission.get('cik') or '')
         require(submitted.isdigit() and int(submitted)==int(cik),
@@ -434,11 +444,55 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None,
     return target
 
 
-def discover_historical_targets(packet, requested, as_of, client, parent_cik=None):
+def _retained_target_labels(root, packet, as_of):
+    """Reuse a current normal evidence label; never assert a quoted listing alias."""
+    if packet.get('ticker') != 'CPRT':
+        return {}
+    from underwriting_pipeline import read
+    profile = source_budget().owner_profile('900075')
+    if not profile or profile.get('id') != 'CPRT-owner-20261111-v3':
+        return {}
+    cik = profile['target_cik']
+    policy = read(root/'_system/config/underwriting_policy.json')
+    if ((policy.get('related_fact_sources') or {}).get('CPRT') or {}).get(cik) != 'filing_inline':
+        return {}
+    data = read(root/'_system/reference/market-data/valuation_fundamentals/CPRT.json')
+    rows = [(ticker, metadata) for ticker, metadata in (data.get('underwriting_related_issuers') or {}).items()
+            if isinstance(metadata, dict) and str(metadata.get('cik')) == cik]
+    require(len(rows) <= 1, 'Ambiguous retained acquired-issuer labels')
+    if not rows:
+        return {}
+    ticker, metadata = rows[0]
+    require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', ticker) and ticker != packet['ticker'],
+            'Unsafe retained acquired-issuer label')
+    path = root/'_system/reference/market-data/valuation_related_evidence'/(ticker+'.json')
+    target = read(path)
+    if not target or target.get('as_of') != as_of or target.get('status') != 'ready':
+        return {}
+    require(target.get('ticker') == ticker and str(target.get('cik')) == cik and
+            target.get('currency') == packet.get('currency') and
+            isinstance(target.get('company'), str) and name_tokens(target['company']) and
+            name_tokens(target['company']) == name_tokens(metadata.get('company') or '') and
+            all(isinstance(target.get(key), str) and re.fullmatch(r'[0-9a-f]{64}', target[key]) and
+                target[key] == metadata.get(key) for key in ('source_hash','evidence_hash')) and
+            target.get('packet_hash') == digest({key:value for key,value in target.items() if key != 'packet_hash'}),
+            'Retained acquired-issuer source identity changed')
+    binding = acquisition_binding(packet, target['company'])
+    require(binding is not None and binding == metadata.get('parent_transaction_binding') and
+            (target.get('facts_provenance') or {}).get('method') == 'filing_inline' and
+            (target.get('facts_provenance') or {}).get('companyfacts_used') is False,
+            'Retained acquired issuer needs its current primary parent binding')
+    return {cik:{'ticker':ticker,'company':target['company'],'source_hash':target['source_hash'],
+                 'evidence_hash':target['evidence_hash'],'as_of':as_of}}
+
+
+def discover_historical_targets(packet, requested, as_of, client, parent_cik=None, *, retained_labels=None):
     """Resolve primary legal names when an acquired issuer left the ticker list.
 
-    Search supplies candidate CIKs only. SEC submissions must independently
-    confirm the exact legal name and one reported ticker before collection.
+    Search supplies candidate CIKs only. SEC submissions independently confirm
+    exact legal name and CIK. Only CPRT may retain a verified current internal
+    evidence label when SEC explicitly reports no tickers; financial sources
+    are still collected and validated normally.
     """
     names = []
     pattern = (r'\b([A-Z][A-Za-z0-9&.\'-]*(?:\s+[A-Z][A-Za-z0-9&.\'-]*){0,7}\s+'
@@ -470,15 +524,33 @@ def discover_historical_targets(packet, requested, as_of, client, parent_cik=Non
             url = f'https://data.sec.gov/submissions/CIK{cik:010d}.json'
             issuer = client.get_json(url, timeout=30)
             tickers = issuer.get('tickers') or []
-            if (str(issuer.get('cik') or '').isdigit() and int(issuer['cik']) == cik and cik not in seen
+            if not (str(issuer.get('cik') or '').isdigit() and int(issuer['cik']) == cik and cik not in seen
                     and name_tokens(issuer.get('name') or '') == name_tokens(name)
-                    and acquisition_mentioned(packet, issuer['name']) and len(tickers) == 1
-                    and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', tickers[0])
-                    and tickers[0] != packet['ticker']):
-                identities.append({'ticker': tickers[0], 'cik_str': cik, 'title': issuer['name'],
-                                   'identity_discovery': {'method': 'primary_legal_name_and_sec_submissions',
-                                                          'search_url': query, 'source_url': url, 'legal_name': name}})
-                seen.add(cik)
+                    and acquisition_mentioned(packet, issuer['name'])):
+                continue
+            retained = (retained_labels or {}).get(str(cik))
+            retained_label = (packet.get('ticker') == 'CPRT' and str(parent_cik) == '900075' and cik == 1637873 and
+                              isinstance(issuer.get('tickers'), list) and issuer['tickers'] == [] and
+                              isinstance(retained, dict) and retained.get('as_of') == as_of and
+                              name_tokens(retained.get('company') or '') == name_tokens(issuer['name']))
+            if len(tickers) == 1 and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', tickers[0]):
+                ticker = tickers[0]
+            elif retained_label:
+                ticker = retained['ticker']
+            else:
+                continue
+            if ticker == packet['ticker'] or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', ticker):
+                continue
+            identity = {'ticker':ticker, 'cik_str':cik, 'title':issuer['name'],
+                        'identity_discovery':{'method':'primary_legal_name_and_sec_submissions',
+                                              'search_url':query,'source_url':url,'legal_name':name}}
+            if retained_label:
+                identity['identity_discovery'].update(method='primary_identity_with_retained_internal_evidence_label',
+                    current_sec_tickers=[], internal_label_is_not_current_listing=True,
+                    retained_source_hash=retained['source_hash'])
+                identity['_current_submissions'] = copy.deepcopy(issuer)
+            identities.append(identity)
+            seen.add(cik)
     return identities
 
 
@@ -520,7 +592,9 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
                 and acquisition_mentioned(packet,identity['title'])):
             candidates.append(identity)
     if not candidates:
-        candidates = discover_historical_targets(packet, requested, as_of, client, parent_cik)
+        retained = _retained_target_labels(root,packet,as_of)
+        candidates = discover_historical_targets(packet, requested, as_of, client, parent_cik,
+            **({'retained_labels':retained} if retained else {}))
     unique = {}
     for identity in candidates:
         unique.setdefault(str(int(identity['cik_str'])), identity)
@@ -528,6 +602,8 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
     for identity in candidates[:2]:
         mode = related_fact_source(root,packet['ticker'],identity['cik_str'])
         options = {'fact_source':mode} if mode != 'companyfacts' else {}
+        if '_current_submissions' in identity:
+            options['current_submissions'] = identity['_current_submissions']
         with source_budget().target_scope(packet['ticker'],str(identity['cik_str'])):
             target = collect_target(root,identity['ticker'],identity['cik_str'],as_of,packet['currency'],requested_keywords(gaps),client,**options)
         if identity.get('identity_discovery'):
