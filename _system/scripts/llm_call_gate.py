@@ -136,10 +136,12 @@ def evaluate(
         return {**base, "decision": "suppressed", "gate_reason": "missing_evidence_hash"}
     if (state or {}).get("evidence_hash") == evidence_hash and not force:
         return {**base, "decision": "suppressed", "gate_reason": "evidence_already_processed"}
-    from underwriting_completion_authority import completion_limit_authority
-    completion = completion_limit_authority(policy_doc, consumer, subject, reason, owner_completion)
-    if owner_completion is not None and completion is None:
-        return {**base, "decision": "suppressed", "gate_reason": "invalid_owner_completion_authority"}
+    completion = None
+    if owner_completion is not None:
+        from underwriting_completion_authority import completion_limit_authority
+        completion = completion_limit_authority(policy_doc, consumer, subject, reason, owner_completion)
+        if completion is None:
+            return {**base, "decision": "suppressed", "gate_reason": "invalid_owner_completion_authority"}
     if completion:
         base["owner_completion_grant"] = completion['id']
 

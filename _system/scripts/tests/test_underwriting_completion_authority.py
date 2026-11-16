@@ -168,6 +168,12 @@ def test_explicit_invalid_authority_fails_closed(env, field):
     assert not out['approved'] and out['gate_reason'] == 'invalid_owner_completion_authority'
 
 
+def test_ordinary_gate_remains_standalone_without_completion_module(env, monkeypatch):
+    monkeypatch.setitem(sys.modules, 'underwriting_completion_authority', None)
+    assert evaluate(consumer='valuation_underwriter', subject='OTHER', reason='company_underwriting',
+                    evidence_hash='fresh', policy_doc=env[4], ledger=[])['approved']
+
+
 def test_combined_limit_exception_still_records_both_real_accounting_events(env):
     root, work, state, author, policy = env
     state['status'] = 'running'
