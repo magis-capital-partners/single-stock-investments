@@ -5,7 +5,8 @@ Profiles:
   news         — portfolio news ingest (holdings news JSON only)
   marvin-pick  — marvin_pick_ticker metadata (holdings research md/json)
   downloads    — same research trees as marvin-pick; document batches are added later
-  drive        — ticker research, third-party analyses, Drive intake folders, desk-brief inputs
+  drive        — ticker research, third-party analyses, Drive intake folders, onboard status
+                 and download/transcript manifests, desk-brief inputs
   two-phase-watch — INV Accelsius cooling watch (eight ticker trees + INV shard)
   dashboard    — deploy rebuild checkout (base paths only)
   thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
@@ -35,6 +36,13 @@ DESK_BRIEFS_DIR = ROOT / "_system" / "data" / "desk_briefs"
 
 # Soft cap for the dashboard profile (must stay tiny — SPX-scale explosion caused 5h checkouts).
 BASE_PROFILE_PATH_CAP = 200
+
+# Per-ticker files outside research/ that the drive rebuild reads.
+DRIVE_REBUILD_TICKER_FILES = (
+    ".onboard_status.json",
+    "investor-documents/DOWNLOAD_MANIFEST.json",
+    "investor-documents/TRANSCRIPT_MANIFEST.json",
+)
 
 
 def load_holdings() -> list[str]:
@@ -423,6 +431,14 @@ def paths_for_profile(profile: str) -> list[str]:
         # research/ and third-party-analyses/ are what import and the insights
         # rebuild read. drive-intake/ is the company-PDF destination.
         # investor-documents/*.pdf and *.htm stay out: that tree is 41 GiB.
+        # The rebuild's build_dashboard_data also opens three small files per
+        # ticker outside research/: .onboard_status.json (onboard), and the
+        # download and transcript manifests (developments, transcripts). The
+        # prior-row restore does not refill those fields, so without them the
+        # research guard refuses the write (runs 43632221425, 43755181140:
+        # "onboard 853->0"). Only tracked ones are listed, to keep the
+        # non-cone pattern count down.
+        tracked = set(tracked_files())
         paths = []
         for ticker in tracked_company_dirs():
             paths.extend(
@@ -433,6 +449,9 @@ def paths_for_profile(profile: str) -> list[str]:
                     f"{ticker}/investor-documents/drive-intake",
                 ]
             )
+            for rel in DRIVE_REBUILD_TICKER_FILES:
+                if f"{ticker}/{rel}" in tracked:
+                    paths.append(f"{ticker}/{rel}")
         paths.extend(desk_brief_inputs())
         return paths
 

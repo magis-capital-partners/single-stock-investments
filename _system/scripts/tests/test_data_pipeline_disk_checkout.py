@@ -145,6 +145,36 @@ def test_drive_checkout_is_research_and_intake_not_filing_pdfs():
     assert _job("drive")["env"]["DASHBOARD_PRESERVE_INFRA_ALWAYS"] == "1"
 
 
+def test_drive_checkout_holds_the_ticker_files_the_research_guard_needs():
+    """Runs 43632221425 and 43755181140: the drive rebuild refused to write
+    with "onboard 853->0". build_dashboard_data reads .onboard_status.json and
+    the download/transcript manifests outside research/, and the prior-row
+    restore does not refill onboard, developments or transcripts."""
+    from ci_sparse_checkout_paths import tracked_company_dirs, tracked_files
+
+    paths = set(paths_for_profile("drive"))
+    tracked = set(tracked_files())
+    wanted = [
+        f"{ticker}/{rel}"
+        for ticker in tracked_company_dirs()
+        for rel in (
+            ".onboard_status.json",
+            "investor-documents/DOWNLOAD_MANIFEST.json",
+            "investor-documents/TRANSCRIPT_MANIFEST.json",
+        )
+        if f"{ticker}/{rel}" in tracked
+    ]
+    assert len([rel for rel in wanted if rel.endswith(".onboard_status.json")]) >= 100
+    missing = [rel for rel in wanted if rel not in paths]
+    assert not missing, missing[:10]
+    for path in paths:
+        if "/investor-documents/" not in path:
+            continue
+        assert path.endswith(
+            ("/investor-documents/drive-intake", "/DOWNLOAD_MANIFEST.json", "/TRANSCRIPT_MANIFEST.json")
+        ), path
+
+
 def test_rebuild_checkouts_hold_every_path_a_desk_brief_cites():
     """Run 41540991704: the drive rebuild failed check_desk_briefs because the
     activism brief cites AGENT_INDEX.md, a root file the drive checkout left
