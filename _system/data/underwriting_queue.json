@@ -8,22 +8,22 @@
       "reviewed": 2
     },
     "blocker_companies": {
-      "issuer_forecast_missing": 135,
       "parent_cashflow_attribution_missing": 40,
+      "issuer_forecast_missing": 135,
       "new_earnings_disclosure_unresolved": 53,
       "positive_normalized_owner_cash_not_established": 109,
       "pre_listing_share_basis_unverified": 102,
       "realization_timing_missing": 15,
       "annual_capex_missing": 72,
-      "annual_operating_cash_flow_missing": 44,
       "annual_diluted_share_count_missing": 50,
+      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
       "newer_balance_sheet_inputs_available": 214,
       "financial_inputs_expired_or_undated": 22,
-      "listing_calendar_or_completed_close_unverified": 22,
       "corporate_action_history_unverified": 23,
+      "listing_calendar_or_completed_close_unverified": 22,
       "method_specific_forecast_missing": 32,
       "annual_financial_inputs_expired": 10,
       "quote_issuer_mismatch": 2,
@@ -12217,26 +12217,22 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-16T15:47:08.755929+00:00",
+      "last_attempt": "2026-11-16T18:50:18.620147+00:00",
       "retry_after": "2026-11-17",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "author_or_challenger_unresolved: {\"severity\": \"critical\", \"detail\": \"The executed finance_withdrawal_customer_exit test produces low/base/high equity values of -0.1725/0.1152/0.2623. This violates the mandatory nonnegative aggregate-equity requirement despite empty compiler error arrays. The graph permits persistent acquired-business losses to enter negative terminal_earnings and a negative continuing equity claim, while explicit shareholder flows contain distributions only. The opening failure state covers target_recourse_payment only and does not resolve subsequent operating losses. Using doc_62c275106e3bc0df and the acquisition/guarantee documents, execute a funded contin; {\"severity\": \"major\", \"detail\": \"The parent facility cannot finance a squeeze in the supplied graph. liquidity_y1 equals closing cash plus active_facility, while minimum_liquidity_y1 equals required_cash plus active_facility; the facility cancels from the constraint. The same holds in year two, and net_financing is always zero. Consequently intermediate_squeeze_with_timely_credit never executes timely borrowing. Meanwhile losing facility access activates cost savings, restructuring costs and revenue damage independently of an actual funding shortfall; the supplied one-way test even increases value when access falls from 1 to 0.9. doc_e85a30a7; {\"severity\": \"major\", \"detail\": \"distribution_y2 mechanically pays every dollar above required_cash, including the accumulated first-year surplus. payout_fraction_y1 changes only whether that surplus is returned one year sooner. Neither alternative tests continued retention, further acquisitions or a slower return of capital. doc_9b8366946fd8b140 reports no cash-dividend history, no foreseeable dividend plan and discretionary repurchases; the completed ACV pu"
+          "detail": "local_input_too_large: 1060158 characters exceeds 1048576; complete evidence retained"
         }
       ],
       "unresolved_findings": [
         {
-          "severity": "critical",
-          "detail": "The executed finance_withdrawal_customer_exit test produces low/base/high equity values of -0.1725/0.1152/0.2623. This violates the mandatory nonnegative aggregate-equity requirement despite empty compiler error arrays. The graph permits persistent acquired-business losses to enter negative terminal_earnings and a negative continuing equity claim, while explicit shareholder flows contain distributions only. The opening failure state covers target_recourse_payment only and does not resolve subsequent operating losses. Using doc_62c275106e3bc0df and the acquisition/guarantee documents, execute a funded continuation, restructuring or abandonment path with its remaining obligations. If owners must contribute, include bounded capital calls and matching bridge sources; if common ownership can cease, implement limited liability and stop subsequent common proceeds. Do not merely floor the aggregate valuation while preserving unfunded operations."
+          "severity": "major",
+          "detail": "The ACV exit removes future operating cash flows and releases remaining parent surplus after year two, while contractual obligations extend beyond that endpoint. doc_62c275106e3bc0df reports lease payments extending through 2039; doc_6441d4f50e22bf05 Section 7.03 contains six-year indemnification protections; doc_c43b7db10ecff742 requires servicing continuity and successor transition; doc_3f0da7f8c70b49fe preserves guaranteed obligations through payment and possible reinstatement. A $75m-$150m wind-down estimate, stressed to $250m, does not by itself establish their payment timing, settlement or discharge. Extend the audited projection through material payment obligations with a separately chosen holding horizon, or demonstrate a source-supported funded settlement/transfer that removes those obligations. Prevent treasury realization from distributing resources still required for them."
         },
         {
           "severity": "major",
-          "detail": "The parent facility cannot finance a squeeze in the supplied graph. liquidity_y1 equals closing cash plus active_facility, while minimum_liquidity_y1 equals required_cash plus active_facility; the facility cancels from the constraint. The same holds in year two, and net_financing is always zero. Consequently intermediate_squeeze_with_timely_credit never executes timely borrowing. Meanwhile losing facility access activates cost savings, restructuring costs and revenue damage independently of an actual funding shortfall; the supplied one-way test even increases value when access falls from 1 to 0.9. doc_e85a30a75ddf0406 supports conditional committed borrowing. Either model actual draws, interest, remaining undrawn capacity and repayment through maturity when needed, or establish that credit is economically immaterial and remove unsupported claims that these tests validate borrowing access."
-        },
-        {
-          "severity": "major",
-          "detail": "distribution_y2 mechanically pays every dollar above required_cash, including the accumulated first-year surplus. payout_fraction_y1 changes only whether that surplus is returned one year sooner. Neither alternative tests continued retention, further acquisitions or a slower return of capital. doc_9b8366946fd8b140 reports no cash-dividend history, no foreseeable dividend plan and discretionary repurchases; the completed ACV purchase demonstrates another material use of accumulated resources. Cash-equivalent pro-rata distributions are permissible, but their amount and timing still require a defensible capital-allocation forecast. Add a persistent-retention/deployment alternative, reconcile its cash yield and eventual realization, and justify the two-year release against that competing hypothesis."
+          "detail": "The opening waterfall tests only target_recourse_payment. target_debt_payment is subtracted afterward, and the operating continuation terminal is not multiplied by early_claim_survival. Thus the declared failure mechanism does not implement the required complete common-equity waterfall if its senior claim is unpaid. Existing tests report no financing failures, so their success does not validate this branch. Reconcile all obligations sharing the deadline and creditor priority, then ensure every common distribution and operating/treasury realization at or after an executed failure is zero. Preserve creditor claims independently of old common ownership."
         }
       ]
     }
