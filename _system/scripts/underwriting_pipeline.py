@@ -430,6 +430,35 @@ def revision_feedback(author, challenger, error, *, packet=None):
     return result
 
 
+def _carry_literal_source_quote(previous, feedback, packet):
+    """Retain a validated display aid only for the same frozen financial claim."""
+    hint = (previous or {}).get('literal_source_quote')
+    old = (previous or {}).get('previous_contract') or {}
+    current = (feedback or {}).get('previous_contract') or {}
+    if not isinstance(hint, dict) or not isinstance(old, dict) or not isinstance(current, dict):
+        return feedback
+    old_facts = [r for r in old.get('supplemental_facts') or []
+                 if isinstance(r, dict) and r.get('id') == hint.get('observation_id')]
+    current_facts = [r for r in current.get('supplemental_facts') or []
+                     if isinstance(r, dict) and r.get('id') == hint.get('observation_id')]
+    if len(old_facts) != 1 or len(current_facts) != 1:
+        return feedback
+    claim = lambda row: {k:v for k,v in row.items() if k not in ('quote', 'locator')}
+    if claim(old_facts[0]) != claim(current_facts[0]):
+        return feedback
+    carried = {**copy.deepcopy(hint), 'contract_hash': digest(current)}
+    candidate = {**feedback, 'literal_source_quote': carried}
+    try:
+        from underwriting_transport import _literal_source_quote_prefix
+        _literal_source_quote_prefix({'packet':packet, 'revision_feedback':candidate,
+                                      'revision_base_hash':digest(current)})
+    except (ContractError, KeyError, TypeError, AttributeError):
+        # The complete packet and authentic criticism remain. Never label an old
+        # source epoch or a changed extraction as a verified literal quotation.
+        return feedback
+    return candidate
+
+
 def unresolved_findings(feedback):
     return [f for f in ((feedback or {}).get('independent_challenge') or {}).get('findings') or []
             if f.get('severity') in ('major', 'critical')]
@@ -662,6 +691,7 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                 # Challenger payloads still receive no owner preference.
                 if 'owner_direction' in previous_feedback:
                     feedback['owner_direction'] = previous_feedback['owner_direction']
+            feedback = _carry_literal_source_quote(previous_feedback, feedback, packet)
             progress['feedback'] = feedback
             progress['history'].append({'contract_hash': digest(author) if author else None,
                                         'required_correction': str(exc), 'findings': unresolved_findings(feedback)})
