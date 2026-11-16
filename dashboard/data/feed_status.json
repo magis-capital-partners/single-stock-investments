@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-11-16T17:08:05Z",
+  "generated_at": "2026-11-16T23:40:11Z",
   "surfaces": [
     {
       "id": "buyback-radar",
@@ -270,7 +270,7 @@
       "api": null,
       "artifact": "dashboard/data/reverse_splits.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-11-13T20:26:38Z",
+      "stamp": "2026-11-16T22:45:54Z",
       "max_age_hours": 100.0,
       "exists": true,
       "status": "fresh",
@@ -1006,7 +1006,7 @@
       "api": null,
       "artifact": "dashboard/data/insights/podcasts.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-11-16T17:08:02Z",
+      "stamp": "2026-11-16T23:39:58Z",
       "max_age_hours": 240.0,
       "exists": true,
       "status": "fresh",
@@ -1016,14 +1016,15 @@
       "healer": "python _system/scripts/podcast_cloud_refresh.py --date YYYY-MM-DD (podcast-refresh.yml, cron 0 7 * * 1)",
       "next_action": "python _system/scripts/podcast_cloud_refresh.py --date YYYY-MM-DD (podcast-refresh.yml, cron 0 7 * * 1) A lane-failure issue is open.",
       "coverage": {
-        "total_rows": 4545,
-        "complete_rows": 3170,
-        "incomplete_rows": 1375,
+        "total_rows": 4640,
+        "complete_rows": 3199,
+        "incomplete_rows": 1441,
         "excluded_rows": 0,
-        "coverage_pct": 69.7,
+        "coverage_pct": 68.9,
         "missing_by_field": {
           "needs_review": 13,
-          "pending_model": 1362
+          "pending_model": 1363,
+          "not_classified": 65
         },
         "definition": "Reader summaries ready / published podcast catalog",
         "kind": "processing",
@@ -1039,11 +1040,11 @@
       "api": null,
       "artifact": "dashboard/data/insights/videos.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-11-12T22:55:34Z",
+      "stamp": "2026-11-16T21:58:48Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "fresh",
+      "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
