@@ -60,12 +60,12 @@ def test_checked_repo_contains_only_dated_owner_grants_with_original_global_and_
  author=p['consumers']['valuation_underwriter'];review=p['consumers']['valuation_challenger']
  assert (author['daily_repo_limit'],author['per_subject_daily_limit'])==(12,2)
  assert (review['daily_repo_limit'],review['per_subject_daily_limit'])==(6,2)
- assert author['dated_subject_daily_limits']=={'2026-11-10':{'V':4},'2026-11-13':{'CPRT':4},'2026-11-16':{'CPRT':8}}
- assert review['dated_subject_daily_limits']=={'2026-11-10':{'V':3},'2026-11-16':{'CPRT':3}}
+ assert author['dated_subject_daily_limits']=={'2026-11-10':{'V':4},'2026-11-13':{'CPRT':4},'2026-11-16':{'CPRT':12}}
+ assert review['dated_subject_daily_limits']=={'2026-11-10':{'V':3},'2026-11-16':{'CPRT':6}}
  assert not p['consumers']['valuation_builder'].get('dated_subject_daily_limits')
 
 
-@pytest.mark.parametrize('consumer,used,expected',[('valuation_underwriter',6,True),('valuation_underwriter',7,True),('valuation_underwriter',8,False),('valuation_challenger',2,True),('valuation_challenger',3,False)])
+@pytest.mark.parametrize('consumer,used,expected',[('valuation_underwriter',8,True),('valuation_underwriter',9,True),('valuation_underwriter',10,True),('valuation_underwriter',11,True),('valuation_underwriter',12,False),('valuation_challenger',1,True),('valuation_challenger',2,True),('valuation_challenger',3,True),('valuation_challenger',4,True),('valuation_challenger',5,True),('valuation_challenger',6,False)])
 def test_current_CPRT_review_renewal_respects_each_separate_role_limit(consumer,used,expected):
  import json
  from pathlib import Path
