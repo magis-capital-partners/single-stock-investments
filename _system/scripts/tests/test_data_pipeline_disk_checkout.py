@@ -386,6 +386,19 @@ def test_discovery_vault_checkouts_fit_their_30_minute_jobs():
         assert vault[0]["timeout-minutes"] < job["timeout-minutes"], name
 
 
+def test_thirteen_f_and_reverse_split_vaults_are_publication_only():
+    """thirteen-f hit its job limit every day from 2026-11-12 after a 41-73
+    minute whole-vault restore; reverse-splits runs the same checkout."""
+    for name, profile in (("thirteen-f", "thirteen-f"), ("reverse-splits", "minimal")):
+        job = _job(name)
+        assert f"ci_checkout_workspace.sh {profile}" in _run(job), name
+        vault = _vault_steps(job)
+        assert len(vault) == 1, name
+        assert vault[0]["with"]["publication-only"] == "true", name
+        assert "extra-paths" not in vault[0]["with"], name
+        assert vault[0]["timeout-minutes"] < job["timeout-minutes"], name
+
+
 def test_activist_paths_hold_what_the_scan_reads_and_writes_and_no_filings():
     paths = paths_for_profile("activist")
     holdings = json.loads((ROOT / "_system/portfolio/registry.json").read_text(encoding="utf-8"))["holdings"]

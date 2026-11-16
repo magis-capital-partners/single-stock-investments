@@ -1197,8 +1197,15 @@ jobs:
           fetch-depth: 1
       - name: Checkout reverse-split workspace
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      # The reverse-split collectors read the committed ledger and public
+      # sources, never a vault tree. A whole-vault checkout restores every
+      # private catalog record serially (41-73 minutes since 2026-11-12);
+      # publication objects alone take 9-18 minutes.
       - name: Checkout research vault
+        timeout-minutes: 20
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -1441,8 +1448,17 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (13F ownership)
         run: bash _system/scripts/ci_checkout_workspace.sh thirteen-f
+      # The 13F scripts read EDGAR and the ownership files checked out above,
+      # never a vault tree; the vault is here so private snapshots such as
+      # holdings/directory_index.json hydrate and are redacted by commit-main.
+      # A whole-vault checkout restores every private catalog record serially:
+      # 41-73 minutes since 2026-11-12, so the job hit its limit every day.
+      # Publication objects alone take 9-18 minutes.
       - name: Checkout research vault
+        timeout-minutes: 25
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
