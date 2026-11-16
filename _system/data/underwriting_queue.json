@@ -8,22 +8,22 @@
       "reviewed": 2
     },
     "blocker_companies": {
-      "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
+      "parent_cashflow_attribution_missing": 40,
       "new_earnings_disclosure_unresolved": 53,
       "positive_normalized_owner_cash_not_established": 109,
       "pre_listing_share_basis_unverified": 102,
       "realization_timing_missing": 15,
       "annual_capex_missing": 72,
-      "annual_diluted_share_count_missing": 50,
       "annual_operating_cash_flow_missing": 44,
+      "annual_diluted_share_count_missing": 50,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
       "newer_balance_sheet_inputs_available": 214,
       "financial_inputs_expired_or_undated": 22,
-      "corporate_action_history_unverified": 23,
       "listing_calendar_or_completed_close_unverified": 22,
+      "corporate_action_history_unverified": 23,
       "method_specific_forecast_missing": 32,
       "annual_financial_inputs_expired": 10,
       "quote_issuer_mismatch": 2,
@@ -12217,22 +12217,30 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-16T18:50:18.620147+00:00",
+      "last_attempt": "2026-11-16T21:43:06.452683+00:00",
       "retry_after": "2026-11-17",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "local_input_too_large: 1060158 characters exceeds 1048576; complete evidence retained"
+          "detail": "evidence_not_ready: [{\"code\": \"requested_primary_document_unavailable\", \"detail\": \"Retry requested primary disclosure: \"}]"
         }
       ],
       "unresolved_findings": [
         {
-          "severity": "major",
-          "detail": "The ACV exit removes future operating cash flows and releases remaining parent surplus after year two, while contractual obligations extend beyond that endpoint. doc_62c275106e3bc0df reports lease payments extending through 2039; doc_6441d4f50e22bf05 Section 7.03 contains six-year indemnification protections; doc_c43b7db10ecff742 requires servicing continuity and successor transition; doc_3f0da7f8c70b49fe preserves guaranteed obligations through payment and possible reinstatement. A $75m-$150m wind-down estimate, stressed to $250m, does not by itself establish their payment timing, settlement or discharge. Extend the audited projection through material payment obligations with a separately chosen holding horizon, or demonstrate a source-supported funded settlement/transfer that removes those obligations. Prevent treasury realization from distributing resources still required for them."
+          "severity": "critical",
+          "detail": "supp_parent_htm_2026 does not establish the modeled investment balance. Its quotation contains 2,008,539 while numeric_token selects 2,581,901, and the quotation lacks the required explicit reporting year and scale header. doc_9b8366946fd8b140 reports 2,581,901 in the FY2026 investment row and 2,008,539 in the comparison column. Replace the quotation with a complete contiguous FY2026 table excerpt establishing column, scale and amount, then recompile all opening resources and financing tests."
         },
         {
           "severity": "major",
-          "detail": "The opening waterfall tests only target_recourse_payment. target_debt_payment is subtracted afterward, and the operating continuation terminal is not multiplied by early_claim_survival. Thus the declared failure mechanism does not implement the required complete common-equity waterfall if its senior claim is unpaid. Existing tests report no financing failures, so their success does not validate this branch. Reconcile all obligations sharing the deadline and creditor priority, then ensure every common distribution and operating/treasury realization at or after an executed failure is zero. Preserve creditor claims independently of old common ownership."
+          "detail": "projection_maintenance_inflation raises p3_maintenance through p13_maintenance, but each amount is added to cash generation and deducted as reinvestment without reducing owner earnings or increasing modeled revenue. For example, base maintenance rises from $240,841,650 to $245,658,483 in year three, yet this $4,816,833 increase cancels completely. Trusted sensitivity confirms zero value effect. doc_9b8366946fd8b140 identifies labor, towing and replacement requirements; it does not establish exact pricing offsets. Derive owner cash after the rising replacement burden from an explicit pricing/cost bridge, or demonstrate and model the offset. Rerun the joint inflation and competitive stress."
+        },
+        {
+          "severity": "major",
+          "detail": "The largest sensitivity, projection_retention, applies stable base nominal owner earning power throughout the thirteen-year projection, with annual additions from repeated investment and further continuation afterward. The filing's network advantages support persistence as a hypothesis, but obs_225c9f5d553432165c9b versus obs_660ca0ff65f151a90460 shows current operating-income deterioration. The model does not quantitatively distinguish mature-yard pricing, volume, operating costs and replacement needs; later revenue is backsolved from owner earnings. Establish an observable mature-business bridge and explain the duration of persistence separately from the contractual projection. Retain both longer-persistence and faster-erosion alternatives."
+        },
+        {
+          "severity": "major",
+          "detail": "payout_fraction_y2=0 also suppresses distributions in years three through twelve, followed by a complete surplus distribution in year thirteen. The ACV lease tail through 2039 establishes obligations to project, not a requirement to retain every year's surplus until that date. doc_9b8366946fd8b140 reports approximately $1.6 billion of FY2026 repurchases, contradicting an unexplained decade of complete retention. Support a continuing capital policy after the integration holdback, preserve explicit claim reserves and model distributions accordingly. The immediate_surplus_return alternative demonstrates material timing sensitivity but does not justify the selected policy."
         }
       ]
     }
