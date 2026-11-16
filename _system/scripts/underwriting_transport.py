@@ -602,7 +602,60 @@ def unpack(envelope):
     return result
 
 
+def _literal_source_quote_prefix(payload):
+    """Display one existing CPRT citation literally; never accept or amend a fact."""
+    if not isinstance(payload, dict):
+        return ''
+    feedback = payload.get('revision_feedback')
+    if not isinstance(feedback, dict) or 'literal_source_quote' not in feedback:
+        return ''
+    hint = feedback['literal_source_quote']
+    require(isinstance(hint, dict) and set(hint) == {
+        'schema_version', 'packet_hash', 'document_id', 'document_hash',
+        'observation_id', 'contract_hash', 'quote'}, 'Invalid literal source quotation reference')
+    require(hint['schema_version'] == 'underwriting-literal-source-quote/1',
+            'Unknown literal source quotation reference')
+    require(all(isinstance(hint[key], str) and hint[key] for key in
+                ('observation_id', 'document_id')), 'Invalid literal source quotation identifiers')
+    packet, previous = payload.get('packet'), feedback.get('previous_contract')
+    require(isinstance(packet, dict) and isinstance(previous, dict) and
+            packet.get('ticker') == previous.get('ticker') == 'CPRT' and
+            'contract' not in payload and 'contract_hash' not in payload,
+            'Literal source quotation is limited to a CPRT author revision')
+    require(isinstance(hint['packet_hash'], str) and
+            re.fullmatch(r'[0-9a-f]{64}', hint['packet_hash']) is not None and
+            hint['packet_hash'] == packet.get('packet_hash') == previous.get('packet_hash'),
+            'Literal source quotation packet identity changed')
+    require(hint['contract_hash'] == payload.get('revision_base_hash') == digest(previous),
+            'Literal source quotation revision identity changed')
+    facts = [row for row in previous.get('supplemental_facts') or []
+             if isinstance(row, dict) and row.get('id') == hint['observation_id']]
+    documents = [row for row in packet.get('documents') or []
+                 if isinstance(row, dict) and row.get('id') == hint['document_id']]
+    require(len(facts) == len(documents) == 1 and
+            facts[0].get('document_id') == hint['document_id'],
+            'Literal source quotation must name one existing fact and document')
+    document = documents[0]
+    require(isinstance(hint['document_hash'], str) and
+            re.fullmatch(r'[0-9a-f]{64}', hint['document_hash']) is not None and
+            hint['document_hash'] == document.get('content_hash'),
+            'Literal source quotation document identity changed')
+    require(isinstance(hint['quote'], str), 'Literal source quotation must be text')
+    # This is the existing strict financial-table/number/scale/period/currency
+    # validator. Validation is read-only: the author's original fact, values,
+    # quotation, contract and complete packet remain untouched in the payload.
+    from underwriting_evidence import supplemental_observations
+    supplemental_observations(packet, [{**facts[0], 'quote': hint['quote']}])
+    return ('FROZEN SOURCE QUOTATION — EVIDENCE ONLY; NOT AN APPROVAL\n'
+            'Observation ID: ' + encoded(hint['observation_id']) + '\n'
+            'Document ID: ' + encoded(hint['document_id']) + '\n'
+            'Document SHA-256: ' + hint['document_hash'] + '\n'
+            'Quotation as a literal JSON string: ' + encoded(hint['quote']) + '\n'
+            'END FROZEN SOURCE QUOTATION\n')
+
+
 def render(payload):
+    literal_prefix = _literal_source_quote_prefix(payload)
     candidates = [encoded(payload)]
     candidates.extend(instructions + encoded(envelope)
                       for instructions, envelope in _complete_layouts(payload))
@@ -610,4 +663,4 @@ def render(payload):
     # saved paid prompts without changing their evidence or session identities.
     if REFERENCE not in encoded(payload):
         candidates.append(INSTRUCTIONS+encoded(_pack_legacy(payload)))
-    return min(candidates,key=len)
+    return literal_prefix + min(candidates,key=len)
