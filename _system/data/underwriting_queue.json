@@ -10,13 +10,13 @@
     "blocker_companies": {
       "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
-      "pre_listing_share_basis_unverified": 102,
       "positive_normalized_owner_cash_not_established": 109,
       "new_earnings_disclosure_unresolved": 53,
+      "pre_listing_share_basis_unverified": 102,
       "realization_timing_missing": 15,
+      "annual_diluted_share_count_missing": 50,
       "annual_operating_cash_flow_missing": 44,
       "annual_capex_missing": 72,
-      "annual_diluted_share_count_missing": 50,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
@@ -12217,18 +12217,26 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-16T13:13:22.273886+00:00",
+      "last_attempt": "2026-11-16T14:18:55.943353+00:00",
       "retry_after": "2026-11-17",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "local_input_too_large: 1053827 characters exceeds 1048576; complete evidence retained"
+          "detail": "model_call_daily_repo_limit"
         }
       ],
       "unresolved_findings": [
         {
+          "severity": "critical",
+          "detail": "finance_revenue_removed and finance_cost_avoidance use the wrong business scope. In doc_62c275106e3bc0df, the six months ended June 30, 2026 show $46.676m of customer-assurance revenue and $40.702m of customer-assurance cost. These concern Go Green and other vehicle-assurance products, including price guarantees; they are not a standalone captive-finance revenue/cost statement. The contract annualizes them into $93.352m of supposedly forgone financing revenue and derives avoidable financing costs from the assurance-cost row. doc_9f5f42c407493229 separately describes financing-receivable fees and their accounting. Extract the actual lending revenue, interest, credit losses and attributable cash expenses, or explicitly bound those allocations from correctly scoped observations. Model assurance continuation or termination separately. Rebuild target earnings, customer attrition, capital requirements and every affected structural alternative."
+        },
+        {
           "severity": "major",
-          "detail": "The supplied diagnostics reject facility_failure_and_surviving_claims with business.low: alternative liquidity shortfall and reject finance_withdrawal_customer_exit with the same error twice. Both return null values. Their financing_failures arrays are empty, so these are unexplained shortfalls, not executed failure outcomes. The checklist nevertheless asserts survival. Repair the annual cash response and rerun both alternatives. Because target_debt_payment is explicitly elective, retaining or staging that payment may be defensible after reconciling contractual maturities and continuing interest; actual borrowing requires available facilities and debt accounting. If resources cannot fund the path, implement creditor payments, unpaid claims and cessation of common proceeds at the relevant deadline. Do not merely lower the operating buffer until validation passes. Sources: doc_62c275106e3bc0df, doc_e85a30a75ddf0406, doc_f10ce07f9bdee242 and doc_3f0da7f8c70b49fe."
+          "detail": "The unavailable-facility tests lower minimum_cash without a supported operating response that reduces the requirement. The main assumption is $750m; facility_failure_and_surviving_claims overrides it to $700m and finance_withdrawal_customer_exit to $650m. With the access-failure contingency and $100m minority reserve, this reduces required cash from $1.6bn to $1.5bn and $1.4bn respectively. The reported closing resources of approximately $1.518bn and $1.403bn would miss the unchanged requirement by approximately $82m and $197m. doc_9b8366946fd8b140 documents settlement balances and liquidity demands, but the contract supplies no mechanism supporting these smaller requirements during the more severe shocks. Retain the requirement in a joint test, or explicitly model and substantiate how operating changes release the buffer; execute any remaining funding shortfall."
+        },
+        {
+          "severity": "major",
+          "detail": "The emergency response is decisive but its adverse bounds are not executed. The severe facility tests retain $60m annual after-tax savings, 90% first-year effectiveness, $20m restructuring cash cost and only 2% additional service-revenue damage. doc_62c275106e3bc0df reports expense pools, not removable cash costs or implementation timing; doc_6441d4f50e22bf05 also preserves employment and compensation obligations that require reconciliation. The remaining liquidity margins are only approximately $18m and $3m even after the buffer reductions. Test slower or unavailable savings, higher restructuring payments and greater customer damage together with facility failure, within the declared ranges. Show the expense-to-cash and payment-timing bridge, preserving servicing, recurring compensation and creditor obligations."
         }
       ]
     }
