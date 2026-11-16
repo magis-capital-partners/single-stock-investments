@@ -383,6 +383,9 @@ def _perturbed(model, overrides, runway_scale=None):
                         errors.append(f"{component['id']}.{case}: alternative terminal economics are not funded")
             for case in CASES:
                 totals[case] += e['outputs'][case]
+    if not errors and not (0 <= totals['low'] <= totals['base'] <= totals['high']):
+        errors.append('Structural alternative requires ordered nonnegative aggregate equity '
+                      f'and an explicit limited-liability treatment; executed values: {totals}')
     return {'values': totals if not errors else None, 'errors': errors, 'financing_failures': defaults}
 
 
