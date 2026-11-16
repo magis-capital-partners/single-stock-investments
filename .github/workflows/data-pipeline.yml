@@ -957,8 +957,15 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (CVR reference + scripts)
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      # The discovery jobs read no vault tree. A whole-vault checkout restores
+      # every private catalog record serially (41-73 minutes since
+      # 2026-11-12), past this 30-minute job limit. Publication objects alone
+      # take 9-18 minutes, and the rest of the job about 5.
       - name: Checkout research vault
+        timeout-minutes: 22
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -1051,8 +1058,12 @@ jobs:
           fetch-depth: 1
       - name: Checkout warrant workspace
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      # See cvr-discover: no vault tree is read here.
       - name: Checkout research vault
+        timeout-minutes: 22
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -1119,8 +1130,12 @@ jobs:
           fetch-depth: 1
       - name: Checkout separation workspace
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      # See cvr-discover: no vault tree is read here.
       - name: Checkout research vault
+        timeout-minutes: 22
         uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
