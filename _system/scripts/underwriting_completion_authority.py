@@ -84,7 +84,7 @@ def pending_revision_authority(root, work, ticker, state, *, contract=None, pack
     if review.get('verdict') == 'approve':
         return None
     pending_review = (review.get('verdict') == 'revise' and review.get('contract_hash') == digest(previous)
-                      and any(f.get('severity') in ('major', 'critical') for f in review.get('findings') or []))
+                      and any(f.get('severity') in ('minor', 'major', 'critical') for f in review.get('findings') or []))
     pending_compilation = (not review and bool(feedback.get('required_correction')) and any(
         any(f.get('severity') in ('major', 'critical') for f in h.get('findings') or []) for h in history))
     if not (pending_review or pending_compilation):

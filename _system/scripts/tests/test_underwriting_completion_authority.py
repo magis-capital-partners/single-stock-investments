@@ -126,6 +126,14 @@ def test_new_native_descendant_and_compilation_correction_retain_the_paid_anchor
     assert proof(env)['current_contract_hash'] == digest(newer)
 
 
+def test_explicit_review_revision_can_finish_its_remaining_minor_corrections(env):
+    root, work, *_ = env
+    p = json.loads((work/'progress/CPRT.json').read_text())
+    p['feedback']['independent_challenge']['findings'] = [{'severity': 'minor', 'detail': 'A remaining revision'}]
+    put(work/'progress/CPRT.json', p)
+    assert proof(env)
+
+
 @pytest.mark.parametrize('consumer', ['valuation_underwriter', 'valuation_challenger'])
 def test_only_discretionary_call_caps_are_waived(env, consumer):
     authority = proof(env)
