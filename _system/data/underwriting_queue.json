@@ -1,29 +1,29 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-13",
+  "as_of": "2026-11-15",
   "summary": {
-    "companies": 873,
+    "companies": 875,
     "statuses": {
-      "needs_underwriting": 871,
+      "needs_underwriting": 873,
       "reviewed": 2
     },
     "blocker_companies": {
       "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
-      "new_earnings_disclosure_unresolved": 53,
       "pre_listing_share_basis_unverified": 102,
+      "new_earnings_disclosure_unresolved": 53,
       "positive_normalized_owner_cash_not_established": 109,
       "realization_timing_missing": 15,
       "annual_capex_missing": 72,
-      "annual_operating_cash_flow_missing": 44,
       "annual_diluted_share_count_missing": 50,
+      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
       "newer_balance_sheet_inputs_available": 214,
       "financial_inputs_expired_or_undated": 22,
-      "listing_calendar_or_completed_close_unverified": 22,
       "corporate_action_history_unverified": 23,
+      "listing_calendar_or_completed_close_unverified": 22,
       "method_specific_forecast_missing": 32,
       "annual_financial_inputs_expired": 10,
       "quote_issuer_mismatch": 2,
@@ -6853,6 +6853,17 @@
       "unresolved_findings": []
     },
     {
+      "ticker": "0700.HK",
+      "company": "Tencent Holdings Limited",
+      "status": "needs_underwriting",
+      "current_model_basis": null,
+      "blockers": [],
+      "last_attempt": null,
+      "retry_after": null,
+      "underwriting_gaps": [],
+      "unresolved_findings": []
+    },
+    {
       "ticker": "1211.HK",
       "company": "BYD Company Limited",
       "status": "needs_underwriting",
@@ -9128,6 +9139,17 @@
         "parent_cashflow_attribution_missing",
         "source_share_basis_unverified"
       ],
+      "last_attempt": null,
+      "retry_after": null,
+      "underwriting_gaps": [],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "MBGL",
+      "company": "Mobility Global, Inc.",
+      "status": "needs_underwriting",
+      "current_model_basis": null,
+      "blockers": [],
       "last_attempt": null,
       "retry_after": null,
       "underwriting_gaps": [],
@@ -12195,15 +12217,48 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-13T21:46:53.159205+00:00",
-      "retry_after": "2026-11-14",
+      "last_attempt": "2026-11-16T00:01:47.854418+00:00",
+      "retry_after": "2026-11-16",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "primary_evidence_gap: [{\"code\": \"acva_current_surviving_receivables_exposure_unverified\", \"detail\": \"The expanded documents establish obligations beyond ACVA's $205,000,000 reported debt: doc_d12980851f0d0012 section 6.1 requires repurchase following specified eligibility breaches; doc_3f0da7f8c70b49fe guarantees performance of purchase and servicing obligations; doc_f10ce07f9bdee242 includes specified events triggering broader recourse. Repaying all reported debt and assigning ACVA zero realization proceeds therefore does not establish the remaining funding requirement. June 30 financial balances provide historical exposure evidence, but Annex I's initial receivables list is not a current portfolio inventory or liability cap. Retrieve public closing or subsequent primary disclosures identifying the purchased-receivables balance, outstanding repurchase demands, and termination or survival of these arrangements after the October 16 acquisition. Useful searches: 'purchased receivables', 'borrowing base', 'repurchase obligation', 'performance guaranty', 'termination', 'payoff' and 'release'. The missing claim is the current portfolio subject to surviving recourse, not an exact future loss estimate or a leg"
+          "detail": "author_or_challenger_unresolved: {\"severity\": \"critical\", \"detail\": \"The required failure alternatives do not execute validly. facility_failure_and_surviving_claims reports division-by-zero errors in every case: survival_y1 sets revenue_y2 to zero, after which margin_y2 and conversion_y2 divide by zero. joint_operating_and_acquired_funding_shock reports liquidity shortfalls in low/base cases. Repair zero-denominator handling and implement a funded buffer response or an explicit restructuring/failure treatment. Recompile all structural alternatives; their current errors cannot establish financing survival.\"}; {\"severity\": \"major\", \"detail\": \"senior_due_y2 makes all borrowing_y1 contractually due in year 2, although doc_e85a30a75ddf0406 and doc_9b8366946fd8b140 identify a January 2031 parent-facility maturity. This elective repayment causes second-year senior-payment failure in every joint-shock case. Keep optional repayment subordinate to operating liquidity and contractual payments, or provide a specific supported acceleration mechanism. Model interest, access, covenants and eventual repayment through the necessary projection, using a separate holding horizon if required.\"}; {\"severity\": \"major\", \"detail\": \"Common-owner failure improperly eliminates creditor resources. revenue_y2, maintenance_y2, sbc_y2 and target_support_y2 are multiplied by survival_y1. A common-equity wipeout does not itself close profitable Copart auctions or extinguish servicing obligations. doc_9b8366946fd8b140 establishes a continuing operating business; the target guarantees establish potentially surviving obligations. Keep operating assets, cash generation and creditor claims independent of old common ownership, while gating only common payouts and realization. Any actual shutdown must include "
         }
       ],
-      "unresolved_findings": []
+      "unresolved_findings": [
+        {
+          "severity": "critical",
+          "detail": "The required failure alternatives do not execute validly. facility_failure_and_surviving_claims reports division-by-zero errors in every case: survival_y1 sets revenue_y2 to zero, after which margin_y2 and conversion_y2 divide by zero. joint_operating_and_acquired_funding_shock reports liquidity shortfalls in low/base cases. Repair zero-denominator handling and implement a funded buffer response or an explicit restructuring/failure treatment. Recompile all structural alternatives; their current errors cannot establish financing survival."
+        },
+        {
+          "severity": "major",
+          "detail": "senior_due_y2 makes all borrowing_y1 contractually due in year 2, although doc_e85a30a75ddf0406 and doc_9b8366946fd8b140 identify a January 2031 parent-facility maturity. This elective repayment causes second-year senior-payment failure in every joint-shock case. Keep optional repayment subordinate to operating liquidity and contractual payments, or provide a specific supported acceleration mechanism. Model interest, access, covenants and eventual repayment through the necessary projection, using a separate holding horizon if required."
+        },
+        {
+          "severity": "major",
+          "detail": "Common-owner failure improperly eliminates creditor resources. revenue_y2, maintenance_y2, sbc_y2 and target_support_y2 are multiplied by survival_y1. A common-equity wipeout does not itself close profitable Copart auctions or extinguish servicing obligations. doc_9b8366946fd8b140 establishes a continuing operating business; the target guarantees establish potentially surviving obligations. Keep operating assets, cash generation and creditor claims independent of old common ownership, while gating only common payouts and realization. Any actual shutdown must include its costs, recoveries and payment timing."
+        },
+        {
+          "severity": "major",
+          "detail": "target_recourse_payment lacks a bounded exposure mechanism. doc_62c275106e3bc0df reports $205 million funded debt, $191.866 million net finance receivables, $242.259 million cash and approximately $255.1 million maximum vehicle-assurance exposure. doc_f10ce07f9bdee242, doc_3f0da7f8c70b49fe and doc_d12980851f0d0012 distinguish indemnity triggers, performance obligations and specified receivable repurchases. They do not establish an immediate $3-$4 billion payment. Separate the obligations, relevant collateral, recoveries, deadlines and trigger conditions. If future originations expand exposure, model that expansion and its financing explicitly; do not infer a liability cap from current balances."
+        },
+        {
+          "severity": "major",
+          "detail": "The acquisition funding model pays estimated target debt in full, ignores all acquired cash and receivable recoveries, and then adds aggregate recourse and permanent support charges without showing which obligations remain. The completed consideration observation transaction_cash_a92be73731d8500fd9f13054 is correctly issuer-scoped and deducted once, but it does not resolve target debt settlement or acquired-resource availability. Reconcile consideration, retained operating cash, restricted collateral, debt and surviving claims using the target agreements. Uncertain recovery deserves explicit bounds; it does not justify omitting the entire funding asset side in every case."
+        },
+        {
+          "severity": "major",
+          "detail": "Cash conversion is not numerically reconciled. obs_edaa46e08826ae087fc7 reports $1.604492 billion OCF; obs_7fa70ab668d4dd6a45e8 reports $1.484270 billion parent income. Adding selected D&A of $229.373 million and SBC of $38.818 million produces $1.752461 billion, leaving $147.969 million of net deductions to explain, including differences between selected D&A and the cash-flow adjustment. doc_9b8366946fd8b140 supplies the cash-flow rows. Reconcile working capital, taxes, financial income and minorities before applying normalized conversion and separately funding SBC."
+        },
+        {
+          "severity": "major",
+          "detail": "target_annual_support explicitly includes software capitalization, compensation funding, servicing and credit losses, yet every bridge places it entirely in residual_claims. doc_62c275106e3bc0df separately reports first-half operating cash of $41.012 million, software capitalization of $18.491 million, SBC of $28.272 million and finance-receivable investment. Allocate forecast uses and capital releases to their proper annual categories. The comparable_ocf_y1 commitment currently subtracts the mixed support allowance from operating cash, so it cannot be compared directly with consolidated reported OCF."
+        },
+        {
+          "severity": "major",
+          "detail": "The incremental return rationale does not perform its stated calculation. Historical operating income rising from $716.475 million to $1.652590 billion alongside capex does not establish a 14% incremental parent-equity return. Use the supplied history to estimate after-tax incremental earnings relative to incremental invested equity, reconcile acquisitions, maintenance, working capital and investment lags, and distinguish existing-asset returns from deployment capacity. Apply the resulting bounds consistently to explicit organic investment and continuation."
+        }
+      ]
     }
   ]
 }
