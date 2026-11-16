@@ -20,9 +20,11 @@ import json
 import math
 import os
 import sys
+import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
@@ -69,20 +71,63 @@ def load_config() -> dict:
     return json.loads(CONFIG.read_text(encoding="utf-8"))
 
 
+# Hosts that failed at the connection level (timeout, refused, DNS) this run.
+# fred.stlouisfed.org stalls connections from GitHub-hosted runners until the
+# socket timeout; ~30 serial FRED requests at the full timeout each took the
+# panel to ~750s, past the 300s rebuild budget. One failed host costs one
+# request's retries, not one per series.
+_UNREACHABLE_HOSTS: dict[str, str] = {}
+# Same series id is configured under several themes; fetch each once per run.
+_FETCH_MEMO: dict[tuple[str, str], tuple[list[tuple[str, float]], str | None]] = {}
+
+
+def _reset_run_state() -> None:
+    _UNREACHABLE_HOSTS.clear()
+    _FETCH_MEMO.clear()
+
+
+def _is_connection_failure(exc: BaseException) -> bool:
+    if isinstance(exc, urllib.error.HTTPError):
+        return False
+    return isinstance(exc, (urllib.error.URLError, TimeoutError, ConnectionError, OSError))
+
+
 def _http_get(url: str, timeout: int = 30, retries: int = 3) -> str | None:
     import time
 
+    host = urlparse(url).hostname or ""
+    if host in _UNREACHABLE_HOSTS:
+        return None
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     delay = 1.0
     for attempt in range(retries):
         try:
             return urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", errors="ignore")
-        except Exception:
+        except Exception as exc:
             if attempt + 1 >= retries:
+                if _is_connection_failure(exc):
+                    _UNREACHABLE_HOSTS[host] = type(exc).__name__
+                    print(
+                        f"  ! {host} unreachable ({type(exc).__name__}); "
+                        "later requests to it this run reuse cached history",
+                        flush=True,
+                    )
                 return None
             time.sleep(delay)
             delay = min(delay * 2, 8.0)
     return None
+
+
+def _host_unreachable(url: str) -> bool:
+    return (urlparse(url).hostname or "") in _UNREACHABLE_HOSTS
+
+
+def _memoized(kind: str, key: str, fetch) -> tuple[list[tuple[str, float]], str | None]:
+    memo_key = (kind, key)
+    if memo_key not in _FETCH_MEMO:
+        _FETCH_MEMO[memo_key] = fetch()
+    rows, err = _FETCH_MEMO[memo_key]
+    return list(rows), err
 
 
 def _sync_external() -> None:
@@ -135,7 +180,14 @@ def _external_json(name: str) -> Path | None:
 
 
 def fetch_fred(fred_id: str, timeout: int = 12) -> tuple[list[tuple[str, float]], str | None]:
-    raw = _http_get(FRED_URL.format(id=fred_id), timeout=timeout, retries=2)
+    return _memoized("fred", fred_id, lambda: _fetch_fred_uncached(fred_id, timeout))
+
+
+def _fetch_fred_uncached(fred_id: str, timeout: int) -> tuple[list[tuple[str, float]], str | None]:
+    url = FRED_URL.format(id=fred_id)
+    if _host_unreachable(url):
+        return [], "host_unreachable"
+    raw = _http_get(url, timeout=timeout, retries=2)
     if raw is None:
         return [], "network"
     rows: list[tuple[str, float]] = []
@@ -177,15 +229,23 @@ def fetch_stooq_daily(symbol: str) -> tuple[list[tuple[str, float]], str | None]
 
 
 def fetch_yahoo_daily(symbol: str, days: int = 400) -> tuple[list[tuple[str, float]], str | None]:
+    return _memoized("yahoo", f"{symbol}:{days}", lambda: _fetch_yahoo_daily_uncached(symbol, days))
+
+
+def _fetch_yahoo_daily_uncached(symbol: str, days: int) -> tuple[list[tuple[str, float]], str | None]:
     end = datetime.now(timezone.utc)
     start = end - timedelta(days=days)
     url = (
         f"{YAHOO_CHART_URL}/{symbol}?period1={int(start.timestamp())}"
         f"&period2={int(end.timestamp())}&interval=1d"
     )
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    if _host_unreachable(url):
+        return [], "host_unreachable"
+    raw = _http_get(url, timeout=25, retries=1)
+    if raw is None:
+        return [], "network"
     try:
-        payload = json.loads(urllib.request.urlopen(req, timeout=25).read())
+        payload = json.loads(raw)
         result = payload["chart"]["result"][0]
         timestamps = result["timestamp"]
         closes = result["indicators"]["quote"][0]["close"]
@@ -724,6 +784,7 @@ def process_series(spec: dict, offline: bool) -> dict:
 
 
 def build(theme_filter: str | None, offline: bool) -> dict:
+    _reset_run_state()
     _load_dotenv()
     if not offline:
         _sync_external()
@@ -759,7 +820,10 @@ def build(theme_filter: str | None, offline: bool) -> dict:
             res = process_series(spec, offline)
             series_out[spec["id"]] = res
             flag = "STALE" if res["stale"] else "ok"
-            print(f"  [{theme_id}] {spec['id']}: latest={res['latest']} yoy={res['yoy_pct']}% {flag} err={res['error']}")
+            print(
+                f"  [{theme_id}] {spec['id']}: latest={res['latest']} yoy={res['yoy_pct']}% {flag} err={res['error']}",
+                flush=True,
+            )
         manifest["themes"][theme_id] = {
             "label": theme.get("label"),
             "description": theme.get("description"),

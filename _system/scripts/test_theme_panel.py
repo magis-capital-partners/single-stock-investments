@@ -157,6 +157,84 @@ def test_wti_yahoo_fallback():
         assert rows[-1][1] > 0
 
 
+def _counting_urlopen(monkeypatch, behaviour):
+    calls = []
+
+    def fake_urlopen(req, timeout=None):
+        calls.append(req.full_url)
+        return behaviour(req)
+
+    monkeypatch.setattr(panel.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr("time.sleep", lambda _s: None)
+    panel._reset_run_state()
+    return calls
+
+
+def test_stalled_host_is_tried_once_per_run(monkeypatch):
+    """A host that times out (FRED from GitHub runners) must not cost a full timeout per series."""
+    def stall(_req):
+        raise TimeoutError("timed out")
+
+    calls = _counting_urlopen(monkeypatch, stall)
+    first = panel.fetch_fred("HOUST")
+    later = [panel.fetch_fred(fid) for fid in ("PERMIT", "TTLCONS", "WPU1321")]
+    assert first == ([], "network")
+    assert all(res == ([], "host_unreachable") for res in later)
+    assert len(calls) == 2  # retries for the first series only
+    panel._reset_run_state()
+
+
+def test_http_error_does_not_mark_host_unreachable(monkeypatch):
+    """A server that answers (404/429) is reachable; other series still get fetched."""
+    def not_found(req):
+        raise panel.urllib.error.HTTPError(req.full_url, 404, "nf", {}, None)
+
+    calls = _counting_urlopen(monkeypatch, not_found)
+    panel.fetch_fred("BAD1")
+    panel.fetch_fred("BAD2")
+    assert not panel._UNREACHABLE_HOSTS
+    assert len(calls) == 4
+    panel._reset_run_state()
+
+
+def test_repeated_series_fetched_once(monkeypatch):
+    """Series shared across themes (DGS10, HOUST, ^VIX) hit the source once per run."""
+    class Resp:
+        def __init__(self, body):
+            self.body = body
+
+        def read(self):
+            return self.body
+
+    def ok(_req):
+        return Resp(b"observation_date,X\n2026-10-01,1.5\n2026-11-01,2.0\n")
+
+    calls = _counting_urlopen(monkeypatch, ok)
+    a = panel.fetch_fred("HOUST")
+    b = panel.fetch_fred("HOUST")
+    assert a == b == ([("2026-10-01", 1.5), ("2026-11-01", 2.0)], None)
+    a[0].clear()
+    assert panel.fetch_fred("HOUST")[0]  # callers cannot corrupt the memo
+    assert len(calls) == 1
+    panel._reset_run_state()
+
+
+def test_unreachable_series_keeps_cached_history_and_staleness(monkeypatch, tmp_path):
+    """Skipping a dead host reuses the cache; the staleness gate is computed as before."""
+    def stall(_req):
+        raise TimeoutError("timed out")
+
+    _counting_urlopen(monkeypatch, stall)
+    monkeypatch.setattr(panel, "THEMES_DIR", tmp_path)
+    panel.write_csv(tmp_path / "old.csv", [("2020-01-01", 1.0)])
+    panel.fetch_fred("FIRST")
+    res = panel.process_series({"id": "old", "source": "fred", "fred_id": "OLD"}, offline=False)
+    assert res["latest"] == 1.0
+    assert res["error"] == "host_unreachable"
+    assert res["stale"] is True
+    panel._reset_run_state()
+
+
 def test_theme_map_wildcard_macro():
     tmap = overlay.theme_map()
     assert "macro_regime" in tmap.get("CME", [])
