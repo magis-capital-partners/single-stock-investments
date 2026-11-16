@@ -84,6 +84,68 @@ def _unpaid_author_input_repair(root,work,state,detail):
             and not any((cache/name).exists() for name in ('receipt.json','output.json','prompt.txt','author_revision.json')))
 
 
+def _unpaid_acquired_target_routing_repair(root, work, state, detail):
+    """Retry only the diagnosed unmerged-current-target hold; normal readiness still gates calls."""
+    from underwriting_contract import digest
+    from underwriting_pipeline import processing_version, stage_hash, today
+    expected = {'code':'requested_primary_document_unavailable',
+                'detail':'Retry requested primary disclosure: '}
+    if (not detail.startswith('evidence_not_ready: ') or
+            not HEX.fullmatch(str(state.get('processing_version') or '')) or
+            state['processing_version'] == processing_version(root)):
+        return False
+    try:
+        if json.loads(detail[len('evidence_not_ready: '):]) != [expected]:
+            return False
+        readiness = state.get('evidence_readiness') or {}
+        if readiness.get('status') != 'evidence_gap' or readiness.get('gaps') != [expected]:
+            return False
+        progress = _read(work/'progress/CPRT.json')
+        if progress.get('approved') or progress.get('pending_review'):
+            return False
+        packet = _read(work/'packets'/(str(state.get('packet_hash'))+'.json'))
+        data = work.parent/'data'
+        if (not data.is_dir() or data.is_symlink() or
+                _read(data/RUN_POLICY) != _read(root/RUN_POLICY) or
+                completion_grant(_read(data/CALL_POLICY),'CPRT') !=
+                completion_grant(_read(root/CALL_POLICY),'CPRT')):
+            return False
+        from underwriting_foreign_financials import bounded_sources
+        from underwriting_source_profiles import configure_source_budget
+        from underwriting_related_evidence import _retained_target_labels
+        @bounded_sources
+        def current_labels():
+            configure_source_budget(data,'CPRT')
+            return _retained_target_labels(data,packet,today())
+        labels = current_labels()
+        if set(labels) != {'1637873'}:
+            return False
+        label = labels['1637873']
+        related = (packet.get('related_issuers') or {}).get(label.get('ticker')) or {}
+        if (label.get('as_of') != today() or not related or any(
+                label.get(key) != related.get(key) for key in ('source_hash','evidence_hash'))):
+            return False
+        parent_docs = [row for row in packet.get('documents') or []
+                       if row.get('issuer_ticker') in (None,'','CPRT')]
+        parent_points = [row for row in packet.get('observations') or []
+                         if row.get('source_kind') == 'primary' and
+                         row.get('issuer_ticker') in (None,'','CPRT') and
+                         row.get('field') != 'completed_acquisition_cash_consideration_paid']
+        if (readiness.get('documents') != len(parent_docs) or
+                readiness.get('primary_observations') != len(parent_points)):
+            return False
+        feedback = progress.get('feedback') or {};previous = feedback.get('previous_contract') or {}
+        from underwriting_evidence import supplemental_fact_diagnostics
+        payload = {'packet':packet,'revision_feedback':{**feedback,'supplemental_fact_diagnostics':
+                   supplemental_fact_diagnostics(packet,previous.get('supplemental_facts') or [])},
+                   'revision_base_hash':digest(previous)}
+        cache = work/'cache/CPRT'/stage_hash(root,'author',payload)
+        return not any((cache/name).exists() for name in
+            ('receipt.json','output.json','prompt.txt','author_revision.json','input_admission.json'))
+    except (OSError,ValueError,TypeError,KeyError):
+        return False
+
+
 def pending_revision_authority(root, work, ticker, state, *, contract=None, packet=None):
     """Bind a continuation to paid lineage, frozen evidence and an unresolved review."""
     from underwriting_contract import digest
@@ -100,6 +162,7 @@ def pending_revision_authority(root, work, ticker, state, *, contract=None, pack
         if not gaps or any(g.get('code') != 'StageBlocked' or not (
                 g.get('detail') in allowed or str(g.get('detail') or '').startswith(
                     'author_or_challenger_unresolved:') or _unpaid_author_input_repair(
+                        root,work,state,str(g.get('detail') or '')) or _unpaid_acquired_target_routing_repair(
                         root,work,state,str(g.get('detail') or ''))) for g in gaps):
             return None
     progress = _read(work/'progress/CPRT.json')
