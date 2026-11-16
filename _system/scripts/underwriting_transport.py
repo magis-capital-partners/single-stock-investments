@@ -558,7 +558,10 @@ def _complete_layouts(payload):
             short = compact(tokens)
             yield COMPACT_INSTRUCTIONS, short
             from underwriting_marker_transport import compact as compact_markers, INSTRUCTIONS as MARKER_INSTRUCTIONS
-            yield MARKER_INSTRUCTIONS, compact_markers(short)
+            marked = compact_markers(short)
+            yield MARKER_INSTRUCTIONS, marked
+            from underwriting_marker_transport import compact_strings, STRING_INSTRUCTIONS
+            yield STRING_INSTRUCTIONS, compact_strings(marked)
 
 
 def pack(payload):
@@ -567,6 +570,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/8':
+        from underwriting_marker_transport import unpack_strings
+        return unpack_strings(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/7':
         from underwriting_marker_transport import unpack as unpack_markers
         return unpack_markers(envelope)
@@ -683,3 +689,19 @@ def render(payload):
         if len(candidate) < len(best):
             best = candidate
     return literal_prefix + best
+
+
+def render_for_budget(payload, maximum_characters):
+    """Use a complete verified eligible encoding as soon as it fits; retain normal fallback."""
+    require(type(maximum_characters) is int and maximum_characters>0,'Invalid complete input budget')
+    from underwriting_token_transport import eligible, pack as pack_tokens
+    if eligible(payload):
+        tokens=pack_tokens(payload)
+        if tokens:
+            from underwriting_compact_transport import compact as compact_tokens
+            from underwriting_marker_transport import compact as compact_markers, compact_strings, STRING_INSTRUCTIONS
+            candidate=(_literal_source_quote_prefix(payload)+STRING_INSTRUCTIONS+
+                       encoded(compact_strings(compact_markers(compact_tokens(tokens)))))
+            if len(candidate)<=maximum_characters:
+                return candidate
+    return render(payload)
