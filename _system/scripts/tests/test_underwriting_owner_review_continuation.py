@@ -23,7 +23,7 @@ def env(tmp_path,monkeypatch):
  put(root/p.CALL_POLICY,{'consumers':{c:{'daily_repo_limit':limit,'per_subject_daily_limit':2,'dated_subject_daily_limits':{'2026-11-16':{'CPRT':limit}}} for c,limit in [('valuation_underwriter',12),('valuation_challenger',6)]}})
  author={'ticker':'CPRT','packet_hash':'a'*64,'evidence_hash':'b'*64}
  review={'schema_version':'underwriting-review/2','contract_hash':digest(author),'verdict':'revise','findings':[{'severity':'major','detail':'Actual independent financing finding'}]}
- state={'status':'automatic_retry_pending','packet_hash':'a'*64,'evidence_hash':'b'*64,'retry_after':'2026-11-17','stage_attempts':{'author':23,'challenger':3}}
+ state={'status':'automatic_retry_pending','packet_hash':'a'*64,'evidence_hash':'b'*64,'retry_after':'2026-11-17','stage_attempts':{'author':23,'challenger':3},'gaps':[{'code':'StageBlocked','detail':'author_or_challenger_unresolved: Independent challenge unresolved'}]}
  put(work/'states/CPRT.json',state);put(work/'progress/CPRT.json',{'packet_hash':'a'*64,'feedback':{'previous_contract':author,'independent_challenge':review}})
  rows=[{'timestamp':'2026-11-16T01:00:00+00:00','status':'reserved','consumer':c,'subject':'CPRT','id':i} for c,n in [('valuation_underwriter',10),('valuation_challenger',3)] for i in range(n)]
  (work/'ledger.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in rows))
@@ -111,3 +111,8 @@ def test_shared_caps_cannot_be_raised_by_continuation(env,field,value):
 def test_separate_role_and_default_limits_remain_mandatory(env,field,value):
  root=env[0];policy=json.loads((root/p.CALL_POLICY).read_text());policy['consumers']['valuation_underwriter'][field]=value;put(root/p.CALL_POLICY,policy)
  with pytest.raises(ContractError,match='separate role ceilings'):allowed(env)
+
+@pytest.mark.parametrize('detail',['primary_evidence_gap: unchanged request','evidence_not_ready: missing primary source','native input size rejected'])
+def test_prior_review_cannot_reopen_an_unchanged_evidence_or_size_hold(env,detail):
+ env[4]['gaps']=[{'code':'StageBlocked','detail':detail}]
+ assert not allowed(env)

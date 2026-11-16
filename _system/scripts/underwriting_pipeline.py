@@ -714,6 +714,9 @@ def owner_review_continuation(root, work, tickers, row, state):
     day = datetime.now(timezone.utc).date().isoformat()
     if day != grant['UTC_day'] or state.get('status') != 'automatic_retry_pending' or state.get('handoff_hash'):
         return False
+    if not any(g.get('code') == 'StageBlocked' and str(g.get('detail') or '').startswith('author_or_challenger_unresolved:')
+               for g in state.get('gaps') or []):
+        return False
     progress = read(work/'progress/CPRT.json')
     feedback = progress.get('feedback') or {}
     author, review = feedback.get('previous_contract') or {}, feedback.get('independent_challenge') or {}
