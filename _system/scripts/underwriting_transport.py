@@ -667,6 +667,7 @@ def _literal_source_quote_prefix(payload):
     from underwriting_evidence import supplemental_observations
     supplemental_observations(packet, [{**facts[0], 'quote': hint['quote']}])
     return ('FROZEN SOURCE QUOTATION — EVIDENCE ONLY; NOT AN APPROVAL\n'
+            'Revision base contract SHA-256: ' + payload['revision_base_hash'] + '\n'
             'Observation ID: ' + encoded(hint['observation_id']) + '\n'
             'Document ID: ' + encoded(hint['document_id']) + '\n'
             'Document SHA-256: ' + hint['document_hash'] + '\n'
@@ -674,8 +675,55 @@ def _literal_source_quote_prefix(payload):
             'END FROZEN SOURCE QUOTATION\n')
 
 
+def _literal_review_source_quote_prefix(payload):
+    """Expose existing verified CPRT contract quotations without changing reviewer evidence."""
+    if not isinstance(payload, dict):
+        return ''
+    packet, contract = payload.get('packet'), payload.get('contract')
+    if not isinstance(packet, dict) or not isinstance(contract, dict) or packet.get('ticker') != 'CPRT' or contract.get('ticker') != 'CPRT':
+        return ''
+    facts = contract.get('supplemental_facts') or []
+    if not facts:
+        return ''
+    require(isinstance(facts, list) and all(isinstance(fact, dict) for fact in facts),
+            'Invalid review source quotation facts')
+    require('revision_feedback' not in payload and
+            isinstance(payload.get('contract_hash'), str) and
+            re.fullmatch(r'[0-9a-f]{64}', payload['contract_hash']) is not None and
+            payload['contract_hash'] == digest(contract), 'Review quotation contract identity changed')
+    require(isinstance(packet.get('packet_hash'), str) and
+            re.fullmatch(r'[0-9a-f]{64}', packet['packet_hash']) is not None and
+            packet['packet_hash'] == contract.get('packet_hash'), 'Review quotation packet identity changed')
+    require(isinstance(payload.get('deterministic_value_driver_tests'), dict) and
+            payload.get('diagnostics_hash') == digest(payload['deterministic_value_driver_tests']),
+            'Review quotation diagnostics identity changed')
+    require(all(isinstance(fact.get('id'), str) and fact['id'] and
+                isinstance(fact.get('document_id'), str) and fact['document_id'] for fact in facts) and
+            len({fact['id'] for fact in facts}) == len(facts), 'Ambiguous review source quotation facts')
+    documents = []
+    for fact in facts:
+        matches = [row for row in packet.get('documents') or []
+                   if isinstance(row, dict) and row.get('id') == fact['document_id']]
+        require(len(matches) == 1 and isinstance(matches[0].get('content_hash'), str) and
+                re.fullmatch(r'[0-9a-f]{64}', matches[0]['content_hash']) is not None,
+                'Review quotation document identity changed')
+        documents.append(matches[0])
+    # Use the same untouched financial-table/number/scale/period/currency guard.
+    # These are the authentic contract's own quotations, never a replacement fact.
+    from underwriting_evidence import supplemental_observations
+    supplemental_observations(packet, facts)
+    return ''.join('FROZEN CONTRACT SOURCE QUOTATION — EVIDENCE ONLY; NOT AN APPROVAL\n'
+                   'Contract SHA-256: ' + payload['contract_hash'] + '\n'
+                   'Observation ID: ' + encoded(fact['id']) + '\n'
+                   'Document ID: ' + encoded(fact['document_id']) + '\n'
+                   'Document SHA-256: ' + document['content_hash'] + '\n'
+                   'Quotation as a literal JSON string: ' + encoded(fact['quote']) + '\n'
+                   'END FROZEN CONTRACT SOURCE QUOTATION\n'
+                   for fact, document in zip(facts, documents))
+
+
 def render(payload):
-    literal_prefix = _literal_source_quote_prefix(payload)
+    literal_prefix = _literal_source_quote_prefix(payload)+_literal_review_source_quote_prefix(payload)
     best = encoded(payload)
     has_reference = REFERENCE in best
     for instructions, envelope in _complete_layouts(payload):
@@ -700,7 +748,7 @@ def render_for_budget(payload, maximum_characters):
         if tokens:
             from underwriting_compact_transport import compact as compact_tokens
             from underwriting_marker_transport import compact as compact_markers, compact_strings, STRING_INSTRUCTIONS
-            candidate=(_literal_source_quote_prefix(payload)+STRING_INSTRUCTIONS+
+            candidate=(_literal_source_quote_prefix(payload)+_literal_review_source_quote_prefix(payload)+STRING_INSTRUCTIONS+
                        encoded(compact_strings(compact_markers(compact_tokens(tokens)))))
             if len(candidate)<=maximum_characters:
                 return candidate
