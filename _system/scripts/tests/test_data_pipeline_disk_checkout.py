@@ -374,6 +374,19 @@ def test_technicals_model_install_cannot_be_skipped_by_a_vault_failure():
     assert setup < install < vault
 
 
+def test_discovery_vault_checkouts_fit_their_30_minute_jobs():
+    """A whole-vault checkout restores every private catalog record serially,
+    41-73 minutes since 2026-11-12, longer than these jobs' limit."""
+    for name in ("cvr-discover", "warrant-discover", "separation-discover"):
+        job = _job(name)
+        assert "ci_checkout_workspace.sh minimal" in _run(job), name
+        vault = _vault_steps(job)
+        assert len(vault) == 1, name
+        assert vault[0]["with"]["publication-only"] == "true", name
+        assert vault[0]["with"]["publication-scope"] == "workspace", name
+        assert vault[0]["timeout-minutes"] < job["timeout-minutes"], name
+
+
 def test_activist_paths_hold_what_the_scan_reads_and_writes_and_no_filings():
     paths = paths_for_profile("activist")
     holdings = json.loads((ROOT / "_system/portfolio/registry.json").read_text(encoding="utf-8"))["holdings"]
