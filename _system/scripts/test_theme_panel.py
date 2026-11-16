@@ -166,8 +166,158 @@ def _counting_urlopen(monkeypatch, behaviour):
 
     monkeypatch.setattr(panel.urllib.request, "urlopen", fake_urlopen)
     monkeypatch.setattr("time.sleep", lambda _s: None)
+    monkeypatch.delenv("FRED_API_KEY", raising=False)
     panel._reset_run_state()
     return calls
+
+
+class _Resp:
+    def __init__(self, body: bytes):
+        self.body = body
+
+    def read(self):
+        return self.body
+
+
+FAKE_KEY = "abcdef0123456789abcdef0123456789"
+FREDGRAPH_BODY = b"observation_date,X\n2026-10-01,1.5\n2026-11-01,2.0\n"
+API_BODY = json.dumps(
+    {
+        "observations": [
+            {"realtime_start": "2026-11-16", "date": "2026-09-01", "value": "."},
+            {"realtime_start": "2026-11-16", "date": "2026-10-01", "value": "1.5"},
+            {"realtime_start": "2026-11-16", "date": "2026-11-01", "value": "2.0"},
+        ]
+    }
+).encode()
+
+
+def _host(url: str) -> str:
+    return panel.urlparse(url).hostname or ""
+
+
+def test_fred_api_used_when_key_set(monkeypatch):
+    """With FRED_API_KEY the official API is called and parsed into the fredgraph row format."""
+    calls = _counting_urlopen(monkeypatch, lambda req: _Resp(API_BODY))
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    rows, err = panel.fetch_fred("HOUST")
+    assert (rows, err) == ([("2026-10-01", 1.5), ("2026-11-01", 2.0)], None)
+    assert len(calls) == 1
+    q = panel.urllib.parse.parse_qs(panel.urlparse(calls[0]).query)
+    assert _host(calls[0]) == "api.stlouisfed.org"
+    assert q == {"series_id": ["HOUST"], "api_key": [FAKE_KEY], "file_type": ["json"]}
+    panel._reset_run_state()
+
+
+def test_fred_api_and_fredgraph_rows_match(monkeypatch):
+    """Same series, either source: identical rows, so cached CSVs merge cleanly."""
+    _counting_urlopen(monkeypatch, lambda req: _Resp(FREDGRAPH_BODY))
+    via_csv = panel.fetch_fred("HOUST")
+    panel._reset_run_state()
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    monkeypatch.setattr(panel.urllib.request, "urlopen", lambda req, timeout=None: _Resp(API_BODY))
+    assert panel.fetch_fred("HOUST") == via_csv
+    panel._reset_run_state()
+
+
+def test_no_key_keeps_fredgraph_only(monkeypatch):
+    """Without FRED_API_KEY nothing changes: fredgraph only, never the API host."""
+    calls = _counting_urlopen(monkeypatch, lambda req: _Resp(FREDGRAPH_BODY))
+    assert panel.fetch_fred("HOUST") == ([("2026-10-01", 1.5), ("2026-11-01", 2.0)], None)
+    assert [_host(u) for u in calls] == ["fred.stlouisfed.org"]
+    panel._reset_run_state()
+
+
+def test_no_key_unreachable_fredgraph_still_skips_host(monkeypatch):
+    def stall(_req):
+        raise TimeoutError("timed out")
+
+    calls = _counting_urlopen(monkeypatch, stall)
+    assert panel.fetch_fred("HOUST") == ([], "network")
+    assert panel.fetch_fred("PERMIT") == ([], "host_unreachable")
+    assert len(calls) == 2
+    panel._reset_run_state()
+
+
+def test_fred_api_http_error_falls_back_to_fredgraph(monkeypatch):
+    def api_fails(req):
+        if _host(req.full_url) == "api.stlouisfed.org":
+            raise panel.urllib.error.HTTPError(req.full_url, 429, "Too Many Requests", {}, None)
+        return _Resp(FREDGRAPH_BODY)
+
+    calls = _counting_urlopen(monkeypatch, api_fails)
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    assert panel.fetch_fred("HOUST") == ([("2026-10-01", 1.5), ("2026-11-01", 2.0)], None)
+    assert [_host(u) for u in calls] == ["api.stlouisfed.org"] * 2 + ["fred.stlouisfed.org"]
+    assert not panel._UNREACHABLE_HOSTS
+    panel._reset_run_state()
+
+
+def test_fred_api_bad_json_falls_back(monkeypatch):
+    def api_garbage(req):
+        if _host(req.full_url) == "api.stlouisfed.org":
+            return _Resp(b"<html>maintenance</html>")
+        return _Resp(FREDGRAPH_BODY)
+
+    _counting_urlopen(monkeypatch, api_garbage)
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    assert panel.fetch_fred("HOUST")[0] == [("2026-10-01", 1.5), ("2026-11-01", 2.0)]
+    panel._reset_run_state()
+
+
+def test_api_and_fredgraph_down_reuse_cache_with_host_unreachable(monkeypatch, tmp_path):
+    """Both FRED hosts stall: one try each, then cached history marked host_unreachable."""
+    def stall(_req):
+        raise TimeoutError("timed out")
+
+    calls = _counting_urlopen(monkeypatch, stall)
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    monkeypatch.setattr(panel, "THEMES_DIR", tmp_path)
+    panel.write_csv(tmp_path / "old.csv", [("2020-01-01", 1.0)])
+    panel.fetch_fred("FIRST")
+    assert len(calls) == 4  # two retries per host, once per run
+    res = panel.process_series({"id": "old", "source": "fred", "fred_id": "OLD"}, offline=False)
+    assert len(calls) == 4
+    assert res["latest"] == 1.0
+    assert res["error"] == "host_unreachable"
+    assert res["stale"] is True
+    panel._reset_run_state()
+
+
+def test_api_key_redacted_from_logs(monkeypatch, capsys):
+    """An error that echoes the request URL must not print the key."""
+    def leaky(req):
+        if _host(req.full_url) == "api.stlouisfed.org":
+            raise ValueError(f"cannot fetch {req.full_url}")
+        return _Resp(FREDGRAPH_BODY)
+
+    _counting_urlopen(monkeypatch, leaky)
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    rows, err = panel.fetch_fred("HOUST")
+    out = capsys.readouterr().out
+    assert rows and err is None
+    assert FAKE_KEY not in out
+    assert "api_key=REDACTED" in out
+    assert "falling back to fredgraph" in out
+    panel._reset_run_state()
+
+
+def test_redact_handles_bare_key(monkeypatch):
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    assert FAKE_KEY not in panel._redact(f"token {FAKE_KEY} leaked")
+    assert panel._redact("x?api_key=zzz&file_type=json") == "x?api_key=REDACTED&file_type=json"
+
+
+def test_fred_api_throttled_under_rate_limit(monkeypatch):
+    sleeps = []
+    _counting_urlopen(monkeypatch, lambda req: _Resp(API_BODY))
+    monkeypatch.setattr("time.sleep", sleeps.append)
+    monkeypatch.setenv("FRED_API_KEY", FAKE_KEY)
+    for fid in ("A", "B", "C"):
+        panel.fetch_fred(fid)
+    assert len(sleeps) == 2
+    assert all(0 < s <= panel.FRED_API_MIN_INTERVAL_S for s in sleeps)
+    panel._reset_run_state()
 
 
 def test_stalled_host_is_tried_once_per_run(monkeypatch):

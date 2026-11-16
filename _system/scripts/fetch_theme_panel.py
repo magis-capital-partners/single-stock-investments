@@ -11,6 +11,9 @@ and overlay sizing only; they never auto-inflate Lawrence base IRR.
 
 Network failures degrade gracefully: cached CSV history is kept and the last
 known value is reused, with an error note in the manifest.
+
+FRED series use the official API when FRED_API_KEY is set, then fredgraph CSV,
+then cached history. The key is redacted from every log line.
 """
 from __future__ import annotations
 
@@ -19,12 +22,13 @@ import csv
 import json
 import math
 import os
+import re
 import sys
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
@@ -41,6 +45,10 @@ UA = "MarvinResearch/1.0 (theme-panel)"
 TODAY = date.today().isoformat()
 
 FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={id}"
+# Official API (needs FRED_API_KEY). fred.stlouisfed.org never answers
+# GitHub-hosted runners; api.stlouisfed.org does. Limit is 120 requests/min.
+FRED_API_URL = "https://api.stlouisfed.org/fred/series/observations"
+FRED_API_MIN_INTERVAL_S = 0.5
 STOOQ_DAILY_URL = "https://stooq.com/q/d/l/?s={symbol}&i=d"
 YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 
@@ -79,11 +87,23 @@ def load_config() -> dict:
 _UNREACHABLE_HOSTS: dict[str, str] = {}
 # Same series id is configured under several themes; fetch each once per run.
 _FETCH_MEMO: dict[tuple[str, str], tuple[list[tuple[str, float]], str | None]] = {}
+_FRED_API_LAST_CALL: list[float] = []
 
 
 def _reset_run_state() -> None:
     _UNREACHABLE_HOSTS.clear()
     _FETCH_MEMO.clear()
+    _FRED_API_LAST_CALL.clear()
+
+
+def _redact(text: str) -> str:
+    """Strip API keys from anything that may reach a log line."""
+    text = re.sub(r"(api_key=)[^&\s'\"]+", r"\1REDACTED", str(text))
+    for name in ("FRED_API_KEY", "EIA_API_KEY"):
+        secret = os.environ.get(name, "").strip()
+        if len(secret) >= 4:
+            text = text.replace(secret, "REDACTED")
+    return text
 
 
 def _is_connection_failure(exc: BaseException) -> bool:
@@ -92,7 +112,12 @@ def _is_connection_failure(exc: BaseException) -> bool:
     return isinstance(exc, (urllib.error.URLError, TimeoutError, ConnectionError, OSError))
 
 
-def _http_get(url: str, timeout: int = 30, retries: int = 3) -> str | None:
+def _http_get(
+    url: str,
+    timeout: int = 30,
+    retries: int = 3,
+    errors: list[str] | None = None,
+) -> str | None:
     import time
 
     host = urlparse(url).hostname or ""
@@ -105,6 +130,10 @@ def _http_get(url: str, timeout: int = 30, retries: int = 3) -> str | None:
             return urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", errors="ignore")
         except Exception as exc:
             if attempt + 1 >= retries:
+                if errors is not None:
+                    code = getattr(exc, "code", None) if isinstance(exc, urllib.error.HTTPError) else None
+                    detail = f"HTTP {code}" if code else f"{type(exc).__name__}: {exc}"
+                    errors.append(_redact(detail)[:200])
                 if _is_connection_failure(exc):
                     _UNREACHABLE_HOSTS[host] = type(exc).__name__
                     print(
@@ -183,7 +212,55 @@ def fetch_fred(fred_id: str, timeout: int = 12) -> tuple[list[tuple[str, float]]
     return _memoized("fred", fred_id, lambda: _fetch_fred_uncached(fred_id, timeout))
 
 
+def _fred_api_throttle() -> None:
+    import time
+
+    if _FRED_API_LAST_CALL:
+        wait = FRED_API_MIN_INTERVAL_S - (time.monotonic() - _FRED_API_LAST_CALL[0])
+        if wait > 0:
+            time.sleep(wait)
+    _FRED_API_LAST_CALL[:] = [time.monotonic()]
+
+
+def _fetch_fred_api(fred_id: str, api_key: str, timeout: int) -> tuple[list[tuple[str, float]], str | None]:
+    url = FRED_API_URL + "?" + urlencode(
+        {"series_id": fred_id, "api_key": api_key, "file_type": "json"}
+    )
+    if _host_unreachable(url):
+        return [], "host_unreachable"
+    _fred_api_throttle()
+    errors: list[str] = []
+    raw = _http_get(url, timeout=timeout, retries=2, errors=errors)
+    if raw is None:
+        return [], errors[-1] if errors else "network"
+    try:
+        observations = json.loads(raw).get("observations")
+    except (json.JSONDecodeError, AttributeError):
+        return [], "bad_json"
+    if not isinstance(observations, list):
+        return [], "bad_json"
+    rows: list[tuple[str, float]] = []
+    for obs in observations:
+        if not isinstance(obs, dict):
+            continue
+        d = str(obs.get("date") or "").strip()
+        v = str(obs.get("value") or "").strip()
+        if not d or v in ("", "."):
+            continue
+        try:
+            rows.append((d, float(v)))
+        except ValueError:
+            continue
+    return rows, (None if rows else "empty")
+
+
 def _fetch_fred_uncached(fred_id: str, timeout: int) -> tuple[list[tuple[str, float]], str | None]:
+    api_key = os.environ.get("FRED_API_KEY", "").strip()
+    if api_key:
+        rows, err = _fetch_fred_api(fred_id, api_key, timeout)
+        if rows:
+            return rows, None
+        print(f"  ! FRED API {fred_id}: {_redact(err or 'empty')}; falling back to fredgraph", flush=True)
     url = FRED_URL.format(id=fred_id)
     if _host_unreachable(url):
         return [], "host_unreachable"
