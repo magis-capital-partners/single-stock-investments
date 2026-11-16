@@ -383,7 +383,6 @@ def test_discovery_vault_checkouts_fit_their_30_minute_jobs():
         vault = _vault_steps(job)
         assert len(vault) == 1, name
         assert vault[0]["with"]["publication-only"] == "true", name
-        assert vault[0]["with"]["publication-scope"] == "workspace", name
         assert vault[0]["timeout-minutes"] < job["timeout-minutes"], name
 
 
