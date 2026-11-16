@@ -73,7 +73,7 @@ def input_fingerprint(root, ticker):
 def processing_version(root):
     paths = [CALL_POLICY, POLICY, Path('_system/prompts/valuation_underwriting.md')]
     paths += [Path('_system/scripts')/name for name in ('underwriting_pipeline.py', 'underwriting_contract.py',
-                                                      'underwriting_evidence.py', 'underwriting_primary_references.py', 'underwriting_foreign_financials.py', 'underwriting_related_evidence.py', 'underwriting_filing_facts.py', 'underwriting_source_profiles.py','underwriting_primary_packages.py','underwriting_token_transport.py', 'underwriting_economics.py', 'underwriting_revisions.py', 'underwriting_transport.py', 'underwriting_compact_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
+                                                      'underwriting_evidence.py', 'underwriting_primary_references.py', 'underwriting_foreign_financials.py', 'underwriting_related_evidence.py', 'underwriting_filing_facts.py', 'underwriting_source_profiles.py','underwriting_primary_packages.py','underwriting_token_transport.py', 'underwriting_economics.py', 'underwriting_revisions.py', 'underwriting_transport.py', 'underwriting_compact_transport.py', 'underwriting_completion_authority.py', 'llm_call_gate.py', 'underwriting_updates.py', 'underwriting_codex.py',
                                                       'valuation_market_sync.py', 'valuation_earnings.py', 'autonomous_compounders.py',
                                                       'refresh_shared_forecasts.py', 'private_dashboard_assets.py')]
     return digest({str(p): (root/p).read_text(encoding='utf-8') if (root/p).is_file() else None for p in paths})
@@ -221,10 +221,13 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
     reserved = [r for r in ledger_rows if r.get('consumer') in STAGES.values() and r.get('status') == 'reserved'
                 and str(r.get('timestamp') or '')[:10] >= day_start
                 and (r.get('run_id'), r.get('subject'), r.get('evidence_hash')) not in failed]
-    if len(reserved) >= int(read(root/POLICY).get('maximum_model_calls_per_day') or 18):
+    from underwriting_completion_authority import pending_revision_authority
+    completion = pending_revision_authority(root, work, ticker, state,
+                    contract=payload.get('contract'), packet=payload.get('packet'))
+    if len(reserved) >= int(read(root/POLICY).get('maximum_model_calls_per_day') or 18) and not completion:
         raise StageBlocked('total_daily_model_call_budget')
     admission = evaluate(consumer=consumer, subject=ticker, reason='company_underwriting', evidence_hash=call_hash,
-                         policy_doc=policies, ledger=ledger_rows)
+                         policy_doc=policies, ledger=ledger_rows, owner_completion=completion)
     if not admission['approved']:
         raise StageBlocked('model_call_'+admission['gate_reason'])
     require(launch, 'A paid model call requires --launch')
@@ -237,6 +240,8 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
     write(work/'states'/f'{ticker}.json', state)
     record = {'consumer': consumer, 'subject': ticker, 'reason': 'company_underwriting', 'evidence_hash': call_hash,
               'run_id': os.environ.get('GITHUB_RUN_ID') or str(os.getpid()), 'timestamp': now()}
+    if completion:
+        record['owner_completion_grant'] = completion['id']
     append_ledger(ledger, {**record, 'status': 'reserved'})
     env = {**os.environ, 'UNDERWRITING_MODEL': model, 'UNDERWRITING_STAGE': stage,
            'UNDERWRITING_REASONING_EFFORT': effort or '',
@@ -702,9 +707,12 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
 
 
 def owner_review_continuation(root, work, tickers, row, state):
-    """Resume only the owner's dated CPRT review correction, without changing a retry date."""
+    """Resume the owner's scoped paid CPRT correction without rewriting a retry date."""
     if tickers != ['CPRT'] or row.get('ticker') != 'CPRT' or row.get('status') in ('reviewed','waiting_for_build'):
         return False
+    from underwriting_completion_authority import pending_revision_authority
+    if pending_revision_authority(root, work, 'CPRT', state):
+        return True
     grant = (read(root/POLICY).get('owner_review_continuations') or {}).get('CPRT')
     if grant is None:
         return False
