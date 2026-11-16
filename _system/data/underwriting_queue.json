@@ -8,22 +8,22 @@
       "reviewed": 2
     },
     "blocker_companies": {
-      "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
-      "positive_normalized_owner_cash_not_established": 109,
+      "parent_cashflow_attribution_missing": 40,
       "new_earnings_disclosure_unresolved": 53,
+      "positive_normalized_owner_cash_not_established": 109,
       "pre_listing_share_basis_unverified": 102,
       "realization_timing_missing": 15,
-      "annual_diluted_share_count_missing": 50,
-      "annual_operating_cash_flow_missing": 44,
       "annual_capex_missing": 72,
+      "annual_operating_cash_flow_missing": 44,
+      "annual_diluted_share_count_missing": 50,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
       "newer_balance_sheet_inputs_available": 214,
       "financial_inputs_expired_or_undated": 22,
-      "corporate_action_history_unverified": 23,
       "listing_calendar_or_completed_close_unverified": 22,
+      "corporate_action_history_unverified": 23,
       "method_specific_forecast_missing": 32,
       "annual_financial_inputs_expired": 10,
       "quote_issuer_mismatch": 2,
@@ -12217,26 +12217,26 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-16T14:18:55.943353+00:00",
+      "last_attempt": "2026-11-16T15:47:08.755929+00:00",
       "retry_after": "2026-11-17",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "model_call_daily_repo_limit"
+          "detail": "author_or_challenger_unresolved: {\"severity\": \"critical\", \"detail\": \"The executed finance_withdrawal_customer_exit test produces low/base/high equity values of -0.1725/0.1152/0.2623. This violates the mandatory nonnegative aggregate-equity requirement despite empty compiler error arrays. The graph permits persistent acquired-business losses to enter negative terminal_earnings and a negative continuing equity claim, while explicit shareholder flows contain distributions only. The opening failure state covers target_recourse_payment only and does not resolve subsequent operating losses. Using doc_62c275106e3bc0df and the acquisition/guarantee documents, execute a funded contin; {\"severity\": \"major\", \"detail\": \"The parent facility cannot finance a squeeze in the supplied graph. liquidity_y1 equals closing cash plus active_facility, while minimum_liquidity_y1 equals required_cash plus active_facility; the facility cancels from the constraint. The same holds in year two, and net_financing is always zero. Consequently intermediate_squeeze_with_timely_credit never executes timely borrowing. Meanwhile losing facility access activates cost savings, restructuring costs and revenue damage independently of an actual funding shortfall; the supplied one-way test even increases value when access falls from 1 to 0.9. doc_e85a30a7; {\"severity\": \"major\", \"detail\": \"distribution_y2 mechanically pays every dollar above required_cash, including the accumulated first-year surplus. payout_fraction_y1 changes only whether that surplus is returned one year sooner. Neither alternative tests continued retention, further acquisitions or a slower return of capital. doc_9b8366946fd8b140 reports no cash-dividend history, no foreseeable dividend plan and discretionary repurchases; the completed ACV pu"
         }
       ],
       "unresolved_findings": [
         {
           "severity": "critical",
-          "detail": "finance_revenue_removed and finance_cost_avoidance use the wrong business scope. In doc_62c275106e3bc0df, the six months ended June 30, 2026 show $46.676m of customer-assurance revenue and $40.702m of customer-assurance cost. These concern Go Green and other vehicle-assurance products, including price guarantees; they are not a standalone captive-finance revenue/cost statement. The contract annualizes them into $93.352m of supposedly forgone financing revenue and derives avoidable financing costs from the assurance-cost row. doc_9f5f42c407493229 separately describes financing-receivable fees and their accounting. Extract the actual lending revenue, interest, credit losses and attributable cash expenses, or explicitly bound those allocations from correctly scoped observations. Model assurance continuation or termination separately. Rebuild target earnings, customer attrition, capital requirements and every affected structural alternative."
+          "detail": "The executed finance_withdrawal_customer_exit test produces low/base/high equity values of -0.1725/0.1152/0.2623. This violates the mandatory nonnegative aggregate-equity requirement despite empty compiler error arrays. The graph permits persistent acquired-business losses to enter negative terminal_earnings and a negative continuing equity claim, while explicit shareholder flows contain distributions only. The opening failure state covers target_recourse_payment only and does not resolve subsequent operating losses. Using doc_62c275106e3bc0df and the acquisition/guarantee documents, execute a funded continuation, restructuring or abandonment path with its remaining obligations. If owners must contribute, include bounded capital calls and matching bridge sources; if common ownership can cease, implement limited liability and stop subsequent common proceeds. Do not merely floor the aggregate valuation while preserving unfunded operations."
         },
         {
           "severity": "major",
-          "detail": "The unavailable-facility tests lower minimum_cash without a supported operating response that reduces the requirement. The main assumption is $750m; facility_failure_and_surviving_claims overrides it to $700m and finance_withdrawal_customer_exit to $650m. With the access-failure contingency and $100m minority reserve, this reduces required cash from $1.6bn to $1.5bn and $1.4bn respectively. The reported closing resources of approximately $1.518bn and $1.403bn would miss the unchanged requirement by approximately $82m and $197m. doc_9b8366946fd8b140 documents settlement balances and liquidity demands, but the contract supplies no mechanism supporting these smaller requirements during the more severe shocks. Retain the requirement in a joint test, or explicitly model and substantiate how operating changes release the buffer; execute any remaining funding shortfall."
+          "detail": "The parent facility cannot finance a squeeze in the supplied graph. liquidity_y1 equals closing cash plus active_facility, while minimum_liquidity_y1 equals required_cash plus active_facility; the facility cancels from the constraint. The same holds in year two, and net_financing is always zero. Consequently intermediate_squeeze_with_timely_credit never executes timely borrowing. Meanwhile losing facility access activates cost savings, restructuring costs and revenue damage independently of an actual funding shortfall; the supplied one-way test even increases value when access falls from 1 to 0.9. doc_e85a30a75ddf0406 supports conditional committed borrowing. Either model actual draws, interest, remaining undrawn capacity and repayment through maturity when needed, or establish that credit is economically immaterial and remove unsupported claims that these tests validate borrowing access."
         },
         {
           "severity": "major",
-          "detail": "The emergency response is decisive but its adverse bounds are not executed. The severe facility tests retain $60m annual after-tax savings, 90% first-year effectiveness, $20m restructuring cash cost and only 2% additional service-revenue damage. doc_62c275106e3bc0df reports expense pools, not removable cash costs or implementation timing; doc_6441d4f50e22bf05 also preserves employment and compensation obligations that require reconciliation. The remaining liquidity margins are only approximately $18m and $3m even after the buffer reductions. Test slower or unavailable savings, higher restructuring payments and greater customer damage together with facility failure, within the declared ranges. Show the expense-to-cash and payment-timing bridge, preserving servicing, recurring compensation and creditor obligations."
+          "detail": "distribution_y2 mechanically pays every dollar above required_cash, including the accumulated first-year surplus. payout_fraction_y1 changes only whether that surplus is returned one year sooner. Neither alternative tests continued retention, further acquisitions or a slower return of capital. doc_9b8366946fd8b140 reports no cash-dividend history, no foreseeable dividend plan and discretionary repurchases; the completed ACV purchase demonstrates another material use of accumulated resources. Cash-equivalent pro-rata distributions are permissible, but their amount and timing still require a defensible capital-allocation forecast. Add a persistent-retention/deployment alternative, reconcile its cash yield and eventual realization, and justify the two-year release against that competing hypothesis."
         }
       ]
     }
