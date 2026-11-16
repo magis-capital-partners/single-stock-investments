@@ -226,13 +226,27 @@ jobs:
           fetch-depth: 1
       - name: Checkout dashboard data workspace
         run: bash _system/scripts/ci_checkout_workspace.sh dashboard
-      - name: Checkout research vault
-        uses: ./.github/actions/checkout-vault
+      # Before the vault: the vol and capitulation step runs always(), and
+      # when a vault failure skipped this install it ran on the runner's
+      # Python without numpy, wrote nothing, and reported capitulation as the
+      # failure (runs 43194409803 and 43401588127).
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install criticality model dependencies
         run: pip install -r _system/scripts/requirements-criticality.txt
+      # These builders read market data and committed dashboard snapshots, not
+      # vault trees. The vault is here so private snapshots can be hydrated
+      # and redacted again by commit-main. A whole-vault checkout restores
+      # every one of the ~21k private catalog records one at a time: 41
+      # minutes and a failure on 2026-11-12 and 11-13, and 73 minutes until
+      # the job limit on 11-16 (run 43841064008). Publication objects alone
+      # take 9-18 minutes, as on buyback-radar.
+      - name: Checkout research vault
+        timeout-minutes: 25
+        uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
       - id: technical_health
         name: Refresh free technical fear and capitulation signals
         continue-on-error: true
