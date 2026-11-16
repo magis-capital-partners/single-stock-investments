@@ -1281,6 +1281,9 @@ jobs:
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+          # fetch_theme_panel.py: fred.stlouisfed.org never answers hosted
+          # runners; the official API does. Unset falls back to cached history.
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         with:
           profile: world-model-weekly
           validate: "false"
