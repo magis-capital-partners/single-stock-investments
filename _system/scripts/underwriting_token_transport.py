@@ -3,10 +3,10 @@ from __future__ import annotations
 import copy
 from contextlib import ExitStack, closing
 import heapq
-import json
 from pathlib import Path
 import re
 import sqlite3
+import struct
 import tempfile
 from collections import Counter
 from functools import lru_cache
@@ -30,7 +30,12 @@ def eligible(payload):
 
 def _run_counts(streams, depth):
     """Count every eligible run exactly, spilling bounded chunks to owned scratch."""
-    from underwriting_transport import encoded
+    atoms=[];identities={}
+    for stream in streams.values():
+        for atom in stream:
+            require(type(atom) in (int,str), 'Invalid internal token atom')
+            if atom not in identities:
+                identities[atom]=len(atoms);atoms.append(atom)
     with ExitStack() as stack:
         counts=Counter();database=None
         def flush():
@@ -46,22 +51,27 @@ def _run_counts(streams, depth):
                 database.execute('PRAGMA temp_store=FILE')
                 database.execute('CREATE TABLE runs (run BLOB PRIMARY KEY, n INTEGER NOT NULL) WITHOUT ROWID')
             database.executemany('INSERT INTO runs VALUES (?,?) ON CONFLICT(run) DO UPDATE SET n=n+excluded.n',
-                ((encoded(run).encode('utf-8'),n) for run,n in counts.items()))
+                counts.items())
             counts.clear()
         for stream in streams.values():
+            packed=b''.join(struct.pack('!I',identities[x]) for x in stream)
+            blocked=[0]
+            for atom in stream:
+                blocked.append(blocked[-1]+int(type(atom) is int and depth[atom]>=MAX_DEPTH))
             for width in (8,16,32,64):
                 for i in range(len(stream)-width+1):
-                    run=tuple(stream[i:i+width])
-                    if max((depth[x] for x in run if type(x) is int),default=0)>=MAX_DEPTH:continue
+                    if blocked[i+width]!=blocked[i]:continue
+                    run=packed[i*4:(i+width)*4]
                     counts[run]+=1
                     if len(counts)>=4096:flush()
         if database is None:
-            yield from counts.items()
+            rows=counts.items()
         else:
             if counts:flush()
             database.commit()
-            for raw,n in database.execute('SELECT run,n FROM runs WHERE n>=2'):
-                yield tuple(json.loads(raw)),n
+            rows=database.execute('SELECT run,n FROM runs WHERE n>=2')
+        for raw,n in rows:
+            yield tuple(atoms[index] for index, in struct.iter_unpack('!I',raw)),n
 
 
 def _rank_run_candidates(streams, depth, limit):
