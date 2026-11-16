@@ -701,6 +701,51 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
     raise StageBlocked('author_or_challenger_unresolved: '+(details or str((feedback or {}).get('required_correction'))))
 
 
+def owner_review_continuation(root, work, tickers, row, state):
+    """Resume only the owner's dated CPRT review correction, without changing a retry date."""
+    if tickers != ['CPRT'] or row.get('ticker') != 'CPRT' or row.get('status') in ('reviewed','waiting_for_build'):
+        return False
+    grant = (read(root/POLICY).get('owner_review_continuations') or {}).get('CPRT')
+    if grant is None:
+        return False
+    expected = {'id':'CPRT-owner-remaining-allowance-20261116', 'UTC_day':'2026-11-16',
+                'author_limit':12, 'challenger_limit':6, 'combined_limit':18}
+    require(grant == expected, 'Unrecognized owner review continuation')
+    day = datetime.now(timezone.utc).date().isoformat()
+    if day != grant['UTC_day'] or state.get('status') != 'automatic_retry_pending' or state.get('handoff_hash'):
+        return False
+    progress = read(work/'progress/CPRT.json')
+    feedback = progress.get('feedback') or {}
+    author, review = feedback.get('previous_contract') or {}, feedback.get('independent_challenge') or {}
+    if (progress.get('approved') or review.get('schema_version') != 'underwriting-review/2'
+            or review.get('verdict') != 'revise' or review.get('contract_hash') != digest(author)
+            or not any(f.get('severity') in ('major','critical') for f in review.get('findings') or [])
+            or author.get('ticker') != 'CPRT'
+            or not re.fullmatch(r'[0-9a-f]{64}', str(state.get('packet_hash') or ''))
+            or not re.fullmatch(r'[0-9a-f]{64}', str(state.get('evidence_hash') or ''))
+            or progress.get('packet_hash') != state['packet_hash']
+            or author.get('packet_hash') != state['packet_hash']
+            or author.get('evidence_hash') != state.get('evidence_hash')):
+        return False
+    calls = read(root/CALL_POLICY)
+    for consumer, limit in (('valuation_underwriter',12),('valuation_challenger',6)):
+        role = (calls.get('consumers') or {}).get(consumer) or {}
+        require(role.get('daily_repo_limit') == limit and role.get('per_subject_daily_limit') == 2
+                and (role.get('dated_subject_daily_limits') or {}).get(day, {}).get('CPRT') == limit,
+                'Owner continuation requires the unchanged separate role ceilings')
+    require(read(root/POLICY).get('maximum_model_calls_per_day') == 18
+            and read(root/POLICY).get('maximum_model_minutes_per_run') == 100,
+            'Owner continuation cannot change shared call or run ceilings')
+    require((work/'ledger.jsonl').is_file(), 'Real admission ledger required for owner continuation')
+    actual_rows = read_ledger(work/'ledger.jsonl')
+    require(actual_rows, 'Real admission ledger required for owner continuation')
+    reserved = [r for r in actual_rows if r.get('status') == 'reserved'
+                and str(r.get('timestamp') or '')[:10] == day and r.get('consumer') in STAGES.values()]
+    return (sum(r.get('consumer') == 'valuation_underwriter' for r in reserved) < 12
+            and sum(r.get('consumer') == 'valuation_challenger' for r in reserved) < 6
+            and len(reserved) <= 16)
+
+
 def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, vault=None, prepare=prepare_packet, execute=None, phase='all'):
     from vault_paths import research_vault_root
     as_of = today()
@@ -731,7 +776,10 @@ def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, v
     configured = int(read(root/POLICY).get('maximum_companies_per_run') or 1)
     limit = limit or configured
     require(1 <= limit <= int(read(root/POLICY).get('maximum_batch_size') or 3), 'Batch limit is outside the configured bound')
-    candidates = [r for r in queue['companies'] if r['status'] not in ('reviewed', 'automatic_retry_pending', 'waiting_for_build') and (not tickers or r['ticker'] in tickers)][:limit]
+    continuations = {r['ticker'] for r in queue['companies']
+                     if phase == 'author' and owner_review_continuation(root, work, tickers, r, states.get(r['ticker']) or {})}
+    candidates = [r for r in queue['companies'] if (r['status'] not in ('reviewed', 'automatic_retry_pending', 'waiting_for_build')
+                  or r['ticker'] in continuations) and (not tickers or r['ticker'] in tickers)][:limit]
     handoffs = {}
     if phase == 'build':
         covered = {r['ticker'] for r in queue['companies']}
@@ -755,6 +803,8 @@ def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, v
         candidates = [{'ticker':t} for t in handoffs][:limit]
     result = {'schema_version': 'underwriting-batch/1', 'as_of': as_of, 'started_at': now(),
               'selected': [r['ticker'] for r in candidates], 'completed': [], 'approved': [], 'blocked': [], 'launched': launch, 'phase': phase}
+    if continuations:
+        result['owner_authorized_review_continuations'] = sorted(continuations & set(result['selected']))
     if not launch:
         return result
     if candidates and not execute:
