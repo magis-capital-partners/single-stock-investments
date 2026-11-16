@@ -108,6 +108,7 @@ def evaluate(
     state: dict | None = None,
     at: datetime | None = None,
     force: bool = False,
+    owner_completion: dict | None = None,
 ) -> dict:
     at = at or now_utc()
     config = consumer_policy(policy_doc, consumer)
@@ -135,6 +136,12 @@ def evaluate(
         return {**base, "decision": "suppressed", "gate_reason": "missing_evidence_hash"}
     if (state or {}).get("evidence_hash") == evidence_hash and not force:
         return {**base, "decision": "suppressed", "gate_reason": "evidence_already_processed"}
+    from underwriting_completion_authority import completion_limit_authority
+    completion = completion_limit_authority(policy_doc, consumer, subject, reason, owner_completion)
+    if owner_completion is not None and completion is None:
+        return {**base, "decision": "suppressed", "gate_reason": "invalid_owner_completion_authority"}
+    if completion:
+        base["owner_completion_grant"] = completion['id']
 
     # A reservation is a concurrency/budget lock, not a permanent charge when
     # the same run later records a failed startup. Catch-up workflows may retry
@@ -159,7 +166,7 @@ def evaluate(
 
     day_start = at.replace(hour=0, minute=0, second=0, microsecond=0)
     today = [row for row in relevant if (parse_time(row.get("timestamp")) or datetime.min.replace(tzinfo=timezone.utc)) >= day_start and row.get("status") in BUDGET_STATUSES]
-    if len(today) >= int(config.get("daily_repo_limit") or 999999) and not force:
+    if len(today) >= int(config.get("daily_repo_limit") or 999999) and not force and not completion:
         return {**base, "decision": "suppressed", "gate_reason": "daily_repo_limit"}
     today_subject = [row for row in today if row.get("subject") == subject]
     subject_limit = int(config.get("per_subject_daily_limit") or 999999)
@@ -178,7 +185,7 @@ def evaluate(
         subject_limit = renewed
         base["effective_per_subject_daily_limit"] = subject_limit
         base["dated_subject_limit_scope"] = {"UTC_day": utc_day, "subject": subject}
-    if len(today_subject) >= subject_limit and not force:
+    if len(today_subject) >= subject_limit and not force and not completion:
         return {**base, "decision": "suppressed", "gate_reason": "per_subject_daily_limit"}
 
     cooldown = timedelta(hours=float(config.get("cooldown_hours") or 0))
