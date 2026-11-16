@@ -110,6 +110,25 @@ def recover_from_history(vault: Path, sha256: str) -> bool:
     return True
 
 
+def restore_from_private_storage(vault: Path, sha256: str) -> bool:
+    """Fetch one receipt object from private storage into a vault no catalog view prepared.
+
+    A CI checkout carries a catalog view, and materialize() reads through it.
+    A long-lived lane clone has none, so a snapshot CI stored after that clone
+    stopped syncing could not be resolved there at all.
+    """
+    from private_storage import StorageError, enabled, ensure_private_file
+    from private_storage_io import MARKER
+
+    if (vault / MARKER).is_file() or not enabled(ROOT):
+        return False
+    try:
+        ensure_private_file(vault, "dashboard-private/objects/" + sha256, root=ROOT)
+    except (StorageError, OSError, ValueError, subprocess.SubprocessError):
+        return False
+    return stored_object(vault, sha256).is_file()
+
+
 def private_object(vault: Path, sha256: str) -> Path:
     stored = stored_object(vault, sha256)
     if not stored.is_file():
@@ -263,6 +282,8 @@ def private_source(source: Path, relative: str, manifest: dict | None = None) ->
     if vault is None:
         raise RuntimeError(f"Private research vault required to restore {relative}")
     private = private_object(vault, entry["private_sha256"])
+    if not private.is_file() and restore_from_private_storage(vault, entry["private_sha256"]):
+        private = private_object(vault, entry["private_sha256"])
     if not private.is_file() or digest(private) != entry["private_sha256"]:
         raise RuntimeError(f"Private snapshot is missing or mismatched: {relative}")
     current = digest(public) if public.exists() else None
@@ -286,6 +307,8 @@ def restore_managed_input(source: Path, relative: str, *, include_missing=False)
     if vault is None:
         raise RuntimeError(f"Private research vault required to restore {relative}")
     private = private_object(vault, entry["private_sha256"])
+    if not private.is_file() and restore_from_private_storage(vault, entry["private_sha256"]):
+        private = private_object(vault, entry["private_sha256"])
     if not private.is_file() or digest(private) != entry["private_sha256"]:
         raise RuntimeError(f"Private snapshot is missing or mismatched: {relative}")
     state = hydration_state(source.parent)

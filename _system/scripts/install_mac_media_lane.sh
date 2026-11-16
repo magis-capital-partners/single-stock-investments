@@ -14,6 +14,9 @@
 #   * faster-whisper + ffmpeg (pip install -r _system/scripts/requirements-video-whisper.txt)
 #   * LM Studio with qwen/qwen3.5-9b available (same model the Windows lane uses)
 #   * RESEARCH_VAULT_ROOT pointing at the research-vault checkout (optional env)
+#   * WRANGLER_JS pointing at an installed wrangler/bin/wrangler.js (optional env).
+#     Publishing preserves each insights snapshot in R2 through the existing
+#     `wrangler login`, whose token lasts an hour; wrangler refreshes it.
 set -euo pipefail
 
 LABEL="com.magis.ssi.media-lane"
@@ -81,16 +84,20 @@ if [[ -z "$PYTHON" ]]; then
 fi
 
 # --- sparse worktree on main -------------------------------------------------
+# The publishers patch the insights manifest in place, and its events shard and
+# the private-assets receipt beside it, so the cone needs them as well as _system.
+SPARSE=(_system dashboard/data/insights)
 if [[ ! -e "${WORKTREE}/.git" ]]; then
   mkdir -p "$(dirname "$WORKTREE")"
   git -C "$SOURCE" fetch origin "$BRANCH"
   SHA="$(git -C "$SOURCE" rev-parse FETCH_HEAD)"
   git -C "$SOURCE" worktree add --no-checkout --detach "$WORKTREE" "$SHA"
-  git -C "$WORKTREE" sparse-checkout set --cone _system
+  git -C "$WORKTREE" sparse-checkout set --cone "${SPARSE[@]}"
   git -C "$WORKTREE" read-tree -mu HEAD
-  echo "created ${WORKTREE} at ${SHA:0:11} (origin/${BRANCH}, sparse: _system)"
+  echo "created ${WORKTREE} at ${SHA:0:11} (origin/${BRANCH}, sparse: ${SPARSE[*]})"
 else
   echo "worktree exists: ${WORKTREE}"
+  git -C "$WORKTREE" sparse-checkout add "${SPARSE[@]:1}" || true
   git -C "$WORKTREE" fetch origin "$BRANCH" || true
   # Detached worktree: move HEAD to origin/main when safe.
   if ! pgrep -f "media_lane_supervisor.py" >/dev/null 2>&1; then
@@ -116,25 +123,23 @@ esc_py="$(printf '%s' "$PYTHON" | sed 's/[&|]/\\&/g')"
 sed -e "s|__REPO_ROOT__|${esc_repo}|g" -e "s|__PYTHON__|${esc_py}|g" \
   "$TEMPLATE" > "$PLIST"
 
-# Optional vault root from the installing shell.
-if [[ -n "${RESEARCH_VAULT_ROOT:-}" ]]; then
-  # Insert into EnvironmentVariables dict before the closing </dict> of that block.
-  python3 - "$PLIST" "$RESEARCH_VAULT_ROOT" <<'PY'
-import pathlib, sys
-plist, vault = pathlib.Path(sys.argv[1]), sys.argv[2]
+# Optional machine paths from the installing shell, inserted into the
+# EnvironmentVariables dict ahead of LOCAL_LLM_BASE.
+python3 - "$PLIST" RESEARCH_VAULT_ROOT WRANGLER_JS <<'PY'
+import os, pathlib, sys
+from xml.sax.saxutils import escape
+plist = pathlib.Path(sys.argv[1])
 text = plist.read_text(encoding="utf-8")
 needle = "    <key>LOCAL_LLM_BASE</key>"
-inject = (
-    "    <key>RESEARCH_VAULT_ROOT</key>\n"
-    f"    <string>{vault}</string>\n"
-    + needle
-)
-if "RESEARCH_VAULT_ROOT" not in text:
+for key in sys.argv[2:]:
+    value = os.environ.get(key, "").strip()
+    if not value or f"<key>{key}</key>" in text:
+        continue
     if needle not in text:
         raise SystemExit("plist template missing LOCAL_LLM_BASE anchor")
-    plist.write_text(text.replace(needle, inject, 1), encoding="utf-8")
+    text = text.replace(needle, f"    <key>{key}</key>\n    <string>{escape(value)}</string>\n" + needle, 1)
+plist.write_text(text, encoding="utf-8")
 PY
-fi
 
 unload_agent
 if [[ "$START" -eq 1 ]]; then
