@@ -314,7 +314,8 @@ qwen analysis draining without overlapping the heavy phases:
 ```bash
 # On the Mac Mini, from a checkout of this repo:
 bash _system/scripts/install_mac_media_lane.sh
-# Optional: RESEARCH_VAULT_ROOT=/path/to/research-vault bash _system/scripts/install_mac_media_lane.sh
+# Optional: RESEARCH_VAULT_ROOT=/path/to/research-vault WRANGLER_JS=/path/to/wrangler/bin/wrangler.js \
+#   bash _system/scripts/install_mac_media_lane.sh
 
 python _system/scripts/media_lane_supervisor.py --status
 # Logs: ~/Projects/ssi-local-lanes/tmp/media_lane_supervisor.log
@@ -333,6 +334,18 @@ before the claims phases (and `--status` reports
 visible than extracting claims, so it goes first, and the claims backlog
 must not be allowed to starve it. Reader and video-analysis windows
 alternate when both queues have work.
+
+The lane also runs `phase=podcast-discovery` at most once every 20 hours
+(`MEDIA_LANE_PODCAST_DISCOVERY_HOURS`): `discover_podcasts.py --all-watchlist
+--paginate-capped-feeds`, then `fetch_podcast_transcript.py --no-whisper`. New
+episodes no longer arrive through a vault pull, so the Mac finds them itself;
+Whisper picks up the rest through the orphan reconcile.
+
+Its worktree's sparse cone is `_system` plus `dashboard/data/insights`: the
+publishers patch the insights manifest in place and read the events shard and
+`dashboard/private-assets.json` beside it. Each new manifest snapshot is stored
+in R2 through the existing `wrangler login` before the public placeholder is
+committed; a snapshot CI stored that this vault clone lacks is read back from R2.
 
 ## Config
 

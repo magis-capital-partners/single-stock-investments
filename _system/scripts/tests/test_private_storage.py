@@ -210,6 +210,51 @@ def test_materialization_is_create_only_and_path_bounded(tmp_path):
     assert out.read_bytes() == b"existing local bytes"
 
 
+@pytest.fixture
+def mac_home(tmp_path, monkeypatch):
+    for name in ("CLOUDFLARE_API_TOKEN", "APPDATA", "XDG_CONFIG_HOME", "WRANGLER_JS"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setattr(store, "ROOT", tmp_path)
+    return tmp_path
+
+
+def wrangler_login(home, token, expires):
+    path = home / "Library/Preferences/.wrangler/config/default.toml"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f'oauth_token = "{token}"\nexpiration_time = "{expires}"\n')
+    return path
+
+
+def test_a_mac_wrangler_login_is_reused(mac_home):
+    wrangler_login(mac_home, "mac-session", "2999-01-01T00:00:00.000Z")
+    assert store.cloudflare_token() == "mac-session"
+
+
+def test_an_expired_wrangler_login_is_refreshed_by_wrangler_itself(mac_home, monkeypatch):
+    session = wrangler_login(mac_home, "stale", "2000-01-01T00:00:00.000Z")
+    script = mac_home / "wrangler.js"
+    script.write_text("")
+    monkeypatch.setenv("WRANGLER_JS", str(script))
+    calls = []
+
+    def whoami(command, **_):
+        calls.append(command)
+        wrangler_login(mac_home, "fresh", "2999-01-01T00:00:00.000Z")
+
+    monkeypatch.setattr(store.subprocess, "run", whoami)
+    assert store.cloudflare_token() == "fresh"
+    assert calls == [["node", str(script), "whoami"]]
+    assert "fresh" in session.read_text()
+
+
+def test_a_login_that_cannot_be_refreshed_is_not_used(mac_home, monkeypatch):
+    wrangler_login(mac_home, "stale", "2000-01-01T00:00:00.000Z")
+    monkeypatch.setattr(store.shutil, "which", lambda name: None)
+    with pytest.raises(store.StorageError, match="expired"):
+        store.cloudflare_token()
+
+
 def test_public_catalog_is_rejected(tmp_path):
     config = {"catalog_repository": "magis-capital-partners/research-catalog", "catalog_repository_id": 1}
     catalog = store.Catalog(config, tmp_path / "catalog.git")

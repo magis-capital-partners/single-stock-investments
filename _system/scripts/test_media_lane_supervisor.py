@@ -56,6 +56,29 @@ class MediaLaneSupervisorTests(unittest.TestCase):
         self.assertLess(reader_at, video_at)
         self.assertLess(video_at, podcast_at)
 
+    def test_podcast_discovery_runs_daily_after_youtube_and_before_the_model(self):
+        import media_lane_supervisor as mls
+
+        text = (SCRIPTS / "media_lane_supervisor.py").read_text(encoding="utf-8")
+        self.assertLess(text.index("phase=youtube"), text.index("phase=podcast-discovery"))
+        self.assertLess(text.index("phase=podcast-discovery"), text.index("if not ensure_model("))
+        self.assertTrue(mls.podcast_discovery_due({}))
+        self.assertFalse(mls.podcast_discovery_due({"last_podcast_discovery_at": mls._stamp()}))
+
+    def test_podcast_discovery_fetches_published_transcripts_without_whisper(self):
+        import media_lane_supervisor as mls
+        import youtube_lane
+
+        calls = []
+        with mock.patch.object(mls, "wait_for_memory"), mock.patch.object(mls, "log"), \
+             mock.patch.object(youtube_lane, "load_env_file", return_value=0), \
+             mock.patch.object(mls, "run_python", side_effect=lambda args, **_: calls.append(args) or 0):
+            self.assertEqual(mls.phase_podcast_discovery(), 0)
+        self.assertEqual([Path(args[0]).name for args in calls],
+                         ["discover_podcasts.py", "fetch_podcast_transcript.py"])
+        self.assertIn("--all-watchlist", calls[0])
+        self.assertEqual(calls[1][1:], ["--no-whisper"])
+
     def test_whisper_reconciles_and_rotates_with_analysis(self):
         text = (SCRIPTS / "media_lane_supervisor.py").read_text(encoding="utf-8")
         self.assertIn("--reconcile-whisper-orphans", text)

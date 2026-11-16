@@ -155,6 +155,55 @@ def test_history_bytes_that_do_not_hash_to_the_receipt_are_refused(workspace, mo
     assert not assets.stored_object(vault, sha).exists()
 
 
+def _managed_placeholder(root, raw):
+    relative = 'data/insights/manifest.json'
+    placeholder = b'{"private_snapshot":true,"source_shape":"object","entry_count":2,"collection_counts":{}}\n'
+    (root/'dashboard'/relative).parent.mkdir(parents=True, exist_ok=True)
+    (root/'dashboard'/relative).write_bytes(placeholder)
+    sha = hashlib.sha256(raw).hexdigest()
+    (root/'dashboard/private-assets.json').write_text(json.dumps({'assets': {relative: {
+        'private_sha256': sha, 'public_sha256': hashlib.sha256(placeholder).hexdigest()}}}), encoding='utf-8')
+    return relative, sha
+
+
+def _private_storage_holding(monkeypatch, raw):
+    import private_storage
+    requested = []
+
+    def restore(vault, relative, *, root):
+        requested.append(relative)
+        (vault/relative).parent.mkdir(parents=True, exist_ok=True)
+        (vault/relative).write_bytes(raw)
+        return vault/relative
+
+    monkeypatch.setattr(private_storage, 'enabled', lambda root=None: True)
+    monkeypatch.setattr(private_storage, 'ensure_private_file', restore)
+    return requested
+
+
+def test_a_lane_vault_restores_a_snapshot_ci_stored_after_it_stopped_syncing(workspace, monkeypatch):
+    root, vault = workspace
+    monkeypatch.setattr(assets, 'ROOT', root)
+    raw = b'{"source_health":{"videos":{"items":3}},"provenance":{}}\n'
+    relative, sha = _managed_placeholder(root, raw)
+    requested = _private_storage_holding(monkeypatch, raw)
+    assert assets.private_source(root/'dashboard', relative).read_bytes() == raw
+    assert requested == ['dashboard-private/objects/' + sha]
+
+
+def test_a_catalog_view_vault_is_left_to_its_own_materialization(workspace, monkeypatch):
+    import private_storage_io
+    root, vault = workspace
+    monkeypatch.setattr(assets, 'ROOT', root)
+    relative, _ = _managed_placeholder(root, b'{"view":"owned"}\n')
+    (vault/private_storage_io.MARKER).write_text('{}', encoding='utf-8')
+    monkeypatch.setattr(private_storage_io, 'materialize', lambda vault, relative: None)
+    requested = _private_storage_holding(monkeypatch, b'{"view":"owned"}\n')
+    with pytest.raises(RuntimeError, match='missing'):
+        assets.private_source(root/'dashboard', relative)
+    assert requested == []
+
+
 def test_history_source_the_receipt_no_longer_names_is_ignored(workspace, monkeypatch):
     root, vault = workspace
     monkeypatch.setattr(assets, 'ROOT', root)

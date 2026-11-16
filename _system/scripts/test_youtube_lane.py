@@ -268,6 +268,54 @@ class PushMainTests(unittest.TestCase):
         self.assertIn("main: nothing to commit", self.lines)
 
 
+class SelfUpdateTests(unittest.TestCase):
+    """A podcast publish that fails before its commit leaves derived files behind.
+
+    The lane pulls main with an autostash before every publish, and CI rewrites
+    the same catalog files and receipt on main. Carrying the lane's copies
+    across that pull turns a skipped publish into a stash that cannot be put back.
+    """
+
+    EPISODES = "dashboard/data/insights/podcast_episodes"
+    CATALOG = "dashboard/data/insights/podcasts.json"
+    RECEIPT = "dashboard/private-assets.json"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        base = Path(self.tmp.name)
+        self.origin, self.repo, self.ci = base / "origin.git", base / "lane", base / "ci"
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(self.origin)], check=True)
+        subprocess.run(["git", "init", "-q", "-b", "main", str(self.repo)], check=True)
+        _configure(self.repo)
+        _git(self.repo, "remote", "add", "origin", str(self.origin))
+        for rel in (*lane.PODCAST_PATHS, self.RECEIPT):
+            _write(self.repo / rel, '{"seed":true}\n')
+        _write(self.repo / self.EPISODES / "kept.json", '{"episode_id":"kept"}\n')
+        _git(self.repo, "add", "-A")
+        _git(self.repo, "commit", "-qm", "seed")
+        _git(self.repo, "push", "-q", "origin", "main")
+        subprocess.run(["git", "clone", "-q", str(self.origin), str(self.ci)], check=True)
+        _configure(self.ci)
+        for rel in (self.CATALOG, self.RECEIPT):
+            _write(self.ci / rel, '{"from":"ci"}\n')
+        _git(self.ci, "commit", "-qam", "chore(podcasts): weekly refresh")
+        _git(self.ci, "push", "-q", "origin", "main")
+        for patch in (mock.patch.object(lane, "ROOT", self.repo), mock.patch.object(lane, "log")):
+            patch.start()
+            self.addCleanup(patch.stop)
+
+    def test_a_failed_podcast_publish_does_not_strand_the_next_pull(self):
+        for rel in (self.CATALOG, self.RECEIPT):
+            _write(self.repo / rel, '{"from":"failed lane publish"}\n')
+        _write(self.repo / self.EPISODES / "unpublished.json", '{"episode_id":"new"}\n')
+        self.assertIs(lane.self_update(), True)
+        for rel in (self.CATALOG, self.RECEIPT):
+            self.assertEqual((self.repo / rel).read_text(encoding="utf-8"), '{"from":"ci"}\n')
+        self.assertFalse((self.repo / self.EPISODES / "unpublished.json").exists())
+        self.assertEqual(_git(self.repo, "status", "--porcelain"), "")
+
+
 class DescribeFailureTests(unittest.TestCase):
     def test_the_reason_survives_a_long_preamble(self):
         preamble = [f" * branch main -> FETCH_HEAD ({i})" for i in range(30)]

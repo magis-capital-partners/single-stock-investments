@@ -14,6 +14,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import tempfile
 import threading
@@ -22,6 +23,7 @@ import tomllib
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timedelta, timezone
 from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -126,17 +128,69 @@ class HTTP:
         return raw
 
 
+WRANGLER_CONFIG = Path(".wrangler") / "config" / "default.toml"
+WRANGLER_EXPIRY_MARGIN = timedelta(minutes=2)
+
+
+def wrangler_config_paths():
+    """Where `wrangler login` keeps its session: Windows, macOS, Linux, then the legacy home path."""
+    home = Path.home()
+    appdata = Path(os.environ.get("APPDATA", home / "AppData/Roaming"))
+    xdg = Path(os.environ.get("XDG_CONFIG_HOME") or home / ".config")
+    return (appdata / "xdg.config" / WRANGLER_CONFIG, home / "Library/Preferences" / WRANGLER_CONFIG,
+            xdg / WRANGLER_CONFIG, home / WRANGLER_CONFIG)
+
+
+def _wrangler_session():
+    for path in wrangler_config_paths():
+        if path.is_file():
+            return tomllib.loads(path.read_text())
+    return {}
+
+
+def _session_expired(values):
+    stamp = values.get("expiration_time")
+    if not isinstance(stamp, str):
+        return False
+    try:
+        expires = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return expires <= datetime.now(timezone.utc) + WRANGLER_EXPIRY_MARGIN
+
+
+def _refresh_wrangler_session():
+    # The OAuth token lasts an hour. Wrangler exchanges its stored refresh token
+    # on any authenticated command and rewrites the session file itself.
+    explicit = os.environ.get("WRANGLER_JS", "").strip()
+    scripts = [Path(explicit)] if explicit else []
+    scripts.append(ROOT / "dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js")
+    command = next((["node", str(script)] for script in scripts if script.is_file()), None)
+    installed = shutil.which("wrangler")
+    if command is None and installed:
+        command = [installed]
+    if command is None:
+        return
+    try:
+        subprocess.run([*command, "whoami"], capture_output=True, timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+
 def cloudflare_token():
     value = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
     if value:
         return value
     # Reuse the user's existing signed-in Wrangler session; never create keys.
-    appdata = Path(os.environ.get("APPDATA", Path.home() / "AppData/Roaming"))
-    path = appdata / "xdg.config/.wrangler/config/default.toml"
-    values = tomllib.loads(path.read_text()) if path.is_file() else {}
+    values = _wrangler_session()
+    if values.get("oauth_token") and _session_expired(values):
+        _refresh_wrangler_session()
+        values = _wrangler_session()
     token = values.get("oauth_token")
     if not token:
         raise StorageError("Existing authorized Cloudflare storage credentials are required")
+    if _session_expired(values):
+        raise StorageError("The signed-in Wrangler session expired and could not be refreshed")
     return token
 
 

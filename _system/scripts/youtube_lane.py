@@ -214,11 +214,15 @@ def self_update() -> bool:
     with a `clean` as well as a `checkout`: most of its drift is *untracked*
     files, which a checkout leaves in place and an autostash then carries into
     the rebase.
+
+    The podcast publish leaves the same kind of output, plus the receipt it
+    rewrites, whenever it fails before its commit. CI rewrites all of them on
+    main, so they are reset too; the next publish rebuilds them.
     """
-    for rel in MAIN_PATHS:
+    for rel in dict.fromkeys((*MAIN_PATHS, *PODCAST_PATHS, "dashboard/private-assets.json")):
         if (ROOT / rel).is_file():
             run_git(ROOT, "checkout", "--", rel, check=False, timeout=120)
-    for rel in MAIN_DIRS:
+    for rel in (*MAIN_DIRS, *PODCAST_DIRS):
         if (ROOT / rel).is_dir():
             run_git(ROOT, "checkout", "--", rel, check=False, timeout=120)
             run_git(ROOT, "clean", "-fdq", "--", rel, check=False, timeout=120)

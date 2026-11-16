@@ -4,7 +4,8 @@
 One process. One lock. Strict sequencing:
 
   1. Podcast Whisper backlog (feeds everything else)
-  2. YouTube discover / captions (Whisper for videos only when podcast queue is empty)
+  2. YouTube discover / captions (Whisper for videos only when podcast queue is empty),
+     then podcast discovery and published transcripts, each at most once a day
   3. Podcast reader summaries, published immediately (alternating with video
      analysis when both have work, so neither surface starves)
   4. Local-model claims analysis (videos first, then podcasts) — same qwen endpoint as Windows
@@ -63,6 +64,7 @@ DEFAULT_WHISPER_HOURS = float(os.environ.get("MEDIA_LANE_WHISPER_HOURS", "2"))
 DEFAULT_SUMMARY_HOURS = float(os.environ.get("MEDIA_LANE_SUMMARY_HOURS", "2"))
 DEFAULT_ANALYSIS_HOURS = float(os.environ.get("MEDIA_LANE_ANALYSIS_HOURS", "2"))
 DEFAULT_YT_HOURS = float(os.environ.get("MEDIA_LANE_YT_HOURS", "1"))
+DEFAULT_DISCOVERY_EVERY_HOURS = float(os.environ.get("MEDIA_LANE_PODCAST_DISCOVERY_HOURS", "20"))
 DEFAULT_YT_WHISPER = int(os.environ.get("MEDIA_LANE_YT_WHISPER", "0"))
 DEFAULT_CHUNK = int(os.environ.get("MEDIA_LANE_WHISPER_CHUNK", "2"))
 RECEIPT_PATH = ROOT / "_system" / "data" / "lane_receipts" / "media-analysis.json"
@@ -281,8 +283,7 @@ def ensure_model(model: str, model_path: str, context_length: int) -> bool:
     return ok
 
 
-def youtube_due(state: dict, min_hours: float = 20.0) -> bool:
-    last = state.get("last_youtube_at")
+def _due(last: str | None, min_hours: float) -> bool:
     if not last:
         return True
     try:
@@ -291,6 +292,14 @@ def youtube_due(state: dict, min_hours: float = 20.0) -> bool:
         return True
     age_h = (datetime.now(timezone.utc) - then).total_seconds() / 3600.0
     return age_h >= min_hours
+
+
+def youtube_due(state: dict, min_hours: float = 20.0) -> bool:
+    return _due(state.get("last_youtube_at"), min_hours)
+
+
+def podcast_discovery_due(state: dict, min_hours: float = DEFAULT_DISCOVERY_EVERY_HOURS) -> bool:
+    return _due(state.get("last_podcast_discovery_at"), min_hours)
 
 
 _active_floor_mb = DEFAULT_MEMORY_FLOOR
@@ -334,6 +343,33 @@ def phase_youtube(*, hours: float, whisper: int, push: bool) -> int:
     if not push:
         args.append("--no-push")
     return run_python(args)
+
+
+def phase_podcast_discovery() -> int:
+    """New watchlist episodes and their published transcripts.
+
+    New episodes used to reach this clone only through CI's weekly refresh and
+    a vault pull. The vault outgrew both: GitHub refuses CI's push on size
+    quota and this clone's pull timed out, so nothing CI found after
+    2026-10-29 arrived here. Whisper, summaries and the dashboard publish stay
+    in their own phases; the next podcast vault commit picks up the metas
+    this writes.
+    """
+    wait_for_memory(_active_floor_mb, log=log, stop_flag=lambda: _stop)
+    if _stop:
+        return 0
+    from youtube_lane import load_env_file
+
+    keys = load_env_file(ROOT / "_secrets" / "podcastindex.env")
+    log(f"loaded {keys} key(s) from _secrets/podcastindex.env")
+    code = run_python([
+        str(SCRIPTS / "discover_podcasts.py"),
+        "--paginate-capped-feeds",
+        "--all-watchlist",
+    ])
+    if code != 0 or _stop:
+        return code
+    return run_python([str(SCRIPTS / "fetch_podcast_transcript.py"), "--no-whisper"])
 
 
 def phase_reader_summary(*, model: str, hours: float, push: bool) -> int:
@@ -478,6 +514,14 @@ def run_forever(args: argparse.Namespace) -> int:
                 # Fall through to analysis in the same loop iteration only when
                 # whisper is still empty; otherwise the next iteration will
                 # prefer transcription again.
+
+            if podcast_discovery_due(state) and not _stop:
+                log("phase=podcast-discovery")
+                code = phase_podcast_discovery()
+                state["last_podcast_discovery_at"] = _stamp()
+                state["last_podcast_discovery_code"] = code
+                save_state(state)
+                log(f"podcast discovery exited code={code}")
 
             if not ensure_model(args.model, args.model_path, args.context_length):
                 log(f"model not ready; retrying in {backoff}s")
