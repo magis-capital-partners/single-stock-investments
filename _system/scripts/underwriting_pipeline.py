@@ -479,7 +479,7 @@ def load_progress(root, work, ticker, packet):
                     'models': {s: stage_model(root, s) for s in STAGES}})
     saved = read(work/'progress'/(ticker+'.json'))
     if saved.get('scope') == scope:
-        return saved
+        return recover_pending_review(root, work, ticker, packet, saved)
     result = {'scope': scope, 'packet_hash': packet['packet_hash'], 'history': [], 'feedback': None}
     if saved.get('feedback'):
         # New evidence/code invalidates approvals, not unresolved criticism.
@@ -533,7 +533,66 @@ def load_progress(root, work, ticker, packet):
             result['feedback'] = None
     if result.get('feedback'):
         result['feedback']['prior_findings'] = [f for h in result['history'][:-1] for f in h.get('findings') or []]
-    return result
+    return recover_pending_review(root, work, ticker, packet, result)
+
+
+def pending_review_author(root, work, ticker, packet, pending):
+    """A pending review reuses an authentic paid author; it is never an approval."""
+    author, receipt = pending['author'], pending['author_receipt']
+    identity = receipt.get('input_hash') or ''
+    require(re.fullmatch(r'[0-9a-f]{64}', identity), 'Invalid paid author cache identity')
+    cache = work/'cache'/ticker/identity
+    require(read(cache/'output.json') == author and read(cache/'receipt.json') == receipt,
+            'Paid author output identity changed')
+    selected = stage_model(root, 'author')
+    require(receipt.get('status') == 'finished' and receipt.get('agent_id') and receipt.get('stage') == 'author'
+            and receipt.get('model') == selected['id']
+            and all(receipt.get(k) == selected[k] for k in ('reasoning_effort','provider')),
+            'Pending review requires the configured finished author')
+    require(author.get('ticker') == ticker and author.get('packet_hash') == packet['packet_hash']
+            and author.get('evidence_hash') == packet['evidence_hash'], 'Pending author evidence changed')
+    from underwriting_revisions import validate_derivation
+    validate_derivation(receipt, digest(author))
+    imported = (receipt.get('output_import') or {}).get('output_hash')
+    require(imported == ((receipt.get('contract_revision') or {}).get('provider_output_hash') or digest(author)),
+            'Paid author output identity changed')
+    return author, receipt
+
+
+def recover_pending_review(root, work, ticker, packet, progress):
+    if progress.get('approved'):
+        return progress
+    if progress.get('pending_review'):
+        pending_review_author(root, work, ticker, packet, progress['pending_review'])
+        return progress
+    authors, reviewed = [], set()
+    selected = stage_model(root, 'author')
+    for path in (work/'cache'/ticker).glob('*/receipt.json'):
+        receipt, output = read(path), read(path.parent/'output.json')
+        if (receipt.get('status') != 'finished' or not receipt.get('agent_id')
+                or receipt.get('input_hash') != path.parent.name or output.get('packet_hash') != packet['packet_hash']):
+            continue
+        if receipt.get('stage') == 'challenger':
+            reviewed.add(output.get('contract_hash'))
+        elif (receipt.get('stage') == 'author' and receipt.get('model') == selected['id']
+                and all(receipt.get(k) == selected[k] for k in ('reasoning_effort','provider'))):
+            authors.append((output, receipt))
+    if not authors:
+        return progress
+    author, receipt = max(authors, key=lambda r: (r[1].get('finished_at') or '', r[1]['input_hash']))
+    if (author.get('schema_version') != 'underwriting-contract/2' or digest(author) in reviewed
+            or not (receipt.get('output_import') or {}).get('output_hash')):
+        return progress
+    pending = {'author': author, 'author_receipt': receipt}
+    pending_review_author(root, work, ticker, packet, pending)
+    try:
+        canonical = compile_contract(packet, author)
+        tests = model_diagnostics(canonical)['economic_diagnostics']['structural_tests']
+        require(all(not t['errors'] for t in tests), 'Invalid structural alternatives must be repaired')
+    except ContractError:
+        return progress
+    progress['pending_review'] = {**pending, 'canonical_hash': digest(canonical)}
+    return progress
 
 
 def save_handoff(root, vault, packet, approved):
@@ -634,60 +693,70 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                 require(digest(canonical) == approved['canonical_hash'], 'Compiler changed after independent approval')
                 validate_review(author, challenger, canonical)
             else:
-                payload = {'packet': packet, 'revision_feedback': feedback}
-                if (feedback or {}).get('previous_contract'):
-                    # Enrich recovered paid drafts against the current packet;
-                    # never edit the authentic draft or waive its failed checks.
-                    from underwriting_evidence import supplemental_fact_diagnostics
-                    payload['revision_feedback'] = {**feedback, 'supplemental_fact_diagnostics':
-                        supplemental_fact_diagnostics(packet, feedback['previous_contract'].get('supplemental_facts') or [])}
-                    payload['revision_base_hash'] = digest(feedback['previous_contract'])
-                if baseline:
-                    payload['approved_baseline'] = baseline
-                author, author_receipt = call_stage(root, work, ticker, 'author', payload, state, execute=execute)
-                if author.get('status') == 'evidence_gap':
-                    gaps = author.get('gaps') or []
-                    state['evidence_requests'] = gaps
-                    state['evidence_request_history'] = merge_evidence_requests(state.get('evidence_request_history'),gaps)
-                    # Requests choose bounded search terms, never destinations or tools.
-                    # Re-read the same independently discovered primary documents.
-                    keywords = requested_keywords(gaps, history=state['evidence_request_history'])
-                    state['evidence_keywords'] = keywords
-                    if prepare is prepare_packet and keywords:
-                        repaired = prepare(root, ticker, as_of, focus_keywords=keywords)
-                        from underwriting_related_evidence import augment_requested_targets
-                        repaired = augment_requested_targets(root,repaired,state['evidence_request_history'],as_of)
-                        if repaired['evidence_hash'] != packet['evidence_hash'] and repaired.get('readiness', {}).get('status') != 'evidence_gap':
-                            packet = repaired
-                            write(work/'packets'/(packet['packet_hash']+'.json'), packet)
-                            state.update(packet_hash=packet['packet_hash'], evidence_hash=packet['evidence_hash'], input_fingerprint=input_fingerprint(root, ticker))
-                            progress = load_progress(root, work, ticker, packet)
-                            previous_feedback = feedback or {}
-                            findings = list(previous_feedback.get('prior_findings') or [])+unresolved_findings(previous_feedback)
-                            findings += [f for h in progress.get('history') or [] for f in h.get('findings') or []]
-                            feedback = {**previous_feedback,
-                                        'required_correction': 'Primary disclosure contexts expanded; resolve prior criticism against the CURRENT packet.',
-                                        'evidence_requests': gaps,
-                                        'prior_findings': list({digest(f):f for f in findings}.values())}
-                            progress['feedback'] = feedback
-                            checkpoint()
-                            continue
-                    raise StageBlocked('primary_evidence_gap: '+json.dumps(gaps)[:1200])
+                pending = progress.get('pending_review')
+                if pending:
+                    author, author_receipt = pending_review_author(root, work, ticker, packet, pending)
+                else:
+                    payload = {'packet': packet, 'revision_feedback': feedback}
+                    if (feedback or {}).get('previous_contract'):
+                        # Enrich recovered paid drafts against the current packet;
+                        # never edit the authentic draft or waive its failed checks.
+                        from underwriting_evidence import supplemental_fact_diagnostics
+                        payload['revision_feedback'] = {**feedback, 'supplemental_fact_diagnostics':
+                            supplemental_fact_diagnostics(packet, feedback['previous_contract'].get('supplemental_facts') or [])}
+                        payload['revision_base_hash'] = digest(feedback['previous_contract'])
+                    if baseline:
+                        payload['approved_baseline'] = baseline
+                    author, author_receipt = call_stage(root, work, ticker, 'author', payload, state, execute=execute)
+                    if author.get('status') == 'evidence_gap':
+                        gaps = author.get('gaps') or []
+                        state['evidence_requests'] = gaps
+                        state['evidence_request_history'] = merge_evidence_requests(state.get('evidence_request_history'),gaps)
+                        # Requests choose bounded search terms, never destinations or tools.
+                        # Re-read the same independently discovered primary documents.
+                        keywords = requested_keywords(gaps, history=state['evidence_request_history'])
+                        state['evidence_keywords'] = keywords
+                        if prepare is prepare_packet and keywords:
+                            repaired = prepare(root, ticker, as_of, focus_keywords=keywords)
+                            from underwriting_related_evidence import augment_requested_targets
+                            repaired = augment_requested_targets(root,repaired,state['evidence_request_history'],as_of)
+                            if repaired['evidence_hash'] != packet['evidence_hash'] and repaired.get('readiness', {}).get('status') != 'evidence_gap':
+                                packet = repaired
+                                write(work/'packets'/(packet['packet_hash']+'.json'), packet)
+                                state.update(packet_hash=packet['packet_hash'], evidence_hash=packet['evidence_hash'], input_fingerprint=input_fingerprint(root, ticker))
+                                progress = load_progress(root, work, ticker, packet)
+                                previous_feedback = feedback or {}
+                                findings = list(previous_feedback.get('prior_findings') or [])+unresolved_findings(previous_feedback)
+                                findings += [f for h in progress.get('history') or [] for f in h.get('findings') or []]
+                                feedback = {**previous_feedback,
+                                            'required_correction': 'Primary disclosure contexts expanded; resolve prior criticism against the CURRENT packet.',
+                                            'evidence_requests': gaps,
+                                            'prior_findings': list({digest(f):f for f in findings}.values())}
+                                progress['feedback'] = feedback
+                                checkpoint()
+                                continue
+                        raise StageBlocked('primary_evidence_gap: '+json.dumps(gaps)[:1200])
                 require(author.get('schema_version') == read(root/POLICY).get('required_contract_schema', 'underwriting-contract/2'),
                         'Author must use the current economic underwriting contract')
                 canonical = compile_contract(packet, author)
+                if pending:
+                    require(digest(canonical) == pending['canonical_hash'], 'Compiler changed before pending independent review')
                 challenge = challenge_payload(packet, author, canonical)
                 structural_failures = [{'id': test['id'], 'errors': test['errors']}
                     for test in challenge['deterministic_value_driver_tests'].get('economic_diagnostics', {}).get('structural_tests', [])
                     if test.get('errors')]
                 require(not structural_failures, 'Structural alternatives failed deterministic validation: '
                         +json.dumps(structural_failures, ensure_ascii=False))
+                progress['pending_review'] = {'author': author, 'author_receipt': author_receipt,
+                                              'canonical_hash': digest(canonical)}
+                checkpoint()
                 challenger, challenger_receipt = call_stage(root, work, ticker, 'challenger',
                     challenge, state, execute=execute)
                 validate_review(author, challenger, canonical)
                 progress['approved'] = {'author': author, 'review': challenger, 'canonical_hash': digest(canonical),
                                         'receipts': {'author': author_receipt, 'challenger': challenger_receipt}}
                 progress['feedback'] = None
+                progress.pop('pending_review', None)
                 checkpoint()
             if phase == 'author':
                 return save_handoff(root, vault, packet, progress['approved'])
@@ -700,6 +769,7 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
             if progress.get('approved'):
                 # A provider/build/publication failure does not revoke a valid review.
                 raise StageBlocked('approved_model_build_or_publication: '+str(exc)) from exc
+            progress.pop('pending_review', None)
             previous_feedback = progress.get('feedback') or {}
             feedback = revision_feedback(author, challenger, exc, packet=packet)
             if not author:

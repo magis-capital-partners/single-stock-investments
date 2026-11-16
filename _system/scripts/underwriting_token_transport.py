@@ -1,7 +1,13 @@
 """Bounded lossless token dictionaries for complete CPRT source evidence."""
 from __future__ import annotations
 import copy
+from contextlib import ExitStack, closing
+import heapq
+import json
+from pathlib import Path
 import re
+import sqlite3
+import tempfile
 from collections import Counter
 from functools import lru_cache
 from underwriting_contract import digest, require
@@ -20,6 +26,53 @@ def eligible(payload):
     if not isinstance(packet,dict) or packet.get('ticker')!='CPRT':return False
     scope=(packet.get('primary_reference_usage') or {}).get('owner_authorized_scope') or {}
     return scope.get('parent')=='CPRT' and scope.get('target_cik')=='1637873' and scope.get('document_context_characters')==450000
+
+
+def _run_counts(streams, depth):
+    """Count every eligible run exactly, spilling bounded chunks to owned scratch."""
+    from underwriting_transport import encoded
+    with ExitStack() as stack:
+        counts=Counter();database=None
+        def flush():
+            nonlocal database
+            if database is None:
+                scratch=Path(stack.enter_context(tempfile.TemporaryDirectory(prefix='underwriting-token-runs-'))).resolve()
+                require(scratch.parent==Path(tempfile.gettempdir()).resolve()
+                        and scratch.name.startswith('underwriting-token-runs-'), 'Invalid owned token scratch path')
+                database=stack.enter_context(closing(sqlite3.connect(scratch/'counts.sqlite')))
+                database.execute('PRAGMA journal_mode=OFF')
+                database.execute('PRAGMA synchronous=OFF')
+                database.execute('PRAGMA cache_size=-2048')
+                database.execute('PRAGMA temp_store=FILE')
+                database.execute('CREATE TABLE runs (run BLOB PRIMARY KEY, n INTEGER NOT NULL) WITHOUT ROWID')
+            database.executemany('INSERT INTO runs VALUES (?,?) ON CONFLICT(run) DO UPDATE SET n=n+excluded.n',
+                ((encoded(run).encode('utf-8'),n) for run,n in counts.items()))
+            counts.clear()
+        for stream in streams.values():
+            for width in (8,16,32,64):
+                for i in range(len(stream)-width+1):
+                    run=tuple(stream[i:i+width])
+                    if max((depth[x] for x in run if type(x) is int),default=0)>=MAX_DEPTH:continue
+                    counts[run]+=1
+                    if len(counts)>=4096:flush()
+        if database is None:
+            yield from counts.items()
+        else:
+            if counts:flush()
+            database.commit()
+            for raw,n in database.execute('SELECT run,n FROM runs WHERE n>=2'):
+                yield tuple(json.loads(raw)),n
+
+
+def _rank_run_candidates(streams, depth, limit):
+    if limit<=0:return []
+    def ranked():
+        for run,n in _run_counts(streams,depth):
+            if n<2:continue
+            length=sum(3 if type(x) is int else len(x) for x in run)
+            gain=n*(length-3)-(length+12)
+            if gain>16:yield gain,repr(run),run
+    return heapq.nlargest(limit,ranked())
 
 
 def pack(payload):
@@ -64,19 +117,8 @@ def pack(payload):
                 else:out.append(stream[i]);i+=1
             streams[text]=out
     for iteration in range(24):
-        runs=Counter()
-        for stream in streams.values():
-            for width in (8,16,32,64):
-                runs.update(tuple(stream[i:i+width]) for i in range(len(stream)-width+1)
-                    if max((depth[x] for x in stream[i:i+width] if type(x) is int),default=0)<MAX_DEPTH)
-        ranked=[]
-        for run,n in runs.items():
-            if n<2:continue
-            length=sum(3 if type(x) is int else len(x) for x in run)
-            gain=n*(length-3)-(length+12)
-            if gain>16:ranked.append((gain,repr(run),run))
-        ranked.sort(reverse=True)
-        selected={run:len(entries)+i for i,(_,__,run) in enumerate(ranked[:min(2048,65536-len(entries))])}
+        ranked=_rank_run_candidates(streams,depth,min(2048,65536-len(entries)))
+        selected={run:len(entries)+i for i,(_,__,run) in enumerate(ranked)}
         if not selected:break
         for run,index in selected.items():
             require(index==len(entries),'Token dictionary ordering changed')
