@@ -121,3 +121,19 @@ def test_spilled_repeated_runs_keep_exact_ranking_across_chunks():
     words=['source-'+str(i) for i in range(1400)]
     streams={'one':words,'two':words[:],'mixed':([0,'0',1,'Ω']*1200)}
     assert token._rank_run_candidates(streams,[0,1],2048)==old_rank(streams,[0,1],2048)
+
+
+def test_complete_token_envelope_is_identical_to_original_run_ranking(monkeypatch):
+    from underwriting_transport import encoded
+    payload={'packet':{'ticker':'CPRT'},'types':[1,1.0,None,False],
+             'full_text':''.join('Exact operating and restricted finance source Ω '+str(i%19)+'; '
+                                 for i in range(600))}
+    current=token.pack(payload)
+    monkeypatch.setattr(token,'_rank_run_candidates',old_rank)
+    assert encoded(token.pack(payload))==encoded(current)
+
+
+@pytest.mark.parametrize('bad',[True,False,1.5,None])
+def test_binary_scratch_rejects_invalid_internal_atom_types(bad):
+    with pytest.raises(ValueError,match='Invalid internal token atom'):
+        token._rank_run_candidates({'bad':[bad]*20},[0],2048)
