@@ -52,6 +52,38 @@ def completion_limit_authority(policy, consumer, subject, reason, proof):
     return grant
 
 
+
+def _unpaid_author_input_repair(root,work,state,detail):
+    """Retry one genuine pre-admission size hold after a source repair, never a paid attempt."""
+    from underwriting_contract import digest
+    from underwriting_pipeline import processing_version,stage_hash
+    from underwriting_evidence import supplemental_fact_diagnostics
+    from underwriting_codex import MAX_INPUT_CHARACTERS
+    match=re.fullmatch(r'local_input_too_large: ([1-9][0-9]*) characters exceeds 1048576; complete evidence retained',detail)
+    if (not match or int(match[1])<=MAX_INPUT_CHARACTERS
+            or not HEX.fullmatch(str(state.get('processing_version') or ''))
+            or state['processing_version']==processing_version(root)):
+        return False
+    progress=_read(work/'progress/CPRT.json')
+    if progress.get('approved') or progress.get('pending_review'):
+        return False
+    feedback=progress.get('feedback') or {};previous=feedback.get('previous_contract') or {}
+    packet=_read(work/'packets'/(str(state.get('packet_hash'))+'.json'))
+    if (packet.get('ticker')!='CPRT' or packet.get('packet_hash')!=state.get('packet_hash')
+            or packet.get('evidence_hash')!=state.get('evidence_hash') or not previous):
+        return False
+    payload={'packet':packet,'revision_feedback':{**feedback,'supplemental_fact_diagnostics':
+             supplemental_fact_diagnostics(packet,previous.get('supplemental_facts') or [])},
+             'revision_base_hash':digest(previous)}
+    identity=stage_hash(root,'author',payload);cache=work/'cache/CPRT'/identity
+    record=_read(cache/'input_admission.json')
+    return (set(record)=={'status','input_hash','payload_hash','reason','model_calls'}
+            and record.get('status')=='blocked' and record.get('input_hash')==identity
+            and record.get('payload_hash')==digest(payload) and record.get('reason')==detail
+            and type(record.get('model_calls')) is int and record['model_calls']==0
+            and not any((cache/name).exists() for name in ('receipt.json','output.json','prompt.txt','author_revision.json')))
+
+
 def pending_revision_authority(root, work, ticker, state, *, contract=None, packet=None):
     """Bind a continuation to paid lineage, frozen evidence and an unresolved review."""
     from underwriting_contract import digest
@@ -67,7 +99,8 @@ def pending_revision_authority(root, work, ticker, state, *, contract=None, pack
                    'total_daily_model_call_budget'}
         if not gaps or any(g.get('code') != 'StageBlocked' or not (
                 g.get('detail') in allowed or str(g.get('detail') or '').startswith(
-                    'author_or_challenger_unresolved:')) for g in gaps):
+                    'author_or_challenger_unresolved:') or _unpaid_author_input_repair(
+                        root,work,state,str(g.get('detail') or ''))) for g in gaps):
             return None
     progress = _read(work/'progress/CPRT.json')
     feedback = progress.get('feedback') or {}
