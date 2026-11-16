@@ -1,4 +1,5 @@
-import unittest
+import unittest,hashlib
+from unittest.mock import patch
 from announcement_text import extract
 try:import pymupdf
 except ImportError:pymupdf=None
@@ -27,4 +28,17 @@ class AnnouncementTextTests(unittest.TestCase):
         with self.assertRaises(ValueError):extract(raw,'unbounded')
     def test_extended_reader_still_rejects_over_limit_bytes(self):
         with self.assertRaises(ValueError):extract(b'%PDF-'+b' '*(48*1024*1024),'external_primary_report')
+    def test_reviewed_large_report_exception_is_exact_source_and_external_only(self):
+        import announcement_text
+        doc=pymupdf.open()
+        for i in range(513):
+            page=doc.new_page();page.insert_text((72,72),'Complete native primary disclosure page with enough readable text '+str(i+1))
+        raw=doc.tobytes();doc.close();digest=hashlib.sha256(raw).hexdigest()
+        with self.assertRaises(ValueError):extract(raw,'external_primary_report')
+        approval={'source_sha256':digest,'pages':513,'reviewed_at':'2026-11-16T00:25:00Z','scope':'Exact source fixture only'}
+        with patch.dict(announcement_text.REVIEWED_LARGE_REPORTS,{digest:approval},clear=True):
+            result=extract(raw,'external_primary_report');self.assertTrue(result['complete']);self.assertEqual(result['pages'],513);self.assertEqual(result['reader_review']['source_sha256'],digest);self.assertFalse(result['OCR_admitted_to_signals'])
+            with self.assertRaises(ValueError):extract(raw,'standard')
+        with patch.dict(announcement_text.REVIEWED_LARGE_REPORTS,{digest:{**approval,'pages':514}},clear=True):
+            with self.assertRaises(ValueError):extract(raw,'external_primary_report')
 if __name__=='__main__':unittest.main()

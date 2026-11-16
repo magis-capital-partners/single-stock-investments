@@ -295,6 +295,9 @@ export async function consume(batch,env){
     }catch(e){const deferred=e.code==='RECONCILIATION_INCOMPLETE'||/source deadline|SEC access is in backoff|SEC request budget occupied|Source returned HTTP (403|429)|abort|timeout/i.test(e.message),attempts=Math.max(0,row.attempts-(deferred?1:0)),delay=Math.min(3600000,30000*2**Math.min(deferred?2:attempts,7));await env.DB.prepare('UPDATE rs_jobs SET state=?,attempts=?,error=?,available_at=?,updated_at=? WHERE id=? AND token=?').bind(attempts>=6?'failed':'pending',attempts,e.message,Date.now()+delay,stamp(),id,token).run();log(deferred?'job_deferred':'job_failure',{id,kind:row.kind,error:e.message,attempt:attempts});message.ack();}
   }
 }
+export async function repairReviewedLargePdf(env){
+  return recoverReaderFailures(env,{hash:sha,version:'reviewed_large_pdf.2026-11-15.v1',eligible:(error,row)=>row.id==='filing:0001213900-26-119240'&&error==='Announcement PDF requires verified readable text'});
+}
 export async function scheduled(event,env){
   if(env.ENABLED!=='true'){await state(env,'service_mode','paused');return;}
   await state(env,'last_tick',stamp());await state(env,'service_mode',env.COLLECTOR_MODE||'research_monitor');
@@ -303,6 +306,7 @@ export async function scheduled(event,env){
     await queueAnnouncementRepairs(env);
     await queueReviewedHistoryRepair(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'extended_primary_pdf.2026-11-10.v1',eligible:(error,row)=>['history-filing:0001015820-24-000069','history-filing:0001193125-22-108042'].includes(row.id)&&/Announcement PDF (?:exceeds byte limit|requires verified readable text)/.test(error||'')});
+    await repairReviewedLargePdf(env);
     await recoverHistorySearch(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'oversized_primary.2026-11-09.v1',eligible:error=>/Source exceeds document size limit/.test(error||'')});
     await recoverReaderFailures(env,{hash:sha,version:'reviewed_pdf.2026-11-09.v1',eligible:(error,row)=>row.id==='filing:0001193125-26-450710'&&/OCR candidates require review/.test(error||'')});
