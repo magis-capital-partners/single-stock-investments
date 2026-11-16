@@ -555,7 +555,10 @@ def _complete_layouts(payload):
         if tokens:
             yield TOKEN_INSTRUCTIONS, tokens
             from underwriting_compact_transport import compact, INSTRUCTIONS as COMPACT_INSTRUCTIONS
-            yield COMPACT_INSTRUCTIONS, compact(tokens)
+            short = compact(tokens)
+            yield COMPACT_INSTRUCTIONS, short
+            from underwriting_marker_transport import compact as compact_markers, INSTRUCTIONS as MARKER_INSTRUCTIONS
+            yield MARKER_INSTRUCTIONS, compact_markers(short)
 
 
 def pack(payload):
@@ -564,6 +567,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/7':
+        from underwriting_marker_transport import unpack as unpack_markers
+        return unpack_markers(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/6':
         from underwriting_compact_transport import unpack as unpack_compact
         return unpack_compact(envelope)
