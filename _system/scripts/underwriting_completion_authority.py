@@ -146,6 +146,42 @@ def _unpaid_acquired_target_routing_repair(root, work, state, detail):
         return False
 
 
+def _unpaid_review_input_repair(root,work,state,detail):
+    """Resume only an unpaid complete-input hold for an authentic compiled paid author."""
+    from underwriting_contract import digest,compile_contract
+    from underwriting_pipeline import processing_version,stage_hash,pending_review_author,challenge_payload
+    from underwriting_codex import MAX_INPUT_CHARACTERS
+    match=re.fullmatch(r'local_input_too_large: ([1-9][0-9]*) characters exceeds 1048576; complete evidence retained',detail)
+    if (not match or int(match[1])<=MAX_INPUT_CHARACTERS
+            or not HEX.fullmatch(str(state.get('processing_version') or ''))
+            or state['processing_version']==processing_version(root)):
+        return False
+    try:
+        progress=_read(work/'progress/CPRT.json');pending=progress.get('pending_review')
+        packet=_read(work/'packets'/(str(state.get('packet_hash'))+'.json'))
+        if (progress.get('approved') or not isinstance(pending,dict)
+                or (packet.get('readiness') or {}).get('status')!='ready'
+                or packet.get('ticker')!='CPRT' or packet.get('packet_hash')!=state.get('packet_hash')
+                or packet.get('evidence_hash')!=state.get('evidence_hash')):
+            return False
+        author,receipt=pending_review_author(root,work,'CPRT',packet,pending)
+        if any(type((receipt.get('usage') or {}).get(k)) is not int for k in ('input_tokens','output_tokens')):
+            return False
+        canonical=compile_contract(packet,author)
+        if digest(canonical)!=pending.get('canonical_hash'):
+            return False
+        payload=challenge_payload(packet,author,canonical)
+        cache=work/'cache/CPRT'/stage_hash(root,'challenger',payload)
+        record=_read(cache/'input_admission.json')
+        return (set(record)=={'status','input_hash','payload_hash','reason','model_calls'}
+                and record.get('status')=='blocked' and record.get('input_hash')==cache.name
+                and record.get('payload_hash')==digest(payload) and record.get('reason')==detail
+                and type(record.get('model_calls')) is int and record['model_calls']==0
+                and not any((cache/name).exists() for name in ('receipt.json','output.json','prompt.txt','author_revision.json')))
+    except (OSError,ValueError,TypeError,KeyError):
+        return False
+
+
 def pending_revision_authority(root, work, ticker, state, *, contract=None, packet=None):
     """Bind a continuation to paid lineage, frozen evidence and an unresolved review."""
     from underwriting_contract import digest
@@ -162,6 +198,7 @@ def pending_revision_authority(root, work, ticker, state, *, contract=None, pack
         if not gaps or any(g.get('code') != 'StageBlocked' or not (
                 g.get('detail') in allowed or str(g.get('detail') or '').startswith(
                     'author_or_challenger_unresolved:') or _unpaid_author_input_repair(
+                        root,work,state,str(g.get('detail') or '')) or _unpaid_review_input_repair(
                         root,work,state,str(g.get('detail') or '')) or _unpaid_acquired_target_routing_repair(
                         root,work,state,str(g.get('detail') or ''))) for g in gaps):
             return None
