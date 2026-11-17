@@ -14,6 +14,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   observe:
+    # RS_COLLECTOR_HOST=lightsail hands this observer to box R
+    # (reverse-split-live/deploy/lightsail/README.md).
+    if: vars.RS_COLLECTOR_HOST != 'lightsail'
     runs-on: ubuntu-latest
     timeout-minutes: 290
     outputs:
