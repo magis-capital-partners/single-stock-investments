@@ -184,6 +184,8 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
     validate_owner_task(root, ticker, stage, payload)
     from underwriting_related_evidence import validate_related_identity
     validate_related_identity(payload.get('packet') or {})
+    from underwriting_completion_authority import native_timeout_retry_payload
+    payload=native_timeout_retry_payload(root,work,ticker,stage,payload,state)
     from underwriting_transport import render
     consumer = STAGES[stage]
     policies = read(root/CALL_POLICY)
@@ -257,7 +259,9 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
         if remaining < 60:
             append_ledger(ledger, {**record, 'timestamp': now(), 'status': 'failed'})
             raise StageBlocked('batch_time_budget')
-        env['UNDERWRITING_TIMEOUT_MS'] = str(int(min(1200, remaining-10)*1000))
+        from underwriting_completion_authority import native_response_timeout_seconds
+        response_timeout=native_response_timeout_seconds(root,ticker,stage,state,completion)
+        env['UNDERWRITING_TIMEOUT_MS'] = str(int(min(response_timeout, remaining-10)*1000))
     error = None
     try:
         if execute:

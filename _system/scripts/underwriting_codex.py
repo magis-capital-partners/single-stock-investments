@@ -190,6 +190,7 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
     receipt = {'schema_version': 'underwriting-call/1', 'provider': 'codex-local', 'stage': stage,
                'model': model, 'reasoning_effort': effort, 'status': 'starting',
                'started_at': datetime.now(timezone.utc).isoformat(), 'tools_disabled': True,
+               'response_timeout_seconds':timeout,
                'input_admission':input_admission}
     write(receipt_path, receipt)
     with tempfile.TemporaryDirectory(prefix='ssi-codex-underwriting-') as temporary:
