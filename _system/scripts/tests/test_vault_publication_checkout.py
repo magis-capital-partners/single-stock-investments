@@ -31,6 +31,9 @@ PUBLICATION_CALLERS = set(LOOPS) | {
     "company-source-backfill.yml",
     # The hub validation job reads the immutable published snapshot objects.
     "python-tests.yml",
+    # Deterministic company builds retain the complete underwriting tree via
+    # extra-paths; they do not run hosted model judgments.
+    "valuation-underwriting.yml",
 }
 
 
