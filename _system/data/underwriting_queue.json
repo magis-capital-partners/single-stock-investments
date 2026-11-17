@@ -8,14 +8,14 @@
       "reviewed": 2
     },
     "blocker_companies": {
-      "issuer_forecast_missing": 135,
       "parent_cashflow_attribution_missing": 40,
+      "issuer_forecast_missing": 135,
       "new_earnings_disclosure_unresolved": 53,
-      "pre_listing_share_basis_unverified": 102,
       "positive_normalized_owner_cash_not_established": 109,
+      "pre_listing_share_basis_unverified": 102,
       "realization_timing_missing": 15,
-      "annual_capex_missing": 72,
       "annual_diluted_share_count_missing": 50,
+      "annual_capex_missing": 72,
       "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
@@ -12217,18 +12217,18 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-17T08:00:46.155892+00:00",
+      "last_attempt": "2026-11-17T11:23:55.513870+00:00",
       "retry_after": "2026-11-18",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "author_or_challenger_unresolved: {\"severity\": \"major\", \"detail\": \"The continue_lending_with_parent_cash alternative sets finance_revenue_removed=0 and funds incremental lending, but retains target_interest_savings and has no explicit replacement of warehouse funding at its December 2027 commitment termination and subsequent amortization deadline. doc_9f5f42c407493229 and doc_d658374dce23688a describe that funding structure; doc_62c275106e3bc0df reports $125m warehouse borrowing and $191.866m net finance receivables. Paying opening debt from parent cash can eliminate the existing borrowing, but the alternative must then explicitly reconcile the existing loan book, collateral "
+          "detail": "local_input_too_large: 1051984 characters exceeds 1048576; complete evidence retained"
         }
       ],
       "unresolved_findings": [
         {
           "severity": "major",
-          "detail": "The continue_lending_with_parent_cash alternative sets finance_revenue_removed=0 and funds incremental lending, but retains target_interest_savings and has no explicit replacement of warehouse funding at its December 2027 commitment termination and subsequent amortization deadline. doc_9f5f42c407493229 and doc_d658374dce23688a describe that funding structure; doc_62c275106e3bc0df reports $125m warehouse borrowing and $191.866m net finance receivables. Paying opening debt from parent cash can eliminate the existing borrowing, but the alternative must then explicitly reconcile the existing loan book, collateral cash, subsequent originations, collections and equity funding without assuming continued access or counting debt repayment as sufficient funding for future lending. Add a financial-equity capital/funding bridge or a reconciled parent-funded runoff/replacement schedule, including unavailable refinancing and its customer consequences."
+          "detail": "Add an unavailable-facility counterpart to intermediate_squeeze_with_timely_credit, preserving its other assumptions. That test produces opening cash of $2,229,743,689 after consideration: $1,907,901,000*0.8+$2,581,901,000*0.97-$1,801,021,081. Paying $350m target debt and $600m recourse leaves $1,279,743,689 against required_cash of $1.3bn, making $20,256,311 of borrowing necessary before operating receipts. Existing no-access tests change the operating buffer or accessible resources; upper_operating_cash_requirement increases cash_access to 0.9. They therefore do not execute loss of credit in the demonstrated borrowing-dependent state. Model an explicit timely response, such as rescheduling elective debt repayment while retaining its obligation and subsequent interest, or execute the resulting funding failure. Do not silently reduce the buffer or use later annual OCF before the deadline. Sources: doc_9b8366946fd8b140, supp_parent_htm_2026, transaction_cash_2f5b52adf635c226cfa106d3 and doc_e85a30a75ddf0406."
         }
       ]
     }
