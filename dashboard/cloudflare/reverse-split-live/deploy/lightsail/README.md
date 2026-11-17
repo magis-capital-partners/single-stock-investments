@@ -4,7 +4,7 @@ Box R is one Lightsail instance that does exactly two things, all day, every day
 
 | Service | What it does | Replaces |
 |---|---|---|
-| `rs-collector` | `collector.mjs --watch`: SEC and press-release feeds, Databento quotes, IBKR borrow file, simulated entries and exits, checkpoints | the `collect` job of `reverse-split-live.yml` (270-minute GitHub sessions) |
+| `rs-collector` | `collector.mjs --watch`: SEC and press-release feeds, Databento quotes, IBKR borrow file, simulated entries and exits, checkpoints | the `collect` job of `reverse-split-live.yml` and the warm successor `prepare-and-observe` in `reverse-split-shadow-warm.yml` (270-minute GitHub sessions) |
 | `rs-market-status` | `market-status-source.mjs`: Nasdaq Trader halts and short-sale restrictions, once a minute in session | the `observe` job of `reverse-split-market-status.yml` |
 
 Everything else stays on GitHub: the deploy job (tests and D1 migrations), financial preparation,

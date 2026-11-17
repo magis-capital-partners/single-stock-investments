@@ -6,6 +6,10 @@ permissions:
   contents: read
 jobs:
   prepare-and-observe:
+    # RS_COLLECTOR_HOST=lightsail hands collection to box R
+    # (reverse-split-live/deploy/lightsail/README.md). Without this, each GitHub
+    # session would keep queueing a warm successor that competes for the lease.
+    if: vars.RS_COLLECTOR_HOST != 'lightsail'
     runs-on: ubuntu-latest
     timeout-minutes: 300
     permissions:
