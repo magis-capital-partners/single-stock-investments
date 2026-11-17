@@ -117,4 +117,12 @@ def test_unit_tests_and_complete_company_assembly_narrow_their_restore():
                         assert options["extra-paths"].splitlines() == ["/valuation-underwriting/"]
                         assert not options.get("catalog-prefixes")
                         assert str(options.get("snapshot-validation-only", "false")).lower() == "false"
-    assert callers == {("python-tests.yml", "unit-tests"), ("valuation-underwriting.yml", "underwrite")}
+                    elif (path.name, name) == ("autonomous-compounders.yml", "refresh"):
+                        condition = "$" + "{{ github.event_name == 'repository_dispatch' && github.event.client_payload.prices_only == true }}"
+                        assert options["publication-only"] == condition
+                        assert options["publication-scope"] == condition[:-3] + " && 'workspace' || 'all' }}"
+                        assert options["extra-paths"].splitlines() == ["/valuation-underwriting/packets/"]
+                        assert not options.get("catalog-prefixes")
+                        assert str(options.get("snapshot-validation-only", "false")).lower() == "false"
+    assert callers == {("python-tests.yml", "unit-tests"), ("valuation-underwriting.yml", "underwrite"),
+                       ("autonomous-compounders.yml", "refresh")}
