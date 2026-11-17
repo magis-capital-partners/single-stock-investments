@@ -293,6 +293,17 @@ def test_strict_validation_reads_trusted_storage_before_replay():
     restore=next(s for s in job['steps'] if s.get('name')=='Restore named immutable packets from the private catalog')
     assert '--prefix valuation-underwriting/packets/' in restore['run']
 
+def test_data_pipeline_vault_jobs_carry_the_existing_storage_secret():
+    # checkout-vault initializes the private catalog; rebuild-data calls it.
+    import yaml
+    root=Path(__file__).resolve().parents[3]
+    jobs=yaml.safe_load((root/'.github/workflows/data-pipeline.yml').read_text())['jobs']
+    vault_actions={'./.github/actions/checkout-vault','./.github/actions/rebuild-data'}
+    users=[name for name,job in jobs.items() if any(s.get('uses') in vault_actions for s in job.get('steps',[]))]
+    assert 'intake-full' in users
+    missing=[name for name in users if (jobs[name].get('env') or {}).get('CLOUDFLARE_API_TOKEN')!='${{ secrets.CLOUDFLARE_API_TOKEN }}']
+    assert missing==[]
+
 def test_research_dispatch_job_carries_the_existing_storage_secret():
     import yaml
     root=Path(__file__).resolve().parents[3]
