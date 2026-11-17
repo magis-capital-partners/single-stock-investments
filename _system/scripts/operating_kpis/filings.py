@@ -59,7 +59,8 @@ def x_rgld(t, f, url):
         p = q_from_text(t[:2500])
         m = re.search(r"stream segment sales were approximately ([\d,]{5,}) gold equivalent ounces", t)
         if p and m: out.append((p, "stream_geos_prelim", n(m.group(1)), "oz"))
-        ms = list(re.finditer(r"Sales volume of ([\d,]{5,}) GEOs\s*\d?\s*(?:\(compared to ([\d,]{5,}))?", t))[:2]
+        # Q3 2026 headline reads "Record sales volume of 109,000 GEOs".
+        ms = list(re.finditer(r"[Ss]ales volume of ([\d,]{5,}) GEOs\s*\d?\s*(?:\(compared to ([\d,]{5,}))?", t))[:2]
         m = min(ms, key=lambda x: n(x.group(1))) if ms else None  # Q4 releases also carry the full-year figure
         if p and m:
             yoy = round(n(m.group(1)) / n(m.group(2)) - 1, 4) if m.group(2) else None
