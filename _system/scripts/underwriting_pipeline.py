@@ -493,6 +493,26 @@ def load_progress(root, work, ticker, packet):
         result['feedback'] = copy.deepcopy(saved['feedback'])
         result['feedback']['required_correction'] = ('Evidence or process changed; reassess the prior criticism against the CURRENT packet. '
                                                      +str(saved['feedback'].get('required_correction') or ''))
+    if (ticker=='CPRT' and saved.get('pending_review') and not saved.get('approved')
+            and (saved['pending_review'].get('author') or {}).get('packet_hash')!=packet['packet_hash']):
+        pending=saved['pending_review'];old_author=pending.get('author') or {}
+        old_packet=read(work/'packets'/(str(old_author.get('packet_hash'))+'.json'))
+        require(old_packet.get('packet_hash')==digest({k:v for k,v in old_packet.items() if k!='packet_hash'}),
+                'Pending paid source packet identity changed')
+        old_author,old_receipt=pending_review_author(root,work,ticker,old_packet,pending)
+        require(all(type((old_receipt.get('usage') or {}).get(k)) is int for k in ('input_tokens','output_tokens')),
+                'Pending paid source revision has incomplete usage')
+        require(digest(compile_contract(old_packet,old_author))==pending.get('canonical_hash'),
+                'Pending paid model changed before source reassessment')
+        old_feedback=copy.deepcopy(saved.get('feedback') or {})
+        feedback=copy.deepcopy(old_feedback)
+        feedback.update(previous_contract=copy.deepcopy(old_author),independent_challenge=None,
+            previous_independent_challenge=copy.deepcopy(old_feedback.get('independent_challenge')),
+            required_correction='Primary source identity changed. Reassess the latest paid contract against the CURRENT packet; explicitly bind the authored revision to current packet/evidence hashes and preserve all prior criticism. '+str(old_feedback.get('required_correction') or ''),
+            source_change_from_pending_review={'previous_packet_hash':old_packet['packet_hash'],
+                'previous_contract_hash':digest(old_author),'previous_canonical_hash':pending['canonical_hash'],
+                'paid_author_input_hash':old_receipt['input_hash'],'current_packet_hash':packet['packet_hash']})
+        result['feedback']=feedback
     authors, reviews = {}, []
     for path in (work/'cache'/ticker).glob('*/receipt.json'):
         receipt, output = read(path), read(path.parent/'output.json')
@@ -537,7 +557,7 @@ def load_progress(root, work, ticker, packet):
                                   'receipts': {'author': author_receipt, 'challenger': challenger_receipt}}
             result['feedback'] = None
     if result.get('feedback'):
-        result['feedback']['prior_findings'] = [f for h in result['history'][:-1] for f in h.get('findings') or []]
+        result['feedback']['prior_findings'] = [f for h in (result['history'] if result['feedback'].get('source_change_from_pending_review') else result['history'][:-1]) for f in h.get('findings') or []]
     return recover_pending_review(root, work, ticker, packet, result)
 
 
