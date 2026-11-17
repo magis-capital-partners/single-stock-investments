@@ -575,6 +575,10 @@ def _complete_layouts(payload):
             literal_keys=compact_literal_keys(front)
             if literal_keys:
                 yield LITERAL_KEY_INSTRUCTIONS, literal_keys
+                from underwriting_derived_key_transport import compact as compact_derived_keys, INSTRUCTIONS as DERIVED_KEY_INSTRUCTIONS
+                derived_keys=compact_derived_keys(literal_keys)
+                if derived_keys:
+                    yield DERIVED_KEY_INSTRUCTIONS, derived_keys
 
 
 def pack(payload):
@@ -583,6 +587,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/13':
+        from underwriting_derived_key_transport import unpack as unpack_derived_keys
+        return unpack_derived_keys(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/12':
         from underwriting_literal_key_transport import unpack as unpack_literal_keys
         return unpack_literal_keys(envelope)
@@ -764,9 +771,15 @@ def render(payload):
     return literal_prefix + best
 
 
-def render_for_budget(payload, maximum_characters):
+def render_for_budget(payload, maximum_characters, *, native_prefix=None):
     """Use a complete verified eligible encoding as soon as it fits; retain normal fallback."""
     require(type(maximum_characters) is int and maximum_characters>0,'Invalid complete input budget')
+    require(native_prefix is None or isinstance(native_prefix,str),'Invalid native input prefix')
+    def fits(candidate):
+        if native_prefix is None:
+            return len(candidate)<=maximum_characters
+        from underwriting_codex import input_characters
+        return input_characters(native_prefix+candidate)<=maximum_characters
     from underwriting_token_transport import eligible, pack as pack_tokens
     if eligible(payload):
         tokens=pack_tokens(payload)
@@ -776,26 +789,32 @@ def render_for_budget(payload, maximum_characters):
             literal_prefix=_literal_source_quote_prefix(payload)+_literal_review_source_quote_prefix(payload)
             strings=compact_strings(compact_markers(compact_tokens(tokens)))
             candidate=literal_prefix+STRING_INSTRUCTIONS+encoded(strings)
-            if len(candidate)<=maximum_characters:
+            if fits(candidate):
                 return candidate
             from underwriting_dictionary_transport import compact as compact_rows, INSTRUCTIONS as ROW_INSTRUCTIONS
             rows=compact_rows(strings)
             candidate=literal_prefix+ROW_INSTRUCTIONS+encoded(rows)
-            if len(candidate)<=maximum_characters:
+            if fits(candidate):
                 return candidate
             from underwriting_array_transport import compact as compact_arrays, INSTRUCTIONS as ARRAY_INSTRUCTIONS
             candidate=literal_prefix+ARRAY_INSTRUCTIONS+encoded(compact_arrays(rows))
-            if len(candidate)<=maximum_characters:
+            if fits(candidate):
                 return candidate
             from underwriting_front_array_transport import compact as compact_front_arrays, INSTRUCTIONS as FRONT_INSTRUCTIONS
             front=compact_front_arrays(rows)
             candidate=literal_prefix+FRONT_INSTRUCTIONS+encoded(front)
-            if len(candidate)<=maximum_characters:
+            if fits(candidate):
                 return candidate
             from underwriting_literal_key_transport import compact as compact_literal_keys, INSTRUCTIONS as LITERAL_KEY_INSTRUCTIONS
             literal_keys=compact_literal_keys(front)
             if literal_keys:
                 candidate=literal_prefix+LITERAL_KEY_INSTRUCTIONS+encoded(literal_keys)
-                if len(candidate)<=maximum_characters:
+                if fits(candidate):
                     return candidate
+                from underwriting_derived_key_transport import compact as compact_derived_keys, INSTRUCTIONS as DERIVED_KEY_INSTRUCTIONS
+                derived_keys=compact_derived_keys(literal_keys)
+                if derived_keys:
+                    candidate=literal_prefix+DERIVED_KEY_INSTRUCTIONS+encoded(derived_keys)
+                    if fits(candidate):
+                        return candidate
     return render(payload)
