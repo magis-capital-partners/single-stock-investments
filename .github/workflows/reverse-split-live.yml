@@ -49,7 +49,9 @@ jobs:
           RS_RELEASE_COMMIT=$(git rev-parse HEAD)
           node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js deploy --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc --message "reverse-split research release $RS_RELEASE_COMMIT"
   collect:
-    if: github.event_name == 'schedule' || (github.event_name == 'repository_dispatch' && github.event.action != 'reverse-split-release')
+    # RS_COLLECTOR_HOST=lightsail hands collection to box R
+    # (reverse-split-live/deploy/lightsail/README.md); deploys still run here.
+    if: vars.RS_COLLECTOR_HOST != 'lightsail' && (github.event_name == 'schedule' || (github.event_name == 'repository_dispatch' && github.event.action != 'reverse-split-release'))
     permissions:
       contents: write
     runs-on: ubuntu-latest

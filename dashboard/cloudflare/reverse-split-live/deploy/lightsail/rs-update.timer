@@ -1,0 +1,12 @@
+# Box R: take new collector code once a night, after the US close.
+# The time zone is part of the calendar spec, so DST never moves it.
+[Unit]
+Description=Nightly code update for the box R reverse-split services
+
+[Timer]
+OnCalendar=*-*-* 20:30:00 America/New_York
+Persistent=false
+RandomizedDelaySec=0
+
+[Install]
+WantedBy=timers.target

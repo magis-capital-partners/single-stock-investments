@@ -1,0 +1,10 @@
+[Unit]
+Description=Update box R to a tested origin/main and restart its services
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Runs as root: it pulls as `research` and restarts the units.
+ExecStart=/srv/rs/repo/dashboard/cloudflare/reverse-split-live/deploy/lightsail/update.sh
+TimeoutStartSec=1200

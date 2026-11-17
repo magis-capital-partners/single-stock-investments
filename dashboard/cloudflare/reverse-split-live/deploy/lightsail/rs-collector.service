@@ -1,0 +1,53 @@
+# Box R: reverse-split research collector (Lightsail, Ubuntu 24.04, 8 GB).
+# Installed to /etc/systemd/system by bootstrap.sh and update.sh.
+#
+# Research only: no broker, order, Gateway, ThetaData or NY4 access. The only
+# write authority is the collector lease in the research D1 database, which
+# also fences GitHub and any other machine.
+#
+# Memory: the 2026-11-16 telemetry showed 3.9 GiB in use and a 5.6 GiB peak
+# (Node + the Databento Python child + the in-process SQLite checkpoint). The
+# limits below are a starting point for the load test in README.md, not a
+# measured fit. Re-set them from `soak-report.sh` before calling the box done.
+[Unit]
+Description=Reverse-split research collector (box R)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=research
+Group=research
+WorkingDirectory=/srv/rs/repo
+EnvironmentFile=/etc/reverse-split-live.env
+EnvironmentFile=/etc/reverse-split-live.runtime.env
+ExecStart=/srv/rs/repo/dashboard/cloudflare/reverse-split-live/deploy/lightsail/run.sh collector
+
+# A lease-standby timeout or a lost lease exits the process; start again.
+Restart=always
+RestartSec=30
+
+# SIGTERM goes to the collector only. It stops ticking, saves its checkpoint,
+# closes the Databento child and releases the lease. KillMode=mixed lets it do
+# that before anything else in the group is killed.
+KillSignal=SIGTERM
+KillMode=mixed
+TimeoutStopSec=240
+
+MemoryHigh=6G
+MemoryMax=6800M
+Nice=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
