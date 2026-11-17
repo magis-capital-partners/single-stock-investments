@@ -43,7 +43,10 @@ jobs:
   refresh:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Restore, verified private preservation and the main push exceeded the old
+    # 45-minute boundary in completed price publications. Native run/call limits
+    # are enforced separately and are unchanged.
+    timeout-minutes: 60
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
