@@ -8,22 +8,22 @@
       "reviewed": 2
     },
     "blocker_companies": {
-      "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
-      "pre_listing_share_basis_unverified": 102,
+      "parent_cashflow_attribution_missing": 40,
       "new_earnings_disclosure_unresolved": 53,
+      "pre_listing_share_basis_unverified": 102,
       "positive_normalized_owner_cash_not_established": 109,
       "realization_timing_missing": 15,
-      "annual_operating_cash_flow_missing": 44,
-      "annual_diluted_share_count_missing": 50,
       "annual_capex_missing": 72,
+      "annual_diluted_share_count_missing": 50,
+      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
       "newer_balance_sheet_inputs_available": 214,
       "financial_inputs_expired_or_undated": 22,
-      "corporate_action_history_unverified": 23,
       "listing_calendar_or_completed_close_unverified": 22,
+      "corporate_action_history_unverified": 23,
       "method_specific_forecast_missing": 32,
       "annual_financial_inputs_expired": 10,
       "quote_issuer_mismatch": 2,
@@ -12217,15 +12217,20 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-17T03:14:50.799305+00:00",
-      "retry_after": "2026-11-17",
+      "last_attempt": "2026-11-17T08:00:46.155892+00:00",
+      "retry_after": "2026-11-18",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "author_or_challenger_unresolved: Structural alternatives failed deterministic validation: [{\"id\": \"slower_new_capital_maturation\", \"errors\": [\"business.high: alternative terminal economics are not funded\"]}]"
+          "detail": "author_or_challenger_unresolved: {\"severity\": \"major\", \"detail\": \"The continue_lending_with_parent_cash alternative sets finance_revenue_removed=0 and funds incremental lending, but retains target_interest_savings and has no explicit replacement of warehouse funding at its December 2027 commitment termination and subsequent amortization deadline. doc_9f5f42c407493229 and doc_d658374dce23688a describe that funding structure; doc_62c275106e3bc0df reports $125m warehouse borrowing and $191.866m net finance receivables. Paying opening debt from parent cash can eliminate the existing borrowing, but the alternative must then explicitly reconcile the existing loan book, collateral "
         }
       ],
-      "unresolved_findings": []
+      "unresolved_findings": [
+        {
+          "severity": "major",
+          "detail": "The continue_lending_with_parent_cash alternative sets finance_revenue_removed=0 and funds incremental lending, but retains target_interest_savings and has no explicit replacement of warehouse funding at its December 2027 commitment termination and subsequent amortization deadline. doc_9f5f42c407493229 and doc_d658374dce23688a describe that funding structure; doc_62c275106e3bc0df reports $125m warehouse borrowing and $191.866m net finance receivables. Paying opening debt from parent cash can eliminate the existing borrowing, but the alternative must then explicitly reconcile the existing loan book, collateral cash, subsequent originations, collections and equity funding without assuming continued access or counting debt repayment as sufficient funding for future lending. Add a financial-equity capital/funding bridge or a reconciled parent-funded runoff/replacement schedule, including unavailable refinancing and its customer consequences."
+        }
+      ]
     }
   ]
 }
