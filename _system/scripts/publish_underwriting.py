@@ -84,7 +84,8 @@ def publish(root=ROOT, *, batch_path=None, wait=False):
     for ticker in completed:
         validate_saved(root, ticker, vault)
     base = git(root, 'rev-parse', 'HEAD')
-    git(root, 'fetch', '-q', 'origin', 'main')
+    # Publishing needs only parent-repository objects, without unrelated submodule access.
+    git(root, 'fetch', '--no-recurse-submodules', '-q', 'origin', 'main')
     latest = git(root, 'rev-parse', 'origin/main')
     # A model changed by another researcher is re-queued, never overwritten.
     for ticker in completed:
