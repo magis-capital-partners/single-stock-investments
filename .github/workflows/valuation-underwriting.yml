@@ -66,6 +66,12 @@ jobs:
         uses: ./.github/actions/checkout-vault
         with:
           include-source-archive: 'false'
+          # Keep complete underwriting controls and evidence, without unrelated
+          # legacy research or snapshots outside this complete sparse workspace.
+          publication-only: 'true'
+          publication-scope: workspace
+          extra-paths: |
+            /valuation-underwriting/
       - name: Verify underwriting gates before calling a model
         run: |
           python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py _system/scripts/tests/test_underwriting_economics.py
