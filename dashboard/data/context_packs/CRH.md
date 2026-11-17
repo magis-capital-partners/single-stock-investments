@@ -106,11 +106,11 @@ Documents in folder: **51** (all listed below; Tier 1–3 extracted or keyword-s
 | inventory | other | 2025-03-14 | `investor-documents/sec-edgar/PRE 14A_20250314_rpt20241231_acc0001628280_25_012727.htm` | 0
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CRH/research/deep_dive_2026-11-06.md (sha256 sha256:89ef4708efb5a179...)
+- deep_dive: CRH/research/deep_dive_2026-11-06.md (sha256 sha256:51940b89d420431b...)
 - filing_digest: CRH/research/evidence/filing_digest.md (sha256 sha256:e16c69d7b16ae434...)
 - adversarial: CRH/research/adversarial_2026-11-06.md (sha256 sha256:2ed2cb88db46d8cf...)
-- valuation: CRH/research/valuation.json (sha256 sha256:3cb87cd0354ac893...)
-- thesis_card: CRH/research/thesis_card.json (sha256 sha256:693ace530090ec80...)
+- valuation: CRH/research/valuation.json (sha256 sha256:6928291d52f72e6e...)
+- thesis_card: CRH/research/thesis_card.json (sha256 sha256:b83bcd096a541ff4...)
 - cross_check: CRH/research/cross_check_third_party_2026-11-06.md (sha256 sha256:414e5cb738087f06...)
 
 ## Excluded from this pack
