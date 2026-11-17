@@ -40,13 +40,12 @@ fit the measured workload (3.9 GiB in use, 5.6 GiB peak on 2026-11-16).
 Only the owner can do these.
 
 1. **Instance.** Lightsail, region us-east-1, Linux, **Ubuntu 24.04 LTS**, the 8 GB / 2 vCPU /
-   160 GB plan ($44/month). The production box is `magis-collector-1`. The 8 GB plan is a
+   160 GB plan ($44/month). The production box is `magis-collector-2` (us-east-1a, Ubuntu
+   24.04.5, Python 3.12.3, created 2026-11-17 to replace a 22.04 box). The 8 GB plan is a
    load-test candidate, not a proven fit (section 4). `bootstrap.sh` refuses other Ubuntu
-   releases: 24.04 matches the GitHub runner the collector is tested on (Python 3.12). A box
-   created on 22.04 should be replaced while it is still empty: create the 24.04 instance, move
-   the static IP to it, delete the old one.
-2. **Static IP.** Attached to the instance (`magis-collector-ip`). Keep it attached: Lightsail
-   charges for a static IP that is not attached to a running instance.
+   releases: 24.04 matches the GitHub runner the collector is tested on (Python 3.12).
+2. **Static IP.** `magis-collector-ip`, 100.51.253.151, attached to the instance. Keep it
+   attached: Lightsail charges for a static IP that is not attached to a running instance.
 3. **Firewall** (instance > Networking). Only SSH (22). It is open to all addresses because the
    owner travels; `bootstrap.sh` compensates with key-only SSH, no root login, fail2ban and
    unattended security upgrades. Nothing else inbound: both services only make outgoing calls.
