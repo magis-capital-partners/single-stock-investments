@@ -99,8 +99,8 @@ def test_catalog_prefixes_become_read_only_prefix_arguments(tmp_path):
                         "--sparse-scope", *expected]
 
 
-def test_only_unit_tests_narrow_their_restore():
-    """Builders and publishers keep the full object set and a writable catalog view."""
+def test_unit_tests_and_complete_company_assembly_narrow_their_restore():
+    """Other producers retain full defaults; company assembly retains its complete audit tree."""
     callers = set()
     for path in sorted(list(WORKFLOWS.glob("*.yml")) + list((ROOT / ".github/actions").glob("*/action.yml"))):
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -111,4 +111,10 @@ def test_only_unit_tests_narrow_their_restore():
                 if step.get("uses") == "./.github/actions/checkout-vault" and (
                         options.get("publication-scope", "all") != "all" or options.get("catalog-prefixes")):
                     callers.add((path.name, name))
-    assert callers == {("python-tests.yml", "unit-tests")}
+                    if (path.name, name) == ("valuation-underwriting.yml", "underwrite"):
+                        assert options["publication-scope"] == "workspace"
+                        assert str(options["publication-only"]).lower() == "true"
+                        assert options["extra-paths"].splitlines() == ["/valuation-underwriting/"]
+                        assert not options.get("catalog-prefixes")
+                        assert str(options.get("snapshot-validation-only", "false")).lower() == "false"
+    assert callers == {("python-tests.yml", "unit-tests"), ("valuation-underwriting.yml", "underwrite")}
