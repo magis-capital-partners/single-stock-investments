@@ -568,6 +568,8 @@ def _complete_layouts(payload):
             yield ROW_INSTRUCTIONS, rows
             from underwriting_array_transport import compact as compact_arrays, INSTRUCTIONS as ARRAY_INSTRUCTIONS
             yield ARRAY_INSTRUCTIONS, compact_arrays(rows)
+            from underwriting_front_array_transport import compact as compact_front_arrays, INSTRUCTIONS as FRONT_INSTRUCTIONS
+            yield FRONT_INSTRUCTIONS, compact_front_arrays(rows)
 
 
 def pack(payload):
@@ -576,6 +578,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/11':
+        from underwriting_front_array_transport import unpack as unpack_front_arrays
+        return unpack_front_arrays(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/10':
         from underwriting_array_transport import unpack as unpack_arrays
         return unpack_arrays(envelope)
@@ -772,6 +777,10 @@ def render_for_budget(payload, maximum_characters):
                 return candidate
             from underwriting_array_transport import compact as compact_arrays, INSTRUCTIONS as ARRAY_INSTRUCTIONS
             candidate=literal_prefix+ARRAY_INSTRUCTIONS+encoded(compact_arrays(rows))
+            if len(candidate)<=maximum_characters:
+                return candidate
+            from underwriting_front_array_transport import compact as compact_front_arrays, INSTRUCTIONS as FRONT_INSTRUCTIONS
+            candidate=literal_prefix+FRONT_INSTRUCTIONS+encoded(compact_front_arrays(rows))
             if len(candidate)<=maximum_characters:
                 return candidate
     return render(payload)
