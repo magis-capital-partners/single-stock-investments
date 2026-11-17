@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from build_kpi_trends import apply_display_cap  # noqa: E402
 from operating_kpis.cboe import parse_cboe_xlsx  # noqa: E402
 from operating_kpis.cme import parse_cme_release  # noqa: E402
+from operating_kpis.filings import parse_filing  # noqa: E402
 from operating_kpis.ice import parse_ice_release  # noqa: E402
 from operating_kpis.miax import parse_miax_text  # noqa: E402
 from operating_kpis.model import LayoutError, attach_yoy, make_point  # noqa: E402
@@ -21,6 +22,7 @@ from operating_kpis.trends import select_shard_series  # noqa: E402
 from scaffold_industry_kpi_ledgers import merge_template_kpis  # noqa: E402
 
 FIXTURE = ROOT / "_system" / "scripts" / "tests" / "fixtures" / "operating_kpis" / "miax_2026_layout.txt"
+CBOE_OCT_2026 = FIXTURE.parent / "cboe_october_2026_sheet.tsv"
 FETCHED = "2026-10-20T00:00:00Z"
 
 
@@ -192,6 +194,54 @@ class CboeWorkbookTests(unittest.TestCase):
         self.assertEqual(values["vix_futures_adv"]["2026-09"], 200)
         self.assertNotIn(9_000, values["options_multilist_adv"].values())
         self.assertNotIn(90.0, values["us_equities_share"].values())
+
+    def test_october_2026_layout_reads_labels_from_the_period_column(self) -> None:
+        # Real "2026" sheet: Cognos lookup keys in columns A-L, the table from column M.
+        rows = [line.rstrip("\n").split("\t") for line in CBOE_OCT_2026.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(rows[3][12], "Period")
+        points = parse_cboe_xlsx(_xlsx(rows), source_url="https://cdn.cboe.com/x.xlsx", doc="x.xlsx", fetched_at=FETCHED)
+        values = _by_kpi(points)
+        self.assertEqual(values["options_multilist_adv"]["2026-10"], 14_252_668)
+        self.assertEqual(values["options_multilist_adv"]["2026-09"], 15_382_323)
+        self.assertEqual(values["options_index_adv"]["2026-10"], 6_889_067)
+        self.assertEqual(values["options_multilist_share"]["2026-10"], 21.391252)
+        self.assertEqual(values["options_multilist_rpc"]["2026-09"], 0.052279)
+        self.assertNotIn("2026-10", values["options_multilist_rpc"])
+        self.assertEqual(values["futures_adv"]["2026-10"], 237_451)
+        self.assertEqual(values["us_equities_adv"]["2026-10"], 1_527_648_748)
+        self.assertEqual(values["spx_options_adv"]["2026-10"], 5_490_637)
+        self.assertEqual(values["vix_futures_adv"]["2026-10"], 231_109)
+        self.assertNotIn("2026-11", values["options_multilist_adv"])
+        self.assertEqual({p["period"] for p in points if p["kpi"] == "options_multilist_adv"},
+                         {f"2026-{m:02d}" for m in range(1, 11)})
+
+    def test_month_header_without_a_period_label_column_is_a_layout_error(self) -> None:
+        rows = [line.rstrip("\n").split("\t") for line in CBOE_OCT_2026.read_text(encoding="utf-8").splitlines()]
+        rows[3][12] = ""
+        with self.assertRaises(LayoutError):
+            parse_cboe_xlsx(_xlsx(rows), source_url="u", doc="d", fetched_at=FETCHED)
+
+
+class RoyalGoldExhibitTests(unittest.TestCase):
+    def _parse(self, name: str) -> list[dict]:
+        text = (FIXTURE.parent / name).read_text(encoding="utf-8")
+        return parse_filing("RGLD", text, filing={"accessionNumber": "a", "filingDate": "2026-11-04"},
+                            source_url="u", fetched_at=FETCHED)
+
+    def test_q3_2026_record_sales_volume_headline(self) -> None:
+        points = self._parse("rgld_q3_2026_exhibit_head.txt")
+        self.assertEqual([(p["period"], p["kpi"], p["value"], p["yoy"]) for p in points],
+                         [("2026Q3", "total_geos_sold", 109_000.0, 0.4952)])
+
+    def test_q2_2026_sales_volume_headline_is_unchanged(self) -> None:
+        points = self._parse("rgld_q2_2026_exhibit_head.txt")
+        self.assertEqual([(p["period"], p["kpi"], p["value"], p["yoy"]) for p in points],
+                         [("2026Q2", "total_geos_sold", 100_000.0, 0.5649)])
+
+    def test_reworded_headline_still_produces_no_points(self) -> None:
+        text = (FIXTURE.parent / "rgld_q3_2026_exhibit_head.txt").read_text(encoding="utf-8")
+        text = text.replace("Record sales volume of", "Record volume of")
+        self.assertEqual(parse_filing("RGLD", text, filing={}, source_url="u", fetched_at=FETCHED), [])
 
 
 class OccCsvTests(unittest.TestCase):

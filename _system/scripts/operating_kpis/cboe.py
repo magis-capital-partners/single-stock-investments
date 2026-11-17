@@ -113,12 +113,17 @@ def parse_cboe_xlsx(
             break
     if header_index is None:
         raise LayoutError(f"Cboe workbook {doc} has no Jan-YY header row")
+    # Labels sit in the "Period" column just left of the first month. From
+    # October 2026 that is column M; columns A-L hold Cognos lookup keys.
+    label_col = columns[0][0] - 1
+    if label_col < 0 or str(rows[header_index][label_col]).strip() != "Period":
+        raise LayoutError(f"Cboe workbook {doc} has no Period label column before its month header")
 
     section = ""
     points: list[dict] = []
     seen: set[str] = set()
     for row in rows[header_index + 1 :]:
-        label = str(row[0] or "").strip()
+        label = str(row[label_col] if label_col < len(row) else "").strip()
         if not label:
             continue
         section = _section_for(label, section)
