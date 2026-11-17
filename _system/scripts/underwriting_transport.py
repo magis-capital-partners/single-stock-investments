@@ -569,7 +569,12 @@ def _complete_layouts(payload):
             from underwriting_array_transport import compact as compact_arrays, INSTRUCTIONS as ARRAY_INSTRUCTIONS
             yield ARRAY_INSTRUCTIONS, compact_arrays(rows)
             from underwriting_front_array_transport import compact as compact_front_arrays, INSTRUCTIONS as FRONT_INSTRUCTIONS
-            yield FRONT_INSTRUCTIONS, compact_front_arrays(rows)
+            front=compact_front_arrays(rows)
+            yield FRONT_INSTRUCTIONS, front
+            from underwriting_literal_key_transport import compact as compact_literal_keys, INSTRUCTIONS as LITERAL_KEY_INSTRUCTIONS
+            literal_keys=compact_literal_keys(front)
+            if literal_keys:
+                yield LITERAL_KEY_INSTRUCTIONS, literal_keys
 
 
 def pack(payload):
@@ -578,6 +583,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/12':
+        from underwriting_literal_key_transport import unpack as unpack_literal_keys
+        return unpack_literal_keys(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/11':
         from underwriting_front_array_transport import unpack as unpack_front_arrays
         return unpack_front_arrays(envelope)
@@ -780,7 +788,14 @@ def render_for_budget(payload, maximum_characters):
             if len(candidate)<=maximum_characters:
                 return candidate
             from underwriting_front_array_transport import compact as compact_front_arrays, INSTRUCTIONS as FRONT_INSTRUCTIONS
-            candidate=literal_prefix+FRONT_INSTRUCTIONS+encoded(compact_front_arrays(rows))
+            front=compact_front_arrays(rows)
+            candidate=literal_prefix+FRONT_INSTRUCTIONS+encoded(front)
             if len(candidate)<=maximum_characters:
                 return candidate
+            from underwriting_literal_key_transport import compact as compact_literal_keys, INSTRUCTIONS as LITERAL_KEY_INSTRUCTIONS
+            literal_keys=compact_literal_keys(front)
+            if literal_keys:
+                candidate=literal_prefix+LITERAL_KEY_INSTRUCTIONS+encoded(literal_keys)
+                if len(candidate)<=maximum_characters:
+                    return candidate
     return render(payload)
