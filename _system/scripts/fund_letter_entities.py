@@ -292,6 +292,10 @@ def theme_tickers() -> dict[str, frozenset[str]]:
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8")) if REGISTRY_PATH.is_file() else {}
     quality = {str(t).upper() for t in compounders.get("tickers") or []}
     acquirers = {str(t).upper() for t, row in (compounders.get("issuers") or {}).items() if (row or {}).get("watchlist_group") == "acquirers"}
+    serial_path = COMPOUNDERS_PATH.with_name('serial_acquirers.json')
+    if serial_path.is_file():
+        serial = json.loads(serial_path.read_text(encoding='utf-8'))
+        acquirers.update(row['ticker'].upper() for row in serial.get('companies') or [])
     for bucket in ("holdings", "watchlist"):
         for ticker, row in (registry.get(bucket) or {}).items():
             archetype = ((row or {}).get("classification") or {}).get("archetype") if isinstance((row or {}).get("classification"), dict) else (row or {}).get("archetype")

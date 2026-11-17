@@ -15,6 +15,9 @@ on:
       - '.github/workflows/company-source-backfill.yml'
       - '_system/scripts/commodity_configs/**'
       - '_system/scripts/build_compounder_roster.py'
+      - '_system/scripts/sync_compounder_universes.py'
+      - '_system/scripts/tests/test_compounder*'
+      - '_system/reference/serial_acquirers.json'
       - '_system/scripts/buy_zones.py'
       - '_system/reference/core_compounders.json'
       - '_system/scripts/tests/test_commodity_models.py'
@@ -37,6 +40,10 @@ on:
       - '_system/scripts/commodity_configs/**'
       - '_system/reference/core_compounders.json'
       - 'dashboard/compounders.js'
+      - '_system/scripts/build_compounder_roster.py'
+      - '_system/scripts/sync_compounder_universes.py'
+      - '_system/scripts/tests/test_compounder*'
+      - '_system/reference/serial_acquirers.json'
       - 'dashboard/company-models.js'
       - 'dashboard/commodity-model-viz.js'
       - '.github/workflows/research-desk-tests.yml'
@@ -52,6 +59,7 @@ jobs:
           sparse-checkout: |
             /_system/scripts/
             /_system/reference/core_compounders.json
+            /_system/reference/serial_acquirers.json
             /_system/reference/market-data/commodities/
             /_system/portfolio/registry.json
             /dashboard/
@@ -66,6 +74,8 @@ jobs:
       - name: Balance identities, source guards and owner roster
         run: python -m pytest -q _system/scripts/tests/test_commodity_models.py _system/scripts/tests/test_commodity_inputs.py _system/scripts/tests/test_commodity_free_sources.py _system/scripts/tests/test_commodity_resolution.py _system/scripts/tests/test_source_backfill.py _system/scripts/tests/test_company_filings.py
       - name: Company scope, valuation expiry and UI contracts
-        run: node --test _system/scripts/tests/test_research_desk_ui.cjs _system/scripts/tests/test_buyback_radar_ui.cjs _system/scripts/tests/test_commodity_resolution_ui.cjs
+        run: node --test _system/scripts/tests/test_research_desk_ui.cjs _system/scripts/tests/test_compounder_filters.cjs _system/scripts/tests/test_buyback_radar_ui.cjs _system/scripts/tests/test_commodity_resolution_ui.cjs
+      - name: Compounder coverage and listing identities
+        run: python -m pytest -q _system/scripts/tests/test_compounder_universes.py
       - name: Validate published context models
         run: python _system/scripts/validate_commodity_models.py
