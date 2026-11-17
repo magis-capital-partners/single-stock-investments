@@ -73,7 +73,7 @@ def input_fingerprint(root, ticker):
 def processing_version(root):
     paths = [CALL_POLICY, POLICY, Path('_system/prompts/valuation_underwriting.md')]
     paths += [Path('_system/scripts')/name for name in ('underwriting_pipeline.py', 'underwriting_contract.py',
-                                                      'underwriting_evidence.py', 'underwriting_primary_references.py', 'underwriting_foreign_financials.py', 'underwriting_related_evidence.py', 'underwriting_filing_facts.py', 'underwriting_source_profiles.py','underwriting_primary_packages.py','underwriting_token_transport.py', 'underwriting_economics.py', 'underwriting_revisions.py', 'underwriting_transport.py', 'underwriting_compact_transport.py', 'underwriting_marker_transport.py', 'underwriting_dictionary_transport.py', 'underwriting_array_transport.py', 'underwriting_front_array_transport.py', 'underwriting_literal_key_transport.py', 'underwriting_completion_authority.py', 'llm_call_gate.py', 'underwriting_updates.py', 'underwriting_codex.py',
+                                                      'underwriting_evidence.py', 'underwriting_primary_references.py', 'underwriting_foreign_financials.py', 'underwriting_related_evidence.py', 'underwriting_filing_facts.py', 'underwriting_source_profiles.py','underwriting_primary_packages.py','underwriting_token_transport.py', 'underwriting_economics.py', 'underwriting_revisions.py', 'underwriting_transport.py', 'underwriting_compact_transport.py', 'underwriting_marker_transport.py', 'underwriting_dictionary_transport.py', 'underwriting_array_transport.py', 'underwriting_front_array_transport.py', 'underwriting_literal_key_transport.py', 'underwriting_derived_key_transport.py', 'underwriting_completion_authority.py', 'llm_call_gate.py', 'underwriting_updates.py', 'underwriting_codex.py',
                                                       'valuation_market_sync.py', 'valuation_earnings.py', 'autonomous_compounders.py',
                                                       'refresh_shared_forecasts.py', 'private_dashboard_assets.py')]
     return digest({str(p): (root/p).read_text(encoding='utf-8') if (root/p).is_file() else None for p in paths})
@@ -204,7 +204,7 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
     if ticker == 'CPRT':
         from underwriting_transport import render_for_budget
         from underwriting_codex import MAX_INPUT_CHARACTERS
-        prompt = prefix + render_for_budget(payload, MAX_INPUT_CHARACTERS-len(prefix))
+        prompt = prefix + render_for_budget(payload, MAX_INPUT_CHARACTERS, native_prefix=prefix)
     else:
         prompt = prefix + render(payload)
     from underwriting_codex import validate_input
