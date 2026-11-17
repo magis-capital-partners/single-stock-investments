@@ -20,6 +20,8 @@ def running(env):
 
 
 def execute_probe(monkeypatch,author):
+    # This stub simulates the owner host; the production CI guard stays intact.
+    monkeypatch.delenv('GITHUB_ACTIONS',raising=False)
     seen=[]
     def execute(**kw):
         seen.append(kw)
@@ -213,3 +215,12 @@ def test_longer_reply_wait_never_bypasses_authority_or_remaining_run_time(env,mo
     packet={'ticker':'CPRT','packet_hash':author['packet_hash'],'evidence_hash':author['evidence_hash']}
     p.call_stage(root,work,'CPRT','author',{'packet':packet},state)
     assert seen[0]['timeout']==1200 if mutation!='short_deadline' else 0<seen[0]['timeout']<300
+
+
+def test_github_cannot_invoke_signed_in_native_model_even_for_warm_cprt(env,monkeypatch):
+    root,work,state,author,_=running(env);seen=execute_probe(monkeypatch,author)
+    monkeypatch.setenv('GITHUB_ACTIONS','true')
+    packet={'ticker':'CPRT','packet_hash':author['packet_hash'],'evidence_hash':author['evidence_hash']}
+    with pytest.raises(ValueError,match='only on the owner computer'):
+        p.call_stage(root,work,'CPRT','author',{'packet':packet},state)
+    assert not seen
