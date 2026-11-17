@@ -86,8 +86,6 @@ P3_LANE_HEALERS = {
     "data-pipeline-separation-discover": {"event_type": "heal-separations"},
     "data-pipeline-buyback-radar": {"event_type": "heal-buyback-radar"},
     "data-pipeline-reverse-splits": {"event_type": "heal-reverse-splits"},
-    "podcasts": {"workflow": "podcast-refresh.yml",
-                 "fields": {"backfill": "false", "whisper_batch": "0"}},
     "ls-algo": {"event_type": "sync-ls-algo-universe"},
     "valuation": {"event_type": "refresh-power-zones"},
     "deploy": {"workflow": "dashboard-pages.yml",
@@ -114,7 +112,10 @@ P6_FEED_LANES = {
     "short_alpha": "data-pipeline-intake-full",
     "special_situations": "data-pipeline-intake-full",
     "market_risk_components_committed": "market-risk",
-    "podcast_catalog": "podcasts",
+    # Published by the Mac media lane, which no CI lane can watch. Intake has
+    # no healer, so a stale catalog alerts without dispatching a CI rebuild
+    # that would overwrite the Mac's reader summaries.
+    "podcast_catalog": "data-pipeline-intake-full",
     # Rebuilt by forced-flow-daily and by the technicals job; only the latter
     # has an on-demand trigger (heal-technicals).
     "capitulation_daily": "data-pipeline-technicals",

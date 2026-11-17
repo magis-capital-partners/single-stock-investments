@@ -39,6 +39,8 @@ make podcasts-backfill
 
 Pipeline: discover `--all-watchlist --paginate-capped-feeds` → fetch (published / backlog) → whisper-batch → officer directory → **build insights** → summarize (meta; in CI this writes Tier B/C fallbacks and marks transcript episodes `pending_model`, since no local model runs there) → **build insights again** (pull `reader_summary` + detail shards) → `publish_podcast_dashboard.py` → summary-coverage check on the published shards.
 
+Who publishes: the Mac media lane discovers episodes daily and publishes the catalog after each reader-summary phase. `podcast-refresh.yml` runs this pipeline in CI on manual dispatch only; it has no schedule, because the GitHub vault it reads holds none of the Mac's model summaries.
+
 Capped feeds (e.g. Capital Allocators at 1000): set `PODCASTINDEX_API_KEY` + `PODCASTINDEX_API_SECRET` (or `PODCAST_INDEX_*`).
 
 ## Source of truth (no payload clones)

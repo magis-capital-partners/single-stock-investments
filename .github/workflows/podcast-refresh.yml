@@ -9,24 +9,15 @@ name: Podcast Refresh
 # not go stale. Both halves are fixed together; a cron with no staleness check
 # fails silently the first time the job errors, and a staleness check with no
 # cron just reports the same violation forever.
+#
+# Manual only since 2026-11-16. The Mac media lane (media_lane_supervisor.py)
+# now discovers episodes daily, writes model reader summaries and publishes
+# the catalog. This job rebuilds from the GitHub vault, which refuses pushes on
+# its size quota and so holds none of those summaries: a scheduled run put
+# placeholder summaries back on the dashboard until the Mac's next publish.
+# The P6 podcast_catalog feed still alarms if the published catalog goes stale.
 
 on:
-  # Weekly, Monday 21:00 UTC. The upstream shows publish on their own
-  # schedules through the week and the fetch is rate-limited against iTunes and
-  # the Podcast Index, so a daily run would spend most of its budget
-  # re-discovering episodes it already has.
-  #
-  # Moved off 07:00 after the only scheduled run this workflow ever had --
-  # 32007940562 on 2026-08-17 -- was cancelled while queued with
-  # "Canceling since a higher priority waiting request for data-commit-main
-  # exists". Monday 07:00 lands in the middle of the morning writer pile-up
-  # (power-zone 05:30 Mon, data-pipeline activist 06:00 daily, portfolio news
-  # 06:30), so the job spent 55 minutes pending and was then evicted from the
-  # single pending slot that group allows. 21:00 UTC is empty in every other
-  # workflow's schedule. The concurrency change below is the real fix; this is
-  # belt-and-braces so the fetch also is not competing for runners.
-  schedule:
-    - cron: "7 21 * * 1"  # moved off the quarter-hour, where GitHub drops and delays scheduled runs
   workflow_dispatch:
     inputs:
       backfill:
@@ -383,4 +374,4 @@ jobs:
       - name: Commit podcast catalog
         uses: ./.github/actions/commit-main
         with:
-          message: "chore(podcasts): weekly catalog refresh $(date -u +%Y-%m-%d)"
+          message: "chore(podcasts): manual catalog refresh $(date -u +%Y-%m-%d)"

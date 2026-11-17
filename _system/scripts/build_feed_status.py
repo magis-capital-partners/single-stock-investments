@@ -33,7 +33,7 @@ FEED_LANES = {
     "short_alpha": "data-pipeline-intake-full",
     "special_situations": "data-pipeline-intake-full",
     "market_risk_components_committed": "market-risk",
-    "podcast_catalog": "podcasts",
+    "podcast_catalog": "data-pipeline-intake-full",
     "capitulation_daily": "data-pipeline-technicals",
 }
 
@@ -322,7 +322,7 @@ SURFACES: list[dict] = [
         "id": "podcasts",
         "label": "Podcasts",
         "hash": "#/insights/podcasts",
-        "lane": "podcasts",
+        "lane": "data-pipeline-intake-full",
         "kind": "file",
         "data_feed": "podcast_catalog",
     },
