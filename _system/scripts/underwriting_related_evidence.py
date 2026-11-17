@@ -444,6 +444,50 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None,
     return target
 
 
+def _paid_parent_binding_revalidation(root, packet, target, previous, current, as_of):
+    """A changed raw response needs a new binding, never a stale raw hash."""
+    from underwriting_pipeline import read,pending_review_author
+    from underwriting_contract import compile_contract
+    from datetime import date
+    try:
+        if (not isinstance(previous,dict) or not isinstance(current,dict) or
+                set(previous)!=set(current) or any(previous[k]!=current[k] for k in previous if k!='content_hash') or
+                previous.get('content_hash')==current.get('content_hash') or
+                any(re.fullmatch(r'[0-9a-f]{64}',str(x.get('content_hash') or '')) is None for x in (previous,current))):
+            return None
+        home=root.parent;work=home/'work';owner=read(home/'runtime-owner.json')
+        if root.name!='data' or owner.get('repository')!='magis-capital-partners/single-stock-investments' or owner.get('purpose')!='local-codex-underwriting':
+            return None
+        state=read(work/'states/CPRT.json');progress=read(work/'progress/CPRT.json');pending=progress.get('pending_review')
+        if state.get('handoff_hash') or progress.get('approved') or not pending:
+            return None
+        prior=read(work/'packets'/(str(state.get('packet_hash'))+'.json'))
+        if (prior.get('ticker')!='CPRT' or prior.get('packet_hash')!=digest({k:v for k,v in prior.items() if k!='packet_hash'}) or
+                not 0<=(date.fromisoformat(as_of)-date.fromisoformat(prior['as_of'])).days<=7 or
+                acquisition_binding(prior,target['company'])!=previous):
+            return None
+        author,receipt=pending_review_author(root,work,'CPRT',prior,pending)
+        if (any(type((receipt.get('usage') or {}).get(k)) is not int for k in ('input_tokens','output_tokens')) or
+                digest(compile_contract(prior,author))!=pending.get('canonical_hash')):
+            return None
+        old=[d for d in _parent_documents(prior) if d.get('id')==previous['document_id']]
+        new=[d for d in _parent_documents(packet) if d.get('id')==current['document_id']]
+        if (len(old)!=1 or len(new)!=1 or old[0].get('content_hash')!=previous['content_hash'] or
+                new[0].get('content_hash')!=current['content_hash'] or
+                old[0].get('coverage')!='complete_requested_primary_document' or
+                new[0].get('coverage')!='complete_requested_primary_document' or
+                len(old[0].get('contexts') or [])!=1 or old[0]['contexts']!=new[0].get('contexts') or
+                old[0].get('source_url')!=new[0].get('source_url') or
+                not re.fullmatch(r'https://www\.sec\.gov/Archives/edgar/data/900075/\d{18}/[A-Za-z0-9_.-]+\.html?',current['source_url'])):
+            return None
+        return {'previous_binding':copy.deepcopy(previous),'current_binding':copy.deepcopy(current),
+                'previous_packet_hash':prior['packet_hash'],'previous_paid_contract_hash':digest(author),
+                'complete_extracted_parent_contexts_identical':True,
+                'current_target_collection_and_current_packet_reassessment_required':True}
+    except (OSError,ValueError,KeyError,TypeError):
+        return None
+
+
 def _retained_target_labels(root, packet, as_of):
     """Reuse a current normal evidence label; never assert a quoted listing alias."""
     if packet.get('ticker') != 'CPRT':
@@ -478,12 +522,16 @@ def _retained_target_labels(root, packet, as_of):
             target.get('packet_hash') == digest({key:value for key,value in target.items() if key != 'packet_hash'}),
             'Retained acquired-issuer source identity changed')
     binding = acquisition_binding(packet, target['company'])
-    require(binding is not None and binding == metadata.get('parent_transaction_binding') and
+    previous_binding=metadata.get('parent_transaction_binding')
+    revalidation=(_paid_parent_binding_revalidation(root,packet,target,previous_binding,binding,as_of)
+                  if binding!=previous_binding else None)
+    require(binding is not None and (binding == previous_binding or revalidation is not None) and
             (target.get('facts_provenance') or {}).get('method') == 'filing_inline' and
             (target.get('facts_provenance') or {}).get('companyfacts_used') is False,
             'Retained acquired issuer needs its current primary parent binding')
     return {cik:{'ticker':ticker,'company':target['company'],'source_hash':target['source_hash'],
-                 'evidence_hash':target['evidence_hash'],'as_of':as_of}}
+                 'evidence_hash':target['evidence_hash'],'as_of':as_of,
+                 **({'parent_source_revalidation':revalidation} if revalidation else {})}}
 
 
 def discover_historical_targets(packet, requested, as_of, client, parent_cik=None, *, retained_labels=None):
@@ -548,6 +596,8 @@ def discover_historical_targets(packet, requested, as_of, client, parent_cik=Non
                 identity['identity_discovery'].update(method='primary_identity_with_retained_internal_evidence_label',
                     current_sec_tickers=[], internal_label_is_not_current_listing=True,
                     retained_source_hash=retained['source_hash'])
+                if retained.get('parent_source_revalidation'):
+                    identity['identity_discovery']['parent_source_revalidation']=copy.deepcopy(retained['parent_source_revalidation'])
                 identity['_current_submissions'] = copy.deepcopy(issuer)
             identities.append(identity)
             seen.add(cik)

@@ -182,6 +182,40 @@ def _unpaid_review_input_repair(root,work,state,detail):
         return False
 
 
+def _unpaid_parent_binding_repair(root,work,state,detail):
+    """Retry the diagnosed unpaid binding stop; every fresh source gate still runs."""
+    from underwriting_pipeline import processing_version,stage_hash,challenge_payload,today
+    from underwriting_contract import compile_contract
+    if (detail!='Retained acquired issuer needs its current primary parent binding' or
+            not HEX.fullmatch(str(state.get('processing_version') or '')) or
+            state['processing_version']==processing_version(root)):
+        return False
+    try:
+        progress=_read(work/'progress/CPRT.json');pending=progress.get('pending_review')
+        if not pending or progress.get('approved'):
+            return False
+        packet=_read(work/'packets'/(str(state.get('packet_hash'))+'.json'))
+        canonical=compile_contract(packet,pending['author']);payload=challenge_payload(packet,pending['author'],canonical)
+        cache=work/'cache/CPRT'/stage_hash(root,'challenger',payload);record=_read(cache/'input_admission.json')
+        if not _unpaid_review_input_repair(root,work,state,str(record.get('reason') or '')):
+            return False
+        data=work.parent/'data'
+        if _read(data/RUN_POLICY)!=_read(root/RUN_POLICY) or completion_grant(_read(data/CALL_POLICY),'CPRT')!=completion_grant(_read(root/CALL_POLICY),'CPRT'):
+            return False
+        from underwriting_foreign_financials import bounded_sources
+        from underwriting_source_profiles import configure_source_budget
+        from underwriting_related_evidence import _retained_target_labels
+        @bounded_sources
+        def labels():
+            configure_source_budget(data,'CPRT')
+            return _retained_target_labels(data,packet,today())
+        retained=labels();related=(packet.get('related_issuers') or {}).get('ACVA') or {}
+        return (set(retained)=={'1637873'} and retained['1637873'].get('ticker')=='ACVA' and
+                all(retained['1637873'].get(k)==related.get(k) for k in ('source_hash','evidence_hash')))
+    except (OSError,ValueError,KeyError,TypeError):
+        return False
+
+
 def pending_revision_authority(root, work, ticker, state, *, contract=None, packet=None):
     """Bind a continuation to paid lineage, frozen evidence and an unresolved review."""
     from underwriting_contract import digest
@@ -195,12 +229,13 @@ def pending_revision_authority(root, work, ticker, state, *, contract=None, pack
         gaps = state.get('gaps') or []
         allowed = {'model_call_daily_repo_limit', 'model_call_per_subject_daily_limit',
                    'total_daily_model_call_budget'}
-        if not gaps or any(g.get('code') != 'StageBlocked' or not (
+        if not gaps or any(not (g.get('code')=='ContractError' and _unpaid_parent_binding_repair(
+                root,work,state,str(g.get('detail') or ''))) and (g.get('code') != 'StageBlocked' or not (
                 g.get('detail') in allowed or str(g.get('detail') or '').startswith(
                     'author_or_challenger_unresolved:') or _unpaid_author_input_repair(
                         root,work,state,str(g.get('detail') or '')) or _unpaid_review_input_repair(
                         root,work,state,str(g.get('detail') or '')) or _unpaid_acquired_target_routing_repair(
-                        root,work,state,str(g.get('detail') or ''))) for g in gaps):
+                        root,work,state,str(g.get('detail') or '')))) for g in gaps):
             return None
     progress = _read(work/'progress/CPRT.json')
     feedback = progress.get('feedback') or {}
