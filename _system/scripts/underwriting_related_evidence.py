@@ -534,13 +534,68 @@ def _retained_target_labels(root, packet, as_of):
                  **({'parent_source_revalidation':revalidation} if revalidation else {})}}
 
 
-def discover_historical_targets(packet, requested, as_of, client, parent_cik=None, *, retained_labels=None):
+def _historical_target_label_candidates(root, packet, as_of):
+    """Recover an internal identifier for fresh discovery, never cached financials.
+
+    The historical date and hashes stay historical. Fresh SEC identity and the
+    normal current target collector must both succeed before evidence is merged.
+    """
+    from datetime import date
+    from underwriting_pipeline import read
+    if packet.get('ticker') != 'CPRT':
+        return {}
+    profile = source_budget().owner_profile('900075')
+    if not profile or profile.get('id') != 'CPRT-owner-20261111-v3' or profile.get('target_cik') != '1637873':
+        return {}
+    cik = profile['target_cik']
+    policy = read(root/'_system/config/underwriting_policy.json')
+    if ((policy.get('related_fact_sources') or {}).get('CPRT') or {}).get(cik) != 'filing_inline':
+        return {}
+    data = read(root/'_system/reference/market-data/valuation_fundamentals/CPRT.json')
+    rows = [(ticker, metadata) for ticker, metadata in (data.get('underwriting_related_issuers') or {}).items()
+            if isinstance(metadata, dict) and str(metadata.get('cik')) == cik]
+    require(len(rows) <= 1, 'Ambiguous historical acquired-issuer labels')
+    if not rows:
+        return {}
+    ticker, metadata = rows[0]
+    require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', ticker) and ticker != packet['ticker'],
+            'Unsafe historical acquired-issuer label')
+    target = read(root/'_system/reference/market-data/valuation_related_evidence'/(ticker+'.json'))
+    if not target or target.get('status') != 'ready':
+        return {}
+    try:
+        previous_day, current_day = date.fromisoformat(target.get('as_of', '')), date.fromisoformat(as_of)
+    except (TypeError, ValueError):
+        return {}
+    if not 0 < (current_day-previous_day).days <= 7:
+        return {}
+    prior_identity = target.get('identity_discovery') or {}
+    require(target.get('ticker') == ticker and str(target.get('cik')) == cik and
+            target.get('currency') == packet.get('currency') and
+            isinstance(target.get('company'), str) and name_tokens(target['company']) and
+            name_tokens(target['company']) == name_tokens(metadata.get('company') or '') and
+            all(isinstance(target.get(key), str) and re.fullmatch(r'[0-9a-f]{64}', target[key]) and
+                target[key] == metadata.get(key) for key in ('source_hash', 'evidence_hash')) and
+            target.get('packet_hash') == digest({key:value for key,value in target.items() if key != 'packet_hash'}) and
+            prior_identity.get('method') == 'primary_identity_with_retained_internal_evidence_label' and
+            prior_identity.get('current_sec_tickers') == [] and
+            prior_identity.get('internal_label_is_not_current_listing') is True and
+            (target.get('facts_provenance') or {}).get('method') == 'filing_inline' and
+            (target.get('facts_provenance') or {}).get('companyfacts_used') is False and
+            acquisition_binding(packet, target['company']) is not None,
+            'Historical acquired-issuer label requires original identity and a current parent acquisition binding')
+    return {cik:{'ticker':ticker, 'company':target['company'], 'source_hash':target['source_hash'],
+                 'evidence_hash':target['evidence_hash'], 'as_of':target['as_of']}}
+
+
+def discover_historical_targets(packet, requested, as_of, client, parent_cik=None, *, retained_labels=None, historical_labels=None):
     """Resolve primary legal names when an acquired issuer left the ticker list.
 
     Search supplies candidate CIKs only. SEC submissions independently confirm
-    exact legal name and CIK. Only CPRT may retain a verified current internal
-    evidence label when SEC explicitly reports no tickers; financial sources
-    are still collected and validated normally.
+    exact legal name and CIK. Only CPRT may retain a verified internal evidence
+    label when SEC explicitly reports no tickers. A recent historical label
+    supplies discovery identity only; current financial sources are collected
+    and validated normally, with the historical label date preserved.
     """
     names = []
     pattern = (r'\b([A-Z][A-Za-z0-9&.\'-]*(?:\s+[A-Z][A-Za-z0-9&.\'-]*){0,7}\s+'
@@ -577,14 +632,24 @@ def discover_historical_targets(packet, requested, as_of, client, parent_cik=Non
                     and acquisition_mentioned(packet, issuer['name'])):
                 continue
             retained = (retained_labels or {}).get(str(cik))
+            historical = (historical_labels or {}).get(str(cik))
+            from datetime import date
+            try:
+                historical_age = (date.fromisoformat(as_of)-date.fromisoformat((historical or {}).get('as_of',''))).days
+            except (ValueError,TypeError):
+                historical_age = 0
+            historical_label = (packet.get('ticker') == 'CPRT' and str(parent_cik) == '900075' and cik == 1637873 and
+                                isinstance(issuer.get('tickers'), list) and issuer['tickers'] == [] and
+                                isinstance(historical, dict) and 0 < historical_age <= 7 and
+                                name_tokens(historical.get('company') or '') == name_tokens(issuer['name']))
             retained_label = (packet.get('ticker') == 'CPRT' and str(parent_cik) == '900075' and cik == 1637873 and
                               isinstance(issuer.get('tickers'), list) and issuer['tickers'] == [] and
                               isinstance(retained, dict) and retained.get('as_of') == as_of and
                               name_tokens(retained.get('company') or '') == name_tokens(issuer['name']))
             if len(tickers) == 1 and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', tickers[0]):
                 ticker = tickers[0]
-            elif retained_label:
-                ticker = retained['ticker']
+            elif retained_label or historical_label:
+                ticker = (retained if retained_label else historical)['ticker']
             else:
                 continue
             if ticker == packet['ticker'] or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', ticker):
@@ -592,10 +657,15 @@ def discover_historical_targets(packet, requested, as_of, client, parent_cik=Non
             identity = {'ticker':ticker, 'cik_str':cik, 'title':issuer['name'],
                         'identity_discovery':{'method':'primary_legal_name_and_sec_submissions',
                                               'search_url':query,'source_url':url,'legal_name':name}}
-            if retained_label:
+            if retained_label or historical_label:
+                retained = retained if retained_label else historical
                 identity['identity_discovery'].update(method='primary_identity_with_retained_internal_evidence_label',
                     current_sec_tickers=[], internal_label_is_not_current_listing=True,
                     retained_source_hash=retained['source_hash'])
+                if historical_label:
+                    identity['identity_discovery'].update(
+                        historical_label_as_of=historical['as_of'],
+                        current_primary_identity_observed_as_of=as_of)
                 if retained.get('parent_source_revalidation'):
                     identity['identity_discovery']['parent_source_revalidation']=copy.deepcopy(retained['parent_source_revalidation'])
                 identity['_current_submissions'] = copy.deepcopy(issuer)
@@ -643,8 +713,10 @@ def augment_requested_targets(root, packet, gaps, as_of, client=None):
             candidates.append(identity)
     if not candidates:
         retained = _retained_target_labels(root,packet,as_of)
+        historical = _historical_target_label_candidates(root,packet,as_of) if not retained else {}
         candidates = discover_historical_targets(packet, requested, as_of, client, parent_cik,
-            **({'retained_labels':retained} if retained else {}))
+            **({'retained_labels':retained} if retained else {}),
+            **({'historical_labels':historical} if historical else {}))
     unique = {}
     for identity in candidates:
         unique.setdefault(str(int(identity['cik_str'])), identity)

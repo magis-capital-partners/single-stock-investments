@@ -115,17 +115,18 @@ def _unpaid_acquired_target_routing_repair(root, work, state, detail):
             return False
         from underwriting_foreign_financials import bounded_sources
         from underwriting_source_profiles import configure_source_budget
-        from underwriting_related_evidence import _retained_target_labels
+        from underwriting_related_evidence import _retained_target_labels, _historical_target_label_candidates
         @bounded_sources
         def current_labels():
             configure_source_budget(data,'CPRT')
-            return _retained_target_labels(data,packet,today())
+            return (_retained_target_labels(data,packet,today()) or
+                    _historical_target_label_candidates(data,packet,today()))
         labels = current_labels()
         if set(labels) != {'1637873'}:
             return False
         label = labels['1637873']
         related = (packet.get('related_issuers') or {}).get(label.get('ticker')) or {}
-        if (label.get('as_of') != today() or not related or any(
+        if (label.get('as_of') not in (today(), packet.get('as_of')) or not related or any(
                 label.get(key) != related.get(key) for key in ('source_hash','evidence_hash'))):
             return False
         parent_docs = [row for row in packet.get('documents') or []
@@ -143,8 +144,12 @@ def _unpaid_acquired_target_routing_repair(root, work, state, detail):
                    supplemental_fact_diagnostics(packet,previous.get('supplemental_facts') or [])},
                    'revision_base_hash':digest(previous)}
         cache = work/'cache/CPRT'/stage_hash(root,'author',payload)
-        return not any((cache/name).exists() for name in
-            ('receipt.json','output.json','prompt.txt','author_revision.json','input_admission.json'))
+        if any((cache/name).exists() for name in
+                ('receipt.json','output.json','prompt.txt','author_revision.json')):
+            return False
+        record = _read(cache/'input_admission.json')
+        return (not (cache/'input_admission.json').exists() or
+                _unpaid_author_input_repair(root,work,state,str(record.get('reason') or '')))
     except (OSError,ValueError,TypeError,KeyError):
         return False
 
