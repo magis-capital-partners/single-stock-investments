@@ -41,7 +41,28 @@ done
 say "packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y -qq git ca-certificates curl gnupg python3-venv tesseract-ocr-eng unattended-upgrades
+apt-get install -y -qq git ca-certificates curl gnupg python3-venv tesseract-ocr-eng unattended-upgrades fail2ban
+
+# SSH stays open to the internet by the owner's choice (they travel), so the
+# box is hardened instead: keys only, no root login, fail2ban on sshd, and
+# automatic security updates. The drop-in is validated before sshd reloads,
+# so a bad file cannot lock anyone out.
+say "SSH hardening: key-only, no root login, fail2ban, unattended security upgrades"
+cat > /etc/ssh/sshd_config.d/10-rs-hardening.conf <<'SSHD'
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitRootLogin no
+MaxAuthTries 4
+SSHD
+install -d -m 0755 /run/sshd   # sshd -t needs it; absent while 24.04's socket-activated ssh is idle
+if sshd -t; then
+  systemctl try-reload-or-restart ssh.service || true   # new connections read the drop-in either way
+else
+  rm -f /etc/ssh/sshd_config.d/10-rs-hardening.conf; die "sshd rejected the hardening drop-in; removed it"
+fi
+printf '[sshd]\nenabled = true\nmaxretry = 5\nbantime = 1h\nfindtime = 10m\n' > /etc/fail2ban/jail.d/rs-sshd.local
+systemctl enable --now fail2ban && systemctl restart fail2ban
+printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' > /etc/apt/apt.conf.d/20auto-upgrades
 
 if ! command -v node >/dev/null || [ "$(node -p 'process.versions.node.split(".")[0]')" -lt "$NODE_MAJOR" ]; then
   say "Node.js $NODE_MAJOR from the signed NodeSource apt repository"
@@ -88,11 +109,13 @@ tess=$(dpkg -L tesseract-ocr-eng | grep '/eng\.traineddata$' | head -1)
 printf 'TESSDATA_PREFIX=%s\n' "$(dirname "$tess")" > /etc/reverse-split-live.runtime.env
 chmod 0644 /etc/reverse-split-live.runtime.env
 
+# systemd reads EnvironmentFile= as root before it drops to `research`, so the
+# secrets file can be root-only: the service user cannot read it from a shell.
 if [ ! -f /etc/reverse-split-live.env ]; then
-  install -o root -g research -m 0640 "$DEPLOY/reverse-split-live.env.example" /etc/reverse-split-live.env
+  install -o root -g root -m 0600 "$DEPLOY/reverse-split-live.env.example" /etc/reverse-split-live.env
   say "created /etc/reverse-split-live.env from the template: fill it in before starting anything"
 fi
-chown root:research /etc/reverse-split-live.env && chmod 0640 /etc/reverse-split-live.env
+chown root:root /etc/reverse-split-live.env && chmod 0600 /etc/reverse-split-live.env
 
 say "systemd units"
 for u in rs-collector.service rs-market-status.service rs-update.service rs-update.timer; do

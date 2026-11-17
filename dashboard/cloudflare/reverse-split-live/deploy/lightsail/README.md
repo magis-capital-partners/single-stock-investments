@@ -39,11 +39,19 @@ fit the measured workload (3.9 GiB in use, 5.6 GiB peak on 2026-11-16).
 
 Only the owner can do these.
 
-1. **Instance.** Lightsail, region us-east-1, Linux, Ubuntu 24.04 LTS, the 8 GB / 2 vCPU / 160 GB
-   plan. Name it `rs-box-r`. The 8 GB plan is a load-test candidate, not a proven fit (section 4).
-2. **Static IP.** Create one and attach it.
-3. **Firewall** (instance > Networking). Remove the default HTTP rule. Restrict SSH (22) to your
-   own IP. Nothing else inbound: both services only make outgoing calls.
+1. **Instance.** Lightsail, region us-east-1, Linux, **Ubuntu 24.04 LTS**, the 8 GB / 2 vCPU /
+   160 GB plan ($44/month). The production box is `magis-collector-1`. The 8 GB plan is a
+   load-test candidate, not a proven fit (section 4). `bootstrap.sh` refuses other Ubuntu
+   releases: 24.04 matches the GitHub runner the collector is tested on (Python 3.12). A box
+   created on 22.04 should be replaced while it is still empty: create the 24.04 instance, move
+   the static IP to it, delete the old one.
+2. **Static IP.** Attached to the instance (`magis-collector-ip`). Keep it attached: Lightsail
+   charges for a static IP that is not attached to a running instance.
+3. **Firewall** (instance > Networking). Only SSH (22). It is open to all addresses because the
+   owner travels; `bootstrap.sh` compensates with key-only SSH, no root login, fail2ban and
+   unattended security upgrades. Nothing else inbound: both services only make outgoing calls.
+   Use a key pair made for this box rather than the region's default key, and keep the `.pem`
+   out of every repository and chat.
 4. **Snapshots.** Turn on automatic daily snapshots. They protect the machine setup; the research
    data is protected by the collector's own checksummed checkpoints in R2.
 5. **Alarms** (instance > Metrics, email notification): status check failed; CPU burst capacity
@@ -71,7 +79,7 @@ Every line under "prerequisites" must read `ok` and no `BAD` line may appear.
 Layout: code in `/srv/rs/repo` (blob-less sparse clone of the public repo, only the collector
 folder), Python in `/srv/rs/venv` (`databento==0.82.0`, `PyMuPDF==1.28.0`), Node 24 from the
 signed NodeSource repository, service user `research`, secrets in `/etc/reverse-split-live.env`
-(root:research 0640).
+(root:root 0600; systemd reads it as root, so the service user cannot read it from a shell).
 
 ## 3. Cutover
 
