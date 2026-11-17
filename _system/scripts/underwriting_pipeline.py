@@ -512,6 +512,10 @@ def load_progress(root, work, ticker, packet):
             source_change_from_pending_review={'previous_packet_hash':old_packet['packet_hash'],
                 'previous_contract_hash':digest(old_author),'previous_canonical_hash':pending['canonical_hash'],
                 'paid_author_input_hash':old_receipt['input_hash'],'current_packet_hash':packet['packet_hash']})
+        if 'literal_source_quote' in feedback:
+            # A source-scoped display aid remains history. Its old packet/hash
+            # must never be presented as a verified current quotation.
+            feedback['previous_literal_source_quote']=feedback.pop('literal_source_quote')
         result['feedback']=feedback
     authors, reviews = {}, []
     for path in (work/'cache'/ticker).glob('*/receipt.json'):

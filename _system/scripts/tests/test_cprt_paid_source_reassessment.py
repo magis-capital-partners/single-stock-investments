@@ -63,3 +63,25 @@ def test_absent_pending_work_keeps_existing_feedback_behavior(env,monkeypatch):
     root,work,old,new,earlier,latest,receipt,saved,cache=fixture(env,monkeypatch);saved.pop('pending_review');put(work/'progress/CPRT.json',saved)
     result=p.load_progress(root,work,'CPRT',new)
     assert result['feedback']['previous_contract']==earlier
+
+
+@pytest.mark.parametrize('hint',[{'schema_version':'underwriting-literal-source-quote/1','packet_hash':'old'},None,{'unrecognized':'old display aid'}])
+def test_changed_source_retains_literal_aid_as_history_instead_of_current_quote(env,monkeypatch,hint):
+    root,work,old,new,earlier,latest,receipt,saved,cache=fixture(env,monkeypatch)
+    saved['feedback']['literal_source_quote']=hint;put(work/'progress/CPRT.json',saved)
+    before=(work/'progress/CPRT.json').read_bytes()
+    feedback=p.load_progress(root,work,'CPRT',new)['feedback']
+    assert 'literal_source_quote' not in feedback
+    assert feedback['previous_literal_source_quote']==hint
+    from underwriting_transport import _literal_source_quote_prefix
+    assert _literal_source_quote_prefix({'packet':new,'revision_feedback':feedback,'revision_base_hash':digest(latest)})==''
+    assert (work/'progress/CPRT.json').read_bytes()==before
+
+
+def test_same_source_does_not_relabel_the_current_literal_aid(env,monkeypatch):
+    root,work,old,new,earlier,latest,receipt,saved,cache=fixture(env,monkeypatch)
+    hint={'unchanged':'current display aid'};saved['feedback']['literal_source_quote']=hint
+    put(work/'progress/CPRT.json',saved)
+    result=p.load_progress(root,work,'CPRT',old)
+    assert result['feedback']['literal_source_quote']==hint
+    assert 'previous_literal_source_quote' not in result['feedback']
