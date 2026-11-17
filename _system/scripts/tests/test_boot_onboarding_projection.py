@@ -14,7 +14,7 @@ def test_onboarding_detail_survives_full_ticker_shard_without_boot_duplication(t
     original = {"ticker": "TEST", "onboard": {"phase": "downloading", "updated": "2026-11-17T18:00:00Z", "error": None, "download_detail": "complete source inventory", "deep_dive_pending": True}}
     before = copy.deepcopy(original)
     boot = shards.slim_ticker_row(original)
-    assert boot["onboard"] == {"phase": "downloading"}
+    assert boot["onboard"] == {"phase": "downloading", "deep_dive_pending": True}
     assert original == before
     shards.write_ticker_shards({"tickers": [original]}, tmp_path)
     complete = json.loads((tmp_path / "tickers/TEST.json").read_text())
@@ -35,3 +35,10 @@ def test_unrecorded_phase_is_not_invented():
 @pytest.mark.parametrize("value", [None, "unavailable", []])
 def test_non_mapping_onboarding_values_are_preserved(value):
     assert shards.slim_ticker_row({"ticker": "TEST", "onboard": value})["onboard"] == value
+
+
+@pytest.mark.parametrize("pending", [False, True, None])
+def test_deploy_consistency_check_keeps_its_exact_completion_flag(pending):
+    row = {"ticker": "TEST", "onboard": {"phase": "complete", "deep_dive_pending": pending, "error": "detail only"}}
+    boot = shards.slim_ticker_row(row)
+    assert boot["onboard"]["deep_dive_pending"] is pending

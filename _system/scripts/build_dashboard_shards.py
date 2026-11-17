@@ -313,11 +313,11 @@ def _slim_essential_insights(essential: dict) -> dict:
 def slim_ticker_row(row: dict) -> dict:
     """Trim a full dashboard row down to what the holdings table needs."""
     slim = {k: v for k, v in row.items() if k not in DETAIL_ONLY_FIELDS}
-    # The boot table reads only the onboarding badge. Operational history
-    # remains complete in the ticker shard, which replaces this summary on open.
+    # Keep the table badge and deploy-only consistency flag. Complete operational
+    # history remains in the ticker shard, which replaces this summary on open.
     onboard = row.get("onboard")
     if isinstance(onboard, dict):
-        slim["onboard"] = {key: onboard[key] for key in ("phase",) if key in onboard}
+        slim["onboard"] = {key: onboard[key] for key in ("phase", "deep_dive_pending") if key in onboard}
     if isinstance(row.get("autonomous_irr"), dict):
         from autonomous_compounders import summary_estimate
         slim["autonomous_irr"] = summary_estimate(row["autonomous_irr"])
