@@ -97,6 +97,12 @@ jobs:
         uses: ./.github/actions/checkout-vault
         with:
           include-source-archive: 'false'
+          # A price-only publication reads complete workspace snapshots and the
+          # frozen packets bound by existing receipts, without author archives.
+          publication-only: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.prices_only == true }}
+          publication-scope: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.prices_only == true && 'workspace' || 'all' }}
+          extra-paths: |
+            /valuation-underwriting/packets/
       - name: Verify automatic publication checks
         run: python -m pytest -q _system/scripts/tests/test_autonomous_compounders.py _system/scripts/tests/test_shared_valuation_forecast.py _system/scripts/tests/test_valuation_market_sync.py
       - name: Collect, validate and publish every core compounder
