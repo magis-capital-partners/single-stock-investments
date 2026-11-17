@@ -8,15 +8,15 @@
       "reviewed": 2
     },
     "blocker_companies": {
-      "parent_cashflow_attribution_missing": 40,
       "issuer_forecast_missing": 135,
+      "parent_cashflow_attribution_missing": 40,
+      "new_earnings_disclosure_unresolved": 53,
       "positive_normalized_owner_cash_not_established": 109,
       "pre_listing_share_basis_unverified": 102,
-      "new_earnings_disclosure_unresolved": 53,
       "realization_timing_missing": 15,
       "annual_diluted_share_count_missing": 50,
-      "annual_operating_cash_flow_missing": 44,
       "annual_capex_missing": 72,
+      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
@@ -12217,30 +12217,26 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-17T00:00:57.921040+00:00",
+      "last_attempt": "2026-11-17T01:05:40.052948+00:00",
       "retry_after": "2026-11-17",
       "underwriting_gaps": [
         {
-          "code": "ContractError",
-          "detail": "Retained acquired issuer needs its current primary parent binding"
+          "code": "StageBlocked",
+          "detail": "provider_run_incomplete: 01a1e73b-0332-72d2-8b85-29a385c3e195"
         }
       ],
       "unresolved_findings": [
         {
-          "severity": "critical",
-          "detail": "supp_parent_htm_2026 does not establish the modeled investment balance. Its quotation contains 2,008,539 while numeric_token selects 2,581,901, and the quotation lacks the required explicit reporting year and scale header. doc_9b8366946fd8b140 reports 2,581,901 in the FY2026 investment row and 2,008,539 in the comparison column. Replace the quotation with a complete contiguous FY2026 table excerpt establishing column, scale and amount, then recompile all opening resources and financing tests."
+          "severity": "major",
+          "detail": "The largest driver, projection_retention, restricts every admissible path to at most 2% annual activity erosion. doc_9b8366946fd8b140 reports domestic service revenue falling from $3.451558bn to $3.388287bn despite higher revenue per car. Thus the roughly 1.8% revenue decline does not establish a 2% adverse activity bound. The same assumption also governs international operations and, when continued, ACV, whose customer economics differ. Separate geographic/business activity from price and mix, justify persistence and adverse bounds, and execute a materially faster activity-loss path with correlated pricing resistance and stranded costs. Exact cohort statistics need not be invented; uncertainty can be modeled explicitly."
         },
         {
           "severity": "major",
-          "detail": "projection_maintenance_inflation raises p3_maintenance through p13_maintenance, but each amount is added to cash generation and deducted as reinvestment without reducing owner earnings or increasing modeled revenue. For example, base maintenance rises from $240,841,650 to $245,658,483 in year three, yet this $4,816,833 increase cancels completely. Trusted sensitivity confirms zero value effect. doc_9b8366946fd8b140 identifies labor, towing and replacement requirements; it does not establish exact pricing offsets. Derive owner cash after the rising replacement burden from an explicit pricing/cost bridge, or demonstrate and model the offset. Rerun the joint inflation and competitive stress."
+          "detail": "For years 3–13, p_initial_cash_expenses is revenue minus normalized owner cash and maintenance. This residual includes taxes, operating-balance movements, compensation and other equity-cash conversion effects. The graph then applies an 80% activity-sensitive share and unit-cost inflation to the entire residual. doc_9b8366946fd8b140 supports activity-sensitive subhaul and purchased-vehicle costs, but does not establish that elasticity for this broader residual. Derived margins and conversion ratios only restate the forecast. Reconcile material operating costs, parent taxes, working-capital investment and compensation numerically, or provide a supported bounded aggregation that preserves their distinct behavior. Retest the three largest sensitivities after that correction."
         },
         {
           "severity": "major",
-          "detail": "The largest sensitivity, projection_retention, applies stable base nominal owner earning power throughout the thirteen-year projection, with annual additions from repeated investment and further continuation afterward. The filing's network advantages support persistence as a hypothesis, but obs_225c9f5d553432165c9b versus obs_660ca0ff65f151a90460 shows current operating-income deterioration. The model does not quantitatively distinguish mature-yard pricing, volume, operating costs and replacement needs; later revenue is backsolved from owner earnings. Establish an observable mature-business bridge and explain the duration of persistence separately from the contractual projection. Retain both longer-persistence and faster-erosion alternatives."
-        },
-        {
-          "severity": "major",
-          "detail": "payout_fraction_y2=0 also suppresses distributions in years three through twelve, followed by a complete surplus distribution in year thirteen. The ACV lease tail through 2039 establishes obligations to project, not a requirement to retain every year's surplus until that date. doc_9b8366946fd8b140 reports approximately $1.6 billion of FY2026 repurchases, contradicting an unexplained decade of complete retention. Support a continuing capital policy after the integration holdback, preserve explicit claim reserves and model distributions accordingly. The immediate_surplus_return alternative demonstrates material timing sensitivity but does not justify the selected policy."
+          "detail": "p_cohort_revenue converts each assumed incremental owner-cash return into revenue using the existing consolidated owner-cash margin, then repeats that cohort throughout the projection. The historical incremental-return exercises are useful checks, but do not establish new-yard revenue intensity, ramp timing or acquisition economics. This mechanism affects the response to all three largest drivers and the terminal earnings base. Declare and support the cohort revenue/capital and maturation judgments explicitly, distinguish legacy organic deployment from continuing ACV deployment, and test slower maturation and lower cash conversion without granting new cohorts the incumbent margin automatically."
         }
       ]
     }
