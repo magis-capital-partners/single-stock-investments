@@ -1,6 +1,6 @@
 {
   "schema_version": "underwriting-queue/1",
-  "as_of": "2026-11-16",
+  "as_of": "2026-11-17",
   "summary": {
     "companies": 875,
     "statuses": {
@@ -8,22 +8,22 @@
       "reviewed": 2
     },
     "blocker_companies": {
-      "issuer_forecast_missing": 135,
       "parent_cashflow_attribution_missing": 40,
+      "issuer_forecast_missing": 135,
+      "pre_listing_share_basis_unverified": 102,
       "new_earnings_disclosure_unresolved": 53,
       "positive_normalized_owner_cash_not_established": 109,
-      "pre_listing_share_basis_unverified": 102,
       "realization_timing_missing": 15,
+      "annual_operating_cash_flow_missing": 44,
       "annual_diluted_share_count_missing": 50,
       "annual_capex_missing": 72,
-      "annual_operating_cash_flow_missing": 44,
       "new_financial_report_after_model": 429,
       "source_share_basis_unverified": 56,
       "completed_session_quote_missing": 32,
       "newer_balance_sheet_inputs_available": 214,
       "financial_inputs_expired_or_undated": 22,
-      "listing_calendar_or_completed_close_unverified": 22,
       "corporate_action_history_unverified": 23,
+      "listing_calendar_or_completed_close_unverified": 22,
       "method_specific_forecast_missing": 32,
       "annual_financial_inputs_expired": 10,
       "quote_issuer_mismatch": 2,
@@ -12217,28 +12217,15 @@
         "newer_balance_sheet_inputs_available",
         "underwriting_revision_required"
       ],
-      "last_attempt": "2026-11-17T01:05:40.052948+00:00",
+      "last_attempt": "2026-11-17T03:14:50.799305+00:00",
       "retry_after": "2026-11-17",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "provider_run_incomplete: 01a1e73b-0332-72d2-8b85-29a385c3e195"
+          "detail": "author_or_challenger_unresolved: Structural alternatives failed deterministic validation: [{\"id\": \"slower_new_capital_maturation\", \"errors\": [\"business.high: alternative terminal economics are not funded\"]}]"
         }
       ],
-      "unresolved_findings": [
-        {
-          "severity": "major",
-          "detail": "The largest driver, projection_retention, restricts every admissible path to at most 2% annual activity erosion. doc_9b8366946fd8b140 reports domestic service revenue falling from $3.451558bn to $3.388287bn despite higher revenue per car. Thus the roughly 1.8% revenue decline does not establish a 2% adverse activity bound. The same assumption also governs international operations and, when continued, ACV, whose customer economics differ. Separate geographic/business activity from price and mix, justify persistence and adverse bounds, and execute a materially faster activity-loss path with correlated pricing resistance and stranded costs. Exact cohort statistics need not be invented; uncertainty can be modeled explicitly."
-        },
-        {
-          "severity": "major",
-          "detail": "For years 3–13, p_initial_cash_expenses is revenue minus normalized owner cash and maintenance. This residual includes taxes, operating-balance movements, compensation and other equity-cash conversion effects. The graph then applies an 80% activity-sensitive share and unit-cost inflation to the entire residual. doc_9b8366946fd8b140 supports activity-sensitive subhaul and purchased-vehicle costs, but does not establish that elasticity for this broader residual. Derived margins and conversion ratios only restate the forecast. Reconcile material operating costs, parent taxes, working-capital investment and compensation numerically, or provide a supported bounded aggregation that preserves their distinct behavior. Retest the three largest sensitivities after that correction."
-        },
-        {
-          "severity": "major",
-          "detail": "p_cohort_revenue converts each assumed incremental owner-cash return into revenue using the existing consolidated owner-cash margin, then repeats that cohort throughout the projection. The historical incremental-return exercises are useful checks, but do not establish new-yard revenue intensity, ramp timing or acquisition economics. This mechanism affects the response to all three largest drivers and the terminal earnings base. Declare and support the cohort revenue/capital and maturation judgments explicitly, distinguish legacy organic deployment from continuing ACV deployment, and test slower maturation and lower cash conversion without granting new cohorts the incumbent margin automatically."
-        }
-      ]
+      "unresolved_findings": []
     }
   ]
 }
