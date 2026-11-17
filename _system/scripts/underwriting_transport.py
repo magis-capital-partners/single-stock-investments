@@ -564,7 +564,10 @@ def _complete_layouts(payload):
             strings = compact_strings(marked)
             yield STRING_INSTRUCTIONS, strings
             from underwriting_dictionary_transport import compact as compact_rows, INSTRUCTIONS as ROW_INSTRUCTIONS
-            yield ROW_INSTRUCTIONS, compact_rows(strings)
+            rows = compact_rows(strings)
+            yield ROW_INSTRUCTIONS, rows
+            from underwriting_array_transport import compact as compact_arrays, INSTRUCTIONS as ARRAY_INSTRUCTIONS
+            yield ARRAY_INSTRUCTIONS, compact_arrays(rows)
 
 
 def pack(payload):
@@ -573,6 +576,9 @@ def pack(payload):
 
 
 def unpack(envelope):
+    if envelope.get('schema_version') == 'underwriting-transport/10':
+        from underwriting_array_transport import unpack as unpack_arrays
+        return unpack_arrays(envelope)
     if envelope.get('schema_version') == 'underwriting-transport/9':
         from underwriting_dictionary_transport import unpack as unpack_rows
         return unpack_rows(envelope)
@@ -760,7 +766,12 @@ def render_for_budget(payload, maximum_characters):
             if len(candidate)<=maximum_characters:
                 return candidate
             from underwriting_dictionary_transport import compact as compact_rows, INSTRUCTIONS as ROW_INSTRUCTIONS
-            candidate=literal_prefix+ROW_INSTRUCTIONS+encoded(compact_rows(strings))
+            rows=compact_rows(strings)
+            candidate=literal_prefix+ROW_INSTRUCTIONS+encoded(rows)
+            if len(candidate)<=maximum_characters:
+                return candidate
+            from underwriting_array_transport import compact as compact_arrays, INSTRUCTIONS as ARRAY_INSTRUCTIONS
+            candidate=literal_prefix+ARRAY_INSTRUCTIONS+encoded(compact_arrays(rows))
             if len(candidate)<=maximum_characters:
                 return candidate
     return render(payload)

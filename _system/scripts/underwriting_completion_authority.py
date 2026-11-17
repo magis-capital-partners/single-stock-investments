@@ -353,10 +353,16 @@ def _timeout_attempt(root, work, payload, identity):
         body=text[len(prefix):]
         literal=_literal_source_quote_prefix(payload)+_literal_review_source_quote_prefix(payload)
         if body!=literal+encoded(payload):
-            if not body.startswith(literal+ROW_INSTRUCTIONS):
+            from underwriting_array_transport import INSTRUCTIONS as ARRAY_INSTRUCTIONS
+            formats=(('underwriting-transport/9',ROW_INSTRUCTIONS),
+                     ('underwriting-transport/10',ARRAY_INSTRUCTIONS))
+            matches=[(schema,instructions) for schema,instructions in formats
+                     if body.startswith(literal+instructions)]
+            if len(matches)!=1:
                 return None
-            envelope=json.loads(body[len(literal+ROW_INSTRUCTIONS):])
-            if envelope.get('schema_version')!='underwriting-transport/9' or digest(unpack(envelope))!=digest(payload):
+            schema,instructions=matches[0]
+            envelope=json.loads(body[len(literal+instructions):])
+            if envelope.get('schema_version')!=schema or digest(unpack(envelope))!=digest(payload):
                 return None
         events=[json.loads(line) for line in (work/'ledger.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
         def accounting_pair(attempt):
