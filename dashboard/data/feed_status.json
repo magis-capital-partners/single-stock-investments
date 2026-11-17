@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-10-30T01:21:06Z",
+  "generated_at": "2026-11-17T20:34:00Z",
   "surfaces": [
     {
       "id": "buyback-radar",
@@ -13,12 +13,12 @@
       "stamp": "2026-10-28T02:11:51Z",
       "max_age_hours": 102.0,
       "exists": true,
-      "status": "degraded",
-      "label_text": "Review required",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-buyback-radar",
       "lane_receipt_at": "2026-10-28T02:15:30Z",
       "healer": "data-pipeline buyback-radar; repository_dispatch heal-buyback-radar",
-      "next_action": "data-pipeline buyback-radar; repository_dispatch heal-buyback-radar",
+      "next_action": "data-pipeline buyback-radar; repository_dispatch heal-buyback-radar A lane-failure issue is open.",
       "coverage": {
         "total_rows": 973,
         "complete_rows": 713,
@@ -48,7 +48,7 @@
       "status": "api",
       "label_text": "Check observation dates",
       "lane": "deploy",
-      "lane_receipt_at": "2026-10-29T23:34:32Z",
+      "lane_receipt_at": "2026-10-31T17:33:12Z",
       "healer": "Wait for the next Flex report. This page does not read the Gateway.",
       "next_action": "Wait for the next Flex report. This page does not read the Gateway. A lane-failure issue is open.",
       "coverage": null
@@ -80,11 +80,11 @@
       "api": null,
       "artifact": "dashboard/data/spx_surface_latest.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T21:59:20.027002+00:00",
+      "stamp": "2026-10-30T21:36:53.502874+00:00",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-29T08:54:32Z",
       "healer": "python _system/scripts/build_spx_surface.py (data-pipeline technicals lane, cron 15 2 * * 1-5)",
@@ -107,7 +107,7 @@
       "lane": "ls-algo",
       "lane_receipt_at": "2026-10-29T09:29:00Z",
       "healer": "When the snapshot is stopped, unknown, or older than its cadence, ls-algo owns the next action. This page does not probe the Gateway.",
-      "next_action": "When the snapshot is stopped, unknown, or older than its cadence, ls-algo owns the next action. This page does not probe the Gateway.",
+      "next_action": "When the snapshot is stopped, unknown, or older than its cadence, ls-algo owns the next action. This page does not probe the Gateway. A lane-failure issue is open.",
       "coverage": null
     },
     {
@@ -118,23 +118,23 @@
       "api": null,
       "artifact": "dashboard/data/darwin_cc.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T23:38:44Z",
+      "stamp": "2026-10-31T01:02:53Z",
       "max_age_hours": 96.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "darwin-covered-call",
-      "lane_receipt_at": "2026-10-29T23:51:20Z",
+      "lane_receipt_at": "2026-10-31T01:14:39Z",
       "healer": "darwin-covered-call.yml rebuilds the signal from Cboe delayed chains several times each weekday (build_darwin_covered_call.py). This page does not dispatch that job.",
       "next_action": "darwin-covered-call.yml rebuilds the signal from Cboe delayed chains several times each weekday (build_darwin_covered_call.py). This page does not dispatch that job.",
       "coverage": {
         "total_rows": 503,
-        "complete_rows": 434,
-        "incomplete_rows": 69,
+        "complete_rows": 429,
+        "incomplete_rows": 74,
         "excluded_rows": 0,
-        "coverage_pct": 86.3,
+        "coverage_pct": 85.3,
         "missing_by_field": {
-          "unscored": 69
+          "unscored": 74
         },
         "definition": "Published scores / declared signal universe",
         "kind": "score_coverage",
@@ -150,7 +150,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:30:17Z",
+      "stamp": "2026-11-17T20:32:22Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -158,7 +158,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -169,24 +169,24 @@
       "api": null,
       "artifact": "dashboard/data/technical_summary.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T22:12:21Z",
+      "stamp": "2026-10-30T21:51:03Z",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-29T08:54:32Z",
       "healer": "python _system/scripts/build_technical_signals.py (data-pipeline lane, cron 15 2 * * 1-5)",
       "next_action": "python _system/scripts/build_technical_signals.py (data-pipeline lane, cron 15 2 * * 1-5) A lane-failure issue is open.",
       "coverage": {
-        "total_rows": 863,
-        "complete_rows": 837,
+        "total_rows": 866,
+        "complete_rows": 840,
         "incomplete_rows": 26,
         "excluded_rows": 0,
         "coverage_pct": 97.0,
         "missing_by_field": {
-          "unavailable": 24,
-          "not_fresh": 2
+          "unavailable": 23,
+          "not_fresh": 3
         },
         "definition": "Fresh technical snapshots / requested names",
         "kind": "freshness",
@@ -202,7 +202,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:30:17Z",
+      "stamp": "2026-11-17T20:32:22Z",
       "max_age_hours": 56.0,
       "exists": true,
       "status": "fresh",
@@ -221,7 +221,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:30:17Z",
+      "stamp": "2026-11-17T20:32:22Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -229,7 +229,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -240,7 +240,7 @@
       "api": null,
       "artifact": "dashboard/data/short_alpha.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29",
+      "stamp": "2026-11-17",
       "max_age_hours": 100.0,
       "exists": true,
       "status": "fresh",
@@ -248,7 +248,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/)",
-      "next_action": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/) A lane-failure issue is open.",
+      "next_action": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/) The supervisor will retry this lane, at most three times a day.",
       "coverage": {
         "total_rows": 186,
         "complete_rows": 2,
@@ -270,11 +270,11 @@
       "api": null,
       "artifact": "dashboard/data/reverse_splits.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T18:50:09Z",
+      "stamp": "2026-10-30T18:26:01Z",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-reverse-splits",
       "lane_receipt_at": "2026-10-26T20:57:25Z",
       "healer": "python _system/scripts/build_reverse_splits_dashboard.py (data-pipeline nightly intake-full rebuild + Monday reverse-splits job; repository_dispatch heal-reverse-splits)",
@@ -289,15 +289,15 @@
       "api": null,
       "artifact": "dashboard/data/desk_briefs.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:28:19Z",
+      "stamp": "2026-10-30T12:33:01Z",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard)",
-      "next_action": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard) A lane-failure issue is open.",
+      "next_action": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard) The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -308,15 +308,15 @@
       "api": null,
       "artifact": "dashboard/data/warrants.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-27T13:57:56Z",
+      "stamp": "2026-11-01T05:11:00Z",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-warrant-discover",
       "lane_receipt_at": "2026-10-27T08:24:47Z",
       "healer": "python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _system/scripts/build_warrant_dashboard.py (data-pipeline nightly + Monday discovery)",
-      "next_action": "python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _system/scripts/build_warrant_dashboard.py (data-pipeline nightly + Monday discovery)",
+      "next_action": "python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _system/scripts/build_warrant_dashboard.py (data-pipeline nightly + Monday discovery) A lane-failure issue is open.",
       "coverage": null
     },
     {
@@ -327,15 +327,15 @@
       "api": null,
       "artifact": "dashboard/data/separations.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-27T13:57:57Z",
+      "stamp": "2026-11-01T05:11:58Z",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-separation-discover",
       "lane_receipt_at": "2026-10-26T08:09:41Z",
       "healer": "python _system/scripts/build_separation_flows.py && python _system/scripts/build_separations_dashboard.py (data-pipeline nightly + Monday separation-discover; repository_dispatch heal-separations)",
-      "next_action": "python _system/scripts/build_separation_flows.py && python _system/scripts/build_separations_dashboard.py (data-pipeline nightly + Monday separation-discover; repository_dispatch heal-separations)",
+      "next_action": "python _system/scripts/build_separation_flows.py && python _system/scripts/build_separations_dashboard.py (data-pipeline nightly + Monday separation-discover; repository_dispatch heal-separations) A lane-failure issue is open.",
       "coverage": null
     },
     {
@@ -346,15 +346,15 @@
       "api": null,
       "artifact": "dashboard/data/special_situations.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-27T13:58:22Z",
+      "stamp": "2026-11-01T05:11:08Z",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py)",
-      "next_action": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py) A lane-failure issue is open.",
+      "next_action": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py) The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -365,7 +365,7 @@
       "api": null,
       "artifact": "dashboard/data/nol_screener.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:31:29Z",
+      "stamp": "2026-11-17T20:33:35Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -373,16 +373,16 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": {
         "total_rows": 89,
-        "complete_rows": 61,
-        "incomplete_rows": 28,
+        "complete_rows": 60,
+        "incomplete_rows": 29,
         "excluded_rows": 0,
-        "coverage_pct": 68.5,
+        "coverage_pct": 67.4,
         "missing_by_field": {
-          "gross_nol_usd": 13,
-          "market_cap_usd": 21
+          "gross_nol_usd": 14,
+          "market_cap_usd": 22
         },
         "definition": "Required comparison fields: gross_nol_usd, market_cap_usd",
         "kind": "field_presence",
@@ -397,7 +397,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "ADAP",
@@ -407,7 +407,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "ALDX",
@@ -416,7 +416,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "APLS",
@@ -425,7 +425,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "AVDL",
@@ -434,7 +434,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "BDSI",
@@ -443,16 +443,17 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "CDTX",
             "missing": [
+              "gross_nol_usd",
               "market_cap_usd"
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "DRRX",
@@ -461,7 +462,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "DXC",
@@ -470,7 +471,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "FOLD",
@@ -479,7 +480,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "GAIA",
@@ -488,7 +489,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "GPRO",
@@ -498,7 +499,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "HNST",
@@ -507,7 +508,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "IGMS",
@@ -516,7 +517,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "IMGN",
@@ -525,7 +526,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "IMUX",
@@ -534,7 +535,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "KPTI",
@@ -543,7 +544,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "MTRX",
@@ -552,7 +553,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "PARA",
@@ -562,7 +563,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "PERI",
@@ -572,7 +573,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "PRPL",
@@ -581,7 +582,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "PRQR",
@@ -591,7 +592,16 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
+          },
+          {
+            "entity": "RMTI",
+            "missing": [
+              "market_cap_usd"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "SGMO",
@@ -600,7 +610,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "SND",
@@ -609,7 +619,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "SONN",
@@ -618,7 +628,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "SUP",
@@ -627,7 +637,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "TRUE",
@@ -636,7 +646,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           },
           {
             "entity": "XOMA",
@@ -645,7 +655,7 @@
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:29Z"
+            "checked_at": "2026-11-17T20:33:35Z"
           }
         ]
       }
@@ -658,7 +668,7 @@
       "api": null,
       "artifact": "dashboard/data/advantaged_banks_screener.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:31:37Z",
+      "stamp": "2026-11-17T20:33:43Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -666,7 +676,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": {
         "total_rows": 9,
         "complete_rows": 6,
@@ -693,7 +703,7 @@
               "p_tbv": "A dated USD quote and verified common-share / tangible-equity basis are required."
             },
             "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001392272.json",
-            "checked_at": "2026-10-29T19:31:36.229438+00:00"
+            "checked_at": "2026-11-17T20:33:41.860302+00:00"
           },
           {
             "entity": "VBNK",
@@ -710,7 +720,7 @@
               "p_tbv": "A dated USD quote and verified common-share / tangible-equity basis are required."
             },
             "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001690639.json",
-            "checked_at": "2026-10-29T19:31:36.731953+00:00"
+            "checked_at": "2026-11-17T20:33:42.648679+00:00"
           },
           {
             "entity": "NU",
@@ -723,7 +733,7 @@
               "p_tbv": "A dated USD quote and verified common-share / tangible-equity basis are required."
             },
             "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001691493.json",
-            "checked_at": "2026-10-29T19:31:37.346309+00:00"
+            "checked_at": "2026-11-17T20:33:43.335524+00:00"
           }
         ]
       }
@@ -736,68 +746,176 @@
       "api": null,
       "artifact": "dashboard/data/rock_aggregates_screener.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:31:49.738237+00:00",
+      "stamp": "2026-11-17T20:33:57.173301+00:00",
       "max_age_hours": 102.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "aggregates-screener",
-      "lane_receipt_at": "2026-10-29T01:57:05Z",
+      "lane_receipt_at": "2026-10-31T01:50:13Z",
       "healer": "Aggregates Screener daily source refresh; repair with heal-aggregates",
       "next_action": "Aggregates Screener daily source refresh; repair with heal-aggregates",
       "coverage": {
         "total_rows": 11,
-        "complete_rows": 7,
-        "incomplete_rows": 4,
+        "complete_rows": 0,
+        "incomplete_rows": 11,
         "excluded_rows": 0,
-        "coverage_pct": 63.6,
+        "coverage_pct": 0.0,
         "missing_by_field": {
-          "ev_ebitda": 4,
-          "fcf_yield_pct": 2,
+          "ev_ebitda": 2,
+          "fcf_yield_pct": 1,
+          "organic_volume_growth_pct": 11,
+          "reserve_life_years": 11,
+          "cash_gp_per_ton": 10,
+          "shipments_million_tons": 9,
+          "price_per_ton": 9,
           "operating_required": 11
         },
-        "definition": "Required comparison fields: ev_ebitda, fcf_yield_pct",
+        "definition": "Required comparison fields: ev_ebitda, fcf_yield_pct; including the declared required operating observations",
         "kind": "field_presence",
         "next_action": "Reconcile source filings, units and periods; retain explicit reasons for undisclosed metrics.",
         "decision_approval": false,
         "backlog": [
           {
-            "entity": "AMRZ",
+            "entity": "VMC",
             "missing": [
-              "ev_ebitda"
+              "organic_volume_growth_pct",
+              "reserve_life_years"
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:49Z"
+            "checked_at": "2026-11-17T20:33:57Z"
+          },
+          {
+            "entity": "MLM",
+            "missing": [
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:57Z"
+          },
+          {
+            "entity": "CRH",
+            "missing": [
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:57Z"
+          },
+          {
+            "entity": "AMRZ",
+            "missing": [
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:57Z"
           },
           {
             "entity": "EXP",
             "missing": [
-              "ev_ebitda"
+              "ev_ebitda",
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:49Z"
+            "checked_at": "2026-11-17T20:33:57Z"
+          },
+          {
+            "entity": "KNF",
+            "missing": [
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:57Z"
+          },
+          {
+            "entity": "ACA",
+            "missing": [
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:57Z"
+          },
+          {
+            "entity": "USLM",
+            "missing": [
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:57Z"
+          },
+          {
+            "entity": "GVA",
+            "missing": [
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
+            ],
+            "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
+            "source": null,
+            "checked_at": "2026-11-17T20:33:57Z"
           },
           {
             "entity": "ROAD",
             "missing": [
-              "ev_ebitda",
-              "fcf_yield_pct"
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:49Z"
+            "checked_at": "2026-11-17T20:33:57Z"
           },
           {
             "entity": "CX",
             "missing": [
               "ev_ebitda",
-              "fcf_yield_pct"
+              "fcf_yield_pct",
+              "shipments_million_tons",
+              "price_per_ton",
+              "cash_gp_per_ton",
+              "organic_volume_growth_pct",
+              "reserve_life_years"
             ],
             "reason": "Required values are absent from this source publication; verify issuer filings, periods and reporting currency.",
             "source": null,
-            "checked_at": "2026-10-29T19:31:49Z"
+            "checked_at": "2026-11-17T20:33:57Z"
           }
         ]
       }
@@ -810,15 +928,15 @@
       "api": null,
       "artifact": "dashboard/data/insights/events.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-15T09:13:13Z",
+      "stamp": "2026-11-17T20:29:59Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "fresh",
+      "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -829,13 +947,13 @@
       "api": null,
       "artifact": "dashboard/data/fund_holdings_summary.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:56:32Z",
+      "stamp": "2026-11-01T19:38:04Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-thirteen-f",
-      "lane_receipt_at": "2026-10-29T19:57:15Z",
+      "lane_receipt_at": "2026-10-31T18:40:18Z",
       "healer": "The 13:29 UTC data-pipeline thirteen-f job refreshes filings. This page does not dispatch that job.",
       "next_action": "The 13:29 UTC data-pipeline thirteen-f job refreshes filings. This page does not dispatch that job.",
       "coverage": null
@@ -867,15 +985,15 @@
       "api": null,
       "artifact": "dashboard/data/insights/manifest.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-15T09:13:13Z",
+      "stamp": "2026-11-17T20:29:59Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "fresh",
+      "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "This table is written with the dashboard build. It does not dispatch refreshes.",
-      "next_action": "This table is written with the dashboard build. It does not dispatch refreshes. A lane-failure issue is open.",
+      "next_action": "This table is written with the dashboard build. It does not dispatch refreshes. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -886,11 +1004,11 @@
       "api": null,
       "artifact": "dashboard/data/insights/letters.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-15T09:13:13Z",
+      "stamp": "2026-11-17T20:29:59Z",
       "max_age_hours": 174.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "fresh",
+      "label_text": "Fresh",
       "lane": "letters",
       "lane_receipt_at": "2026-10-25T20:44:31Z",
       "healer": "Letter backfill republishes the letters shard.",
@@ -905,23 +1023,24 @@
       "api": null,
       "artifact": "dashboard/data/insights/podcasts.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-30T01:21:01Z",
+      "stamp": "2026-11-17T20:29:59Z",
       "max_age_hours": 240.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "podcasts",
-      "lane_receipt_at": "2026-10-20T00:58:30Z",
+      "lane_receipt_at": "2026-10-30T01:25:06Z",
       "healer": "python _system/scripts/podcast_cloud_refresh.py --date YYYY-MM-DD (podcast-refresh.yml, cron 0 7 * * 1)",
       "next_action": "python _system/scripts/podcast_cloud_refresh.py --date YYYY-MM-DD (podcast-refresh.yml, cron 0 7 * * 1) A lane-failure issue is open.",
       "coverage": {
-        "total_rows": 4582,
-        "complete_rows": 3085,
-        "incomplete_rows": 1497,
+        "total_rows": 4545,
+        "complete_rows": 3062,
+        "incomplete_rows": 1483,
         "excluded_rows": 0,
-        "coverage_pct": 67.3,
+        "coverage_pct": 67.4,
         "missing_by_field": {
-          "pending_model": 1497
+          "needs_review": 2,
+          "pending_model": 1481
         },
         "definition": "Reader summaries ready / published podcast catalog",
         "kind": "processing",
@@ -937,15 +1056,15 @@
       "api": null,
       "artifact": "dashboard/data/insights/videos.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-15T09:13:13Z",
+      "stamp": "2026-11-17T20:29:59Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "fresh",
+      "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -964,7 +1083,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": {
         "total_rows": 865,
         "complete_rows": 755,
@@ -991,23 +1110,23 @@
       "stamp": "2026-10-29T16:11:20Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job.",
-      "next_action": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job. A lane-failure issue is open.",
+      "next_action": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": {
-        "total_rows": 866,
+        "total_rows": 870,
         "complete_rows": 502,
-        "incomplete_rows": 364,
+        "incomplete_rows": 368,
         "excluded_rows": 0,
-        "coverage_pct": 58.0,
+        "coverage_pct": 57.7,
         "missing_by_field": {
+          "market_cap": 80,
+          "earnings": 324,
           "float_pct": 131,
           "adv": 64,
-          "earnings": 320,
-          "market_cap": 76,
           "shares": 76
         },
         "definition": "Rows without listed input gaps / broad published universe; index eligibility is separate",
@@ -1024,15 +1143,15 @@
       "api": null,
       "artifact": "dashboard/data/insights/consensus.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-15T09:13:13Z",
+      "stamp": "2026-11-17T20:29:59Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "fresh",
+      "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -1043,15 +1162,15 @@
       "api": null,
       "artifact": "dashboard/data/insights/registry.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-15T09:13:13Z",
+      "stamp": "2026-11-17T20:29:59Z",
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "fresh",
+      "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -1062,7 +1181,7 @@
       "api": null,
       "artifact": "dashboard/data/document_catalog.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T19:28:20Z",
+      "stamp": "2026-11-17T20:31:01Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -1070,7 +1189,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -1081,15 +1200,15 @@
       "api": null,
       "artifact": "dashboard/data/research_memory.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-23T09:47:52Z",
+      "stamp": null,
       "max_age_hours": 54.0,
       "exists": true,
-      "status": "stale",
-      "label_text": "Stale",
+      "status": "unauthorized",
+      "label_text": "Private snapshot unavailable",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open.",
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -1106,7 +1225,7 @@
       "status": "api",
       "label_text": "Check observation dates",
       "lane": "market-risk",
-      "lane_receipt_at": "2026-10-29T22:17:30Z",
+      "lane_receipt_at": "2026-10-31T01:45:58Z",
       "healer": "Live readings come from /api/v1/market-risk/latest. The committed fallback is market_risk_components.json.",
       "next_action": "Live readings come from /api/v1/market-risk/latest. The committed fallback is market_risk_components.json.",
       "coverage": null
@@ -1119,13 +1238,13 @@
       "api": null,
       "artifact": "dashboard/data/market_risk_components.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T22:17:15.095764+00:00",
+      "stamp": "2026-10-31T01:40:29.235580+00:00",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "market-risk",
-      "lane_receipt_at": "2026-10-29T22:17:30Z",
+      "lane_receipt_at": "2026-10-31T01:45:58Z",
       "healer": "market-risk-components.yml commit-once-daily step (lands the $RUNNER_TEMP snapshot it already builds)",
       "next_action": "market-risk-components.yml commit-once-daily step (lands the $RUNNER_TEMP snapshot it already builds)",
       "coverage": {
@@ -1151,11 +1270,11 @@
       "api": null,
       "artifact": "dashboard/data/criticality_summary.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T22:13:39.826494+00:00",
+      "stamp": "2026-10-30T21:52:19.514836+00:00",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-29T08:54:32Z",
       "healer": "python _system/scripts/build_criticality_signals.py --workers 4 (data-pipeline lane, cron 15 2 * * 1-5)",
@@ -1170,11 +1289,11 @@
       "api": null,
       "artifact": "dashboard/data/vol_metrics_latest.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T22:00:01.610268+00:00",
+      "stamp": "2026-10-30T21:37:34.958525+00:00",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-29T08:54:32Z",
       "healer": "python _system/scripts/build_vol_metrics.py (self-healing composite sources; data-pipeline technicals lane, cron 15 2 * * 1-5)",
@@ -1189,11 +1308,11 @@
       "api": null,
       "artifact": "dashboard/data/capitulation_daily.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-29T22:00:05.763578+00:00",
+      "stamp": "2026-10-31T01:14:29.150571+00:00",
       "max_age_hours": 100.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-29T08:54:32Z",
       "healer": "python _system/scripts/build_capitulation_daily.py --workers 6 (forced-flow-daily weekdays 22:00 UTC; data-pipeline technicals lane, heal-technicals)",
@@ -1227,11 +1346,11 @@
       "api": null,
       "artifact": "dashboard/data/compounders.json",
       "stamp_field": "as_of",
-      "stamp": "2026-10-28",
+      "stamp": "2026-10-29",
       "max_age_hours": 240.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "valuation",
       "lane_receipt_at": "2026-10-27T13:04:20Z",
       "healer": "Maintain the shared company roster and verify company valuation evidence.",
@@ -1268,12 +1387,12 @@
       "stamp": "2026-10-29",
       "max_age_hours": 240.0,
       "exists": true,
-      "status": "fresh",
-      "label_text": "Fresh",
+      "status": "stale",
+      "label_text": "Stale",
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Rebuild dated factor evidence and the existing research/paper publication.",
-      "next_action": "Rebuild dated factor evidence and the existing research/paper publication. A lane-failure issue is open.",
+      "next_action": "Rebuild dated factor evidence and the existing research/paper publication. The supervisor will retry this lane, at most three times a day.",
       "coverage": {
         "total_rows": 235,
         "complete_rows": 0,
@@ -1357,7 +1476,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-27T10:17:03Z",
       "healer": "Refresh dated context sources; keep forecasts separate from observations.",
-      "next_action": "Refresh dated context sources; keep forecasts separate from observations. A lane-failure issue is open.",
+      "next_action": "Refresh dated context sources; keep forecasts separate from observations. The supervisor will retry this lane, at most three times a day.",
       "coverage": null
     },
     {
@@ -1368,7 +1487,7 @@
       "api": null,
       "artifact": "dashboard/data/irr_readiness.json",
       "stamp_field": "as_of",
-      "stamp": "2026-10-29",
+      "stamp": "2026-11-17",
       "max_age_hours": 56.0,
       "exists": true,
       "status": "fresh",
@@ -1378,22 +1497,22 @@
       "healer": "Reconcile canonical price/model fields and complete source-backed valuation requirements.",
       "next_action": "Reconcile canonical price/model fields and complete source-backed valuation requirements. A lane-failure issue is open.",
       "coverage": {
-        "total_rows": 866,
+        "total_rows": 873,
         "complete_rows": 0,
-        "incomplete_rows": 866,
+        "incomplete_rows": 873,
         "excluded_rows": 0,
         "coverage_pct": 0.0,
         "missing_by_field": {
-          "cash_allocation": 866,
-          "cashflow_schedule": 866,
-          "freshness": 623,
-          "model": 643,
-          "ownership": 620,
-          "price": 865,
-          "proof": 692,
-          "publication": 866,
-          "sources": 643,
-          "underwriting": 866
+          "cash_allocation": 873,
+          "cashflow_schedule": 873,
+          "freshness": 628,
+          "model": 647,
+          "ownership": 626,
+          "price": 872,
+          "proof": 698,
+          "publication": 873,
+          "sources": 648,
+          "underwriting": 873
         },
         "definition": "Companies passing every canonical IRR requirement / assessed companies",
         "kind": "decision_readiness",
