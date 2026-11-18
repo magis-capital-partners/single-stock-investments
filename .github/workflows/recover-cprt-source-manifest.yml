@@ -1,0 +1,30 @@
+name: Recover CPRT source archive manifest
+
+on:
+  repository_dispatch:
+    types: [recover-cprt-source-manifest]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cprt-source-archive-manifest-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      GH_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      TICKER: ${{ github.event.client_payload.ticker }}
+      LIMIT: ${{ github.event.client_payload.limit }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recover only the completed CPRT publication source snapshot
+        run: python _system/scripts/recover_company_source_manifest.py --ticker "$TICKER" --limit "$LIMIT" --parts-commit ca8e15b00a6eef5a51cfeacd24c095ac615a34b0 --expected-parts 3420 --expected-files 1856098 --expected-generated-at 2026-11-17T19:39:53+00:00 --publish
