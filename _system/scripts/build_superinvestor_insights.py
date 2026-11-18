@@ -9,6 +9,7 @@ consensus layer can decide what to count.
 """
 from __future__ import annotations
 
+import bisect
 import csv
 import hashlib
 import json
@@ -170,12 +171,50 @@ def classify_document(path: Path, text: str) -> tuple[str, bool, str]:
     return "other_research", False, "no_letter_signal"
 
 
-def _theme_keyword_matches(text: str, keyword: str) -> list[re.Match[str]]:
+# Under re.I these are the only non-ASCII code points that match an ASCII
+# letter, so folding them first makes a plain substring test a lossless
+# prefilter for an ASCII keyword.  test_superinvestor_theme_matching checks
+# the set against every code point.
+_IGNORECASE_ASCII_FOLD = str.maketrans({"\u0130": "i", "\u0131": "i", "\u017f": "s", "\u212a": "k"})
+_THEME_NOT_AFTER_WORD = re.compile(r"(?<![A-Za-z0-9])", re.I)
+_THEME_PATTERNS: dict[str, re.Pattern[str]] = {}
+
+
+def _theme_search_text(text: str) -> str:
+    return text.translate(_IGNORECASE_ASCII_FOLD).lower()
+
+
+def _theme_keyword_matches(
+    text: str, keyword: str, search_text: str | None = None
+) -> list[re.Match[str]]:
+    """Return what ``(?<![A-Za-z0-9])kw(?![A-Za-z0-9])`` finditer would.
+
+    A leading lookbehind stops ``re`` from scanning for the literal, which made
+    ~90 keyword passes the costliest part of every letter.  The boundary before
+    the match is checked separately; a rejected start resumes one character
+    later, which is exactly where finditer would try next.
+    """
     clean = keyword.strip()
     if not clean:
         return []
-    pattern = re.compile(rf"(?<![A-Za-z0-9]){re.escape(clean)}(?![A-Za-z0-9])", re.I)
-    return list(pattern.finditer(text))
+    if clean.isascii():
+        if search_text is None:
+            search_text = _theme_search_text(text)
+        if clean.lower() not in search_text:
+            return []
+    pattern = _THEME_PATTERNS.get(clean)
+    if pattern is None:
+        pattern = re.compile(rf"{re.escape(clean)}(?![A-Za-z0-9])", re.I)
+        _THEME_PATTERNS[clean] = pattern
+    rows: list[re.Match[str]] = []
+    pos = 0
+    while (row := pattern.search(text, pos)) is not None:
+        if _THEME_NOT_AFTER_WORD.match(text, row.start()):
+            rows.append(row)
+            pos = row.end()
+        else:
+            pos = row.start() + 1
+    return rows
 
 
 def tickers_near_keyword(text: str, keyword: str, tickers: list[str], window: int = 400) -> list[str]:
@@ -198,14 +237,32 @@ def tickers_near_keyword(text: str, keyword: str, tickers: list[str], window: in
     return found
 
 
+def _paragraph_break_ends(text: str) -> list[int]:
+    """End offsets of the non-overlapping "\\n\\n" runs str.count would see."""
+    ends: list[int] = []
+    idx = text.find("\n\n")
+    while idx >= 0:
+        ends.append(idx + 2)
+        idx = text.find("\n\n", idx + 2)
+    return ends
+
+
 def extract_themes(text: str, tickers: list[str]) -> list[dict]:
     themes: list[dict] = []
+    search_text = _theme_search_text(text)
+    paragraph_ends: list[int] | None = None
     for theme, kws in THEME_KEYWORDS.items():
-        matches = {k: _theme_keyword_matches(text, k) for k in kws}
+        matches = {k: _theme_keyword_matches(text, k, search_text) for k in kws}
         matches = {k: rows for k, rows in matches.items() if rows}
+        if not matches:
+            continue
         total_hits = sum(len(rows) for rows in matches.values())
+        if paragraph_ends is None:
+            paragraph_ends = _paragraph_break_ends(text)
+        # Same value as text.count("\n\n", 0, start) without rescanning the
+        # prefix for every hit.
         paragraph_hits = {
-            text.count("\n\n", 0, row.start())
+            bisect.bisect_right(paragraph_ends, row.start())
             for rows in matches.values()
             for row in rows
         }

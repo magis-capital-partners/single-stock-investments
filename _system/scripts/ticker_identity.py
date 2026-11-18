@@ -182,6 +182,21 @@ def _exchange_pairs(text: str) -> tuple[tuple[str, str], ...]:
 
 
 _cached_exchange_pairs = lru_cache(maxsize=64)(_exchange_pairs)
+_large_text_pairs: tuple[str, tuple[tuple[str, str], ...]] | None = None
+
+
+def _document_exchange_pairs(text: str) -> tuple[tuple[str, str], ...]:
+    global _large_text_pairs
+    if len(text) <= 65536:
+        return _cached_exchange_pairs(text)
+    # A large document is checked against every candidate issuer in turn, so
+    # reparsing it per issuer is quadratic.  Keep only the latest one.
+    held = _large_text_pairs
+    if held is not None and (held[0] is text or held[0] == text):
+        return held[1]
+    pairs = _exchange_pairs(text)
+    _large_text_pairs = (text, pairs)
+    return pairs
 
 
 def explicit_exchange_mentions(text: str, ticker: str) -> list[str]:
@@ -190,9 +205,7 @@ def explicit_exchange_mentions(text: str, ticker: str) -> list[str]:
         return []
     base = ticker.split(".", 1)[0].upper()
     dotted = ticker.upper()
-    # Each document window is checked against many issuers. Parse its exchange
-    # pairs once, without retaining large books in the process-wide cache.
-    pairs = _cached_exchange_pairs(text) if len(text) <= 65536 else _exchange_pairs(text)
+    pairs = _document_exchange_pairs(text)
     return [exchange for symbol, exchange in pairs if symbol in {base, dotted}]
 
 
@@ -282,12 +295,36 @@ def text_has_company_conflict(
     """True when a nearby issuer name conflicts with the book company."""
     if not text or not ticker or not company:
         return False
-    base = re.escape(ticker.split(".", 1)[0])
-    for match in re.finditer(rf"(?<![A-Z0-9.\-]){base}(?![A-Z0-9.\-])", text, re.I):
-        phrase = nearby_company_phrase(text, match.start())
+    for start in _ticker_token_starts(text, ticker.split(".", 1)[0]):
+        phrase = nearby_company_phrase(text, start)
         if phrase and company_names_conflict(phrase, company, aliases):
             return True
     return False
+
+
+_TICKER_NOT_AFTER_SYMBOL = re.compile(r"(?<![A-Z0-9.\-])", re.I)
+_TICKER_TOKEN_PATTERNS: dict[str, re.Pattern[str]] = {}
+
+
+def _ticker_token_starts(text: str, base: str) -> Iterable[int]:
+    """Starts of ``(?<![A-Z0-9.\\-])base(?![A-Z0-9.\\-])`` finditer matches (re.I).
+
+    The leading lookbehind is checked per candidate instead of in the pattern
+    so ``re`` can scan for the literal; this is the per-issuer pass over every
+    letter, and over whole books when a large PDF is extracted.
+    """
+    pattern = _TICKER_TOKEN_PATTERNS.get(base)
+    if pattern is None:
+        pattern = re.compile(rf"{re.escape(base)}(?![A-Z0-9.\-])", re.I)
+        _TICKER_TOKEN_PATTERNS[base] = pattern
+    pos = 0
+    while pos <= len(text) and (match := pattern.search(text, pos)) is not None:
+        start, end = match.span()
+        if _TICKER_NOT_AFTER_SYMBOL.match(text, start):
+            yield start
+            pos = end if end > start else start + 1
+        else:
+            pos = start + 1
 
 
 def identity_match_ok(
