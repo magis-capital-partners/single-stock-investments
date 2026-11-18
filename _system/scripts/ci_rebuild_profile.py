@@ -212,6 +212,23 @@ EXTERNAL_STEP_POLICY: dict[str, tuple[int, int]] = {
 }
 DEFAULT_STEP_TIMEOUT_SEC = 50 * 60
 DASHBOARD_STEP = "_system/scripts/build_dashboard_data.py"
+# Unix time by which the whole profile must stop. The workflow sets it inside
+# its own step timeout, so a slow script fails here with a named source and the
+# partial-progress commit still has its budget, instead of the runner killing
+# the job with nothing attributed.
+DEADLINE_ENV = "CI_REBUILD_DEADLINE_EPOCH"
+# A script started with less than this left would only be killed mid-write.
+MIN_STEP_BUDGET_SEC = 60
+
+
+def rebuild_deadline(env: dict[str, str]) -> float | None:
+    raw = (env.get(DEADLINE_ENV) or "").strip()
+    if not raw:
+        return None
+    try:
+        return float(raw)
+    except ValueError as exc:
+        raise SystemExit(f"{DEADLINE_ENV} must be a Unix timestamp, got {raw!r}") from exc
 
 
 def step_policy(script: str) -> tuple[int, int]:
@@ -233,13 +250,28 @@ def github_output(key: str, value: str) -> None:
         handle.write(f"{key}={value}\n")
 
 
-def run_step(step: list[str], env: dict[str, str], *, sleep_fn=time.sleep) -> None:
+def run_step(
+    step: list[str], env: dict[str, str], *, sleep_fn=time.sleep, clock=time.time
+) -> None:
     script = step[0]
     source = Path(script).name
-    attempts, timeout = step_policy(script)
+    attempts, policy_timeout = step_policy(script)
+    deadline = rebuild_deadline(env)
     cmd = [sys.executable, *step]
     detail = "failed"
+    ran = 0
     for attempt in range(1, attempts + 1):
+        timeout = policy_timeout
+        budget_bound = False
+        if deadline is not None:
+            remaining = int(deadline - clock())
+            if remaining < MIN_STEP_BUDGET_SEC:
+                detail = f"rebuild budget exhausted ({max(remaining, 0)}s left)"
+                break
+            if remaining < timeout:
+                timeout = remaining
+                budget_bound = True
+        ran = attempt
         print(
             f"+ {' '.join(cmd)} (attempt {attempt}/{attempts}, timeout {timeout}s)",
             flush=True,
@@ -249,6 +281,9 @@ def run_step(step: list[str], env: dict[str, str], *, sleep_fn=time.sleep) -> No
             return
         except subprocess.TimeoutExpired:
             detail = f"timed out after {timeout}s"
+            if budget_bound:
+                detail += " (rebuild budget exhausted)"
+                break
         except subprocess.CalledProcessError as exc:
             detail = f"exit {exc.returncode}"
         if attempt >= attempts:
@@ -262,7 +297,7 @@ def run_step(step: list[str], env: dict[str, str], *, sleep_fn=time.sleep) -> No
         sleep_fn(delay)
     message = (
         f"intake rebuild failed on source {source} ({script}) "
-        f"after {attempts} attempt(s): {detail}"
+        f"after {ran} attempt(s): {detail}"
     )
     print(f"::error::{message}", flush=True)
     raise SourceFailure(source, message)
