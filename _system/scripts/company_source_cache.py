@@ -117,6 +117,11 @@ def restore(source,cache,publication_only=False):
     manifest=source/'manifest.json'
     if not manifest.is_file():return {'parts':0}
     parts=json.loads(manifest.read_text(encoding='utf-8'))['parts']
+    return restore_parts(source,cache,parts,publication_only)
+
+
+def restore_parts(source,cache,parts,publication_only=False):
+    """Restore an explicit verified checkpoint without changing its manifest."""
     for part in parts:
         path=source/part['file']
         if path.parent.resolve()!=source.resolve():raise ValueError('Invalid archive path')

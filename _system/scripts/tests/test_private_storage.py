@@ -215,6 +215,9 @@ def mac_home(tmp_path, monkeypatch):
     for name in ("CLOUDFLARE_API_TOKEN", "APPDATA", "XDG_CONFIG_HOME", "WRANGLER_JS"):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("HOME", str(tmp_path))
+    # Windows Path.home() uses USERPROFILE rather than HOME. Never fall through
+    # to a developer's real Wrangler session while testing a fake Mac login.
+    monkeypatch.setattr(store.Path, "home", classmethod(lambda cls: tmp_path))
     monkeypatch.setattr(store, "ROOT", tmp_path)
     return tmp_path
 
