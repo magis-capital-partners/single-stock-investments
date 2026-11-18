@@ -357,3 +357,21 @@ def test_publish_failure_halts_entries_but_keeps_protecting(live, monkeypatch):
     monkeypatch.setattr(live.engine.book, "publish", broken)
     run(live.engine.tick([signal(id="x")], NOW))  # must not raise
     assert live.journal.get("entry_halt") == "account_guard_publish:OSError"
+
+
+@pytest.mark.parametrize("host", ["ny4", "spx-ny4", "FXVPS374628", "spx-ny4.localdomain"])
+def test_paper_refuses_every_ny4_name(monkeypatch, host):
+    import socket
+    monkeypatch.setattr(socket, "gethostname", lambda: host)
+    with pytest.raises(SafetyError):
+        PaperEndpoint("DU000000", 171, 4002).runtime_guard()
+
+
+def test_paper_refuses_a_host_with_the_spx_install(monkeypatch, tmp_path):
+    import socket
+    monkeypatch.setattr(socket, "gethostname", lambda: "laptop")
+    monkeypatch.setattr(safety, "NY4_MARKERS", (tmp_path,))
+    with pytest.raises(SafetyError):
+        PaperEndpoint("DU000000", 171, 4002).runtime_guard()
+    monkeypatch.setattr(safety, "NY4_MARKERS", (tmp_path / "absent",))
+    PaperEndpoint("DU000000", 171, 4002).runtime_guard()

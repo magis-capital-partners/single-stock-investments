@@ -169,7 +169,7 @@ async def run(args, endpoint, policy, config):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["preflight", "run", "status", "probe", "integration-test"])
+    parser.add_argument("command", choices=["preflight", "run", "status", "probe", "integration-test", "shadow-report"])
     parser.add_argument("--config", required=True)
     parser.add_argument(
         "--state",
@@ -188,11 +188,23 @@ def main(argv=None):
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--symbol", help="probe: reviewed common-share symbol")
     parser.add_argument("--conid", type=int, help="probe: reviewed IB conid")
-    parser.add_argument("--shares", type=int, default=1, help="probe: WhatIf size")
+    parser.add_argument("--shares", type=int, help="probe WhatIf size (1); mechanics size (10)")
     parser.add_argument("--report", help="probe/integration-test: write the JSON report here")
     parser.add_argument(
         "--journal", help="integration-test: a NEW *.integration.sqlite file"
     )
+    parser.add_argument(
+        "--mechanics-only",
+        action="store_true",
+        help="integration-test without live quotes (route A step P): order mechanics only",
+    )
+    parser.add_argument(
+        "--reference-price", type=float, help="mechanics: price if no delayed quote arrives"
+    )
+    parser.add_argument("--min-sessions", type=int, default=5, help="shadow-report")
+    parser.add_argument("--max-gap-seconds", type=int, default=120, help="shadow-report")
+    parser.add_argument("--since", help="shadow-report: UTC ISO start")
+    parser.add_argument("--until", help="shadow-report: UTC ISO end")
     parser.add_argument(
         "--resume-entries",
         action="store_true",
@@ -248,25 +260,44 @@ def main(argv=None):
             broker = PaperIBKR(endpoint, lambda: {"borrow": {}, "eligibility": {}})
             report = asyncio.run(
                 probe(endpoint, policy, broker, symbol=args.symbol,
-                      conid=args.conid, shares=args.shares)
+                      conid=args.conid, shares=args.shares or 1)
             )
             text = json.dumps(report, indent=1, sort_keys=True)
             if args.report:
                 Path(args.report).write_text(text + "\n", encoding="utf-8")
             print(text)
             return 0 if report["pass"] else 3
+        elif args.command == "shadow-report":
+            from .shadow_report import shadow_report
+
+            report = shadow_report(
+                args.state, min_sessions=args.min_sessions,
+                max_gap_seconds=args.max_gap_seconds, since=args.since, until=args.until,
+            )
+            text = json.dumps(report, indent=1, sort_keys=True)
+            if args.report:
+                Path(args.report).write_text(text + "\n", encoding="utf-8")
+            print(text)
+            return 0 if report["ready_for_arm_review"] else 3
         elif args.command == "integration-test":
             if endpoint.live or not args.connect_paper:
                 raise SafetyError("integration-test needs a paper endpoint and --connect-paper")
             if not (args.symbol and args.conid and args.journal):
                 raise SafetyError("integration-test needs --symbol, --conid and --journal")
-            from .integration import dumps, run_integration
+            from .integration import dumps, run_integration, run_mechanics
 
             async def stage6():
                 broker = PaperIBKR(endpoint, lambda: {"borrow": {}, "eligibility": {}})
                 require_local_ib_listener(endpoint.port)
                 await broker.connect()
                 try:
+                    if args.mechanics_only:
+                        return await run_mechanics(
+                            endpoint, policy, broker, args.journal,
+                            symbol=args.symbol, conid=args.conid,
+                            shares=args.shares or 10,
+                            reference=args.reference_price,
+                        )
                     return await run_integration(
                         endpoint, policy, broker, args.journal,
                         symbol=args.symbol, conid=args.conid,

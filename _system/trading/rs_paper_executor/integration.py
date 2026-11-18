@@ -197,5 +197,181 @@ async def run_integration(endpoint, policy, broker, journal_path, *, symbol, con
     return report
 
 
+def reference_price(quote, ticker, operator_price=None):
+    """A price to work orders around when the paper session has no live quotes.
+
+    Delayed bid/ask mid first, then delayed last/close, then the operator's
+    ``--reference-price``. Mechanics mode only: never an entry decision input."""
+    import math
+
+    def ok(x):
+        try:
+            return x is not None and math.isfinite(float(x)) and float(x) > 0
+        except (TypeError, ValueError):
+            return False
+
+    bid, ask = quote.get("bid"), quote.get("ask")
+    if ok(bid) and ok(ask) and float(ask) >= float(bid):
+        return (float(bid) + float(ask)) / 2, "delayed_mid"
+    for name in ("last", "close"):
+        value = getattr(ticker, name, None)
+        if ok(value):
+            return float(value), "delayed_" + name
+    if ok(operator_price):
+        return float(operator_price), "operator"
+    raise SafetyError("no delayed quote and no --reference-price: cannot price mechanics orders")
+
+
+async def run_mechanics(endpoint, policy, broker, journal_path, *, symbol, conid,
+                        shares=10, reference=None, timeout=60, sleep=asyncio.sleep,
+                        reconnect=True):
+    """Order mechanics on a paper session WITHOUT live quotes (route A, step P).
+
+    With no separate paper host and no second IBKR username, a paper session
+    off NY4 gets delayed data or none, so the engine correctly refuses to
+    enter or to protect. This mode therefore drives the real adapter and the
+    real journal directly, and proves on IBKR's simulated paper market:
+
+     1. delayed_quote_refused   the engine refuses a non-live quote
+     2. whatif_preview          a real exact-stock WhatIf returns finite fields
+     3. entry_fill              a bounded SELL priced through the market fills
+                                (partials counted), imported by execution ID
+     4. duplicate_prevented     the journal refuses a second entry for it
+     5. reconnect_recovery      disconnect, reconnect, reconcile: no duplicates
+     6. cancel_confirmed        a resting 1-share order expires (TTL) and the
+                                cancellation is broker-confirmed
+     7. scoped_cover            a BUY priced through the market flattens it
+     8. kill_latch_holds        a set kill latch refuses resume_entries
+
+    Entry decisions, live-quote protection, stops and margin refusal are NOT
+    proven here: live shadow (stage S) and the unit tests cover those.
+    """
+    if endpoint.live:
+        raise SafetyError("mechanics test is paper only")
+    if not 1 <= int(shares) <= 100:
+        raise SafetyError("mechanics size must be 1-100 shares")
+    journal_path = Path(journal_path)
+    if not journal_path.name.endswith(".integration.sqlite") or journal_path.exists():
+        raise SafetyError("integration journal must be a NEW *.integration.sqlite file")
+    steps = {}
+    report = {"schema": SCHEMA, "mode": "mechanics_only", "synthetic_control": True,
+              "paper_only": True, "symbol": symbol, "conid": conid, "steps": steps,
+              "not_proven_here": ["entry decision gates on live quotes",
+                                  "live-quote protection and stops",
+                                  "margin refusal inside enter()"]}
+
+    def record(name, ok, **detail):
+        steps[name] = {"pass": bool(ok), **detail}
+
+    journal = Journal(journal_path, policy.digest)
+    executor = Executor(endpoint, policy, journal, broker)
+
+    def orders(side=None):
+        return [o for o in journal.rows("orders") if side is None or o["side"] == side]
+
+    async def until(predicate):
+        # Reconcile and TTL expiry only: protect() would (correctly) halt on
+        # a position it cannot quote live.
+        for _ in range(int(timeout)):
+            snap = await executor.reconcile(broker.now())
+            await executor.expire_orders(snap, broker.now())
+            if predicate():
+                return True
+            await sleep(1)
+        return False
+
+    def tick_round(price):
+        return round(price, 2)
+
+    try:
+        if getattr(broker, "ib", None) is not None and hasattr(broker.ib, "reqMarketDataType"):
+            broker.ib.reqMarketDataType(3)  # delayed where available
+        await broker.qualify({"ticker": symbol, "expected_conid": conid})
+        q = await broker.quote(conid)
+        ref, source = reference_price(q, broker.tickers.get(conid), reference)
+        if ref < 1:
+            raise SafetyError("mechanics test needs a stock priced at $1 or more")
+        report["reference"] = {"price": ref, "source": source,
+                               "market_data_type": q.get("market_data_type")}
+
+        try:
+            executor.quote(q, broker.now(), conid)
+            record("delayed_quote_refused", q.get("market_data_type") == 1,
+                   reason="quote accepted (live data present: full mode is available)")
+        except SafetyError as exc:
+            record("delayed_quote_refused", True, reason=str(exc))
+
+        preview = await broker.margin(conid, int(shares), tick_round(ref))
+        fields = ("initial_change", "maintenance_change", "initial_after", "maintenance_after")
+        try:
+            values = {k: float(preview.get(k)) for k in fields}
+            finite = all(abs(v) < 1e100 for v in values.values())
+        except (TypeError, ValueError):
+            values, finite = {}, False
+        record("whatif_preview", finite and not preview.get("warning"), **values,
+               warning=preview.get("warning"))
+
+        sig = control_signal(symbol, conid, broker.now())
+        sig["conid"] = conid
+        sig["planned_exit_at"] = broker.now()
+        sell = tick_round(ref * 0.97)
+        ref_entry = await executor.submit(sig, "SELL", int(shares), sell, broker.now())
+        filled = await until(lambda: any(o["ref"] == ref_entry and o["state"] == "filled"
+                                         for o in orders()))
+        fills = [f for f in journal.rows("fills") if f["ref"] == ref_entry]
+        held = sum(p["shares"] for p in journal.rows("positions"))
+        record("entry_fill", filled and held == int(shares), ref=ref_entry, limit=sell,
+               fills=len(fills), partial_fills=max(0, len(fills) - 1), shares=held)
+
+        try:
+            await executor.submit(sig, "SELL", int(shares), sell, broker.now())
+            record("duplicate_prevented", False, reason="second entry accepted")
+        except SafetyError as exc:
+            record("duplicate_prevented", True, reason=str(exc))
+
+        if reconnect:
+            before = len(journal.rows("fills"))
+            broker.ib.disconnect()
+            await broker.connect()
+            if hasattr(broker.ib, "reqMarketDataType"):
+                broker.ib.reqMarketDataType(3)
+            await broker.qualify({"ticker": symbol, "expected_conid": conid})
+            snap = await executor.reconcile(broker.now())
+            record("reconnect_recovery", len(journal.rows("fills")) == before
+                   and snap["positions"].get(conid, 0) == -held,
+                   fills_before=before, fills_after=len(journal.rows("fills")),
+                   broker_position=snap["positions"].get(conid, 0))
+
+        far = tick_round(ref * 1.5)
+        cancel_sig = control_signal(symbol, conid, broker.now(), cik="999999997")
+        cancel_sig["conid"], cancel_sig["planned_exit_at"] = conid, broker.now()
+        cref = await executor.submit(cancel_sig, "SELL", 1, far, broker.now())
+        await sleep(policy.entry_order_ttl_seconds + 1)
+        done = await until(lambda: any(o["ref"] == cref and o["state"] == "cancelled"
+                                       for o in orders()))
+        record("cancel_confirmed", done, ref=cref, limit=far,
+               cancel_requested=journal.get("cancel_requested:" + cref) is not None)
+
+        buy = tick_round(ref * 1.03)
+        cover = await executor.submit(sig, "BUY", held, buy, broker.now()) if held else None
+        flat = await until(lambda: not any(p["shares"] for p in journal.rows("positions"))
+                           and all(o["state"] in TERMINAL for o in orders()))
+        snap = await executor.reconcile(broker.now())
+        record("scoped_cover", flat and snap["positions"].get(conid, 0) == 0,
+               ref=cover, limit=buy, broker_position=snap["positions"].get(conid, 0))
+
+        journal.set("kill", True)
+        try:
+            await executor.resume_entries(broker.now())
+            record("kill_latch_holds", False, reason="resume accepted after kill")
+        except SafetyError as exc:
+            record("kill_latch_holds", True, reason=str(exc))
+    finally:
+        journal.close()
+    report["pass"] = bool(steps) and all(s["pass"] for s in steps.values())
+    report["journal"] = str(journal_path)
+    return report
+
+
 def dumps(report):
     return json.dumps(report, indent=1, sort_keys=True)

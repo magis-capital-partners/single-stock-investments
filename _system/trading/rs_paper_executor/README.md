@@ -3,8 +3,9 @@
 A **standalone process**, built from the SPX/SPY operating patterns. It is not a
 feature switch on the live SPX executor or the Box R collector. It runs:
 
-* **paper**: an isolated paper Gateway/TWS on loopback, `DU` account, unregistered
-  paper client ID, `RSPAPER|` references (`--connect-paper`);
+* **paper**: a paper Gateway/TWS on the operator's machine (never NY4) on
+  loopback, `DU` account, unregistered paper client ID, `RSPAPER|` references
+  (`--connect-paper`);
 * **live**: the shared NY4 Gateway as the registered `reverse-split` system,
   client **60**, `RSLIVE|` references (`--connect-live`). It runs in **SHADOW**
   (every gate and the real WhatIf, but no SELL transmitted) until the owner's arm
@@ -20,8 +21,12 @@ Nothing is deployed automatically.
 * Box R continues collecting SEC/news/financial/history data, EQUS.MINI research
   books and public borrow/Flex evidence. Its code, deployment and policies are
   untouched by this package. No broker client, credentials or session belongs on R.
-* An **isolated paper host** runs this package beside an independently configured
-  paper Gateway/TWS. Only `127.0.0.1:4002` or `127.0.0.1:7497`, an explicit `DU...`
+* **Paper runs supervised on the operator's own machine** (Drew's laptop), beside a
+  paper Gateway/TWS logged in with the **paper username**. The owner decided on
+  2026-11-18 that there will be no separate paper host and no second IBKR
+  username. Off NY4 the paper session therefore has no live quotes, and paper
+  proves order mechanics only (see "Acceptance path"). Paper never runs on NY4:
+  the guard matches `ny4`, `spx-ny4`, `FXVPS374628` and the SPX install path. Only `127.0.0.1:4002` or `127.0.0.1:7497`, an explicit `DU...`
   account and a distinct operator-selected paper client ID are accepted. IDs in
   the canonical production/reserved/retired registry are rejected. This is a
   separate paper endpoint namespace, not an allocation on the NY4 Gateway.
@@ -204,6 +209,36 @@ Recovery follows the paper procedure below:
 
 Never edit or delete the journal or the claims file to clear a position.
 
+### Acceptance path (owner, 2026-11-18: no paper host, no second IBKR username)
+
+The original plan ("paper acceptance on a separate host") needs live quotes in a
+paper session. IBKR gives a paper user live data only on the same machine as the
+live user, or while the live user is logged out, and NY4's live user is logged in
+through the session. Route A replaces that plan. Each stage needs the owner's word
+to start, and its evidence is reviewed before the next.
+
+| Stage | Where | Proves | Evidence |
+|---|---|---|---|
+| **P: paper mechanics** | Laptop paper, supervised, delayed data | Order mechanics only, on IBKR's simulated market (see the mechanics test above) | `integration-test --mechanics-only` report, `pass: true` |
+| **S: live shadow** | NY4, client 60, **no arm file** | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report` over ≥ N sessions (default 5): `ready_for_arm_review: true`, the would-be entries, and refusals by reason |
+| **L: live pilot** | NY4, owner arm file | Real fills, cancels, recalls and fees at the smallest size | The owner sets pilot caps (e.g. `max_names: 1`, a small `target_notional`) and widens them only after reviewing the pilot's fills and the account reconciliation |
+
+```text
+python -m _system.trading.rs_paper_executor shadow-report --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite --min-sessions 5 --report shadow.json
+```
+
+`shadow-report` is read-only. It holds no writer lock and opens no broker
+connection. It prints acceptance facts:
+* no transmitted orders;
+* the number of sessions observed;
+* the worst heartbeat gap;
+* whether the kill and daily-loss latches are set.
+
+It exits 0 only when all of them hold. The decision to arm stays with the owner.
+Note that shadow sees no would-be entries until the evidence producers exist
+(identity/conid within the 15-minute window, intraday SSR, borrow ≤30 min). Its
+refusal histogram shows exactly which one is missing.
+
 ### Account reconciliation (after the Flex day closes)
 
 ```text
@@ -241,8 +276,8 @@ economic sizing and full corporate-action support require further validation.
 
 ## Safe startup (operator-run; not performed by this change)
 
-Use a dedicated Python 3.12 virtual environment on the isolated paper execution
-host. It needs no GitHub/Databento/Flex/NY4 credentials. Copy source through the
+Use a dedicated Python 3.12 virtual environment on the operator's machine (never
+NY4 or Box R). It needs no GitHub/Databento/Flex/NY4 credentials. Copy source through the
 existing reviewed artifact process. Verify a separate paper Gateway is listening
 locally; do not tunnel or redirect it to the live Gateway.
 
@@ -314,6 +349,28 @@ python -m _system.trading.rs_paper_executor integration-test --config /etc/rs-pa
    a news signal, never in the production journal. Run it in regular hours on a
    liquid name.
 
+   This full mode needs live quotes in the paper session, which this account
+   cannot get off NY4. Use **`--mechanics-only`** instead (stage P below). Set the
+   paper user NOT to share the live user's data, so it receives delayed data:
+
+```text
+python -m _system.trading.rs_paper_executor integration-test --mechanics-only --config <paper config> --connect-paper --symbol <LIQUID_TICKER> --conid <REVIEWED_CONID> --shares 10 --journal <dir>/2026-11-20.integration.sqlite --report stage-p.json
+```
+
+   Mechanics mode prices orders through the market from the delayed mid (or
+   `--reference-price`) and drives the real adapter and journal. It proves:
+   * the delayed quote is refused by the engine;
+   * a real WhatIf preview;
+   * entry fills, with partials counted;
+   * duplicate refusal;
+   * reconnect without duplicate fills;
+   * a broker-confirmed TTL cancel;
+   * a scoped cover to flat;
+   * the kill latch.
+
+   It does not prove entry gates, live-quote protection or stops; those belong
+   to stage S and the unit tests.
+
 Use `--once` for one bounded paper cycle. The default journal is under the user's
 private home state directory; keep configuration/state/evidence outside Git and
 readable only by the service user. `rs-paper-executor.service` is an **uninstalled**
@@ -340,7 +397,7 @@ still needed before unattended operation is accepted.
 ## Verification
 
 ```text
-python -m pytest -q _system/trading/tests/test_rs_paper_executor.py _system/trading/tests/test_rs_paper_probe.py _system/trading/tests/test_rs_live_guards.py _system/trading/tests/test_rs_symbol_claims.py _system/trading/tests/test_rs_integration_harness.py _system/trading/tests/test_account_ownership.py _system/trading/tests/test_ib_gateway_registry.py
+python -m pytest -q _system/trading/tests/test_rs_shadow_report.py _system/trading/tests/test_rs_paper_executor.py _system/trading/tests/test_rs_paper_probe.py _system/trading/tests/test_rs_live_guards.py _system/trading/tests/test_rs_symbol_claims.py _system/trading/tests/test_rs_integration_harness.py _system/trading/tests/test_account_ownership.py _system/trading/tests/test_ib_gateway_registry.py
 python -m ruff check _system/trading/rs_paper_executor _system/trading/account_ownership.py _system/trading/tests --select F
 ```
 

@@ -62,6 +62,11 @@ LIVE_PREFIX = "RSLIVE|"
 RS_SYSTEM = "reverse-split"
 LIVE_APPROVAL = Path("/etc/rs-live-approved")
 BOX_R_HOSTS = {"magis-collector-3", "magis-collector-2"}
+# NY4 answers to several names (SSH alias spx-ny4, provider name FXVPS374628).
+# Paper must never run there: a paper Gateway beside the live one is route B,
+# which the owner declined on 2026-11-18. The SPX install path is a second proof.
+NY4_HOSTS = {"ny4", "spx-ny4", "fxvps374628"}
+NY4_MARKERS = (Path("/home/spx/spx-0dte"), Path("/home/spx/.config/spx-0dte"))
 # Names other systems in this account trade as products or deliverables. An RS
 # order or position here would switch off that product's delivery attribution
 # in spx-0dte (order_ownership foreign-share rule); never an RS name.
@@ -120,7 +125,8 @@ class PaperEndpoint:
             raise SafetyError("broker client identity mismatch")
 
     def runtime_guard(self):
-        if _refuse_box_r() == "ny4":
+        host = _refuse_box_r()
+        if host.split(".")[0] in NY4_HOSTS or any(m.exists() for m in NY4_MARKERS):
             raise SafetyError("paper broker adapter may not run on Box R or NY4")
 
 
