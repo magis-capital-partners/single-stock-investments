@@ -178,7 +178,7 @@ installed by anything.
 | Repo and venv | `/srv/rs-live/repo`, `/srv/rs-live/venv` |
 | Config and arm | `/etc/rs-live/` |
 | State | `/var/lib/rs-live/` (journal, evidence, operations copy, `book/`) |
-| Claims | `/var/lib/ib-account-claims/` (group `ib-claims`, readable by the `spx` user) |
+| Claims | `/var/lib/ib-account-claims/`: owner `rs-live`, group `ib-claims`, mode `2750` (setgid, so new files inherit the group); `spx` is a member of `ib-claims`. RS writes `reverse-split.json` at startup even with no claims and never deletes released entries |
 | SPX claim files | read from `/home/spx/spx-0dte/data/live/<date>/`, read-only; RS never writes there |
 
 The unit sets `CPUWeight=20` and `OOMScoreAdjust=700`; `RuntimeMaxSec` ends the

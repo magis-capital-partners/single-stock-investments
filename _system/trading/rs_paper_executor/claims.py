@@ -64,6 +64,11 @@ class ClaimBook:
         self.system, self.account = system, account
         self._foreign_cache = {}
 
+    def publish_current(self, now):
+        """Write the file even with no claims: readers treat 'configured but no
+        file' differently from 'no claims', so the file must always exist."""
+        self.write(self.load(), now)
+
     def foreign(self, now):
         """Names other systems in this account hold (fails closed, see module doc)."""
         return foreign_claims(self.directory, self.system, now, self._foreign_cache)

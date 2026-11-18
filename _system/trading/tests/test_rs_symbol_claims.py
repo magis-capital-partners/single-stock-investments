@@ -59,3 +59,10 @@ def test_file_name_must_match_system(tmp_path):
     (tmp_path / "reverse-split.json").rename(tmp_path / "imposter.json")
     with pytest.raises(SafetyError):
         foreign_claims(tmp_path, "other", NOW, {})
+
+
+def test_empty_claims_file_is_published(tmp_path):
+    book = ClaimBook(tmp_path, "reverse-split", "U1")
+    book.publish_current(NOW)
+    data = json.loads((tmp_path / "reverse-split.json").read_text())
+    assert data["claims"] == {} and data["generated_at"] == NOW

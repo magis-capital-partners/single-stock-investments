@@ -75,6 +75,8 @@ async def run(args, endpoint, policy, config):
         raise SafetyError("evidence and Box R operations source required")
     with_context = lambda: read_json(args.evidence)
     claims, book = account_guards(config, endpoint, policy)
+    if claims is not None:
+        claims.publish_current(datetime.now(ZoneInfo("UTC")).isoformat())
     arm_file = (config.get("live") or {}).get("arm_file")
     journal = Journal(args.state, policy.digest, endpoint.prefix)
     broker = PaperIBKR(endpoint, with_context)
