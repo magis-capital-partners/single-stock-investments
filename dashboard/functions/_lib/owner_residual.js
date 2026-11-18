@@ -15,6 +15,13 @@
  *
  * The edge has no spx-0dte delivery forecast, so every SPY / QQQ / TSLA / NVDA /
  * AMZN share here is `etf_0dte_delivery_unattributed` -- owned by nobody, like the attributed kind.
+ *
+ * reverse-split (RS: small-cap stock shorts, orderRef `RSLIVE|`) is excluded by
+ * its stamp and by its symbol claims. The edge cannot read the claims file on
+ * NY4; it gets the effective set the hub attributed against, in the snapshot's
+ * `completeness.symbol_claims["reverse-split"]` ({status, source, claims:
+ * [{symbol, conid, sec_type}]}). Absent means RS was not configured where the
+ * snapshot was built. `status: "error"` quarantines every unproven short.
  */
 import universeFile from "../../data/etf_ls_universe.json" with { type: "json" };
 
@@ -35,6 +42,17 @@ const ETF_0DTE_POLICY_REASONS = {
   etf_0dte: "etf_0dte_option_exclusion",
   etf_0dte_delivery: "etf_0dte_expected_delivery",
   etf_0dte_delivery_unattributed: "etf_0dte_unattributed_shares",
+};
+// reverse-split: stamp, claim buckets and policy reasons, as in classify_positions.py
+// and allocation_policy.py.
+export const RS_SYSTEM = "reverse-split";
+const RS_REF_PREFIXES = ["RSLIVE|"];
+const RS_POLICY_REASONS = {
+  order_ref: "reverse_split_order_reference",
+  symbol_claim_conid: "reverse_split_symbol_claim",
+  symbol_claim_symbol: "reverse_split_symbol_claim",
+  symbol_claim_last_good_conid: "reverse_split_last_good_claim",
+  symbol_claim_last_good_symbol: "reverse_split_last_good_claim",
 };
 
 export function normSym(symbol) {
@@ -124,6 +142,29 @@ function etf0dteShareClassification(pos, root, delivery, knownHoldings) {
   return { ticker: root, bucket: "etf_0dte_delivery", reason: "expected_delivery", owner: null };
 }
 
+function conidOf(value) {
+  if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
+  const number = Number(String(value).trim());
+  return Number.isInteger(number) && number > 0 ? number : null;
+}
+
+/**
+ * Port of SymbolClaims.position_match over a snapshot's claims summary: the
+ * classifier reason for a ref-less row RS claims, else "". Conid first, symbol
+ * second, the claim's sec type only.
+ */
+export function rsClaimReason(pos, rsClaims) {
+  if (!rsClaims || !Array.isArray(rsClaims.claims)) return "";
+  const sec = String(pos.secType || pos.sec_type || "STK").trim().toUpperCase();
+  const claims = rsClaims.claims.filter((claim) => String(claim.sec_type || "STK").toUpperCase() === sec);
+  const prefix = rsClaims.source === "last_good" ? "symbol_claim_last_good_" : "symbol_claim_";
+  const conid = conidOf(pos.conid ?? pos.conId ?? pos.con_id);
+  if (conid !== null && claims.some((claim) => conidOf(claim.conid) === conid)) return `${prefix}conid`;
+  const symbol = normSym(pos.symbol || pos.ticker || pos.localSymbol || pos.local_symbol || "");
+  if (symbol && claims.some((claim) => normSym(claim.symbol) === symbol)) return `${prefix}symbol`;
+  return "";
+}
+
 function withOptionUnderlying(row) {
   const sec = String(row.sec_type || row.secType || "STK").trim().toUpperCase();
   const underlying = row.underlying || row.underlyingSymbol || row.underlying_symbol || "";
@@ -142,6 +183,7 @@ export function classifyPosition(pos, {
   drewSymbols = [],
   etf0dteDelivery = null,
   etf0dteKnownHoldings = {},
+  rsClaims = null,
 } = {}) {
   const under = normSym(pos.underlyingSymbol || pos.underlying || "");
   const ticker = normSym(pos.symbol || pos.ticker || pos.localSymbol || "");
@@ -154,6 +196,14 @@ export function classifyPosition(pos, {
   const indexName = under || ticker || tclass;
   const option = sec === "OPT" || sec === "FOP";
   const etfRoot = etf0dteRoot(pos);
+
+  // reverse-split's stamp beats every rule below, etf-0dte's included; a
+  // ref-less row its claims name is RS's before any symbol or owner rule.
+  if (RS_REF_PREFIXES.some((prefix) => ref.startsWith(prefix))) {
+    return { ticker: option ? (under || ticker) : ticker, bucket: "reverse_split", reason: "order_ref", owner: null };
+  }
+  const claimed = ref ? "" : rsClaimReason(pos, rsClaims);
+  if (claimed) return { ticker, bucket: "reverse_split", reason: claimed, owner: null };
 
   // etf-0dte's own stamp beats every symbol rule below.
   if (ETF_0DTE_REF_PREFIXES.some((prefix) => ref.startsWith(prefix))) {
@@ -219,11 +269,19 @@ export function classifyPosition(pos, {
     return { ticker, bucket: "michael", reason: "cash", owner: "michael" };
   }
   if (!ticker) return { ticker: "", bucket: "ignored", reason: "missing_symbol", owner: null };
+  // Unreadable RS claims: a short STK row with no other evidence is not proven
+  // anyone's but RS's, so it is quarantined rather than left on Michael.
+  if (rsClaims?.status === "error" && sec === "STK" && !ref) {
+    const quantity = quantityOf(pos);
+    if (quantity === null || quantity < 0) {
+      return { ticker, bucket: "reverse_split_unverified", reason: "symbol_claims_unreadable", owner: null };
+    }
+  }
   return { ticker, bucket: "michael", reason: "residual", owner: "michael" };
 }
 
 /** Port of classify_policy_position. */
-export function classifyPolicyPosition(row, { lsSymbols = [], drewSymbols = [] } = {}) {
+export function classifyPolicyPosition(row, { lsSymbols = [], drewSymbols = [], rsClaims = null } = {}) {
   const prepared = withOptionUnderlying(row);
   const symbol = normSym(prepared.symbol || prepared.local_symbol || prepared.localSymbol || "");
   if (!symbol) {
@@ -231,14 +289,31 @@ export function classifyPolicyPosition(row, { lsSymbols = [], drewSymbols = [] }
   }
   const classification = classifyPosition({
     symbol,
+    conid: prepared.conid,
     localSymbol: prepared.local_symbol || prepared.localSymbol,
     secType: prepared.sec_type || prepared.secType,
     underlying: prepared.underlying,
     tradingClass: prepared.trading_class || prepared.tradingClass,
     orderRef: prepared.order_ref || prepared.orderRef,
     quantity: prepared.quantity_decimal ?? prepared.quantity,
-  }, { etfLsSymbols: lsSymbols, drewSymbols, blacklistFamily: [] });
+  }, { etfLsSymbols: lsSymbols, drewSymbols, blacklistFamily: [], rsClaims });
 
+  if (classification.bucket === "reverse_split") {
+    return {
+      owner: "unallocated",
+      strategy: "reverse_split",
+      reason: RS_POLICY_REASONS[classification.reason] || "reverse_split_symbol_claim",
+      bucket: "reverse_split",
+    };
+  }
+  if (classification.bucket === "reverse_split_unverified") {
+    return {
+      owner: "unallocated",
+      strategy: "ownership_review",
+      reason: "reverse_split_claims_unreadable",
+      bucket: "reverse_split_unverified",
+    };
+  }
   if (Object.hasOwn(ETF_0DTE_POLICY_REASONS, classification.bucket)) {
     return {
       owner: "unallocated",
@@ -303,10 +378,10 @@ export function drewSymbolsFromSleeveRows(rows) {
  * Broker rows whose policy owner is Michael, each carrying one allocation for
  * the full broker quantity so the positions table can scale market value.
  */
-export function michaelResidualPositions(rows, { lsSymbols = lsUniverseSymbols(), drewSymbols = [] } = {}) {
+export function michaelResidualPositions(rows, { lsSymbols = lsUniverseSymbols(), drewSymbols = [], rsClaims = null } = {}) {
   const positions = [];
   for (const row of rows || []) {
-    const policy = classifyPolicyPosition(row, { lsSymbols, drewSymbols });
+    const policy = classifyPolicyPosition(row, { lsSymbols, drewSymbols, rsClaims });
     if (policy.owner !== "michael") continue;
     positions.push({
       ...row,

@@ -12,11 +12,15 @@ from _system.trading.sleeves.classify_positions import (
     ETF_0DTE,
     ETF_0DTE_DELIVERY,
     ETF_0DTE_DELIVERY_UNATTRIBUTED,
+    REVERSE_SPLIT,
+    REVERSE_SPLIT_UNVERIFIED,
+    RS_SYSTEM,
     classify_position,
     etf_0dte_root,
     norm_sym,
 )
 from _system.trading.sleeves.etf_0dte_delivery import DEFAULT_MAX_AGE_DAYS, read_expected_delivery
+from _system.trading.sleeves.symbol_claims import SymbolClaims, claim_refusal, claims_moment, load_symbol_claims
 
 
 POLICY_SOURCE_PREFIX = "policy:owner-custody:v1"
@@ -30,6 +34,21 @@ ETF_0DTE_POLICY_REASONS = {
     ETF_0DTE_DELIVERY: "etf_0dte_expected_delivery",
     ETF_0DTE_DELIVERY_UNATTRIBUTED: "etf_0dte_unattributed_shares",
 }
+
+# reverse-split (RS: small-cap stock shorts, client 60, orderRef RSLIVE|) owns
+# these lots. Owner "unallocated" like etf-0dte: the hub never sizes, rebalances
+# or tickets against them. A short the hub cannot prove is not RS's while the
+# claims file is unreadable is an ownership review, in no book.
+RS_STRATEGY = REVERSE_SPLIT
+RS_REVIEW_STRATEGY = "ownership_review"
+RS_POLICY_REASONS = {
+    "order_ref": "reverse_split_order_reference",
+    "symbol_claim_conid": "reverse_split_symbol_claim",
+    "symbol_claim_symbol": "reverse_split_symbol_claim",
+    "symbol_claim_last_good_conid": "reverse_split_last_good_claim",
+    "symbol_claim_last_good_symbol": "reverse_split_last_good_claim",
+}
+RS_UNVERIFIED_REASON = "reverse_split_claims_unreadable"
 
 
 @dataclass(frozen=True)
@@ -98,6 +117,36 @@ def load_etf_0dte_expected_delivery(
     )
 
 
+def load_rs_symbol_claims(
+    *, as_of: str | None = None, session_date: str | None = None, last_good_dir: str | Path | None = None,
+) -> SymbolClaims:
+    """reverse-split's symbol claims, judged at the snapshot's moment.
+
+    Read from ``IB_ACCOUNT_SYMBOL_CLAIMS_DIR`` (default
+    ``/var/lib/ib-account-claims``, written by the RS process on NY4). Not
+    configured on this host means RS is not deployed here: no claims. Configured
+    but unreadable is ``status="error"`` carrying the last good copy, which the
+    classifier uses and the ticket guard refuses on. ``last_good_dir`` (or
+    ``IB_ACCOUNT_SYMBOL_CLAIMS_LAST_GOOD_DIR``) keeps that copy across processes.
+    """
+    claims = load_symbol_claims(RS_SYSTEM, last_good_dir=last_good_dir)
+    return claims.at(claims_moment(as_of=as_of, session_date=session_date) if (as_of or session_date) else None)
+
+
+def reverse_split_ticket_refusal(identity: Mapping[str, Any], claims: SymbolClaims | None) -> str | None:
+    """Why the hub must refuse a ticket on this broker-qualified contract, or None.
+
+    reverse-split shorts small caps in this account and names them in its claims
+    file. The hub cannot tell RS's shares from anyone's on a ticket: the
+    reduce-only check reads the account-wide position, so a ``short_framework``
+    BUY cover passes against RS's short and a plain BUY nets it. No hub ticket,
+    any side, any sec type (an option delivers shares when exercised), may name
+    a claimed symbol or conid -- and while the claims are unreadable none may be
+    drafted at all, since nothing is proven unclaimed.
+    """
+    return claim_refusal(identity, claims, who="The hub")
+
+
 def _new_york_date(as_of: str | None) -> date | None:
     if not as_of:
         return None
@@ -150,17 +199,20 @@ def classify_policy_position(
     ls_symbols: Iterable[str],
     drew_symbols: Iterable[str] = (),
     etf_0dte_delivery: Mapping[str, Any] | None = None,
+    rs_claims: SymbolClaims | None = None,
 ) -> PolicyAllocation:
     """Owner custody rule: Michael's book is everything EXCEPT
     SPX option strategies, etf-0dte's SPY / QQQ / TSLA / NVDA / AMZN options and
-    delivered shares, every ticker in ls-algo's universe (ETFs and underlyings
-    alike), and Drew's sleeve holdings."""
+    delivered shares, reverse-split's stamped and claimed stock shorts, every
+    ticker in ls-algo's universe (ETFs and underlyings alike), and Drew's sleeve
+    holdings."""
     symbol = norm_sym(row.get("symbol") or row.get("local_symbol") or "")
     if not symbol:
         return PolicyAllocation("unallocated", "other", "missing_symbol_quarantine")
     classification = classify_position(
         {
             "symbol": symbol,
+            "conid": row.get("conid"),
             "localSymbol": row.get("local_symbol"),
             "secType": row.get("sec_type"),
             "underlying": row.get("underlying"),
@@ -173,7 +225,15 @@ def classify_policy_position(
         etf_ls_symbols=set(ls_symbols),
         drew_symbols=set(drew_symbols),
         etf_0dte_delivery=etf_0dte_delivery,
+        rs_claims=rs_claims,
     )
+    # RS's stamp or claim beats a broker-matched owner on the same conid: the
+    # account nets the two, so the whole position is RS's (see classify_positions).
+    if classification.bucket == REVERSE_SPLIT:
+        return PolicyAllocation(
+            "unallocated", RS_STRATEGY, RS_POLICY_REASONS.get(classification.reason, "reverse_split_symbol_claim"),
+            REVERSE_SPLIT,
+        )
     if classification.bucket in ETF_0DTE_POLICY_REASONS:
         return PolicyAllocation(
             "unallocated", ETF_0DTE_STRATEGY, ETF_0DTE_POLICY_REASONS[classification.bucket], classification.bucket,
@@ -185,7 +245,12 @@ def classify_policy_position(
     if row.get("_ownership"):
         evidence = row["_ownership"]
         return PolicyAllocation("unallocated" if evidence["owner"] == "excluded" else evidence["owner"],
-                                evidence["strategy"], evidence["reason"])
+                                evidence["strategy"], evidence["reason"],
+                                REVERSE_SPLIT if evidence["strategy"] == RS_STRATEGY else None)
+    # Positive evidence above still wins; only the residual fallthrough is
+    # quarantined while RS's claims are unreadable.
+    if classification.bucket == REVERSE_SPLIT_UNVERIFIED:
+        return PolicyAllocation("unallocated", RS_REVIEW_STRATEGY, RS_UNVERIFIED_REASON, REVERSE_SPLIT_UNVERIFIED)
     if classification.bucket == "etf_ls":
         return PolicyAllocation("unallocated", "letf", "ls_algo_universe_exclusion")
     if classification.bucket == "drew":

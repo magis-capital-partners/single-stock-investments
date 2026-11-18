@@ -42,11 +42,13 @@ import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Any
+from typing import Any, Callable
 
 from contextlib import contextmanager
 
-from .allocation_policy import etf_0dte_ticket_refusal
+from _system.trading.sleeves.symbol_claims import SymbolClaims
+
+from .allocation_policy import etf_0dte_ticket_refusal, load_rs_symbol_claims, reverse_split_ticket_refusal
 from .orders import GuardedOrderService, OrderIntent
 from .publisher import signed_headers
 
@@ -199,7 +201,12 @@ class OrderCommandChannel:
 class OrderCommandLoop:
     def __init__(self, service: GuardedOrderService, channel: OrderCommandChannel, *,
                  account_alias: str, live_enabled: bool = False, options_enabled: bool = False,
-                 sessions: Any = None, clock=time.monotonic):
+                 sessions: Any = None, clock=time.monotonic,
+                 symbol_claims: Callable[[], SymbolClaims] | None = None):
+        # reverse-split's claims, re-read for every ticket at draft and again
+        # before submit: RS can claim a name inside the approval window. A file
+        # read, never a socket. Default: IB_ACCOUNT_SYMBOL_CLAIMS_DIR.
+        self.symbol_claims = symbol_claims or load_rs_symbol_claims
         # `sessions` is a GatewaySessionFactory. When present the loop holds NO
         # standing IB connection: it polls D1 over HTTPS, and opens a Gateway
         # session only around the broker work a claimed ticket actually needs
@@ -386,6 +393,13 @@ class OrderCommandLoop:
         if refusal:
             self.channel.publish(row["request_id"], {"state": "rejected", "reject_reason": refusal})
             return
+        # A reverse-split claimed name, any side -- a short_framework cover is
+        # reduce-only against the account-wide position, which RS's short
+        # satisfies -- and every ticket while the claims cannot be read.
+        refusal = reverse_split_ticket_refusal(identity, self.symbol_claims())
+        if refusal:
+            self.channel.publish(row["request_id"], {"state": "rejected", "reject_reason": refusal})
+            return
         intent = OrderIntent(
             account_alias=self.account_alias,
             conid=int(row["conid"]),
@@ -444,6 +458,17 @@ class OrderCommandLoop:
         if not intent_uuid:
             raise ValueError("approved request has no hub intent")
         order = self.service.get(intent_uuid)
+        # RS may have claimed this name since the preview. The conId is what
+        # would be transmitted; the symbol is the ticket's, IBKR's identity
+        # having already been checked at draft.
+        refusal = reverse_split_ticket_refusal(
+            {"conid": order["conid"], "symbol": row.get("symbol"), "sec_type": row.get("sec_type")},
+            self.symbol_claims(),
+        )
+        if refusal:
+            self.service.refuse(intent_uuid, "reverse_split_symbol_claim", {"detail": refusal})
+            self.channel.publish(row["request_id"], {"state": "rejected", "reject_reason": refusal})
+            return
         # The edge's approval is a human signal. Authority comes from the token
         # this process issued and still holds.
         self.service.approve(

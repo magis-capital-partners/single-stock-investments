@@ -1,11 +1,14 @@
-"""Classify IB positions into Michael / Drew / systematic LETF / SPX 0DTE / ETF 0DTE."""
+"""Classify IB positions into Michael / Drew / systematic LETF / SPX 0DTE / ETF 0DTE / reverse-split."""
 
 from __future__ import annotations
 
 import re
 from dataclasses import asdict, dataclass
 from decimal import Decimal, InvalidOperation
-from typing import Any, Iterable, Mapping
+from typing import TYPE_CHECKING, Any, Iterable, Mapping
+
+if TYPE_CHECKING:  # pragma: no cover - typing only; symbol_claims imports this module
+    from .symbol_claims import SymbolClaims
 
 CASH_SEC_TYPES = {"CASH", "BILL"}
 CASH_SYMBOLS = {"USD", "EUR", "GBP", "CAD", "JPY", "BIL", "SGOV", "SHV", "TBIL", "TFLO", "VMFXX"}
@@ -60,9 +63,33 @@ ETF_0DTE = "etf_0dte"
 ETF_0DTE_DELIVERY = "etf_0dte_delivery"
 ETF_0DTE_DELIVERY_UNATTRIBUTED = "etf_0dte_delivery_unattributed"
 ETF_0DTE_BUCKETS = frozenset({ETF_0DTE, ETF_0DTE_DELIVERY, ETF_0DTE_DELIVERY_UNATTRIBUTED})
+
+# reverse-split ("RS"): small-cap stock shorts in this same account (IB client
+# 60, watchdog 140 reserved). Every order and execution is stamped RSLIVE|.
+# Positions carry no ref, so RS names its positions in a symbol-claims file
+# (symbol_claims.py, schema ib_account_symbol_claims.v1):
+#
+#   reverse_split             an RSLIVE| order/execution, or a ref-less row
+#                             that an active claim names (conid first, symbol
+#                             second, the claim's sec type only)
+#   reverse_split_unverified  a ref-less short STK row that would otherwise be
+#                             Michael's residual while the claims file is
+#                             configured but unreadable: nothing proves it is
+#                             not RS's, so no book holds it until it reads again
+#
+# Like etf-0dte, no SSI book owns either, and nothing here may size, rebalance,
+# sleeve-tag or ticket against them. A claim beats every symbol rule and every
+# owner's evidence on the same conid, because the account nets them: the hub
+# cannot see RS's share of a position, so it does not pretend to split it.
+RS_SYSTEM = "reverse-split"
+RS_REF_PREFIXES = ("RSLIVE|",)
+REVERSE_SPLIT = "reverse_split"
+REVERSE_SPLIT_UNVERIFIED = "reverse_split_unverified"
+RS_BUCKETS = frozenset({REVERSE_SPLIT, REVERSE_SPLIT_UNVERIFIED})
+
 # Buckets that belong to another system. A sleeve tag never pulls a row out of
 # one, and neither owner's gates, books or sizing ever count one.
-OTHER_SYSTEM_BUCKETS = frozenset({"etf_ls", "spx_0dte", "index_put_hedge"}) | ETF_0DTE_BUCKETS
+OTHER_SYSTEM_BUCKETS = frozenset({"etf_ls", "spx_0dte", "index_put_hedge"}) | ETF_0DTE_BUCKETS | RS_BUCKETS
 
 # Flex stores an option's OCC string in `symbol` and keeps no underlying, and
 # norm_sym turns its spaces into dashes, so accept either separator.
@@ -106,7 +133,8 @@ def expand_blacklist_symbols(
 class Classification:
     ticker: str
     # michael | drew | etf_ls | spx_0dte | index_put_hedge | etf_0dte |
-    # etf_0dte_delivery | etf_0dte_delivery_unattributed | ignored
+    # etf_0dte_delivery | etf_0dte_delivery_unattributed | reverse_split |
+    # reverse_split_unverified | ignored
     bucket: str
     reason: str
     owner: str | None
@@ -135,6 +163,18 @@ def _occ_root(text: Any) -> str:
 def has_etf_0dte_ref(ref: Any) -> bool:
     """True for an orderRef stamped by an etf-0dte executor or its watchdog."""
     return str(ref or "").strip().upper().startswith(ETF_0DTE_REF_PREFIXES)
+
+
+def has_rs_ref(ref: Any) -> bool:
+    """True for an orderRef stamped by the reverse-split executor (RSLIVE|)."""
+    return str(ref or "").strip().upper().startswith(RS_REF_PREFIXES)
+
+
+def _rs_claim(pos: Mapping[str, Any], rs_claims: "SymbolClaims | None") -> str | None:
+    """The claim reason for a ref-less row RS's claims name, else None."""
+    if rs_claims is None or _order_ref(pos):
+        return None
+    return rs_claims.position_match(pos)
 
 
 def etf_0dte_root(pos: Mapping[str, Any]) -> str:
@@ -282,13 +322,15 @@ def classify_position(
     drew_symbols: Iterable[str] | None = None,
     etf_0dte_delivery: Mapping[str, Any] | None = None,
     etf_0dte_known_holdings: Mapping[str, Any] | None = None,
+    rs_claims: "SymbolClaims | None" = None,
 ) -> Classification:
     """One row's bucket.
 
     `etf_0dte_delivery` is spx-0dte's delivery forecast (symbol -> net shares),
     None when none is available. `etf_0dte_known_holdings` is the signed
     etf-0dte-root shares other books are known to hold; those keep their
-    current bucket.
+    current bucket. `rs_claims` is reverse-split's symbol claims
+    (`symbol_claims.load_symbol_claims`), None when the caller has none.
     """
     classification = _classify(
         pos,
@@ -297,10 +339,15 @@ def classify_position(
         drew_symbols=drew_symbols,
         etf_0dte_delivery=etf_0dte_delivery,
         etf_0dte_known_holdings=etf_0dte_known_holdings,
+        rs_claims=rs_claims,
         share_rule=True,
     )
     evidence = pos.get("_ownership")
-    if evidence and classification.bucket not in {"spx_0dte", "index_put_hedge", *ETF_0DTE_BUCKETS}:
+    # A broker-matched opening ref proves an owner, but never over RS's own
+    # stamp or claim: the account nets the two and only RS knows its share.
+    if evidence and classification.bucket not in {"spx_0dte", "index_put_hedge", REVERSE_SPLIT, *ETF_0DTE_BUCKETS}:
+        if evidence.get("strategy") == REVERSE_SPLIT:
+            return Classification(classification.ticker, REVERSE_SPLIT, evidence["reason"], None)
         owner = evidence["owner"]
         bucket = "etf_ls" if owner == "excluded" else (owner if owner in {"drew", "michael"} else "ownership_review")
         return Classification(classification.ticker, bucket, evidence["reason"], owner if owner in {"drew", "michael"} else None)
@@ -316,6 +363,7 @@ def _classify(
     etf_0dte_delivery: Mapping[str, Any] | None,
     etf_0dte_known_holdings: Mapping[str, Any] | None,
     share_rule: bool,
+    rs_claims: "SymbolClaims | None" = None,
 ) -> Classification:
     under = norm_sym(pos.get("underlyingSymbol") or pos.get("underlying") or "")
     ticker = norm_sym(pos.get("symbol") or pos.get("ticker") or pos.get("localSymbol") or "")
@@ -327,6 +375,17 @@ def _classify(
     drew = {norm_sym(s) for s in (drew_symbols or [])}
     index_name = under or ticker or tclass
     etf_root = etf_0dte_root(pos)
+
+    # reverse-split's stamp is positive ownership and beats every rule below,
+    # etf-0dte's included. Only orders and executions carry it.
+    if has_rs_ref(ref):
+        return Classification((under or ticker) if sec in OPTION_SEC_TYPES else ticker, REVERSE_SPLIT, "order_ref", None)
+    # A ref-less row RS's claims name is RS's, before every symbol and owner
+    # rule: neither the LS universe, a Drew symbol nor the blacklist family can
+    # pull a claimed short into a book.
+    claimed = _rs_claim(pos, rs_claims)
+    if claimed:
+        return Classification(ticker, REVERSE_SPLIT, claimed, None)
 
     # etf-0dte's own stamp is positive ownership and beats every symbol rule
     # below. Only orders carry a ref; this is how an open SPY/QQQ/TSLA/NVDA/AMZN
@@ -437,6 +496,14 @@ def _classify(
     if not ticker:
         return Classification("", "ignored", "missing_symbol", None)
 
+    # Michael's residual is the fallthrough, so it is where an RS short lands
+    # when the claims cannot be read. A short STK row with no other evidence is
+    # quarantined until they can; a long one is not RS's (RS only shorts).
+    if rs_claims is not None and rs_claims.unreadable and sec == "STK" and not ref:
+        quantity = _quantity(pos)
+        if quantity is None or quantity < 0:
+            return Classification(ticker, REVERSE_SPLIT_UNVERIFIED, "symbol_claims_unreadable", None)
+
     return Classification(ticker, "michael", "residual", "michael")
 
 
@@ -473,6 +540,7 @@ def classify_positions(
     drew_symbols: Iterable[str] | None = None,
     etf_0dte_delivery: Mapping[str, Any] | None = None,
     etf_0dte_known_holdings: Mapping[str, Any] | None = None,
+    rs_claims: "SymbolClaims | None" = None,
 ) -> list[dict[str, Any]]:
     """Classify every row; split an etf-0dte-root share row that mixes holders.
 
@@ -480,12 +548,14 @@ def classify_positions(
     symbol (Flex reports one row per tax lot), spent in row order: known
     holdings first, then the forecast, then unattributed. A row that ends up
     in more than one bucket is emitted once per bucket, with its quantity and
-    values scaled and an `etf_0dte_split` marker.
+    values scaled and an `etf_0dte_split` marker. A row reverse-split claims
+    is never split: it is RS's whole.
     """
     kwargs = {
         "blacklist_family": list(blacklist_family),
         "etf_ls_symbols": list(etf_ls_symbols),
         "drew_symbols": list(drew_symbols or []),
+        "rs_claims": rs_claims,
     }
     known_left = _share_map(etf_0dte_known_holdings)
     forecast_left = None if etf_0dte_delivery is None else _share_map(etf_0dte_delivery)
@@ -494,7 +564,7 @@ def classify_positions(
         root = etf_0dte_root(pos)
         quantity = _quantity(pos) if root else None
         parts: list[tuple[Decimal, str | None, str]] = []
-        if root and quantity and _sec_type(pos) == "STK" and not _order_ref(pos):
+        if root and quantity and _sec_type(pos) == "STK" and not _order_ref(pos) and not _rs_claim(pos, rs_claims):
             parts = _share_parts(root, quantity, known_left=known_left, forecast_left=forecast_left)
         if not parts:
             row = dict(pos)

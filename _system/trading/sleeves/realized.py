@@ -15,7 +15,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
-from .classify_positions import classify_position, norm_sym
+from .classify_positions import REVERSE_SPLIT, classify_position, has_rs_ref, norm_sym
 from .strategy_ownership import OwnershipRegistry
 from ..portfolio_hub.flex import flex_date, slash_date_order
 
@@ -236,6 +236,11 @@ def owner_policy(event: dict, *, ls_symbols: set[str], blacklist: set[str], open
     ref = event.get("order_ref", "").upper()
     ticker = norm_sym(event.get("ticker") or event.get("symbol"))
     sec = event.get("sec_type", "STK")
+    # reverse-split stamps every execution RSLIVE|. A ref-less execution on one
+    # of its lots (a buy-in, a corporate action) is reached through the opening
+    # execution's evidence in build_history, not here.
+    if has_rs_ref(ref):
+        return "excluded", REVERSE_SPLIT, "order_reference"
     if any(marker in ref for marker in ("ETF_0DTE", "ETF0DTE", "SPY_0DTE", "QQQ_0DTE", "TSLA_0DTE", "NVDA_0DTE", "AMZN_0DTE")):
         return "excluded", "etf_0dte", "order_reference"
     if (sec in OPTION_TYPES and ticker in {"SPY", "QQQ", "TSLA", "NVDA", "AMZN"}

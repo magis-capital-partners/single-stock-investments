@@ -212,6 +212,16 @@ class GuardedOrderService:
             )
         return self._transition(intent_uuid, "Acknowledged", "broker_acknowledged", result)
 
+    def refuse(self, intent_uuid: str, event_type: str, payload: dict[str, Any]) -> dict[str, Any]:
+        """Reject an intent that has not reached the broker, with the reason on record.
+
+        For a guard outside this service (the reverse-split claim re-check before
+        submit). Only states before submission can be refused this way.
+        """
+        if self.get(intent_uuid)["state"] not in {"Draft", "Previewed", "Approved"}:
+            raise ValueError("only an unsubmitted order can be refused")
+        return self._transition(intent_uuid, "Rejected", event_type, payload)
+
     def reconcile_uncertain(self, intent_uuid: str) -> dict[str, Any]:
         order = self.get(intent_uuid)
         if order["state"] != "SubmitUncertain":

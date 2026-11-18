@@ -16,10 +16,12 @@ from .allocation_policy import (
     ETF_0DTE_POLICY_REASONS,
     ETF_0DTE_STRATEGY,
     POLICY_SOURCE_PREFIX,
+    RS_STRATEGY,
     classify_policy_position,
     load_drew_symbols,
     load_etf_0dte_expected_delivery,
     load_ls_universe,
+    load_rs_symbol_claims,
     residual_quantity,
 )
 
@@ -211,10 +213,11 @@ class PortfolioLedger:
     def _sync_policy_allocations(self, db: sqlite3.Connection, snapshot_id: str, payload: dict[str, Any], now: str) -> None:
         account_alias = payload["account_alias"]
         as_of = payload["as_of"]
-        ownership = (payload.get("completeness") or {}).get("ownership")
+        completeness = payload.get("completeness") or {}
         if "completeness" not in payload:
             stored = db.execute("SELECT completeness_json FROM account_snapshots WHERE snapshot_id=?", (snapshot_id,)).fetchone()
-            ownership = json.loads(stored[0]).get("ownership") if stored else None
+            completeness = (json.loads(stored[0]) if stored else None) or {}
+        ownership = completeness.get("ownership")
         if ownership:
             # Rebuild this projection from the broker lots atomically. Existing
             # human corrections remain in the audit log; ticker-wide rows may
@@ -234,6 +237,11 @@ class PortfolioLedger:
         ls_symbols = load_ls_universe()
         drew_symbols = load_drew_symbols()
         expected_delivery = load_etf_0dte_expected_delivery(account_alias, as_of=as_of)
+        # reverse-split's claims, judged at this snapshot (its Flex session date
+        # when it has one). The last good copy lives beside this ledger.
+        rs_claims = load_rs_symbol_claims(
+            as_of=as_of, session_date=completeness.get("session_date"), last_good_dir=self.path.parent / "symbol-claims",
+        )
         positions = db.execute(
             "SELECT * FROM position_snapshot_rows WHERE snapshot_id=? ORDER BY conid,model_code",
             (snapshot_id,),
@@ -241,14 +249,18 @@ class PortfolioLedger:
         for position in positions:
             policy = classify_policy_position(
                 dict(position), ls_symbols=ls_symbols, drew_symbols=drew_symbols,
-                etf_0dte_delivery=expected_delivery,
+                etf_0dte_delivery=expected_delivery, rs_claims=rs_claims,
             )
             # etf-0dte's SPY / QQQ / TSLA / NVDA / AMZN shares: an explicit
             # Drew/Michael lot is another book's KNOWN holding and keeps its owner; only the remainder is
             # attributed against spx-0dte's delivery forecast. Its options are
-            # nobody's here, like SPX's.
+            # nobody's here, like SPX's. reverse-split's stamped or claimed
+            # stock is nobody's here either, whole: the account nets RS against
+            # any owner lot on the same conid, so those lots end like etf-0dte's
+            # options. (A quarantined unverified short keeps explicit lots: they
+            # are known holdings, and only the remainder is unproven.)
             etf_0dte_shares = policy.strategy == ETF_0DTE_STRATEGY and policy.bucket != ETF_0DTE
-            if policy.strategy in {"letf", "spx_0dte", "ls_algo"} or (
+            if policy.strategy in {"letf", "spx_0dte", "ls_algo", RS_STRATEGY} or (
                 policy.strategy == ETF_0DTE_STRATEGY and not etf_0dte_shares
             ):
                 db.execute(

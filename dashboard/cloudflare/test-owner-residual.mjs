@@ -251,19 +251,95 @@ test("etf-0dte rows never reach Michael's residual book", () => {
   assert.deepEqual(rows.map((row) => row.symbol), ["CSU"]);
 });
 
+// reverse-split: RSLIVE| small-cap stock shorts. The edge sees RS's claims only as
+// the hub published them, in completeness.symbol_claims["reverse-split"].
+const RS_CLAIMS = {
+  schema: "ib_account_symbol_claims.v1", system: "reverse-split", status: "ok", source: "file",
+  claims: [{ symbol: "ABCD", conid: 11, sec_type: "STK" }, { symbol: "WXYZ", conid: 12, sec_type: "STK" }],
+};
+const RS_BROKEN = {
+  schema: "ib_account_symbol_claims.v1", system: "reverse-split", status: "error", source: "none",
+  claims: [], error: "reverse-split.json: JSONDecodeError",
+};
+
+test("reverse-split stamps and claims belong to no owner, ahead of every other rule", () => {
+  const ls = lsUniverseSymbols();
+  const policy = (row, rsClaims = RS_CLAIMS) => classifyPolicyPosition(row, { lsSymbols: ls, drewSymbols: new Set(["ABCD"]), rsClaims });
+
+  for (const [row, reason] of [
+    [{ conid: 11, symbol: "ABCD", local_symbol: "ABCD", sec_type: "STK", quantity_decimal: "-500" }, "reverse_split_symbol_claim"],
+    [{ conid: 99, symbol: "WXYZ", local_symbol: "WXYZ", sec_type: "STK", quantity_decimal: "-10" }, "reverse_split_symbol_claim"],
+    [{ conid: 5, symbol: "AAPL", local_symbol: "AAPL", sec_type: "STK", order_ref: "RSLIVE|ENTRY|AAPL|1" }, "reverse_split_order_reference"],
+  ]) {
+    assert.deepEqual(policy(row), { owner: "unallocated", strategy: "reverse_split", reason, bucket: "reverse_split" });
+  }
+  // Without the claims the same short was Drew's (a Drew symbol).
+  assert.equal(policy({ conid: 11, symbol: "ABCD", local_symbol: "ABCD", sec_type: "STK" }, null).owner, "drew");
+  // An option on a claimed name, and unclaimed names, keep their rules.
+  assert.equal(policy({ conid: 900, symbol: "ABCD  261218P00005000", local_symbol: "ABCD  261218P00005000", sec_type: "OPT" }).owner, "michael");
+  assert.equal(policy({ conid: 7, symbol: "CSU", local_symbol: "CSU", sec_type: "STK" }).owner, "michael");
+  assert.equal(policy({ conid: 8, symbol: "AAPL", local_symbol: "AAPL", sec_type: "STK" }).strategy, "letf");
+  // The stamp beats etf-0dte's roots; RSPAPER| is a different system entirely.
+  const spy = classifyPosition({ symbol: "SPY", secType: "STK", qty: -10, orderRef: "RSLIVE|ENTRY|SPY|1" }, { etfLsSymbols: ["SPY"] });
+  assert.deepEqual(spy, { ticker: "SPY", bucket: "reverse_split", reason: "order_ref", owner: null });
+  assert.equal(classifyPosition({ symbol: "CSU", secType: "STK", orderRef: "RSPAPER|ENTRY|CSU" }).bucket, "michael");
+  // Conid first, then symbol; a last good copy says so in its reason.
+  assert.equal(classifyPosition({ symbol: "RENAMED", conid: 11, secType: "STK" }, { rsClaims: RS_CLAIMS }).reason, "symbol_claim_conid");
+  assert.equal(classifyPosition({ symbol: "ABCD", conid: 777, secType: "STK" }, { rsClaims: RS_CLAIMS }).reason, "symbol_claim_symbol");
+  assert.equal(
+    classifyPosition({ symbol: "ABCD", conid: 11, secType: "STK" }, { rsClaims: { ...RS_CLAIMS, status: "error", source: "last_good" } }).reason,
+    "symbol_claim_last_good_conid",
+  );
+});
+
+test("unreadable reverse-split claims quarantine every unproven short", () => {
+  const policy = (row) => classifyPolicyPosition(row, { lsSymbols: new Set(), drewSymbols: new Set(["IBKR"]), rsClaims: RS_BROKEN });
+  assert.deepEqual(policy({ conid: 31, symbol: "NEWX", local_symbol: "NEWX", sec_type: "STK", quantity_decimal: "-100" }), {
+    owner: "unallocated", strategy: "ownership_review", reason: "reverse_split_claims_unreadable", bucket: "reverse_split_unverified",
+  });
+  assert.equal(policy({ conid: 7, symbol: "CSU", local_symbol: "CSU", sec_type: "STK", quantity_decimal: "12" }).owner, "michael");
+  assert.equal(policy({ conid: 6, symbol: "IBKR", local_symbol: "IBKR", sec_type: "STK", quantity_decimal: "-9" }).owner, "drew");
+});
+
+test("reverse-split rows never reach Michael's residual book", async () => {
+  const rows = michaelResidualPositions([
+    position({ conid: 1, symbol: "CSU", local_symbol: "CSU", quantity_decimal: "12" }),
+    position({ conid: 11, symbol: "ABCD", local_symbol: "ABCD", quantity_decimal: "-500" }),
+  ], { lsSymbols: new Set(), drewSymbols: [], rsClaims: RS_CLAIMS });
+  assert.deepEqual(rows.map((row) => row.symbol), ["CSU"]);
+
+  const brokerRows = [
+    ...brokerBook(),
+    position({ conid: 11, symbol: "ABCD", local_symbol: "ABCD", quantity_decimal: "-500", market_value_base_decimal: "-1500" }),
+    position({ conid: 31, symbol: "NEWX", local_symbol: "NEWX", quantity_decimal: "-200", market_value_base_decimal: "-400" }),
+  ];
+  const claimed = await loadPortfolio(portfolioDb({
+    brokerRows, completeness: { feed: "flex_eod", session_date: "2026-10-07", symbol_claims: { "reverse-split": RS_CLAIMS } },
+  }).env, "michael");
+  assert.deepEqual(claimed.positions.map((row) => row.symbol), ["CSU", "IBKR", "GTX", "3905.T", "NEWX"]);
+  const broken = await loadPortfolio(portfolioDb({
+    brokerRows, completeness: { feed: "flex_eod", session_date: "2026-10-07", symbol_claims: { "reverse-split": RS_BROKEN } },
+  }).env, "michael");
+  assert.deepEqual(broken.positions.map((row) => row.symbol), ["CSU", "IBKR", "GTX", "3905.T"]);
+  // A snapshot from a host without claims is read exactly as before.
+  const plain = await loadPortfolio(portfolioDb({ brokerRows }).env, "michael");
+  assert.ok(plain.positions.some((row) => row.symbol === "ABCD"));
+});
+
 function portfolioDb({
   ownerJoinRows = [],
   brokerRows = [],
   sleeveRows = [],
   allocationCount = 0,
   sleeveThrows = false,
+  completeness = { feed: "flex_eod", session_date: "2026-10-07" },
 }) {
   const queries = [];
   const run = {
     source_run_id: "run-flex",
     account_alias: "U805366",
     as_of: "2026-10-07T22:15:14Z",
-    completeness_json: JSON.stringify({ feed: "flex_eod", session_date: "2026-10-07" }),
+    completeness_json: JSON.stringify(completeness),
   };
   const db = {
     prepare(sql) {

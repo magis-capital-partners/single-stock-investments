@@ -32,6 +32,7 @@ from _system.trading.sleeves.config_loader import (
 from _system.trading.sleeves.flex_positions import parse_flex_positions
 from _system.trading.sleeves.ingest import post_ingest
 from _system.trading.sleeves.store import SleeveStore
+from _system.trading.sleeves.symbol_claims import SymbolClaims, claims_moment, load_symbol_claims
 
 
 # The edge refuses a sleeve ingest body over 512,000 bytes (MAX_BODY_BYTES in
@@ -217,6 +218,7 @@ def sync_holdings(
     flex_marks: Path | None = None,
     ingest: bool = True,
     write_dashboard: bool = True,
+    symbol_claims: SymbolClaims | None = None,
 ) -> dict[str, Any]:
     cfg = cfg or load_config()
     rows, source = load_positions(cfg, supplied=positions, flex_path=flex_path, flex_marks=flex_marks)
@@ -233,6 +235,12 @@ def sync_holdings(
         norm_sym(symbol)
         for symbol in ((cfg.get("operators") or {}).get("drew") or {}).get("symbols") or []
     ]
+    # reverse-split's claimed names are judged at the statement's session, so a
+    # short RS has since covered and released still reads as RS's on the day it
+    # was held. Unreadable claims quarantine unproven shorts; see symbol_claims.
+    rs_claims = (symbol_claims if symbol_claims is not None else load_symbol_claims()).at(
+        claims_moment(session_date=session or None)
+    )
     # SPY / QQQ / TSLA / NVDA / AMZN shares are attributed against spx-0dte's
     # delivery forecast; with none configured or found they are
     # etf_0dte_delivery_unattributed. Either way no sleeve owns them.
@@ -243,6 +251,7 @@ def sync_holdings(
         drew_symbols=drew_symbols,
         etf_0dte_delivery=load_etf_0dte_expected_delivery(dict(cfg)),
         etf_0dte_known_holdings=load_etf_0dte_known_holdings(dict(cfg)),
+        rs_claims=rs_claims,
     )
     tags = {int(t["con_id"]): t for t in store.sleeve_tags() if t.get("con_id")}
     tags_by_ticker = {(t.get("owner"), str(t.get("ticker") or "").upper()): t for t in store.sleeve_tags()}
@@ -310,6 +319,7 @@ def sync_holdings(
         "michael": michael,
         "drew": drew,
         "ingest": ingest_result,
+        **({"symbol_claims": {rs_claims.system: rs_claims.summary()}} if rs_claims.configured else {}),
     }
 
 
@@ -333,6 +343,12 @@ def main(argv: list[str] | None = None) -> int:
         f"Drew names={drew.get('open_names')} nav={drew.get('nav_usd')}\n"
         f"ingest={result['ingest']}"
     )
+    for system, claims in (result.get("symbol_claims") or {}).items():
+        if claims.get("status") == "error":
+            # Surfaced, not fatal: the books still publish, with every unproven
+            # short quarantined as reverse_split_unverified.
+            print(f"{system} symbol claims unreadable ({claims.get('source')} copy in use): {claims.get('error')}",
+                  file=sys.stderr)
     # A failed POST used to print and exit 0, so the unit reported success while
     # an owner's book never reached the dashboard. Every owner has been attempted
     # by now; fail the run if any of them failed.

@@ -1,6 +1,6 @@
 import { requireDatabase } from "./http.js";
 import { normalizeMatches, rememberContracts } from "./contracts.js";
-import { drewSymbolsFromSleeveRows, lsUniverseSymbols, michaelResidualPositions } from "./owner_residual.js";
+import { RS_SYSTEM, drewSymbolsFromSleeveRows, lsUniverseSymbols, michaelResidualPositions } from "./owner_residual.js";
 
 const DECIMAL = /^-?[0-9]+(?:\.[0-9]+)?$/;
 const OWNERS = new Set(["all", "drew", "michael", "unallocated"]);
@@ -447,6 +447,9 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
     const drewSymbols = drewSymbolsFromSleeveRows(await sleeveOwnerRows(db));
     positions = michaelResidualPositions(brokerRows?.results || [], {
       lsSymbols: lsUniverseSymbols(), drewSymbols,
+      // The claims the hub attributed this snapshot against; the edge cannot
+      // read reverse-split's file on NY4.
+      rsClaims: completeness.symbol_claims?.[RS_SYSTEM] || null,
     });
     allocationState = "residual_fallback";
   }

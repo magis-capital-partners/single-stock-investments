@@ -11,6 +11,7 @@ from . import PKG_DIR
 from .classify_positions import ETF_0DTE_BUCKETS, classify_position, expand_blacklist_symbols, norm_sym
 from .config_loader import load_blacklist, load_config, load_etf_ls_universe, load_etf_to_under, operator_config
 from .contracts import quote_px
+from .symbol_claims import SymbolClaims, claim_refusal, load_symbol_claims
 
 
 def utcnow() -> datetime:
@@ -58,6 +59,7 @@ def check_safeties(
     recent_ticker_at: Mapping[str, datetime] | None = None,
     cfg: Mapping[str, Any] | None = None,
     now: datetime | None = None,
+    symbol_claims: SymbolClaims | None = None,
 ) -> SafetyResult:
     cfg = cfg or load_config()
     now = now or utcnow()
@@ -133,6 +135,19 @@ def check_safeties(
             f"{gate_name} belongs to etf-0dte (SPY/QQQ/TSLA/NVDA/AMZN 0DTE options and their deliveries); "
             "no sleeve trades it"
         )
+    # A name reverse-split claims is its small-cap stock short. Either side and
+    # any sec type: a BUY covers RS's short, a SELL adds to it, and an option
+    # delivers shares on exercise. While its claims cannot be read nothing is
+    # proven unclaimed, so every sleeve order stops.
+    claims = symbol_claims if symbol_claims is not None else load_symbol_claims()
+    refusal = claim_refusal(
+        {"symbol": under_n or ticker_n, "underlying": under_n, "sec_type": sec,
+         "local_symbol": quote.get("local_symbol") or proposal.get("local_symbol"),
+         "conid": quote.get("conid") or quote.get("conId") or proposal.get("conid")},
+        claims, who="No sleeve",
+    )
+    if refusal:
+        failures.append(refusal)
     if owner == "drew":
         if cls.bucket == "etf_ls":
             failures.append(f"{gate_name} is a systematic LETF name; Drew cannot trade it")

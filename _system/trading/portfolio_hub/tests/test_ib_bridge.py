@@ -422,6 +422,43 @@ def test_an_etf_0dte_order_is_never_resolved_or_transmitted_as_the_hubs():
     assert ib.placed == []
 
 
+# reverse-split (small-cap stock shorts, client 60, watchdog 140 reserved)
+# stamps every order RSLIVE|. Same rule 7, same absence of a special case: its
+# orders are foreign to the bridge, its entries and covers never the hub's.
+RS_ORDERS = [
+    ("RSLIVE|ENTRY|ABCD|2026-11-18|1", 60),
+    ("RSLIVE|COVER|ABCD|2026-11-19|2", 60),
+    ("RSLIVE|STOP|WXYZ|2026-11-19|3", 60),
+    ("RSLIVE|WATCHDOG|FLATTEN|2026-11-19", 140),
+]
+
+
+def test_recovery_lists_every_rs_order_as_foreign():
+    trades = [FakeTrade(FakeOrder(ref, client_id=cid, order_id=7000 + i)) for i, (ref, cid) in enumerate(RS_ORDERS)]
+    trades.append(FakeTrade(FakeOrder("RSLIVE|ENTRY|odd", client_id=91, order_id=7999)))
+    result = bridge(FakeIB(open_orders=trades), recovered=False).recover()
+    assert result["hub_orders"] == []
+    assert result["foreign_orders"] == [ref for ref, _ in RS_ORDERS] + ["RSLIVE|ENTRY|odd"]
+
+
+def test_an_rs_order_is_never_cancelled_resolved_or_transmitted_as_the_hubs():
+    trades = [FakeTrade(FakeOrder(ref, client_id=cid, order_id=7000 + i), FakeStatus("Filled", filled="1", remaining="0"))
+              for i, (ref, cid) in enumerate(RS_ORDERS)]
+    ib = FakeIB(open_orders=list(trades), completed=trades)
+    b = bridge(ib)
+    for i, (ref, cid) in enumerate(RS_ORDERS):
+        for client_id in (cid, DEFAULT_BRIDGE_CLIENT_ID):
+            with pytest.raises(OrderOwnershipError):
+                b.cancel_owned_order(ref, client_id, 7000 + i)
+        with pytest.raises(OrderOwnershipError):
+            b.find_owned_order(ref)
+        with pytest.raises(OrderOwnershipError):
+            b.place_limit(ticket(order_ref=ref))
+    with pytest.raises(OrderOwnershipError):
+        b.place_limit(ticket(order_ref="RSLIVE|MAGIS|single_stock|michael|x"))
+    assert ib.cancelled == [] and ib.placed == [] and ib.global_cancels == 0
+
+
 def test_the_hub_service_only_ever_stamps_its_own_prefix():
     # The bridge refuses anything without MAGIS|; this is why it never sees one:
     # GuardedOrderService.create overwrites whatever ref a ticket arrives with.

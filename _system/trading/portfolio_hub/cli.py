@@ -139,10 +139,16 @@ def main(argv: list[str] | None = None) -> int:
                 base_url=args.url, token=os.environ.get("PORTFOLIO_INGEST_TOKEN", ""),
                 account_alias=args.account,
             ))
+            from .allocation_policy import load_rs_symbol_claims
+
+            # reverse-split's claims: re-read per ticket, last good copy kept
+            # beside this ledger so a restart does not forget it.
+            claims_cache = args.db.parent / "symbol-claims"
             loop = OrderCommandLoop(service, channel, account_alias=args.account,
                                     live_enabled=service.live_enabled,
                                     options_enabled=os.environ.get("PORTFOLIO_OPTIONS_ENABLED", "0") == "1",
-                                    sessions=sessions)
+                                    sessions=sessions,
+                                    symbol_claims=lambda: load_rs_symbol_claims(last_good_dir=claims_cache))
             # No teardown block: there is nothing held open between ticks. Each
             # session disconnects in its own `finally` inside GatewaySessionFactory,
             # so killing this process can never leak a client-91 socket.

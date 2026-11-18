@@ -48,8 +48,9 @@ from typing import Any
 
 from .flex import flex_date, parse_flex_file
 from .publisher import publish_payload
-from .allocation_policy import classify_policy_position, load_ls_universe, load_drew_symbols
+from .allocation_policy import classify_policy_position, load_ls_universe, load_drew_symbols, load_rs_symbol_claims
 from _system.trading.sleeves.strategy_ownership import configured_registry, annotate_lots, digest
+from _system.trading.sleeves.symbol_claims import SymbolClaims, claims_moment
 
 
 def _now() -> str:
@@ -77,7 +78,7 @@ def file_age_hours(path: Path, now: float | None = None) -> float:
 
 def build_account_snapshot(
     positions_xml: Path, *, account_alias: str, base_currency: str = "USD",
-    source_run_id: str | None = None,
+    source_run_id: str | None = None, rs_claims: SymbolClaims | None = None,
 ) -> dict[str, Any]:
     """An account_snapshot.v1 envelope sourced entirely from Flex.
 
@@ -85,8 +86,17 @@ def build_account_snapshot(
     one: every consumer -- the read model, the risk endpoint, the allocation
     ledger -- already speaks it, and a parallel schema would mean two code paths
     that can disagree about the same account.
+
+    ``rs_claims`` is reverse-split's symbol claims (read from
+    ``IB_ACCOUNT_SYMBOL_CLAIMS_DIR`` when omitted). They are judged at the
+    statement's session date, and when configured the effective set rides in
+    ``completeness.symbol_claims`` so hosts without the file (the edge) see
+    what the lots were attributed against.
     """
     parsed = parse_flex_file(positions_xml, account_alias=account_alias)
+    claims = (rs_claims if rs_claims is not None else load_rs_symbol_claims()).at(
+        claims_moment(session_date=parsed["session_date"]) if parsed.get("session_date") else None
+    )
     registry = configured_registry(account=account_alias, through=parsed["session_date"])
     if registry:
         # Retrying an evidence version must preserve its snapshot identity.
@@ -163,11 +173,19 @@ def build_account_snapshot(
     ownership = None
     if registry:
         ownership = {"version": registry.version, "through": registry.payload["through"],
-                     "allocations": _owned_allocations(parsed, registry, account_alias, base_currency)}
+                     "allocations": _owned_allocations(parsed, registry, account_alias, base_currency, claims)}
     if parsed.get("session_date") is None:
         # Flagged, never papered over: without a readable session date the edge
         # can only judge freshness from ingest time, and says so.
         warnings.append(f"session date unreadable: {parsed.get('session_date_raw')!r}")
+    if claims.unreadable:
+        # Surfaced, never silently "no claims": lots on the last good copy's
+        # names are reverse_split, and every other unproven short is an
+        # ownership review, until the file reads again.
+        warnings.append(
+            f"{claims.system} symbol claims unreadable; attributed against the "
+            f"{'last good copy' if claims.source == 'last_good' else 'no copy at all'}: {claims.error}"
+        )
     return {
         "schema_version": "account_snapshot.v1",
         "source_run_id": source_run_id or (parsed["source_run_id"] + "-" + registry.version[:20] if registry else parsed["source_run_id"]),
@@ -186,6 +204,9 @@ def build_account_snapshot(
             "feed": "flex_eod",
             "session_date": parsed["session_date"],
             **({"ownership_required": True, "ownership": ownership} if ownership else {}),
+            # Only when this host is configured for claims, so a host without
+            # reverse-split publishes exactly what it did before.
+            **({"symbol_claims": {claims.system: claims.summary()}} if claims.configured else {}),
             "note": (
                 "Flex equity summary states net liquidation. Margin tags are absent until a Flex section states them."
                 if has_nav else
@@ -204,13 +225,13 @@ def build_account_snapshot(
     }
 
 
-def _owned_allocations(parsed, registry, account, base_currency):
+def _owned_allocations(parsed, registry, account, base_currency, rs_claims=None):
     """Split BEFORE folding: cost/P&L follow broker lots, not a quantity ratio."""
     from collections import defaultdict
     groups = defaultdict(list)
     ls_symbols, drew_symbols = load_ls_universe(), load_drew_symbols()
     for row in annotate_lots(parsed["positions"], registry, account=account):
-        policy = classify_policy_position(row, ls_symbols=ls_symbols, drew_symbols=drew_symbols)
+        policy = classify_policy_position(row, ls_symbols=ls_symbols, drew_symbols=drew_symbols, rs_claims=rs_claims)
         groups[(row["conid"], row.get("model_code") or "", policy.owner, policy.strategy)].append(row)
     allocations = []
     for (conid, model, owner, strategy), lots in sorted(groups.items()):
@@ -257,7 +278,12 @@ def publish_flex_snapshot(
             "session_date": None,
         }
 
-    payload = build_account_snapshot(positions, account_alias=account_alias)
+    # The last good claims copy sits beside the ledger, so a oneshot run can
+    # still attribute against it when the RS file is unreadable.
+    ledger_path = getattr(ledger, "path", None)
+    payload = build_account_snapshot(positions, account_alias=account_alias, rs_claims=load_rs_symbol_claims(
+        last_good_dir=Path(ledger_path).parent / "symbol-claims" if ledger_path else None,
+    ))
     if url and not dry_run and not payload["completeness"].get("ownership_required"):
         raise ValueError("ownership registry required for publication; prepare realized sync before publishing positions")
     result: dict[str, Any] = {
@@ -267,6 +293,8 @@ def publish_flex_snapshot(
         "age_hours": round(age, 2),
         "complete": payload["complete"],
         "gateway_contacted": False,
+        **({"symbol_claims": payload["completeness"]["symbol_claims"]}
+           if payload["completeness"].get("symbol_claims") else {}),
     }
     ledger.ingest_account_snapshot(payload)
     if dry_run or not url:

@@ -14,6 +14,8 @@ import csv
 from pathlib import Path
 from datetime import datetime, timezone
 
+from .classify_positions import REVERSE_SPLIT, RS_REF_PREFIXES
+
 VERSION = "strategy_ownership.v1"
 
 
@@ -27,6 +29,10 @@ def digest(value):
 
 def reference_owner(ref, sec_type="STK"):
     ref = str(ref or "").upper().strip()
+    # reverse-split's stock shorts. "excluded" like ls-algo: no SSI owner, and
+    # resolve() treats an RS exit of a human lot as a cross-strategy close.
+    if ref.startswith(RS_REF_PREFIXES):
+        return {"owner": "excluded", "strategy": REVERSE_SPLIT, "reason": "executed_rs_order_reference"}
     if sec_type in {"OPT", "FOP"} and re.match(r"^ETF_LS\|MANUAL\|SELL(?:PUT|CALL)\|", ref):
         return {"owner": "drew", "strategy": "letf_option_overlay", "reason": "documented_manual_option_overlay"}
     if ref.startswith(("ETF_LS|", "B5P|")):

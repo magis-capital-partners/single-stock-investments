@@ -31,6 +31,10 @@ LS client 83 is the read-only stale-order interlock, with 41/77/90/198 plus leas
 etf-0dte uses 50/51/52/53/54 (SPY/QQQ/TSLA/NVDA/AMZN executors) and
 130/131/132/133/134 (their +80 watchdogs), with order-ref prefixes `SPY0DTE|` /
 `QQQ0DTE|` / `TSLA0DTE|` / `NVDA0DTE|` / `AMZN0DTE|`;
+reverse-split (small-cap stock shorts, `_system/trading/rs_paper_executor` and its
+live successor) uses 60 (executor) and 140 (reserved dead-executor watchdog), with
+order-ref prefix `RSLIVE|` -- that allocation lands in the canonical JSON through
+its own change, and until it does these two IDs are not allocated;
 SSI uses 71/72/73/81/82/91. Retired
 IDs and ranges are recorded in the same JSON and may not be reused.
 
@@ -66,6 +70,18 @@ the 09:30 unwind of a delivery) are foreign by the same rule, even on client 91,
 with no special case in the bridge (`tests/test_ib_bridge.py`); the order loop
 also refuses to draft any SPY, QQQ, TSLA, NVDA or AMZN ticket
 (`allocation_policy.etf_0dte_ticket_refusal`).
+
+reverse-split's `RSLIVE|` orders (client 60, watchdog 140) are foreign by the
+same rule, also with no special case in the bridge (`tests/test_ib_bridge.py`).
+Its positions carry no ref, so RS names them in a symbol-claims file
+(`<IB_ACCOUNT_SYMBOL_CLAIMS_DIR>/reverse-split.json`, default
+`/var/lib/ib-account-claims`, schema `ib_account_symbol_claims.v1`, reader
+`sleeves/symbol_claims.py`). The order loop refuses any ticket -- either side,
+any sec type, a reduce-only `short_framework` cover included, since that check
+reads the account-wide position RS's short satisfies -- whose conId or symbol /
+underlying an active claim names, once at draft and again before submit
+(`allocation_policy.reverse_split_ticket_refusal`). While that file is
+configured but unreadable, the loop drafts nothing at all.
 
 Positive hub ownership requires all three: a `MAGIS|` orderRef, the configured
 account, and client ID 91. `find_owned_order`, startup recovery, and cancellation
