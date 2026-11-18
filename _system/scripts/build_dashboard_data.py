@@ -3284,6 +3284,44 @@ def load_valuation_universe_tiers() -> dict:
     return _VALUATION_TIERS_CACHE
 
 
+def use_generated_valuation_tiers() -> dict:
+    """Tier rows from the generator instead of the committed manifest.
+
+    Registry writers do not all regenerate the manifest, so a listing can join
+    coverage before the committed copy names it. The generator applies the
+    same rules the download sync commits.
+    """
+    global _VALUATION_TIERS_CACHE
+    from build_valuation_universe_tiers import build_validated
+
+    payload = build_validated(ROOT)
+    _VALUATION_TIERS_CACHE = {
+        "schema_version": payload.get("schema_version"),
+        "as_of": payload.get("as_of"),
+        "summary": payload.get("summary") or {},
+        "assignments": {
+            str(ticker).upper(): dict(row)
+            for ticker, row in (payload.get("assignments") or {}).items()
+        },
+    }
+    return _VALUATION_TIERS_CACHE
+
+
+def has_valuation_tier(row: dict) -> bool:
+    return (row.get("valuation_tier") or {}).get("tier") in (1, 2, 3)
+
+
+def attach_valuation_tier(row: dict) -> bool:
+    """Give a full ticker row its tier; False when the universe has none."""
+    tier = valuation_tier_for_ticker(str(row.get("ticker") or ""))
+    if not tier or tier.get("tier") not in (1, 2, 3):
+        return False
+    row["valuation_tier"] = tier
+    if isinstance(row.get("valuation_decision"), dict):
+        row["valuation_decision"]["universe_tier"] = tier
+    return True
+
+
 def missing_valuation_tier_tickers(rows: list[dict]) -> list[str]:
     """Tickers whose published row has no Tier 1, 2, or 3 assignment."""
     missing = []
@@ -3774,12 +3812,14 @@ def sync_registered_coverage_inputs() -> list[str]:
     """Add registered listings absent from a restored coverage snapshot.
 
     Rebuild only new rows through the usual row builder. Existing rows and
-    detail files remain untouched, so a sparse underwriting/quote checkout
-    cannot erase research while bringing its coverage inputs up to date.
+    detail files remain untouched apart from filling a missing valuation tier,
+    so a sparse underwriting/quote checkout cannot erase research while
+    bringing its coverage inputs up to date. Tiers come from the generator,
+    and no row is published without one, the same guard the full build has.
     """
     import copy
     from atomic_io import write_json_if_changed, write_text_if_changed
-    from build_dashboard_shards import shard_filename, slim_ticker_row
+    from build_dashboard_shards import shard_filename, slim_ticker_row, slim_valuation_tier
 
     def restored(path):
         value = json.loads(path.read_text(encoding="utf-8"))
@@ -3798,10 +3838,12 @@ def sync_registered_coverage_inputs() -> list[str]:
     if len(known) != len(prior):
         raise ValueError("Duplicate coverage listing identity")
     missing = sorted(set(holdings) - known)
-    if not missing:
+    untiered = {row["ticker"] for row in prior if not has_valuation_tier(row)}
+    if not missing and not untiered:
         return []
     if any(not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,30}", t) for t in missing):
         raise ValueError("Unsafe registered listing identity")
+    use_generated_valuation_tiers()
     classifications = load_classification()
     parsed_holdings = parse_holdings()
     bundle = restored(OUTPUT) if OUTPUT.is_file() else None
@@ -3814,6 +3856,8 @@ def sync_registered_coverage_inputs() -> list[str]:
             row = restored(path)
             if ticker in bundle_rows and bundle_rows[ticker] != row:
                 raise ValueError("Conflicting coverage details require a full rebuild: " + ticker)
+            if not has_valuation_tier(row) and attach_valuation_tier(row):
+                new_details.append((path, row))
         else:
             row = bundle_rows.get(ticker)
             if row is None:
@@ -3821,14 +3865,33 @@ def sync_registered_coverage_inputs() -> list[str]:
                 row = build_ticker_row(ticker, parsed_holdings, classifications,
                                        watchlist=registry.get("watchlist") or {},
                                        owned_views=owned_views_by_ticker(registry))
+            if not has_valuation_tier(row):
+                attach_valuation_tier(row)
             new_details.append((path, row))
         if row.get("ticker") != ticker:
             raise ValueError("Coverage detail listing identity disagrees with registry: " + ticker)
         additions.append(row)
+    current = []
+    for row in prior:
+        ticker = row["ticker"]
+        tier = valuation_tier_for_ticker(ticker) if ticker in untiered else None
+        if not tier or tier.get("tier") not in (1, 2, 3):
+            current.append(row)
+            continue
+        current.append({**row, "valuation_tier": slim_valuation_tier(tier)})
+        path = DATA_DIR / "tickers" / shard_filename(ticker)
+        if path.is_file():
+            detail = restored(path)
+            if detail.get("ticker") != ticker:
+                raise ValueError("Coverage detail listing identity disagrees with registry: " + ticker)
+            if not has_valuation_tier(detail) and attach_valuation_tier(detail):
+                new_details.append((path, detail))
+        if ticker in bundle_rows and not has_valuation_tier(bundle_rows[ticker]):
+            attach_valuation_tier(bundle_rows[ticker])
     payload = copy.deepcopy(core)
-    payload["tickers"] = prior + additions
-    # All three publication guards remain in force. No prior detail is rebuilt
-    # or pruned by this operation; the only changed coverage rows are additions.
+    payload["tickers"] = current + additions
+    # All publication guards remain in force. No prior detail is rebuilt or
+    # pruned by this operation; prior rows change only by gaining a tier.
     baseline = {row["ticker"]: row for row in prior}
     summary = payload.setdefault("summary", {})
     summary["ticker_count"] = len(payload["tickers"])
@@ -3853,7 +3916,8 @@ def sync_registered_coverage_inputs() -> list[str]:
         bundle.setdefault("tickers", []).extend(row for row in additions if row["ticker"] not in bundle_known)
         bundle.setdefault("summary", {})["ticker_count"] = len(bundle["tickers"])
         bundle["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    payload["tickers"] = prior + [slim_ticker_row(row) for row in additions]
+    payload["tickers"] = current + [slim_ticker_row(row) for row in additions]
+    refuse_missing_valuation_tiers(payload["tickers"])
     payload["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     for path, row in new_details:
         write_json_if_changed(path, row, indent=None)

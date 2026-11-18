@@ -1,4 +1,5 @@
-"""Reconcile trusted registry additions before consuming restored coverage."""
+"""Reconcile trusted registry additions and missing valuation tiers before
+consuming restored coverage."""
 from __future__ import annotations
 
 import json
@@ -15,6 +16,9 @@ def ensure_registered_coverage(root):
     snapshot = json.loads(core.read_text(encoding='utf-8'))
     if holdings.get('private_snapshot') or snapshot.get('private_snapshot'):
         raise ValueError('Restore authorized private coverage inputs before synchronizing listings')
-    if set(holdings.get('holdings') or {}) - {r['ticker'] for r in snapshot.get('tickers') or []}:
+    rows = snapshot.get('tickers') or []
+    unregistered = set(holdings.get('holdings') or {}) - {r['ticker'] for r in rows}
+    untiered = any((r.get('valuation_tier') or {}).get('tier') not in (1, 2, 3) for r in rows)
+    if unregistered or untiered:
         subprocess.run([sys.executable, str(root / '_system/scripts/build_dashboard_data.py'),
                         '--coverage-additions-only'], cwd=root, check=True, timeout=120)

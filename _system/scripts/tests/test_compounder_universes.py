@@ -63,6 +63,32 @@ def test_sync_is_idempotent_and_preserves_existing_classifications_and_positions
     assert second == updated and additions == []
 
 
+def test_every_registered_roster_member_has_a_committed_valuation_tier():
+    tiers = json.loads((ROOT/'_system/data/valuation_universe_tiers.json').read_text(encoding='utf-8'))
+    assigned = {t for t, row in tiers['assignments'].items() if row.get('tier') in (1, 2, 3)}
+    members = {r['ticker'] for roster in (build(), build_serial_acquirers()) for r in roster['companies']}
+    assert sorted(members - assigned) == []
+
+
+def test_writing_new_listings_also_writes_their_tiers(tmp_path, monkeypatch):
+    import sync_compounder_universes as sync
+    registry = tmp_path/'_system/portfolio/registry.json'
+    registry.parent.mkdir(parents=True)
+    registry.write_text(json.dumps({'holdings': {}}), encoding='utf-8')
+    member = {'ticker': 'ATD.TO', 'name': 'Alimentation Couche-Tard', 'market': 'CA', 'exchange': 'TSX'}
+    monkeypatch.setattr(sync, 'ROOT', tmp_path)
+    monkeypatch.setattr(sync, 'build', lambda: {'companies': []})
+    monkeypatch.setattr(sync, 'build_serial_acquirers', lambda: {'companies': [member]})
+    written = []
+    monkeypatch.setattr(sync, 'write_manifest', lambda root: written.append(json.loads(
+        (root/'_system/portfolio/registry.json').read_text(encoding='utf-8'))))
+    monkeypatch.setattr(sys, 'argv', ['sync_compounder_universes.py', '--write'])
+    sync.main()
+    assert [set(r['holdings']) for r in written] == [{'ATD.TO'}]
+    sync.main()
+    assert len(written) == 1
+
+
 def test_fund_letter_themes_include_serial_roster_without_promoting_it_to_quality(tmp_path, monkeypatch):
     import fund_letter_entities as entities
     core = tmp_path/'core_compounders.json'
