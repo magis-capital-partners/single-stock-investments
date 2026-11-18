@@ -40,6 +40,11 @@ class Policy:
     cover_order_ttl_seconds: int = 15
     max_cover_attempts: int = 10
     max_shares_per_order: int = 1000000
+    # Account ladder (ExcessLiquidity / NetLiquidation). RS is the lowest rung:
+    # below cushion_halt no RS entry; below cushion_flatten RS flattens. Owner-set;
+    # required for live, optional (None) for paper.
+    cushion_halt: float | None = None
+    cushion_flatten: float | None = None
 
     def validate(self):
         for name in (
@@ -85,6 +90,13 @@ class Policy:
             raise SafetyError("pre_action_exit must be boolean")
         if self.spx_reserve <= 0 or self.daily_loss_limit <= 0:
             raise SafetyError("positive SPX reserve and daily loss limit required")
+        if (self.cushion_halt is None) != (self.cushion_flatten is None):
+            raise SafetyError("cushion_halt and cushion_flatten are set together")
+        if self.cushion_halt is not None:
+            halt = number(self.cushion_halt, "cushion_halt")
+            flat = number(self.cushion_flatten, "cushion_flatten")
+            if not 0 < flat < halt < 1:
+                raise SafetyError("cushion ladder needs 0 < flatten < halt < 1")
         if self.squeeze_loss_multiple < 2 or self.margin_stress_multiple < 2:
             raise SafetyError("stress multiples may not be below two")
         for name in (
@@ -135,6 +147,17 @@ class Calendar:
         return (
             timestamp(self.rows[index]["close"]) - timedelta(seconds=60)
         ).isoformat()
+
+    def next_close_after(self, now):
+        """Close of the first session that ends after ``now``'s own session."""
+        at = timestamp(now)
+        later = [x for x in self.rows if timestamp(x["close"]) > at]
+        current = self.session(now)
+        if current:
+            later = [x for x in later if x is not current]
+        if not later:
+            raise SafetyError("calendar coverage missing")
+        return timestamp(later[0]["close"]).isoformat()
 
     def before_action(self, action_day):
         previous = [x for x in self.rows if x["day"] < action_day]

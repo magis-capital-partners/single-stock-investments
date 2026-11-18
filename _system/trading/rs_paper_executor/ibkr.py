@@ -346,6 +346,17 @@ class PaperIBKR:
             for x in [*self.ib.trades(), *opened, *completed]
             if x.order.orderRef in self.known_refs
         }
+        # reqAllOpenOrders covers every client on the account. A working order in a
+        # contract from another system (or a manual TWS order) blocks our entry.
+        foreign_open = sorted(
+            {
+                integer(x.contract.conId, minimum=1)
+                for x in opened
+                if x.order.orderRef not in self.known_refs
+                and x.orderStatus.status
+                not in ("Filled", "Cancelled", "ApiCancelled", "Inactive")
+            }
+        )
         executions = []
         for fill in fills:
             e = fill.execution
@@ -380,6 +391,7 @@ class PaperIBKR:
             "excess_liquidity": values["ExcessLiquidity"],
             "positions": positions,
             "orders": [self.order_row(t) for t in trades.values()],
+            "foreign_open_conids": foreign_open,
             "executions": executions,
         }
 

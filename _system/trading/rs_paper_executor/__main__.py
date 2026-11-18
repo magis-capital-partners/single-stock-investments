@@ -1,4 +1,9 @@
-"""Paper-only CLI. No network by default; no live-mode command exists."""
+"""RS executor CLI. No network by default.
+
+Paper connects only with --connect-paper. The live endpoint (the shared NY4
+Gateway, registered reverse-split client) connects only with --connect-live and
+then runs in SHADOW unless the owner arm file is valid (see arm.py).
+"""
 
 from __future__ import annotations
 
@@ -11,6 +16,9 @@ from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from .arm import arm_state
+from .book import BookMargin
+from .claims import ClaimBook
 from .engine import Executor
 from .ibkr import PaperIBKR
 from .inbox import proposals, read_https, read_json
@@ -18,16 +26,57 @@ from .journal import Journal
 from .notify import deliver_alerts
 from .policy import Policy
 from .probe import probe, require_local_ib_listener
-from .safety import PaperEndpoint, SafetyError
+from .safety import RS_SYSTEM, SafetyError, endpoint_from_config
+
+# Owner decisions a live config must state explicitly (never template defaults).
+LIVE_REQUIRED_POLICY = (
+    "target_notional", "max_name_notional", "max_gross_notional", "max_names",
+    "spx_reserve", "cash_buffer", "daily_loss_limit", "cushion_halt",
+    "cushion_flatten",
+)
+LIVE_REQUIRED_PATHS = ("claims_dir", "book_margin_root", "book_publish_root", "arm_file")
 
 
-async def run(args, endpoint, policy):
-    if not args.connect_paper:
+def check_live_config(config, endpoint):
+    if not endpoint.live:
+        return
+    missing = [k for k in LIVE_REQUIRED_POLICY if config["policy"].get(k) is None]
+    live = config.get("live") or {}
+    missing += [k for k in LIVE_REQUIRED_PATHS if not live.get(k)]
+    if live.get("spx_book_reserve_fraction") is None:
+        missing.append("spx_book_reserve_fraction")
+    if missing:
+        raise SafetyError("live config must state: " + ", ".join(missing))
+    if config["policy"].get("pre_action_exit") is not True:
+        # Holding through the split can change the conid; SPX's ETF stock proof
+        # holds entries on unidentified stock rows (2026-11-09 incident shape).
+        raise SafetyError("live requires pre_action_exit: true")
+
+
+def account_guards(config, endpoint, policy):
+    live = config.get("live") or {}
+    if not live.get("claims_dir"):
+        return None, None
+    claims = ClaimBook(live["claims_dir"], RS_SYSTEM, endpoint.account)
+    book = BookMargin(
+        live["book_margin_root"], live["book_publish_root"], policy,
+        live["spx_book_reserve_fraction"],
+        limit_fraction=live.get("book_margin_limit_fraction", 1.0),
+    )
+    return claims, book
+
+
+async def run(args, endpoint, policy, config):
+    if endpoint.live and not args.connect_live:
+        raise SafetyError("--connect-live is required; no connection was opened")
+    if not endpoint.live and not args.connect_paper:
         raise SafetyError("--connect-paper is required; no connection was opened")
     if not args.evidence or not (args.operations_file or args.operations_url):
         raise SafetyError("evidence and Box R operations source required")
     with_context = lambda: read_json(args.evidence)
-    journal = Journal(args.state, policy.digest)
+    claims, book = account_guards(config, endpoint, policy)
+    arm_file = (config.get("live") or {}).get("arm_file")
+    journal = Journal(args.state, policy.digest, endpoint.prefix)
     broker = PaperIBKR(endpoint, with_context)
     broker.known_refs = {x["ref"] for x in journal.rows("orders")}
 
@@ -60,6 +109,9 @@ async def run(args, endpoint, policy):
             journal,
             broker,
             kill_switch=lambda: Path(args.kill_file).exists(),
+            transmit=lambda: arm_state(arm_file, endpoint, policy, broker.now()),
+            claims=claims,
+            book=book,
         )
         if args.resume_entries:
             await executor.resume_entries(broker.now())
@@ -122,6 +174,11 @@ def main(argv=None):
         default=str(Path.home() / ".local/state/rs-paper-executor/state.sqlite"),
     )
     parser.add_argument("--connect-paper", action="store_true")
+    parser.add_argument(
+        "--connect-live",
+        action="store_true",
+        help="shared NY4 Gateway as the registered reverse-split client; shadow unless armed",
+    )
     parser.add_argument("--operations-file")
     parser.add_argument("--operations-url")
     parser.add_argument("--evidence")
@@ -139,14 +196,16 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         config = read_json(args.config)
-        endpoint = PaperEndpoint(**config["endpoint"]).validate()
+        endpoint = endpoint_from_config(config["endpoint"])
         policy = Policy(**config["policy"]).validate()
+        check_live_config(config, endpoint)
         if args.command == "preflight":
             print(
                 json.dumps(
                     {
-                        "paper_only": True,
+                        "paper_only": not endpoint.live,
                         "live_orders_allowed": False,
+                        "mode": endpoint.mode,
                         "connection_opened": False,
                         "policy_hash": policy.digest,
                         "policy": asdict(policy),
@@ -179,8 +238,8 @@ def main(argv=None):
             )
             db.close()
         elif args.command == "probe":
-            if not args.connect_paper:
-                raise SafetyError("--connect-paper is required; no connection was opened")
+            if not (args.connect_live if endpoint.live else args.connect_paper):
+                raise SafetyError("--connect-paper/--connect-live is required; no connection was opened")
             broker = PaperIBKR(endpoint, lambda: {"borrow": {}, "eligibility": {}})
             report = asyncio.run(
                 probe(endpoint, policy, broker, symbol=args.symbol,
@@ -192,7 +251,7 @@ def main(argv=None):
             print(text)
             return 0 if report["pass"] else 3
         else:
-            asyncio.run(run(args, endpoint, policy))
+            asyncio.run(run(args, endpoint, policy, config))
     except (SafetyError, KeyError, TypeError, ValueError) as exc:
         print(
             json.dumps(

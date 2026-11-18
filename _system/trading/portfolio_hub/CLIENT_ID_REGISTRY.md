@@ -6,8 +6,8 @@ Status: implemented. The machine-readable registry is authoritative.
 
 Source: `_system/trading/ib_gateway_client_registry.v1.json`
 
-- Registry version: `2026-11-10.1`
-- Canonical SHA-256: `6fabc701ce3de90f6d281c680201f2ff2f7181628d3020fac7bc2a80221b1cb5`
+- Registry version: `2026-11-18.1`
+- Canonical SHA-256: `2b8e284e47c5372afd2f2af587b03d1941c263b53c169496f44343205250f268`
 - Local validation:
   `python _system/scripts/check_ib_gateway_registry.py --skip-mirrors`
 - Manual cross-repo mirror validation:
