@@ -336,3 +336,12 @@ def test_cli_live_run_needs_its_own_flag(tmp_path, capsys):
     assert cli.main(["run", "--config", str(path), "--connect-paper", "--evidence",
                      "e", "--operations-file", "o", "--state", str(tmp_path / "s")]) == 2
     assert "--connect-live is required" in capsys.readouterr().out
+
+
+def test_shipped_live_template_cannot_pass_preflight(capsys):
+    from pathlib import Path
+    template = Path(cli.__file__).with_name("config.live.example.json")
+    assert cli.main(["preflight", "--config", str(template)]) == 2
+    reason = json.loads(capsys.readouterr().out)["reason"]
+    for field in ("explicit pinned U live account", ):
+        assert field in reason
