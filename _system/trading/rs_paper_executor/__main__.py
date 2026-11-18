@@ -17,6 +17,7 @@ from .inbox import proposals, read_https, read_json
 from .journal import Journal
 from .notify import deliver_alerts
 from .policy import Policy
+from .probe import probe, require_local_ib_listener
 from .safety import PaperEndpoint, SafetyError
 
 
@@ -43,6 +44,8 @@ async def run(args, endpoint, policy):
         if attempts >= 3:
             raise SafetyError("daily paper connection budget exhausted")
         journal.set(key, attempts + 1)
+        # A loopback port may be an SSH forward; prove the listener first.
+        require_local_ib_listener(endpoint.port)
         await broker.connect()
 
     try:
@@ -112,7 +115,7 @@ async def run(args, endpoint, policy):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["preflight", "run", "status"])
+    parser.add_argument("command", choices=["preflight", "run", "status", "probe"])
     parser.add_argument("--config", required=True)
     parser.add_argument(
         "--state",
@@ -124,6 +127,10 @@ def main(argv=None):
     parser.add_argument("--evidence")
     parser.add_argument("--kill-file", default="RS_PAPER_FLATTEN")
     parser.add_argument("--once", action="store_true")
+    parser.add_argument("--symbol", help="probe: reviewed common-share symbol")
+    parser.add_argument("--conid", type=int, help="probe: reviewed IB conid")
+    parser.add_argument("--shares", type=int, default=1, help="probe: WhatIf size")
+    parser.add_argument("--report", help="probe: write the JSON report here")
     parser.add_argument(
         "--resume-entries",
         action="store_true",
@@ -171,6 +178,19 @@ def main(argv=None):
                 )
             )
             db.close()
+        elif args.command == "probe":
+            if not args.connect_paper:
+                raise SafetyError("--connect-paper is required; no connection was opened")
+            broker = PaperIBKR(endpoint, lambda: {"borrow": {}, "eligibility": {}})
+            report = asyncio.run(
+                probe(endpoint, policy, broker, symbol=args.symbol,
+                      conid=args.conid, shares=args.shares)
+            )
+            text = json.dumps(report, indent=1, sort_keys=True)
+            if args.report:
+                Path(args.report).write_text(text + "\n", encoding="utf-8")
+            print(text)
+            return 0 if report["pass"] else 3
         else:
             asyncio.run(run(args, endpoint, policy))
     except (SafetyError, KeyError, TypeError, ValueError) as exc:
