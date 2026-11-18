@@ -129,7 +129,10 @@ jobs:
     needs: decide
     if: needs.decide.outputs.intake_full == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    # 180 until the verified private catalog view (#1695) added ~55 minutes
+    # of object restores (catalog view ~46, publication objects ~9) ahead of
+    # the rebuild. The last runs before it took 85-132 minutes.
+    timeout-minutes: 210
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
       group: data-commit-main-intake-full
@@ -139,8 +142,13 @@ jobs:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+    # Step budgets: every step has a timeout, and all of them plus 10 minutes
+    # of runner overhead fit inside the job's timeout-minutes, so the job cap
+    # can never cancel a commit mid-push (2026-11-18).
+    # tests/test_intake_ci_resilience.py enforces the sum.
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        timeout-minutes: 5
         with:
           tool-cache: false
           android: true
@@ -149,6 +157,7 @@ jobs:
           docker-images: true
           swap-storage: true
       - uses: actions/checkout@v4
+        timeout-minutes: 2
         with:
           sparse-checkout: |
             _system/scripts/ci_checkout_workspace.sh
@@ -158,10 +167,18 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (full)
         id: checkout_full
+        timeout-minutes: 25
         run: bash _system/scripts/ci_checkout_workspace.sh full
       - uses: actions/setup-python@v5
+        timeout-minutes: 2
         with:
           python-version: "3.12"
+      - name: Set rebuild deadline
+        # The rebuild profile stops starting or running scripts at this time
+        # and names the one it stopped, leaving the rebuild step's remaining
+        # minutes for validation and the commit step its full budget.
+        timeout-minutes: 1
+        run: echo "CI_REBUILD_DEADLINE_EPOCH=$(( $(date +%s) + 125 * 60 ))" >> "$GITHUB_ENV"
       - name: Nightly intake-full rebuild
         id: intake_rebuild
         # The loud step below still fails the job. continue-on-error only lets
@@ -169,6 +186,7 @@ jobs:
         # dashboard assembly. A validation failure (dashboard_written=true)
         # is not committed.
         continue-on-error: true
+        timeout-minutes: 135
         uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
@@ -177,18 +195,28 @@ jobs:
         with:
           profile: full
           validate: "true"
+          # No full-profile script reads the company source archive, and
+          # restoring its parts took ~23 minutes of this job's budget.
+          vault-include-source-archive: "false"
       - name: Commit artifacts
-        if: steps.checkout_full.outcome == 'success' && steps.intake_rebuild.outcome == 'success'
+        # One step commits either a finished rebuild or, after a named source
+        # failure before dashboard assembly, the steps that finished. Keeping
+        # it one step keeps a single commit budget in the job sum.
+        if: >-
+          steps.checkout_full.outcome == 'success' && (
+          steps.intake_rebuild.outcome == 'success' ||
+          (steps.intake_rebuild.outcome == 'failure' && steps.intake_rebuild.outputs.dashboard_written != 'true')
+          )
+        timeout-minutes: 22
         uses: ./.github/actions/commit-main
         with:
-          message: "chore: nightly intake-full $(date -u +%Y-%m-%d)"
-      - name: Commit partial progress
-        if: steps.checkout_full.outcome == 'success' && steps.intake_rebuild.outcome == 'failure' && steps.intake_rebuild.outputs.dashboard_written != 'true'
-        uses: ./.github/actions/commit-main
-        with:
-          message: "chore: intake-full partial progress after ${{ steps.intake_rebuild.outputs.failed_source }} failed"
+          message: >-
+            ${{ steps.intake_rebuild.outcome == 'success'
+            && 'chore: nightly intake-full $(date -u +%Y-%m-%d)'
+            || format('chore: intake-full partial progress after {0} failed', steps.intake_rebuild.outputs.failed_source) }}
       - name: Report intake-full failure
         if: steps.intake_rebuild.outcome == 'failure'
+        timeout-minutes: 2
         run: |
           set -euo pipefail
           SOURCE="${{ steps.intake_rebuild.outputs.failed_source }}"
