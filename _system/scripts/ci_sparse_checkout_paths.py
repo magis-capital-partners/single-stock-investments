@@ -360,8 +360,14 @@ def paths_for_profile(profile: str) -> list[str]:
     if profile in {"dashboard", "pages"}:
         # Only the three presentation pilots need issuer inputs. Keep their
         # complete archives out of this lightweight publication checkout.
-        from stock_one_pagers import PILOT_INPUT_PATHS
-        return ["/" + path for path in PILOT_INPUT_PATHS]
+        # This script also runs alone in ci-bootstrap-smoke. Do not import the
+        # presentation builder before its sparse paths have been materialized.
+        return [
+            f"/{ticker}/research/{name}"
+            for ticker in ("CPRT", "TBBK", "FRMO")
+            for name in ("valuation_contract.json", "thesis_card.json", "falsifier_specs.json")
+            if ticker != "FRMO" or name != "falsifier_specs.json"
+        ] + [f"/{ticker}/research/evidence/sec_companyfacts.json" for ticker in ("CPRT", "TBBK")]
 
     if profile == "thirteen-f":
         # Read by build_overlap_holdings.py / ingest_13f.py, and rewritten by
