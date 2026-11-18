@@ -17,7 +17,7 @@
 
 - Stepien Thomas M: 8000 @ $10.03 on 2026-08-24
 - Stepien Thomas M: 23529 @ $10.341 on 2026-08-21
-- Sun Kang: 62101 @ $10.341 on 2026-08-21
+- Stepien Thomas M: 2000 @ $20.97 on 2026-06-04
 
 Source: `_system/reference/market-data/insider/AMPX_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

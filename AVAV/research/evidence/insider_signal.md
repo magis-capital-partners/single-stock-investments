@@ -17,7 +17,7 @@
 
 - Shackley Brian Charles: 100 @ $152.27 on 2026-09-15 (10b5-1)
 - PAGE STEPHEN F: 250 @ $152.27 on 2026-09-15 (10b5-1)
-- PAGE STEPHEN F: 250 @ $191.98 on 2026-08-17 (10b5-1)
+- McDonnell Kevin Patrick: 396 @ $224.55 on 2026-03-10 (10b5-1)
 
 Source: `_system/reference/market-data/insider/AVAV_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

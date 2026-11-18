@@ -17,7 +17,7 @@
 
 - Lies Quinton S: 1121 @ $126.59 on 2026-11-06
 - FOWKE BENJAMIN G S III: 5000 @ $115.07 on 2025-12-12 (10b5-1)
-- FOWKE BENJAMIN G S III: 5000 @ $121.58 on 2025-11-14 (10b5-1)
+- Dixon Kate: 2000 @ $125.0 on 2026-09-08 (10b5-1)
 
 Source: `_system/reference/market-data/insider/AEP_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

@@ -1,4 +1,4 @@
-# ALL — Insider conviction (2026-08-12)
+# ALL — Insider conviction (2026-11-12)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- REDMOND ANDREA: 2225 @ $202.91 on 2026-06-01
-- Rizzo Mario: 43398 @ $264.1665 on 2026-08-11
-- Rizzo Mario: 12827 @ $265.5505 on 2026-08-11
+- WILSON THOMAS J: 79433 @ $260.002 on 2026-11-10
+- WILSON THOMAS J: 51484 @ $260.0127 on 2026-11-10
+- WILSON THOMAS J: 35200 @ $260.1034 on 2026-11-06
 
 Source: `_system/reference/market-data/insider/ALL_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

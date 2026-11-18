@@ -1,4 +1,4 @@
-# AMD — Insider conviction (2026-10-19)
+# AMD — Insider conviction (2026-11-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
+- Denzel Nora: 9000 @ $564.88 on 2026-11-11
 - Denzel Nora: 8626 @ $522.0 on 2026-06-02
 - Denzel Nora: 1821 @ $522.0 on 2026-05-29
-- GRASBY PAUL DARREN: 15000 @ $514.91 on 2026-08-17
 
 Source: `_system/reference/market-data/insider/AMD_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

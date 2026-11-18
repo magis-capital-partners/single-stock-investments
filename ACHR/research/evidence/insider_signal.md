@@ -1,4 +1,4 @@
-# ACHR — Insider conviction (2026-10-15)
+# ACHR — Insider conviction (2026-11-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- Gupta Priya: 10015 @ $6.4128 on 2026-08-17
-- Rungta Harsh: 13880 @ $6.4128 on 2026-08-17
-- Lyon Benjamin: 50188 @ $6.4128 on 2026-08-17
+- Gupta Priya: 11474 @ $3.694 on 2026-11-16
+- Rungta Harsh: 14669 @ $3.694 on 2026-11-16
+- Lyon Benjamin: 53039 @ $3.694 on 2026-11-16
 
 Source: `_system/reference/market-data/insider/ACHR_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

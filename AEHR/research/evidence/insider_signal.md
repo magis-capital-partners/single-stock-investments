@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
+- Siu Chris: 470 @ $108.0 on 2026-05-14
+- Siu Chris: 1600 @ $106.78 on 2026-05-14
 - ROGERS VERNON: 3994 @ $143.77 on 2026-08-17
-- SLAYEN HOWARD T: 5700 @ $133.0288 on 2026-08-14
-- ROGERS VERNON: 1000 @ $134.0 on 2026-08-14
 
 Source: `_system/reference/market-data/insider/AEHR_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

@@ -1,4 +1,4 @@
-# AMAT — Insider conviction (2026-10-15)
+# AMAT — Insider conviction (2026-10-05)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -16,8 +16,8 @@
 **Routine / planned sales (context):**
 
 - BRUNER JUDY: 1000 @ $465.0 on 2026-09-08
-- Hill Brice: 7500 @ $479.2501 on 2026-08-25
 - Iannotti Thomas J: 9250 @ $599.77 on 2026-06-16
+- BRUNER JUDY: 1128 @ $450.0 on 2026-05-26
 
 Source: `_system/reference/market-data/insider/AMAT_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

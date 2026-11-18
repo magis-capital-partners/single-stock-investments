@@ -16,7 +16,6 @@
 **Routine / planned sales (context):**
 
 - Wood River Capital, LLC: 12280426 @ $4.73 on 2026-09-23
-- Young Donald R: 56845 @ $3.23 on 2025-11-13
 
 Source: `_system/reference/market-data/insider/ASPN_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
