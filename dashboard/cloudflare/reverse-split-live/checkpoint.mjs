@@ -25,7 +25,9 @@ export async function openCheckpoint(env){
   try{
     receiptValue=(await remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").first())?.value??null;receipt=JSON.parse(receiptValue||'null');
     if(receipt){const object=await env.EVIDENCE.get(checkpointObjectKey(receipt));if(!object)throw new Error('Committed collector checkpoint is unavailable');const bytes=await restoreCheckpoint(new Uint8Array(await object.arrayBuffer()),receipt);writeFileSync(file,bytes);}
-    db=new DatabaseSync(file);db.exec('PRAGMA journal_mode=DELETE');for(const name of readdirSync(new URL('./migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./migrations/'+name,import.meta.url),'utf8'));
+    // synchronous=OFF: this file is a working copy restored from the committed R2
+    // checkpoint on every start, so an fsync per write buys no durability.
+    db=new DatabaseSync(file);db.exec('PRAGMA journal_mode=DELETE');db.exec('PRAGMA synchronous=OFF');for(const name of readdirSync(new URL('./migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./migrations/'+name,import.meta.url),'utf8'));
     env.DB=localAdapter(db);
     const bootstrap=readFileSync(new URL('./bootstrap.json',import.meta.url)),bootstrapHash=await sha(bootstrap);
     if(!db.prepare("SELECT value FROM rs_state WHERE key='prior_history_bootstrap'").get()||db.prepare("SELECT value FROM rs_state WHERE key='prior_history_bootstrap'").get().value!==bootstrapHash){
