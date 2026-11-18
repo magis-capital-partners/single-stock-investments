@@ -75,6 +75,47 @@ class StepPolicyTests(unittest.TestCase):
         self.assertEqual(caught.exception.source, "build_kpi_trends.py")
         self.assertIn("exit 1", str(caught.exception))
 
+    def test_the_rebuild_deadline_caps_a_step_and_names_it(self):
+        calls = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(kwargs.get("timeout"))
+            raise subprocess.TimeoutExpired(cmd, kwargs.get("timeout"))
+
+        env = {ci.DEADLINE_ENV: "10900"}
+        with patch.object(ci.subprocess, "run", fake_run):
+            with self.assertRaises(ci.SourceFailure) as caught:
+                ci.run_step(
+                    ["_system/scripts/sync_pdf_store_google_drive.py"],
+                    env,
+                    sleep_fn=lambda _delay: self.fail("no retry once the budget is spent"),
+                    clock=lambda: 10000.0,
+                )
+        self.assertEqual(calls, [900])
+        self.assertEqual(caught.exception.source, "sync_pdf_store_google_drive.py")
+        self.assertIn("rebuild budget exhausted", str(caught.exception))
+
+    def test_no_step_starts_inside_the_last_minute_of_the_budget(self):
+        with patch.object(ci.subprocess, "run", lambda *_a, **_k: self.fail("must not start")):
+            with self.assertRaises(ci.SourceFailure) as caught:
+                ci.run_step(
+                    ["_system/scripts/build_superinvestor_insights.py"],
+                    {ci.DEADLINE_ENV: "10030"},
+                    clock=lambda: 10000.0,
+                )
+        self.assertEqual(caught.exception.source, "build_superinvestor_insights.py")
+        self.assertIn("after 0 attempt(s): rebuild budget exhausted (30s left)", str(caught.exception))
+
+    def test_a_distant_deadline_keeps_the_step_policy(self):
+        calls = []
+        with patch.object(ci.subprocess, "run", lambda cmd, **kw: calls.append(kw["timeout"])):
+            ci.run_step(
+                ["_system/scripts/build_superinvestor_insights.py"],
+                {ci.DEADLINE_ENV: str(10000 + 4 * 3600)},
+                clock=lambda: 10000.0,
+            )
+        self.assertEqual(calls, [ci.DEFAULT_STEP_TIMEOUT_SEC])
+
 
 class PartialCommitFlagTests(unittest.TestCase):
     def test_a_failure_before_dashboard_assembly_is_safe_to_commit(self):
@@ -132,15 +173,68 @@ class IntakeWorkflowTests(unittest.TestCase):
         steps = workflow["jobs"]["intake-full"]["steps"]
         rebuild = next(step for step in steps if step.get("id") == "intake_rebuild")
         self.assertTrue(rebuild.get("continue-on-error"))
-        partial = next(step for step in steps if step.get("name") == "Commit partial progress")
-        self.assertIn("dashboard_written != 'true'", partial["if"])
-        self.assertIn("failed_source", partial["with"]["message"])
+        commit = next(step for step in steps if step.get("name") == "Commit artifacts")
+        self.assertIn("intake_rebuild.outcome == 'success' ||", commit["if"])
+        self.assertIn(
+            "(steps.intake_rebuild.outcome == 'failure' && steps.intake_rebuild.outputs.dashboard_written != 'true')",
+            commit["if"],
+        )
+        self.assertIn("failed_source", commit["with"]["message"])
+        self.assertIn("'chore: nightly intake-full $(date -u +%Y-%m-%d)'", commit["with"]["message"])
         loud = next(step for step in steps if step.get("name") == "Report intake-full failure")
         self.assertIn("::error::", loud["run"])
         self.assertIn("exit 1", loud["run"])
         self.assertIn("failed_source", loud["run"])
-        success = next(step for step in steps if step.get("name") == "Commit artifacts")
-        self.assertIn("intake_rebuild.outcome == 'success'", success["if"])
+
+    def _intake(self) -> dict:
+        workflow = yaml.safe_load(
+            (ROOT / ".github" / "workflows" / "data-pipeline.yml").read_text(encoding="utf-8")
+        )
+        return workflow["jobs"]["intake-full"]
+
+    def test_step_budgets_fit_inside_the_job_limit(self):
+        # 2026-11-18: the 180-minute job cap cancelled the partial-progress
+        # commit mid-push because no step had a budget of its own.
+        # Same rule as the activist job: a step without a limit fails here, so
+        # the sum is a real bound, and runner overhead gets 10 minutes.
+        job = self._intake()
+        total = 0
+        for step in job["steps"]:
+            self.assertIn("timeout-minutes", step, step.get("name") or step.get("uses"))
+            total += step["timeout-minutes"]
+        self.assertLessEqual(total + 10, job["timeout-minutes"])
+        self.assertLessEqual(job["timeout-minutes"], 300)
+        commits = [s for s in job["steps"] if s.get("uses") == "./.github/actions/commit-main"]
+        self.assertEqual(len(commits), 1)
+
+    def test_profile_deadline_leaves_validation_time_inside_the_rebuild_step(self):
+        steps = self._intake()["steps"]
+        names = [s.get("name") for s in steps]
+        deadline = steps[names.index("Set rebuild deadline")]
+        rebuild = steps[names.index("Nightly intake-full rebuild")]
+        self.assertEqual(names.index("Set rebuild deadline") + 1, names.index("Nightly intake-full rebuild"))
+        self.assertIn(ci.DEADLINE_ENV, deadline["run"])
+        minutes = int(deadline["run"].split("+ ", 1)[1].split(" * 60", 1)[0])
+        self.assertGreaterEqual(rebuild["timeout-minutes"] - minutes, 5)
+
+    def test_intake_full_skips_the_source_archive_it_never_reads(self):
+        steps = self._intake()["steps"]
+        rebuild = next(step for step in steps if step.get("id") == "intake_rebuild")
+        self.assertEqual(rebuild["with"]["vault-include-source-archive"], "false")
+        for script in ci.expand_steps(ci.PROFILES[ci.resolve_profile("full")]):
+            source = (ROOT / script[0]).read_text(encoding="utf-8")
+            self.assertNotIn("company-source-backfill", source, script[0])
+
+    def test_rebuild_data_forwards_the_source_archive_choice(self):
+        action = yaml.safe_load(
+            (ROOT / ".github" / "actions" / "rebuild-data" / "action.yml").read_text(encoding="utf-8")
+        )
+        self.assertEqual(action["inputs"]["vault-include-source-archive"]["default"], "true")
+        vault = action["runs"]["steps"][0]
+        self.assertEqual(vault["uses"], "./.github/actions/checkout-vault")
+        self.assertEqual(
+            vault["with"]["include-source-archive"], "${{ inputs.vault-include-source-archive }}"
+        )
 
 
 if __name__ == "__main__":
