@@ -31,6 +31,7 @@ jobs:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
       PUBLICATION_REPAIR: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'refresh-company-source-publication' }}
+      RESUME_CATALOG_COMMIT: ${{ github.event.client_payload.resume_catalog_commit || '' }}
     steps:
       - name: Make room for the private source archive
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
@@ -78,6 +79,15 @@ jobs:
       # Isolate the complete archive from older jobs with narrower cache schemas.
       - name: Restore private extraction results
         run: python _system/scripts/company_source_cache.py restore --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
+      - name: Resume preserved publication matching work
+        id: resume
+        if: env.RESUME_CATALOG_COMMIT != ''
+        run: |
+          set -euo pipefail
+          test "$PUBLICATION_REPAIR" = "true"
+          python _system/scripts/resume_company_source_publication.py \
+            --vault "$RESEARCH_VAULT_ROOT" --cache _private/company-research/cache \
+            --catalog-commit "$RESUME_CATALOG_COMMIT"
       - name: Resume bounded extraction
         if: env.PUBLICATION_REPAIR != 'true'
         env:
@@ -110,6 +120,7 @@ jobs:
           pip install faster-whisper
           python _system/scripts/backfill_company_sources.py --skip-seed --only-status needs_transcript --transcribe --seconds 600
       - name: Refresh the complete publication snapshot
+        id: refresh
         env:
           # Collections that were not checked out keep their prior records.
           COMPANY_SOURCE_ABSENT_COLLECTIONS_ARE_UNSCANNED: "1"
@@ -126,7 +137,7 @@ jobs:
           fi
       - name: Save private checkpoint and results
         id: archive
-        if: always()
+        if: ${{ always() && (env.RESUME_CATALOG_COMMIT == '' || (steps.resume.outcome == 'success' && steps.refresh.outcome == 'success')) }}
         # Retire only byte-verified packed files from this worker's scratch cache
         # before Git needs space for compressed upload objects. Keep all vault parts.
         run: python _system/scripts/company_source_cache.py pack --release-packed-inputs --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
@@ -134,8 +145,19 @@ jobs:
         id: parts
         if: ${{ always() && steps.archive.outcome == 'success' }}
         run: python _system/scripts/push_company_source_parts.py --vault "$RESEARCH_VAULT_ROOT"
+      - name: Select source manifest publication scope
+        id: scope
+        if: ${{ always() && steps.parts.outcome == 'success' }}
+        run: |
+          if python _system/scripts/private_storage_io.py enabled; then
+            # Every immutable part has already passed upload and read-back.
+            echo "git_add=--sparse --force dashboard-private/company-source-backfill-v2/manifest.json" >> "$GITHUB_OUTPUT"
+          else
+            # Retain the legacy Git protocol's caller index/rebase behavior.
+            echo "git_add=--sparse --force dashboard-private/company-source-backfill-v2" >> "$GITHUB_OUTPUT"
+          fi
       - uses: ./.github/actions/commit-vault
         if: ${{ always() && steps.parts.outcome == 'success' }}
         with:
           message: Preserve resumable company source backfill
-          git_add: --sparse --force dashboard-private/company-source-backfill-v2
+          git_add: ${{ steps.scope.outputs.git_add }}

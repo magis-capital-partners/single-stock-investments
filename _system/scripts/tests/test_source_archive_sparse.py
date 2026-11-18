@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import random
+import re
 import subprocess
 import sys
 import zipfile
@@ -91,7 +92,11 @@ def test_worker_packing_does_not_materialize_historical_archive_versions(tmp_pat
     commit = next(s for s in workflow['jobs']['backfill']['steps']
                   if s.get('uses') == './.github/actions/commit-vault')
     import shlex
-    git(worker, 'add', *shlex.split(commit['with']['git_add']))
+    assert commit['with']['git_add'] == '${{ steps.scope.outputs.git_add }}'
+    scope = next(s for s in workflow['jobs']['backfill']['steps'] if s.get('id') == 'scope')
+    legacy_branch = re.search(r'\belse\b(.*?)\bfi\b', scope['run'], re.S).group(1)
+    legacy_args = re.search(r'echo "git_add=([^"]+)"', legacy_branch).group(1)
+    git(worker, 'add', *shlex.split(legacy_args))
     git(worker, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
         'commit', '-m', 'Advance current manifest')
     git(worker, 'fetch', 'origin', 'main')
