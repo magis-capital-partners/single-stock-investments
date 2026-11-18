@@ -99,6 +99,7 @@ class PaperIBKR:
         self.contracts, self.tickers, self.components = {}, {}, {}
         self.known_refs = set()
         self.position_cache = None
+        self.listening = False
 
     def now(self):
         return self.clock()
@@ -110,6 +111,13 @@ class PaperIBKR:
             from ib_insync import IB
 
             self.ib = IB()
+        if self.listening:
+            self.ib.pendingTickersEvent -= self.receive_ticks
+            self.listening = False
+        # Handles/mappings from a previous connection are never a live book.
+        self.contracts.clear()
+        self.tickers.clear()
+        self.components.clear()
         self.ib.MaxSyncedSubAccounts = 0
         self.ib.RaiseRequestErrors = True
 
@@ -127,6 +135,7 @@ class PaperIBKR:
             )
             self.prove()
             self.ib.pendingTickersEvent += self.receive_ticks
+            self.listening = True
             self.ib.reqMarketDataType(1)
         except Exception:
             self.ib.disconnect()
@@ -240,6 +249,26 @@ class PaperIBKR:
         if ticker is not None and getattr(ticker, "halted", None) in (1, 2):
             row["halted"] = True
         return row
+
+    async def exit_eligibility(self, conid):
+        """A BUY cover does not require SSR clearance from the research host."""
+        self.prove()
+        ticker = self.tickers.get(conid)
+        if (
+            ticker is not None
+            and ticker.marketDataType == 1
+            and ticker.halted in (0, 1, 2)
+        ):
+            return {
+                "conid": conid,
+                "at": self.now(),
+                "complete": True,
+                "source_verified": True,
+                "halted": ticker.halted != 0,
+                "ssr": None,
+                "source": "current_paper_broker_halt_state",
+            }
+        return await self.eligibility(conid)
 
     async def margin(self, conid, shares, price):
         self.prove()
@@ -400,6 +429,9 @@ class PaperIBKR:
                 if self.ib.isConnected():
                     self.retain_quotes(set())
             finally:
+                if self.listening:
+                    self.ib.pendingTickersEvent -= self.receive_ticks
+                    self.listening = False
                 self.ib.disconnect()
 
     def retain_quotes(self, wanted):

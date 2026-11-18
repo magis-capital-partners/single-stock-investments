@@ -340,7 +340,10 @@ class Executor:
                 await self.broker.qualify(signal)
                 q = await self.broker.quote(pos["conid"])
                 _, ask = self.quote(q, now, pos["conid"])
-                proof = await self.broker.eligibility(pos["conid"])
+                get_exit_proof = getattr(
+                    self.broker, "exit_eligibility", self.broker.eligibility
+                )
+                proof = await get_exit_proof(pos["conid"])
                 self.eligibility(proof, now, pos["conid"], require_ssr_clear=False)
             except (SafetyError, KeyError) as exc:
                 marks_complete = False

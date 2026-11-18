@@ -879,3 +879,70 @@ def test_notification_outbox_redacts_retries_and_never_loses_event(setup):
     assert j.get("alert_cursor") > 0
     with pytest.raises(SafetyError):
         deliver_alerts(j, "https://evil.invalid/services/test", later, post=failed)
+
+
+def test_reconnect_discards_old_quotes_and_uses_one_listener():
+    class Event:
+        def __init__(self):
+            self.listeners = []
+
+        def __iadd__(self, handler):
+            self.listeners.append(handler)
+            return self
+
+        def __isub__(self, handler):
+            self.listeners.remove(handler)
+            return self
+
+    class IB:
+        def __init__(self):
+            self.pendingTickersEvent = Event()
+            self.client = SimpleNamespace(clientId=171)
+
+        async def connectAsync(self, *args, **kwargs):
+            pass
+
+        def isConnected(self):
+            return True
+
+        def managedAccounts(self):
+            return ["DU000000"]
+
+        def reqMarketDataType(self, value):
+            assert value == 1
+
+        def disconnect(self):
+            pass
+
+    ib = IB()
+    b = PaperIBKR(PaperEndpoint("DU000000", 171, 4002), lambda: {}, ib=ib)
+    run(b.connect())
+    b.tickers[1001] = object()
+    b.components[1001] = {"bid_at": NOW}
+    run(b.connect())
+    assert not b.tickers and not b.components
+    assert len(ib.pendingTickersEvent.listeners) == 1
+    b.close()
+    assert not ib.pendingTickersEvent.listeners
+
+
+def test_cover_uses_broker_halt_state_without_box_r_ssr_file():
+    class IB:
+        client = SimpleNamespace(clientId=171)
+
+        def isConnected(self):
+            return True
+
+        def managedAccounts(self):
+            return ["DU000000"]
+
+    def unavailable():
+        raise OSError("Box R unavailable")
+
+    b = PaperIBKR(
+        PaperEndpoint("DU000000", 171, 4002), unavailable, ib=IB(), clock=lambda: NOW
+    )
+    b.tickers[1001] = SimpleNamespace(marketDataType=1, halted=0)
+    assert run(b.exit_eligibility(1001))["halted"] is False
+    b.tickers[1001].halted = 1
+    assert run(b.exit_eligibility(1001))["halted"] is True
