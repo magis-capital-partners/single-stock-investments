@@ -305,7 +305,7 @@ class PaperIBKR:
             "Filled": "filled",
             "Cancelled": "cancelled",
             "ApiCancelled": "cancelled",
-            "Inactive": "rejected",
+            "Inactive": "uncertain",
             "PendingSubmit": "working",
             "PreSubmitted": "working",
             "Submitted": "working",

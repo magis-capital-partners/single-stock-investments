@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from .engine import Executor
 from .ibkr import PaperIBKR
@@ -31,7 +32,12 @@ async def run(args, endpoint, policy):
 
     async def connect_budgeted():
         # Persistent connect-event budget; supervisor restarts cannot reset it.
-        day = datetime.fromisoformat(broker.now()).date().isoformat()
+        day = (
+            datetime.fromisoformat(broker.now())
+            .astimezone(ZoneInfo("America/New_York"))
+            .date()
+            .isoformat()
+        )
         key = "connection_attempts:" + day
         attempts = journal.get(key, 0)
         if attempts >= 3:
@@ -53,20 +59,7 @@ async def run(args, endpoint, policy):
             kill_switch=lambda: Path(args.kill_file).exists(),
         )
         if args.resume_entries:
-            await executor.reconcile(broker.now())
-            if (
-                journal.get("kill", False)
-                or Path(args.kill_file).exists()
-                or journal.get("entry_halt") == "daily_loss_limit"
-            ):
-                raise SafetyError("kill/daily-loss halt cannot be resumed by this flag")
-            if any(
-                x["state"] not in ("filled", "cancelled", "rejected")
-                for x in journal.rows("orders")
-            ):
-                raise SafetyError("resolve orders before acknowledging a recovery halt")
-            journal.set("entry_halt", None)
-            journal.event(broker.now(), "operator_resume", {"paper_only": True})
+            await executor.resume_entries(broker.now())
         while True:
             now = broker.now()
             if not broker.ib.isConnected():

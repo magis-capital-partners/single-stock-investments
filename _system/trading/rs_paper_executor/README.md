@@ -152,8 +152,9 @@ python -m _system.trading.rs_paper_executor status --config /etc/rs-paper-config
 Create `FLATTEN` to latch a paper entry stop and request scoped covers. Removing
 the file does not clear the latch. After safe recovery, `run --resume-entries`
 requires fresh reconciliation and no unresolved orders; it cannot bypass a
-kill/daily-loss halt. A daily-loss halt currently requires operator review/new
-approved recovery work, not editing the DB or deleting it.
+kill latch or a daily-loss breach in the same Eastern session. After a daily-loss
+halt, operator review and explicit resumption in a later session are required.
+Never clear these guards by editing or deleting the journal.
 
 Optional `RS_PAPER_SLACK_WEBHOOK` sends only event kind/time, no free-form broker
 data. Failed alerts retain the cursor for a throttled retry; webhook failures do

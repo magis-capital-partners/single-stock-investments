@@ -50,6 +50,16 @@ class Executor:
             self.journal.set("kill", True)
         return self.journal.get("kill", False)
 
+    async def resume_entries(self, now):
+        await self.reconcile(now)
+        day = timestamp(now).astimezone(ZoneInfo("America/New_York")).date().isoformat()
+        if self.killed() or self.journal.get("daily_loss_day") == day:
+            raise SafetyError("kill/daily-loss halt cannot be resumed")
+        if any(o["state"] not in TERMINAL for o in self.journal.rows("orders")):
+            raise SafetyError("resolve orders before acknowledging a recovery halt")
+        self.journal.set("entry_halt", None)
+        self.alert(now, "operator_resume", {"paper_only": True})
+
     async def reconcile(self, now):
         snap = await self.broker.snapshot()
         if (
@@ -408,6 +418,7 @@ class Executor:
         if marks_complete:
             self.journal.set("last_pnl", pnl)
         if marks_complete and loss >= self.policy.daily_loss_limit:
+            self.journal.set("daily_loss_day", day)
             self.halt(now, "daily_loss_limit")
             details = [
                 (pos, signal, ask, "daily_loss_limit")

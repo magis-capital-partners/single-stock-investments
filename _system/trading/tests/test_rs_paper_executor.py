@@ -1013,3 +1013,34 @@ def test_fresh_completed_order_beats_stale_working_cache(monkeypatch):
     )
     b.known_refs = {ref}
     assert run(b.snapshot())["orders"][0]["state"] == "cancelled"
+
+
+def test_daily_loss_latch_survives_secondary_error(setup):
+    e, j, b = setup
+    run(e.enter(signal(), b.snap, NOW))
+    b.execute()
+    run(e.reconcile(NOW))
+    b.book["ask"] = 16
+    run(e.protect(b.snap, NOW))
+    assert j.get("daily_loss_day") == "2026-11-18"
+    e.halt(NOW, "secondary_source_failure")
+    with pytest.raises(SafetyError, match="daily-loss"):
+        run(e.resume_entries(NOW))
+
+
+def test_inactive_status_is_not_proof_of_rejection():
+    order = SimpleNamespace(
+        orderRef="RSPAPER|" + "a" * 20,
+        account="DU000000",
+        clientId=171,
+        action="SELL",
+        totalQuantity=73,
+        orderId=1,
+        permId=101,
+    )
+    trade = SimpleNamespace(
+        order=order,
+        contract=SimpleNamespace(conId=1001),
+        orderStatus=SimpleNamespace(status="Inactive", filled=0, permId=101),
+    )
+    assert PaperIBKR.order_row(trade)["state"] == "uncertain"
