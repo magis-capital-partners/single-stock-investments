@@ -12,9 +12,8 @@ name: Podcast Refresh
 #
 # Manual only since 2026-11-16. The Mac media lane (media_lane_supervisor.py)
 # now discovers episodes daily, writes model reader summaries and publishes
-# the catalog. This job rebuilds from the GitHub vault, which refuses pushes on
-# its size quota and so holds none of those summaries: a scheduled run put
-# placeholder summaries back on the dashboard until the Mac's next publish.
+# the catalog. This job has no local model, so a scheduled run publishes
+# placeholder summaries and races the Mac's own publish of the same catalog.
 # The P6 podcast_catalog feed still alarms if the published catalog goes stale.
 
 on:
