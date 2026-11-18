@@ -345,3 +345,15 @@ def test_shipped_live_template_cannot_pass_preflight(capsys):
     reason = json.loads(capsys.readouterr().out)["reason"]
     for field in ("explicit pinned U live account", ):
         assert field in reason
+
+
+def test_publish_failure_halts_entries_but_keeps_protecting(live, monkeypatch):
+    run(live.engine.enter(signal(), live.broker.snap, NOW))
+    live.broker.execute()
+
+    def broken(*args, **kwargs):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(live.engine.book, "publish", broken)
+    run(live.engine.tick([signal(id="x")], NOW))  # must not raise
+    assert live.journal.get("entry_halt") == "account_guard_publish:OSError"

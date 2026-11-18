@@ -705,7 +705,10 @@ class Executor:
                     )
                     self.journal.set(key, str(exc))
         if self.book is not None and proposals:
-            self.book.publish(self, snap, self.broker.now())  # include new reservations
+            try:
+                self.book.publish(self, snap, self.broker.now())  # new reservations
+            except Exception as exc:  # never let a file error end position protection
+                self.halt(now, "account_guard_publish:" + type(exc).__name__)
         self.journal.event(
             now,
             "heartbeat",
