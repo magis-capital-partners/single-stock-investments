@@ -96,6 +96,9 @@ if [ ! -d "$REPO/.git" ]; then
   runuser -u research -- git clone --quiet --filter=blob:none --sparse --branch main "https://github.com/$OWNER_REPO.git" "$REPO"
   runuser -u research -- git -C "$REPO" sparse-checkout set --cone "$LIVE_REL"
 fi
+# Lets root (an operator's `sudo git ...`) read the research-owned clone without
+# git's "dubious ownership" refusal. update.sh itself runs git as research.
+git config --system --get-all safe.directory 2>/dev/null | grep -qx "$REPO" || git config --system --add safe.directory "$REPO"
 [ -x "$DEPLOY/run.sh" ] || die "$DEPLOY/run.sh missing or not executable in the checkout"
 say "code at $(runuser -u research -- git -C "$REPO" rev-parse --short HEAD)"
 

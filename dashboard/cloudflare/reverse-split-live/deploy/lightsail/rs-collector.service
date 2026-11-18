@@ -1,14 +1,15 @@
-# Box R: reverse-split research collector (Lightsail, Ubuntu 24.04, 8 GB).
+# Box R: reverse-split research collector (Lightsail, Ubuntu 24.04, 16 GB / 4 vCPU).
 # Installed to /etc/systemd/system by bootstrap.sh and update.sh.
 #
 # Research only: no broker, order, Gateway, ThetaData or NY4 access. The only
 # write authority is the collector lease in the research D1 database, which
 # also fences GitHub and any other machine.
 #
-# Memory: the 2026-11-16 telemetry showed 3.9 GiB in use and a 5.6 GiB peak
-# (Node + the Databento Python child + the in-process SQLite checkpoint). The
-# limits below are a starting point for the load test in README.md, not a
-# measured fit. Re-set them from `soak-report.sh` before calling the box done.
+# Memory: on the 8 GB box the collector ran out of room (Node's default heap
+# is ~2 GB there) and was throttled at 6G. On the 16 GB box it peaked at
+# 6.6 GiB (2026-11-17). run.sh gives Node a 4 GB heap, as on GitHub's 16 GB
+# runners; the limits below cover Node, the Databento Python child and the
+# SQLite working copy, with room left for the OS.
 [Unit]
 Description=Reverse-split research collector (box R)
 After=network-online.target
@@ -23,6 +24,10 @@ WorkingDirectory=/srv/rs/repo
 EnvironmentFile=/etc/reverse-split-live.env
 EnvironmentFile=/etc/reverse-split-live.runtime.env
 ExecStart=/srv/rs/repo/dashboard/cloudflare/reverse-split-live/deploy/lightsail/run.sh collector
+# /var/lib/rs-collector (owned by research, writable under ProtectSystem=strict)
+# holds the owner file that lets a restarted collector retake its own lease.
+StateDirectory=rs-collector
+StateDirectoryMode=0700
 
 # A lease-standby timeout or a lost lease exits the process; start again.
 Restart=always
@@ -35,8 +40,8 @@ KillSignal=SIGTERM
 KillMode=mixed
 TimeoutStopSec=240
 
-MemoryHigh=6G
-MemoryMax=6800M
+MemoryHigh=12G
+MemoryMax=13500M
 Nice=5
 
 NoNewPrivileges=true

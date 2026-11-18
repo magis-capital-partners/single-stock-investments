@@ -39,10 +39,10 @@ fit the measured workload (3.9 GiB in use, 5.6 GiB peak on 2026-11-16).
 
 Only the owner can do these.
 
-1. **Instance.** Lightsail, region us-east-1, Linux, **Ubuntu 24.04 LTS**, the 8 GB / 2 vCPU /
-   160 GB plan ($44/month). The production box is `magis-collector-2` (us-east-1a, Ubuntu
-   24.04.5, Python 3.12.3, created 2026-11-17 to replace a 22.04 box). The 8 GB plan is a
-   load-test candidate, not a proven fit (section 4). `bootstrap.sh` refuses other Ubuntu
+1. **Instance.** Lightsail, region us-east-1, Linux, **Ubuntu 24.04 LTS**, the **16 GB / 4 vCPU /
+   320 GB** plan ($84/month). The production box is `magis-collector-3` (us-east-1a), restored on
+   2026-11-17 from a snapshot of the 8 GB `magis-collector-2`. The 8 GB plan did not fit: the
+   collector peaks at 6.6 GiB and was CPU-bound on 2 vCPUs. `bootstrap.sh` refuses other Ubuntu
    releases: 24.04 matches the GitHub runner the collector is tested on (Python 3.12).
 2. **Static IP.** `magis-collector-ip`, 100.51.253.151, attached to the instance. Keep it
    attached: Lightsail charges for a static IP that is not attached to a running instance.
@@ -122,7 +122,7 @@ Record each result, with the date and `soak-report.sh` output, in a dated note n
 
 | Test | How | Pass |
 |---|---|---|
-| Memory | Three full sessions on the full current ledger | `soak-report.sh` peak stays under `MemoryHigh` with at least 1 GiB left for the OS. If not: snapshot, create a 16 GB instance from it, repeat. Then set `MemoryHigh`/`MemoryMax` from the measured peak. |
+| Memory | Three full sessions on the full current ledger | `soak-report.sh` peak stays under `MemoryHigh` with at least 1 GiB left for the OS. (The 8 GB box failed this on 2026-11-17; the 16 GB box peaked at 6.6 GiB.) |
 | CPU | Same three sessions | Burst capacity never reaches zero, in particular during checkpoint compression. |
 | Process death | After hours: `sudo systemctl kill -s SIGKILL rs-collector` | Restarts in 30 s, restores the latest checkpoint, retakes the lease (at most 10 minutes), no duplicated or lost rows on the dashboard. |
 | Death during a checkpoint upload | Same, timed while the journal shows a checkpoint being written | Same as above, and the restored generation's checksums match. |
@@ -140,7 +140,29 @@ Record each result, with the date and `soak-report.sh` output, in a dated note n
   files, restarts, and rolls back if the collector is not stable 3 minutes later.
   `journalctl -u rs-update` shows each night's decision.
 - **Logs:** `journalctl -u rs-collector -u rs-market-status --since -1h`.
-- **Health:** `sudo bash .../soak-report.sh --since -24h`.
+- **Health:** `sudo bash .../soak-report.sh --since -24h`. It prints the memory limits in effect
+  (drop-ins included) and the Node heap flag the running collector actually got.
+- **Restarts after a crash** retake the box's own lease at once: the collector records its lease
+  owner id in `/var/lib/rs-collector/owner`, and the next process may take over exactly that
+  lease. Any other owner's lease (GitHub after a rollback) is never displaced.
+- **No local overrides.** The heap flag (`run.sh`), the memory limits (unit file) and SQLite's
+  `synchronous=OFF` (`checkpoint.mjs`) live in the repo. Do not add drop-ins under
+  `/etc/systemd/system/rs-collector.service.d/`; `soak-report.sh` lists any that exist.
+
+### Removing the 2026-11-17 hand overrides (once this change is on the box)
+
+The nightly update installs the new unit file and restarts the collector. The next morning,
+check `journalctl -u rs-update` says it is running the new commit, then:
+
+```bash
+sudo rm /etc/systemd/system/rs-collector.service.d/20-heap.conf /etc/systemd/system/rs-collector.service.d/10-no-fsync.conf
+sudo rmdir /etc/systemd/system/rs-collector.service.d
+sudo systemctl daemon-reload && sudo systemctl restart rs-collector
+sudo bash /srv/rs/repo/dashboard/cloudflare/reverse-split-live/deploy/lightsail/soak-report.sh
+```
+
+The report should show `MemoryHigh=12.0G MemoryMax=13.2G`, no drop-ins, and the
+`--max-old-space-size=4096` heap flag. Do this outside 09:00-16:30 ET.
 
 ## 6. What pages you
 

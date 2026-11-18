@@ -27,6 +27,11 @@ commit="$(git -C "$REPO" rev-parse HEAD)"
 case "${1:-}" in
   collector)
     export RS_PIPELINE_COMMIT="$commit"
+    # Node sizes its default heap from machine memory (~2 GB on 8 GB, ~4 GB on
+    # GitHub's 16 GB runners). Pin 4 GB so the box matches GitHub at any size.
+    export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=4096}"
+    # Lets a restart retake this box's own lease at once (collector-lease.mjs).
+    export RS_COLLECTOR_OWNER_FILE="${STATE_DIRECTORY:-/var/lib/rs-collector}/owner"
     exec node "$LIVE/collector.mjs" --watch --interval 1 --run-minutes 0 --standby-seconds 1800
     ;;
   market-status)

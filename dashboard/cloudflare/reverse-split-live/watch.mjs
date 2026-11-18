@@ -17,7 +17,7 @@ import {recordSessionHealth,archiveDailyHealth} from './session-health.mjs';
 import {PIPELINE_VERSION} from './pipeline-version.mjs';
 import {finishHandoff} from './handoff.mjs';
 import {importMarketStatus} from './market-status-import.mjs';
-import {claimCollectorLease} from './collector-lease.mjs';
+import {claimCollectorLease,readReclaimOwner,recordOwner} from './collector-lease.mjs';
 const now=()=>new Date().toISOString();
 export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
 export const needsStartupReconciliation=(last,at=Date.now())=>Number.isFinite(Date.parse(last))&&at-Date.parse(last)>15*60000;
@@ -36,8 +36,8 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
     await remote.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind('collector_usage:'+budgetDay,JSON.stringify({rows_read:Number(baseline.rows_read||0)+env.usage.rows_read,rows_written:Number(baseline.rows_written||0)+env.usage.rows_written}),now()).run();
   }
   try{
-    const claimed=await claimCollectorLease(remote,{owner:token,waitMs:Math.min(standbyMs,maximumMs),sleep,shouldStop:()=>stopping||shouldStop(),onWaiting:async status=>{const value={...status,status:'prepared_waiting_for_lease',pipeline_commit:process.env.RS_PIPELINE_COMMIT||null,market_data_connections:0,broker_connections:0,orders:0};await env.EVIDENCE.put('collector-standby/latest.json',new TextEncoder().encode(JSON.stringify(value)),{httpMetadata:{contentType:'application/json'}});}});
-    if(!claimed)return {skipped:true,reason:'Another collector owns the bounded lease or standby ended'};lease=claimed.lease;
+    const ownerFile=process.env.RS_COLLECTOR_OWNER_FILE,claimed=await claimCollectorLease(remote,{owner:token,reclaimOwner:readReclaimOwner(ownerFile),waitMs:Math.min(standbyMs,maximumMs),sleep,shouldStop:()=>stopping||shouldStop(),onWaiting:async status=>{const value={...status,status:'prepared_waiting_for_lease',pipeline_commit:process.env.RS_PIPELINE_COMMIT||null,market_data_connections:0,broker_connections:0,orders:0};await env.EVIDENCE.put('collector-standby/latest.json',new TextEncoder().encode(JSON.stringify(value)),{httpMetadata:{contentType:'application/json'}});}});
+    if(!claimed)return {skipped:true,reason:'Another collector owns the bounded lease or standby ended'};lease=claimed.lease;recordOwner(ownerFile,token);
     leaseTimer=setInterval(renewLease,120000);env.collectorLeaseOwner=token;env.assertCollectorLease=()=>{if(leaseError)throw leaseError;if(Date.now()>=Number(lease.split(':')[0]))throw new Error('Collector lease expired');};
     await ensureRemoteReadIndexes(remote);checkpoint=await openCheckpoint(env);env.CHECKPOINT_COMPRESSION='gzip';env.PUBLICATION_MODE='r2';env.FAST_MONITOR=true;env.ENABLE_DELAY_STUDY=true;env.eventSerial=new Map();env.EXPECTED_CADENCE_SECONDS='15';installFinancialImport(env);await env.restoreFinancialScores();await initializeShadow(env);await initializeExecution(env);await initializeValidation(env);await initializeReview(env);await initializeAnnouncementQuotes(env);announcementTimer=setInterval(()=>{if(!stopping&&!draining&&!announcementTask)announcementTask=announcementQuoteTick(env).catch(error=>console.error(JSON.stringify({event:'announcement_quotes_degraded',error:error.message}))).finally(()=>{announcementTask=null;});},1000);await budget();
     evaluation=createEvaluationLoop({shouldEvaluate:ticker=>!stopping&&(activeSymbols.has(ticker)||(['AAPL','SPY','IWM'].includes(ticker)&&env.validationPlan&&Date.now()>=Date.parse(env.validationPlan.start_at)&&Date.now()<=Date.parse(env.validationPlan.end_at))),onError:error=>console.error(JSON.stringify({event:'quote_evaluation_degraded',error:error.message})),evaluate:async event=>{

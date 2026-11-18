@@ -28,7 +28,15 @@ for u in rs-collector rs-market-status rs-update.timer; do
     printf "%-17s %s/%s restarts=%s since=%s\n", u, v["ActiveState"], v["SubState"], v["NRestarts"], v["ActiveEnterTimestamp"];
     if (v["MemoryCurrent"] ~ /^[0-9]+$/) printf "%-17s memory now %.2f GiB, peak %.2f GiB, cpu %.0f s\n", "", v["MemoryCurrent"]/1073741824, (v["MemoryPeak"] ~ /^[0-9]+$/ ? v["MemoryPeak"]/1073741824 : 0), v["CPUUsageNSec"]/1e9 }'
 done
-grep -E '^(MemoryHigh|MemoryMax)=' /etc/systemd/system/rs-collector.service | tr '\n' ' '; echo
+# The limits in effect, including drop-ins, not the base unit file's text.
+systemctl show rs-collector -p MemoryHigh -p MemoryMax -p DropInPaths 2>/dev/null |
+  awk -F= '{ if ($1 ~ /^Memory/ && $2 ~ /^[0-9]+$/) printf "%s=%.1fG  ", $1, $2/1073741824; else if ($1 ~ /^Memory/) printf "%s=%s  ", $1, $2; else if ($2 != "") printf "\ndrop-ins: %s", $2 } END { print "" }'
+pid=$(systemctl show -p MainPID --value rs-collector 2>/dev/null)
+if [ -n "$pid" ] && [ "$pid" != 0 ]; then
+  node_pid=$(pgrep -P "$pid" -x node 2>/dev/null | head -1); [ -z "$node_pid" ] && node_pid=$pid
+  heap=$(tr '\0' '\n' < "/proc/$node_pid/environ" 2>/dev/null | grep '^NODE_OPTIONS=' | cut -d= -f2-)
+  echo "node heap flag: ${heap:-none (Node default)}"
+fi
 
 hr "machine"
 free -m | sed -n '1,3p'
