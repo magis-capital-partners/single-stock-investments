@@ -1,0 +1,25 @@
+# TEMPLATE ONLY. Never installed by a workflow or by Box R's update service.
+# Use only on an isolated IBKR PAPER host; never Box R or NY4.
+[Unit]
+Description=Reverse-split isolated IBKR paper executor
+After=network-online.target
+ConditionPathExists=/etc/rs-paper-approved
+
+[Service]
+Type=simple
+User=rs-paper
+WorkingDirectory=/srv/rs-paper/repo
+EnvironmentFile=/etc/rs-paper-executor.env
+ExecStart=/srv/rs-paper/venv/bin/python -m _system.trading.rs_paper_executor run --config /etc/rs-paper-config.json --state /var/lib/rs-paper/state.sqlite --evidence /var/lib/rs-paper/evidence.json --operations-file /var/lib/rs-paper/operations.json --kill-file /var/lib/rs-paper/FLATTEN --connect-paper
+Restart=no
+StateDirectory=rs-paper
+StateDirectoryMode=0700
+UMask=0077
+MemoryMax=1G
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
