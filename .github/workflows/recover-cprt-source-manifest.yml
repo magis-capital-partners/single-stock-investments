@@ -23,6 +23,14 @@ jobs:
       LIMIT: ${{ github.event.client_payload.limit }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/config/private_storage.json
+            _system/scripts/company_source_cache.py
+            _system/scripts/private_storage.py
+            _system/scripts/private_storage_s3.py
+            _system/scripts/recover_company_source_manifest.py
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
