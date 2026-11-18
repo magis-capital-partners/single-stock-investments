@@ -343,7 +343,7 @@ class PaperIBKR:
                 x.order.orderId,
                 x.orderStatus.permId or x.order.permId,
             ): x
-            for x in [*completed, *opened, *self.ib.trades()]
+            for x in [*self.ib.trades(), *opened, *completed]
             if x.order.orderRef in self.known_refs
         }
         executions = []

@@ -946,3 +946,70 @@ def test_cover_uses_broker_halt_state_without_box_r_ssr_file():
     assert run(b.exit_eligibility(1001))["halted"] is False
     b.tickers[1001].halted = 1
     assert run(b.exit_eligibility(1001))["halted"] is True
+
+
+def test_fresh_completed_order_beats_stale_working_cache(monkeypatch):
+    import sys
+    import _system.trading.rs_paper_executor.ibkr as adapter
+
+    async def positions(*args):
+        return {}
+
+    async def values(*args):
+        return {
+            "NetLiquidation": 10000000,
+            "AvailableFunds": 5000000,
+            "ExcessLiquidity": 5000000,
+        }
+
+    monkeypatch.setattr(adapter, "positions_for_account", positions)
+    monkeypatch.setattr(adapter, "account_values", values)
+    monkeypatch.setitem(
+        sys.modules,
+        "ib_insync",
+        SimpleNamespace(ExecutionFilter=lambda **kwargs: kwargs),
+    )
+    ref = "RSPAPER|" + "a" * 20
+    order = SimpleNamespace(
+        orderRef=ref,
+        account="DU000000",
+        clientId=171,
+        action="SELL",
+        totalQuantity=73,
+        orderId=1,
+        permId=101,
+    )
+
+    def trade(status):
+        return SimpleNamespace(
+            order=order,
+            contract=SimpleNamespace(conId=1001),
+            orderStatus=SimpleNamespace(status=status, filled=0, permId=101),
+        )
+
+    class IB:
+        client = SimpleNamespace(clientId=171)
+
+        def isConnected(self):
+            return True
+
+        def managedAccounts(self):
+            return ["DU000000"]
+
+        async def reqAllOpenOrdersAsync(self):
+            return []
+
+        async def reqCompletedOrdersAsync(self, *args):
+            return [trade("Cancelled")]
+
+        async def reqExecutionsAsync(self, *args):
+            return []
+
+        def trades(self):
+            return [trade("Submitted")]
+
+    b = PaperIBKR(
+        PaperEndpoint("DU000000", 171, 4002), lambda: {}, ib=IB(), clock=lambda: NOW
+    )
+    b.known_refs = {ref}
+    assert run(b.snapshot())["orders"][0]["state"] == "cancelled"
