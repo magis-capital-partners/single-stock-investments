@@ -1,0 +1,314 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "tape_index",
+  "as_of": "2026-11-18",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-11-18T10:28:13Z"
+    },
+    {
+      "path": "dashboard/data/capitulation_daily.json",
+      "generated_at": "2026-11-18T10:29:15Z"
+    },
+    {
+      "path": "dashboard/data/index_membership.json",
+      "generated_at": "2026-11-09T10:42:19Z"
+    },
+    {
+      "path": "dashboard/data/portfolio_news.json",
+      "generated_at": "2026-11-18T08:24:11Z"
+    }
+  ],
+  "items": [
+    {
+      "ticker": "WCN",
+      "headline": "WCN is a preliminary Russell 3000 addition on the FTSE Russell list of 2026-11-13, effective after the Dec 11 close.",
+      "one_number": "effective 2026-12-11",
+      "lane": "index_event",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z WCN current_memberships empty; no Nov 13 Russell add stored",
+          "url": null,
+          "as_of": "2026-11-09",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "FTSE Russell ru3000 additions PDF 2026-11-13 WCN prelim add, effective after 2026-12-11 close; dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z",
+          "url": "https://www.lseg.com/content/dam/ftse-russell/en_us/documents/other/ru3000-additions-20261113.pdf",
+          "as_of": "2026-11-13",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Preliminary. Russell updates on Nov 20, Nov 27, and Dec 4 can change the list before the effective date.",
+      "handoff": null
+    },
+    {
+      "ticker": "FER",
+      "headline": "FER is a preliminary Russell 3000 addition on the FTSE Russell list of 2026-11-13, effective after the Dec 11 close.",
+      "one_number": "effective 2026-12-11",
+      "lane": "index_event",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z FER current_memberships empty; no Nov 13 Russell add stored",
+          "url": null,
+          "as_of": "2026-11-09",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "FTSE Russell ru3000 additions PDF 2026-11-13 FER prelim add, effective after 2026-12-11 close; dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z",
+          "url": "https://www.lseg.com/content/dam/ftse-russell/en_us/documents/other/ru3000-additions-20261113.pdf",
+          "as_of": "2026-11-13",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Preliminary. Russell updates on Nov 20, Nov 27, and Dec 4 can change the list before the effective date.",
+      "handoff": null
+    },
+    {
+      "ticker": "LB",
+      "headline": "LB is a preliminary Russell 3000 addition on the FTSE Russell list of 2026-11-13; R1000 vs R2000 placement is not in the list.",
+      "one_number": "effective 2026-12-11",
+      "lane": "index_event",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z LB current_memberships empty; no Nov 13 Russell add stored",
+          "url": null,
+          "as_of": "2026-11-09",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "FTSE Russell ru3000 additions PDF 2026-11-13 LB prelim add, effective after 2026-12-11 close; dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z",
+          "url": "https://www.lseg.com/content/dam/ftse-russell/en_us/documents/other/ru3000-additions-20261113.pdf",
+          "as_of": "2026-11-13",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "FTSE Russell ru3000 additions PDF 2026-11-13 does not place LB in R1000 or R2000; dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z",
+          "url": "https://www.lseg.com/content/dam/ftse-russell/en_us/documents/other/ru3000-additions-20261113.pdf",
+          "as_of": "2026-11-13",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Preliminary. R1000 versus R2000 placement is not in the list. Updates Nov 20, Nov 27, and Dec 4.",
+      "handoff": null
+    },
+    {
+      "ticker": "QDEL",
+      "headline": "QDEL capitulation is panic (was stress_building): RSI14 29.6, CMF -0.137, close 9.87. No forced flow found.",
+      "one_number": "RSI14 29.6",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z QDEL cap=panic rsi14=29.6 cmf=-0.137 close=9.87 as_of 2026-11-17",
+          "url": null,
+          "as_of": "2026-11-17",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json gen 2026-11-09T10:42:19Z QDEL current_memberships empty, no confirmed event; dashboard/data/portfolio_news.json gen 2026-11-18T08:24:11Z no index or split row",
+          "url": null,
+          "as_of": "2026-11-09",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-13.json gen 2026-11-11T09:43:41Z QDEL prior cap=stress_building rsi14=35.7 as_of 2026-11-10",
+          "url": null,
+          "as_of": "2026-11-10",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored print leaves panic or RSI14 is back through 35.",
+      "handoff": null
+    },
+    {
+      "ticker": "AMZN",
+      "headline": "AMZN capitulation is stress_building, with CMF -0.155 below the -0.10 line. Close 257.89.",
+      "one_number": "CMF -0.155",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z AMZN cap=stress_building cmf=-0.155 close=257.89 as_of 2026-11-17",
+          "url": null,
+          "as_of": "2026-11-17",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored CMF is back through -0.10 and the state leaves stress_building.",
+      "handoff": null
+    },
+    {
+      "ticker": "MIAX",
+      "headline": "MIAX RSI14 is 73.0, above the 70 overbought line. Close 37.30.",
+      "one_number": "RSI14 73.0",
+      "lane": "overbought",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z MIAX rsi14=73.0 pressure=overbought close=37.3 as_of 2026-11-17",
+          "url": null,
+          "as_of": "2026-11-17",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored RSI14 is back through 70.",
+      "handoff": null
+    },
+    {
+      "ticker": "GOOGL",
+      "headline": "GOOGL stretch_z is -2.066, past |z| of 2. RSI, trend, CMF, and stress_building were already past threshold.",
+      "one_number": "stretch_z -2.066",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z GOOGL stretch_z=-2.066 rsi14=27.3 trend_z=-1.762 cmf=-0.299 cap=stress_building as_of 2026-11-17",
+          "url": null,
+          "as_of": "2026-11-17",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_evals/tape_index/tape_snapshots/2026-11-13.json gen 2026-11-11T09:43:41Z GOOGL prior rsi14=25.0 trend_z=-1.698 cmf=-0.305 stretch_z=-1.979 cap=stress_building as_of 2026-11-10",
+          "url": null,
+          "as_of": "2026-11-10",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "The new cross is stretch_z. Invalidated if the next stored stretch_z is back inside 2.",
+      "handoff": null
+    },
+    {
+      "ticker": "CSGP",
+      "headline": "CSGP capitulation state is stress_building. Close 30.59.",
+      "one_number": "close 30.59",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z CSGP cap=stress_building close=30.59 rsi14=63.0 cmf=-0.003 as_of 2026-11-17",
+          "url": null,
+          "as_of": "2026-11-17",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored state leaves stress_building.",
+      "handoff": null
+    },
+    {
+      "ticker": "COST",
+      "headline": "COST declared a $30 special dividend, ex and record 2026-11-24, payable 2026-12-04. No tape flag.",
+      "one_number": "$30 ex 2026-11-24",
+      "lane": "dated_event",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/portfolio_news.json gen 2026-11-18T08:24:11Z COST $30 special dividend, ex/record 2026-11-24; no tape flag on this run",
+          "url": null,
+          "as_of": "2026-11-18",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "filing",
+          "ref": "COST 8-K 2026-11-10: $30 special dividend, record 2026-11-24, payable 2026-12-04; dashboard/data/portfolio_news.json gen 2026-11-18T08:24:11Z",
+          "url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000134/cost-20261107.htm",
+          "as_of": "2026-11-10",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "OCC memo 60200: ex/record 2026-11-24, payable 2026-12-04; dashboard/data/portfolio_news.json gen 2026-11-18T08:24:11Z",
+          "url": "https://infomemo.theocc.com/infomemos?number=60200",
+          "as_of": "2026-11-11",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Ex and record 2026-11-24, payable 2026-12-04. No tape flag on this run.",
+      "handoff": null
+    },
+    {
+      "ticker": "SNDK",
+      "headline": "SNDK 8-for-1 split is effective after the 2026-11-19 close; stored price steps to 1/8. Tape flag held under the cap.",
+      "one_number": "8-for-1, 2026-11-20",
+      "lane": "forced_flow",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z SNDK rsi14=22.5 cap=panic close=797.24 as_of 2026-11-17; tape flag held under the 8-line cap",
+          "url": null,
+          "as_of": "2026-11-17",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "Sandisk release 2026-10-29: 8-for-1 after 2026-11-19 close, trade 2026-11-20; dashboard/data/portfolio_news.json gen 2026-11-18T08:24:11Z",
+          "url": "https://www.sandisk.com/company/newsroom/press-releases/2026/2026-10-29-sandisk-reports-fiscal-first-quarter-2027-financial-results",
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "OCC adjustment effective 2026-11-20 (memo 60125); dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z stored price steps to 1/8",
+          "url": "https://infomemo.theocc.com/infomemos?number=60125",
+          "as_of": "2026-11-02",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Split-adjusted trading starts 2026-11-20. Read that print as one-eighth of the pre-split price.",
+      "handoff": null
+    },
+    {
+      "ticker": "MSTR",
+      "headline": "MSTR is deleted from MSCI USA at the 2026-11-30 close, announced 2026-11-11 and already posted on 2026-11-13.",
+      "one_number": "effective 2026-11-30 close",
+      "lane": "index_event",
+      "evidence": [
+        {
+          "kind": "provider",
+          "ref": "MSCI USA deletion announced 2026-11-11, effective close 2026-11-30; dashboard/data/technical_summary.json gen 2026-11-18T10:28:13Z",
+          "url": "https://www.msci.com/eqb/gimi/stdindex/MSCI_Nov26_STPublicList.pdf",
+          "as_of": "2026-11-11",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "_system/data/desk_briefs/tape_index/2026-11-13.json gen 2026-11-13 already posted MSTR delete effective 2026-11-30",
+          "url": null,
+          "as_of": "2026-11-13",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Deletion is effective at the 2026-11-30 close. Already posted on 2026-11-13.",
+      "handoff": null
+    }
+  ],
+  "notes": "technical_summary was last built 2026-11-11 until refreshed 2026-11-18 (generated_at 2026-11-18T10:28:13Z; stored levels as_of 2026-11-17). index_membership.json last built 2026-11-09T10:42:19Z and does not reflect the Russell Nov 13 lists. Market: SPY stored state panic, RSI14 34.5; capitulation_daily SPY state stress (as_of 2026-11-17). 6 further names held under the 8-line cap.",
+  "screens_empty": [],
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}
