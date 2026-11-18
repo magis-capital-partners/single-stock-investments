@@ -132,7 +132,39 @@ locally; do not tunnel or redirect it to the live Gateway.
 python -m _system.trading.rs_paper_executor preflight --config /etc/rs-paper-config.json
 ```
 
-5. The explicit opt-in for a **paper** connection is:
+5. Prove the paper session read-only before any `run`. One connection, no retry,
+   no journal, no order transmission. It refuses unless the port's listening
+   process is a local IB Gateway/TWS (`java`, `javaw`, `ibgateway`, `tws`); an
+   `ssh`/`sshd`/`plink` listener means a forward that could carry the API
+   handshake to a live Gateway, and is refused before any socket opens. `run`
+   applies the same check before every connect.
+
+```text
+python -m _system.trading.rs_paper_executor probe --config /etc/rs-paper-config.json --connect-paper
+python -m _system.trading.rs_paper_executor probe --config /etc/rs-paper-config.json --connect-paper --symbol <TICKER> --conid <REVIEWED_CONID> --shares 1 --report probe.json
+```
+
+   Checks: local IB listener, DU-only managed accounts under the configured
+   client ID, complete `positionMultiEnd` snapshot, NAV/AvailableFunds/
+   ExcessLiquidity and, with a symbol, contract identity, a real-time (type 1)
+   two-sided share-size quote, the paper shortable tick, broker halt state and an
+   exact-stock WhatIf (1-100 shares). Exit 0 = all passed, 3 = a check failed,
+   2 = refused. Quote/halt checks need regular hours. A pass is paper evidence
+   only: not live margin, not a locate, and it does not see SPX's live exposure.
+
+   **IBKR login and data rules.** Log in with the account's dedicated **paper
+   username**, never the live username SPX uses on NY4: IBKR runs one trading
+   session per username, so a second login of that username can end NY4's. Per
+   IBKR FAQ 1136176599 (read 2026-11-18), a paper user set to share a live user's subscriptions gets **no data** whenever that
+   live user is logged in on a different device, and NY4's live user is always
+   logged in. So on a separate host the paper session receives live data only by
+   mirroring a **second live username** that holds its own stock subscriptions
+   and never logs in anywhere; otherwise it gets delayed data, and every entry
+   correctly blocks on `market_data_type != 1`. Changing which user the paper
+   account mirrors is a Client Portal setting; it does not change SPX's
+   subscriptions, but make it outside 07:45-16:15 ET.
+
+6. The explicit opt-in for a **paper** connection is:
 
 ```text
 python -m _system.trading.rs_paper_executor run --config /etc/rs-paper-config.json --state /var/lib/rs-paper/state.sqlite --operations-file /var/lib/rs-paper/operations.json --evidence /var/lib/rs-paper/evidence.json --kill-file /var/lib/rs-paper/FLATTEN --connect-paper
