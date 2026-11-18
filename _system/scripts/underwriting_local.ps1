@@ -54,7 +54,11 @@ if ($newSource) {
 }
 $patterns = @('/_system/scripts/', '/_system/config/private_storage.json', '/_system/config/llm_usage_policy.json', '/_system/config/underwriting_policy.json',
         '/_system/prompts/valuation_underwriting.md', '/_system/portfolio/registry.json',
-        '/_system/portfolio/classification.json', '/_system/reference/core_compounders.json',
+        '/_system/portfolio/classification.json', '/_system/portfolio/valuation_universe_policy.json',
+        '/_system/portfolio/paper/', '/_system/portfolio/*_target_weights.json',
+        '/_system/reference/valuation_followups.json', '/*/research/valuation_workbench.json',
+        '/*/research/committee_work/*/manifest.json', '/*/research/committee_trigger.json',
+        '/*/research/human_decision.json', '/_system/reference/core_compounders.json',
         '/_system/reference/listing_units_overrides.json', '/_system/reference/letter_classification_*.json',
         '/_system/reference/valuation_identity_aliases.json', '/_system/reference/valuation_method_registry.json',
         '/_system/reference/valuation_listing_ratios.json', '/_system/reference/market-data/valuation_quotes/',

@@ -42,6 +42,21 @@ ACTIVE_COMMITTEE_STAGES = {
     "round_one_open",
 }
 CASH_TICKERS = {"$CASH", "CASH", "CASH_USD", "USD"}
+# Every committed file build() reads. A sparse checkout that omits one of the
+# optional inputs silently drops its promotion signal, so consumers that tier
+# rows from a sparse checkout must restore all of these.
+INPUT_SPARSE_PATTERNS = (
+    "/_system/portfolio/valuation_universe_policy.json",
+    "/_system/portfolio/registry.json",
+    "/_system/portfolio/classification.json",
+    "/_system/portfolio/paper/",
+    "/_system/portfolio/*_target_weights.json",
+    "/_system/reference/valuation_followups.json",
+    "/*/research/valuation_workbench.json",
+    "/*/research/committee_work/*/manifest.json",
+    "/*/research/committee_trigger.json",
+    "/*/research/human_decision.json",
+)
 
 
 def _ticker(value: Any) -> str:
@@ -555,6 +570,17 @@ def render(payload: dict) -> str:
     return json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
 
 
+def build_validated(root: Path = ROOT, as_of: str | None = None) -> dict:
+    """Build the manifest in memory and raise unless it passes validation."""
+    stamp = as_of or datetime.now(timezone.utc).date().isoformat()
+    payload = build(stamp, root)
+    validation = payload.get("validation") or {}
+    if validation.get("status") != "pass":
+        errors = validation.get("errors") or ["validation failed"]
+        raise ValueError("Valuation universe tiers failed validation: " + "; ".join(errors[:8]))
+    return payload
+
+
 def write_manifest(root: Path = ROOT, as_of: str | None = None, *, out: Path | None = None) -> dict:
     """Build and write the tier manifest. Registry membership alone is Tier 3.
 
@@ -562,12 +588,7 @@ def write_manifest(root: Path = ROOT, as_of: str | None = None, *, out: Path | N
     that just joined the registry is tiered by the same rules as every other
     name. Validation failure raises rather than writing a partial manifest.
     """
-    stamp = as_of or datetime.now(timezone.utc).date().isoformat()
-    payload = build(stamp, root)
-    validation = payload.get("validation") or {}
-    if validation.get("status") != "pass":
-        errors = validation.get("errors") or ["validation failed"]
-        raise ValueError("Valuation universe tiers failed validation: " + "; ".join(errors[:8]))
+    payload = build_validated(root, as_of)
     target = Path(out) if out else Path(root) / OUTPUT_REL
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(render(payload), encoding="utf-8")

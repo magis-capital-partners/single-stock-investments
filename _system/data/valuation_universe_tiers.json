@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-11-13",
+  "as_of": "2026-11-18",
   "policy_id": "valuation_universe_tiers_v1",
   "policy_ref": "_system/portfolio/valuation_universe_policy.json",
   "universe_semantics": {
@@ -11,14 +11,14 @@
     "automated_and_generic_models": "screening only; never authorize capital"
   },
   "summary": {
-    "security_count": 875,
+    "security_count": 986,
     "tier_counts": {
       "tier_1": 40,
       "tier_2": 26,
-      "tier_3": 809
+      "tier_3": 920
     },
     "owner_override_count": 0,
-    "automatic_assignment_count": 875
+    "automatic_assignment_count": 986
   },
   "source_health": {
     "status": "healthy",
@@ -49,8 +49,8 @@
       },
       "committee_workbenches": {
         "required": false,
-        "files_seen": 868,
-        "valid_files": 868,
+        "files_seen": 866,
+        "valid_files": 866,
         "record_count": 40,
         "missing_files": [],
         "invalid_files": []
@@ -91,7 +91,7 @@
         "required": true,
         "files_seen": 1,
         "valid_files": 1,
-        "record_count": 875,
+        "record_count": 986,
         "missing_files": [],
         "invalid_files": []
       },
@@ -226,8 +226,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "2884.T": {
+      "ticker": "2884.T",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "319A.T": {
       "ticker": "319A.T",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "3697.T": {
+      "ticker": "3697.T",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -400,6 +470,41 @@
       ],
       "workflow_policy": {
         "committee_auto_start": true,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "9166.T": {
+      "ticker": "9166.T",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
         "committee_requires_stock_specific_model": true,
         "automated_screen_can_authorize_capital": false,
         "generic_screen_can_authorize_capital": false,
@@ -1043,6 +1148,76 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "ADDT-B.ST": {
+      "ticker": "ADDT-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "ADEN.TO": {
+      "ticker": "ADEN.TO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "ADI": {
       "ticker": "ADI",
       "tier": 3,
@@ -1325,6 +1500,41 @@
     },
     "AEP": {
       "ticker": "AEP",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "AEP.V": {
+      "ticker": "AEP.V",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -1759,6 +1969,41 @@
     },
     "ALGN": {
       "ticker": "ALGN",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "ALIF-B.ST": {
+      "ticker": "ALIF-B.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -2405,6 +2650,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "ANOD-B.ST": {
+      "ticker": "ANOD-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "AON": {
       "ticker": "AON",
       "tier": 3,
@@ -2512,6 +2792,41 @@
     },
     "APD": {
       "ticker": "APD",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "APG": {
+      "ticker": "APG",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -2991,6 +3306,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "ASSA-B.ST": {
+      "ticker": "ASSA-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "ASTS": {
       "ticker": "ASTS",
       "tier": 3,
@@ -3028,6 +3378,76 @@
     },
     "ASX.AX": {
       "ticker": "ASX.AX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "ATCO-A.ST": {
+      "ticker": "ATCO-A.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "ATD.TO": {
+      "ticker": "ATD.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -3921,8 +4341,113 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "BEIJ-B.ST": {
+      "ticker": "BEIJ-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "BEN": {
       "ticker": "BEN",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "BERG-B.ST": {
+      "ticker": "BERG-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "BERNER-B.ST": {
+      "ticker": "BERNER-B.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -3993,6 +4518,41 @@
     },
     "BG": {
       "ticker": "BG",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "BG.VI": {
+      "ticker": "BG.VI",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -4565,6 +5125,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "BNZL.L": {
+      "ticker": "BNZL.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "BOLSAA.MX": {
       "ticker": "BOLSAA.MX",
       "tier": 3,
@@ -4915,6 +5510,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "BUFAB.ST": {
+      "ticker": "BUFAB.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "BULL": {
       "ticker": "BULL",
       "tier": 3,
@@ -5099,6 +5729,41 @@
     },
     "BXP": {
       "ticker": "BXP",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "BYD.TO": {
+      "ticker": "BYD.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -5473,6 +6138,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "CBF.WA": {
+      "ticker": "CBF.WA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "CBOE": {
       "ticker": "CBOE",
       "tier": 2,
@@ -5622,6 +6322,41 @@
     },
     "CCL": {
       "ticker": "CCL",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "CCL.B.TO": {
+      "ticker": "CCL.B.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -5900,6 +6635,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "CGY.TO": {
+      "ticker": "CGY.TO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "CHD": {
       "ticker": "CHD",
       "tier": 3,
@@ -5935,8 +6705,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "CHG.DE": {
+      "ticker": "CHG.DE",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "CHNL": {
       "ticker": "CHNL",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "CHRT.L": {
+      "ticker": "CHRT.L",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -6075,6 +6915,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "CIE.MC": {
+      "ticker": "CIE.MC",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "CIEN": {
       "ticker": "CIEN",
       "tier": 3,
@@ -6112,6 +6987,41 @@
     },
     "CIFR": {
       "ticker": "CIFR",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "CIGI.TO": {
+      "ticker": "CIGI.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -6462,6 +7372,41 @@
     },
     "CMG": {
       "ticker": "CMG",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "CMG.TO": {
+      "ticker": "CMG.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -7872,6 +8817,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "CSW": {
+      "ticker": "CSW",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "CSX": {
       "ticker": "CSX",
       "tier": 3,
@@ -7979,6 +8959,41 @@
     },
     "CTVA": {
       "ticker": "CTVA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "CUP.AX": {
+      "ticker": "CUP.AX",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -8364,6 +9379,41 @@
     },
     "DE": {
       "ticker": "DE",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "DE.V": {
+      "ticker": "DE.V",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -9072,6 +10122,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "DPLM.L": {
+      "ticker": "DPLM.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "DPZ": {
       "ticker": "DPZ",
       "tier": 3,
@@ -9179,6 +10264,146 @@
     },
     "DRR.AX": {
       "ticker": "DRR.AX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "DSCV.L": {
+      "ticker": "DSCV.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "DSG.TO": {
+      "ticker": "DSG.TO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "DSGR": {
+      "ticker": "DSGR",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "DSV.CO": {
+      "ticker": "DSV.CO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -9856,6 +11081,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "ELIX.L": {
+      "ticker": "ELIX.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "ELV": {
       "ticker": "ELV",
       "tier": 3,
@@ -9961,8 +11221,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "ENGH.TO": {
+      "ticker": "ENGH.TO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "ENPH": {
       "ticker": "ENPH",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "ENSG": {
+      "ticker": "ENSG",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -10208,6 +11538,41 @@
     },
     "EQR": {
       "ticker": "EQR",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "EQS.PA": {
+      "ticker": "EQS.PA",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -11060,6 +12425,76 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "FAGR.BR": {
+      "ticker": "FAGR.BR",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "FAN.L": {
+      "ticker": "FAN.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "FANG": {
       "ticker": "FANG",
       "tier": 3,
@@ -11097,6 +12532,41 @@
     },
     "FAST": {
       "ticker": "FAST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "FCNCA": {
+      "ticker": "FCNCA",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -12159,6 +13629,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "FRAN.L": {
+      "ticker": "FRAN.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "FRMI": {
       "ticker": "FRMI",
       "tier": 3,
@@ -12267,6 +13772,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "FRP.L": {
+      "ticker": "FRP.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "FRT": {
       "ticker": "FRT",
       "tier": 3,
@@ -12339,6 +13879,41 @@
     },
     "FSLR": {
       "ticker": "FSLR",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "FSV.TO": {
+      "ticker": "FSV.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -12549,6 +14124,41 @@
     },
     "FXI": {
       "ticker": "FXI",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "GBCI": {
+      "ticker": "GBCI",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -13734,6 +15344,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "GREEN.ST": {
+      "ticker": "GREEN.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "GRMN": {
       "ticker": "GRMN",
       "tier": 3,
@@ -14557,6 +16202,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "HLMA.L": {
+      "ticker": "HLMA.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "HLT": {
       "ticker": "HLT",
       "tier": 3,
@@ -14594,6 +16274,41 @@
     },
     "HNFSA": {
       "ticker": "HNFSA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "HOMB": {
+      "ticker": "HOMB",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -15047,6 +16762,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "HWKN": {
+      "ticker": "HWKN",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "HWM": {
       "ticker": "HWM",
       "tier": 3,
@@ -15295,8 +17045,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "IDUN-B.ST": {
+      "ticker": "IDUN-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "IDXX": {
       "ticker": "IDXX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "IESC": {
+      "ticker": "IESC",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -15435,8 +17255,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "IMCD.AS": {
+      "ticker": "IMCD.AS",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "INCY": {
       "ticker": "INCY",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "INDT.ST": {
+      "ticker": "INDT.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -15722,8 +17612,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "IP.MI": {
+      "ticker": "IP.MI",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "IPCXR": {
       "ticker": "IPCXR",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "IPG.AX": {
+      "ticker": "IPG.AX",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -16212,6 +18172,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "JDG.L": {
+      "ticker": "JDG.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "JKHY": {
       "ticker": "JKHY",
       "tier": 3,
@@ -16389,6 +18384,41 @@
     },
     "JPM": {
       "ticker": "JPM",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "KARNEL-B.ST": {
+      "ticker": "KARNEL-B.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -16884,6 +18914,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "KPG.AX": {
+      "ticker": "KPG.AX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "KR": {
       "ticker": "KR",
       "tier": 3,
@@ -16919,8 +18984,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "KRMN": {
+      "ticker": "KRMN",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "KRP": {
       "ticker": "KRP",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "KRX.IR": {
+      "ticker": "KRX.IR",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -17059,6 +19194,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "KWY": {
+      "ticker": "KWY",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "L": {
       "ticker": "L",
       "tier": 3,
@@ -17129,6 +19299,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "LAGR-B.ST": {
+      "ticker": "LAGR-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "LAND": {
       "ticker": "LAND",
       "tier": 3,
@@ -17166,6 +19371,41 @@
     },
     "LASR": {
       "ticker": "LASR",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "LATO-B.ST": {
+      "ticker": "LATO-B.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -17744,6 +19984,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "LMAT": {
+      "ticker": "LMAT",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "LMN": {
       "ticker": "LMN",
       "tier": 3,
@@ -17886,6 +20161,41 @@
     },
     "LNT": {
       "ticker": "LNT",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "LOAR": {
+      "ticker": "LOAR",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -18464,6 +20774,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "MBB.DE": {
+      "ticker": "MBB.DE",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "MBGL": {
       "ticker": "MBGL",
       "tier": 2,
@@ -18497,6 +20842,76 @@
       "demotion_conditions": [
         "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
         "The owner explicitly overrides the name to Tier 3."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "MC.PA": {
+      "ticker": "MC.PA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "MCAP.ST": {
+      "ticker": "MCAP.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -19040,6 +21455,41 @@
     },
     "MLM": {
       "ticker": "MLM",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "MMGR-B.ST": {
+      "ticker": "MMGR-B.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -20296,6 +22746,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "NIC": {
+      "ticker": "NIC",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "NIO": {
       "ticker": "NIO",
       "tier": 3,
@@ -20578,6 +23063,41 @@
     },
     "NTAP": {
       "ticker": "NTAP",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "NTG.CO": {
+      "ticker": "NTG.CO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -21300,6 +23820,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "ONB": {
+      "ticker": "ONB",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "ONDS": {
       "ticker": "ONDS",
       "tier": 3,
@@ -21657,6 +24212,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "OTP.BD": {
+      "ticker": "OTP.BD",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "OUST": {
       "ticker": "OUST",
       "tier": 3,
@@ -21799,6 +24389,41 @@
     },
     "PAYX": {
       "ticker": "PAYX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "PB": {
+      "ticker": "PB",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -22219,6 +24844,41 @@
     },
     "PFG": {
       "ticker": "PFG",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "PFP.AX": {
+      "ticker": "PFP.AX",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -23710,8 +26370,78 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "QXO": {
+      "ticker": "QXO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "RACE": {
       "ticker": "RACE",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "RBC": {
+      "ticker": "RBC",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -23782,6 +26512,41 @@
     },
     "RCAT": {
       "ticker": "RCAT",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "RCH.TO": {
+      "ticker": "RCH.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -23957,6 +26722,41 @@
     },
     "REGN": {
       "ticker": "REGN",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "RELAIS.HE": {
+      "ticker": "RELAIS.HE",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -24507,6 +27307,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "RNWH.L": {
+      "ticker": "RNWH.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "ROAD": {
       "ticker": "ROAD",
       "tier": 3,
@@ -24544,6 +27379,41 @@
     },
     "ROK": {
       "ticker": "ROK",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "ROKO-B.ST": {
+      "ticker": "ROKO-B.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -24857,6 +27727,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "RYAN": {
+      "ticker": "RYAN",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "RYN": {
       "ticker": "RYN",
       "tier": 3,
@@ -25032,6 +27937,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "SBCF": {
+      "ticker": "SBCF",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "SBET": {
       "ticker": "SBET",
       "tier": 3,
@@ -25137,8 +28077,148 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "SCHP.PA": {
+      "ticker": "SCHP.PA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "SCHW": {
       "ticker": "SCHW",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SDI.L": {
+      "ticker": "SDI.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SDIP-B.ST": {
+      "ticker": "SDIP-B.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SES.MI": {
+      "ticker": "SES.MI",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -25205,6 +28285,76 @@
       "demotion_conditions": [
         "No validation follow-up, watchlist membership, priority stance, or proposed target allocation remains.",
         "The owner explicitly overrides the name to Tier 3."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SFT.L": {
+      "ticker": "SFT.L",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SGN.WA": {
+      "ticker": "SGN.WA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
       ],
       "workflow_policy": {
         "committee_auto_start": false,
@@ -25286,6 +28436,41 @@
     },
     "SHW": {
       "ticker": "SHW",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SIKA.SW": {
+      "ticker": "SIKA.SW",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -25739,6 +28924,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "SNEX": {
+      "ticker": "SNEX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "SNOW": {
       "ticker": "SNOW",
       "tier": 2,
@@ -25923,6 +29143,41 @@
     },
     "SOFI": {
       "ticker": "SOFI",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SOL.MI": {
+      "ticker": "SOL.MI",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -26385,8 +29640,113 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "SRG.AX": {
+      "ticker": "SRG.AX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "SRPT": {
       "ticker": "SRPT",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SSB": {
+      "ticker": "SSB",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SSNC": {
+      "ticker": "SSNC",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -26715,6 +30075,41 @@
     },
     "SUM": {
       "ticker": "SUM",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "SUNB": {
+      "ticker": "SUNB",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -27273,6 +30668,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "TEA.AX": {
+      "ticker": "TEA.AX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "TECH": {
       "ticker": "TECH",
       "tier": 3,
@@ -27521,6 +30951,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "TFII.TO": {
+      "ticker": "TFII.TO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "TFPM": {
       "ticker": "TFPM",
       "tier": 3,
@@ -27558,6 +31023,41 @@
     },
     "TGT": {
       "ticker": "TGT",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "THEP.PA": {
+      "ticker": "THEP.PA",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -27948,6 +31448,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "TPG.DE": {
+      "ticker": "TPG.DE",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "TPHS": {
       "ticker": "TPHS",
       "tier": 3,
@@ -28180,6 +31715,41 @@
     },
     "TRMB": {
       "ticker": "TRMB",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "TRNS": {
+      "ticker": "TRNS",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -28633,6 +32203,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "TVK.TO": {
+      "ticker": "TVK.TO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "TXN": {
       "ticker": "TXN",
       "tier": 3,
@@ -28670,6 +32275,41 @@
     },
     "TXT": {
       "ticker": "TXT",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "TXT.MI": {
+      "ticker": "TXT.MI",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -28810,6 +32450,41 @@
     },
     "UBER": {
       "ticker": "UBER",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "UBSI": {
+      "ticker": "UBSI",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -29753,6 +33428,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "VHI.TO": {
+      "ticker": "VHI.TO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "VIAV": {
       "ticker": "VIAV",
       "tier": 3,
@@ -29790,6 +33500,41 @@
     },
     "VICI": {
       "ticker": "VICI",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "VIT-B.ST": {
+      "ticker": "VIT-B.ST",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -29998,6 +33743,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "VOLO.ST": {
+      "ticker": "VOLO.ST",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "VOXR": {
       "ticker": "VOXR",
       "tier": 3,
@@ -30140,6 +33920,41 @@
     },
     "VRTX": {
       "ticker": "VRTX",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "VSEC": {
+      "ticker": "VSEC",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -31017,6 +34832,76 @@
     },
     "WSM": {
       "ticker": "WSM",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "WSO": {
+      "ticker": "WSO",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "WSP.TO": {
+      "ticker": "WSP.TO",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",

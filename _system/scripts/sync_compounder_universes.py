@@ -11,6 +11,7 @@ import json
 from datetime import datetime, timezone
 
 from build_compounder_roster import build, build_serial_acquirers
+from build_valuation_universe_tiers import write_manifest
 from portfolio_registry import DEFAULT_CLASSIFICATION, ROOT, infer_download_type
 
 
@@ -57,6 +58,9 @@ def main():
     if args.write and updated != prior:
         updated.setdefault('meta', {})['updated'] = now.strftime('%Y-%m-%dT%H:%M:%SZ')
         path.write_text(json.dumps(updated, indent=2, ensure_ascii=True)+'\n', encoding='utf-8')
+        # A registered listing reaches the dashboard only with a tier, so the
+        # registry change and its tier assignment land in the same commit.
+        write_manifest(ROOT)
     print(json.dumps({'added': additions, 'count': len(additions), 'write': args.write}))
 
 
