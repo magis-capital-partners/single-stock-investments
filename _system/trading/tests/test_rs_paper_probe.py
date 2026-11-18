@@ -173,7 +173,7 @@ def test_cli_probe_requires_connect_flag(tmp_path, capsys):
     path = tmp_path / "c.json"
     path.write_text(json.dumps(config))
     assert cli.main(["probe", "--config", str(path)]) == 2
-    assert "--connect-paper is required" in capsys.readouterr().out
+    assert "is required; no connection was opened" in capsys.readouterr().out
 
 
 def test_run_checks_listener_before_connect(tmp_path, monkeypatch, capsys):

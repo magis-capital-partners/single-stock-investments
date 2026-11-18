@@ -8,7 +8,15 @@ import math
 from zoneinfo import ZoneInfo
 
 from .policy import Calendar
-from .safety import SafetyError, fresh, integer, number, owned_order, timestamp
+from .safety import (
+    PROTECTED_SYMBOLS,
+    SafetyError,
+    fresh,
+    integer,
+    number,
+    owned_order,
+    timestamp,
+)
 
 TERMINAL = {"filled", "cancelled", "rejected"}
 
@@ -22,8 +30,15 @@ class Executor:
         broker,
         calendar=None,
         kill_switch=lambda: False,
+        transmit=lambda: (True, "paper"),
+        claims=None,
+        book=None,
     ):
         self.endpoint = endpoint.validate()
+        # Live needs every account-sharing guard wired; paper may run without.
+        if endpoint.live and (claims is None or book is None):
+            raise SafetyError("live executor requires symbol claims and book margin")
+        self.transmit, self.claims, self.book = transmit, claims, book
         self.policy = policy.validate()
         self.journal, self.broker = journal, broker
         self.calendar = calendar or Calendar()
@@ -128,6 +143,24 @@ class Executor:
                 )
         return snap
 
+    def cushion(self, snap):
+        nav = number(snap.get("nav"), "NAV", minimum=1)
+        return number(snap.get("excess_liquidity"), "ExcessLiquidity", minimum=0) / nav
+
+    def release_flat_claims(self, now):
+        """A flat name with no unresolved order is released after the NEXT session
+        close, so a late cover fill or a recall settles before another system
+        may trade it. Never released immediately."""
+        if self.claims is None:
+            return
+        open_conids = {x["conid"] for x in self.journal.rows("positions") if x["shares"]}
+        open_conids |= {
+            x["conid"] for x in self.journal.rows("orders") if x["state"] not in TERMINAL
+        }
+        for symbol, row in self.claims.load()["claims"].items():
+            if row.get("release_after") is None and row["conid"] not in open_conids:
+                self.claims.release(symbol, self.calendar.next_close_after(now), now)
+
     def validate_signal(self, signal, now):
         p = self.policy
         if not self.calendar.session(now):
@@ -149,6 +182,8 @@ class Executor:
             raise SafetyError("primary source hash required")
         if not re.fullmatch(r"[A-Z][A-Z0-9.]{0,11}", signal["ticker"]):
             raise SafetyError("invalid common-share symbol")
+        if signal["ticker"] in PROTECTED_SYMBOLS:
+            raise SafetyError("symbol belongs to another system's product")
         if integer(signal["cik"], "CIK", minimum=1) <= 0:
             raise SafetyError("invalid CIK")
         if signal.get("status") != "scheduled" or signal.get("instrument_type") != "CS":
@@ -344,6 +379,15 @@ class Executor:
             if o["ref"] == f["ref"]
         )
         details, mark_value, marks_complete = [], 0, True
+        ladder = ""
+        p = self.policy
+        if p.cushion_flatten is not None and self.cushion(snap) < p.cushion_flatten:
+            # Lowest rung of the account ladder: RS flattens before anything else.
+            ladder = "cushion_flatten"
+            self.halt(now, "cushion_flatten")
+        if self.book is not None and positions and self.book.must_yield(snap, now, self):
+            ladder = ladder or "book_margin_yield"
+            self.halt(now, "book_margin_yield")
         for pos in positions:
             signal = json.loads(pos["payload"])
             try:
@@ -383,6 +427,8 @@ class Executor:
                 bound["apr"] = max(bound["apr"], self.policy.max_borrow_apr)
                 self.halt(now, "current_borrow_rate_unknown")
             self.journal.set(key, bound)
+            if ladder:
+                reason = ladder
             if self.killed():
                 reason = "operator_flatten"
             details.append((pos, signal, ask, reason))
@@ -470,6 +516,18 @@ class Executor:
             raise SafetyError("proposal/IB contract identity mismatch")
         if snap.get("positions", {}).get(signal["conid"], 0):
             raise SafetyError("existing broker stock position is not a new RS entry")
+        foreign_orders = snap.get("foreign_open_conids")
+        if foreign_orders is None and self.endpoint.live:
+            raise SafetyError("account-wide open-order proof missing")
+        if signal["conid"] in (foreign_orders or ()):
+            raise SafetyError("another system has a working order in this contract")
+        if self.claims is not None:
+            held = self.claims.foreign(now)
+            if signal["ticker"] in held:
+                raise SafetyError("symbol claimed by " + held[signal["ticker"]])
+        floor = self.policy.cushion_halt
+        if floor is not None and self.cushion(snap) < floor:
+            raise SafetyError("account cushion below the RS entry floor")
         proof = await self.broker.eligibility(signal["conid"])
         self.eligibility(proof, now, signal["conid"])
         borrow = await self.broker.borrow(signal["conid"])
@@ -559,6 +617,12 @@ class Executor:
         )
         if min(after_initial, stressed) < protected:
             raise SafetyError("SPX reserve/stressed margin headroom insufficient")
+        if p.cushion_halt is not None and stressed / nav < p.cushion_halt:
+            raise SafetyError("entry would leave the account cushion below the RS floor")
+        if self.book is not None:
+            self.book.require_fit(
+                snap, now, self, p.squeeze_loss_multiple * shares * ask + maintenance
+            )
         signal["margin_reserve"] = max(initial, maintenance) + shares * ask
         signal["entry_maintenance_margin"] = maintenance
         signal["entry_evidence"] = {
@@ -590,6 +654,20 @@ class Executor:
         self.quote(quote, current, signal["conid"])
         if self.killed() or self.journal.get("entry_halt"):
             raise SafetyError("entry stopped during pretrade checks")
+        armed, why = self.transmit()
+        if not armed:
+            key = "shadow:" + signal["id"]
+            if not self.journal.get(key):
+                self.journal.set(key, current)
+                self.alert(current, "shadow_entry", {
+                    "id": signal["id"], "ticker": signal["ticker"], "shares": shares,
+                    "limit": bid, "reason": why,
+                    "initial_margin": initial, "maintenance_margin": maintenance,
+                })
+            return None
+        if self.claims is not None:
+            # Durable claim BEFORE the first order in the name.
+            self.claims.claim(signal["ticker"], signal["conid"], current)
         return await self.submit(signal, "SELL", shares, bid, current)
 
     async def tick(self, proposals, now):
@@ -600,6 +678,13 @@ class Executor:
         except Exception as exc:
             self.halt(now, type(exc).__name__ + ":" + str(exc))
             return
+        try:
+            # Published every cycle, halted or not: other systems read it.
+            self.release_flat_claims(now)
+            if self.book is not None:
+                self.book.publish(self, snap, now)
+        except Exception as exc:
+            self.halt(now, "account_guard_publish:" + type(exc).__name__)
         if self.killed() or self.journal.get("entry_halt"):
             await self.cancel_entries(now)
             return
@@ -619,6 +704,11 @@ class Executor:
                         {"id": proposal.get("id"), "reason": str(exc)},
                     )
                     self.journal.set(key, str(exc))
+        if self.book is not None and proposals:
+            self.book.publish(self, snap, self.broker.now())  # include new reservations
         self.journal.event(
-            now, "heartbeat", {"paper_only": True, "live_orders_allowed": False}
+            now,
+            "heartbeat",
+            {"paper_only": not self.endpoint.live,
+             "live_orders_allowed": self.endpoint.live and self.transmit()[0]},
         )

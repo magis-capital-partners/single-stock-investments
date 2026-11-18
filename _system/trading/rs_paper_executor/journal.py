@@ -8,11 +8,14 @@ import os
 from pathlib import Path
 import sqlite3
 
-from .safety import SafetyError
+from .safety import PREFIX, SafetyError
 
 
 class Journal:
-    def __init__(self, path, policy_hash):
+    def __init__(self, path, policy_hash, prefix=PREFIX):
+        if prefix not in ("RSPAPER|", "RSLIVE|"):
+            raise SafetyError("unknown order reference prefix")
+        self.prefix = prefix
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.lock = path.with_suffix(path.suffix + ".lock").open("a+b")
@@ -53,6 +56,10 @@ class Journal:
             self.close()
             raise SafetyError("policy changed: use a separately registered journal")
         self.set("policy_hash", policy_hash)
+        if self.get("order_prefix", prefix) != prefix:
+            self.close()
+            raise SafetyError("journal belongs to another order namespace")
+        self.set("order_prefix", prefix)
 
     def get(self, key, default=None):
         row = self.db.execute("SELECT value FROM meta WHERE key=?", (key,)).fetchone()
@@ -89,12 +96,12 @@ class Journal:
         if any(x["state"] not in ("filled", "cancelled", "rejected") for x in previous):
             raise SafetyError("order outcome unresolved")
         ref = (
-            "RSPAPER|"
+            self.prefix
             + hashlib.sha256(
                 f"{signal['id']}:{side}:{len(previous)}".encode()
             ).hexdigest()[:20]
         )
-        payload = {"at": at, "signal": signal, "paper_only": True}
+        payload = {"at": at, "signal": signal, "paper_only": self.prefix == PREFIX}
         with self.db:
             self.db.execute(
                 "INSERT OR IGNORE INTO signals VALUES(?,?,?)",
