@@ -167,7 +167,7 @@ async def run(args, endpoint, policy, config):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["preflight", "run", "status", "probe"])
+    parser.add_argument("command", choices=["preflight", "run", "status", "probe", "integration-test"])
     parser.add_argument("--config", required=True)
     parser.add_argument(
         "--state",
@@ -187,7 +187,10 @@ def main(argv=None):
     parser.add_argument("--symbol", help="probe: reviewed common-share symbol")
     parser.add_argument("--conid", type=int, help="probe: reviewed IB conid")
     parser.add_argument("--shares", type=int, default=1, help="probe: WhatIf size")
-    parser.add_argument("--report", help="probe: write the JSON report here")
+    parser.add_argument("--report", help="probe/integration-test: write the JSON report here")
+    parser.add_argument(
+        "--journal", help="integration-test: a NEW *.integration.sqlite file"
+    )
     parser.add_argument(
         "--resume-entries",
         action="store_true",
@@ -197,8 +200,8 @@ def main(argv=None):
     try:
         config = read_json(args.config)
         endpoint = endpoint_from_config(config["endpoint"])
-        policy = Policy(**config["policy"]).validate()
         check_live_config(config, endpoint)
+        policy = Policy(**config["policy"]).validate()
         if args.command == "preflight":
             print(
                 json.dumps(
@@ -249,6 +252,30 @@ def main(argv=None):
             if args.report:
                 Path(args.report).write_text(text + "\n", encoding="utf-8")
             print(text)
+            return 0 if report["pass"] else 3
+        elif args.command == "integration-test":
+            if endpoint.live or not args.connect_paper:
+                raise SafetyError("integration-test needs a paper endpoint and --connect-paper")
+            if not (args.symbol and args.conid and args.journal):
+                raise SafetyError("integration-test needs --symbol, --conid and --journal")
+            from .integration import dumps, run_integration
+
+            async def stage6():
+                broker = PaperIBKR(endpoint, lambda: {"borrow": {}, "eligibility": {}})
+                require_local_ib_listener(endpoint.port)
+                await broker.connect()
+                try:
+                    return await run_integration(
+                        endpoint, policy, broker, args.journal,
+                        symbol=args.symbol, conid=args.conid,
+                    )
+                finally:
+                    broker.close()
+
+            report = asyncio.run(stage6())
+            if args.report:
+                Path(args.report).write_text(dumps(report) + "\n", encoding="utf-8")
+            print(dumps(report))
             return 0 if report["pass"] else 3
         else:
             asyncio.run(run(args, endpoint, policy, config))

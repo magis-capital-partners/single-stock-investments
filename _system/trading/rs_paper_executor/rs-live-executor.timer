@@ -1,0 +1,13 @@
+# TEMPLATE ONLY (see rs-live-executor.service). Starts the session run; the
+# service's RuntimeMaxSec ends it after the close. US holidays: the executor
+# takes no entry outside a calendar session, but stop the timer for a holiday
+# week if the Gateway is down, so the connect budget is not spent on refusals.
+[Unit]
+Description=Start the reverse-split live executor for the session
+
+[Timer]
+OnCalendar=Mon..Fri 09:05:00 America/New_York
+Persistent=false
+
+[Install]
+WantedBy=timers.target

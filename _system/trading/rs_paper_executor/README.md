@@ -1,10 +1,19 @@
-# Reverse-split IBKR paper executor
+# Reverse-split IBKR executor (paper, and gated live)
 
-This is a **standalone paper trading process**, built from the SPX/SPY operating
-patterns. It is not a feature switch on the live SPX executor or Box R collector.
-There is no live mode, live order switch, production client allocation or automatic
-deployment. The owner authorized its implementation/testing/merge on 2026-11-18;
-that does not authorize connecting to NY4, a live Gateway, or placing real orders.
+A **standalone process**, built from the SPX/SPY operating patterns. It is not a
+feature switch on the live SPX executor or the Box R collector. It runs:
+
+* **paper**: an isolated paper Gateway/TWS on loopback, `DU` account, unregistered
+  paper client ID, `RSPAPER|` references (`--connect-paper`);
+* **live**: the shared NY4 Gateway as the registered `reverse-split` system,
+  client **60**, `RSLIVE|` references (`--connect-live`). It runs in **SHADOW**
+  (every gate and the real WhatIf, but no SELL transmitted) until the owner's arm
+  file is valid. See "Live mode" below.
+
+The owner authorized the paper implementation on 2026-11-18 and asked for the
+live account-sharing guards the same day. Neither authorizes installing it on
+NY4, connecting to the live Gateway, or arming it: each is a separate owner word.
+Nothing is deployed automatically.
 
 ## Boundaries
 
@@ -21,9 +30,12 @@ that does not authorize connecting to NY4, a live Gateway, or placing real order
   Box R's role/environment/file and known collector/NY4 hostnames are blocked.
 * Nothing here modifies the shared live Gateway registry, credentials, settings,
   SPX/ETF code or services. No test opens a Gateway or vendor connection.
-* A future live RS system requires a new reviewed implementation, formal client-ID
-  allocation/mirrors and approved operating contract. Changing a JSON mode or port
-  cannot enable live orders in this implementation.
+* Live is a separate endpoint class (`LiveEndpoint`), not a JSON switch on paper.
+  It accepts only the registry-allocated `reverse-split` executor ID (registry
+  `2026-11-18.1`, hash-pinned, mirrored in spx-0dte and ls-algo), the registry's
+  Gateway live port on loopback, a `U` account, the host file
+  `/etc/rs-live-approved`, and `--connect-live`. Transmission needs the arm file
+  on top of that.
 
 ## SPX framework reuse
 
@@ -84,6 +96,121 @@ and cancellation. It never binds or cancels another client's orders.
 The 20% stop and pre-action exit are **new paper guardrails**, not the historical
 five-session backtest. Original 60-point/all-scoreable shadow policies, source
 clocks, failed trial grades and original November 13 trial end are unchanged.
+
+## Live mode: sharing one account with SPX, etf-0dte, ls-algo and the hub
+
+IBKR margins, nets and liquidates per **account**, so separating code does not
+separate risk. Live mode is built around six account-sharing guards. Each is
+required: the executor refuses to start in live without them.
+
+1. **Ownership tags.** Every order is `RSLIVE|<20 hex>` from client 60. Covers
+   and cancels touch only journalled `RSLIVE|` orders of this client. No
+   `reqGlobalCancel`, no `reqAutoOpenOrders`, no `reqPositions` (account-scoped
+   `reqPositionsMulti` only).
+2. **Symbol partitioning** (`claims.py`, contract `ib_account_symbol_claims.v1`).
+   Before the first order in a name, RS durably claims it in
+   `<claims_dir>/reverse-split.json`. ls-algo refuses any order in a claimed name
+   at its single placement chokepoint, freezes it in its blacklist and leaves it
+   out of its inventory. The portfolio hub attributes it to `reverse_split` and
+   refuses tickets on it. RS refuses:
+   * a name another system claims;
+   * a contract with another system's working order (account-wide `reqAllOpenOrders`);
+   * a contract the account already holds;
+   * SPX/SPXW/XSP/VIX/SPY/QQQ/TSLA/NVDA/AMZN.
+
+   A flat name is released only after the **next** session close; age never
+   releases a claim.
+3. **One ledger per system, reconciled together** (`_system/trading/account_ownership.py`).
+   After the Flex day closes, every account position must have exactly one owner,
+   and RS's journal must equal the broker share for share. An unowned,
+   double-owned or mismatched position is an alarm (exit 1).
+4. **A margin budget measured, not assumed.** Every entry previews the exact stock
+   short with IBKR WhatIf. In the book-wide limit (`book.py`) RS takes **no
+   pro-rata share**. It reads spx-0dte's per-product claim files read-only and fits
+   only in `limit x NAV - max(SPX claim, spx_book_reserve_fraction x NAV) - other
+   products`, with its own claim priced on squeeze stress. Without a valid SPX file
+   for today RS takes no entry. SPX's executor is unchanged and never counts RS.
+5. **A de-risking order RS controls** (cushion = ExcessLiquidity / NetLiq):
+   * below `cushion_halt`, no RS entry (also checked on the post-trade stressed figure);
+   * below `cushion_flatten`, RS flattens its own names first;
+   * when the book limit no longer has room for it, RS also flattens (`book_margin_yield`).
+6. **Priority, not equal shares.** `spx_reserve` + `cash_buffer` (dollars) must
+   remain in AvailableFunds and in stressed ExcessLiquidity after every RS entry,
+   so SPX's pre-entry buying-power check keeps its room (`ib_executor` uses
+   BuyingPower, falling back to AvailableFunds). Size `spx_reserve` to SPX's
+   largest one-day buying-power need plus the ETF products'.
+
+Live config (`config.live.example.json`) must state every owner decision
+explicitly; the template leaves them null and cannot pass preflight:
+* `target_notional`, `max_name_notional`, `max_gross_notional`, `max_names`;
+* `spx_reserve`, `cash_buffer`, `daily_loss_limit`;
+* `cushion_halt`, `cushion_flatten`;
+* `pre_action_exit: true` (a split can change the conid, which spx-0dte's ETF
+  stock proof treats as unidentified);
+* `live.spx_book_reserve_fraction`.
+
+The paper envelope caps (50k/name, 150k gross, 3 names, 0.5%/1.5% of NAV) still
+bound every value.
+
+**Arm file** (`/etc/rs-live/ARM.json`, owner-written; any policy change disarms):
+
+```json
+{"schema": "rs_live_arm.v1", "account": "U...", "client_id": 60,
+ "policy_hash": "<preflight policy_hash>", "armed_by": "<owner>",
+ "valid_until": "2026-12-31T21:00:00+00:00"}
+```
+
+**What it adds to the shared Gateway:**
+* one long-lived session: client 60, at most 3 connects a day, no restart loop
+  (`Restart=no`);
+* at most **8 streaming** stock lines, for open names only, cancelled on exit;
+* snapshot-style account and order reads on that one session.
+
+`ibc_guard`'s live-lock veto does not know RS, so a remedial Gateway restart can
+disconnect it. RS then halts entries and reconnects within its budget.
+
+**NY4 layout.** The templates `rs-live-executor.service` / `.timer` are not
+installed by anything.
+
+| What | Where |
+|---|---|
+| User | `rs-live` |
+| Repo and venv | `/srv/rs-live/repo`, `/srv/rs-live/venv` |
+| Config and arm | `/etc/rs-live/` |
+| State | `/var/lib/rs-live/` (journal, evidence, operations copy, `book/`) |
+| Claims | `/var/lib/ib-account-claims/` (group `ib-claims`, readable by the `spx` user) |
+| SPX claim files | read from `/home/spx/spx-0dte/data/live/<date>/`, read-only; RS never writes there |
+
+The unit sets `CPUWeight=20` and `OOMScoreAdjust=700`; `RuntimeMaxSec` ends the
+session run.
+
+### Live operator commands (on NY4, as `rs-live`)
+
+Install or change anything only outside 07:45-16:20 ET.
+
+```text
+python -m _system.trading.rs_paper_executor preflight --config /etc/rs-live/config.json
+python -m _system.trading.rs_paper_executor status   --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite
+systemctl start rs-live-executor        # owner word; shadow unless armed
+touch /var/lib/rs-live/FLATTEN          # scoped flatten: cancels RS entries, covers RS names only
+systemctl stop rs-live-executor         # stop; working DAY orders stay at IBKR, check status
+rm /etc/rs-live/ARM.json                # disarm: back to shadow on the next cycle; covers continue
+```
+
+Recovery follows the paper procedure below:
+1. Restart, and let reconciliation import fills by execution ID.
+2. Inspect any `RSLIVE|` order it reports as uncertain.
+3. Run `run --resume-entries`.
+
+Never edit or delete the journal or the claims file to clear a position.
+
+### Account reconciliation (after the Flex day closes)
+
+```text
+python -m _system.trading.account_ownership --positions <flex OpenPositions XML or JSON> \
+  --rules rules.json --claims-dir /var/lib/ib-account-claims \
+  --ledger reverse-split=/var/lib/rs-live/state.sqlite --report ownership.json
+```
 
 ## Input contract and missing access
 
@@ -170,6 +297,23 @@ python -m _system.trading.rs_paper_executor probe --config /etc/rs-paper-config.
 python -m _system.trading.rs_paper_executor run --config /etc/rs-paper-config.json --state /var/lib/rs-paper/state.sqlite --operations-file /var/lib/rs-paper/operations.json --evidence /var/lib/rs-paper/evidence.json --kill-file /var/lib/rs-paper/FLATTEN --connect-paper
 ```
 
+7. **Stage-6 integration test** (paper only, synthetic controls, separate journal):
+
+```text
+python -m _system.trading.rs_paper_executor integration-test --config /etc/rs-paper-config.json --connect-paper --symbol <LIQUID_TICKER> --conid <REVIEWED_CONID> --journal /var/lib/rs-paper/2026-11-20.integration.sqlite --report stage6.json
+```
+
+   It proves, on the real paper broker:
+   * stale-quote refusal, and margin refusal after a real WhatIf;
+   * a bounded entry and its fills (partials counted), then duplicate refusal;
+   * reconnect without duplicate fills;
+   * a broker-confirmed TTL cancel;
+   * kill -> scoped cover -> flat, with alerts.
+
+   The signal and the halt/borrow inputs are **labelled synthetic controls**: never
+   a news signal, never in the production journal. Run it in regular hours on a
+   liquid name.
+
 Use `--once` for one bounded paper cycle. The default journal is under the user's
 private home state directory; keep configuration/state/evidence outside Git and
 readable only by the service user. `rs-paper-executor.service` is an **uninstalled**
@@ -196,8 +340,8 @@ still needed before unattended operation is accepted.
 ## Verification
 
 ```text
-python -m pytest -q _system/trading/tests/test_rs_paper_executor.py
-python -m ruff check _system/trading/rs_paper_executor _system/trading/tests/test_rs_paper_executor.py --select F
+python -m pytest -q _system/trading/tests/test_rs_paper_executor.py _system/trading/tests/test_rs_paper_probe.py _system/trading/tests/test_rs_live_guards.py _system/trading/tests/test_rs_symbol_claims.py _system/trading/tests/test_rs_integration_harness.py _system/trading/tests/test_account_ownership.py _system/trading/tests/test_ib_gateway_registry.py
+python -m ruff check _system/trading/rs_paper_executor _system/trading/account_ownership.py _system/trading/tests --select F
 ```
 
 Tests exercise the actual engine, durable journal, restart/partial-fill paths,
