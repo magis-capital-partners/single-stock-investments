@@ -8,7 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
-from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
+from vault_paths import letters_root, resolve_ref_to_path, research_vault_root  # noqa: E402
+from source_links import SourceLinks, repository_url  # noqa: E402
 
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 DRIVE_AUDIT_PATH = ROOT / "_system/reference/document-store/drive_audit_latest.json"
@@ -24,6 +25,9 @@ def _clean_ref(ref: str | None) -> tuple[str | None, str]:
     clean = str(ref).strip()
     if not clean:
         return None, ""
+    if not clean.startswith(("http://", "https://")) and clean.lower().endswith((".pdf", ".txt", ".md")):
+        # Numbered letter titles can contain a literal # in the filename.
+        return clean.replace("\\", "/"), ""
     base, sep, anchor = clean.partition("#")
     return base.replace("\\", "/"), f"#{anchor}" if sep else ""
 
@@ -110,7 +114,7 @@ def document_for_ref(ref: str | None, registry: dict | None = None) -> dict | No
 
 
 def github_blob_url(rel_path: str, github_repo: str) -> str:
-    return f"https://github.com/{github_repo}/blob/main/{rel_path.replace(chr(92), '/')}"
+    return repository_url(rel_path, github_repo)
 
 
 def _normalize_name(value: str) -> str:
@@ -379,14 +383,17 @@ def drive_link_for_letter(
 
 
 def pdf_ref_for(base: str) -> str:
-    path = ROOT / base
-    if path.suffix.lower() in {".txt", ".md"}:
-        return str(path.with_suffix(".pdf").relative_to(ROOT)).replace("\\", "/")
+    # Extracts may have an original PDF, but a note is not an invented PDF.
+    if base.endswith(".pdf.txt"):
+        candidate = base[:-4]
+        path = resolve_ref_to_path(candidate) or (ROOT / candidate)
+        if path.is_file():
+            return candidate
     return base
 
 
-def pdf_github_url(base: str, github_repo: str, anchor: str = "") -> str:
-    return github_blob_url(pdf_ref_for(base), github_repo) + anchor
+def pdf_github_url(base: str, github_repo: str, anchor: str = "") -> str | None:
+    return SourceLinks(ROOT, research_vault_root()).ref_url(pdf_ref_for(base), repo=github_repo, anchor=anchor)
 
 
 def letter_evidence_url(
@@ -400,7 +407,7 @@ def letter_evidence_url(
     if not base:
         return None
     if base.startswith(("http://", "https://")):
-        return base + anchor
+        return SourceLinks(ROOT, research_vault_root()).resolve(base + anchor)
 
     drive = drive_link_for_letter(
         source_ref=base,
@@ -414,7 +421,7 @@ def letter_evidence_url(
     if doc:
         pdf_path = doc.get("local_pdf_path")
         if pdf_path and (resolve_ref_to_path(str(pdf_path)) or (ROOT / pdf_path)).exists():
-            return github_blob_url(str(pdf_path), github_repo) + anchor
+            return SourceLinks(ROOT, research_vault_root()).ref_url(str(pdf_path), repo=github_repo, anchor=anchor)
 
     if "superinvestor-letters" in base:
         return pdf_github_url(base, github_repo, anchor)
@@ -436,7 +443,7 @@ def best_document_url(ref: str | None, github_repo: str, registry: dict | None =
     if not base:
         return None
     if base.startswith(("http://", "https://")):
-        return base + anchor
+        return SourceLinks(ROOT, research_vault_root()).resolve(base + anchor)
 
     if "superinvestor-letters" in base:
         meta = letter_source_index().get(base) or letter_source_index().get(Path(base).name.lower())
@@ -453,7 +460,7 @@ def best_document_url(ref: str | None, github_repo: str, registry: dict | None =
             if drive:
                 return drive + anchor
             if Path(ROOT / pdf_path).exists():
-                return github_blob_url(str(pdf_path), github_repo) + anchor
+                return SourceLinks(ROOT, research_vault_root()).ref_url(str(pdf_path), repo=github_repo, anchor=anchor)
 
     drive = drive_link_for_ref(base) or drive_link_for_ref(pdf_ref_for(base))
     if drive:
@@ -463,7 +470,7 @@ def best_document_url(ref: str | None, github_repo: str, registry: dict | None =
     if path.suffix.lower() in {".pdf", ".txt", ".md"}:
         return pdf_github_url(base, github_repo, anchor)
 
-    return github_blob_url(base, github_repo) + anchor
+    return SourceLinks(ROOT, research_vault_root()).ref_url(base, repo=github_repo, anchor=anchor)
 
 
 def best_document_label(ref: str | None, registry: dict | None = None) -> str:
@@ -480,8 +487,10 @@ def best_document_label(ref: str | None, registry: dict | None = None) -> str:
     if drive_link_for_ref(base) or drive_link_for_ref(pdf_ref_for(base)):
         return "PDF"
     suffix = Path(pdf_ref_for(base)).suffix.lower()
-    if suffix == ".pdf" or "superinvestor-letters" in base:
+    if suffix == ".pdf":
         return "PDF"
+    if suffix in {".txt", ".md"}:
+        return "Text"
     if suffix in {".htm", ".html"}:
         return "HTML"
     if suffix == ".json":

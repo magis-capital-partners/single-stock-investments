@@ -48,7 +48,7 @@ TREE_WALKING_BUILDERS = ("build_dashboard_data.py",)
 
 CHECKOUT = re.compile(r"ci_checkout_workspace\.sh\s+([a-z-]+)")
 # Listed profiles name every ticker with one anchored "/*/research/**" pattern.
-TICKER_RESEARCH = re.compile(r"^/?([A-Za-z0-9.\-]+|\*)/research")
+TICKER_RESEARCH = re.compile(r"^/?([A-Za-z0-9.\-]+|\*)/research(?:/\*\*)?/?$")
 
 
 @lru_cache(maxsize=None)
@@ -135,6 +135,5 @@ def test_the_profiles_this_test_reasons_about_still_behave_as_assumed():
         "`world-model` ends in build_dashboard_data and must keep every research tree"
     )
     assert not provides_ticker_trees("pages"), (
-        "`pages` used to be ticker-less; if it now ships tickers this test has "
-        "lost the case it was written for"
+        "`pages` may include named pilot inputs but must not materialize complete ticker trees"
     )

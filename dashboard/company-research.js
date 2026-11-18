@@ -7,7 +7,7 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const sourceTitle = value => String(value ?? '').replace(/\u00c2\u00b7/g,'\u00b7');
   const words = value => [...new Set(String(value).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().match(/[a-z0-9]+/g)||[])];
-  const safeURL = value => { try { const url=new URL(value,global.location?.href || 'https://research.invalid/'); return ['https:','http:'].includes(url.protocol) ? url.href : ''; } catch { return ''; } };
+  const safeURL = value => { if(typeof value!=='string'||!value.trim())return ''; try { const url=new URL(value,global.location?.href || 'https://research.invalid/'); return ['https:','http:'].includes(url.protocol) ? url.href : ''; } catch { return ''; } };
   function asset(path) {
     if (!/^[A-Za-z0-9._/-]+\.json$/.test(path) || path.includes('..')) throw new Error('Invalid research asset path');
     if (!cache.has(path)) cache.set(path,fetch(BASE+path,{credentials:'same-origin',cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Research library unavailable. Retry after the next source update.');return r.json();}).catch(e=>{cache.delete(path);throw e;}));
@@ -22,7 +22,12 @@
     return index;
   }
   const manifest = ticker => asset(`companies/${encodeURIComponent(ticker)}.json`);
-  const sourceURL = row => {const loc=(row.locations||[]).find(x=>safeURL(x.url)); return loc?safeURL(loc.url):'';};
+  const resolvedURL = value => safeURL(global.SourceLinks ? global.SourceLinks.resolve(value) : value);
+  const sourceURL = row => {
+    const locations=(row.locations||[]).map(l=>({...l,url:resolvedURL(l.url)})).filter(l=>l.url&&l.availability!=='unavailable');
+    const rank=l=>/drive.google.com\/drive\/folders\//.test(l.url)?4:/github.com\/.*research-vault\//.test(l.url)?3:/github.com\//.test(l.url)?2:0;
+    return locations.sort((a,b)=>rank(a)-rank(b))[0]?.url || '';
+  };
   function referencesHTML(refs) {
     if(!refs)return '';
     const values=(Array.isArray(refs)?refs:[refs]).filter(ref=>ref!==null&&ref!==undefined);
@@ -49,7 +54,7 @@
   function rowHTML(row) {
     const url=sourceURL(row);
     const passages=(row.passages||[]).map(p=>`<blockquote><p>${esc(p.text)}</p><cite>${esc(p.locator)}${p.timestamp?` · ${esc(p.timestamp)}`:''}</cite></blockquote>`).join('');
-    const links=(row.locations||[]).filter(l=>safeURL(l.url)).map(l=>`<a href="${esc(safeURL(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.label||l.kind)}</a>`).join(' · ');
+    const links=(row.locations||[]).filter(l=>resolvedURL(l.url)).map(l=>`<a href="${esc(resolvedURL(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.label||l.kind)}</a>`).join(' · ');
     return `<article class="cr-source"><div class="cr-source-main"><div><h4>${url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(sourceTitle(row.title))}</a>`:esc(sourceTitle(row.title))}</h4><p class="cr-meta">${row.author?`${esc(row.author)} · `:''}${esc(String(row.date||'Undated').slice(0,10))} · ${esc(categories[row.category]||row.category)}${row.version_count>1?` · ${row.version_count} versions`:''}${row.relationship!=='direct'?' · Related business research':''}</p>${row.relationship!=='direct'?`<p>${esc(row.reason)}</p>`:''}</div><button type="button" data-cr-read="${esc(row.id)}">Read${row.processing_status==='indexed'?' passage':' details'}</button></div><details><summary>Source details${row.availability!=='available'?` · ${esc(String(row.availability).replaceAll('_',' '))}`:''}</summary>${passages||'<p class="cr-meta">Company-specific collection or reviewed business-driver link. Open the original for context.</p>'}<p>${links||'Original link unavailable.'}</p>${row.period?`<p>Reporting period: ${esc(row.period)}</p>`:''}${row.revision?`<p>Version: ${esc(row.revision)}</p>`:''}${row.model_purpose?`<p>Purpose: ${esc(row.model_purpose)}</p>`:''}${row.assumptions?`<details><summary>Model assumptions</summary><pre>${esc(JSON.stringify(row.assumptions,null,2))}</pre></details>`:''}${referencesHTML(row.source_refs)}${row.extraction_review?`<p class="cr-meta">${esc(row.extraction_review)}</p>`:''}<p class="cr-meta">${row.processing_status==='indexed'?'Text indexed for search':esc(row.processing_status.replaceAll('_',' '))}</p></details></article>`;
   }
   async function read(row, host) {
@@ -61,7 +66,7 @@
       const bundle=await asset(row.content_path); const doc={...bundle[row.id]};
       if(doc.text_parts?.length){const parts=[];for(let i=0;i<doc.text_parts.length;i+=4){parts.push(...await Promise.all(doc.text_parts.slice(i,i+4).map(asset)));}doc.text=parts.map(p=>p.text).join('');}
       if(!host.isConnected||host._readRequest!==request)return;if(!bundle[row.id])throw new Error('Source content is unavailable.');
-      output.innerHTML=`<div class="cr-reader-head"><h3>${esc(sourceTitle(doc.title))}</h3><button type="button" data-cr-close>Close source</button></div>${(row.passages||[]).map(p=>`<blockquote>${esc(p.text)}<cite>${esc(p.locator)}</cite></blockquote>`).join('')}<p>${(doc.locations||[]).filter(l=>safeURL(l.url)).map(l=>`<a href="${esc(safeURL(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.label||'Open original')}</a>`).join(' · ')}</p><details${(row.passages||[]).length?'':' open'}><summary>Full source text</summary><pre>${esc(doc.text||'Text is not yet available. Use the original link above.')}</pre></details>`;
+      output.innerHTML=`<div class="cr-reader-head"><h3>${esc(sourceTitle(doc.title))}</h3><button type="button" data-cr-close>Close source</button></div>${(row.passages||[]).map(p=>`<blockquote>${esc(p.text)}<cite>${esc(p.locator)}</cite></blockquote>`).join('')}<p>${(doc.locations||[]).filter(l=>resolvedURL(l.url)).map(l=>`<a href="${esc(resolvedURL(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.label||'Open original')}</a>`).join(' · ')}</p><details${(row.passages||[]).length?'':' open'}><summary>Full source text</summary><pre>${esc(doc.text||'Text is not yet available. Use the original link above.')}</pre></details>`;
       output.querySelector('[data-cr-close]').onclick=()=>{output.hidden=true;host.querySelector(`[data-cr-read="${row.id}"]`)?.focus();};
       output.scrollIntoView({block:'nearest'});
       output.querySelector('[data-cr-close]').focus({preventScroll:true});
@@ -73,6 +78,11 @@
     host.innerHTML='<p class="cr-meta" role="status">Loading company sources…</p>';
     try {
       const meta=await manifest(ticker); if(!live())return;
+      if(options.summary&&options.brief) {
+        host.innerHTML=`<div class="cr-overview-heading"><h3>Essential reading</h3><button type="button" data-rw-go="sources">Complete research library</button></div><ul class="cr-reading">${(meta.featured||[]).slice(0,3).map(r=>`<li><button type="button" class="sp-text-link" data-cr-open="${esc(r.id)}">${esc(r.title)}</button><span>${esc(String(r.date||'Undated').slice(0,10))}</span></li>`).join('')||'<li>No essential reading is currently indexed.</li>'}</ul>`;
+        host.onclick=event=>{const button=event.target.closest('[data-cr-open]');if(button){global.CompanyResearch.pendingReadId=button.dataset.crOpen;global.ResearchWorkspace?.activate('sources');}};
+        return;
+      }
       if(options.summary) {
         host.innerHTML=`<div class="cr-overview-heading"><h3>Research library</h3><button type="button" data-rw-go="sources">All ${Number(meta.total).toLocaleString()} sources</button></div><p class="cr-meta">${coverage(meta)}</p><div class="cr-categories">${Object.entries(categories).map(([id,label])=>`<button type="button" data-cr-category="${id}">${esc(label)} <strong>${meta.categories?.[id]||0}</strong></button>`).join('')}</div><h3>Essential reading</h3><ul class="cr-reading">${(meta.featured||[]).map(r=>`<li>${sourceURL(r)?`<a href="${esc(sourceURL(r))}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>`:esc(r.title)}<span>${esc(String(r.date||'Undated').slice(0,10))}</span></li>`).join('')||'<li>No qualifying sources indexed yet.</li>'}</ul>`;
         host.onclick=e=>{const c=e.target.closest('[data-cr-category]');if(c){global.CompanyResearch.pendingCategory=c.dataset.crCategory;global.ResearchWorkspace?.activate('sources');host.closest('.research-workspace')?.querySelector('[data-company-library="sources"]')?._setCategory?.(c.dataset.crCategory);}};
@@ -92,6 +102,8 @@
       host.querySelector('[data-cr-prev]').onclick=()=>{state.page--;redraw();};host.querySelector('[data-cr-next]').onclick=()=>{state.page++;redraw();};
       host.onclick=e=>{const button=e.target.closest('[data-cr-read]');if(button){const row=rows.find(r=>r.id===button.dataset.crRead);if(row)read(row,host);}};
       await render();
+      const pending=rows.find(r=>r.id===global.CompanyResearch.pendingReadId);
+      if(pending){global.CompanyResearch.pendingReadId=null;await read(pending,host);}
     }catch(e){if(live()){host.innerHTML=`<p class="cr-meta">${esc(e.message)}</p><button type="button" data-cr-retry>Retry library</button>`;host.querySelector('button').onclick=()=>mount(host,ticker,options);}}
   }
   global.CompanyResearch={mount,filter,words,safeURL,rowHTML,categories,pendingCategory:''};

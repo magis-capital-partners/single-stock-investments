@@ -31,6 +31,7 @@ CORE_VERSION = 1
 
 # Row fields only needed once a ticker is opened in the detail pane.
 DETAIL_ONLY_FIELDS = (
+    "one_pager",
     "valuation_evidence",
     "shared_forecast",
     "download_script_path",

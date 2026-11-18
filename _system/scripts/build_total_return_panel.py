@@ -322,6 +322,14 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
         "price_only_annualized_pct": round(price_ann, 2) if price_ann is not None else None,
         "total_return_annualized_pct": round(total_ann, 2) if total_ann is not None else None,
         "market_cap_m": market_cap_m, "shares_outstanding": shares, "price_for_market_cap": price, "chart": chart_rel,
+        "history": {
+            "schema_version": "stock-performance.v1", "ticker": t,
+            "currency": meta.get("currency"), "status": status, "coverage": coverage,
+            "source_url": f"https://finance.yahoo.com/quote/{symbol}/history/",
+            "basis": "Split-adjusted prices; cash distributions reinvested at the ex-date close; pre-tax nominal listing currency.",
+            "columns": ["date", "price_index", "total_return_index"],
+            "points": [[d, round(p, 6), round(v, 6)] for d, p, v in zip(dates, price_idx, total_idx)],
+        },
     }
     panel_path = research / "total_return_panel.json"
     write_json_if_changed(panel_path, panel)
