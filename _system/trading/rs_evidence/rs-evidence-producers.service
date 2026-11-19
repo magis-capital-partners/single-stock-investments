@@ -1,0 +1,44 @@
+# TEMPLATE ONLY. Never installed by a workflow, by Box R, or by spx-0dte's
+# installer. Install/enable only on the owner's explicit word, outside
+# 07:45-16:20 ET.
+# RS evidence producers: identity, borrow and halt/SSR rows for the RS
+# executor. No broker session, no IB client ID, no vendor login. Outbound
+# reads only: nasdaqtrader.com, sec.gov, IBKR's anonymous short-stock FTP, and
+# Box R's operations.json through the narrow R2 read token.
+[Unit]
+Description=Reverse-split evidence producers (public reference files only)
+ConditionPathExists=/etc/rs-live-approved
+
+[Service]
+Type=simple
+User=rs-live
+Group=rs-live
+SupplementaryGroups=ib-claims
+WorkingDirectory=/srv/rs-live/repo
+Environment=TZ=America/New_York
+# RS_OPERATIONS_READ_TOKEN: the narrow R2 read token (owner-created).
+EnvironmentFile=-/etc/rs-live/producers.env
+ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_evidence run --config /etc/rs-live/producers.json --max-seconds 26400
+# No Gateway connection exists here, so a bounded restart cannot become a
+# connect storm; the burst limit keeps public sites from being hammered.
+Restart=on-failure
+RestartSec=60
+StartLimitIntervalSec=3600
+StartLimitBurst=5
+RuntimeMaxSec=27000
+# AGENTS.md rule 8: background work never makes the SPX executor wait on CPU.
+Nice=15
+CPUQuota=10%
+CPUWeight=10
+OOMScoreAdjust=800
+MemoryMax=256M
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/rs-live
+ReadOnlyPaths=/var/lib/ib-account-claims
+
+[Install]
+WantedBy=multi-user.target

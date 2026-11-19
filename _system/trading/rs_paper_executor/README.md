@@ -322,6 +322,10 @@ Never set `source_verified=true` merely because a producer is alive or a ticker 
 absent from a daily SSR list. Missing fields block paper entries; examples are not
 production evidence.
 
+The producers for all three sections live in `_system/trading/rs_evidence/`
+(see its README). They are not installed anywhere. Until the owner picks an
+intraday SSR source, they write every eligibility row as incomplete.
+
 * `identities[TICKER]`: `cik`, numeric `conid`, `type: "CS"`, `currency: "USD"`,
   `verified: true`, UTC `at`/`valid_until`, `source_url`/`source_sha256`, canonical
   issuer `action_id`, reviewed `ratio` and earliest legal/trading `action_day`,
