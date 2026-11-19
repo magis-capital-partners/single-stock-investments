@@ -3160,8 +3160,7 @@ def build_ticker_row(
     attach_forecast(row, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()))
     row.pop("autonomous_irr", None)
     from stock_one_pagers import build_one_pager
-    if ticker in {"CPRT", "TBBK", "FRMO"}:
-        row["one_pager"] = build_one_pager(ROOT, ticker, row)
+    row["one_pager"] = build_one_pager(ROOT, ticker, row)
     return row
 
 

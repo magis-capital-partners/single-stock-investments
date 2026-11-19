@@ -358,8 +358,9 @@ def paths_for_profile(profile: str) -> list[str]:
         ]
 
     if profile in {"dashboard", "pages"}:
-        # Only the three presentation pilots need issuer inputs. Keep their
-        # complete archives out of this lightweight publication checkout.
+        # All-stock histories and presentation inputs restore from one private
+        # snapshot. These ten small overrides keep the original reference stocks
+        # current without expanding issuer archives in a publication checkout.
         # This script also runs alone in ci-bootstrap-smoke. Do not import the
         # presentation builder before its sparse paths have been materialized.
         return [

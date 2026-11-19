@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from atomic_io import _atomic_write_text
 from source_links import SourceLinks
-from stock_one_pagers import PROFILES, build_one_pager
+from stock_one_pagers import build_one_pager, set_publication_inputs
 from vault_paths import research_vault_root
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,8 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 def curate_reading(data: Path):
     """Choose a primary report, substantive research and a letter before macro snapshots."""
     library = data / "company-research"
-    for ticker in PROFILES:
-        path = library / f"companies/{ticker}.json"
+    for path in sorted((library / "companies").glob("*.json")):
         if not path.is_file():
             continue
         manifest = json.loads(path.read_text(encoding="utf-8"))
@@ -43,6 +42,10 @@ def curate_reading(data: Path):
 
 
 def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
+    snapshot_path = "_system/reference/stock-research/universe.json"
+    if (root / snapshot_path).is_file():
+        from private_dashboard_assets import read_resolved_json
+        set_publication_inputs(root, read_resolved_json(root, snapshot_path)[0])
     links = SourceLinks(root, vault)
     pilots, changed = [], 0
     data = site / "data"
@@ -55,16 +58,16 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
         if path.name == "source_links.json":
             continue
         raw = path.read_text(encoding="utf-8")
-        pilot = path.parent == data / "tickers" and path.stem in PROFILES
+        pilot = path.parent == data / "tickers"
         if not pilot and "github.com/" not in raw and "raw.githubusercontent.com/" not in raw:
             continue
         value = json.loads(raw)
         if pilot and isinstance(value, dict) and not value.get("private_snapshot"):
-            value["one_pager"] = build_one_pager(root, path.stem, value)
-            brief = value["one_pager"]
-            if not brief["model"]["assumptions"] or not brief["financials"]["series"] or not brief["risks"]:
-                raise ValueError(f"Incomplete {path.stem} pilot inputs; refusing to publish an empty brief")
-            pilots.append(path.stem)
+            ticker = value.get("ticker")
+            if not isinstance(ticker, str) or not ticker:
+                raise ValueError(f"Missing stock identity in {path.name}")
+            value["one_pager"] = build_one_pager(root, ticker, value)
+            pilots.append(ticker)
         # Register links in references as well, without changing frozen proof inputs.
         def collect(node):
             if isinstance(node, dict):
@@ -86,7 +89,15 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
     index = {"schema_version": "source-links.v1", "repairs": links.repairs, "counts": dict(links.counts)}
     data.mkdir(parents=True, exist_ok=True)
     _atomic_write_text(data / "source_links.json", json.dumps(index, ensure_ascii=False, separators=(",", ":")) + "\n")
-    return {"pilots": sorted(pilots), "changed_publication_files": changed, "source_links": dict(links.counts)}
+    core_path = data / "core.json"
+    if core_path.is_file():
+        core = json.loads(core_path.read_text(encoding="utf-8"))
+        expected = {r["ticker"] for r in core.get("tickers", [])}
+        if expected - set(pilots):
+            raise ValueError(f"Missing stock briefs: {sorted(expected - set(pilots))}")
+        if core_path.stat().st_size >= 6_000_000:
+            raise ValueError("Dashboard core exceeds the 6 MB startup budget")
+    return {"stocks": len(pilots), "tickers": sorted(pilots), "changed_publication_files": changed, "source_links": dict(links.counts)}
 
 
 if __name__ == "__main__":

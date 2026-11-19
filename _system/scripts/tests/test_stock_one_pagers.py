@@ -74,7 +74,7 @@ def test_pilots_have_distinct_economics_history_and_all_model_input_sources():
         assert performance["benchmark"]["currency"] == performance["currency"]
         assert performance["status"] != "complete"
         assert all(p.get("source") for r in result["financials"]["series"] for p in r["annual"])
-    assert build_one_pager(ROOT, "AAPL") is None
+    assert build_one_pager(ROOT, "AAPL")["schema_version"] == "stock-one-pager.v1"
 
 
 def test_frmo_parent_equity_and_revised_comparatives_do_not_include_minorities():
@@ -114,13 +114,74 @@ def test_publication_replaces_hardlink_without_changing_private_source(tmp_path)
     assert index["repairs"][original["locations"][0]["url"]]["url"] is None
 
 
-def test_publication_rejects_missing_pilot_inputs(tmp_path):
+def test_partial_research_still_gets_a_brief_and_missing_stock_shards_block_publication(tmp_path):
     import pytest
     site = tmp_path / "site"
     (site / "data/tickers").mkdir(parents=True)
-    (site / "data/tickers/CPRT.json").write_text('{"ticker":"CPRT"}', encoding="utf-8")
-    with pytest.raises(ValueError, match="Incomplete CPRT"):
+    shard = site / "data/tickers/A_B.json"
+    shard.write_text('{"ticker":"A/B"}', encoding="utf-8")
+    report = prepare(tmp_path, site)
+    assert report["tickers"] == ["A/B"]
+    brief = json.loads(shard.read_text(encoding="utf-8"))["one_pager"]
+    assert brief["ticker"] == "A/B"
+    assert brief["coverage"]["financial_history"] == "unavailable"
+    assert brief["model"]["assumptions"] == []
+    (site / "data/core.json").write_text('{"tickers":[{"ticker":"A/B"},{"ticker":"NEW"}]}', encoding="utf-8")
+    with pytest.raises(ValueError, match="Missing stock briefs.*NEW"):
         prepare(tmp_path, site)
+
+
+def test_foreign_currency_and_52_week_fiscal_year_keep_source_units():
+    data = {"cik": 1, "facts": {"ifrs-full": {"Revenue": {"units": {"EUR": [observation("2024-09-29", "2025-09-27", 120, form="20-F")]}}}}}
+    series = sec_series(data, "revenue", "09-30", "EUR")
+    assert series["unit"] == "EUR"
+    assert series["annual"][0]["period"] == "2025-09-27"
+    assert "ifrs-full:Revenue" in series["annual"][0]["source"]["locator"]
+    assert sec_series(data, "revenue", "09-30", "USD")["annual"] == []
+
+
+def test_typed_templates_use_industry_codes_not_incidental_narrative_words():
+    from stock_one_pagers import company_profile
+    assert company_profile("TEST", {"sic": 6022}, {})["category"] == "bank"
+    assert company_profile("TEST", {"sic": 6331}, {})["category"] == "insurance"
+    assert company_profile("TEST", {"sic": 6798}, {})["category"] == "property"
+    assert company_profile("TEST", {"instrument_type": "ETF"}, {})["category"] == "fund"
+    assert company_profile("TEST", {"one_line_thesis": "A software company with bank customers"}, {})["category"] == "operating"
+
+
+def test_new_forecast_does_not_relabel_old_component_values(tmp_path):
+    from stock_one_pagers import set_publication_inputs
+    set_publication_inputs(tmp_path, {"schema_version": "stock-research-universe.v1", "companies": {"TEST": {
+        "model": {"as_of": "2025-01-01", "assumptions": [], "components": [{"id": "old", "range": {"base": 100}}]},
+        "source_forecast": {"forecast_hash": "old", "model_as_of": "2025-01-01"}}}})
+    result = build_one_pager(tmp_path, "TEST", {"shared_forecast": {"forecast_hash": "new", "model_as_of": "2026-01-01",
+                             "model_assumptions": [{"id": "growth", "values": {"base": 0.05}}]}})
+    assert result["model"]["reference_only"] is True
+    assert result["model"]["components"] == []
+    assert result["model"]["as_of"] == "2026-01-01"
+    assert result["model"]["assumptions"][0]["id"] == "growth"
+
+
+def test_normalized_cache_stays_quarterly_and_currencies_do_not_mix():
+    from stock_one_pagers import normalized_series
+    values = [{"period": "2025-12-31", "value": 12, "fp": "FY", "derived": "ytd_difference", "filed": "2026-01-30"}]
+    rows = normalized_series({"ticker": "TEST", "cik": 1, "metrics": {"revenues": values}})
+    assert rows[0]["annual"] == []
+    assert rows[0]["quarterly"][0]["value"] == 12
+    assert normalized_series({"metrics": {"revenues": [*values, {**values[0], "currency": "EUR"}]}}) == []
+
+
+def test_quarterly_cache_annual_sum_requires_a_sourced_q4_boundary():
+    from stock_one_pagers import normalized_series
+    points = [{"period": d, "value": v, "fp": "FY", "form": "10-K"}
+              for d, v in [("2025-03-31", 1), ("2025-06-30", 2), ("2025-09-30", 3), ("2025-12-31", 4)]]
+    raw_data = {"metrics": {"revenues": points}}
+    assert normalized_series(raw_data)[0]["annual"] == []
+    points[-1]["derived"] = "ytd_difference"
+    annual = normalized_series(raw_data)[0]["annual"]
+    assert len(annual) == 1
+    assert annual[0]["value"] == 10
+    assert len(annual[0]["source_refs"]) == 4
 
 
 def test_essential_reading_prefers_primary_reports_and_substantive_research(tmp_path):

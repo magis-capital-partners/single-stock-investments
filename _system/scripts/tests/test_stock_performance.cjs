@@ -25,3 +25,13 @@ test('performance UI includes source definitions, period controls and explicit i
  assert.match(html,/Annual values, sources and return definitions/);assert.match(html,/aria-pressed="true">All history/);
  assert.match(html,/S&amp;P 500|S&P 500/);
 });
+
+
+test('turning off the benchmark preserves the entire stock history and zero closing wealth',()=>{
+ const copy=JSON.parse(JSON.stringify(record));copy.points.unshift(['1960-01-01',10,10]);
+ assert.equal(ui.windowData(copy,'all',false).start,'1960-01-01');
+ assert.equal(ui.windowData(copy,'all',true).start,'2000-01-01');
+ const loss={currency:'USD',points:[['2000-01-01',100,100],['2001-01-01',0,0]]};
+ assert.equal(ui.windowData(loss).total,-1);
+ assert.match(ui.render({ticker:'MISSING'}),/history is not available for this listing/);
+});
