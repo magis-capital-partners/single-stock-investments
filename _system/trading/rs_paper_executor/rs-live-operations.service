@@ -1,0 +1,41 @@
+# TEMPLATE ONLY. Never installed by a workflow, by Box R, or by spx-0dte's
+# installer. Install only on the owner's explicit word, outside 07:45-16:20 ET.
+# Box R operations feed fetcher for the RS executor: polls ONE R2 object over
+# R2's S3 API (bucket-scoped "Object Read only" token) and writes
+# /var/lib/rs-live/feed/{operations.json,operations.meta.json,cadence/,...}.
+# No IB connection, no client ID, no Gateway, no ThetaData: HTTPS to R2 only.
+[Unit]
+Description=Reverse-split operations feed fetcher (R2 read only; no broker)
+# Stops and restarts with the executor; started by its Wants=.
+PartOf=rs-live-executor.service
+ConditionPathExists=/etc/rs-live-approved
+StartLimitIntervalSec=3600
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=rs-live
+Group=rs-live
+WorkingDirectory=/srv/rs-live/repo
+Environment=TZ=America/New_York
+# Required. root:root 0600, holding RS_OPERATIONS_S3_ENDPOINT
+# (https://<account id>.r2.cloudflarestorage.com), RS_OPERATIONS_ACCESS_KEY_ID and
+# RS_OPERATIONS_SECRET_ACCESS_KEY: a read-only token scoped to the
+# single-stock-reverse-splits-evidence bucket and nothing else.
+EnvironmentFile=/etc/rs-live/operations.env
+ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor operations-fetch --config /etc/rs-live/config.json --feed-dir /var/lib/rs-live/feed --poll-seconds 5
+# HTTP only, so a bounded restart is harmless (no Gateway connect events); the
+# loop itself records errors and backs off to 60 s instead of exiting.
+Restart=on-failure
+RestartSec=30
+RuntimeMaxSec=27600
+TimeoutStopSec=15
+CPUWeight=10
+OOMScoreAdjust=800
+MemoryMax=256M
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/rs-live/feed

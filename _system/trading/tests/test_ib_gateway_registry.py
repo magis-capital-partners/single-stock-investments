@@ -68,6 +68,12 @@ def test_embedded_registry_version_hash_and_host_facts_are_pinned():
     assert raw["systems"]["etf-0dte"]["order_ref_prefixes"] == [
         "SPY0DTE|", "QQQ0DTE|", "TSLA0DTE|", "NVDA0DTE|", "AMZN0DTE|",
     ]
+    rs_executor, rs_watchdog = allocation_index(raw)[60], allocation_index(raw)[140]
+    assert (rs_executor.system, rs_executor.access, rs_executor.status) == (
+        "reverse-split", "transmit", "active")
+    assert (rs_watchdog.system, rs_watchdog.status) == ("reverse-split", "reserved")
+    assert not rs_watchdog.connectable
+    assert raw["systems"]["reverse-split"]["order_ref_prefixes"] == ["RSLIVE|"]
 
 
 def test_duplicate_allocation_fails_even_with_a_recomputed_hash(tmp_path):

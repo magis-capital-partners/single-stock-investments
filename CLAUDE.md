@@ -1,13 +1,14 @@
 # CLAUDE.md — single-stock-investments
 
-## IB Gateway coexistence (three systems, one Gateway) — DO NOT VIOLATE
+## IB Gateway coexistence (five systems, one Gateway) — DO NOT VIOLATE
 
 The NY4 Gateway is shared by **spx-0dte**, **ls-algo**, this repo, and
-**etf-0dte** (SPY/QQQ/TSLA/NVDA/AMZN 0DTE; yields to SPX). SPX 0DTE
+**etf-0dte** (SPY/QQQ/TSLA/NVDA/AMZN 0DTE; yields to SPX), and **reverse-split**
+(small-cap stock shorts from this repo; yields to everyone). SPX 0DTE
 is the protected party. The allocation source of truth is
 `_system/trading/ib_gateway_client_registry.v1.json`, registry version
-`2026-11-10.1`, canonical SHA-256
-`6fabc701ce3de90f6d281c680201f2ff2f7181628d3020fac7bc2a80221b1cb5`.
+`2026-11-18.1`, canonical SHA-256
+`2b8e284e47c5372afd2f2af587b03d1941c263b53c169496f44343205250f268`.
 The same version/hash is mirrored in the other two repos. Prose is explanatory,
 not an allocation authority.
 
@@ -17,6 +18,7 @@ not an allocation authority.
 | ls-algo | 0 disabled-reserved; 83 read-only stale-order interlock; 41 rebalance; 77 flow; 90 screener; 198 contract probe; leased pool 100–129 |
 | single-stock-investments | 71 Drew legacy sleeve; 72 Michael legacy sleeve; 73 legacy read-only sync; 81 disabled/reserved collector; 82 reserved/no-connect observer; **91 event-driven hub bridge and sole hub transmitter** |
 | etf-0dte | 50 SPY 0DTE live executor; 51 QQQ 0DTE live executor; 52 TSLA 0DTE live executor; 53 NVDA 0DTE live executor; 54 AMZN 0DTE live executor; 130 SPY dead-executor watchdog; 131 QQQ dead-executor watchdog; 132 TSLA dead-executor watchdog; 133 NVDA dead-executor watchdog; 134 AMZN dead-executor watchdog. Order-ref prefixes `SPY0DTE|` / `QQQ0DTE|` / `TSLA0DTE|` / `NVDA0DTE|` / `AMZN0DTE|` |
+| reverse-split | 60 live stock-short executor (`_system/trading/rs_paper_executor`, `--connect-live`; shadow until the owner arm file is valid; at most 8 streaming stock lines); 140 dead-executor watchdog, **reserved, not built**. Order-ref prefix `RSLIVE|`. Yields to every other system: fits only after SPX's reserve in the book margin limit, flattens first on the account cushion ladder, and claims its names in `ib_account_symbol_claims.v1` before the first order |
 
 **Rule 0 — the one that governs the rest. During market hours on a market day
 (09:30–16:00 ET, Mon–Fri, US holidays excluded) no agent initiates anything that

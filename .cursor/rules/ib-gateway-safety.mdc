@@ -6,7 +6,8 @@ alwaysApply: true
 # IB Gateway safety — SPX 0DTE is the protected party
 
 One IB Gateway on the NY4 box (`spx-ny4`, FXVPS374628) is shared by **spx-0dte**,
-**ls-algo**, and **this repo's portfolio hub**. spx-0dte runs a **live money**
+**ls-algo**, **this repo's portfolio hub**, **etf-0dte**, and **reverse-split**
+(this repo's small-cap stock-short executor, `_system/trading/rs_paper_executor`). spx-0dte runs a **live money**
 options executor on it. Nothing here may cost it a connection, a client ID, a
 market-data line, or a CPU core.
 
@@ -34,7 +35,7 @@ Off-hours work is fine, and after 16:15 ET on a weekday is the normal window.
 |---|---|
 | `reqGlobalCancel()` | Cancels every working order account-wide, including SPX's. **Test-enforced**: `test_ib_bridge.py` asserts no call site exists. |
 | `reqAutoOpenOrders(True)` | Binds TWS-created orders to this client — how a hub session ends up owning an SPX order. **Test-enforced.** |
-| Reusing another system's client ID | The hazard is grabbing an ID while its owner is mid-reconnect. Reserved: `{0, 17, 18, 19, 41, 77, 87, 90, 197, 207, 71, 72, 73, 82}` plus ls-algo worker ranges 241–273, 341–373, 551, 1041+. |
+| Reusing another system's client ID | The hazard is grabbing an ID while its owner is mid-reconnect. The canonical registry `_system/trading/ib_gateway_client_registry.v1.json` is the only allocation authority; the map below is a summary. |
 | Stopping/restarting the Gateway, or flipping its global Read-Only toggle | SPX rides through IBKR's daily restart by design. The **only** carve-out is spx-0dte's own `ibc_guard`. |
 | Adding a streaming market-data subscription | Lines are one account-wide pool shared with SPX's option NBBO stream. The hub uses `snapshot=True` only and cancels in `finally`. Leak-tested. |
 | Cancelling an order you cannot prove you own | Requires a `MAGIS|` orderRef **and** `clientId == 91`. |
@@ -43,9 +44,12 @@ Off-hours work is fine, and after 16:15 ET on a weekday is the normal window.
 
 | System | IDs |
 |---|---|
-| spx-0dte | 17 (live executor), 18 (ibc_guard probe), 19 (market-data line probe, off-hours only), 87 (ES/SPX basis sampler) |
-| ls-algo | 0, 41, 77, 90, 197/207, workers 241–273, 341–373, 551, 1041+ |
-| this repo | 71/72/73 (sleeves), 81 (collector, read-only), 82 (observer, reserved), **91** (order bridge, sole transmitter) |
+| spx-0dte | 17 (live executor), 18 (ibc_guard probe), 19 (market-data line probe, off-hours only), 87 (ES/SPX basis sampler), 88 (off-hours what-if), 97 (emergency watchdog) |
+| ls-algo | 0 (disabled-reserved), 41 (rebalance), 77 (flow), 83 (read-only stale-order interlock), 90 (screener), 198 (contract probe), leased pool 100–129 |
+| this repo — portfolio hub | 71/72/73 (legacy sleeves / sync), 81 (collector, disabled-reserved), 82 (observer, reserved), **91** (order bridge, sole hub transmitter) |
+| etf-0dte | 50–54 (SPY/QQQ/TSLA/NVDA/AMZN live executors), 130–134 (their dead-executor watchdogs) |
+| this repo — reverse-split | **60** (live stock-short executor, prefix `RSLIVE|`, shadow until owner arm, ≤8 streaming stock lines), 140 (watchdog, reserved, not built) |
+| Retired | 92, 197, 207, 551, 241–273, 341–373, 1041–1568 |
 | Operator TWS | manual only |
 
 New IDs go in this table, in `CLAUDE.md`, and in `CLIENT_ID_REGISTRY.md` **before
@@ -85,7 +89,7 @@ never by touching `ibc.service`.
 
 Anything long-running deployed to NY4 runs `Nice>=15` + a `CPUQuota` +
 `IOSchedulingClass=idle`, so the SPX executor never waits for a core. The box has
-**4 cores**. Enforced via systemd drop-ins at
+**2 vCPU / 4 GB**. Enforced via systemd drop-ins at
 `~/.config/systemd/user/<unit>.service.d/10-spx-coexistence.conf`.
 
 Retry loops need a real backoff. At the stock `RestartSec=5` the collector
