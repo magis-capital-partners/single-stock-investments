@@ -358,15 +358,20 @@ def parse_shorthalts(text, day, observed_at):
 
 # IB primary-exchange codes for otherlisted.txt's Exchange column.
 OTHER_EXCHANGE = {"A": "AMEX", "N": "NYSE", "P": "ARCA", "Z": "BATS", "V": "IEX"}
+# Checked on the live SymDir files 2026-11-18: closed-end funds are often named
+# "... Fund Common Stock"; ADSs are also spelled "Depository" and "ADSs"; many
+# NYSE names in otherlisted.txt carry no type word at all ("CarMax Inc"),
+# which stays UNRESOLVED (refused) rather than being guessed.
 NOT_COMMON = re.compile(
-    r"\b(warrants?|rights?|units?|preferred|pfd|depositary|ads|adr|notes?|"
-    r"debentures?|bonds?|beneficial interest|subordinated?|etf|etn|"
-    r"limited partnership|partnership units?|when issued|when-issued)\b",
+    r"\b(warrants?|rights?|units?|preferred|preference|pfd|depositary|depository|"
+    r"adss?|adrs?|notes?|debentures?|bonds?|beneficial interest|subordinated?|"
+    r"etf|etn|fund|closed end|limited partnership|partnership units?|"
+    r"when issued|when-issued)\b",
     re.I,
 )
 COMMON = re.compile(
-    r"\b(common stock|common shares?|ordinary shares?|class [a-z] common|"
-    r"class [a-z] ordinary|common)\b",
+    r"\b(common stock|common shares?|ordinary shares?|ord shares?|"
+    r"class [a-z] (?:common|ordinary|shares?)|common)\b",
     re.I,
 )
 

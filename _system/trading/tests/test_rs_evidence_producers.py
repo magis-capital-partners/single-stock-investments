@@ -250,6 +250,15 @@ def test_restriction_file_proves_restriction_only():
         ("Acq Corp - Units", "NOT_COMMON"),
         ("Bank - 6.5% Series A Preferred", "NOT_COMMON"),
         ("Odd Co.", "UNRESOLVED"),
+        # Live SymDir names, 2026-11-18.
+        ("Globavend Holdings Limited - Ord Shares", "CS"),
+        ("ReTo Eco-Solutions, Inc. - Class A Shares", "CS"),
+        ("Nanobiotix S.A. - ADSs", "NOT_COMMON"),
+        ("Silence Therapeutics Plc - American Depository Share", "NOT_COMMON"),
+        ("Nuveen New York Quality Municipal Income Fund Common Stock", "NOT_COMMON"),
+        ("Carlyle Secured Lending, Inc. - Closed End Fund", "NOT_COMMON"),
+        ("CarMax Inc", "UNRESOLVED"),
+        ("Fundamental Global Inc. - Common Stock", "CS"),
     ],
 )
 def test_security_class_names_common_shares_only(name, expected):
