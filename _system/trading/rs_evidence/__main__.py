@@ -20,6 +20,7 @@ import sys
 from _system.trading.rs_paper_executor.safety import SafetyError, timestamp
 
 from . import reviews
+from .gaps import entry_gaps
 from .runner import Producers, load_config, run_forever
 from .sources import utc_now
 
@@ -46,6 +47,7 @@ def _status(config, now):
     out["eligibility_complete"] = sorted(
         k for k, r in evidence.get("eligibility", {}).items() if r.get("complete") is True
     )
+    out["entry_gaps"] = entry_gaps(evidence, now)
     return out
 
 

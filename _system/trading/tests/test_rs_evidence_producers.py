@@ -124,6 +124,7 @@ def candidate(**changes):
         "source_urls": [{"url": "https://www.sec.gov/x.htm", "sha256": SHA_A}],
         "analyzed_at": "2026-11-18T14:59:20Z",
         "published_at": "2026-11-18T14:59:00Z",
+        "publication_clock": "timestamp",
         "first_seen_at": "2026-11-18T14:59:10Z",
         "effective_date": "2026-11-25",
         "legal_effective_date": "2026-11-24",
