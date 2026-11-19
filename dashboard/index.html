@@ -1823,6 +1823,8 @@
   }
 </style>
 <link rel="stylesheet" href="research-workspace.css?v=20261025">
+<link rel="stylesheet" href="stock-performance.css?v=20261118">
+<link rel="stylesheet" href="stock-one-pager.css?v=20261118">
 <link rel="stylesheet" href="company-research.css?v=20261028">
 <link rel="stylesheet" href="research-desk.css?v=20261028">
 <link rel="stylesheet" href="display-system.css?v=20261029">
@@ -2025,7 +2027,7 @@
 <script src="energy-model-viz.js?v=20261015-energy"></script>
 <script src="inflections-viz.js?v=20261110-company-overview"></script>
 <script src="btc-model-viz.js?v=20261111-btc2033"></script>
-<script src="insights-viz.js?v=20261111-btc2033"></script>
+<script src="insights-viz.js?v=20261118"></script>
 <script src="strategy-workbench.js?v=20261029"></script>
 <link rel="stylesheet" href="fund-letters/reader.css?v=8">
 <script src="fund-letters/reader.js?v=8"></script>
@@ -2064,8 +2066,11 @@
 <script src="company-models.js?v=20261028"></script>
 <script src="commodity-resolution.js?v=20261113"></script>
 <script src="commodity-model-viz.js?v=20261113"></script>
-<script src="research-workspace.js?v=20261027-market-sync"></script>
-<script src="company-research.js?v=20261028"></script>
+<script src="source-links.js?v=20261118"></script>
+<script src="stock-performance.js?v=20261118"></script>
+<script src="stock-one-pager.js?v=20261118"></script>
+<script src="research-workspace.js?v=20261118"></script>
+<script src="company-research.js?v=20261118"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
 const GITHUB_REPO = GH_REPO;
@@ -2672,7 +2677,9 @@ function stripMd(s) {
 
 function linkHtml(url, label, className = '') {
   if (!url) return label;
-  return `<a href="${url}" target="_blank" rel="noopener" class="${className}" onclick="event.stopPropagation()">${label}</a>`;
+  url = window.SourceLinks ? SourceLinks.resolve(url) : url;
+  if (!url) return `<span class="source-unavailable">${label} <small>Source unavailable</small></span>`;
+  return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener" class="${className}" onclick="event.stopPropagation()">${label}</a>`;
 }
 
 function escapeHtml(s) {
@@ -2925,6 +2932,8 @@ function renderReadNextCard(t) {
 
 function clearTickerSelection(opts = {}) {
   window.ResearchWorkspace?.rememberScroll();
+  window.StockOnePager?.destroy(document.getElementById('detail'));
+  window.StockPerformance?.destroy(document.getElementById('detail'));
   selected = null;
   const grid = document.getElementById('main-grid');
   document.body.classList.remove('research-focused-page');
@@ -3405,6 +3414,9 @@ function renderComponentValuation(t) {
 }
 
 function renderTotalReturnSection(t) {
+  if (window.StockOnePager?.isPilot(t)) return '';
+  const interactive = window.StockPerformance?.render(t, {linkHtml});
+  if (interactive) return interactive;
   const tr = t.total_return_panel;
   if (!tr) {
     return `
@@ -3687,6 +3699,8 @@ async function loadOperationalData() {
 // ---------------------------------------------------------------------------
 
 async function load() {
+  await window.SourceLinks?.load();
+    window.SourceLinks?.observe(document.getElementById('main-content'));
   void window.DashboardDisplay?.start();
   try {
     oauthConfig = await MarvinOAuth.loadConfig();

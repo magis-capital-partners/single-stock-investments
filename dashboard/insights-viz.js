@@ -124,6 +124,7 @@
   function evidenceLink(ref, linkHtml, ghRepo, label) {
     if (!ref) return '—';
     const text = evidenceLabel(ref, label);
+    if (global.SourceLinks) return linkHtml(global.SourceLinks.reference(ref), text, 'source-open-link');
     if (String(ref).startsWith('http')) return linkHtml(ref, text, 'source-open-link');
     const vault = vaultBlobUrl(ref);
     if (vault) return linkHtml(vault, text, 'source-open-link');

@@ -7,7 +7,7 @@ Profiles:
   downloads    — same research trees as marvin-pick; document batches are added later
   drive        — ticker research, third-party analyses, Drive intake folders, desk-brief inputs
   two-phase-watch — INV Accelsius cooling watch (eight ticker trees + INV shard)
-  dashboard    — deploy rebuild checkout (base paths only)
+  dashboard/pages — deploy checkout (base paths and ten named pilot inputs)
   thirteen-f   — Data Pipeline 13F job (the dashboard files that job reads)
   buyback-radar — buyback snapshots, consumer shards, and the two books it patches
   activist     — Data Pipeline activist job (downloads trees, third-party analyses, desk-brief inputs)
@@ -357,10 +357,18 @@ def paths_for_profile(profile: str) -> list[str]:
             f"{ticker}/investor-documents/TRANSCRIPT_MANIFEST.json",
         ]
 
-    if profile == "dashboard":
-        # The pages rebuild reads market-data / portfolio / dashboard under
-        # _system and dashboard/ (already in base sparse set). No ticker trees.
-        return []
+    if profile in {"dashboard", "pages"}:
+        # All-stock histories and presentation inputs restore from one private
+        # snapshot. These ten small overrides keep the original reference stocks
+        # current without expanding issuer archives in a publication checkout.
+        # This script also runs alone in ci-bootstrap-smoke. Do not import the
+        # presentation builder before its sparse paths have been materialized.
+        return [
+            f"/{ticker}/research/{name}"
+            for ticker in ("CPRT", "TBBK", "FRMO")
+            for name in ("valuation_contract.json", "thesis_card.json", "falsifier_specs.json")
+            if ticker != "FRMO" or name != "falsifier_specs.json"
+        ] + [f"/{ticker}/research/evidence/sec_companyfacts.json" for ticker in ("CPRT", "TBBK")]
 
     if profile == "thirteen-f":
         # Read by build_overlap_holdings.py / ingest_13f.py, and rewritten by
@@ -477,7 +485,7 @@ def main() -> None:
             seen.add(path)
             out.append(path)
 
-    if profile == "dashboard" and len(out) > BASE_PROFILE_PATH_CAP:
+    if profile in {"dashboard", "pages"} and len(out) > BASE_PROFILE_PATH_CAP:
         raise SystemExit(
             f"ERROR: sparse profile {profile!r} has {len(out)} paths "
             f"(cap {BASE_PROFILE_PATH_CAP}). Refusing SPX-scale checkout explosion."

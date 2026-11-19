@@ -123,6 +123,7 @@ runs:
         set -euo pipefail
         python _system/scripts/build_cloudflare_pages_site.py
         python _system/scripts/stage_company_research.py --hardlink
+        python _system/scripts/prepare_stock_research_publication.py
         # The staged assets retain their bytes; release the reproducible ZIP
         # and extraction working copies before expanding the holdings archive.
         python _system/scripts/release_deploy_workspace.py
