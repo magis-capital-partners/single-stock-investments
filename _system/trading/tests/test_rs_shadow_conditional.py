@@ -8,8 +8,6 @@ No socket, Gateway or vendor is contacted.
 """
 
 import asyncio
-import json
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -27,7 +25,7 @@ from _system.trading.tests.test_rs_live_guards import (  # noqa: F401 (fixtures)
     no_network,
 )
 from _system.trading.tests.test_rs_paper_executor import NOW, Broker, run, signal
-from _system.trading.tests.test_rs_shadow_report import build
+from _system.trading.tests.test_rs_shadow_report import build, ready
 
 UNKNOWN = dict(conid=1001, at=NOW, complete=False, source_verified=False,
                halted=None, ssr=None,
@@ -223,7 +221,9 @@ def test_ib_halt_tick_still_refuses_a_conditional_entry():
         Executor.shadow_eligibility(_engine(), proof, NOW, 1001)
 
 
-# ---- shadow report -------------------------------------------------------
+# ---- shadow report (rs_shadow_report.v2) --------------------------------
+# Opportunities come only from fully gated shadow_entry events. Conditional
+# entries are a separate, non-gating block and never touch readiness.
 
 def _add(path, kind, payload, at="2026-11-18T15:10:00+00:00"):
     j = Journal(path, "p", "RSLIVE|")
@@ -231,61 +231,66 @@ def _add(path, kind, payload, at="2026-11-18T15:10:00+00:00"):
     j.close()
 
 
-COND = {"id": "c1", "ticker": "ABC", "shares": 400, "limit": 2.0, "reason": "arm file absent",
-        "initial_margin": 800, "maintenance_margin": 700,
-        "eligibility_unknown": ["halted", "ssr"], "eligibility_missing": []}
+COND = {"id": "c1", "ticker": "ABC", "shares": 400, "limit": 2.0,
+        "reason": "shadow journal: entries are never transmitted",
+        "initial_margin": 800, "maintenance_margin": 700, "fully_gated": False,
+        "eligibility_unknown": ["halted", "ssr"], "eligibility_missing": [],
+        "cik": "444", "action_id": "c-a1", "conid": 444, "synthetic_control": False,
+        "published_at": "2026-11-18T15:09:00+00:00", "first_seen_at": "2026-11-18T15:09:10+00:00"}
 
 
-def test_report_counts_conditional_entries_apart_and_never_as_arm_ready(tmp_path):
-    path = build(tmp_path / "s.sqlite", entry=False)
-    _add(path, "shadow_entry_conditional", COND)
-    r = shadow_report(path, min_sessions=2)
-    assert r["would_be_entries"] == 0 and r["conditional_would_be_entries"] == 1
-    assert r["conditional_unknown_inputs"] == {"halted": 1, "ssr": 1}
-    assert r["checks"]["downstream_gates_exercised"] is True
-    assert r["checks"]["enough_would_be_entries"] is False
-    assert r["ready_for_arm_review"] is False and r["conditional_note"]
+def test_conditional_entries_never_make_a_quiet_run_ready(tmp_path):
+    path = build(tmp_path / "s.sqlite", entries=None)
+    for n, cik in enumerate(("444", "555", "666")):  # 3 issuers, enough if they counted
+        _add(path, "shadow_entry_conditional", {**COND, "id": "c%d" % n, "cik": cik,
+                                                "action_id": "c-a%d" % n},
+             at=("2026-11-17T15:10:00+00:00" if n == 0 else "2026-11-18T15:1%d:00+00:00" % n))
+    r = ready(tmp_path, path)
+    assert r["checks"]["opportunities"] == 0 and r["ready_for_arm_review"] is False
+    assert "enough_opportunities" in r["failed_checks"]
+    c = r["conditional"]
+    assert c["counts_toward_readiness"] is False and c["would_be_entries"] == 3
+    assert c["issuers"] == 3 and c["sessions"] == 2
+    assert c["unknown_inputs"] == {"halted": 3, "ssr": 3}
+    assert c["downstream_gates_exercised"] is True
+    assert "downstream_gates_exercised" not in r["checks"]
     assert r["sessions"][1]["conditional_entries"][0]["id"] == "c1"
 
 
-def test_report_without_conditional_entries_is_unchanged(tmp_path):
-    r = shadow_report(build(tmp_path / "s.sqlite"), min_sessions=2)
-    assert r["ready_for_arm_review"] is True and r["conditional_would_be_entries"] == 0
-    assert r["checks"]["downstream_gates_exercised"] is True and r["conditional_note"] is None
-    r = shadow_report(build(tmp_path / "e.sqlite", entry=False), min_sessions=2)
-    assert r["checks"]["downstream_gates_exercised"] is False
-
-
-def test_report_counts_one_per_issuer_action_and_counts_issuers(tmp_path):
-    path = build(tmp_path / "s.sqlite", entry=False)
-    a = {**COND, "cik": "1", "action_id": "1:2026-11-25"}
-    _add(path, "shadow_entry_conditional", a)
-    _add(path, "shadow_entry_conditional", {**a, "id": "dup"})  # same action, other record
-    _add(path, "shadow_entry_conditional", {**a, "id": "c2", "action_id": "1:2027-02-01"})
-    _add(path, "shadow_entry_conditional", {**a, "id": "c3", "cik": "2", "action_id": "2:x"})
-    r = shadow_report(path, min_sessions=2)
-    assert r["conditional_would_be_entries"] == 3 and r["conditional_issuers"] == 2
-    assert r["ready_for_arm_review"] is False
-
-
-def test_a_proposal_with_a_full_entry_is_not_also_counted_conditional(tmp_path):
-    path = build(tmp_path / "s.sqlite")  # full shadow entry for "s1"
-    _add(path, "shadow_entry_conditional", {**COND, "id": "s1"}, at="2026-11-18T15:01:00+00:00")
-    r = shadow_report(path, min_sessions=2)
-    assert r["would_be_entries"] == 1 and r["conditional_would_be_entries"] == 0
-
-
-def test_cli_report_carries_the_conditional_counts(tmp_path, capsys):
-    from _system.trading.rs_paper_executor import __main__ as cli
-
-    path = build(tmp_path / "s.sqlite", entry=False)
+def test_conditional_entries_leave_a_ready_report_unchanged(tmp_path):
+    plain = ready(tmp_path, build(tmp_path / "a.sqlite"))
+    path = build(tmp_path / "b.sqlite")
     _add(path, "shadow_entry_conditional", COND)
-    config = tmp_path / "c.json"
-    config.write_text(json.dumps({
-        "endpoint": {"account": "DU000000", "client_id": 171, "port": 4002},
-        "policy": {"spx_reserve": 1, "cash_buffer": 1, "daily_loss_limit": 1}}))
-    assert cli.main(["shadow-report", "--config", str(config), "--state", str(path),
-                     "--min-sessions", "2"]) == 3
-    out = json.loads(capsys.readouterr().out)
-    assert out["conditional_would_be_entries"] == 1 and not out["ready_for_arm_review"]
-    assert Path(path).exists()
+    mixed = ready(tmp_path, path)
+    assert plain["ready_for_arm_review"] is mixed["ready_for_arm_review"] is True
+    assert plain["checks"] == mixed["checks"]
+    assert plain["conditional"]["would_be_entries"] == 0
+    assert plain["conditional"]["downstream_gates_exercised"] is True  # full entries ran them
+    quiet = ready(tmp_path, build(tmp_path / "c.sqlite", entries=None))
+    assert quiet["conditional"]["downstream_gates_exercised"] is False
+
+
+def test_conditional_dedup_matches_the_opportunity_rules(tmp_path):
+    path = build(tmp_path / "s.sqlite", entries=None)
+    _add(path, "shadow_entry_conditional", COND)
+    _add(path, "shadow_entry_conditional", {**COND, "id": "other-publisher"})        # duplicate
+    _add(path, "shadow_entry_conditional", {**COND, "id": "synthetic-control:q",
+                                            "action_id": "q", "cik": "777"})        # control
+    _add(path, "shadow_entry_conditional", {**COND, "id": "late", "action_id": "c-late",
+                                            "published_at": "2026-11-18T13:00:00+00:00"})
+    _add(path, "shadow_entry_conditional", {**COND, "id": "c2", "action_id": "c-a2"})
+    r = shadow_report(path, min_sessions=2)
+    assert r["conditional"]["would_be_entries"] == 2 and r["conditional"]["issuers"] == 1
+    assert r["conditional"]["excluded_entries"] == {
+        "duplicate_issuer_action": 1, "synthetic_control": 1, "catch_up_announcement": 1}
+
+
+def test_a_fully_gated_entry_supersedes_its_conditional_record(tmp_path):
+    path = build(tmp_path / "s.sqlite")  # full entries for (111, a1), (222, a2), (333, a3)
+    _add(path, "shadow_entry_conditional", {**COND, "cik": "111", "action_id": "a1",
+                                            "published_at": "2026-11-17T15:00:00+00:00",
+                                            "first_seen_at": "2026-11-17T15:00:00+00:00"},
+         at="2026-11-17T15:01:00+00:00")
+    r = shadow_report(path, min_sessions=2)
+    assert r["checks"]["opportunities"] == 3 and r["conditional"]["would_be_entries"] == 0
+    assert r["conditional"]["excluded_entries"] == {"has_fully_gated_entry": 1}

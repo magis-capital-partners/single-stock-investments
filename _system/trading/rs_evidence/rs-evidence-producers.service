@@ -3,11 +3,16 @@
 # 07:45-16:20 ET.
 # RS evidence producers: identity, borrow and halt/SSR rows for the RS
 # executor. No broker session, no IB client ID, no vendor login. Outbound
-# reads only: nasdaqtrader.com, sec.gov, IBKR's anonymous short-stock FTP, and
-# Box R's operations.json through the narrow R2 read token.
+# reads only: nasdaqtrader.com, sec.gov and IBKR's anonymous short-stock FTP.
+# Box R's operations.json is the local copy rs-live-operations writes into
+# /var/lib/rs-live/feed, so this unit holds no credential at all.
 [Unit]
 Description=Reverse-split evidence producers (public reference files only)
 ConditionPathExists=/etc/rs-live-approved
+# No Gateway connection exists here, so a bounded restart cannot become a
+# connect storm; the burst limit keeps public sites from being hammered.
+StartLimitIntervalSec=3600
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -16,16 +21,9 @@ Group=rs-live
 SupplementaryGroups=ib-claims
 WorkingDirectory=/srv/rs-live/repo
 Environment=TZ=America/New_York
-# Required, as for the executor: RS_OPERATIONS_URL (Box R's private R2 object)
-# and RS_OPERATIONS_READ_TOKEN (read-only). root:root 0600; systemd reads it.
-EnvironmentFile=/etc/rs-live/executor.env
 ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_evidence run --config /etc/rs-live/producers.json --max-seconds 26400
-# No Gateway connection exists here, so a bounded restart cannot become a
-# connect storm; the burst limit keeps public sites from being hammered.
 Restart=on-failure
 RestartSec=60
-StartLimitIntervalSec=3600
-StartLimitBurst=5
 RuntimeMaxSec=27000
 # AGENTS.md rule 8: background work never makes the SPX executor wait on CPU.
 Nice=15

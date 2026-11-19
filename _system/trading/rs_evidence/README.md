@@ -9,7 +9,9 @@ They hold no broker session, no IB client ID and no vendor login. Their only
 reads are:
 * public files from Nasdaq Trader, the SEC, and IBKR's anonymous short-stock
   FTP;
-* Box R's `operations.json`, through the executor's own narrow read path;
+* Box R's `operations.json`, from the local copy that `rs-live-operations`
+  (#1823's `operations-fetch`) writes to `/var/lib/rs-live/feed`. The
+  producers hold no credential;
 * optionally, a local file written by a licensed market-status handler. The
   owner has not picked that source yet.
 
@@ -169,14 +171,17 @@ python -m _system.trading.rs_evidence review --config /etc/rs-live/producers.jso
 The config needs:
 * `user_agent`, the SEC fair-access contact. The owner supplies it; the code
   never invents one.
-* `RS_OPERATIONS_READ_TOKEN` in the environment when `operations_url` is
-  used.
+* `operations_file`: `/var/lib/rs-live/feed/operations.json`, the copy
+  `rs-live-operations` maintains. The fetcher's `operations.meta.json`
+  `downloaded_at` is recorded beside Box R's `generated_at` in the identity
+  producer's meta. `operations_url` (with `RS_OPERATIONS_READ_TOKEN`) is for
+  development only. A bucket-scoped R2 read token does not work with the
+  Cloudflare REST URL, which is why #1823 moved the fetch into its own
+  process.
+* `operations_mirror` is off by default and not needed on NY4.
 
-Box R's operations URL and token come from `RS_OPERATIONS_URL` and
-`RS_OPERATIONS_READ_TOKEN` in the same root-only `EnvironmentFile` the executor
-unit uses, unless the config names `operations_file`/`operations_url`.
-`operations_mirror` (off by default) writes a copy for an executor run with
-`--operations-file`. The live unit now reads the URL itself.
+Install steps for NY4 are in `../rs_paper_executor/NY4_SHADOW_INSTALL.md`,
+section 7.
 
 ## Verification
 

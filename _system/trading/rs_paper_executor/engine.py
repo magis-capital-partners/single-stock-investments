@@ -721,10 +721,14 @@ class Executor:
                 "fully_gated": False,
                 "eligibility_unknown": unknown,
                 "eligibility_missing": proof.get("missing"),
+                # The same deduplication keys as shadow_entry (issuer/action).
                 "cik": signal["cik"], "action_id": signal.get("action_id"),
-                "action_day": signal.get("action_day"),
+                "conid": signal["conid"], "action_day": signal.get("action_day"),
                 "published_at": signal["published_at"],
                 "first_seen_at": signal["first_seen_at"],
+                "synthetic_control": bool(
+                    signal.get("synthetic_control")
+                    or str(signal.get("id", "")).startswith("synthetic-control:")),
                 # A public indication capped by the live shortable tick. Not
                 # an allocation, and the WhatIf above does not prove a borrow.
                 "borrow_indication": {

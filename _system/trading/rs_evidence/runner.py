@@ -2,9 +2,10 @@
 
 It holds no broker session, no IB client ID and no vendor login. Its only
 network reads are public files (Nasdaq Trader, SEC, IBKR's anonymous
-short-stock FTP) plus Box R's ``operations.json`` through the executor's own
-narrow read path, and an optional local file written by a licensed feed
-handler the owner has not chosen yet.
+short-stock FTP). It reads Box R's ``operations.json`` from the local copy that
+``rs-live-operations`` (``operations-fetch``, #1823) maintains, so it holds no
+credential at all. It also reads an optional local file written by a licensed
+feed handler the owner has not chosen yet.
 
 Failure policy, per section:
 
@@ -25,7 +26,8 @@ import os
 from pathlib import Path
 import time
 
-from _system.trading.rs_paper_executor.inbox import read_https, read_json
+from _system.trading.rs_paper_executor.inbox import read_https
+from _system.trading.rs_paper_executor.operations_feed import read_local
 from _system.trading.rs_paper_executor.safety import SafetyError, timestamp
 
 from . import sources
@@ -66,10 +68,8 @@ def load_config(path):
         raise SafetyError("terms_mode must be one of " + ", ".join(TERMS_MODES))
     if not config.get("evidence"):
         raise SafetyError("evidence path required")
-    # Same convention as the executor's unit: the private R2 URL and its token
-    # come from a root-only EnvironmentFile, never from a readable config.
-    if not config.get("operations_file") and not config.get("operations_url"):
-        config["operations_url"] = os.environ.get("RS_OPERATIONS_URL")
+    # Live reads the local copy rs-live-operations writes (one process holds the
+    # R2 credential). An explicit operations_url is for development only.
     if not (config.get("operations_file") or config.get("operations_url")):
         raise SafetyError("Box R operations source required")
     if config["eligibility"]["max_age_seconds"] > 30:
@@ -115,6 +115,7 @@ class State:
     restriction: object = None
     halt_feed: object = None
     claims: dict = field(default_factory=dict)
+    operations_meta: dict = field(default_factory=dict)
 
 
 SESSION_TASKS = ("halt_feed", "restriction_file", "eligibility")
@@ -145,7 +146,9 @@ class Producers:
     # ----------------------------------------------------------- references
     def _operations(self):
         if self.config.get("operations_file"):
-            return read_json(self.config["operations_file"])
+            data, self.state.operations_meta = read_local(self.config["operations_file"])
+            return data
+        self.state.operations_meta = {}
         return read_https(self.config["operations_url"], os.environ["RS_OPERATIONS_READ_TOKEN"])
 
     def refresh_references(self, now):
@@ -227,7 +230,9 @@ class Producers:
             )
             for row in rows.values():
                 self.store.archive(row["proof"])
-            meta.update(status="ok", operations_generated_at=operations.get("generated_at"), report=report)
+            meta.update(status="ok", operations_generated_at=operations.get("generated_at"),
+                        operations_downloaded_at=self.state.operations_meta.get("downloaded_at"),
+                        report=report)
         except Exception as exc:
             rows = evidence.get("identities", {})
             meta.update(status="degraded_kept_previous", error=type(exc).__name__)

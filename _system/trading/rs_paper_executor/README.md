@@ -294,7 +294,7 @@ the refusal histogram shows which input is missing.
 
 **Conditional would-be entries (owner 2026-11-19, option B).** No source available
 today can say "SSR clear" intraday, so every strict eligibility check fails.
-In **shadow only** (no valid arm file), an entry whose halt/SSR state is
+In **shadow only** (the `run --shadow` journal, or no valid arm file), an entry whose halt/SSR state is
 *unknown* runs the later gates anyway:
 * live quote and size, borrow, WhatIf on the real account;
 * the SPX reserve and cushion, and book-margin room.
@@ -315,13 +315,17 @@ Some inputs refuse exactly as before:
 An armed executor refuses every unknown-SSR entry exactly as before. If an
 arm file appears mid-evaluation, the entry is refused, not sent.
 
-`shadow-report` lists these separately:
-* `conditional_would_be_entries` and `conditional_unknown_inputs`;
-* the `downstream_gates_exercised` check.
+`shadow-report` lists them in a separate `conditional` block, with
+`counts_toward_readiness: false`:
+* the would-be entries, issuers and sessions, deduplicated and excluded by the
+  same rules as opportunities;
+* the unknown inputs;
+* `downstream_gates_exercised`, a non-gating fact.
 
-They never count toward `ready_for_arm_review`. An armed executor cannot
-enter without an eligibility source that can say "clear", so arm review
-waits for one (a paid feed; see `_system/trading/rs_evidence/README.md`).
+Opportunities are counted only from fully gated `shadow_entry` events, so
+conditional entries never count toward `ready_for_arm_review`. The owner's
+3-opportunity rule therefore cannot pass until an eligibility source can say
+"clear" (a paid feed; see `_system/trading/rs_evidence/README.md`).
 
 ### Account reconciliation (after the Flex day closes)
 

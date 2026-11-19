@@ -665,12 +665,23 @@ def test_an_unreadable_claims_file_keeps_the_last_held_names(tmp_path):
     assert producers.watch({"identities": {}}) == {5005: "HELD"}
 
 
-def test_operations_url_comes_from_the_executor_environment(tmp_path, monkeypatch):
-    path = write_config(tmp_path, operations_file=None)
-    monkeypatch.delenv("RS_OPERATIONS_URL", raising=False)
+def test_operations_come_from_the_fetchers_local_copy(tmp_path, monkeypatch):
+    # #1823: one process (rs-live-operations) holds the R2 credential and writes
+    # /var/lib/rs-live/feed/operations.json; the producers read that copy.
+    monkeypatch.setenv("RS_OPERATIONS_URL", "https://api.cloudflare.com/x")
     with pytest.raises(SafetyError, match="operations source"):
-        load_config(path)
-    url = ("https://api.cloudflare.com/client/v4/accounts/x/r2/buckets/"
-           "single-stock-reverse-splits-evidence/objects/collector-dashboard/operations.json")
-    monkeypatch.setenv("RS_OPERATIONS_URL", url)
-    assert load_config(path)["operations_url"] == url
+        load_config(write_config(tmp_path, operations_file=None))  # the env is no longer read
+    feed = tmp_path / "feed"
+    feed.mkdir()
+    (feed / "operations.json").write_text(json.dumps({"generated_at": NOW, "candidates": [candidate()]}))
+    (feed / "operations.meta.json").write_text(json.dumps(
+        {"source_generated_at": NOW, "downloaded_at": "2026-11-18T15:00:03+00:00"}))
+    config = load_config(write_config(tmp_path, operations_file=str(feed / "operations.json"),
+                                      operations_mirror=None))
+    fake = fake_fetchers()  # operations left unset: the real local-copy reader runs
+    producers = Producers(config, Fetchers(https=fake.https, ibkr=fake.ibkr, clock=fake.clock),
+                          in_session=lambda now: True)
+    producers.step(NOW, only={"references", "ibkr_file", "identity"})
+    meta = json.loads(Path(config["evidence"]).read_text())["producers"]["identities"]
+    assert meta["status"] == "ok" and meta["operations_generated_at"] == NOW
+    assert meta["operations_downloaded_at"] == "2026-11-18T15:00:03+00:00"
