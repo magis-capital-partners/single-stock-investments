@@ -313,10 +313,13 @@ In **shadow only** (no valid arm file), an entry whose halt/SSR state is
 * live quote and size, borrow, WhatIf on the real account;
 * the SPX reserve and cushion, and book-margin room.
 
-If all of them pass, it is recorded once per proposal as
-`shadow_entry_conditional`, with the unknown inputs (`eligibility_unknown`).
-It is recorded once so later cycles do not repeat quote, borrow or WhatIf
-requests on the shared Gateway.
+If all of them pass, it is recorded once per issuer/action as
+`shadow_entry_conditional` with `fully_gated: false`. The record carries the
+unknown inputs (`eligibility_unknown`), `cik`, `action_id` and the borrow
+*indication* used. It is recorded once, whichever publisher record carries
+the action, so later cycles do not repeat quote, borrow or WhatIf requests on
+the shared Gateway. The borrow is a public indication capped by tick 89. It
+is not an allocation, and the passing WhatIf does not prove a borrow.
 
 Some inputs refuse exactly as before:
 * a **known** halt (evidence or IB tick 49) or SSR restriction;

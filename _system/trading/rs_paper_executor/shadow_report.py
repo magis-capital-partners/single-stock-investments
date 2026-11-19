@@ -87,8 +87,16 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, min_entries=1,
     worst_gap = max((s["max_heartbeat_gap_seconds"] for s in sessions), default=None)
     entries = sum(len(s["shadow_entries"]) for s in sessions)
     full_ids = {e.get("id") for s in sessions for e in s["shadow_entries"]}
-    conditional = [e for s in sessions for e in s["conditional_entries"]
-                   if e.get("id") not in full_ids]
+    # One per issuer/action: a second publisher record of the same action is
+    # not a second opportunity.
+    by_action = {}
+    for s in sessions:
+        for e in s["conditional_entries"]:
+            if e.get("id") in full_ids:
+                continue
+            key = (e.get("cik"), e.get("action_id") or e.get("id"))
+            by_action.setdefault(key, e)
+    conditional = list(by_action.values())
     unknown = Counter(f for e in conditional for f in e.get("eligibility_unknown") or ["?"])
     checks = {
         "no_orders_transmitted": not orders and not any(s["orders_submitted"] for s in sessions),
@@ -112,6 +120,7 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, min_entries=1,
         "endpoint": meta.get("endpoint"),
         "would_be_entries": entries,
         "conditional_would_be_entries": len(conditional),
+        "conditional_issuers": len({e.get("cik") for e in conditional if e.get("cik")}),
         "conditional_unknown_inputs": dict(unknown.most_common()),
         "refusals_total": dict(sum((Counter(s["refusals"]) for s in sessions), Counter())
                                .most_common()),

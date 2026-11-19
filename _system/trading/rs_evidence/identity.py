@@ -32,6 +32,20 @@ What stays a decision (``terms_mode``, owner's call; default ``owner_review``):
 Every row the producer writes is new dated evidence. A row whose content is
 unchanged keeps its first ``at``, so ``at`` truthfully says when the mapping
 became known and the 24 h expiry is not renewed by re-stamping.
+
+Only the FIRST live record of an action is an opportunity (owner 2026-11-19):
+
+* ``publication_clock`` must be Box R's ``timestamp``. A date-only SEC
+  daily-index record (``date_only_next_day``), an undated archive catch-up
+  (``unverified_archive``) or an ``unknown`` clock gets ``verified: false``.
+  The executor's 15-minute window trusts ``published_at``, and a date-only
+  clock can look fresh the next morning.
+* A later scheduled record for the same issuer and action day is a duplicate
+  publisher record. It gets no row and is reported, so it cannot open a
+  second entry window. If either action day is unknown, the later record is
+  treated as a possible duplicate.
+* A labelled synthetic control (``synthetic_control`` or a
+  ``synthetic-control:`` id) never gets an identity row.
 """
 
 from __future__ import annotations
@@ -67,6 +81,48 @@ def earliest_action_day(candidate):
         if isinstance(candidate.get(k), str) and DAY.fullmatch(candidate.get(k))
     ]
     return min(days) if days else None
+
+
+CLOCK = re.compile(r"[a-z_]{1,40}")
+
+
+def _cik(value):
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def synthetic_control(candidate):
+    return candidate.get("synthetic_control") is True or str(
+        candidate.get("id", "")
+    ).startswith("synthetic-control:")
+
+
+def duplicate_records(candidates):
+    """``{later id: (first id, basis)}`` for later scheduled records of an
+    issuer's action already seen in an earlier record. All candidates are
+    compared, including those older than the lookback, so a duplicate cannot
+    reopen a window the first record already used."""
+    by_issuer = {}
+    for c in candidates:
+        if c.get("status") != "scheduled" or synthetic_control(c):
+            continue
+        cik = _cik(c.get("cik"))
+        if cik is not None:
+            by_issuer.setdefault(cik, []).append(c)
+    found = {}
+    for rows in by_issuer.values():
+        rows.sort(key=lambda c: (_first_seen(c) or "~", str(c.get("id"))))
+        for i, later in enumerate(rows):
+            day = earliest_action_day(later)
+            for first in rows[:i]:
+                other = earliest_action_day(first)
+                if day is None or other is None or day == other:
+                    basis = "same_action_day" if day is not None and day == other else "action_day_unknown"
+                    found[later.get("id")] = (first.get("id"), basis)
+                    break
+    return found
 
 
 def box_r_ratio(candidate):
@@ -157,6 +213,7 @@ def build_identities(operations, refs, reviews, now, *, terms_mode, previous=Non
         key=_first_seen,
         reverse=True,  # one row per ticker: the newest candidate wins
     )
+    duplicates = duplicate_records(candidates)
     for candidate in candidates:
         ticker = candidate.get("ticker")
         if not isinstance(ticker, str) or not SYMBOL.fullmatch(ticker):
@@ -176,10 +233,23 @@ def build_identities(operations, refs, reviews, now, *, terms_mode, previous=Non
         if not sources:
             report.append({"ticker": ticker, "skipped": "no_primary_source_hash"})
             continue
+        if synthetic_control(candidate):
+            report.append({"ticker": ticker, "skipped": "synthetic_control"})
+            continue
+        if candidate.get("id") in duplicates:
+            first, basis = duplicates[candidate.get("id")]
+            report.append({"ticker": ticker, "skipped": "duplicate_publisher_record",
+                           "candidate_id": candidate.get("id"), "duplicate_of": first,
+                           "basis": basis})
+            continue  # the first record keeps the ticker's row
 
         fields, refusals, used = _instrument(candidate, refs)
         if ticker in PROTECTED_SYMBOLS:
             refusals.append("protected_symbol")
+        clock = candidate.get("publication_clock")
+        if clock != "timestamp":
+            refusals.append("publication_clock_" + (
+                clock if isinstance(clock, str) and CLOCK.fullmatch(clock) else "missing"))
 
         checks = candidate.get("checks", {})
         box_ok = (
@@ -240,6 +310,7 @@ def build_identities(operations, refs, reviews, now, *, terms_mode, previous=Non
             "security_name": fields.get("security_name"),
             "verified": verified,
             "action_id": candidate.get("id"),
+            "publication_clock": clock,
             "ratio": terms["ratio"],
             "action_day": terms["action_day"],
             "action_source_sha256": sources[0],

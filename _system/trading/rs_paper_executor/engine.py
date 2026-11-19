@@ -283,6 +283,11 @@ class Executor:
         ):
             raise SafetyError("halt/SSR unknown or restricted")
 
+    @staticmethod
+    def _conditional_key(signal):
+        return "shadow_conditional:%s:%s" % (
+            signal["cik"], signal.get("action_id") or signal["id"])
+
     def shadow_eligibility(self, proof, now, conid):
         """SHADOW ONLY (owner 2026-11-19, option B). No source available today
         can say "SSR clear" intraday, so every strict eligibility check fails and
@@ -563,9 +568,10 @@ class Executor:
             if self.transmit()[0]:
                 raise
             unknown = self.shadow_eligibility(proof, now, signal["conid"])
-            if self.journal.get("shadow_conditional:" + signal["id"]):
-                # Recorded once. Re-running would repeat quote, borrow and
-                # WhatIf requests on the shared Gateway every cycle.
+            if self.journal.get(self._conditional_key(signal)):
+                # Recorded once per issuer/action, whichever publisher record
+                # carries it. Re-running would repeat quote, borrow and WhatIf
+                # requests on the shared Gateway every cycle.
                 return None
         borrow = await self.broker.borrow(signal["conid"])
         if borrow.get("conid") != signal["conid"]:
@@ -698,13 +704,25 @@ class Executor:
         if unknown:
             if armed:  # an arm file appeared mid-evaluation
                 raise SafetyError("halt/SSR unknown; an armed executor never enters on it")
-            self.journal.set("shadow_conditional:" + signal["id"], current)
+            self.journal.set(self._conditional_key(signal), current)
             self.alert(current, "shadow_entry_conditional", {
                 "id": signal["id"], "ticker": signal["ticker"], "shares": shares,
                 "limit": bid, "reason": why,
                 "initial_margin": initial, "maintenance_margin": maintenance,
+                "fully_gated": False,
                 "eligibility_unknown": unknown,
                 "eligibility_missing": proof.get("missing"),
+                "cik": signal["cik"], "action_id": signal.get("action_id"),
+                "action_day": signal.get("action_day"),
+                "published_at": signal["published_at"],
+                "first_seen_at": signal["first_seen_at"],
+                # A public indication capped by the live shortable tick. Not
+                # an allocation, and the WhatIf above does not prove a borrow.
+                "borrow_indication": {
+                    "apr": apr, "available_shares": borrow.get("available_shares"),
+                    "at": borrow.get("at"),
+                    "locate_approved": borrow.get("locate_approved") is True,
+                },
             })
             return None
         if not armed:

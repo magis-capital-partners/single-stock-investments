@@ -39,9 +39,22 @@ and `.timer` are uninstalled templates, like the executor's.
     `ratio`/`ratio_candidates` in `operations.json`, which it does not do
     today.
 * A row whose content has not changed keeps its first `at`.
+* Only the first live record of an action is an opportunity (owner
+  2026-11-19):
+  * `publication_clock` must be Box R's `timestamp`. A date-only SEC
+    daily-index record, an undated archive catch-up or an `unknown` clock gets
+    `verified: false` (`publication_clock_<value>`). A date-only clock can look
+    fresh to the executor's 15-minute window the next morning.
+  * A later scheduled record of the same issuer and action day is a duplicate
+    publisher record. It gets no row, and `report` names `duplicate_of`.
+    Unknown action days count as possible duplicates.
+  * Synthetic controls never get a row.
 
-**Borrow.** These are public indications only (`locate_approved: false`). A
-conid that is missing from the file gets no row; it never gets zero.
+**Borrow.** These are public indications only (`availability_only: true`,
+`locate_approved: false`). **They are not allocations**, and a successful
+WhatIf margin preview does not establish borrow availability (owner
+2026-11-19). A conid that is missing from the file gets no row; it never gets
+zero.
 Watched conids are:
 * identity conids;
 * conids in RS's own claims file (the last good copy if that file is
@@ -74,6 +87,60 @@ Watched conids are:
 The halt feed's 60 s cycle and the 30 s limit mean a free-halt clearance can be
 fresh for only part of each minute. A licensed handler is what makes the halt
 and SSR components fresh enough for every cycle.
+
+## Exact missing fields, IBKR capabilities and proposed cost (owner 2026-11-19)
+
+The owner's order: identify these before buying anything. Nothing has been
+bought. `status` prints `entry_gaps` for the live evidence file: the field
+that blocks each name, by the executor's own checks (`gaps.py`).
+
+**What blocks every entry today**
+
+| Executor field | Today | What closes it |
+| --- | --- | --- |
+| `identities.ratio`, `conditions_resolved` | **Missing** until an owner review (`owner_review_required`) | The `review` command per candidate, or `box_r_auto` plus Box R exporting `ratio` |
+| `identities.type` for unnamed NYSE names | `UNRESOLVED` (144 of 7,687 in `otherlisted`) | OpenFIGI fallback (free), if the owner approves it |
+| `identities` for date-only or catch-up records | Refused by design | Nothing: these are not opportunities |
+| `identities.cik` cross-check | Needs the SEC User-Agent contact in the config | The owner supplies it |
+| `borrow.apr`, `available_shares` | Present: IBKR public file, about every 15 min | An indication, never an allocation (see below) |
+| `eligibility.halted = false` | Restriction yes, clearance **no**: the RSS clears only with `halt_feed_clears` (off) | The owner's `halt_feed_clears` call, or a licensed handler |
+| `eligibility.ssr = false` | **Missing.** No free per-symbol intraday clearance exists | A licensed status feed (below) |
+| `eligibility.complete`, `source_verified` | False on every row, because SSR is missing | Same |
+
+**What IBKR already offers** (from IBKR's documentation; nothing was
+connected to check it):
+
+| Capability | What it gives | Usable for RS? |
+| --- | --- | --- |
+| TWS API generic tick 236: tick 46 `Shortable`, tick 89 `Shortable Shares` | Shortable level (>2.5: at least 1000 shares; >1.5: if a locate is found) and a share count | **Already used:** the executor caps size by tick 89. Both are indications, not allocations |
+| Public FTP `usa.txt` | `FEERATE`, `REBATERATE`, `AVAILABLE` per conid, about every 15 min | **Already used** by `borrow.py`. Indications. IBKR's tick page names this file as the source for the fee rate |
+| TWS API tick 49 `Halted` | 1 general halt, 2 volatility halt; **0 "only if the contract is in a TWS watchlist"**; -1 unavailable | Proves *halted*, never *not halted* on a Gateway. Already merged as a restriction |
+| SSR / Rule 201 in the TWS API | **None.** No tick or field documents a short-sale restriction | No |
+| Web API snapshot fields 7636/7637/7644 (shortable shares, **fee rate**, shortable) | A live indicative fee rate | **No, not on NY4.** A Web API brokerage session is one per username, and a competing login can end the other session. It would compete with the SPX Gateway's login. It needs a second username |
+| Pre-borrow (TWS API: `secType SBL`, exchange `PREBORROW`, BUY `MKT`) | **The only real allocation IBKR offers** | Needs a Portfolio Margin account, the Pre-Borrow permission and a **$10,000 minimum** (an older guide says $100,000). It costs a $20 ticket fee plus a $20 borrow fee, a fill is not guaranteed, and unused shares are returned after about one settlement cycle. **It cannot serve pilot names of $5,000** |
+| Flex Borrow Fee Details (Box R already reads it) | Rates actually charged on held loans, after the fact | Reconciliation only, not pre-trade |
+
+So without a pre-borrow, borrow is established only when the short order
+executes; IBKR locates at order time. A WhatIf preview does not establish it.
+
+**Proposed subscription** (none bought; owner's call):
+* **IEX TOPS, $1,000/month licence**, plus connectivity, which has not been
+  quoted. It is the cheapest source that gives per-symbol Rule 201 state and
+  halts for every listing market. A handler writes the plug-point file below.
+* The alternatives cover Nasdaq-listed names only:
+  * Databento XNAS.ITCH status: about $3,300/month, and another Databento
+    session.
+  * Nasdaq Basic through Databento: $1,680/firm + $14.10/user, plus the plan.
+* A SIP through a vendor: cost unverified.
+
+The full table and citations are in the design note.
+
+**The owner's shadow acceptance gate needs a source.** That gate is three
+fully gated, deduplicated issuer/action opportunities from three issuers
+over two or more sessions. "Fully gated" includes eligibility, which cannot
+pass while SSR is unknown. Option B's conditional entries
+(`fully_gated: false`) show the later gates working, but they cannot meet
+the gate.
 
 ## Licensed handler file (the plug point)
 
@@ -114,7 +181,7 @@ unit uses, unless the config names `operations_file`/`operations_url`.
 ## Verification
 
 ```text
-python -m pytest -q _system/trading/tests/test_rs_evidence_producers.py
+python -m pytest -q _system/trading/tests/test_rs_evidence_producers.py _system/trading/tests/test_rs_evidence_owner_rules.py _system/trading/tests/test_rs_shadow_conditional.py
 python -m ruff check _system/trading/rs_evidence _system/trading/tests/test_rs_evidence_producers.py --select F
 ```
 

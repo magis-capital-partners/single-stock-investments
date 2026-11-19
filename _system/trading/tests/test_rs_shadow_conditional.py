@@ -80,6 +80,14 @@ def test_unknown_ssr_in_shadow_runs_the_later_gates_and_records_once(box):
     assert row["eligibility_missing"] == UNKNOWN["missing"]
     assert row["reason"] == "arm file absent" and row["shares"] > 0
     assert row["initial_margin"] == 10000 and row["maintenance_margin"] == 10000
+    assert row["fully_gated"] is False
+    assert (row["cik"], row["action_id"], row["action_day"]) == (
+        "12345", "issuer1:2026-11-25:10", "2026-11-25")
+    assert row["published_at"] == "2026-11-18T14:59:00Z"
+    # The borrow used is a public indication: never an allocation, and the
+    # successful WhatIf above proves no borrow.
+    assert row["borrow_indication"]["locate_approved"] is False
+    assert row["borrow_indication"]["available_shares"] == 10000
     assert {"quote", "borrow", "margin"} <= set(counting.calls)
     # Recorded once: the next cycles do not repeat quote, borrow or WhatIf.
     before = list(counting.calls)
@@ -87,6 +95,21 @@ def test_unknown_ssr_in_shadow_runs_the_later_gates_and_records_once(box):
         assert run(box.engine.enter(signal(), box.broker.snap, NOW)) is None
     assert counting.calls == before
     assert len(events(box.journal, "shadow_entry_conditional")) == 1
+
+
+def test_a_second_publisher_record_of_the_same_action_is_not_a_second_record(box):
+    shadow(box)
+    counting = Counting(box.broker)
+    box.engine.broker = counting
+    assert run(box.engine.enter(signal(), box.broker.snap, NOW)) is None
+    before = list(counting.calls)
+    assert run(box.engine.enter(signal(id="prn:two"), box.broker.snap, NOW)) is None
+    assert counting.calls == before
+    assert len(events(box.journal, "shadow_entry_conditional")) == 1
+    # A different action of the same issuer is a new opportunity.
+    assert run(box.engine.enter(signal(id="x", action_id="issuer1:2027-02-01:5"),
+                                box.broker.snap, NOW)) is None
+    assert len(events(box.journal, "shadow_entry_conditional")) == 2
 
 
 def test_armed_executor_refuses_unknown_ssr_exactly_as_before(box):
@@ -231,6 +254,18 @@ def test_report_without_conditional_entries_is_unchanged(tmp_path):
     assert r["checks"]["downstream_gates_exercised"] is True and r["conditional_note"] is None
     r = shadow_report(build(tmp_path / "e.sqlite", entry=False), min_sessions=2)
     assert r["checks"]["downstream_gates_exercised"] is False
+
+
+def test_report_counts_one_per_issuer_action_and_counts_issuers(tmp_path):
+    path = build(tmp_path / "s.sqlite", entry=False)
+    a = {**COND, "cik": "1", "action_id": "1:2026-11-25"}
+    _add(path, "shadow_entry_conditional", a)
+    _add(path, "shadow_entry_conditional", {**a, "id": "dup"})  # same action, other record
+    _add(path, "shadow_entry_conditional", {**a, "id": "c2", "action_id": "1:2027-02-01"})
+    _add(path, "shadow_entry_conditional", {**a, "id": "c3", "cik": "2", "action_id": "2:x"})
+    r = shadow_report(path, min_sessions=2)
+    assert r["conditional_would_be_entries"] == 3 and r["conditional_issuers"] == 2
+    assert r["ready_for_arm_review"] is False
 
 
 def test_a_proposal_with_a_full_entry_is_not_also_counted_conditional(tmp_path):
