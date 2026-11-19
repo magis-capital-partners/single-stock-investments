@@ -181,13 +181,74 @@ installed by anything.
 |---|---|
 | User | `rs-live` |
 | Repo and venv | `/srv/rs-live/repo`, `/srv/rs-live/venv` |
-| Config and arm | `/etc/rs-live/` |
-| State | `/var/lib/rs-live/` (journal, evidence, operations copy, `book/`) |
+| Config and arm | `/etc/rs-live/` (`config.json`; `ARM.json` only for the pilot) |
+| Feed credentials | `/etc/rs-live/executor.env`, `root:root 0600`: `RS_OPERATIONS_URL` (Box R's private R2 object, `https://api.cloudflare.com/client/v4/accounts/<account>/r2/buckets/single-stock-reverse-splits-evidence/objects/collector-dashboard/operations.json`) and `RS_OPERATIONS_READ_TOKEN` (read-only). The unit requires this file |
+| State | `/var/lib/rs-live/` (journal, `evidence.json`, `book/`) |
 | Claims | `/var/lib/ib-account-claims/`: owner `rs-live`, group `ib-claims`, mode `2750` (setgid, so new files inherit the group); `spx` is a member of `ib-claims`. RS writes `reverse-split.json` at startup even with no claims and never deletes released entries |
-| SPX claim files | read from `/home/spx/spx-0dte/data/live/<date>/`, read-only; RS never writes there |
+| SPX claim files | read from `/home/spx/spx-0dte/data/live/<date>/`, read-only, through an ACL (below); RS never writes there |
 
 The unit sets `CPUWeight=20` and `OOMScoreAdjust=700`; `RuntimeMaxSec` ends the
 session run.
+
+### Shadow install (owner's word; a weekday evening after 16:20 ET)
+
+Not between Sunday 23:05 and Monday 07:10 ET, when the Gateway is closed. Nothing
+here touches SPX's services, and no SPX unit is restarted. The order matters:
+
+1. **Group first.** `groupadd ib-claims; usermod -aG ib-claims spx`. ls-algo runs
+   as `spx`. Once ls-algo's claims guard (#70) is deployed, a claims file it cannot
+   read is a global failure for ls-algo, not "no claims". Its jobs are one-shot, so
+   each picks up the group at its next start.
+2. **User and directories.**
+   * `useradd --system --home /srv/rs-live rs-live; usermod -aG ib-claims rs-live`;
+   * `install -d -o rs-live -g ib-claims -m 2750 /var/lib/ib-account-claims`;
+   * `install -d -o rs-live -g rs-live -m 0750 /var/lib/rs-live`;
+   * `install -d -o root -g rs-live -m 0750 /etc/rs-live`. The service can read its
+     config but cannot write `ARM.json` itself; only root (the owner) arms.
+3. **Read grant on SPX's claim files**, the one folder and nothing else in `spx`'s
+   home. Use traverse-only on the parents, and a default ACL so the day
+   directories SPX creates later inherit it:
+
+   ```text
+   setfacl -m u:rs-live:--x /home/spx /home/spx/spx-0dte /home/spx/spx-0dte/data
+   setfacl -R -m u:rs-live:r-X /home/spx/spx-0dte/data/live
+   setfacl -R -d -m u:rs-live:r-X /home/spx/spx-0dte/data/live
+   ```
+
+   spx-0dte writes these files with its default mode (`heartbeat._atomic_write_text`,
+   not `mkstemp`'s 0600), so the default ACL reaches each new file. Without this
+   grant every entry is refused as `SPX book margin directory unreadable`.
+4. **Code and venv.** Check out the reviewed SSI commit at `/srv/rs-live/repo` (only
+   `_system/trading` is needed). Install the package's pinned requirements into
+   `/srv/rs-live/venv`.
+5. **Files.**
+   * `config.json`, with the owner's values;
+   * `executor.env` (above);
+   * `/var/lib/rs-live/evidence.json`, copied from `evidence.example.json`
+     (empty: every proposal is refused until the evidence producers exist);
+   * `/etc/rs-live-approved`;
+   * the unit and timer, copied to `/etc/systemd/system/` but **not enabled**.
+   * No `ARM.json`.
+6. **Checks, as `rs-live`, the same evening** (from `/srv/rs-live/repo`).
+   `operations-check` goes through `systemd-run`, so the token reaches it from
+   `executor.env` without passing through a shell or a command line:
+
+   ```text
+   sudo -u rs-live /srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor preflight --config /etc/rs-live/config.json
+   sudo systemd-run --wait --pipe -p User=rs-live -p WorkingDirectory=/srv/rs-live/repo -p EnvironmentFile=/etc/rs-live/executor.env /srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor operations-check --config /etc/rs-live/config.json --operations-url '${RS_OPERATIONS_URL}'
+   sudo -u rs-live /srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor probe --config /etc/rs-live/config.json --connect-live --symbol <REVIEWED_TICKER> --conid <REVIEWED_CONID> --report /var/lib/rs-live/probe.json
+   ```
+
+   * `preflight` now also checks the live paths: the SPX tree and its newest day
+     must be readable, and the claims and publish directories writable. It
+     exits 2 and names every failure. It opens no connection.
+   * `operations-check` makes one read of Box R's feed and exits 0 only if it
+     is under 120 s old.
+   * `probe` is the first and only connection of the evening: one session, no
+     journal, a 1-share WhatIf, nothing transmitted. Its quote checks need
+     regular hours, so the first shadow session settles them.
+7. **Enable the timer** (`systemctl enable --now rs-live-executor.timer`). The first
+   session starts at 09:05 ET the next weekday. Run `shadow-report` after each close.
 
 ### Live operator commands (on NY4, as `rs-live`)
 
@@ -224,15 +285,21 @@ to start, and its evidence is reviewed before the next.
 | **L: live pilot** | NY4, owner arm file | Real fills, cancels, recalls and fees at the smallest size | The owner sets pilot caps (e.g. `max_names: 1`, a small `target_notional`) and widens them only after reviewing the pilot's fills and the account reconciliation |
 
 ```text
-python -m _system.trading.rs_paper_executor shadow-report --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite --min-sessions 5 --report shadow.json
+python -m _system.trading.rs_paper_executor shadow-report --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite --min-sessions 5 --min-entries 1 --report shadow.json
 ```
 
 `shadow-report` is read-only. It holds no writer lock and opens no broker
 connection. It prints acceptance facts:
 * no transmitted orders;
 * the number of sessions observed;
+* the number of would-be entries (`--min-entries`, default 1);
 * the worst heartbeat gap;
 * whether the kill and daily-loss latches are set.
+
+A would-be entry is recorded only after every live gate has passed: live quote
+and size, WhatIf on the real account, the SPX reserve and cushion, and
+book-margin room. With none, the live entry path has never run, so uptime alone
+does not make the report ready.
 
 It exits 0 only when all of them hold. The decision to arm stays with the owner.
 Note that shadow sees no would-be entries until the evidence producers exist

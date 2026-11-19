@@ -15,6 +15,10 @@ is true only when every check below holds:
 
 * no order was transmitted (a shadow journal must hold none);
 * at least ``min_sessions`` sessions were observed;
+* at least ``min_entries`` would-be entries were recorded. A shadow_entry is
+  written only after every live gate passed (live quote and size, WhatIf on the
+  real account, SPX reserve and cushion, book-margin room), so without one the
+  live entry path has never run and uptime alone proves little;
 * no session's largest heartbeat gap exceeds ``max_gap_seconds``;
 * the kill latch and daily-loss latch are clear.
 """
@@ -34,8 +38,8 @@ def _ro(path):
     return sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
 
 
-def shadow_report(state_path, *, calendar=None, min_sessions=5, max_gap_seconds=120,
-                  since=None, until=None):
+def shadow_report(state_path, *, calendar=None, min_sessions=5, min_entries=1,
+                  max_gap_seconds=120, since=None, until=None):
     calendar = calendar or Calendar()
     db = _ro(state_path)
     db.row_factory = sqlite3.Row
@@ -71,24 +75,27 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, max_gap_seconds=
             "orders_submitted": sum(1 for k, _ in payload if k == "paper_order_submitted"),
         })
     worst_gap = max((s["max_heartbeat_gap_seconds"] for s in sessions), default=None)
+    entries = sum(len(s["shadow_entries"]) for s in sessions)
     checks = {
         "no_orders_transmitted": not orders and not any(s["orders_submitted"] for s in sessions),
         "sessions_observed": len(sessions),
         "enough_sessions": len(sessions) >= min_sessions,
+        "enough_would_be_entries": entries >= min_entries,
         "worst_heartbeat_gap_seconds": worst_gap,
         "uptime_ok": worst_gap is not None and worst_gap <= max_gap_seconds,
         "kill_latch_clear": not meta.get("kill"),
         "daily_loss_latch_clear": not meta.get("daily_loss_day"),
         "current_entry_halt": meta.get("entry_halt"),
     }
-    ready = all(checks[k] for k in ("no_orders_transmitted", "enough_sessions", "uptime_ok",
+    ready = all(checks[k] for k in ("no_orders_transmitted", "enough_sessions",
+                                    "enough_would_be_entries", "uptime_ok",
                                     "kill_latch_clear", "daily_loss_latch_clear"))
     return {
         "schema": "rs_shadow_report.v1",
         "journal_prefix": meta.get("order_prefix"),
         "policy_hash": meta.get("policy_hash"),
         "endpoint": meta.get("endpoint"),
-        "would_be_entries": sum(len(s["shadow_entries"]) for s in sessions),
+        "would_be_entries": entries,
         "refusals_total": dict(sum((Counter(s["refusals"]) for s in sessions), Counter())
                                .most_common()),
         "checks": checks,

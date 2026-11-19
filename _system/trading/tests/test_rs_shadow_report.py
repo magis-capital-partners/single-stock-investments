@@ -10,7 +10,7 @@ from _system.trading.rs_paper_executor.shadow_report import shadow_report
 SESSIONS = (("2026-11-17", 14), ("2026-11-18", 14))  # 09:30-16:00 ET = 14:30-21:00Z
 
 
-def build(path, *, gap_at=None, order=False, kill=False):
+def build(path, *, gap_at=None, order=False, kill=False, entry=True):
     j = Journal(path, "p", "RSLIVE|")
     for day, _ in SESSIONS:
         t = datetime.fromisoformat(day + "T14:30:00+00:00")
@@ -21,9 +21,11 @@ def build(path, *, gap_at=None, order=False, kill=False):
             t += timedelta(seconds=30)
         j.event(day + "T15:00:00+00:00", "proposal_blocked",
                 {"id": "x", "reason": "fresh eligibility source required"})
-    j.event("2026-11-18T15:05:00+00:00", "shadow_entry",
-            {"id": "s1", "ticker": "ABC", "shares": 500, "limit": 2.0, "reason": "arm file absent",
-             "initial_margin": 1000, "maintenance_margin": 900})
+    if entry:
+        j.event("2026-11-18T15:05:00+00:00", "shadow_entry",
+                {"id": "s1", "ticker": "ABC", "shares": 500, "limit": 2.0,
+                 "reason": "arm file absent", "initial_margin": 1000,
+                 "maintenance_margin": 900})
     if order:
         with j.db:
             j.db.execute("INSERT INTO orders(ref,side,shares,state) VALUES('RSLIVE|x','SELL',1,'filled')")
@@ -54,6 +56,16 @@ def test_outage_order_or_latch_blocks_review(tmp_path):
     assert not r["ready_for_arm_review"] and not r["checks"]["kill_latch_clear"]
     r = shadow_report(build(tmp_path / "d.sqlite"), min_sessions=5)
     assert not r["checks"]["enough_sessions"]
+
+
+def test_uptime_without_a_would_be_entry_is_not_ready(tmp_path):
+    # Every proposal refused (no evidence producers): the live entry path never ran.
+    r = shadow_report(build(tmp_path / "e.sqlite", entry=False), min_sessions=2)
+    assert r["checks"]["uptime_ok"] and r["checks"]["enough_sessions"]
+    assert r["would_be_entries"] == 0
+    assert not r["checks"]["enough_would_be_entries"] and not r["ready_for_arm_review"]
+    assert shadow_report(tmp_path / "e.sqlite", min_sessions=2,
+                         min_entries=0)["ready_for_arm_review"] is True
 
 
 def test_cli_shadow_report_exit_codes(tmp_path, capsys):

@@ -17,7 +17,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from .arm import arm_state
-from .book import BookMargin
+from .book import PREFIX as BOOK_PREFIX, BookMargin
 from .claims import ClaimBook
 from .engine import Executor
 from .ibkr import PaperIBKR
@@ -26,7 +26,7 @@ from .journal import Journal
 from .notify import deliver_alerts
 from .policy import Policy
 from .probe import probe, require_local_ib_listener
-from .safety import RS_SYSTEM, SafetyError, endpoint_from_config
+from .safety import LIVE_APPROVAL, RS_SYSTEM, SafetyError, endpoint_from_config, fresh
 
 # Owner decisions a live config must state explicitly (never template defaults).
 LIVE_REQUIRED_POLICY = (
@@ -53,6 +53,72 @@ def check_live_config(config, endpoint):
         raise SafetyError("live requires pre_action_exit: true")
 
 
+def _readable_tree(root):
+    """The SPX claim tree must be listable, and so must its newest day with
+    every claim file in it: that proves the install's read grant reaches the
+    directories SPX creates each day, not only the ones present at install."""
+    root = Path(root)
+    names = sorted(x.name for x in root.iterdir() if x.is_dir())
+    days = [n for n in names if len(n) == 10 and n[4] == n[7] == "-"]
+    if not days:
+        return "readable (no day directory yet)"
+    newest = root / days[-1]
+    files = sorted(newest.glob(BOOK_PREFIX + "*.json"))
+    for path in files:
+        with path.open("rb") as fh:
+            fh.read(1)
+    return "readable (" + days[-1] + ": " + str(len(files)) + " claim files)"
+
+
+def _writable_dir(path):
+    path = Path(path)
+    probe = path
+    while not probe.exists():
+        if probe.parent == probe:
+            raise PermissionError("no existing parent")
+        probe = probe.parent
+    if not probe.is_dir() or not os.access(probe, os.W_OK | os.X_OK):
+        raise PermissionError("not writable: " + str(probe))
+    return "writable" if probe == path else "creatable under " + str(probe)
+
+
+def check_live_paths(config):
+    """Filesystem preconditions of a live run, without writing anything.
+
+    Raised as one SafetyError naming every failure, so the install evening's
+    preflight shows them all at once (run as the service user)."""
+    live = config.get("live") or {}
+    checks, failed = {}, []
+    tests = (
+        ("book_margin_root", lambda: _readable_tree(live["book_margin_root"])),
+        ("claims_dir", lambda: _writable_dir(live["claims_dir"])),
+        ("book_publish_root", lambda: _writable_dir(live["book_publish_root"])),
+    )
+    for name, test in tests:
+        try:
+            checks[name] = test()
+        except OSError as exc:
+            checks[name] = "FAILED: " + type(exc).__name__ + ": " + str(exc)
+            failed.append(name)
+    arm = Path(live["arm_file"])
+    checks["arm_file"] = "present (armed if valid)" if arm.exists() else "absent (shadow)"
+    checks["approval_file"] = "present" if LIVE_APPROVAL.exists() else "absent"
+    if failed:
+        raise SafetyError("live paths not usable by this user: " + ", ".join(
+            name + " " + checks[name] for name in failed))
+    return checks
+
+
+def operations_source(args):
+    """One read of Box R's operations snapshot (file or private R2 URL)."""
+    if args.operations_file:
+        return read_json(args.operations_file)
+    token = os.environ.get("RS_OPERATIONS_READ_TOKEN")
+    if not token:
+        raise SafetyError("RS_OPERATIONS_READ_TOKEN is not set for --operations-url")
+    return read_https(args.operations_url, token)
+
+
 def account_guards(config, endpoint, policy):
     live = config.get("live") or {}
     if not live.get("claims_dir"):
@@ -73,6 +139,9 @@ async def run(args, endpoint, policy, config):
         raise SafetyError("--connect-paper is required; no connection was opened")
     if not args.evidence or not (args.operations_file or args.operations_url):
         raise SafetyError("evidence and Box R operations source required")
+    if args.operations_url and not os.environ.get("RS_OPERATIONS_READ_TOKEN"):
+        # Otherwise every cycle would log inbox_unavailable for a whole session.
+        raise SafetyError("RS_OPERATIONS_READ_TOKEN is not set for --operations-url")
     with_context = lambda: read_json(args.evidence)
     claims, book = account_guards(config, endpoint, policy)
     if claims is not None:
@@ -130,13 +199,7 @@ async def run(args, endpoint, policy, config):
                 journal.set("kill", True)
                 await executor.tick([], broker.now())
             try:
-                data = (
-                    read_json(args.operations_file)
-                    if args.operations_file
-                    else read_https(
-                        args.operations_url, os.environ["RS_OPERATIONS_READ_TOKEN"]
-                    )
-                )
+                data = operations_source(args)
                 await executor.tick(
                     proposals(data, with_context(), broker.now()), broker.now()
                 )
@@ -169,7 +232,8 @@ async def run(args, endpoint, policy, config):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["preflight", "run", "status", "probe", "integration-test", "shadow-report"])
+    parser.add_argument("command", choices=["preflight", "run", "status", "probe", "integration-test",
+                                            "shadow-report", "operations-check"])
     parser.add_argument("--config", required=True)
     parser.add_argument(
         "--state",
@@ -202,6 +266,10 @@ def main(argv=None):
         "--reference-price", type=float, help="mechanics: price if no delayed quote arrives"
     )
     parser.add_argument("--min-sessions", type=int, default=5, help="shadow-report")
+    parser.add_argument(
+        "--min-entries", type=int, default=1,
+        help="shadow-report: would-be entries needed (the live entry path must have run)",
+    )
     parser.add_argument("--max-gap-seconds", type=int, default=120, help="shadow-report")
     parser.add_argument("--since", help="shadow-report: UTC ISO start")
     parser.add_argument("--until", help="shadow-report: UTC ISO end")
@@ -217,18 +285,38 @@ def main(argv=None):
         check_live_config(config, endpoint)
         policy = Policy(**config["policy"]).validate()
         if args.command == "preflight":
-            print(
-                json.dumps(
-                    {
-                        "paper_only": not endpoint.live,
-                        "live_orders_allowed": False,
-                        "mode": endpoint.mode,
-                        "connection_opened": False,
-                        "policy_hash": policy.digest,
-                        "policy": asdict(policy),
-                    }
-                )
-            )
+            report = {
+                "paper_only": not endpoint.live,
+                "live_orders_allowed": False,
+                "mode": endpoint.mode,
+                "connection_opened": False,
+                "policy_hash": policy.digest,
+                "policy": asdict(policy),
+            }
+            if endpoint.live:
+                report["paths"] = check_live_paths(config)
+            print(json.dumps(report))
+        elif args.command == "operations-check":
+            # One read of the proposal feed; no broker connection, no journal.
+            if not (args.operations_file or args.operations_url):
+                raise SafetyError("--operations-file or --operations-url required")
+            try:
+                data = operations_source(args)
+            except OSError as exc:  # network or file error: report, never a traceback
+                raise SafetyError("operations read failed: " + type(exc).__name__ + ": " + str(exc))
+            now = datetime.now(ZoneInfo("UTC")).isoformat()
+            try:
+                fresh(data.get("generated_at"), now, 120)
+                ok = True
+            except SafetyError:
+                ok = False
+            print(json.dumps({
+                "generated_at": data.get("generated_at"), "checked_at": now,
+                "fresh_within_120s": ok,
+                "candidates": len(data.get("candidates") or []),
+                "broker_connection_opened": False,
+            }))
+            return 0 if ok else 3
         elif args.command == "status":
             # A read-only status process does not compete for the writer lock.
             import sqlite3
@@ -271,7 +359,7 @@ def main(argv=None):
             from .shadow_report import shadow_report
 
             report = shadow_report(
-                args.state, min_sessions=args.min_sessions,
+                args.state, min_sessions=args.min_sessions, min_entries=args.min_entries,
                 max_gap_seconds=args.max_gap_seconds, since=args.since, until=args.until,
             )
             text = json.dumps(report, indent=1, sort_keys=True)

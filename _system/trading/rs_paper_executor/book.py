@@ -78,7 +78,16 @@ class BookMargin:
         today = et_day(now)
         directory = self.read_root / today
         found, nav = {}, None
-        paths = sorted(directory.glob(PREFIX + "*.json")) if directory.is_dir() else []
+        try:
+            paths = sorted(directory.glob(PREFIX + "*.json")) if directory.is_dir() else []
+        except OSError as exc:
+            # spx-0dte's tree lives in the spx user's home; without the install's
+            # read grant this is EACCES, not "no file". Name it as what it is.
+            if for_entry:
+                raise SafetyError(
+                    "SPX book margin directory unreadable: " + type(exc).__name__)
+            last = {k[1]: v for k, v in self._last_good.items() if k[0] == today}
+            return {k: v[0] for k, v in last.items()}, last.get(SPX_PRODUCT, (0, None))[1]
         for path in paths:
             product = path.stem[len(PREFIX):]
             if product == OWN_PRODUCT:

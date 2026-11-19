@@ -16,8 +16,13 @@ Group=rs-live
 SupplementaryGroups=ib-claims
 WorkingDirectory=/srv/rs-live/repo
 Environment=TZ=America/New_York
-EnvironmentFile=-/etc/rs-live/executor.env
-ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor run --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite --evidence /var/lib/rs-live/evidence.json --operations-file /var/lib/rs-live/operations.json --kill-file /var/lib/rs-live/FLATTEN --connect-live
+# Required (no leading "-"): RS_OPERATIONS_URL (Box R's private R2 object, the
+# api.cloudflare.com form inbox.read_https accepts) and RS_OPERATIONS_READ_TOKEN
+# (read-only). root:root 0600; systemd reads it, the service user never can.
+# Box R republishes operations.json about every 60 s while active; the executor
+# refuses a snapshot older than 120 s, so a local copy nothing refreshes is useless.
+EnvironmentFile=/etc/rs-live/executor.env
+ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor run --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite --evidence /var/lib/rs-live/evidence.json --operations-url ${RS_OPERATIONS_URL} --kill-file /var/lib/rs-live/FLATTEN --connect-live
 # No restart: a crash must not become a connect loop (AGENTS.md rule 9). The
 # executor's own 3-per-day connect budget covers transient disconnects.
 Restart=no

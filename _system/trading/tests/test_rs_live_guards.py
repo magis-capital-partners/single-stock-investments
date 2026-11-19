@@ -293,7 +293,21 @@ def test_flat_name_released_only_after_next_close(live):
 
 # ---- CLI live config -----------------------------------------------------
 
-def live_config(**policy):
+FEED_URL = ("https://api.cloudflare.com/client/v4/accounts/x/r2/buckets/"
+            "single-stock-reverse-splits-evidence/objects/collector-dashboard/operations.json")
+
+
+def live_config(tmp=None, **policy):
+    config = _live_config(**policy)
+    if tmp is not None:  # real directories, so preflight's path checks can pass
+        for key in ("claims_dir", "book_margin_root", "book_publish_root", "arm_file"):
+            config["live"][key] = str(tmp / key)
+        (tmp / "claims_dir").mkdir(exist_ok=True)
+        (tmp / "book_margin_root").mkdir(exist_ok=True)
+    return config
+
+
+def _live_config(**policy):
     return {"endpoint": {"account": ACCOUNT, "client_id": 60, "port": 7496,
                          "host": "127.0.0.1", "mode": "live",
                          "deployment_role": "ny4_reverse_split_live"},
@@ -311,7 +325,7 @@ def live_config(**policy):
 
 def test_cli_live_preflight_states_every_owner_decision(tmp_path, capsys):
     path = tmp_path / "c.json"
-    path.write_text(json.dumps(live_config()))
+    path.write_text(json.dumps(live_config(tmp_path)))
     assert cli.main(["preflight", "--config", str(path)]) == 0
     out = json.loads(capsys.readouterr().out)
     assert out["mode"] == "live" and out["connection_opened"] is False
@@ -336,6 +350,88 @@ def test_cli_live_run_needs_its_own_flag(tmp_path, capsys):
     assert cli.main(["run", "--config", str(path), "--connect-paper", "--evidence",
                      "e", "--operations-file", "o", "--state", str(tmp_path / "s")]) == 2
     assert "--connect-live is required" in capsys.readouterr().out
+
+
+def test_unreadable_spx_tree_is_named_not_treated_as_absent(live, monkeypatch):
+    book = live.engine.book
+    found, nav = book.others(NOW, for_entry=False)  # one good read
+    assert nav == 5_000_000
+    day = live.spx_root / "2026-11-18"
+    real = type(day).is_dir
+
+    def denied(self):  # the spx home without the install's read grant
+        if self == day:
+            raise PermissionError(13, "Permission denied")
+        return real(self)
+
+    monkeypatch.setattr(type(day), "is_dir", denied)
+    with pytest.raises(SafetyError, match="directory unreadable: PermissionError"):
+        run(live.engine.enter(signal(), live.broker.snap, NOW))
+    assert live.broker.sent == []
+    # The yield check keeps the last good figures instead of crashing the tick.
+    assert book.others(NOW, for_entry=False) == (found, nav)
+
+
+def test_preflight_checks_live_paths_without_writing(tmp_path, capsys):
+    path = tmp_path / "c.json"
+    config = live_config(tmp_path)
+    path.write_text(json.dumps(config))
+    spx_file(tmp_path / "book_margin_root", 0)
+    assert cli.main(["preflight", "--config", str(path)]) == 0
+    paths = json.loads(capsys.readouterr().out)["paths"]
+    assert paths["book_margin_root"] == "readable (2026-11-18: 1 claim files)"
+    assert paths["claims_dir"] == "writable"
+    assert paths["book_publish_root"].startswith("creatable under")
+    assert paths["arm_file"] == "absent (shadow)"
+    assert not (tmp_path / "book_publish_root").exists()
+    # The NEWEST day must be readable too (the default ACL reaching new days).
+    (tmp_path / "book_margin_root" / "2026-11-19" / "book_margin_spx.json").mkdir(parents=True)
+    assert cli.main(["preflight", "--config", str(path)]) == 2
+    assert "book_margin_root FAILED" in json.loads(capsys.readouterr().out)["reason"]
+    config["live"]["book_margin_root"] = str(tmp_path / "missing")
+    path.write_text(json.dumps(config))
+    assert cli.main(["preflight", "--config", str(path)]) == 2
+    assert "book_margin_root FAILED" in capsys.readouterr().out
+
+
+def test_operations_check_reports_feed_age_without_a_connection(tmp_path, capsys, monkeypatch):
+    from datetime import datetime, timedelta, timezone
+
+    path = tmp_path / "c.json"
+    path.write_text(json.dumps(live_config(tmp_path)))
+    ops = tmp_path / "ops.json"
+    now = datetime.now(timezone.utc)
+    ops.write_text(json.dumps({"generated_at": now.isoformat(), "candidates": [{}, {}]}))
+    argv = ["operations-check", "--config", str(path), "--operations-file", str(ops)]
+    assert cli.main(argv) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["fresh_within_120s"] is True and out["candidates"] == 2
+    assert out["broker_connection_opened"] is False
+    ops.write_text(json.dumps({"generated_at": (now - timedelta(seconds=300)).isoformat()}))
+    assert cli.main(argv) == 3
+    assert json.loads(capsys.readouterr().out)["fresh_within_120s"] is False
+    monkeypatch.delenv("RS_OPERATIONS_READ_TOKEN", raising=False)
+    assert cli.main(["operations-check", "--config", str(path), "--operations-url", FEED_URL]) == 2
+    assert "RS_OPERATIONS_READ_TOKEN is not set" in capsys.readouterr().out
+
+
+def test_live_run_refuses_feed_url_without_token(tmp_path, capsys, monkeypatch):
+    monkeypatch.delenv("RS_OPERATIONS_READ_TOKEN", raising=False)
+    path = tmp_path / "c.json"
+    path.write_text(json.dumps(live_config(tmp_path)))
+    state = tmp_path / "s.sqlite"
+    assert cli.main(["run", "--config", str(path), "--connect-live", "--evidence", "e",
+                     "--operations-url", FEED_URL, "--state", str(state)]) == 2
+    assert "RS_OPERATIONS_READ_TOKEN is not set" in capsys.readouterr().out
+    assert not state.exists()
+
+
+def test_shipped_unit_reads_the_feed_url_from_a_required_env_file():
+    from pathlib import Path
+    unit = Path(cli.__file__).with_name("rs-live-executor.service").read_text()
+    assert "EnvironmentFile=/etc/rs-live/executor.env" in unit
+    assert "--operations-url ${RS_OPERATIONS_URL}" in unit
+    assert "--operations-file" not in unit
 
 
 def test_shipped_live_template_cannot_pass_preflight(capsys):
