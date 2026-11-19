@@ -5,7 +5,7 @@ SHA-256(token value). No token is created, saved, logged or granted access.
 https://developers.cloudflare.com/r2/api/tokens/#get-s3-api-credentials-from-an-api-token
 """
 from __future__ import annotations
-import hashlib,hmac,json,os,re,threading,time,urllib.error,urllib.parse,urllib.request
+import hashlib,hmac,http.client,json,os,re,ssl,threading,time,urllib.error,urllib.parse,urllib.request
 from datetime import datetime,timezone
 from private_storage import HTTP,NoRedirect,StorageError,StorageHTTPError
 
@@ -81,6 +81,16 @@ class S3HTTP:
                 if delay>300:raise StorageError('Private storage requested a longer hold; verified progress remains') from None
                 while delay:
                     pause=min(delay,60);time.sleep(pause);delay-=pause
+                continue
+            except (urllib.error.URLError,TimeoutError,ConnectionError,ssl.SSLError,http.client.IncompleteRead) as error:
+                reason=error.reason if isinstance(error,urllib.error.URLError) else error
+                if isinstance(reason,ssl.SSLCertVerificationError):
+                    raise StorageError(f'Private S3 storage {method} failed certificate verification') from None
+                if attempt==3:
+                    raise StorageError(f'Private S3 storage {method} exhausted its connection retries') from None
+                # GET and the exact-body immutable PUT are safe to replay. A
+                # failed read never returns partial bytes or changes transport.
+                time.sleep(2**(attempt+1))
                 continue
             if len(raw)>limit:raise StorageError('Private storage response exceeds its exact bounded size')
             return raw
