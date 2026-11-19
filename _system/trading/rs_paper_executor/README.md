@@ -237,7 +237,7 @@ to start, and its evidence is reviewed before the next.
 | Stage | Where | Proves | Evidence |
 |---|---|---|---|
 | **P: paper mechanics** | Laptop paper, supervised, delayed data | Order mechanics only, on IBKR's simulated market (see the mechanics test above) | `integration-test --mechanics-only` report, `pass: true` |
-| **S: live shadow** | NY4, client 60, the dedicated shadow journal (`run --shadow`; never transmits an entry) | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report`: ≥ 5 complete sessions, ≥ 3 deduplicated opportunities from 3 issuers over ≥ 2 sessions, verified stage-P mechanics (rules below) |
+| **S: live shadow** | NY4, client 60, the dedicated shadow journal (`run --shadow`; never transmits an entry) | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report`: ≥ 5 complete sessions, ≥ 3 deduplicated opportunities from 3 issuers over ≥ 2 sessions, verified stage-P mechanics (rules below). Option B's conditional entries are reported separately and never count (below) |
 | **L: live pilot** | NY4, owner arm file | Real fills, cancels, recalls and fees at the smallest size | The owner sets pilot caps (e.g. `max_names: 1`, a small `target_notional`) and widens them only after reviewing the pilot's fills and the account reconciliation |
 
 ```text
@@ -292,6 +292,41 @@ It exits 0 only when every check holds; the decision to arm stays with the
 owner. Shadow sees no would-be entry until the evidence producers exist, and
 the refusal histogram shows which input is missing.
 
+**Conditional would-be entries (owner 2026-11-19, option B).** No source available
+today can say "SSR clear" intraday, so every strict eligibility check fails.
+In **shadow only** (the `run --shadow` journal, or no valid arm file), an entry whose halt/SSR state is
+*unknown* runs the later gates anyway:
+* live quote and size, borrow, WhatIf on the real account;
+* the SPX reserve and cushion, and book-margin room.
+
+If all of them pass, it is recorded once per issuer/action as
+`shadow_entry_conditional` with `fully_gated: false`. The record carries the
+unknown inputs (`eligibility_unknown`), `cik`, `action_id` and the borrow
+*indication* used. It is recorded once, whichever publisher record carries
+the action, so later cycles do not repeat quote, borrow or WhatIf requests on
+the shared Gateway. The borrow is a public indication capped by tick 89. It
+is not an allocation, and the passing WhatIf does not prove a borrow.
+
+Some inputs refuse exactly as before:
+* a **known** halt (evidence or IB tick 49) or SSR restriction;
+* a stale eligibility row, meaning the producers stopped;
+* a contract mismatch.
+
+An armed executor refuses every unknown-SSR entry exactly as before. If an
+arm file appears mid-evaluation, the entry is refused, not sent.
+
+`shadow-report` lists them in a separate `conditional` block, with
+`counts_toward_readiness: false`:
+* the would-be entries, issuers and sessions, deduplicated and excluded by the
+  same rules as opportunities;
+* the unknown inputs;
+* `downstream_gates_exercised`, a non-gating fact.
+
+Opportunities are counted only from fully gated `shadow_entry` events, so
+conditional entries never count toward `ready_for_arm_review`. The owner's
+3-opportunity rule therefore cannot pass until an eligibility source can say
+"clear" (a paid feed; see `_system/trading/rs_evidence/README.md`).
+
 ### Account reconciliation (after the Flex day closes)
 
 ```text
@@ -307,6 +342,10 @@ from reviewed primary/reference data and an authorized fresh eligibility produce
 Never set `source_verified=true` merely because a producer is alive or a ticker is
 absent from a daily SSR list. Missing fields block paper entries; examples are not
 production evidence.
+
+The producers for all three sections live in `_system/trading/rs_evidence/`
+(see its README). They are not installed anywhere. Until the owner picks an
+intraday SSR source, they write every eligibility row as incomplete.
 
 * `identities[TICKER]`: `cik`, numeric `conid`, `type: "CS"`, `currency: "USD"`,
   `verified: true`, UTC `at`/`valid_until`, `source_url`/`source_sha256`, canonical

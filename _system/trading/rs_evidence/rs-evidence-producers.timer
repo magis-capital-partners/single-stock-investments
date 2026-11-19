@@ -1,0 +1,11 @@
+# TEMPLATE ONLY (see rs-evidence-producers.service). Starts before the
+# executor (09:05) so identity references and the IBKR file are loaded first.
+[Unit]
+Description=Start the reverse-split evidence producers for the session
+
+[Timer]
+OnCalendar=Mon..Fri 09:00:00 America/New_York
+Persistent=false
+
+[Install]
+WantedBy=timers.target

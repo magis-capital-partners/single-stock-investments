@@ -287,6 +287,37 @@ class Executor:
         ):
             raise SafetyError("halt/SSR unknown or restricted")
 
+    @staticmethod
+    def _conditional_key(signal):
+        return "shadow_conditional:%s:%s" % (
+            signal["cik"], signal.get("action_id") or signal["id"])
+
+    def shadow_eligibility(self, proof, now, conid):
+        """SHADOW ONLY (owner 2026-11-19, option B). No source available today
+        can say "SSR clear" intraday, so every strict eligibility check fails and
+        shadow would never reach the later gates. This returns the halt/SSR
+        inputs that are unknown, so the later gates can still run and be
+        recorded as a conditional would-be entry.
+
+        It never makes an input clear. A known halt or SSR restriction, a stale
+        proof (the producers stopped writing) or a contract mismatch still
+        refuses. `enter` never submits an order on its result."""
+        if proof.get("conid") != conid:
+            raise SafetyError("eligibility contract mismatch")
+        fresh(proof.get("at"), now, self.policy.evidence_age_seconds)
+        for field in ("halted", "ssr"):
+            if proof.get(field) not in (None, False):
+                raise SafetyError("halt/SSR unknown or restricted")
+        unknown = [f for f in ("halted", "ssr") if proof.get(f) is not False]
+        if "halted" not in unknown and proof.get("halt_at") is not None:
+            # An incomplete row's `at` is the producer's write time, so a
+            # cleared halt is labelled by its own clock.
+            try:
+                fresh(proof["halt_at"], now, self.policy.evidence_age_seconds)
+            except SafetyError:
+                unknown.insert(0, "halted")
+        return unknown or ["source_unverified"]
+
     async def submit(self, signal, side, shares, price, now):
         count = sum(
             timestamp(json.loads(o["payload"])["at"])
@@ -533,7 +564,19 @@ class Executor:
         if floor is not None and self.cushion(snap) < floor:
             raise SafetyError("account cushion below the RS entry floor")
         proof = await self.broker.eligibility(signal["conid"])
-        self.eligibility(proof, now, signal["conid"])
+        unknown = []
+        try:
+            self.eligibility(proof, now, signal["conid"])
+        except SafetyError:
+            # Shadow only: an armed executor refuses exactly as before.
+            if self.transmit()[0]:
+                raise
+            unknown = self.shadow_eligibility(proof, now, signal["conid"])
+            if self.journal.get(self._conditional_key(signal)):
+                # Recorded once per issuer/action, whichever publisher record
+                # carries it. Re-running would repeat quote, borrow and WhatIf
+                # requests on the shared Gateway every cycle.
+                return None
         borrow = await self.broker.borrow(signal["conid"])
         if borrow.get("conid") != signal["conid"]:
             raise SafetyError("borrow contract mismatch")
@@ -659,11 +702,42 @@ class Executor:
         fresh(margin["at"], current, p.evidence_age_seconds)
         fresh(snap["at"], current, p.evidence_age_seconds)
         fresh(borrow["at"], current, p.borrow_age_seconds)
-        self.eligibility(proof, current, signal["conid"])
+        if unknown:
+            self.shadow_eligibility(proof, current, signal["conid"])
+        else:
+            self.eligibility(proof, current, signal["conid"])
         self.quote(quote, current, signal["conid"])
         if self.killed() or self.journal.get("entry_halt"):
             raise SafetyError("entry stopped during pretrade checks")
         armed, why = self.transmit()
+        if unknown:
+            if armed:  # an arm file appeared mid-evaluation
+                raise SafetyError("halt/SSR unknown; an armed executor never enters on it")
+            self.journal.set(self._conditional_key(signal), current)
+            self.alert(current, "shadow_entry_conditional", {
+                "id": signal["id"], "ticker": signal["ticker"], "shares": shares,
+                "limit": bid, "reason": why,
+                "initial_margin": initial, "maintenance_margin": maintenance,
+                "fully_gated": False,
+                "eligibility_unknown": unknown,
+                "eligibility_missing": proof.get("missing"),
+                # The same deduplication keys as shadow_entry (issuer/action).
+                "cik": signal["cik"], "action_id": signal.get("action_id"),
+                "conid": signal["conid"], "action_day": signal.get("action_day"),
+                "published_at": signal["published_at"],
+                "first_seen_at": signal["first_seen_at"],
+                "synthetic_control": bool(
+                    signal.get("synthetic_control")
+                    or str(signal.get("id", "")).startswith("synthetic-control:")),
+                # A public indication capped by the live shortable tick. Not
+                # an allocation, and the WhatIf above does not prove a borrow.
+                "borrow_indication": {
+                    "apr": apr, "available_shares": borrow.get("available_shares"),
+                    "at": borrow.get("at"),
+                    "locate_approved": borrow.get("locate_approved") is True,
+                },
+            })
+            return None
         if not armed:
             key = "shadow:" + signal["id"]
             if not self.journal.get(key):

@@ -198,3 +198,61 @@ Before any live arming, all of these are needed:
 * watchdog 140;
 * off-host monitoring;
 * the daily account reconciliation (`account_ownership.py`).
+
+## 7. Evidence producers (#1825; only once #1825 is merged)
+
+Without them, `/var/lib/rs-live/evidence.json` stays the empty example, and
+every candidate is refused at the evidence step. They are a separate owner
+word from stages 2 to 4.
+
+* **No credential.** They read Box R's snapshot from
+  `/var/lib/rs-live/feed/operations.json`, which `rs-live-operations` writes.
+* **No socket to the Gateway, no client ID, no ThetaData.**
+* **Egress from NY4**, which needs the owner's OK:
+  * `www.nasdaqtrader.com:443` and `www.sec.gov:443`;
+  * `ftp2.interactivebrokers.com:21`. This is anonymous FTP, so passive-mode
+    data ports must be allowed outbound too.
+
+They are part of the same release archive (`_system/trading`), and need no
+extra wheels.
+
+Install, the same evening as stage 2 or later, as root:
+
+```text
+install -d -o rs-live -g rs-live -m 0750 /var/lib/rs-live/evidence-archive
+install -o root -g rs-live -m 0640 /srv/rs-live/repo/_system/trading/rs_evidence/config.example.json /etc/rs-live/producers.json
+sudoedit /etc/rs-live/producers.json   # set user_agent (the owner's SEC contact) and terms_mode; nothing else
+install -m 0644 /srv/rs-live/repo/_system/trading/rs_evidence/rs-evidence-producers.service /srv/rs-live/repo/_system/trading/rs_evidence/rs-evidence-producers.timer /etc/systemd/system/
+systemctl daemon-reload                # do not enable
+```
+
+`/var/lib/rs-live/evidence.json` from stage 2 can stay. The producers rewrite
+it section by section, each under its own lock.
+
+Verify, before enabling anything. Here
+`P=/srv/rs-live/venv/bin/python -m _system.trading.rs_evidence`, run from
+`/srv/rs-live/repo`:
+
+```text
+sudo -u rs-live $P once --config /etc/rs-live/producers.json --only references,ibkr_file,identity,borrow
+sudo -u rs-live $P status --config /etc/rs-live/producers.json
+```
+
+* `once` fetches SymDir and SEC once, plus IBKR's file once. The halt, Rule
+  201 and eligibility tasks are skipped outside the session.
+* `status` prints the row counts, the ages and `entry_gaps`: the exact field
+  that blocks each name.
+* **Today's expected blockers:**
+  * `eligibility.intraday_ssr_clearance_source_absent`, which only an SSR
+    source clears;
+  * `identity.owner_review_required` until reviews exist.
+
+Enable is a separate owner word: `systemctl enable --now rs-evidence-producers.timer`.
+It starts at 09:00 ET, before the executor's 09:05, and ends by
+`RuntimeMaxSec`. The unit runs `Nice=15` and `CPUQuota=10%` (rule 8).
+
+Rollback:
+* `systemctl disable --now rs-evidence-producers.timer && systemctl stop rs-evidence-producers`.
+* The executor then sees the evidence age out and refuses every entry.
+* Archive `/var/lib/rs-live/evidence.json`, `evidence-archive/` and
+  `reviews.jsonl` before an uninstall. They are the evidence history.

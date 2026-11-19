@@ -34,6 +34,13 @@ is true only when every check holds:
 * no current entry halt, and the kill and daily-loss latches are clear;
 * the stage-P paper-mechanics report verifies against its own journal (see
   ``verify_mechanics``).
+
+``conditional`` is a separate, NON-gating fact (owner 2026-11-19, option B).
+``shadow_entry_conditional`` events passed every later gate while halt/SSR
+state was unknown. They get the same exclusions and dedup, but are never
+counted as opportunities and never affect ``ready_for_arm_review``.
+``downstream_gates_exercised`` says the quote, borrow, WhatIf, reserve, cushion
+and book-margin gates ran on the real account.
 """
 
 from __future__ import annotations
@@ -162,61 +169,8 @@ def _feed(beats, fresh_seconds):
     return fresh / len(beats), round(worst, 1), (lags[len(lags) // 2] if lags else None)
 
 
-def shadow_report(state_path, *, calendar=None, min_sessions=5, max_gap_seconds=120,
-                  min_feed_coverage=0.95, feed_fresh_seconds=120, min_opportunities=3,
-                  min_issuers=3, min_opportunity_sessions=2, entry_window_seconds=900,
-                  mechanics=None, since=None, until=None):
-    calendar = calendar or Calendar()
-    db = _ro(state_path)
-    try:
-        meta = {r["key"]: json.loads(r["value"]) for r in db.execute("SELECT * FROM meta")}
-        events = [dict(r) for r in db.execute("SELECT id,at,kind,payload FROM events ORDER BY id")]
-        orders = [dict(r) for r in db.execute("SELECT ref,side,shares,state FROM orders")]
-        positions = [dict(r) for r in db.execute("SELECT signal_id,shares FROM positions")]
-    finally:
-        db.close()
-    lo = timestamp(since) if since else None
-    hi = timestamp(until) if until else None
-    sessions, entries = [], []
-    for row in calendar.rows:
-        open_, close = timestamp(row["open"]), timestamp(row["close"])
-        if (lo and close <= lo) or (hi and open_ >= hi):
-            continue
-        inside = [(timestamp(e["at"]), e["kind"], json.loads(e["payload"] or "{}"))
-                  for e in events if open_ <= timestamp(e["at"]) < close]
-        if not inside:
-            continue
-        beats = sorted((at, p) for at, k, p in inside if k == "heartbeat")
-        marks = [open_, *(at for at, _ in beats), close]
-        gap = max((b - a).total_seconds() for a, b in zip(marks, marks[1:]))
-        coverage, feed_gap, lag = _feed(beats, feed_fresh_seconds)
-        quotes = {}
-        for at, kind, p in inside:
-            if kind == "quote_check":
-                q = quotes.setdefault(str(p.get("conid")), {
-                    "ticker": p.get("ticker"), "checks": 0, "available": False, "reasons": []})
-                q["checks"] += 1
-                q["available"] = q["available"] or bool(p.get("available"))
-                if p.get("reason") and p["reason"] not in q["reasons"]:
-                    q["reasons"].append(p["reason"])
-            elif kind == "shadow_entry":
-                entries.append((row["day"], at, p))
-        complete = gap <= max_gap_seconds and coverage >= min_feed_coverage
-        sessions.append({
-            "day": row["day"],
-            "complete": complete,
-            "process": {"heartbeats": len(beats), "max_gap_seconds": round(gap, 1)},
-            "source": {"feed_fresh_share": round(coverage, 4),
-                       "max_stale_seconds": feed_gap, "median_download_lag_seconds": lag,
-                       "inbox_unavailable": sum(1 for _, k, _ in inside if k == "inbox_unavailable")},
-            "quotes": quotes,
-            "shadow_entries": [p for _, k, p in inside if k == "shadow_entry"],
-            "refusals": dict(Counter(p.get("reason", "?") for _, k, p in inside
-                                     if k == "proposal_blocked").most_common()),
-            "entry_halts": [p.get("reason") for _, k, p in inside if k == "entry_halt"],
-            "orders_submitted": sum(1 for _, k, _ in inside if k == "paper_order_submitted"),
-            "covers": sum(1 for _, k, _ in inside if k == "cover_trigger"),
-        })
+def _dedupe(entries, entry_window_seconds):
+    """One per (cik, action_id); synthetic, catch-up and repeats excluded."""
     seen, excluded = {}, Counter()
     for day, at, p in sorted(entries, key=lambda x: x[1]):
         if _synthetic(p):
@@ -240,7 +194,76 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, max_gap_seconds=
         seen[key] = {"day": day, "at": at.isoformat(), "cik": p["cik"],
                      "action_id": p["action_id"], "ticker": p.get("ticker"),
                      "candidate_id": p.get("id")}
+    return seen, excluded
+
+
+def shadow_report(state_path, *, calendar=None, min_sessions=5, max_gap_seconds=120,
+                  min_feed_coverage=0.95, feed_fresh_seconds=120, min_opportunities=3,
+                  min_issuers=3, min_opportunity_sessions=2, entry_window_seconds=900,
+                  mechanics=None, since=None, until=None):
+    calendar = calendar or Calendar()
+    db = _ro(state_path)
+    try:
+        meta = {r["key"]: json.loads(r["value"]) for r in db.execute("SELECT * FROM meta")}
+        events = [dict(r) for r in db.execute("SELECT id,at,kind,payload FROM events ORDER BY id")]
+        orders = [dict(r) for r in db.execute("SELECT ref,side,shares,state FROM orders")]
+        positions = [dict(r) for r in db.execute("SELECT signal_id,shares FROM positions")]
+    finally:
+        db.close()
+    lo = timestamp(since) if since else None
+    hi = timestamp(until) if until else None
+    sessions, entries, conditional_entries = [], [], []
+    for row in calendar.rows:
+        open_, close = timestamp(row["open"]), timestamp(row["close"])
+        if (lo and close <= lo) or (hi and open_ >= hi):
+            continue
+        inside = [(timestamp(e["at"]), e["kind"], json.loads(e["payload"] or "{}"))
+                  for e in events if open_ <= timestamp(e["at"]) < close]
+        if not inside:
+            continue
+        beats = sorted((at, p) for at, k, p in inside if k == "heartbeat")
+        marks = [open_, *(at for at, _ in beats), close]
+        gap = max((b - a).total_seconds() for a, b in zip(marks, marks[1:]))
+        coverage, feed_gap, lag = _feed(beats, feed_fresh_seconds)
+        quotes = {}
+        for at, kind, p in inside:
+            if kind == "quote_check":
+                q = quotes.setdefault(str(p.get("conid")), {
+                    "ticker": p.get("ticker"), "checks": 0, "available": False, "reasons": []})
+                q["checks"] += 1
+                q["available"] = q["available"] or bool(p.get("available"))
+                if p.get("reason") and p["reason"] not in q["reasons"]:
+                    q["reasons"].append(p["reason"])
+            elif kind == "shadow_entry":
+                entries.append((row["day"], at, p))
+            elif kind == "shadow_entry_conditional":
+                conditional_entries.append((row["day"], at, p))
+        complete = gap <= max_gap_seconds and coverage >= min_feed_coverage
+        sessions.append({
+            "day": row["day"],
+            "complete": complete,
+            "process": {"heartbeats": len(beats), "max_gap_seconds": round(gap, 1)},
+            "source": {"feed_fresh_share": round(coverage, 4),
+                       "max_stale_seconds": feed_gap, "median_download_lag_seconds": lag,
+                       "inbox_unavailable": sum(1 for _, k, _ in inside if k == "inbox_unavailable")},
+            "quotes": quotes,
+            "shadow_entries": [p for _, k, p in inside if k == "shadow_entry"],
+            "conditional_entries": [p for _, k, p in inside if k == "shadow_entry_conditional"],
+            "refusals": dict(Counter(p.get("reason", "?") for _, k, p in inside
+                                     if k == "proposal_blocked").most_common()),
+            "entry_halts": [p.get("reason") for _, k, p in inside if k == "entry_halt"],
+            "orders_submitted": sum(1 for _, k, _ in inside if k == "paper_order_submitted"),
+            "covers": sum(1 for _, k, _ in inside if k == "cover_trigger"),
+        })
+    seen, excluded = _dedupe(entries, entry_window_seconds)
     opportunities = list(seen.values())
+    cond_seen, cond_excluded = _dedupe(conditional_entries, entry_window_seconds)
+    for key in [k for k in cond_seen if k in seen]:  # a fully gated entry supersedes it
+        del cond_seen[key]
+        cond_excluded["has_fully_gated_entry"] += 1
+    cond = list(cond_seen.values())
+    unknown = Counter(f for _, _, p in conditional_entries
+                      for f in (p.get("eligibility_unknown") or ["?"]))
     complete = [s for s in sessions if s["complete"]]
     worst_gap = max((s["process"]["max_gap_seconds"] for s in sessions), default=None)
     checks = {
@@ -281,6 +304,18 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, max_gap_seconds=
                        "entry_window_seconds": entry_window_seconds},
         "opportunities": opportunities,
         "excluded_entries": dict(excluded),
+        "conditional": {
+            "counts_toward_readiness": False,
+            "would_be_entries": len(cond),
+            "issuers": len({c["cik"] for c in cond}),
+            "sessions": len({c["day"] for c in cond}),
+            "entries": cond,
+            "excluded_entries": dict(cond_excluded),
+            "unknown_inputs": dict(unknown.most_common()),
+            "downstream_gates_exercised": bool(cond or opportunities),
+            "note": ("Every later gate passed with halt/SSR unknown. Not an opportunity: an "
+                     "armed executor refuses every SSR-unknown entry."),
+        },
         "refusals_total": dict(sum((Counter(s["refusals"]) for s in sessions), Counter())
                                .most_common()),
         "mechanics": mechanics,
