@@ -1,7 +1,7 @@
 # Core compounder review: ASML
 
 Research only; pending human review.
-Proposal: `tci-f21776161af3d56551e9`
+Proposal: `tci-51c63e0252a6701f55a2`
 
 ## Evidence and underwriting gaps
 
@@ -23,11 +23,11 @@ re_pass: false
 
 # ASML — Adversarial review
 
-**Date:** 2026-11-01  
+**Date:** 2026-11-06  
 **Agent:** Milly (batch pass)  
-**Dive reviewed:** `ASML/research/deep_dive_2026-11-01.md`  
+**Dive reviewed:** `ASML/research/deep_dive_2026-11-06.md`  
 **Valuation reviewed:** `ASML/research/valuation.json`  
-**Filings used:** `ASML/research/evidence/filing_facts_2026-11-01.json`
+**Filings used:** `ASML/research/evidence/filing_facts_2026-11-06.json`
 
 **Goal:** Truth-seeking QA. Not bearish for its own sake.
 
@@ -40,4 +40,4 @@ re_pass: false
 | Filing reconciliation | pass | filing_facts spot-check |
 | Internal consistency | pass | lint_adversarial |
 | Disclosure scan | pass | no 8-K scan this batch |
-| Short activist scan | no_hit | No Tier-1 forensic short in `short_scan_2026-0 — ASML/research/adversarial_2026-11-01.md (as of 2026-11-01; opinion)
+| Short activist scan | no_hit | No Tier-1 forensic short in `short_scan_2026-0 — ASML/research/adversarial_2026-11-06.md (as of 2026-11-06; opinion)
