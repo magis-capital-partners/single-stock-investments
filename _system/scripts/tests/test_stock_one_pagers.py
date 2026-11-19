@@ -114,6 +114,18 @@ def test_publication_replaces_hardlink_without_changing_private_source(tmp_path)
     assert index["repairs"][original["locations"][0]["url"]]["url"] is None
 
 
+def test_publication_registers_relative_proof_refs_without_rewriting_them(tmp_path):
+    site = tmp_path / "site"
+    (site / "data").mkdir(parents=True)
+    path = site / "data/proof.json"
+    ref = "TEST/research/missing.pdf"
+    path.write_text(json.dumps({"source": {"ref": ref}, "evidence_url": "https://example.com/report"}), encoding="utf-8")
+    prepare(tmp_path, site)
+    assert json.loads(path.read_text(encoding="utf-8"))["source"]["ref"] == ref
+    index = json.loads((site / "data/source_links.json").read_text(encoding="utf-8"))
+    assert index["repairs"][ref]["url"] is None
+
+
 def test_partial_research_still_gets_a_brief_and_missing_stock_shards_block_publication(tmp_path):
     import pytest
     site = tmp_path / "site"
@@ -182,6 +194,36 @@ def test_quarterly_cache_annual_sum_requires_a_sourced_q4_boundary():
     assert len(annual) == 1
     assert annual[0]["value"] == 10
     assert len(annual[0]["source_refs"]) == 4
+
+
+def test_consolidated_balances_are_not_mislabelled_as_parent_shareholder_claims():
+    from stock_one_pagers import normalized_series
+    def point(tag, value):
+        return {"period": "2025-12-31", "value": value, "tag": tag}
+    rows = normalized_series({"metrics": {
+        "stockholders_equity": [point("StockholdersEquity", 80), point("StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", 100)],
+        "net_income": [point("ProfitLossAttributableToOwnersOfParent", 8), point("ProfitLoss", 10)],
+    }})
+    by_id = {r["id"]: r for r in rows}
+    assert by_id["equity"]["quarterly"][0]["value"] == 80
+    assert by_id["total_equity"]["quarterly"][0]["value"] == 100
+    assert by_id["net_income"]["quarterly"][0]["value"] == 8
+    assert by_id["consolidated_net_income"]["quarterly"][0]["value"] == 10
+
+
+def test_partitioned_snapshot_loads_every_stock_and_rejects_overlaps(tmp_path):
+    import pytest
+    from stock_one_pagers import load_universe_document
+    folder = tmp_path / "_system/reference/stock-research"
+    (folder / "parts").mkdir(parents=True)
+    parts = ["_system/reference/stock-research/parts/part-00.json", "_system/reference/stock-research/parts/part-01.json"]
+    (folder / "universe.json").write_text(json.dumps({"schema_version": "stock-research-universe-parts.v1", "parts": parts, "stock_count": 2}), encoding="utf-8")
+    for relative, ticker in zip(parts, ["FIRST", "LAST"]):
+        (tmp_path / relative).write_text(json.dumps({"schema_version": "stock-research-universe.v1", "companies": {ticker: {"ticker": ticker}}}), encoding="utf-8")
+    assert set(load_universe_document(tmp_path, resolve_private=True)["companies"]) == {"FIRST", "LAST"}
+    (tmp_path / parts[1]).write_text(json.dumps({"schema_version": "stock-research-universe.v1", "companies": {"FIRST": {}}}), encoding="utf-8")
+    with pytest.raises(ValueError, match="overlapping"):
+        load_universe_document(tmp_path, resolve_private=True)
 
 
 def test_essential_reading_prefers_primary_reports_and_substantive_research(tmp_path):

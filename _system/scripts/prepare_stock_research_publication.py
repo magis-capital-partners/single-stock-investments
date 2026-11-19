@@ -5,8 +5,8 @@ import json
 import re
 from pathlib import Path
 from atomic_io import _atomic_write_text
-from source_links import SourceLinks
-from stock_one_pagers import build_one_pager, set_publication_inputs
+from source_links import SourceLinks, repository_url
+from stock_one_pagers import build_one_pager, set_publication_inputs, load_universe_document
 from vault_paths import research_vault_root
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -44,8 +44,7 @@ def curate_reading(data: Path):
 def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
     snapshot_path = "_system/reference/stock-research/universe.json"
     if (root / snapshot_path).is_file():
-        from private_dashboard_assets import read_resolved_json
-        set_publication_inputs(root, read_resolved_json(root, snapshot_path)[0])
+        set_publication_inputs(root, load_universe_document(root, resolve_private=True))
     links = SourceLinks(root, vault)
     pilots, changed = [], 0
     data = site / "data"
@@ -59,7 +58,7 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
             continue
         raw = path.read_text(encoding="utf-8")
         pilot = path.parent == data / "tickers"
-        if not pilot and "github.com/" not in raw and "raw.githubusercontent.com/" not in raw:
+        if not pilot and "github.com/" not in raw and "raw.githubusercontent.com/" not in raw and not re.search(r'"(?:ref|source_ref|source_refs|evidence_ref|model_ref|source_path)"\s*:', raw):
             continue
         value = json.loads(raw)
         if pilot and isinstance(value, dict) and not value.get("private_snapshot"):
@@ -71,7 +70,13 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
         # Register links in references as well, without changing frozen proof inputs.
         def collect(node):
             if isinstance(node, dict):
-                for child in node.values():
+                for key, child in node.items():
+                    if key in {"ref", "source_ref", "source_refs", "evidence_ref", "model_ref", "source_path"}:
+                        for ref in child if isinstance(child, list) else [child]:
+                            if isinstance(ref, str) and not ref.startswith(("http:", "https:")) and re.match(r"^(?:_system|[A-Za-z0-9._-]+)/", ref) and re.search(r"\.(?:pdf|md|txt|json|csv|xlsx?|html?|svg)(?:#.*)?$", ref, re.I):
+                                # Register navigation without rewriting frozen proof refs.
+                                links.resolve(ref)
+                                links.resolve(repository_url(ref))
                     collect(child)
             elif isinstance(node, list):
                 for child in node:
@@ -97,7 +102,15 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
             raise ValueError(f"Missing stock briefs: {sorted(expected - set(pilots))}")
         if core_path.stat().st_size >= 6_000_000:
             raise ValueError("Dashboard core exceeds the 6 MB startup budget")
-    return {"stocks": len(pilots), "tickers": sorted(pilots), "changed_publication_files": changed, "source_links": dict(links.counts)}
+    from build_cloudflare_pages_site import MAX_FILE_BYTES
+    largest = 0
+    for path in data.rglob("*.json"):
+        size = path.stat().st_size
+        if size > MAX_FILE_BYTES:
+            raise ValueError(f"Published data asset exceeds the hosting size limit: {path.relative_to(data)}")
+        largest = max(largest, size)
+    return {"stocks": len(pilots), "tickers": sorted(pilots), "changed_publication_files": changed,
+            "largest_data_asset_bytes": largest, "source_links": dict(links.counts)}
 
 
 if __name__ == "__main__":

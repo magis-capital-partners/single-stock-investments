@@ -1,6 +1,6 @@
 # Stock research presentation inputs
 
-Every covered stock receives the six-tab brief. `universe.json` is a checksum-protected public receipt for a private input snapshot, restored by the existing authorized publication process. It holds financial histories, dated model inputs, risks and shareholder-return series; it is never part of the startup core. The small original reference-stock caches remain as explicit overrides.
+Every covered stock receives the six-tab brief. `universe.json` is a small index of bounded private input parts. Each part has a checksum-protected public counterpart and restores through the existing authorized publication process. It holds financial histories, dated model inputs, risks and shareholder-return series; it is never part of the startup core. The small original reference-stock caches remain as explicit overrides.
 
 To refresh the snapshot, restore the current core and ticker shards into a disposable local folder and run:
 
@@ -8,7 +8,13 @@ To refresh the snapshot, restore the current core and ticker shards into a dispo
 python _system/scripts/build_stock_research_history.py --core <restored-core.json> --shards <restored-tickers-folder> --output <temporary-universe.json> --refresh-performance
 ```
 
-Publish the exact output through the existing private snapshot preservation and storage process, verify the private bytes, then commit only the structural public counterpart and its receipt. Do not commit the full snapshot. Prices come from rate-limited Yahoo HTTPS requests; this tool has no broker or terminal connection. Without `--refresh-performance`, it uses previously collected checkpoints and existing source caches.
+Partition the generated output before private preservation:
+
+```powershell
+python _system/scripts/partition_stock_research_history.py --input <temporary-universe.json> --output <temporary-part-folder>
+```
+
+Publish the parts through the existing private snapshot preservation and storage process, verify the private bytes, then commit only the small index, structural public counterparts and their receipts. Do not commit the full snapshot. Prices come from rate-limited Yahoo HTTPS requests; this tool has no broker or terminal connection. Without `--refresh-performance`, it uses previously collected checkpoints and existing source caches.
 
 Financial periods and currencies retain their source basis. Quarterly caches support TTM. Annual sums require four consecutive quarters ending at an explicitly derived annual-minus-nine-month observation; fiscal boundaries are never guessed from filing-year labels. Raw filings support actual annuals, explicit YTD differences and 52/53-week fiscal years. Incomplete evidence remains a visible gap. Historical financials and newer prices do not upgrade model eligibility or revise a valuation.
 

@@ -47,6 +47,34 @@ PROFILES = {
 
 
 _PUBLICATION_INPUTS = {}
+UNIVERSE_PATH = "_system/reference/stock-research/universe.json"
+
+
+def load_universe_document(root: Path, *, resolve_private: bool = False) -> dict:
+    document = read_json(root / UNIVERSE_PATH)
+    if document.get("schema_version") != "stock-research-universe-parts.v1":
+        if resolve_private:
+            from private_dashboard_assets import read_resolved_json
+            return read_resolved_json(root, UNIVERSE_PATH)[0]
+        return document
+    companies = {}
+    for relative in document.get("parts", []):
+        if not re.fullmatch(r"_system/reference/stock-research/parts/part-\d+\.json", str(relative)):
+            raise ValueError("Invalid stock research snapshot part")
+        if resolve_private:
+            from private_dashboard_assets import read_resolved_json
+            part = read_resolved_json(root, relative)[0]
+        else:
+            part = read_json(root / relative)
+            if part.get("private_snapshot") or not part:
+                return {}  # Editor/test reads never download private inputs.
+        incoming = part.get("companies") or {}
+        if part.get("schema_version") != "stock-research-universe.v1" or companies.keys() & incoming.keys():
+            raise ValueError("Invalid or overlapping stock research parts")
+        companies.update(incoming)
+    if len(companies) != document.get("stock_count"):
+        raise ValueError("Stock research snapshot coverage does not match its receipt")
+    return {"schema_version": "stock-research-universe.v1", "companies": companies}
 
 
 def set_publication_inputs(root: Path, document: dict) -> None:
@@ -63,7 +91,7 @@ def universe_inputs(root: Path) -> dict:
         return _PUBLICATION_INPUTS[root.resolve()]
     # Reading research in a unit test or an editor must never acquire credentials
     # or silently download the private archive. Publication restores it explicitly.
-    return read_json(root / "_system/reference/stock-research/universe.json").get("companies", {})
+    return load_universe_document(root).get("companies", {})
 
 
 def company_profile(ticker: str, row: dict, contract: dict, raw: dict | None = None) -> dict:
@@ -121,11 +149,16 @@ METRICS = {
     "noninterest_expense": ("Non-interest expense", "income", "USD", ["NoninterestExpense"]),
     "operating_income": ("Operating income", "income", "USD", ["OperatingIncomeLoss"]),
     "net_income": ("Net income attributable to shareholders", "income", "USD", ["NetIncomeLossAvailableToCommonStockholdersBasic", "NetIncomeLoss"]),
+    "consolidated_net_income": ("Consolidated net income including noncontrolling interests", "income", "USD", ["ProfitLoss"]),
+    "basic_eps": ("Basic earnings per share", "income", "USD/shares", ["EarningsPerShareBasic"]),
     "diluted_eps": ("Diluted earnings per share", "income", "USD/shares", ["EarningsPerShareDiluted", "EarningsPerShareBasicAndDiluted"]),
     "diluted_shares": ("Weighted average diluted shares", "income", "shares", ["WeightedAverageNumberOfDilutedSharesOutstanding"]),
     "assets": ("Total assets", "balance", "USD", ["Assets"]),
     "cash": ("Cash and cash equivalents", "balance", "USD", ["CashAndCashEquivalentsAtCarryingValue"]),
     "equity": ("Equity attributable to shareholders", "balance", "USD", ["StockholdersEquity"]),
+    "total_equity": ("Total equity including noncontrolling interests", "balance", "USD", ["StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"]),
+    "long_term_debt": ("Long-term debt", "balance", "USD", ["LongTermDebtNoncurrent", "LongTermDebt"]),
+    "current_debt": ("Current portion of long-term debt", "balance", "USD", ["LongTermDebtCurrent"]),
     "liabilities": ("Total liabilities", "balance", "USD", ["Liabilities"]),
     "deposits": ("Deposits", "balance", "USD", ["Deposits"]),
     "loans": ("Loans, net of allowance", "balance", "USD", ["FinancingReceivableExcludingAccruedInterestAfterAllowanceForCreditLoss", "LoansAndLeasesReceivableNetReportedAmount", "FinancingReceivableRecordedInvestmentExcludingAccruedInterestAfterAllowanceForCreditLoss"]),
@@ -138,9 +171,11 @@ METRICS = {
 IFRS_TAGS = {
     "revenue": ["Revenue"], "operating_income": ["ProfitLossFromOperatingActivities"],
     "net_income": ["ProfitLossAttributableToOwnersOfParent"],
+    "consolidated_net_income": ["ProfitLoss"], "basic_eps": ["BasicEarningsLossPerShare"],
     "diluted_eps": ["DilutedEarningsLossPerShare"], "diluted_shares": ["AdjustedWeightedAverageShares"],
     "assets": ["Assets"], "cash": ["CashAndCashEquivalents"], "equity": ["EquityAttributableToOwnersOfParent"],
     "liabilities": ["Liabilities"], "ocf": ["CashFlowsFromUsedInOperatingActivities"],
+    "total_equity": ["Equity"], "long_term_debt": ["LongtermBorrowings", "NoncurrentBorrowings"],
     "capex": ["PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities"],
 }
 
@@ -220,7 +255,7 @@ def sec_series(raw: dict, metric: str, fiscal_end: str | None, currency: str = "
             cumulative[item["end"]] = point
     # A YTD observation becomes a quarter only by subtracting the preceding YTD.
     for end, point in sorted(cumulative.items()):
-        if end in quarter or metric == "diluted_eps":
+        if end in quarter or metric in {"basic_eps", "diluted_eps"}:
             continue
         previous = [p for d, p in cumulative.items() if d < end and p.get("start") == point.get("start") and 60 <= (date.fromisoformat(end) - date.fromisoformat(d)).days <= 110]
         if previous:
@@ -235,7 +270,7 @@ def sec_series(raw: dict, metric: str, fiscal_end: str | None, currency: str = "
                             "source_refs": [prior["source"], point["source"]]}
     # Q4 often appears only as the annual amount less the first nine months.
     for end, point in annual.items():
-        if end in quarter or statement == "balance" or metric == "diluted_eps":
+        if end in quarter or statement == "balance" or metric in {"basic_eps", "diluted_eps"}:
             continue
         preceding = [p for d, p in cumulative.items() if d < end and p.get("start") == point.get("start") and 60 <= (date.fromisoformat(end) - date.fromisoformat(d)).days <= 110]
         if preceding:
@@ -276,16 +311,23 @@ def derived_series(series: list, identity: str, label: str, left: str, right: st
 def normalized_series(raw: dict) -> list:
     """Use the maintained quarterly cache without relabelling annual/YTD flows."""
     mapping = {"revenues": "revenue", "operating_income": "operating_income", "net_income": "net_income",
-               "cfo": "ocf", "cash": "cash", "total_assets": "assets", "stockholders_equity": "equity"}
+               "cfo": "ocf", "cash": "cash", "total_assets": "assets", "stockholders_equity": "equity",
+               "long_term_debt": "long_term_debt", "eps_basic": "basic_eps"}
+    metrics = dict(raw.get("metrics") or {})
+    metrics["total_equity"] = [p for p in metrics.get("stockholders_equity", []) if p.get("tag") in {"StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "Equity"}]
+    metrics["stockholders_equity"] = [p for p in metrics.get("stockholders_equity", []) if p.get("tag") in {"StockholdersEquity", "EquityAttributableToOwnersOfParent"}]
+    metrics["consolidated_net_income"] = [p for p in metrics.get("net_income", []) if p.get("tag") == "ProfitLoss"]
+    metrics["net_income"] = [p for p in metrics.get("net_income", []) if p.get("tag") != "ProfitLoss"]
+    mapping.update(total_equity="total_equity", consolidated_net_income="consolidated_net_income")
     # A Q4 explicitly derived from an annual filing identifies a fiscal boundary.
     # `fp=FY` alone does not: annual filings can repeat earlier quarter facts.
     annual_ends = {p["period"] for key, metric in mapping.items() if METRICS[metric][1] != "balance"
-                   for p in raw.get("metrics", {}).get(key) or []
+                   for p in metrics.get(key) or []
                    if p.get("derived") == "ytd_difference" and p.get("fp") == "FY"
                    and p.get("form") in {"10-K", "10-K/A", "20-F", "20-F/A", "40-F", "40-F/A"}}
     result = []
     for key, metric in mapping.items():
-        observations = raw.get("metrics", {}).get(key) or []
+        observations = metrics.get(key) or []
         currencies = {p.get("currency") or "USD" for p in observations}
         if len(currencies) != 1:
             continue
@@ -307,6 +349,8 @@ def normalized_series(raw: dict) -> list:
                 continue
             if statement == "balance":
                 annual.append(point)
+                continue
+            if metric == "basic_eps":
                 continue
             group = points[max(0, i - 3):i + 1]
             if len(group) != 4 or not all(60 <= (date.fromisoformat(b["period"]) - date.fromisoformat(a["period"])).days <= 110 for a, b in zip(group, group[1:])):
