@@ -1,6 +1,15 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const lib=require('../../../dashboard/company-research.js');
+test('the EchoStar archive never treats a reused SATS security as the same company',()=>{
+ const archive={cutoff:'2026-06-24',cik:'1415404',excludedCik:'1920406'};
+ assert.equal(lib.archiveMatch({title:'EchoStar quarterly results',date:'2026-11-01'},archive),true);
+ assert.equal(lib.archiveMatch({title:'Strive preferred SATS',date:'2025-01-01'},archive),false);
+ assert.equal(lib.archiveMatch({title:'10-Q',locations:[{url:'https://www.sec.gov/Archives/edgar/data/1920406/000001/report.htm'}]},archive),false);
+ assert.equal(lib.archiveMatch({title:'10-Q',locations:[{url:'https://www.sec.gov/Archives/edgar/data/1415404/000001/report.htm'}]},archive),true);
+ assert.equal(lib.archiveMatch({title:'Fund letter',date:'2026-03-31'},archive),true);
+ assert.equal(lib.archiveMatch({title:'SATS fund letter',date:'2026-09-30'},archive),false);
+});
 test('full text search reaches items after previous feed limits',()=>{
  const rows=Array.from({length:351},(_,i)=>({id:String(i),title:`Source ${i}`,category:'analysis',date:'2026-10-01',relationship:'direct'}));
  const found=lib.filter(rows,{query:'treasury exposure'},{treasury:['350'],exposure:['350']});

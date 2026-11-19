@@ -7,6 +7,9 @@ from pathlib import Path
 from atomic_io import _atomic_write_text
 from source_links import SourceLinks, repository_url
 from stock_one_pagers import build_one_pager, set_publication_inputs, load_universe_document
+from stock_valuation_models import INPUT_PATH as VALUATION_INPUT_PATH, set_valuation_inputs, valuation_inputs
+from stock_valuation_identity import quarantine_prior_valuation
+from stock_valuation_aliases import consolidate_aliases
 from vault_paths import research_vault_root
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -45,9 +48,13 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
     snapshot_path = "_system/reference/stock-research/universe.json"
     if (root / snapshot_path).is_file():
         set_publication_inputs(root, load_universe_document(root, resolve_private=True))
+    if (root / VALUATION_INPUT_PATH).is_file():
+        from private_dashboard_assets import read_resolved_json
+        set_valuation_inputs(root, read_resolved_json(root, VALUATION_INPUT_PATH)[0])
     links = SourceLinks(root, vault)
     pilots, changed = [], 0
     data = site / "data"
+    consolidate_aliases(root, data)
     prior_index = data / "source_links.json"
     if prior_index.is_file():
         for original in json.loads(prior_index.read_text(encoding="utf-8")).get("repairs", {}):
@@ -61,10 +68,16 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
         if not pilot and "github.com/" not in raw and "raw.githubusercontent.com/" not in raw and not re.search(r'"(?:ref|source_ref|source_refs|evidence_ref|model_ref|source_path)"\s*:', raw):
             continue
         value = json.loads(raw)
+        if path == data / "core.json":
+            for row in value.get("tickers", []):
+                quarantine_prior_valuation(row, valuation_inputs(root).get(row.get("ticker"), {}))
         if pilot and isinstance(value, dict) and not value.get("private_snapshot"):
+            if value.get("schema_version") == "stock-research-alias.v1":
+                continue
             ticker = value.get("ticker")
             if not isinstance(ticker, str) or not ticker:
                 raise ValueError(f"Missing stock identity in {path.name}")
+            quarantine_prior_valuation(value, valuation_inputs(root).get(ticker, {}))
             value["one_pager"] = build_one_pager(root, ticker, value)
             pilots.append(ticker)
         # Register links in references as well, without changing frozen proof inputs.
