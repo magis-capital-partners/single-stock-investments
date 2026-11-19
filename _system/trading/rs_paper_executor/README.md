@@ -281,7 +281,7 @@ to start, and its evidence is reviewed before the next.
 | Stage | Where | Proves | Evidence |
 |---|---|---|---|
 | **P: paper mechanics** | Laptop paper, supervised, delayed data | Order mechanics only, on IBKR's simulated market (see the mechanics test above) | `integration-test --mechanics-only` report, `pass: true` |
-| **S: live shadow** | NY4, client 60, **no arm file** | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report` over ≥ N sessions (default 5): `ready_for_arm_review: true`, the would-be entries, and refusals by reason |
+| **S: live shadow** | NY4, client 60, **no arm file** | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report` over ≥ N sessions (default 5): `ready_for_arm_review: true`, the would-be entries, and refusals by reason. Until an SSR source can say "clear", the most shadow can show is `downstream_gates_exercised: true` with conditional entries; arm review waits for the source |
 | **L: live pilot** | NY4, owner arm file | Real fills, cancels, recalls and fees at the smallest size | The owner sets pilot caps (e.g. `max_names: 1`, a small `target_notional`) and widens them only after reviewing the pilot's fills and the account reconciliation |
 
 ```text
@@ -305,6 +305,34 @@ It exits 0 only when all of them hold. The decision to arm stays with the owner.
 Note that shadow sees no would-be entries until the evidence producers exist
 (identity/conid within the 15-minute window, intraday SSR, borrow ≤30 min). Its
 refusal histogram shows exactly which one is missing.
+
+**Conditional would-be entries (owner 2026-11-19, option B).** No source available
+today can say "SSR clear" intraday, so every strict eligibility check fails.
+In **shadow only** (no valid arm file), an entry whose halt/SSR state is
+*unknown* runs the later gates anyway:
+* live quote and size, borrow, WhatIf on the real account;
+* the SPX reserve and cushion, and book-margin room.
+
+If all of them pass, it is recorded once per proposal as
+`shadow_entry_conditional`, with the unknown inputs (`eligibility_unknown`).
+It is recorded once so later cycles do not repeat quote, borrow or WhatIf
+requests on the shared Gateway.
+
+Some inputs refuse exactly as before:
+* a **known** halt (evidence or IB tick 49) or SSR restriction;
+* a stale eligibility row, meaning the producers stopped;
+* a contract mismatch.
+
+An armed executor refuses every unknown-SSR entry exactly as before. If an
+arm file appears mid-evaluation, the entry is refused, not sent.
+
+`shadow-report` lists these separately:
+* `conditional_would_be_entries` and `conditional_unknown_inputs`;
+* the `downstream_gates_exercised` check.
+
+They never count toward `ready_for_arm_review`. An armed executor cannot
+enter without an eligibility source that can say "clear", so arm review
+waits for one (a paid feed; see `_system/trading/rs_evidence/README.md`).
 
 ### Account reconciliation (after the Flex day closes)
 

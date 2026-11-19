@@ -58,7 +58,11 @@ Watched conids are:
 * `at` is the oldest deciding input.
 * With no intraday SSR source (today's state), every row is
   `ssr: null, complete: false`, and the executor refuses every entry with
-  "fresh eligibility source required".
+  "fresh eligibility source required". In shadow only, it then runs the
+  later gates and records a conditional would-be entry (owner 2026-11-19,
+  option B; see the executor README). That is why an incomplete row's `at`
+  is the write time: a row that stops being rewritten goes stale, and the
+  shadow path refuses it as well.
 * If the halt feed fails, every row is rewritten as incomplete.
 
 **Polling floors** (enforced by `load_config`):

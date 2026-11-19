@@ -21,6 +21,14 @@ is true only when every check below holds:
   live entry path has never run and uptime alone proves little;
 * no session's largest heartbeat gap exceeds ``max_gap_seconds``;
 * the kill latch and daily-loss latch are clear.
+
+Conditional would-be entries (``shadow_entry_conditional``, owner 2026-11-19,
+option B) passed every later gate while halt/SSR state was UNKNOWN; none was
+known to restrict. They are counted apart. ``downstream_gates_exercised`` says
+the quote, borrow, WhatIf, reserve, cushion and book-margin gates ran on the
+real account. They never count toward ``ready_for_arm_review``: an armed
+executor refuses every entry whose SSR state is unknown, so arming before an
+eligibility source can say "clear" would arm an executor that cannot enter.
 """
 
 from __future__ import annotations
@@ -68,6 +76,8 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, min_entries=1,
             "heartbeats": len(beats),
             "max_heartbeat_gap_seconds": round(gap, 1),
             "shadow_entries": [p for k, p in payload if k == "shadow_entry"],
+            "conditional_entries": [p for k, p in payload
+                                    if k == "shadow_entry_conditional"],
             "refusals": dict(Counter(p.get("reason", "?") for k, p in payload
                                      if k == "proposal_blocked").most_common()),
             "entry_halts": [p.get("reason") for k, p in payload if k == "entry_halt"],
@@ -76,11 +86,16 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, min_entries=1,
         })
     worst_gap = max((s["max_heartbeat_gap_seconds"] for s in sessions), default=None)
     entries = sum(len(s["shadow_entries"]) for s in sessions)
+    full_ids = {e.get("id") for s in sessions for e in s["shadow_entries"]}
+    conditional = [e for s in sessions for e in s["conditional_entries"]
+                   if e.get("id") not in full_ids]
+    unknown = Counter(f for e in conditional for f in e.get("eligibility_unknown") or ["?"])
     checks = {
         "no_orders_transmitted": not orders and not any(s["orders_submitted"] for s in sessions),
         "sessions_observed": len(sessions),
         "enough_sessions": len(sessions) >= min_sessions,
         "enough_would_be_entries": entries >= min_entries,
+        "downstream_gates_exercised": entries + len(conditional) >= max(1, min_entries),
         "worst_heartbeat_gap_seconds": worst_gap,
         "uptime_ok": worst_gap is not None and worst_gap <= max_gap_seconds,
         "kill_latch_clear": not meta.get("kill"),
@@ -96,10 +111,16 @@ def shadow_report(state_path, *, calendar=None, min_sessions=5, min_entries=1,
         "policy_hash": meta.get("policy_hash"),
         "endpoint": meta.get("endpoint"),
         "would_be_entries": entries,
+        "conditional_would_be_entries": len(conditional),
+        "conditional_unknown_inputs": dict(unknown.most_common()),
         "refusals_total": dict(sum((Counter(s["refusals"]) for s in sessions), Counter())
                                .most_common()),
         "checks": checks,
         "ready_for_arm_review": ready,
         "note": "Facts for the owner's arm decision; arming remains the owner's call.",
+        "conditional_note": ("Conditional entries ran every later gate with halt/SSR "
+                             "unknown. They do not count toward arm review: an armed "
+                             "executor refuses every SSR-unknown entry.")
+        if conditional else None,
         "sessions": sessions,
     }
