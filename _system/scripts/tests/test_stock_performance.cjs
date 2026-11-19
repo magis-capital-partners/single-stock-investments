@@ -35,3 +35,8 @@ test('turning off the benchmark preserves the entire stock history and zero clos
  assert.equal(ui.windowData(loss).total,-1);
  assert.match(ui.render({ticker:'MISSING'}),/history is not available for this listing/);
 });
+
+test('a blocked current history cannot fall back to an older unreconciled curve',()=>{
+ const html=ui.render({ticker:'REVIEW',one_pager:{performance:{method_version:'split-cash-basis.v2',status:'evidence_blocked',reason:'Distributions need source review.',points:[]}},total_return_panel:{history:record}});
+ assert.match(html,/Distributions need source review/);assert.doesNotMatch(html,/Ending value of/);
+});
