@@ -1,7 +1,25 @@
-# Fund family proposals (2026-10-16)
+# Fund family proposals (2026-11-19)
 
 Auto-detected multi-strategy shops from shared prefix + identical letter snippets.
 Promote confirmed rows into `_system/data/fund_families.json`.
+
+## `apis` — Apis
+- Shared snippet clusters: **2**
+- Fund IDs:
+  - `apis-deep-value` (Apis Deep Value)
+  - `apis-flagship` (Apis Flagship)
+
+```json
+{
+  "apis": {
+    "display": "Apis",
+    "fund_ids": [
+      "apis-deep-value",
+      "apis-flagship"
+    ]
+  }
+}
+```
 
 ## `chilton` — Chilton
 - Shared snippet clusters: **2**
@@ -22,7 +40,7 @@ Promote confirmed rows into `_system/data/fund_families.json`.
 ```
 
 ## `steadfast` — Steadfast
-- Shared snippet clusters: **3**
+- Shared snippet clusters: **4**
 - Fund IDs:
   - `steadfast-international` (Steadfast International)
   - `steadfast-long` (Steadfast Long)
@@ -40,7 +58,7 @@ Promote confirmed rows into `_system/data/fund_families.json`.
 ```
 
 ## `viking` — Viking
-- Shared snippet clusters: **3**
+- Shared snippet clusters: **2**
 - Fund IDs:
   - `viking-global` (Viking Global)
   - `viking-long-manager` (Viking Long Manager)
