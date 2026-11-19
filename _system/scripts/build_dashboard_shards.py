@@ -31,6 +31,7 @@ CORE_VERSION = 1
 
 # Row fields only needed once a ticker is opened in the detail pane.
 DETAIL_ONLY_FIELDS = (
+    "one_pager",
     "valuation_evidence",
     "shared_forecast",
     "download_script_path",
@@ -359,9 +360,9 @@ def slim_ticker_row(row: dict) -> dict:
     kpi = row.get("kpi_trends")
     if isinstance(kpi, dict):
         slim["kpi_trends"] = {
-            "summary": kpi.get("summary"),
+            "summary": {"confirmed": (kpi.get("summary") or {}).get("confirmed", 0)},
             "business_momentum": kpi.get("business_momentum"),
-            "leadership_risk": kpi.get("leadership_risk"),
+            "leadership_risk": {k: v for k, v in (kpi.get("leadership_risk") or {}).items() if k != "factors"},
             "data_tier": kpi.get("data_tier"),
             "has_trend_data": kpi.get("has_trend_data"),
         }

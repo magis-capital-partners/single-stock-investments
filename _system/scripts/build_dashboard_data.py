@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from dated_md import dated_md_label, dated_md_sort_key, latest_dated_md  # noqa: E402
 from document_date import catalog_sort_key, infer_document_period  # noqa: E402
 from document_store import best_document_label, best_document_url, document_id_for_ref  # noqa: E402
+from source_links import repository_url  # noqa: E402
 from market_order import sort_market_filters, sort_markets  # noqa: E402
 from insight_format import (  # noqa: E402
     OWNERSHIP_SOURCES,
@@ -48,7 +49,7 @@ REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SLEEVES_PATH = ROOT / "_system" / "portfolio" / "investment_sleeves.json"
 CVR_UNIVERSE_PATH = ROOT / "_system" / "reference" / "cvr" / "cvr_universe.json"
 VALUATION_UNIVERSE_TIERS_PATH = ROOT / "_system" / "data" / "valuation_universe_tiers.json"
-GITHUB_REPO = "GoldmanDrew/single-stock-investments"
+GITHUB_REPO = "magis-capital-partners/single-stock-investments"
 UNIVERSE_INTAKE_WORKFLOW = "ls-algo-universe.yml"
 
 RETURN_PUBLISHABLE_MODEL_LEVELS = frozenset({
@@ -59,15 +60,15 @@ RETURN_PUBLISHABLE_MODEL_LEVELS = frozenset({
 
 
 def github_blob_url(rel_path: str) -> str:
-    return f"https://github.com/{GITHUB_REPO}/blob/main/{rel_path.replace(chr(92), '/')}"
+    return repository_url(rel_path, GITHUB_REPO)
 
 
 def github_tree_url(rel_path: str) -> str:
-    return f"https://github.com/{GITHUB_REPO}/tree/main/{rel_path.replace(chr(92), '/').rstrip('/')}"
+    return repository_url(rel_path, GITHUB_REPO, directory=True)
 
 
 def github_raw_url(rel_path: str) -> str:
-    return f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{rel_path.replace(chr(92), '/')}"
+    return repository_url(rel_path, GITHUB_REPO, raw=True)
 
 
 def source_document_ref(ref: str | None) -> str | None:
@@ -3158,6 +3159,8 @@ def build_ticker_row(
     from valuation_forecast import attach_forecast
     attach_forecast(row, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()))
     row.pop("autonomous_irr", None)
+    from stock_one_pagers import build_one_pager
+    row["one_pager"] = build_one_pager(ROOT, ticker, row)
     return row
 
 

@@ -134,6 +134,8 @@ case "$PROFILE" in
     git sparse-checkout set _system .github dashboard Makefile
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
+    apply_sparse_paths
+    git read-tree -mu HEAD
     ;;
   news|marvin-pick|marvin-forecast|dashboard|two-phase-watch|downloads|drive|activist)
     git sparse-checkout init --no-cone

@@ -462,3 +462,19 @@ class InsightManifestGuardTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class StockBriefBudgetTests(unittest.TestCase):
+    def test_boot_retains_table_badges_and_valuation_gates_but_not_history(self):
+        full = {"ticker": "TEST", "one_pager": {"financials": {"series": [1, 2, 3]}},
+                "kpi_trends": {"summary": {"confirmed": 2, "accelerating": 4},
+                               "business_momentum": {"score": 1, "direction": "accelerating", "label": "Improving"},
+                               "leadership_risk": {"score": 2, "label": "Watch", "level": "watch", "factors": [{"title": "Full evidence"}]},
+                               "has_trend_data": True, "data_tier": "sec_fundamentals"}}
+        before = copy.deepcopy(full)
+        slim = bds.slim_ticker_row(full)
+        self.assertNotIn("one_pager", slim)
+        self.assertEqual(slim["kpi_trends"]["summary"], {"confirmed": 2})
+        self.assertEqual(slim["kpi_trends"]["business_momentum"], full["kpi_trends"]["business_momentum"])
+        self.assertNotIn("factors", slim["kpi_trends"]["leadership_risk"])
+        self.assertEqual(full, before)

@@ -16,7 +16,7 @@ import math
 import sys
 import urllib.request
 from collections import Counter
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -42,12 +42,12 @@ def tickers_from_registry() -> list[str]:
 
 
 def _iso_day(timestamp: int) -> str:
-    return datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d")
+    return (datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(seconds=timestamp)).strftime("%Y-%m-%d")
 
 
 def fetch_yahoo_history(symbol: str) -> tuple[list[str], list[float], list[dict], dict, str]:
     end = datetime.now(timezone.utc)
-    url = f"{YAHOO_CHART}/{symbol}?period1=0&period2={int(end.timestamp())}&interval=1d&events=div%2Csplits"
+    url = f"{YAHOO_CHART}/{symbol}?period1=-2208988800&period2={int(end.timestamp())}&interval=1d&events=div%2Csplits"
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
         payload = json.loads(urllib.request.urlopen(req, timeout=30).read())
@@ -64,6 +64,7 @@ def fetch_yahoo_history(symbol: str) -> tuple[list[str], list[float], list[dict]
         events.append({
             "ex_date": _iso_day(int(row["date"])), "amount_per_share": float(row["amount"]),
             "currency": (result.get("meta") or {}).get("currency"), "type": "regular_dividend",
+            "amount_basis": "split_adjusted",
             "source": f"yahoo:{symbol}", "source_tier": "vendor", "reconciliation_status": "discovered",
         })
     for row in (raw_events.get("splits") or {}).values():
@@ -103,6 +104,8 @@ def build_wealth_series(dates: list[str], prices: list[float], events: list[dict
         return {"price_index": [], "total_return_index": [], "cash_by_type": {}, "event_counts": {}}
     events_at: dict[int, list[dict]] = {}
     for event in events:
+        if not dates[0] <= (event.get("ex_date") or "") <= dates[-1]:
+            continue
         idx = effective_event_index(dates, event.get("ex_date") or "")
         if idx is not None:
             events_at.setdefault(idx, []).append(event)
@@ -113,13 +116,13 @@ def build_wealth_series(dates: list[str], prices: list[float], events: list[dict
 
     def amount_on_price_basis(event: dict) -> float:
         amount = float(event.get("amount_per_share") or 0)
-        if not prices_split_adjusted:
-            return amount
         future_factor = 1.0
         for split in split_events:
             if (split.get("ex_date") or "") > (event.get("ex_date") or ""):
                 future_factor *= float(split["split_factor"])
-        return amount / future_factor
+        if event.get("amount_basis") == "split_adjusted":
+            return amount if prices_split_adjusted else amount * future_factor
+        return amount / future_factor if prices_split_adjusted else amount
     price_shares = total_shares = 1.0
     initial_price = prices[0]
     price_idx: list[float] = []
@@ -192,7 +195,7 @@ def compute_period_total_return(ticker: str, start: str, end: str) -> dict:
     first, last = selected[0], selected[-1]
     period_dates, period_prices = dates[first:last + 1], prices[first:last + 1]
     # A decision made at the close does not receive a same-day ex-date distribution.
-    period_events = [event for event in events if period_dates[0] < (event.get("ex_date") or "") <= period_dates[-1]]
+    period_events = [event for event in events if period_dates[0] < (event.get("ex_date") or "") <= period_dates[-1] or event.get("type") == "split"]
     status, error = coverage_status(coverage, period_dates[0], period_dates[-1], period_events)
     wealth = build_wealth_series(period_dates, period_prices, period_events)
     total_index = wealth.get("total_return_index") or []
@@ -322,6 +325,14 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
         "price_only_annualized_pct": round(price_ann, 2) if price_ann is not None else None,
         "total_return_annualized_pct": round(total_ann, 2) if total_ann is not None else None,
         "market_cap_m": market_cap_m, "shares_outstanding": shares, "price_for_market_cap": price, "chart": chart_rel,
+        "history": {
+            "schema_version": "stock-performance.v1", "ticker": t,
+            "currency": meta.get("currency"), "status": status, "coverage": coverage,
+            "source_url": f"https://finance.yahoo.com/quote/{symbol}/history/",
+            "basis": "Split-adjusted prices; cash distributions reinvested at the ex-date close; pre-tax nominal listing currency.",
+            "columns": ["date", "price_index", "total_return_index"],
+            "points": [[d, round(p, 6), round(v, 6)] for d, p, v in zip(dates, price_idx, total_idx)],
+        },
     }
     panel_path = research / "total_return_panel.json"
     write_json_if_changed(panel_path, panel)

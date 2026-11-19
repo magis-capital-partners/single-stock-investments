@@ -46,13 +46,19 @@ from pathlib import Path
 FINGERPRINT_VERSION = "dashboard-deploy-inputs-v1"
 
 # What a deploy publishes or executes. The build job checks out the `pages`
-# profile (_system, .github, dashboard, Makefile), so nothing outside these
-# paths can reach the site or D1. The seed reads per-ticker research files
-# only when present, and they never are in that profile.
+# profile (_system, .github, dashboard, Makefile and ten explicit pilot
+# inputs). Include those inputs so a research correction republishes the pilots.
 DEPLOY_INPUTS = (
     "dashboard",
     "_system/data/evidence_recovery_queue.json",
     "_system/scripts/build_cloudflare_pages_site.py",
+    "_system/scripts/prepare_stock_research_publication.py",
+    "_system/scripts/stock_one_pagers.py",
+    "_system/scripts/build_stock_research_history.py",
+    "_system/scripts/source_links.py",
+    "_system/scripts/document_store.py",
+    "_system/scripts/ci_sparse_checkout_paths.py",
+    "_system/reference/stock-research",
     "_system/scripts/build_company_research.py",
     "_system/scripts/company_sources.py",
     "_system/scripts/company_research_themes.json",
@@ -90,7 +96,12 @@ DEPLOY_INPUTS = (
     ".github/actions/preserve-private-dashboard",
     ".github/actions/checkout-vault",
     ".github/actions/publish-dashboard",
-)
+) + tuple(
+    f"{ticker}/research/{name}"
+    for ticker in ("CPRT", "TBBK", "FRMO")
+    for name in ("valuation_contract.json", "thesis_card.json", "falsifier_specs.json")
+    if ticker != "FRMO" or name != "falsifier_specs.json"
+) + tuple(f"{ticker}/research/evidence/sec_companyfacts.json" for ticker in ("CPRT", "TBBK"))
 
 ALWAYS_DEPLOY_EVENTS = {"workflow_dispatch"}
 
