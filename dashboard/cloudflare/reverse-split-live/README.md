@@ -143,6 +143,22 @@ enrollment; later UTC days return to 40k. This is below the account's 100k/day
 Free limit and does not reset or conceal consumed usage. The budget remains a
 fail-closed stop; it is not an unlimited production-service guarantee.
 
+Between checkpoints the collector refreshes `collector-dashboard/operations.json`
+every 30 seconds (`RS_OPERATIONS_PUBLISH_SECONDS`; `0` disables), so the RS
+executor's 120-second `generated_at` rule holds through the two-minute idle
+checkpoint interval. A refresh never checkpoints and makes no D1 call: a worker
+thread re-evaluates the operations snapshot over a copy of the last committed
+checkpoint (its SHA-256 must match the receipt) at the publication time. Candidates,
+counts and decisions therefore come only from durable state and cannot regress
+across a restart. `generated_at` is the evaluation time and `state_at` names the
+checkpoint, so clock-relative checks (source and heartbeat ages, entry windows)
+can correctly read stale late in a long interval. Refreshes stop once the committed
+checkpoint is older than `RS_OPERATIONS_MAX_STATE_AGE_SECONDS` (default 180), so a
+stalled checkpoint still fails closed at the executor. One queue orders refreshes
+and checkpoint publications of the object; it never moves back to an older
+checkpoint. The refresh put skips the shared R2 request pacer, so it takes no slot
+from checkpoint, validation or archive requests.
+
 The eight `rs_ibkr_{capacity|executable}_{10|25|50|100}bps.v1` cohorts are
 separately registered forward experiments. The original fourteen policies,
 their $1m reference portfolio, fixed 50% borrow assumption and results remain

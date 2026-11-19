@@ -3,6 +3,7 @@
 import {createHash} from 'node:crypto';
 import {readinessSnapshot} from './readiness.mjs';
 import {operationalEvidence} from './operational-evidence.mjs';
+import {operationsText} from './operations-publication.mjs';
 const id=v=>createHash('sha256').update(v).digest('hex'),parse=r=>JSON.parse(r.payload);
 const trim=t=>{const {book,fills,daily_marks,...rest}=t;return rest;};
 export function trackCard(t){const row=Object.fromEntries(Object.entries(t).filter(([,v])=>v===null||['string','number','boolean'].includes(typeof v)));if(t.decision_snapshot)row.decision_snapshot={score:t.decision_snapshot.score,ordinal_min:t.decision_snapshot.ordinal_min};for(const k of ['pnl','gates','feasibility','public_borrow'])if(t[k])row[k]=t[k];return row;}
@@ -32,11 +33,13 @@ export function captureReadSnapshot(db){
   details.push({key:'readiness.json',value:{...envelope,...readiness}});const financialNeeds=db.prepare("SELECT key,value FROM rs_state WHERE key>='financial_need:' AND key<'financial_need;'").all();
   return {objects:[{key:'financial-needs.json',value:financialNeeds},{key:'shadow.json',value:main},{key:'operations.json',value:operations},{key:'execution.json',value:{...envelope,summary:execSummary,daily:executionDaily}},{key:'validation.json',value:{...envelope,summary:validation,plan}},{key:'cards/shadow.json',value:legacy.map(trackCard)},{key:'cards/execution.json',value:execution.map(trackCard)},...cardObjects,{key:'events.json',value:cards},{key:'health.json',value:{status:sources.every(s=>s.status==='healthy')&&!jobs.some(j=>j.state==='failed')?'healthy':'degraded',sources,jobs,state:healthState,counts:db.prepare('SELECT result,count(*) AS count FROM rs_events GROUP BY result').all(),scope:'Public research sources; detailed current state served from the durable private archive.',schedule_note:'Continuous external collector; daily database write budget is protected by private snapshot publication.'}},...details],borrow,borrowHealth,flex,envelope,at:new Date().toISOString()};
 }
-export async function publishReadSnapshot(env,db,snapshot,{shouldYield=()=>false}={}){
+export async function publishReadSnapshot(env,db,snapshot,{shouldYield=()=>false,operations=null}={}){
   async function put(key,value){env.assertCollectorLease?.();const text=JSON.stringify(value),digest=id(text),marker='snapshot:'+key,old=db.prepare('SELECT value FROM rs_state WHERE key=?').get(marker)?.value;if(old===digest)return;await env.EVIDENCE.put('collector-dashboard/'+key,new TextEncoder().encode(text),{httpMetadata:{contentType:'application/json'}});db.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(marker,digest,snapshot.at);}
   // Complete the five current-state objects before yielding older derived pages.
   // Persisted content hashes let the successor resume history without losing work.
-  for(let i=0;i<snapshot.objects.length;i++){if(i>=5&&shouldYield())return {complete:false};const object=snapshot.objects[i];await put(object.key,object.value);}
+  // operations.json goes through the checkpoint's operations channel when there is one,
+  // so it is ordered against between-checkpoint refreshes of the same object.
+  for(let i=0;i<snapshot.objects.length;i++){if(i>=5&&shouldYield())return {complete:false};const object=snapshot.objects[i];if(operations&&object.key==='operations.json'&&snapshot.stateAt)await operations.publish({text:operationsText(object.value,snapshot.stateAt),stateAt:snapshot.stateAt,generatedAt:object.value.generated_at});else await put(object.key,object.value);}
   const days={};for(const row of snapshot.borrow){const day=row.observed_at.slice(0,10);(days[day]||=[]).push(row);}
   for(const [day,observations] of Object.entries(days)){if(shouldYield())return {complete:false};await put('borrow/'+day+'.json',observations);}
   if(shouldYield())return {complete:false};
