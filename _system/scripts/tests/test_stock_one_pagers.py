@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from stock_one_pagers import build_one_pager, sec_series
+from stock_one_pagers import build_one_pager, sec_series, performance_input, PERFORMANCE_METHOD
 from prepare_stock_research_publication import prepare
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -17,6 +17,14 @@ def raw(tag, observations, unit="USD"):
 
 def observation(start, end, value, **extra):
     return {"start": start, "end": end, "val": value, "form": "10-K", "filed": "2026-01-01", "accn": "0000000000-26-000001", **extra}
+
+
+def test_corrected_history_takes_precedence_over_an_older_explicit_pilot_cache(tmp_path):
+    path = tmp_path / "_system/reference/stock-research/CPRT_total_return.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"points": [["2020-01-01", 100, 100]]}), encoding="utf-8")
+    corrected = {"method_version": PERFORMANCE_METHOD, "status": "evidence_blocked", "points": []}
+    assert performance_input(tmp_path, "CPRT", corrected) == corrected
 
 
 def test_fiscal_period_end_and_ytd_difference_override_misleading_fy_metadata():

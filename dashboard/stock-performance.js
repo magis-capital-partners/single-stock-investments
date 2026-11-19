@@ -6,7 +6,7 @@
   const pct = value => Number.isFinite(value) ? new Intl.NumberFormat(undefined, {style:'percent',maximumFractionDigits:1}).format(value) : '—';
   const money = (value, currency='USD', compact=false) => new Intl.NumberFormat(undefined, {style:'currency',currency:currency==='GBp'?'GBX':currency,maximumFractionDigits:0,notation:compact?'compact':'standard'}).format(value);
   const day = value => new Intl.DateTimeFormat(undefined, {year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(value));
-  const history = t => t.one_pager?.performance?.points?.length ? t.one_pager.performance : t.total_return_panel?.history;
+  const history = t => {const p=t.one_pager?.performance;return p?.method_version||p?.status==='evidence_blocked'?p:p?.points?.length?p:t.total_return_panel?.history;};
   const state = t => {
     if (!states.has(t.ticker)) states.set(t.ticker, {period:'all',scale:'logarithmic',view:'wealth',benchmark:false,price:false});
     return states.get(t.ticker);
@@ -41,7 +41,7 @@
 
   function markup(t,h={}) {
     const record=history(t), s=state(t), data=windowData(record,s.period,s.benchmark);
-    if(!data)return '<h3>Long-term shareholder returns</h3><p class="perf-empty">Comparable shareholder-return history is not available for this listing.</p>';
+    if(!data)return `<h3>Long-term shareholder returns</h3><p class="perf-empty">Comparable shareholder-return history is not available for this listing.${record?.reason?' '+esc(record.reason):''}</p>${/^https?:\/\//.test(record?.source_url||'')?(h.linkHtml?h.linkHtml(record.source_url,'Review history source'):`<a href="${esc(record.source_url)}" target="_blank" rel="noopener noreferrer">Review history source</a>`):''}`;
     const currency=record.currency||'USD', initial=money(10000,currency);
     const links=[['Stock history',record.source_url], ...(data.benchmark?[['Benchmark history',data.benchmark.source_url]]:[])];
     const sourceLink=(label,url)=>h.linkHtml?h.linkHtml(url,esc(label)):`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;

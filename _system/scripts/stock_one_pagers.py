@@ -48,6 +48,14 @@ PROFILES = {
 
 _PUBLICATION_INPUTS = {}
 UNIVERSE_PATH = "_system/reference/stock-research/universe.json"
+PERFORMANCE_METHOD = "split-cash-basis.v2"
+
+
+def performance_input(root: Path, ticker: str, cached: dict) -> dict:
+    explicit = read_json(root / "_system/reference/stock-research" / f"{ticker}_total_return.json")
+    if cached.get("method_version") == PERFORMANCE_METHOD and explicit.get("method_version") != PERFORMANCE_METHOD:
+        return cached
+    return explicit or cached
 
 
 def load_universe_document(root: Path, *, resolve_private: bool = False) -> dict:
@@ -510,9 +518,9 @@ def build_one_pager(root: Path, ticker: str, row: dict | None = None) -> dict:
                         "kind": a.get("kind") or "assumption", "unit": a.get("unit"), "rationale": a.get("rationale"),
                         "source": a.get("source") or {}, "values": a.get("values") or {"base": a.get("value")}}
                        for a in published_forecast["model_assumptions"] if isinstance(a, dict)]
-    performance = read_json(root / "_system/reference/stock-research" / f"{ticker}_total_return.json") or cached.get("performance") or {}
+    performance = performance_input(root, ticker, cached.get("performance") or {})
     if performance.get("benchmark_ref"):
-        benchmark = read_json(root / "_system/reference/stock-research/SPY_total_return.json") or (universe_inputs(root).get("SPY") or {}).get("performance") or {}
+        benchmark = performance_input(root, "SPY", (universe_inputs(root).get("SPY") or {}).get("performance") or {})
         if benchmark.get("currency") == performance.get("currency"):
             performance = {**performance, "benchmark": benchmark}
     risks = (contract.get("monitoring") or {}).get("falsifiers") or cached.get("risks") or []

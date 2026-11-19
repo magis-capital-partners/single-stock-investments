@@ -43,3 +43,19 @@ def test_contingent_rights_and_debentures_never_inherit_common_share_returns(mon
     monkeypatch.setattr(history, "urlopen", lambda *a, **kw: (_ for _ in ()).throw(AssertionError("Unexpected parent equity request")))
     for ticker in ("ABMD.CVR", "CSU.DB"):
         assert history.fetch_performance(ticker, {})["status"] == "unavailable"
+
+
+def test_materially_conflicting_vendor_returns_require_source_reconciliation(tmp_path):
+    import gzip
+    from datetime import datetime, timezone
+    source = tmp_path / "source.json.gz"
+    data = {"timestamp": [int(datetime(2020, 1, 1, tzinfo=timezone.utc).timestamp()), int(datetime(2021, 1, 1, tzinfo=timezone.utc).timestamp())],
+            "meta": {"exchangeTimezoneName": "UTC"}, "indicators": {"adjclose": [{"adjclose": [100, 110]}]}}
+    source.write_bytes(gzip.compress(json.dumps({"data": data}).encode()))
+    record = {"points": [["2020-01-01", 100, 100], ["2021-01-01", 110, 300]], "coverage": {"status": "vendor_only"}}
+    result = history.reconcile_performance(record, source)
+    assert result["status"] == "evidence_blocked"
+    assert result["points"] == []
+    assert result["reconciliation"]["status"] == "requires_review"
+    record["points"][-1][2] = 110
+    assert history.reconcile_performance(record, source)["reconciliation"]["status"] == "consistent"
