@@ -2068,7 +2068,9 @@
 <script src="commodity-model-viz.js?v=20261113"></script>
 <script src="source-links.js?v=20261118"></script>
 <script src="stock-performance.js?v=20261118"></script>
-<script src="stock-one-pager.js?v=20261118"></script>
+<script src="stock-valuation.js?v=20261119"></script>
+<script src="stock-valuation-view.js?v=20261119"></script>
+<script src="stock-one-pager.js?v=20261119"></script>
 <script src="research-workspace.js?v=20261118"></script>
 <script src="company-research.js?v=20261118"></script>
 <script>
@@ -2652,9 +2654,11 @@ function applyParsedRouteFromHash() {
   if (route.view === 'insights' && route.insightsSection && INSIGHTS_LIVE_SECTIONS.has(route.insightsSection)) insightsSection = route.insightsSection;
   setView(route.view, { syncHash: false });
   if (route.view === 'holdings' && route.ticker) {
-    const hit = data.tickers.find(x => x.ticker === route.ticker);
-    if (hit || window.BuybackViz?.company(route.ticker) || window.Compounders?.member(route.ticker)) {
-      selectTicker(route.ticker, { syncHash: false, workspaceTab: new URLSearchParams(location.hash.split('?')[1] || '').get('section') || 'overview' });
+    const formerTicker = route.ticker;
+    const resolvedTicker = data.ticker_aliases?.[route.ticker] || route.ticker;
+    const hit = data.tickers.find(x => x.ticker === resolvedTicker);
+    if (hit || window.BuybackViz?.company(resolvedTicker) || window.Compounders?.member(resolvedTicker)) {
+      selectTicker(resolvedTicker, { syncHash: resolvedTicker !== formerTicker, workspaceTab: new URLSearchParams(location.hash.split('?')[1] || '').get('section') || 'overview' });
       return true;
     }
   }
@@ -5833,13 +5837,14 @@ function filtered() {
         t.company,
         t.display_ticker,
         t.quote_ticker,
+        ...(t.legacy_tickers || []),
       ].join(' ').toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     return true;
   }).sort((a, b) => {
     if (q) {
-      const rank = t => [t.ticker,t.display_ticker,t.quote_ticker].some(v=>String(v||'').toLowerCase()===q) ? 0 : String(t.company||'').toLowerCase()===q ? 1 : 2;
+      const rank = t => [t.ticker,t.display_ticker,t.quote_ticker,...(t.legacy_tickers||[])].some(v=>String(v||'').toLowerCase()===q) ? 0 : String(t.company||'').toLowerCase()===q ? 1 : 2;
       if (rank(a)!==rank(b)) return rank(a)-rank(b);
     }
     let av = a[sortKey], bv = b[sortKey];
@@ -6311,6 +6316,7 @@ function wireDetailEvents(ticker) {
 }
 
 function selectTicker(ticker, opts = {}) {
+  ticker = data.ticker_aliases?.[ticker] || ticker;
   const requestVersion = ++detailRequestVersion;
   window.ResearchWorkspace?.rememberScroll();
   selected = ticker;
