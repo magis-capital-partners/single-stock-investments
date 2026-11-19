@@ -101,8 +101,11 @@ The config needs:
 * `RS_OPERATIONS_READ_TOKEN` in the environment when `operations_url` is
   used.
 
-With `operations_mirror` set, the producer also writes the executor's
-`--operations-file`. That way only one process holds the narrow R2 token.
+Box R's operations URL and token come from `RS_OPERATIONS_URL` and
+`RS_OPERATIONS_READ_TOKEN` in the same root-only `EnvironmentFile` the executor
+unit uses, unless the config names `operations_file`/`operations_url`.
+`operations_mirror` (off by default) writes a copy for an executor run with
+`--operations-file`. The live unit now reads the URL itself.
 
 ## Verification
 

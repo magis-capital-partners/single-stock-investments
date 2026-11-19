@@ -16,8 +16,9 @@ Group=rs-live
 SupplementaryGroups=ib-claims
 WorkingDirectory=/srv/rs-live/repo
 Environment=TZ=America/New_York
-# RS_OPERATIONS_READ_TOKEN: the narrow R2 read token (owner-created).
-EnvironmentFile=-/etc/rs-live/producers.env
+# Required, as for the executor: RS_OPERATIONS_URL (Box R's private R2 object)
+# and RS_OPERATIONS_READ_TOKEN (read-only). root:root 0600; systemd reads it.
+EnvironmentFile=/etc/rs-live/executor.env
 ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_evidence run --config /etc/rs-live/producers.json --max-seconds 26400
 # No Gateway connection exists here, so a bounded restart cannot become a
 # connect storm; the burst limit keeps public sites from being hammered.
