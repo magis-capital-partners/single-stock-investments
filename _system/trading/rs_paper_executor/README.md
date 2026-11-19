@@ -174,81 +174,37 @@ bound every value.
 `ibc_guard`'s live-lock veto does not know RS, so a remedial Gateway restart can
 disconnect it. RS then halts entries and reconnects within its budget.
 
-**NY4 layout.** The templates `rs-live-executor.service` / `.timer` are not
-installed by anything.
+**NY4 layout.** The templates `rs-live-executor.service` / `.timer` and
+`rs-live-operations.service` are not installed by anything.
 
 | What | Where |
 |---|---|
 | User | `rs-live` |
-| Repo and venv | `/srv/rs-live/repo`, `/srv/rs-live/venv` |
-| Config and arm | `/etc/rs-live/` (`config.json`; `ARM.json` only for the pilot) |
-| Feed credentials | `/etc/rs-live/executor.env`, `root:root 0600`: `RS_OPERATIONS_URL` (Box R's private R2 object, `https://api.cloudflare.com/client/v4/accounts/<account>/r2/buckets/single-stock-reverse-splits-evidence/objects/collector-dashboard/operations.json`) and `RS_OPERATIONS_READ_TOKEN` (read-only). The unit requires this file |
-| State | `/var/lib/rs-live/` (journal, `evidence.json`, `book/`) |
+| Code and venv | `/srv/rs-live/releases/<commit>/` (a checksum-verified release copied from the laptop), `/srv/rs-live/repo` -> the active release, `/srv/rs-live/venv` |
+| Config and arm | `/etc/rs-live/` (`root:rs-live 0750`; `config.json`; `ARM.json` only for the pilot) |
+| Feed credential | `/etc/rs-live/operations.env`, `root:root 0600`, read by systemd for `rs-live-operations` ONLY: `RS_OPERATIONS_S3_ENDPOINT`, `RS_OPERATIONS_ACCESS_KEY_ID`, `RS_OPERATIONS_SECRET_ACCESS_KEY` (an R2 "Object Read only" token scoped to `single-stock-reverse-splits-evidence`). The executor holds no feed credential |
+| Feed copy | `/var/lib/rs-live/feed/`: `operations.json` (Box R's bytes), `operations.meta.json` (producer and download clocks), `cadence/<ET day>.jsonl`, `operations.status.json` |
+| State | `/var/lib/rs-live/shadow.sqlite` (the dedicated shadow journal), later `state.sqlite` for the pilot; `evidence.json`; `book/` |
 | Claims | `/var/lib/ib-account-claims/`: owner `rs-live`, group `ib-claims`, mode `2750` (setgid, so new files inherit the group); `spx` is a member of `ib-claims`. RS writes `reverse-split.json` at startup even with no claims and never deletes released entries |
-| SPX claim files | read from `/home/spx/spx-0dte/data/live/<date>/`, read-only, through an ACL (below); RS never writes there |
+| SPX claim files | read from `/home/spx/spx-0dte/data/live/<date>/`, read-only, through an ACL; RS never writes there |
 
-The unit sets `CPUWeight=20` and `OOMScoreAdjust=700`; `RuntimeMaxSec` ends the
-session run.
+The executor unit sets `CPUWeight=20` and `OOMScoreAdjust=700`; `RuntimeMaxSec`
+ends the session run. The fetcher is weaker still (`CPUWeight=10`,
+`OOMScoreAdjust=800`) and stops with the executor (`PartOf=`).
 
-### Shadow install (owner's word; a weekday evening after 16:20 ET)
+**Feed.** The executor never reads the network. `operations-fetch` (unit
+`rs-live-operations`) polls Box R's one object every 5 s over R2's S3 API (a
+SigV4 GET, conditional on the ETag). It writes the local copy atomically, and
+records the producer's `generated_at` apart from the download time. The executor
+reads only that file, and still refuses a snapshot whose PRODUCER clock is more
+than 120 s old. Cloudflare's bucket-scoped "Object Read only" tokens work only
+with the S3 API, which is why the reader is not the REST API. That token can
+read every object in the bucket; the code reads exactly one key. `operations-cadence`
+reports the measured publication intervals per ET day.
 
-Not between Sunday 23:05 and Monday 07:10 ET, when the Gateway is closed. Nothing
-here touches SPX's services, and no SPX unit is restarted. The order matters:
-
-1. **Group first.** `groupadd ib-claims; usermod -aG ib-claims spx`. ls-algo runs
-   as `spx`. Once ls-algo's claims guard (#70) is deployed, a claims file it cannot
-   read is a global failure for ls-algo, not "no claims". Its jobs are one-shot, so
-   each picks up the group at its next start.
-2. **User and directories.**
-   * `useradd --system --home /srv/rs-live rs-live; usermod -aG ib-claims rs-live`;
-   * `install -d -o rs-live -g ib-claims -m 2750 /var/lib/ib-account-claims`;
-   * `install -d -o rs-live -g rs-live -m 0750 /var/lib/rs-live`;
-   * `install -d -o root -g rs-live -m 0750 /etc/rs-live`. The service can read its
-     config but cannot write `ARM.json` itself; only root (the owner) arms.
-3. **Read grant on SPX's claim files**, the one folder and nothing else in `spx`'s
-   home. Use traverse-only on the parents, and a default ACL so the day
-   directories SPX creates later inherit it:
-
-   ```text
-   setfacl -m u:rs-live:--x /home/spx /home/spx/spx-0dte /home/spx/spx-0dte/data
-   setfacl -R -m u:rs-live:r-X /home/spx/spx-0dte/data/live
-   setfacl -R -d -m u:rs-live:r-X /home/spx/spx-0dte/data/live
-   ```
-
-   spx-0dte writes these files with its default mode (`heartbeat._atomic_write_text`,
-   not `mkstemp`'s 0600), so the default ACL reaches each new file. Without this
-   grant every entry is refused as `SPX book margin directory unreadable`.
-4. **Code and venv.** Check out the reviewed SSI commit at `/srv/rs-live/repo` (only
-   `_system/trading` is needed). Install the package's pinned requirements into
-   `/srv/rs-live/venv`.
-5. **Files.**
-   * `config.json`, with the owner's values;
-   * `executor.env` (above);
-   * `/var/lib/rs-live/evidence.json`, copied from `evidence.example.json`
-     (empty: every proposal is refused until the evidence producers exist);
-   * `/etc/rs-live-approved`;
-   * the unit and timer, copied to `/etc/systemd/system/` but **not enabled**.
-   * No `ARM.json`.
-6. **Checks, as `rs-live`, the same evening** (from `/srv/rs-live/repo`).
-   `operations-check` goes through `systemd-run`, so the token reaches it from
-   `executor.env` without passing through a shell or a command line:
-
-   ```text
-   sudo -u rs-live /srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor preflight --config /etc/rs-live/config.json
-   sudo systemd-run --wait --pipe -p User=rs-live -p WorkingDirectory=/srv/rs-live/repo -p EnvironmentFile=/etc/rs-live/executor.env /srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor operations-check --config /etc/rs-live/config.json --operations-url '${RS_OPERATIONS_URL}'
-   sudo -u rs-live /srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor probe --config /etc/rs-live/config.json --connect-live --symbol <REVIEWED_TICKER> --conid <REVIEWED_CONID> --report /var/lib/rs-live/probe.json
-   ```
-
-   * `preflight` now also checks the live paths: the SPX tree and its newest day
-     must be readable, and the claims and publish directories writable. It
-     exits 2 and names every failure. It opens no connection.
-   * `operations-check` makes one read of Box R's feed and exits 0 only if it
-     is under 120 s old.
-   * `probe` is the first and only connection of the evening: one session, no
-     journal, a 1-share WhatIf, nothing transmitted. Its quote checks need
-     regular hours, so the first shadow session settles them.
-7. **Enable the timer** (`systemctl enable --now rs-live-executor.timer`). The first
-   session starts at 09:05 ET the next weekday. Run `shadow-report` after each close.
+**Install, verification and rollback:** `NY4_SHADOW_INSTALL.md`, the pinned plan
+for the owner's explicit NY4 authorization. Nothing in it runs without that
+word.
 
 ### Live operator commands (on NY4, as `rs-live`)
 
@@ -256,8 +212,8 @@ Install or change anything only outside 07:45-16:20 ET.
 
 ```text
 python -m _system.trading.rs_paper_executor preflight --config /etc/rs-live/config.json
-python -m _system.trading.rs_paper_executor status   --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite
-systemctl start rs-live-executor        # owner word; shadow unless armed
+python -m _system.trading.rs_paper_executor status   --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite
+systemctl start rs-live-executor        # owner word; the shipped unit runs the shadow journal
 touch /var/lib/rs-live/FLATTEN          # scoped flatten: cancels RS entries, covers RS names only
 systemctl stop rs-live-executor         # stop; working DAY orders stay at IBKR, check status
 rm /etc/rs-live/ARM.json                # disarm: back to shadow on the next cycle; covers continue
@@ -281,30 +237,60 @@ to start, and its evidence is reviewed before the next.
 | Stage | Where | Proves | Evidence |
 |---|---|---|---|
 | **P: paper mechanics** | Laptop paper, supervised, delayed data | Order mechanics only, on IBKR's simulated market (see the mechanics test above) | `integration-test --mechanics-only` report, `pass: true` |
-| **S: live shadow** | NY4, client 60, **no arm file** | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report` over ≥ N sessions (default 5): `ready_for_arm_review: true`, the would-be entries, and refusals by reason |
+| **S: live shadow** | NY4, client 60, the dedicated shadow journal (`run --shadow`; never transmits an entry) | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report`: ≥ 5 complete sessions, ≥ 3 deduplicated opportunities from 3 issuers over ≥ 2 sessions, verified stage-P mechanics (rules below) |
 | **L: live pilot** | NY4, owner arm file | Real fills, cancels, recalls and fees at the smallest size | The owner sets pilot caps (e.g. `max_names: 1`, a small `target_notional`) and widens them only after reviewing the pilot's fills and the account reconciliation |
 
 ```text
-python -m _system.trading.rs_paper_executor shadow-report --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite --min-sessions 5 --min-entries 1 --report shadow.json
+python -m _system.trading.rs_paper_executor shadow-report --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite --mechanics-report stage-p.json --mechanics-journal <stage-P>.integration.sqlite --report shadow.json
 ```
 
 `shadow-report` is read-only. It holds no writer lock and opens no broker
-connection. It prints acceptance facts:
-* no transmitted orders;
-* the number of sessions observed;
-* the number of would-be entries (`--min-entries`, default 1);
-* the worst heartbeat gap;
-* whether the kill and daily-loss latches are set.
+connection. The owner's acceptance rules (2026-11-19) are engineering facts,
+not proof of profitability. `ready_for_arm_review` needs every one of them, and
+`failed_checks` names the ones missing:
 
-A would-be entry is recorded only after every live gate has passed: live quote
-and size, WhatIf on the real account, the SPX reserve and cushion, and
-book-margin room. With none, the live entry path has never run, so uptime alone
-does not make the report ready.
+* **A dedicated shadow journal with zero orders.** The journal must be
+  `journal_role: shadow` (`run --shadow`), and hold no order, no position and
+  no cover. Protection of genuine RS positions runs on the live journal, and is
+  never labelled zero-order shadow validation; `run --shadow` refuses to start
+  while RS holds live names.
+* **At least 5 complete operating sessions** (`--min-sessions`). Complete means
+  both:
+  * the process heartbeat gap stays within 120 s;
+  * the feed was fresh, by the producer's clock, for at least 95% of
+    heartbeats (`--min-feed-coverage`).
 
-It exits 0 only when all of them hold. The decision to arm stays with the owner.
-Note that shadow sees no would-be entries until the evidence producers exist
-(identity/conid within the 15-minute window, intraday SSR, borrow ≤30 min). Its
-refusal histogram shows exactly which one is missing.
+  Each session reports the process gap, feed freshness, the longest stale
+  stretch, the download lag, and per-security quote availability
+  (`quote_check`), all separately.
+* **At least 3 fully gated opportunities from 3 issuers across at least 2
+  sessions** (`--min-opportunities`, `--min-issuers`,
+  `--min-opportunity-sessions`). Opportunities are deduplicated by issuer (CIK)
+  and action. These never count, and are listed under `excluded_entries`:
+  * synthetic controls;
+  * repeated evaluations;
+  * the same action under another publisher record;
+  * catch-up announcements, first seen more than the entry window after
+    publication.
+
+  Quiet sessions alone are never ready.
+* **A clear current entry-halt state**, and clear kill and daily-loss latches.
+* **Verified stage-P mechanics.** `--mechanics-report` is checked against its
+  own `--mechanics-journal`:
+  * the RSPAPER| namespace on a DU account;
+  * a filled SELL;
+  * a broker-confirmed cancel;
+  * a filled BUY cover;
+  * flat at the end, with the kill latch set;
+  * the report's fill count matching the journal.
+
+  Partial fills cannot be forced on IBKR's simulator, so they are reported
+  (`observed_on_paper`) rather than gated. The SimBroker unit tests cover them
+  deterministically.
+
+It exits 0 only when every check holds; the decision to arm stays with the
+owner. Shadow sees no would-be entry until the evidence producers exist, and
+the refusal histogram shows which input is missing.
 
 ### Account reconciliation (after the Flex day closes)
 

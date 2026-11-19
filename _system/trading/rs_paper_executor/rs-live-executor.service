@@ -2,10 +2,15 @@
 # installer (which installs every file in its own deploy/linux/systemd/).
 # NY4 reverse-split executor: registered client 60, prefix RSLIVE|.
 # Install/enable only on the owner's explicit word, outside 07:45-16:20 ET.
-# Without a valid /etc/rs-live/ARM.json it runs in SHADOW (no SELL transmitted).
+# As shipped it runs the dedicated SHADOW journal (--shadow): no entry is ever
+# transmitted, whatever /etc/rs-live/ARM.json says, and it refuses to start
+# while RS holds live names. The pilot is a separate owner decision: a drop-in
+# that removes --shadow and points --state at /var/lib/rs-live/state.sqlite.
 [Unit]
-Description=Reverse-split live executor (client 60; shadow unless owner-armed)
-After=ibc.service
+Description=Reverse-split live executor (client 60; shadow journal)
+After=ibc.service rs-live-operations.service
+# The feed fetcher runs beside it and stops with it (PartOf there).
+Wants=rs-live-operations.service
 ConditionPathExists=/etc/rs-live-approved
 
 [Service]
@@ -16,13 +21,12 @@ Group=rs-live
 SupplementaryGroups=ib-claims
 WorkingDirectory=/srv/rs-live/repo
 Environment=TZ=America/New_York
-# Required (no leading "-"): RS_OPERATIONS_URL (Box R's private R2 object, the
-# api.cloudflare.com form inbox.read_https accepts) and RS_OPERATIONS_READ_TOKEN
-# (read-only). root:root 0600; systemd reads it, the service user never can.
-# Box R republishes operations.json about every 60 s while active; the executor
-# refuses a snapshot older than 120 s, so a local copy nothing refreshes is useless.
-EnvironmentFile=/etc/rs-live/executor.env
-ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor run --config /etc/rs-live/config.json --state /var/lib/rs-live/state.sqlite --evidence /var/lib/rs-live/evidence.json --operations-url ${RS_OPERATIONS_URL} --kill-file /var/lib/rs-live/FLATTEN --connect-live
+# Optional: RS_PAPER_SLACK_WEBHOOK only. The executor holds NO feed credential and
+# makes no feed network read: rs-live-operations writes feed/operations.json and
+# this process reads that local copy. The executor refuses a snapshot whose
+# producer clock is older than 120 s.
+EnvironmentFile=-/etc/rs-live/executor.env
+ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor run --shadow --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite --evidence /var/lib/rs-live/evidence.json --operations-file /var/lib/rs-live/feed/operations.json --kill-file /var/lib/rs-live/FLATTEN --connect-live
 # No restart: a crash must not become a connect loop (AGENTS.md rule 9). The
 # executor's own 3-per-day connect budget covers transient disconnects.
 Restart=no

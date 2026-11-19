@@ -39,6 +39,10 @@ class Executor:
         if endpoint.live and (claims is None or book is None):
             raise SafetyError("live executor requires symbol claims and book margin")
         self.transmit, self.claims, self.book = transmit, claims, book
+        # Input freshness the run loop measured (operations feed clocks); the
+        # heartbeat carries it so shadow-report can tell a live process with a
+        # dead feed from a session where both were up.
+        self.source_status = {}
         self.policy = policy.validate()
         self.journal, self.broker = journal, broker
         self.calendar = calendar or Calendar()
@@ -538,7 +542,12 @@ class Executor:
         if apr > self.policy.max_borrow_apr:
             raise SafetyError("borrow APR exceeds policy")
         quote = await self.broker.quote(signal["conid"])
-        bid, ask = self.quote(quote, now, signal["conid"])
+        try:
+            bid, ask = self.quote(quote, now, signal["conid"])
+        except SafetyError as exc:
+            self.quote_observed(now, signal, False, str(exc))
+            raise
+        self.quote_observed(now, signal, True, None)
         if 10000 * (ask - bid) / ((ask + bid) / 2) > self.policy.max_spread_bps:
             raise SafetyError("spread exceeds policy")
         p = self.policy
@@ -663,6 +672,13 @@ class Executor:
                     "id": signal["id"], "ticker": signal["ticker"], "shares": shares,
                     "limit": bid, "reason": why,
                     "initial_margin": initial, "maintenance_margin": maintenance,
+                    # Deduplication keys for shadow acceptance (issuer/action).
+                    "cik": signal.get("cik"), "action_id": signal.get("action_id"),
+                    "conid": signal["conid"], "published_at": signal.get("published_at"),
+                    "first_seen_at": signal.get("first_seen_at"),
+                    "synthetic_control": bool(
+                        signal.get("synthetic_control")
+                        or str(signal.get("id", "")).startswith("synthetic-control:")),
                 })
             return None
         if self.claims is not None:
@@ -713,5 +729,19 @@ class Executor:
             now,
             "heartbeat",
             {"paper_only": not self.endpoint.live,
-             "live_orders_allowed": self.endpoint.live and self.transmit()[0]},
+             "live_orders_allowed": self.endpoint.live and self.transmit()[0],
+             **self.source_status},
         )
+
+    def quote_observed(self, now, signal, ok, reason):
+        """Security-level quote availability, journalled only when it changes
+        per name and ET day (an evaluation every cycle would flood the journal)."""
+        day = timestamp(now).astimezone(ZoneInfo("America/New_York")).date().isoformat()
+        key = "quote_seen:" + day + ":" + str(signal["conid"])
+        state = [bool(ok), reason]
+        if self.journal.get(key) == state:
+            return
+        self.journal.set(key, state)
+        self.journal.event(now, "quote_check", {
+            "conid": signal["conid"], "ticker": signal.get("ticker"),
+            "cik": signal.get("cik"), "available": bool(ok), "reason": reason})

@@ -24,6 +24,7 @@ from .ibkr import PaperIBKR
 from .inbox import proposals, read_https, read_json
 from .journal import Journal
 from .notify import deliver_alerts
+from .operations_feed import read_local
 from .policy import Policy
 from .probe import probe, require_local_ib_listener
 from .safety import LIVE_APPROVAL, RS_SYSTEM, SafetyError, endpoint_from_config, fresh
@@ -139,15 +140,39 @@ async def run(args, endpoint, policy, config):
         raise SafetyError("--connect-paper is required; no connection was opened")
     if not args.evidence or not (args.operations_file or args.operations_url):
         raise SafetyError("evidence and Box R operations source required")
+    if endpoint.live and args.operations_url:
+        # A blocking HTTPS read inside this loop stalls ib_insync, and position
+        # protection with it. Live reads the copy operations-fetch maintains.
+        raise SafetyError("live reads Box R's feed only from the local copy that "
+                          "operations-fetch writes (--operations-file)")
     if args.operations_url and not os.environ.get("RS_OPERATIONS_READ_TOKEN"):
         # Otherwise every cycle would log inbox_unavailable for a whole session.
         raise SafetyError("RS_OPERATIONS_READ_TOKEN is not set for --operations-url")
+    if args.shadow and not endpoint.live:
+        raise SafetyError("--shadow is a live-endpoint mode")
+    role = ("shadow" if args.shadow else "live") if endpoint.live else "paper"
     with_context = lambda: read_json(args.evidence)
     claims, book = account_guards(config, endpoint, policy)
+    start = datetime.now(ZoneInfo("UTC")).isoformat()
+    if role == "shadow" and claims is not None and claims.held(start):
+        # Genuine RS positions are protected by the journal that holds them; a
+        # shadow journal never manages positions, so it must not run instead.
+        raise SafetyError("RS holds live names (" + ", ".join(sorted(claims.held(start)))
+                          + "): run the live journal so their protection continues")
     if claims is not None:
-        claims.publish_current(datetime.now(ZoneInfo("UTC")).isoformat())
+        claims.publish_current(start)
     arm_file = (config.get("live") or {}).get("arm_file")
     journal = Journal(args.state, policy.digest, endpoint.prefix)
+    if journal.get("journal_role", role) != role:
+        found = journal.get("journal_role")
+        journal.close()
+        raise SafetyError("this is a " + str(found) + " journal; a " + role
+                          + " run needs its own --state")
+    journal.set("journal_role", role)
+    if role == "shadow":
+        transmit = lambda: (False, "shadow journal: entries are never transmitted")
+    else:
+        transmit = lambda: arm_state(arm_file, endpoint, policy, broker.now())
     broker = PaperIBKR(endpoint, with_context)
     broker.known_refs = {x["ref"] for x in journal.rows("orders")}
 
@@ -180,7 +205,7 @@ async def run(args, endpoint, policy, config):
             journal,
             broker,
             kill_switch=lambda: Path(args.kill_file).exists(),
-            transmit=lambda: arm_state(arm_file, endpoint, policy, broker.now()),
+            transmit=transmit,
             claims=claims,
             book=book,
         )
@@ -199,11 +224,21 @@ async def run(args, endpoint, policy, config):
                 journal.set("kill", True)
                 await executor.tick([], broker.now())
             try:
-                data = operations_source(args)
+                if args.operations_file:
+                    data, meta = read_local(args.operations_file)
+                else:
+                    data, meta = operations_source(args), {}
+                # Producer clock and download clock, kept apart for shadow-report.
+                executor.source_status = {
+                    "operations_generated_at": data.get("generated_at"),
+                    "operations_downloaded_at": meta.get("downloaded_at"),
+                }
                 await executor.tick(
                     proposals(data, with_context(), broker.now()), broker.now()
                 )
             except Exception as exc:
+                executor.source_status = dict(
+                    executor.source_status, operations_error=type(exc).__name__)
                 journal.event(
                     broker.now(), "inbox_unavailable", {"type": type(exc).__name__}
                 )
@@ -233,7 +268,9 @@ async def run(args, endpoint, policy, config):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["preflight", "run", "status", "probe", "integration-test",
-                                            "shadow-report", "operations-check"])
+                                            "shadow-report", "operations-check",
+                                            "operations-fetch", "operations-cadence",
+                                            "claims-init"])
     parser.add_argument("--config", required=True)
     parser.add_argument(
         "--state",
@@ -265,11 +302,21 @@ def main(argv=None):
     parser.add_argument(
         "--reference-price", type=float, help="mechanics: price if no delayed quote arrives"
     )
-    parser.add_argument("--min-sessions", type=int, default=5, help="shadow-report")
     parser.add_argument(
-        "--min-entries", type=int, default=1,
-        help="shadow-report: would-be entries needed (the live entry path must have run)",
+        "--shadow", action="store_true",
+        help="run (live): a dedicated shadow journal that never transmits an entry",
     )
+    parser.add_argument("--feed-dir", help="operations-fetch/-cadence: the fetcher's directory")
+    parser.add_argument("--poll-seconds", type=float, default=5, help="operations-fetch")
+    parser.add_argument("--day", help="operations-cadence: ET date (default today)")
+    parser.add_argument("--min-sessions", type=int, default=5,
+                        help="shadow-report: complete operating sessions")
+    parser.add_argument("--min-feed-coverage", type=float, default=0.95, help="shadow-report")
+    parser.add_argument("--min-opportunities", type=int, default=3, help="shadow-report")
+    parser.add_argument("--min-issuers", type=int, default=3, help="shadow-report")
+    parser.add_argument("--min-opportunity-sessions", type=int, default=2, help="shadow-report")
+    parser.add_argument("--mechanics-report", help="shadow-report: the stage-P report")
+    parser.add_argument("--mechanics-journal", help="shadow-report: the stage-P journal")
     parser.add_argument("--max-gap-seconds", type=int, default=120, help="shadow-report")
     parser.add_argument("--since", help="shadow-report: UTC ISO start")
     parser.add_argument("--until", help="shadow-report: UTC ISO end")
@@ -355,12 +402,63 @@ def main(argv=None):
                 Path(args.report).write_text(text + "\n", encoding="utf-8")
             print(text)
             return 0 if report["pass"] else 3
-        elif args.command == "shadow-report":
-            from .shadow_report import shadow_report
+        elif args.command == "operations-fetch":
+            # The feed's network reads live here, in their own process, never in
+            # the executor's position loop. Holds the only feed credential.
+            from .operations_feed import R2Object, fetch_once, run_fetcher, utc_now
 
+            if not args.feed_dir:
+                raise SafetyError("--feed-dir required")
+            source = R2Object.from_env()
+            if not args.once:
+                run_fetcher(source, args.feed_dir, poll_seconds=args.poll_seconds)
+                return 0
+            now = utc_now()
+            try:
+                result = fetch_once(source, args.feed_dir, now)
+            except OSError as exc:
+                raise SafetyError("operations fetch failed: " + type(exc).__name__ + ": " + str(exc))
+            try:
+                fresh(result["source_generated_at"], now, 120)
+                ok = True
+            except SafetyError:
+                ok = False
+            print(json.dumps({**result, "fetched_at": now, "fresh_within_120s": ok,
+                              "broker_connection_opened": False}))
+            return 0 if ok else 3
+        elif args.command == "claims-init":
+            # Install step: create RS's (empty) claims file so the spx user's read
+            # can be verified BEFORE ls-algo's claims reader is deployed. No socket.
+            if not endpoint.live:
+                raise SafetyError("claims-init is for the live endpoint")
+            claims, _ = account_guards(config, endpoint, policy)
+            now = datetime.now(ZoneInfo("UTC")).isoformat()
+            claims.publish_current(now)
+            print(json.dumps({"claims_file": str(claims.path), "held": sorted(claims.held(now)),
+                              "broker_connection_opened": False}))
+        elif args.command == "operations-cadence":
+            from .operations_feed import cadence_report
+
+            if not args.feed_dir:
+                raise SafetyError("--feed-dir required")
+            day = args.day or datetime.now(ZoneInfo("America/New_York")).date().isoformat()
+            print(json.dumps(cadence_report(args.feed_dir, day), indent=1, sort_keys=True))
+        elif args.command == "shadow-report":
+            from .shadow_report import shadow_report, verify_mechanics
+
+            mechanics = None
+            if args.mechanics_report or args.mechanics_journal:
+                if not (args.mechanics_report and args.mechanics_journal):
+                    raise SafetyError("--mechanics-report and --mechanics-journal go together")
+                mechanics = verify_mechanics(args.mechanics_report, args.mechanics_journal)
             report = shadow_report(
-                args.state, min_sessions=args.min_sessions, min_entries=args.min_entries,
-                max_gap_seconds=args.max_gap_seconds, since=args.since, until=args.until,
+                args.state, min_sessions=args.min_sessions,
+                max_gap_seconds=args.max_gap_seconds,
+                min_feed_coverage=args.min_feed_coverage,
+                min_opportunities=args.min_opportunities, min_issuers=args.min_issuers,
+                min_opportunity_sessions=args.min_opportunity_sessions,
+                entry_window_seconds=policy.entry_window_seconds, mechanics=mechanics,
+                since=args.since, until=args.until,
             )
             text = json.dumps(report, indent=1, sort_keys=True)
             if args.report:

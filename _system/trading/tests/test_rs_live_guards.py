@@ -415,23 +415,101 @@ def test_operations_check_reports_feed_age_without_a_connection(tmp_path, capsys
     assert "RS_OPERATIONS_READ_TOKEN is not set" in capsys.readouterr().out
 
 
-def test_live_run_refuses_feed_url_without_token(tmp_path, capsys, monkeypatch):
-    monkeypatch.delenv("RS_OPERATIONS_READ_TOKEN", raising=False)
+def test_live_run_never_reads_the_feed_over_the_network(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("RS_OPERATIONS_READ_TOKEN", "t")
     path = tmp_path / "c.json"
     path.write_text(json.dumps(live_config(tmp_path)))
     state = tmp_path / "s.sqlite"
     assert cli.main(["run", "--config", str(path), "--connect-live", "--evidence", "e",
                      "--operations-url", FEED_URL, "--state", str(state)]) == 2
-    assert "RS_OPERATIONS_READ_TOKEN is not set" in capsys.readouterr().out
+    assert "only from the local copy that operations-fetch writes" in capsys.readouterr().out
     assert not state.exists()
 
 
-def test_shipped_unit_reads_the_feed_url_from_a_required_env_file():
+def test_shipped_units_split_the_feed_credential_from_the_executor():
     from pathlib import Path
-    unit = Path(cli.__file__).with_name("rs-live-executor.service").read_text()
-    assert "EnvironmentFile=/etc/rs-live/executor.env" in unit
-    assert "--operations-url ${RS_OPERATIONS_URL}" in unit
-    assert "--operations-file" not in unit
+    here = Path(cli.__file__).parent
+    unit = (here / "rs-live-executor.service").read_text()
+    assert "run --shadow " in unit and "--state /var/lib/rs-live/shadow.sqlite" in unit
+    assert "--operations-file /var/lib/rs-live/feed/operations.json" in unit
+    assert "--operations-url" not in unit and "RS_OPERATIONS" not in unit.split("[Service]")[1]
+    assert "Wants=rs-live-operations.service" in unit
+    fetch = (here / "rs-live-operations.service").read_text()
+    assert "EnvironmentFile=/etc/rs-live/operations.env" in fetch
+    assert "operations-fetch" in fetch and "--connect" not in fetch
+    assert "PartOf=rs-live-executor.service" in fetch and "ReadWritePaths=/var/lib/rs-live/feed" in fetch
+
+
+def _run_args(tmp_path, *extra):
+    return ["run", "--config", str(tmp_path / "c.json"), "--connect-live", "--evidence", "e",
+            "--operations-file", str(tmp_path / "ops.json"), *extra]
+
+
+def test_shadow_run_refuses_while_rs_holds_live_names(tmp_path, capsys):
+    (tmp_path / "c.json").write_text(json.dumps(live_config(tmp_path)))
+    ClaimBook(tmp_path / "claims_dir", "reverse-split", ACCOUNT).claim("ABC", 77, NOW)
+    state = tmp_path / "shadow.sqlite"
+    assert cli.main(_run_args(tmp_path, "--shadow", "--state", str(state))) == 2
+    assert "RS holds live names (ABC)" in capsys.readouterr().out
+    assert not state.exists()
+
+
+def test_a_journal_keeps_its_role(tmp_path, capsys):
+    config = live_config(tmp_path)
+    (tmp_path / "c.json").write_text(json.dumps(config))
+    state = tmp_path / "state.sqlite"
+    j = Journal(state, Policy(**config["policy"]).validate().digest, "RSLIVE|")
+    j.set("journal_role", "live")
+    j.close()
+    assert cli.main(_run_args(tmp_path, "--shadow", "--state", str(state))) == 2
+    assert "this is a live journal; a shadow run needs its own --state" in capsys.readouterr().out
+
+
+def test_shadow_is_a_live_endpoint_mode(tmp_path, capsys):
+    config = {"endpoint": {"account": "DU000000", "client_id": 171, "port": 4002},
+              "policy": {"spx_reserve": 1, "cash_buffer": 1, "daily_loss_limit": 1}}
+    (tmp_path / "c.json").write_text(json.dumps(config))
+    assert cli.main(["run", "--config", str(tmp_path / "c.json"), "--connect-paper", "--shadow",
+                     "--evidence", "e", "--operations-file", "o",
+                     "--state", str(tmp_path / "s.sqlite")]) == 2
+    assert "--shadow is a live-endpoint mode" in capsys.readouterr().out
+
+
+def test_shadow_entry_carries_dedup_keys_and_quotes_are_logged_per_name(live):
+    live.engine.transmit = lambda: (False, "shadow journal")
+    live.engine.source_status = {"operations_generated_at": "2026-11-18T14:59:40+00:00"}
+    run(live.engine.enter(signal(), live.broker.snap, NOW))
+    assert live.broker.sent == []
+    entry = events(live.journal, "shadow_entry")[-1]
+    assert (entry["cik"], entry["action_id"]) == ("12345", "issuer1:2026-11-25:10")
+    assert entry["published_at"] and entry["first_seen_at"] and entry["synthetic_control"] is False
+    run(live.engine.enter(signal(id="primary:two"), live.broker.snap, NOW))
+    checks = events(live.journal, "quote_check")
+    assert len(checks) == 1 and checks[0]["available"] is True
+    run(live.engine.tick([], NOW))
+    beat = events(live.journal, "heartbeat")[-1]
+    assert beat["operations_generated_at"] == "2026-11-18T14:59:40+00:00"
+
+
+def test_claims_init_writes_the_empty_file_without_a_connection(tmp_path, capsys):
+    (tmp_path / "c.json").write_text(json.dumps(live_config(tmp_path)))
+    assert cli.main(["claims-init", "--config", str(tmp_path / "c.json")]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["held"] == [] and out["broker_connection_opened"] is False
+    written = json.loads((tmp_path / "claims_dir" / "reverse-split.json").read_text())
+    assert written["schema"] == "ib_account_symbol_claims.v1" and written["claims"] == {}
+
+
+def test_shipped_template_carries_the_owner_pilot_values():
+    from pathlib import Path
+    template = json.loads(Path(cli.__file__).with_name("config.live.example.json").read_text())
+    p, live = template["policy"], template["live"]
+    assert (p["target_notional"], p["max_name_notional"], p["max_gross_notional"],
+            p["max_names"]) == (5000, 5000, 10000, 2)
+    assert (p["spx_reserve"], p["cash_buffer"], p["daily_loss_limit"]) == (2_000_000, 500_000, 1000)
+    assert (p["cushion_halt"], p["cushion_flatten"], live["spx_book_reserve_fraction"]) == (0.5, 0.4, 0.9)
+    assert template["endpoint"]["account"] is None  # the installer pins the account
+    Policy(**p).validate()
 
 
 def test_shipped_live_template_cannot_pass_preflight(capsys):
