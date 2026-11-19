@@ -59,11 +59,15 @@ class SourceLinks:
         root = self.vault if private else self.root
         if root is None:
             return False
+        files = tracked_files(str(root), private)
+        if (root / ".git").exists() or files:
+            # Local drafts and R2 materializations do not establish that a file
+            # is published on GitHub. Resolve Git links against the Git tree.
+            return any(name.startswith(ref.rstrip("/") + "/") for name in files) if directory else ref in files
         path = root / ref
         if (path.is_dir() if directory else path.is_file()):
             return True
-        files = tracked_files(str(root), private)
-        return any(name.startswith(ref.rstrip("/") + "/") for name in files) if directory else ref in files
+        return False
 
     def ref_url(self, ref: str, *, repo: str = SSI_REPO, raw: bool = False, directory: bool = False, anchor: str = "") -> str | None:
         ref = str(ref).strip().replace("\\", "/").lstrip("/")
@@ -149,7 +153,7 @@ class SourceLinks:
                 result[key] = self.resolve(item)
             else:
                 result[key] = self.repair_tree(item)
-        if isinstance(result.get("locations"), list):
+        if isinstance(result.get("locations"), list) and all(isinstance(item, dict) and "url" in item for item in result["locations"]):
             locations = result["locations"]
             if locations and not any(location.get("url") for location in locations):
                 result["availability"] = "unavailable"

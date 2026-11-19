@@ -39,6 +39,12 @@ test('repaired and unavailable URLs work across canonical and legacy owners',()=
  assert.match(context.SourceLinks.reference('_system/reference/sumzero-research/CPRT/note.txt'),/research-vault\/blob\/main\/sumzero-research/);
 });
 
+test('frozen relative evidence references use the verified publication destination',()=>{
+ context.SourceLinks.setIndex({repairs:{'CPRT/research/missing.pdf':{url:null,status:'unavailable'},'CPRT/research/note.pdf':{url:'https://example.com/note.md',status:'repaired'}}});
+ assert.equal(context.SourceLinks.reference('CPRT/research/missing.pdf'),null);
+ assert.equal(context.SourceLinks.reference('CPRT/research/note.pdf'),'https://example.com/note.md');
+});
+
 
 test('every stock uses the same layout, with explicit gaps and reporting currency',()=>{
  const x=JSON.parse(JSON.stringify(t));x.ticker='FOREIGN';x.one_pager.financials.currency='EUR';

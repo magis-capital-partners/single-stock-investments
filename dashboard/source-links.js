@@ -25,6 +25,7 @@
   }
   function reference(ref) {
     if (!ref) return null;
+    if (Object.prototype.hasOwnProperty.call(repairs, ref)) return repairs[ref].url || null;
     if (/^https?:\/\//i.test(ref)) return resolve(ref);
     const clean = String(ref).replace(/\\/g,'/').replace(/^\/+/, '');
     const [before, after] = prefixes.find(([from]) => clean.startsWith(from)) || [];

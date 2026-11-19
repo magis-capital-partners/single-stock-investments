@@ -8,6 +8,11 @@ import document_store as store
 from source_links import SourceLinks
 
 
+def test_numerical_chart_locations_are_not_interpreted_as_document_links(tmp_path):
+    value = {"locations": [1, 4, 9], "availability": "reported"}
+    assert SourceLinks(tmp_path).repair_tree(value) == value
+
+
 def isolate(root):
     return patch.multiple(store, ROOT=root, _REGISTRY_CACHE={},
         resolve_ref_to_path=lambda ref: root / ref,
@@ -87,3 +92,12 @@ def test_publication_copy_retains_unavailable_document_metadata_without_mutating
     assert repaired["title"] == "Research report"
     assert repaired["availability"] == "unavailable"
     assert repaired["locations"][0]["url"] is None
+
+
+def test_an_untracked_draft_cannot_create_a_github_destination(tmp_path):
+    import subprocess
+    subprocess.run(["git", "init", "--quiet", str(tmp_path)], check=True, capture_output=True)
+    path = tmp_path / "TEST/research/draft.md"
+    path.parent.mkdir(parents=True)
+    path.write_text("Local research", encoding="utf-8")
+    assert SourceLinks(tmp_path).resolve("TEST/research/draft.md") is None

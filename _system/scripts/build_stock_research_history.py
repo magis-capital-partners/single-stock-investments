@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
+import gzip
 import math
 from pathlib import Path
 import threading
@@ -27,6 +28,9 @@ _next_request = 0.0
 
 
 def fetch_performance(ticker: str, row: dict) -> dict:
+    if ticker.endswith((".CVR", ".DB")):
+        return {"status": "unavailable", "ticker": ticker,
+                "reason": "This claim requires its own verified history; underlying common-share prices are not comparable"}
     symbol = yahoo_symbol_for(row.get("quote_ticker") or ticker, row.get("market") or "US", row.get("exchange") or "")
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{quote(symbol, safe='')}?period1=0&period2={int(time.time())}&interval=1d&events=div%2Csplits"
     global _next_request
@@ -35,8 +39,11 @@ def fetch_performance(ticker: str, row: dict) -> dict:
             with _request_lock:
                 time.sleep(max(0, _next_request - time.monotonic()))
                 _next_request = time.monotonic() + 0.8
-            with urlopen(Request(url, headers={"User-Agent": "Mozilla/5.0 stock-research-history"}), timeout=30) as response:
-                data = json.load(response)["chart"]["result"][0]
+            with urlopen(Request(url, headers={"User-Agent": "Mozilla/5.0 stock-research-history", "Accept-Encoding": "gzip"}), timeout=30) as response:
+                raw = response.read()
+                if getattr(response, "headers", {}).get("Content-Encoding") == "gzip":
+                    raw = gzip.decompress(raw)
+                data = json.loads(raw)["chart"]["result"][0]
             break
         except (OSError, ValueError, KeyError, TypeError, IndexError):
             if attempt == 2:
@@ -47,7 +54,9 @@ def fetch_performance(ticker: str, row: dict) -> dict:
         zone = ZoneInfo(meta.get("exchangeTimezoneName") or "UTC")
     except (KeyError, ValueError):
         zone = timezone.utc
-    day = lambda ts: datetime.fromtimestamp(int(ts), zone).date().isoformat()
+    # Windows' C runtime rejects negative Unix timestamps. Arithmetic from the
+    # UTC epoch supports pre-1970 listings without changing the exchange date.
+    day = lambda ts: (datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(seconds=int(ts))).astimezone(zone).date().isoformat()
     cutoff = datetime.now(zone).date().isoformat()
     bars = {day(ts): float(p) for ts, p in zip(data.get("timestamp") or [], data["indicators"]["quote"][0]["close"])
             if p is not None and math.isfinite(p) and p >= 0 and day(ts) < cutoff}
@@ -100,9 +109,13 @@ def main():
             futures = {pool.submit(fetch_performance, t, r): t for t, r in todo.items()}
             for i, future in enumerate(as_completed(futures), 1):
                 ticker = futures[future]
-                result = future.result()
+                try:
+                    result = future.result()
+                except Exception as exc:
+                    print(f"History needs review: {ticker}: {type(exc).__name__}: {exc}", flush=True)
+                    result = {"ticker": ticker, "status": "unavailable", "reason": "History transformation requires review"}
                 (checkpoint / (quote(ticker, safe='') + ".json")).write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-                if i % 25 == 0:
+                if i <= 4 or i % 25 == 0:
                     print(f"Return histories checked: {i}/{len(todo)}", flush=True)
     companies = {}
     for i, (ticker, row) in enumerate(rows.items(), 1):
