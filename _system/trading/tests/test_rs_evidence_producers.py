@@ -662,3 +662,14 @@ def test_an_unreadable_claims_file_keeps_the_last_held_names(tmp_path):
     assert producers.watch({"identities": {}}) == {5005: "HELD"}
     Path(config["claims_file"]).write_text("{torn")
     assert producers.watch({"identities": {}}) == {5005: "HELD"}
+
+
+def test_operations_url_comes_from_the_executor_environment(tmp_path, monkeypatch):
+    path = write_config(tmp_path, operations_file=None)
+    monkeypatch.delenv("RS_OPERATIONS_URL", raising=False)
+    with pytest.raises(SafetyError, match="operations source"):
+        load_config(path)
+    url = ("https://api.cloudflare.com/client/v4/accounts/x/r2/buckets/"
+           "single-stock-reverse-splits-evidence/objects/collector-dashboard/operations.json")
+    monkeypatch.setenv("RS_OPERATIONS_URL", url)
+    assert load_config(path)["operations_url"] == url

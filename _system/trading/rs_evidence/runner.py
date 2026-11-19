@@ -66,6 +66,10 @@ def load_config(path):
         raise SafetyError("terms_mode must be one of " + ", ".join(TERMS_MODES))
     if not config.get("evidence"):
         raise SafetyError("evidence path required")
+    # Same convention as the executor's unit: the private R2 URL and its token
+    # come from a root-only EnvironmentFile, never from a readable config.
+    if not config.get("operations_file") and not config.get("operations_url"):
+        config["operations_url"] = os.environ.get("RS_OPERATIONS_URL")
     if not (config.get("operations_file") or config.get("operations_url")):
         raise SafetyError("Box R operations source required")
     if config["eligibility"]["max_age_seconds"] > 30:
