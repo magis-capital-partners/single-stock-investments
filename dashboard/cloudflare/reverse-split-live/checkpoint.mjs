@@ -49,7 +49,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
     if(!ok)throw new Error('Collector lease lost or checkpoint superseded before checkpoint commit; original evidence preserved');
     receipt=next;receiptValue=value;
   }
-  async function storeCheckpoint(bytes,at,{compressed=false,onCommittedBytes=null}={}){
+  async function storeCheckpoint(bytes,at,{compressed=false,onCommittedBytes=null,onCommitted=null}={}){
     env.assertCollectorLease?.();
     const parent=receipt,encoded=compressed?await compressCheckpoint(bytes):null,generation=randomUUID(),digest=await sha(bytes),key=`collector-state/checkpoints/${encoded?.stored_sha256||digest}-${generation}.sqlite`+(encoded?'.gz':'');
     const next={slot:parent?.slot===0?1:0,sha256:digest,bytes:bytes.length,at,key,generation};
@@ -58,6 +58,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
     env.assertCollectorLease?.();
     await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'}});
     await commitPointer(next,at);
+    onCommitted?.(next);
     onCommittedBytes?.(encoded?.stored||bytes);
     // Keep two committed generations. Legacy slots, review archives and uncertain
     // failed uploads are never deleted here. A late PUT cannot target a newer key.
@@ -87,10 +88,9 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
         // Retain the previous committed bytes until the successor commits: the
         // refresher must remain usable while a large upload is in flight.
         const started=Date.now(),snapshot=checkpointOnly||backgroundViews?null:captureReadSnapshot(db),bytes=readFileSync(file),captured=Date.now();let stored=null;
-        const next=await storeCheckpoint(bytes,at,{compressed:env.CHECKPOINT_COMPRESSION==='gzip',onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{stored=value;}:null});
+        const next=await storeCheckpoint(bytes,at,{compressed:env.CHECKPOINT_COMPRESSION==='gzip',onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{stored=value;}:null,onCommitted:retainDurableBytes?committed=>{durable={generation:committed.generation,at:committed.at,sha256:committed.sha256,bytes};}:null});
         env.checkpointHealth={state_at:at,bytes:bytes.length,stored_bytes:next.stored_bytes||bytes.length,capture_ms:captured-started,store_ms:Date.now()-captured,total_ms:Date.now()-started};
         // These bytes became durable when the pointer committed; the refresh reads nothing newer.
-        if(retainDurableBytes)durable={generation:next.generation,at:next.at,sha256:next.sha256,bytes};
         if(snapshot)snapshot.stateAt=next.at;
         if(backgroundViews&&!checkpointOnly)queueSnapshot({stored,receipt:next});
         else if(snapshot)await publishSnapshot(snapshot);

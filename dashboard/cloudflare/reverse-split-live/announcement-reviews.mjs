@@ -1,5 +1,10 @@
 // Narrow visual supplements: never an automatic acceptance of OCR candidates.
 export const ANNOUNCEMENT_REVIEWS=Object.freeze({
+ 'dd27b1c42187bdd34bff426f8cda5f8af7f50696aaf48d47a2cc9a5b82316a34':{
+  schema:'announcement_visual_review.v1',reviewed_at:'2026-11-20T15:45:00Z',reviewer:'Codex visual inspection of all seven rendered original divider pages',source_url:'https://www.sec.gov/Archives/edgar/data/1920294/000119312526467904/rzlv-ex99_1.pdf',source_sha256:'dd27b1c42187bdd34bff426f8cda5f8af7f50696aaf48d47a2cc9a5b82316a34',pages:45,
+  supplements:[4,9,13,23,29,33,41].map((page,index)=>({page,text:'SECTION '+String(index+1).padStart(2,'0'),basis:'Rendered original section divider: section number, the already extracted native heading, issuer logo and decorative blue background. No additional financial facts or corporate-action terms.'})),
+  scope:'Only these seven section dividers in this exact 45-page PDF. Native headings and all other pages retain their original extraction. No OCR candidate, financial value or announcement decision is supplied by this review.'
+ },
  '861859d044e64437564b63daf325a93a41a6623f26752cfa7db96e55829f93c9':{
   schema:'announcement_visual_review.v1',reviewed_at:'2026-11-09T17:55:00Z',reviewer:'Codex visual inspection of rendered original pages',source_url:'https://www.sec.gov/Archives/edgar/data/1192448/000119312526450710/gkos-ex99_1.pdf',source_sha256:'861859d044e64437564b63daf325a93a41a6623f26752cfa7db96e55829f93c9',pages:29,
   supplements:[{page:1,text:'GLAUKOS. TRANSFORMING VISION. Investor Presentation. NOVEMBER 2026.',basis:'Cover with issuer logo, presentation title and month; visually read in full.'},{page:28,text:'GLAUKOS. TRANSFORMING VISION.',basis:'Issuer logo and tagline on a blank white page; visually read in full.'}],

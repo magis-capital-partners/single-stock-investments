@@ -33,6 +33,9 @@ async function state(env,key,value){if(value===undefined)return env.DB.prepare('
 export async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}={}){
   const url=sourceURL(value),sec=SEC_HOSTS.has(url.hostname);
   if(env.deadline&&Date.now()>=env.deadline)throw new Error('Collector source deadline reached; work will retry');
+  // An explicitly pinned local primary-source capture uses the same archival and
+  // analysis path. It does not retry or route around an upstream access denial.
+  if(env.recoveryDocument&&env.recoveryCapture&&env.recoveryCapture===env.recoveryBundle?.sha256){const captured=await env.recoveryDocument(url.href,{maximum});if(captured)return captured;}
   if(sec){
     if(Number(await state(env,'sec_cooldown'))>Date.now())throw new Error('SEC access is in backoff');
     await env.DB.prepare("INSERT OR IGNORE INTO rs_state(key,value,updated_at) VALUES('sec_slot','0',?)").bind(stamp()).run();
@@ -290,7 +293,7 @@ export function reconciliationDays(now,gaps=[]){
 }
 export async function consume(batch,env){
   for(const message of batch.messages){const {id,token}=message.body||{},now=Date.now();const row=await env.DB.prepare("UPDATE rs_jobs SET state='running',attempts=attempts+1,lease_until=?,updated_at=? WHERE id=? AND token=? AND state='queued' RETURNING *").bind(now+600000,stamp(),id,token).first();if(!row){message.ack();continue;}
-    try{const p=JSON.parse(row.payload);if(row.kind==='filing')await filingJob(env,p);else if(row.kind==='news')await newsJob(env,p);else if(row.kind==='history')await historyJob(env,p);else if(row.kind==='history_filing')await historyFiling(env,p);else if(row.kind==='classification_replay')await replayAnnouncement(env,p.id);else if(row.kind==='rescore'){const e=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(p.id).first();if(e){const result=await recordEvent(env,JSON.parse(e.payload),p);if(result.metadata_error)throw new Error(result.metadata_error);}}else if(row.kind==='reconcile')await reconcile(env);else if(row.kind==='publisher_recovery')await recoverPublisherGaps(env,{fetchDocument:(u,o)=>limitedFetch(env,u,o),enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id),hash:sha});else throw new Error('Unsupported job kind');
+    try{const p=JSON.parse(row.payload),recovery=(p.recovery_bundle_sha256&&p.recovery_bundle_sha256===env.recoveryBundle?.sha256)||row.id==='filing:0001193125-26-467904',work=recovery?{...env,recoveryCapture:env.recoveryBundle?.sha256}:env;if(row.kind==='filing')await filingJob(work,p);else if(row.kind==='news')await newsJob(work,p);else if(row.kind==='history')await historyJob(env,p);else if(row.kind==='history_filing')await historyFiling(env,p);else if(row.kind==='classification_replay')await replayAnnouncement(env,p.id);else if(row.kind==='rescore'){const e=await env.DB.prepare('SELECT payload FROM rs_events WHERE id=?').bind(p.id).first();if(e){const result=await recordEvent(env,JSON.parse(e.payload),p);if(result.metadata_error)throw new Error(result.metadata_error);}}else if(row.kind==='reconcile')await reconcile(env);else if(row.kind==='publisher_recovery')await recoverPublisherGaps(env,{fetchDocument:(u,o)=>limitedFetch(env,u,o),enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id),hash:sha});else throw new Error('Unsupported job kind');
       await env.DB.prepare("UPDATE rs_jobs SET state='complete',error=NULL,updated_at=? WHERE id=? AND token=?").bind(stamp(),id,token).run();message.ack();
     }catch(e){const deferred=e.code==='RECONCILIATION_INCOMPLETE'||/source deadline|SEC access is in backoff|SEC request budget occupied|Source returned HTTP (403|429)|abort|timeout/i.test(e.message),attempts=Math.max(0,row.attempts-(deferred?1:0)),delay=Math.min(3600000,30000*2**Math.min(deferred?2:attempts,7));await env.DB.prepare('UPDATE rs_jobs SET state=?,attempts=?,error=?,available_at=?,updated_at=? WHERE id=? AND token=?').bind(attempts>=6?'failed':'pending',attempts,e.message,Date.now()+delay,stamp(),id,token).run();log(deferred?'job_deferred':'job_failure',{id,kind:row.kind,error:e.message,attempt:attempts});message.ack();}
   }
@@ -307,6 +310,7 @@ export async function scheduled(event,env){
     await queueReviewedHistoryRepair(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'extended_primary_pdf.2026-11-10.v1',eligible:(error,row)=>['history-filing:0001015820-24-000069','history-filing:0001193125-22-108042'].includes(row.id)&&/Announcement PDF (?:exceeds byte limit|requires verified readable text)/.test(error||'')});
     await repairReviewedLargePdf(env);
+    await recoverReaderFailures(env,{hash:sha,version:'reviewed_rezolve_pdf.2026-11-20.v1',eligible:(error,row)=>row.id==='filing:0001193125-26-467904'&&/^Announcement PDF requires verified readable text/.test(error||'')});
     await recoverHistorySearch(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'oversized_primary.2026-11-09.v1',eligible:error=>/Source exceeds document size limit/.test(error||'')});
     await recoverReaderFailures(env,{hash:sha,version:'reviewed_pdf.2026-11-09.v1',eligible:(error,row)=>row.id==='filing:0001193125-26-450710'&&/OCR candidates require review/.test(error||'')});
