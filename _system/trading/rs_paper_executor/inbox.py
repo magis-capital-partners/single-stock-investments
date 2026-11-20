@@ -46,8 +46,18 @@ def read_https(url, token):
     return json.loads(data)
 
 
-def proposals(operations, evidence, now):
+def require_fresh_operations(operations, now):
+    """A recent report cannot make old saved research state fresh."""
     fresh(operations.get("generated_at"), now, 120)
+    # Legacy snapshots were evaluated at capture and carry a single clock.
+    # New publications name their committed state separately; explicit null or
+    # invalid state clocks must fail rather than fall back to the report time.
+    if "state_at" in operations:
+        fresh(operations["state_at"], now, 120)
+
+
+def proposals(operations, evidence, now):
+    require_fresh_operations(operations, now)
     result = []
     for candidate in operations.get("candidates", []):
         ticker = candidate.get("ticker")

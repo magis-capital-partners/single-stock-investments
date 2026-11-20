@@ -151,6 +151,9 @@ def _feed(beats, fresh_seconds):
             try:
                 age = (at - timestamp(gen)).total_seconds()
                 ok = -2 <= age <= fresh_seconds
+                if "operations_state_at" in payload:
+                    state_age = (at - timestamp(payload["operations_state_at"])).total_seconds()
+                    ok = ok and -2 <= state_age <= fresh_seconds
                 if payload.get("operations_downloaded_at"):
                     lags.append((timestamp(payload["operations_downloaded_at"])
                                  - timestamp(gen)).total_seconds())

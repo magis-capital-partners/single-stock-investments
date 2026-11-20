@@ -21,7 +21,7 @@ from .book import PREFIX as BOOK_PREFIX, BookMargin
 from .claims import ClaimBook
 from .engine import Executor
 from .ibkr import PaperIBKR
-from .inbox import proposals, read_https, read_json
+from .inbox import proposals, read_https, read_json, require_fresh_operations
 from .journal import Journal
 from .notify import deliver_alerts
 from .operations_feed import read_local
@@ -231,6 +231,7 @@ async def run(args, endpoint, policy, config):
                 # Producer clock and download clock, kept apart for shadow-report.
                 executor.source_status = {
                     "operations_generated_at": data.get("generated_at"),
+                    "operations_state_at": data.get("state_at", data.get("generated_at")),
                     "operations_downloaded_at": meta.get("downloaded_at"),
                 }
                 await executor.tick(
@@ -353,12 +354,12 @@ def main(argv=None):
                 raise SafetyError("operations read failed: " + type(exc).__name__ + ": " + str(exc))
             now = datetime.now(ZoneInfo("UTC")).isoformat()
             try:
-                fresh(data.get("generated_at"), now, 120)
+                require_fresh_operations(data, now)
                 ok = True
             except SafetyError:
                 ok = False
             print(json.dumps({
-                "generated_at": data.get("generated_at"), "checked_at": now,
+                "generated_at": data.get("generated_at"), "state_at": data.get("state_at"), "checked_at": now,
                 "fresh_within_120s": ok,
                 "candidates": len(data.get("candidates") or []),
                 "broker_connection_opened": False,
@@ -419,7 +420,8 @@ def main(argv=None):
             except OSError as exc:
                 raise SafetyError("operations fetch failed: " + type(exc).__name__ + ": " + str(exc))
             try:
-                fresh(result["source_generated_at"], now, 120)
+                downloaded, _ = read_local(Path(args.feed_dir) / "operations.json")
+                require_fresh_operations(downloaded, utc_now())
                 ok = True
             except SafetyError:
                 ok = False

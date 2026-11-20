@@ -137,11 +137,34 @@ The external watch retries temporary storage/network failures at most three time
 Free-plan write conservation: a ten-minute collector lease renews at most once
 every two minutes; the dashboard heartbeat updates once a minute; routine
 source-health rows publish every five minutes. Decisions, fills and checkpoints
-keep their immediate/minute cadence while a name is armed or held. With no active names, routine checkpoints publish every two minutes; the heartbeat and quote-feed status still update every minute. The immutable first executable-registration
+keep their immediate/minute cadence while a name is armed or held. With no active names, full dashboard views publish every two minutes; when operations refresh is enabled, a separate checkpoint-only save keeps the underlying research state current at least once a minute without rebuilding those views. The heartbeat and quote-feed status still update every minute. The immutable first executable-registration
 UTC day has a one-time 70k research row-write budget to cover historical cohort
 enrollment; later UTC days return to 40k. This is below the account's 100k/day
 Free limit and does not reset or conceal consumed usage. The budget remains a
 fail-closed stop; it is not an unlimited production-service guarantee.
+
+Between checkpoints the collector refreshes `collector-dashboard/operations.json`
+every 30 seconds (`RS_OPERATIONS_PUBLISH_SECONDS`; `0` disables), so the RS
+executor's 120-second report-age rule holds between full dashboard publications.
+A refresh itself never checkpoints and makes no D1 call: a worker
+thread re-evaluates the operations snapshot over a copy of the last committed
+checkpoint (its SHA-256 must match the receipt) at the publication time. Candidates,
+counts and decisions therefore come only from durable state and cannot regress
+across a restart. `generated_at` is the evaluation time and `state_at` names the
+checkpoint, so clock-relative checks (source and heartbeat ages, entry windows)
+can correctly read stale late in a long interval. A separate serialized,
+checkpoint-only save runs when state reaches half its allowed age (60 seconds by
+default), independently of slow filing jobs in the main loop. It uses the existing
+checkpoint upload and pointer commit, skips derived dashboard pages, and backs off
+after an error. Full dashboard publication retains its own cadence and is not
+starved by these saves. Refreshes stop once the committed checkpoint is older than
+`RS_OPERATIONS_MAX_STATE_AGE_SECONDS` (default and maximum 120). The executor,
+one-shot feed checks, and shadow coverage report check the underlying `state_at`
+clock as well as `generated_at`; a stalled checkpoint cannot be made healthy by
+republication. One queue orders refreshes
+and checkpoint publications of the object; it never moves back to an older
+checkpoint. The refresh put skips the shared R2 request pacer, so it takes no slot
+from checkpoint, validation or archive requests.
 
 The eight `rs_ibkr_{capacity|executable}_{10|25|50|100}bps.v1` cohorts are
 separately registered forward experiments. The original fourteen policies,

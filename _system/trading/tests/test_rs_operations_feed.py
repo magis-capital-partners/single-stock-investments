@@ -9,8 +9,24 @@ import pytest
 from _system.trading.rs_paper_executor import __main__ as cli
 from _system.trading.rs_paper_executor import operations_feed as feed
 from _system.trading.rs_paper_executor.safety import SafetyError
+from _system.trading.rs_paper_executor.inbox import proposals
 
 ENDPOINT = "https://" + "0123456789abcdef" * 2 + ".r2.cloudflarestorage.com"
+
+
+@pytest.mark.parametrize("state_at", ["2026-11-19T14:57:59Z", None, "invalid"])
+def test_freshly_republished_feed_rejects_stale_or_invalid_underlying_state(state_at):
+    snapshot = {"generated_at": "2026-11-19T14:59:55Z", "state_at": state_at,
+                "candidates": []}
+    with pytest.raises(SafetyError):
+        proposals(snapshot, {}, "2026-11-19T15:00:00Z")
+
+
+def test_feed_accepts_fresh_underlying_state_and_the_legacy_single_clock():
+    snapshot = {"generated_at": "2026-11-19T14:59:55Z", "candidates": []}
+    assert proposals(snapshot, {}, "2026-11-19T15:00:00Z") == []
+    snapshot["state_at"] = "2026-11-19T14:59:00Z"
+    assert proposals(snapshot, {}, "2026-11-19T15:00:00Z") == []
 
 
 def test_sigv4_matches_aws_published_get_object_example():

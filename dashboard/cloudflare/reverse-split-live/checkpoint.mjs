@@ -7,6 +7,7 @@ import {join,dirname,basename} from 'node:path';
 import {sha} from './worker.mjs';
 import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
 import {compressCheckpoint,restoreCheckpoint} from './checkpoint-codec.mjs';
+import {operationsChannel} from './operations-publication.mjs';
 const GENERATION_KEY=/^collector-state\/checkpoints\/([a-f0-9]{64})-([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})\.sqlite(\.gz)?$/;
 export function checkpointObjectKey(receipt){
  const key=receipt.key||`collector-state/slot${receipt.slot}.sqlite`;
@@ -20,8 +21,10 @@ function cleanup(dir){const target=realpathSync(dir),parent=realpathSync(tmpdir(
 
 export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>make(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>({meta:{changes:Number(db.prepare(sql).run(...args).changes)}})});return {prepare:sql=>make(sql),batch:async statements=>{db.exec('BEGIN');try{const rows=[];for(const s of statements)rows.push(await s.run());db.exec('COMMIT');return rows;}catch(e){db.exec('ROLLBACK');throw e;}}};}
 
-export async function openCheckpoint(env){
-  const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve();
+// retainDurableBytes: keep the last committed checkpoint's bytes (one generation)
+// for the operations refresh, which evaluates only already-durable state.
+export async function openCheckpoint(env,{retainDurableBytes=false}={}){
+  const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null;
   try{
     receiptValue=(await remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").first())?.value??null;receipt=JSON.parse(receiptValue||'null');
     if(receipt){const object=await env.EVIDENCE.get(checkpointObjectKey(receipt));if(!object)throw new Error('Committed collector checkpoint is unavailable');const bytes=await restoreCheckpoint(new Uint8Array(await object.arrayBuffer()),receipt);writeFileSync(file,bytes);}
@@ -35,6 +38,7 @@ export async function openCheckpoint(env){
       db.exec('BEGIN');try{for(const r of data.records){if(!r.verified||!r.cik||!r.effective_date||!r.known_at||!r.source_url?.startsWith('https://'))throw new Error('Unbound historical action');db.prepare('INSERT OR IGNORE INTO rs_history(id,cik,effective_date,known_at,verified,payload) VALUES(?,?,?,?,1,?)').run(r.cik+':'+r.effective_date,r.cik,r.effective_date,r.known_at,JSON.stringify(r));}db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('prior_history_bootstrap',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(bootstrapHash,new Date().toISOString());db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}
     }
   }catch(e){db?.close();cleanup(dir);throw e;}
+  const operations=operationsChannel(env,{db});
   async function commitPointer(next,at){
     env.assertCollectorLease?.();
     const value=JSON.stringify(next),lease=env.collectorLeaseOwner?" AND EXISTS(SELECT 1 FROM rs_state WHERE key='collector_lease' AND substr(value,instr(value,':')+1)=? AND CAST(value AS INTEGER)>?)":'',args=env.collectorLeaseOwner?[env.collectorLeaseOwner,Date.now()+30000]:[];
@@ -62,7 +66,7 @@ export async function openCheckpoint(env){
     return next;
   }
   async function publishSnapshot(snapshot,options){
-    const result=await publishReadSnapshot(env,db,snapshot,options);
+    const result=await publishReadSnapshot(env,db,snapshot,{...options,operations});
     if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(snapshot.at).run();env.snapshotActivated=true;}
     env.publicationHealth={status:result.complete?'published':'current_published_history_pending',snapshot_at:snapshot.at,history_complete:result.complete};
   }
@@ -77,7 +81,12 @@ export async function openCheckpoint(env){
       db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_job_counts',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(JSON.stringify(jobs),at);
       if(publicationMode==='r2'){
         // Capture without yielding: every displayed fill belongs to these exact durable bytes.
+        // Release the previous generation's retained bytes before reading the next copy.
+        if(durable)durable.bytes=null;
         const snapshot=checkpointOnly?null:captureReadSnapshot(db),bytes=readFileSync(file),next=await storeCheckpoint(bytes,at,{compressed:env.CHECKPOINT_COMPRESSION==='gzip'});
+        // These bytes became durable when the pointer committed; the refresh reads nothing newer.
+        if(retainDurableBytes)durable={generation:next.generation,at:next.at,sha256:next.sha256,bytes};
+        if(snapshot)snapshot.stateAt=next.at;
         if(snapshot){if(backgroundViews)queueSnapshot(snapshot);else await publishSnapshot(snapshot);}
         return next;
       }
@@ -119,6 +128,9 @@ export async function openCheckpoint(env){
   return {
     save(options){const task=saving.catch(()=>{}).then(()=>saveInternal(options));saving=task;return task;},
     changedSince(at){return Boolean(db.prepare('SELECT id FROM rs_events WHERE analyzed_at>? LIMIT 1').get(at));},
+    operations,
+    durable(){return durable&&{generation:durable.generation,at:durable.at,sha256:durable.sha256};},
+    takeDurableBytes(generation){if(durable?.generation!==generation||!durable.bytes)return null;const bytes=durable.bytes;durable.bytes=null;return bytes;},
     async flush({handoff=false}={}){if(handoff)deferDerived=true;if(publicationTask)await publicationTask;},
     close(){db.close();cleanup(dir);},
   };

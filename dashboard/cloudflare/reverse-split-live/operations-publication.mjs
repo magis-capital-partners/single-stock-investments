@@ -1,0 +1,129 @@
+// Node-only. Keeps collector-dashboard/operations.json fresh between checkpoints
+// without publishing anything that is not already durable.
+//
+// A full save captures the views from the exact bytes it checkpoints and publishes
+// them only after the checkpoint pointer commits. Between saves, the refresher
+// re-evaluates operationalEvidence over a byte-identical copy of the LAST COMMITTED
+// checkpoint, at the publication time. Every count, candidate and decision therefore
+// comes from durable state: a restart restores that generation or a newer one, so
+// no published candidate can vanish or regress. Only clock-relative fields
+// (`generated_at`, source/heartbeat ages, entry windows) move forward; `state_at`
+// names the checkpoint the content came from. Evaluation runs on a worker thread,
+// so it never blocks quote, exit or validation work, and it makes no database call.
+import {Worker} from 'node:worker_threads';
+import {createHash} from 'node:crypto';
+import {mkdtempSync,rmSync,realpathSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join,dirname,basename} from 'node:path';
+
+export const OPERATIONS_KEY='collector-dashboard/operations.json';
+const MARKER='snapshot:operations.json',encoder=new TextEncoder();
+export const operationsDigest=text=>createHash('sha256').update(text).digest('hex');
+export const operationsText=(value,stateAt)=>JSON.stringify({...value,state_at:stateAt});
+const clockOf=value=>{const ms=Date.parse(value);if(!Number.isFinite(ms))throw new Error('Operations publication requires ISO state and generation times');return ms;};
+
+// RS_OPERATIONS_PUBLISH_SECONDS: refresh target while collecting (default 30; 0 disables).
+// RS_OPERATIONS_MAX_STATE_AGE_SECONDS: stop refreshing once the last committed
+// checkpoint is older than this (default and maximum 120), so a stalled checkpoint cannot be
+// kept looking fresh; the executor's own 120-second rule then fails closed.
+export function operationsRefreshSettings(source=process.env){
+  const read=(name,fallback,min,max)=>{const raw=source?.[name];if(raw===undefined||raw===null||String(raw).trim()==='')return fallback;const n=Number(raw);if(!Number.isFinite(n)||n<0)return fallback;return n===0?0:Math.min(max,Math.max(min,n));};
+  const interval=read('RS_OPERATIONS_PUBLISH_SECONDS',30,5,110),maxAge=read('RS_OPERATIONS_MAX_STATE_AGE_SECONDS',120,30,120)||120;
+  return {intervalMs:interval*1000,maxStateAgeMs:maxAge*1000};
+}
+
+// The only writer of operations.json for a checkpoint: full snapshots and refreshes
+// share one queue, so two puts are never in flight for the key and the published
+// state never moves back to an older checkpoint.
+export function operationsChannel(env,{db=null}={}){
+  let tail=Promise.resolve(),last=null;
+  const readMarker=()=>db?db.prepare('SELECT value FROM rs_state WHERE key=?').get(MARKER)?.value??null:null;
+  const writeMarker=(digest,at)=>{db?.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(MARKER,digest,at);};
+  return {
+    last:()=>last,
+    idle:()=>tail.catch(()=>{}),
+    publish({text,digest=null,stateAt,generatedAt,urgent=false}){
+      const task=tail.catch(()=>{}).then(async()=>{
+        const state=clockOf(stateAt),generated=clockOf(generatedAt),seen={state,generated,stateAt,generatedAt};
+        if(last&&(state<last.state||(state===last.state&&generated<=last.generated)))return {published:false,reason:'superseded'};
+        env.assertCollectorLease?.();
+        const hash=digest||operationsDigest(text);
+        if(readMarker()===hash){last=seen;return {published:false,reason:'unchanged'};}
+        // `urgent` skips the R2 request pacer: the refresh never takes a slot from
+        // the checkpoint, validation archives or any other queued object request.
+        await env.EVIDENCE.put(OPERATIONS_KEY,encoder.encode(text),{httpMetadata:{contentType:'application/json'},...(urgent?{urgent:true}:{})});
+        writeMarker(hash,generatedAt);last=seen;return {published:true};
+      });
+      tail=task;return task;
+    },
+  };
+}
+
+function removeScratch(dir){
+  if(!dir)return;const target=realpathSync(dir),parent=realpathSync(tmpdir()),same=(a,b)=>process.platform==='win32'?a.toLowerCase()===b.toLowerCase():a===b;
+  if(!same(dirname(target),parent)||!basename(target).startsWith('reverse-split-operations-'))throw new Error('Unsafe operations refresh directory');
+  rmSync(target,{recursive:true,force:true});
+}
+
+export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=120000,clock=Date.now,timeoutMs=60000,workerURL=new URL('./operations-worker.mjs',import.meta.url)}={}){
+  if(!checkpoint?.operations||!checkpoint.durable)throw new Error('Operations refresh requires a durable-checkpoint publisher');
+  const channel=checkpoint.operations,tickMs=Math.max(250,Math.min(1000,Math.floor(intervalMs/4))),waiting=new Map();
+  let worker=null,dir=null,loaded=null,running=null,closed=false,sequence=0,retryAt=0,stopping=Promise.resolve();
+  const health={status:'waiting_for_checkpoint',interval_seconds:intervalMs/1000,max_state_age_seconds:maxStateAgeMs/1000,refreshes:0,published:0,skipped:{},last_generated_at:null,last_state_at:null,last_published_at:null,last_error:null};
+  function settle(error){for(const [id,w] of waiting){clearTimeout(w.timer);waiting.delete(id);w.reject(error);}}
+  function stopWorker(){
+    if(!worker&&!dir)return stopping;
+    const current=worker,scratch=dir;worker=null;dir=null;loaded=null;
+    stopping=(async()=>{
+      if(current){current.removeAllListeners();current.on('error',()=>{});await current.terminate().catch(()=>{});}
+      try{removeScratch(scratch);}catch(error){console.error(JSON.stringify({event:'operations_refresh_cleanup_deferred',error:error.message}));}
+    })();
+    return stopping;
+  }
+  function start(){
+    dir=mkdtempSync(join(tmpdir(),'reverse-split-operations-'));
+    const current=new Worker(workerURL,{workerData:{dir}});worker=current;current.unref();
+    current.on('message',m=>{const w=waiting.get(m.id);if(!w)return;clearTimeout(w.timer);waiting.delete(m.id);if(m.ok)w.resolve(m);else w.reject(new Error(m.error||'Operations evaluation failed'));});
+    const fail=error=>{if(worker!==current)return;settle(error);stopWorker();};
+    current.on('error',fail);current.on('exit',code=>fail(new Error('Operations evaluation worker exited ('+code+')')));
+  }
+  function call(message,{transfer=[],timeout=timeoutMs}={}){
+    if(!worker)start();const current=worker,id=++sequence;current.ref();
+    return new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>{waiting.delete(id);reject(new Error('Operations evaluation timed out'));if(worker===current){settle(new Error('Operations evaluation worker stopped'));stopWorker();}},timeout);
+      waiting.set(id,{resolve,reject,timer});try{current.postMessage({...message,id},transfer);}catch(error){clearTimeout(timer);waiting.delete(id);reject(error);}
+    }).finally(()=>{if(!waiting.size&&worker===current)current.unref();});
+  }
+  const count=reason=>{health.skipped[reason]=(health.skipped[reason]||0)+1;};
+  const skip=reason=>{count(reason);health.status=reason;return {published:false,reason};};
+  async function refreshOnce(){
+    const durable=checkpoint.durable();if(!durable)return skip('waiting_for_checkpoint');
+    const nowMs=clock(),now=new Date(nowMs).toISOString();
+    if(nowMs-Date.parse(durable.at)>maxStateAgeMs)return skip('paused_checkpoint_too_old');
+    const last=channel.last();if(last&&Date.parse(durable.at)<last.state)return skip('superseded');
+    if(loaded!==durable.generation){
+      const bytes=checkpoint.takeDurableBytes(durable.generation);if(!bytes)return skip('checkpoint_copy_unavailable');
+      // Transfer, not copy: the collector does not reuse these bytes after the commit.
+      const owned=bytes.byteOffset===0&&bytes.byteLength===bytes.buffer.byteLength?bytes:new Uint8Array(bytes);
+      loaded=null;await call({type:'load',generation:durable.generation,sha256:durable.sha256,bytes:owned.buffer},{transfer:[owned.buffer]});loaded=durable.generation;
+    }
+    const evaluated=await call({type:'evaluate',generation:durable.generation,now,stateAt:durable.at});
+    if(clock()-Date.parse(durable.at)>maxStateAgeMs)return skip('paused_checkpoint_too_old');
+    const result=await channel.publish({text:evaluated.text,digest:evaluated.digest,stateAt:durable.at,generatedAt:now,urgent:true});
+    health.refreshes++;if(result.published){health.published++;health.last_published_at=new Date(clock()).toISOString();}else count(result.reason);
+    Object.assign(health,{status:'refreshing',last_generated_at:now,last_state_at:durable.at,last_error:null});return result;
+  }
+  return {
+    tickMs,
+    // Due one tick before the newest published operations (from a save or a
+    // refresh) reaches the target, so consecutive generated_at stay within it.
+    // A failed refresh (R2, worker) backs off instead of retrying every tick.
+    due(nowMs=clock()){const last=channel.last();return !closed&&!running&&nowMs>=retryAt&&(!last||nowMs-last.generated>=intervalMs-tickMs);},
+    refresh(){
+      if(closed)return Promise.resolve({published:false,reason:'closed'});if(running)return running;
+      running=refreshOnce().catch(error=>{retryAt=clock()+Math.min(intervalMs,15000);health.status='retry_pending';health.last_error=error.message;throw error;}).finally(()=>{running=null;});return running;
+    },
+    health:()=>({...health,skipped:{...health.skipped}}),
+    async close(){closed=true;if(running)await running.catch(()=>{});await channel.idle();if(worker)await call({type:'close'},{timeout:10000}).catch(()=>{});await stopWorker();},
+  };
+}
