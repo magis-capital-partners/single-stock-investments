@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter} from './reverse-split-live/checkpoint.mjs';
+import {limitedFetch} from './reverse-split-live/worker.mjs';
 import {openRecoveryBundle,installRecoveryBundle,reconcileUnavailableFiling} from './reverse-split-live/recovery-bundle.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const archive='https://www.prnewswire.com/news-releases/news-releases-list/?page=1&pagesize=100',article='https://www.prnewswire.com/news-releases/ordinary-302900002.html',at='2026-11-20T16:00:00Z';
@@ -27,6 +28,13 @@ test('recovery bundle preserves late discovery clocks and cannot close a gap by 
  assert.equal(state.inventory_complete,true);assert.equal(state.coverage_complete,false);assert.equal(db.prepare('SELECT resolved_at FROM rs_source_gaps').get().resolved_at,null);
  assert.equal(job.state,'pending');assert.equal(job.priority,9);assert.equal(payload.first_seen_at,at);assert.equal(payload.published_at,'2026-11-20T14:15:00.000Z');assert.equal(payload.url,article);assert.ok(objects.size>=2);
  assert.equal((await installRecoveryBundle(env,bundle,{now:at})).already_installed,true);
+});
+test('a repair capture never freezes mutable publisher pages or current SEC metadata',async t=>{
+ const {bundle}=setup(t);assert.equal(await bundle.fetchDocument(archive),null);assert.ok(await bundle.fetchDocument(article));
+});
+test('ordinary source checks always fetch current bytes; captured bytes require a matching repair job context',async t=>{
+ const previous=globalThis.fetch;t.after(()=>globalThis.fetch=previous);let calls=0;globalThis.fetch=async()=>{calls++;return new Response('live bytes');};const env={recoveryBundle:{sha256:'a'.repeat(64)},recoveryDocument:async()=>({bytes:Buffer.from('capture')})};
+ assert.equal(new TextDecoder().decode((await limitedFetch(env,article)).bytes),'live bytes');assert.equal(new TextDecoder().decode((await limitedFetch({...env,recoveryCapture:'a'.repeat(64)},article)).bytes),'capture');assert.equal(new TextDecoder().decode((await limitedFetch({...env,recoveryCapture:'b'.repeat(64)},article)).bytes),'live bytes');assert.equal(calls,2);
 });
 test('missing article bytes leave coverage untouched; document hashes and manifest pin fail closed',async t=>{
  const {bundle,db,env}=setup(t,{missingBody:true});await assert.rejects(installRecoveryBundle(env,bundle,{now:at}),/article.*missing/i);assert.equal(db.prepare('SELECT count(*) n FROM rs_jobs').get().n,0);

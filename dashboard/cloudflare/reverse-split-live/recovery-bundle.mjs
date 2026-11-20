@@ -20,7 +20,7 @@ export function openRecoveryBundle(file,{expectedSha256}={}){
   const bytes=readFileSync(path);if(bytes.length!==row.bytes||digest(bytes)!==row.sha256)throw new Error('Recovery document hash or size mismatch');
   return {...row,bytes};
  };
- return {manifest,sha256:expectedSha256,read,fetchDocument:async(url,{maximum=24*1024*1024}={})=>{const doc=read(url);if(doc&&doc.bytes.length>maximum)throw new Error('Source exceeds document size limit');return doc;}};
+ return {manifest,sha256:expectedSha256,read,fetchDocument:async(url,{maximum=24*1024*1024}={})=>{const u=sourceURL(url);if(u.search||!(u.hostname==='www.prnewswire.com'&&/\/news-releases\/.+\.html$/.test(u.pathname)||u.hostname==='www.sec.gov'&&u.pathname.startsWith('/Archives/edgar/data/')))return null;const doc=read(url);if(doc&&doc.bytes.length>maximum)throw new Error('Source exceeds document size limit');return doc;}};
 }
 const releaseId=value=>{const u=sourceURL(value);return u.hostname==='www.prnewswire.com'&&!u.search&&!u.hash?/\/news-releases\/.+-(\d{9,10})\.html$/.exec(u.pathname)?.[1]:null;};
 function verifyArticle(bundle,item){
