@@ -6,6 +6,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
 import {operationsChannel,operationsRefresher,operationsRefreshSettings,OPERATIONS_KEY} from './reverse-split-live/operations-publication.mjs';
 import {watchCollector} from './reverse-split-live/watch.mjs';
+import {enqueue} from './reverse-split-live/worker.mjs';
 
 const decode=bytes=>JSON.parse(new TextDecoder().decode(bytes));
 const iso=ms=>new Date(ms).toISOString();
@@ -171,4 +172,14 @@ test('the continuous collector refreshes operations between checkpoints and stop
   const runtime=JSON.parse((await env.controlDB.prepare("SELECT value FROM rs_state WHERE key='shadow_runtime'").first()).value);
   assert.equal(runtime.status,'handoff');assert.ok(runtime.operations_publication.published>=2);assert.equal(runtime.operations_publication.interval_seconds,1);
   assert.equal((await env.controlDB.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first()).value,'0');
+});
+
+test('slow pre-job imports cannot consume the entire source-processing budget',async t=>{
+ const env=collectorEnv(t),objects=new Map(),remote=env.controlDB;let seeded=false;
+ const delayed=statement=>({...statement,bind:(...args)=>delayed(statement.bind(...args)),all:async()=>{await new Promise(r=>setTimeout(r,1100));return statement.all();}});
+ env.controlDB={...remote,prepare:sql=>sql.startsWith('SELECT payload FROM rs_shadow_evidence WHERE kind IN')?delayed(remote.prepare(sql)):remote.prepare(sql)};
+ env.EVIDENCE={put:async(k,b)=>{objects.set(k,new Uint8Array(b));if(k==='collector-dashboard/runtime.json'&&!seeded){seeded=true;const at=new Date().toISOString();await enqueue(env,'news',{url:'https://www.prnewswire.com/news-releases/ordinary-302900002.html',published_at:at,first_seen_at:at},15,'slow-loop-source');}},get:async k=>objects.has(k)?{arrayBuffer:async()=>objects.get(k).slice().buffer}:null};
+ const previous=globalThis.fetch;t.after(()=>globalThis.fetch=previous);globalThis.fetch=async value=>new Response(String(value).endsWith('.html')?'<html><article>Ordinary source body</article></html>':'<feed></feed>');
+ let stopped=false;const result=await watchCollector(env,{maximumMs:20000,operations:{intervalMs:0,maxStateAgeMs:60000},shouldStop:()=>stopped,sleep:async()=>{stopped=true;}});
+ assert.equal(result.ticks,1);const cp=await openCheckpoint(env);try{assert.equal((await env.DB.prepare("SELECT state FROM rs_jobs WHERE id='slow-loop-source'").first()).state,'complete','The queued source must be analyzed even when imports took longer than one second');}finally{cp.close();}
 });
