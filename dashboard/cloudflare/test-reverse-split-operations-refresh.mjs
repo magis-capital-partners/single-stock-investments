@@ -24,14 +24,14 @@ async function addEvent(env,id,firstSeen){
 }
 
 test('refresh interval defaults to 30 s, is configurable, and 0 disables it',()=>{
-  assert.deepEqual(operationsRefreshSettings({}),{intervalMs:30000,maxStateAgeMs:180000});
+  assert.deepEqual(operationsRefreshSettings({}),{intervalMs:30000,maxStateAgeMs:120000});
   assert.equal(operationsRefreshSettings({RS_OPERATIONS_PUBLISH_SECONDS:'15'}).intervalMs,15000);
   assert.equal(operationsRefreshSettings({RS_OPERATIONS_PUBLISH_SECONDS:'0'}).intervalMs,0);
   assert.equal(operationsRefreshSettings({RS_OPERATIONS_PUBLISH_SECONDS:'1'}).intervalMs,5000);
   assert.equal(operationsRefreshSettings({RS_OPERATIONS_PUBLISH_SECONDS:'500'}).intervalMs,110000);
   assert.equal(operationsRefreshSettings({RS_OPERATIONS_PUBLISH_SECONDS:'soon'}).intervalMs,30000);
-  assert.equal(operationsRefreshSettings({RS_OPERATIONS_MAX_STATE_AGE_SECONDS:'240'}).maxStateAgeMs,240000);
-  assert.equal(operationsRefreshSettings({RS_OPERATIONS_MAX_STATE_AGE_SECONDS:'0'}).maxStateAgeMs,180000);
+  assert.equal(operationsRefreshSettings({RS_OPERATIONS_MAX_STATE_AGE_SECONDS:'240'}).maxStateAgeMs,120000);
+  assert.equal(operationsRefreshSettings({RS_OPERATIONS_MAX_STATE_AGE_SECONDS:'0'}).maxStateAgeMs,120000);
 });
 
 test('the operations channel never regresses state, skips unchanged content and asserts the lease before a put',async t=>{

@@ -5,7 +5,14 @@ import json
 
 from _system.trading.rs_paper_executor import __main__ as cli
 from _system.trading.rs_paper_executor.journal import Journal
-from _system.trading.rs_paper_executor.shadow_report import shadow_report, verify_mechanics
+from _system.trading.rs_paper_executor.shadow_report import _feed, shadow_report, verify_mechanics
+
+
+def test_republished_old_state_does_not_count_as_fresh_shadow_coverage():
+    at = datetime.fromisoformat("2026-11-19T15:00:00+00:00")
+    beat = {"operations_generated_at": "2026-11-19T14:59:55Z",
+            "operations_state_at": "2026-11-19T14:57:59Z"}
+    assert _feed([(at, beat)], 120)[0] == 0.0
 
 DAYS = ("2026-11-17", "2026-11-18")  # 09:30-16:00 ET = 14:30-21:00Z
 

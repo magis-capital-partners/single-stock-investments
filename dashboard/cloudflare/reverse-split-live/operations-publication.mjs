@@ -24,11 +24,11 @@ const clockOf=value=>{const ms=Date.parse(value);if(!Number.isFinite(ms))throw n
 
 // RS_OPERATIONS_PUBLISH_SECONDS: refresh target while collecting (default 30; 0 disables).
 // RS_OPERATIONS_MAX_STATE_AGE_SECONDS: stop refreshing once the last committed
-// checkpoint is older than this (default 180), so a stalled checkpoint cannot be
+// checkpoint is older than this (default and maximum 120), so a stalled checkpoint cannot be
 // kept looking fresh; the executor's own 120-second rule then fails closed.
 export function operationsRefreshSettings(source=process.env){
   const read=(name,fallback,min,max)=>{const raw=source?.[name];if(raw===undefined||raw===null||String(raw).trim()==='')return fallback;const n=Number(raw);if(!Number.isFinite(n)||n<0)return fallback;return n===0?0:Math.min(max,Math.max(min,n));};
-  const interval=read('RS_OPERATIONS_PUBLISH_SECONDS',30,5,110),maxAge=read('RS_OPERATIONS_MAX_STATE_AGE_SECONDS',180,30,600)||180;
+  const interval=read('RS_OPERATIONS_PUBLISH_SECONDS',30,5,110),maxAge=read('RS_OPERATIONS_MAX_STATE_AGE_SECONDS',120,30,120)||120;
   return {intervalMs:interval*1000,maxStateAgeMs:maxAge*1000};
 }
 
@@ -65,7 +65,7 @@ function removeScratch(dir){
   rmSync(target,{recursive:true,force:true});
 }
 
-export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=180000,clock=Date.now,timeoutMs=60000,workerURL=new URL('./operations-worker.mjs',import.meta.url)}={}){
+export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=120000,clock=Date.now,timeoutMs=60000,workerURL=new URL('./operations-worker.mjs',import.meta.url)}={}){
   if(!checkpoint?.operations||!checkpoint.durable)throw new Error('Operations refresh requires a durable-checkpoint publisher');
   const channel=checkpoint.operations,tickMs=Math.max(250,Math.min(1000,Math.floor(intervalMs/4))),waiting=new Map();
   let worker=null,dir=null,loaded=null,running=null,closed=false,sequence=0,retryAt=0,stopping=Promise.resolve();
@@ -108,6 +108,7 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
       loaded=null;await call({type:'load',generation:durable.generation,sha256:durable.sha256,bytes:owned.buffer},{transfer:[owned.buffer]});loaded=durable.generation;
     }
     const evaluated=await call({type:'evaluate',generation:durable.generation,now,stateAt:durable.at});
+    if(clock()-Date.parse(durable.at)>maxStateAgeMs)return skip('paused_checkpoint_too_old');
     const result=await channel.publish({text:evaluated.text,digest:evaluated.digest,stateAt:durable.at,generatedAt:now,urgent:true});
     health.refreshes++;if(result.published){health.published++;health.last_published_at=new Date(clock()).toISOString();}else count(result.reason);
     Object.assign(health,{status:'refreshing',last_generated_at:now,last_state_at:durable.at,last_error:null});return result;
