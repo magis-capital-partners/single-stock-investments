@@ -8,6 +8,7 @@ import {sha} from './worker.mjs';
 import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
 import {compressCheckpoint,restoreCheckpoint} from './checkpoint-codec.mjs';
 import {operationsChannel} from './operations-publication.mjs';
+import {publishCheckpointSnapshot} from './snapshot-background.mjs';
 const GENERATION_KEY=/^collector-state\/checkpoints\/([a-f0-9]{64})-([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})\.sqlite(\.gz)?$/;
 export function checkpointObjectKey(receipt){
  const key=receipt.key||`collector-state/slot${receipt.slot}.sqlite`;
@@ -48,7 +49,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
     if(!ok)throw new Error('Collector lease lost or checkpoint superseded before checkpoint commit; original evidence preserved');
     receipt=next;receiptValue=value;
   }
-  async function storeCheckpoint(bytes,at,{compressed=false}={}){
+  async function storeCheckpoint(bytes,at,{compressed=false,onCommittedBytes=null}={}){
     env.assertCollectorLease?.();
     const parent=receipt,encoded=compressed?await compressCheckpoint(bytes):null,generation=randomUUID(),digest=await sha(bytes),key=`collector-state/checkpoints/${encoded?.stored_sha256||digest}-${generation}.sqlite`+(encoded?'.gz':'');
     const next={slot:parent?.slot===0?1:0,sha256:digest,bytes:bytes.length,at,key,generation};
@@ -57,6 +58,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
     env.assertCollectorLease?.();
     await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'}});
     await commitPointer(next,at);
+    onCommittedBytes?.(encoded?.stored||bytes);
     // Keep two committed generations. Legacy slots, review archives and uncertain
     // failed uploads are never deleted here. A late PUT cannot target a newer key.
     const obsolete=parent?.previous?.key;
@@ -66,9 +68,10 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
     return next;
   }
   async function publishSnapshot(snapshot,options){
-    const result=await publishReadSnapshot(env,db,snapshot,{...options,operations});
-    if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(snapshot.at).run();env.snapshotActivated=true;}
-    env.publicationHealth={status:result.complete?'published':'current_published_history_pending',snapshot_at:snapshot.at,history_complete:result.complete};
+    const result=snapshot.receipt?await publishCheckpointSnapshot(env,db,snapshot,{...options,operations}):await publishReadSnapshot(env,db,snapshot,{...options,operations});
+    const at=result.at||snapshot.at;
+    if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(at).run();env.snapshotActivated=true;}
+    env.publicationHealth={status:result.complete?'published':'current_published_history_pending',snapshot_at:at,history_complete:result.complete};
   }
   function queueSnapshot(snapshot){
     latestSnapshot=snapshot;
@@ -81,13 +84,16 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
       db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_job_counts',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(JSON.stringify(jobs),at);
       if(publicationMode==='r2'){
         // Capture without yielding: every displayed fill belongs to these exact durable bytes.
-        // Release the previous generation's retained bytes before reading the next copy.
-        if(durable)durable.bytes=null;
-        const snapshot=checkpointOnly?null:captureReadSnapshot(db),bytes=readFileSync(file),next=await storeCheckpoint(bytes,at,{compressed:env.CHECKPOINT_COMPRESSION==='gzip'});
+        // Retain the previous committed bytes until the successor commits: the
+        // refresher must remain usable while a large upload is in flight.
+        const started=Date.now(),snapshot=checkpointOnly||backgroundViews?null:captureReadSnapshot(db),bytes=readFileSync(file),captured=Date.now();let stored=null;
+        const next=await storeCheckpoint(bytes,at,{compressed:env.CHECKPOINT_COMPRESSION==='gzip',onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{stored=value;}:null});
+        env.checkpointHealth={state_at:at,bytes:bytes.length,stored_bytes:next.stored_bytes||bytes.length,capture_ms:captured-started,store_ms:Date.now()-captured,total_ms:Date.now()-started};
         // These bytes became durable when the pointer committed; the refresh reads nothing newer.
         if(retainDurableBytes)durable={generation:next.generation,at:next.at,sha256:next.sha256,bytes};
         if(snapshot)snapshot.stateAt=next.at;
-        if(snapshot){if(backgroundViews)queueSnapshot(snapshot);else await publishSnapshot(snapshot);}
+        if(backgroundViews&&!checkpointOnly)queueSnapshot({stored,receipt:next});
+        else if(snapshot)await publishSnapshot(snapshot);
         return next;
       }
       const publications=[];

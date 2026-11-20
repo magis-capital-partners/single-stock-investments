@@ -18,6 +18,34 @@ function storage(t){
   return {env,objects,puts,counter};
 }
 const operationPuts=puts=>puts.filter(p=>p.key===OPERATIONS_KEY).map(p=>({...decode(p.bytes),urgent:p.urgent}));
+
+test('an uploading successor checkpoint does not remove the last committed bytes from the refresher',async t=>{
+  const {env,puts}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});
+  let refresher,release,saving;const gate=new Promise(resolve=>{release=resolve;});
+  t.after(async()=>{release();await saving?.catch(()=>{});await refresher?.close();await cp.flush();cp.close();});
+  const first=await cp.save({publicationMode:'r2'}),put=env.EVIDENCE.put;
+  let uploaded;const uploading=new Promise(resolve=>{uploaded=resolve;});
+  env.EVIDENCE.put=async(key,bytes,options)=>{if(key.startsWith('collector-state/checkpoints/')){uploaded();await gate;}return put(key,bytes,options);};
+  saving=cp.save({publicationMode:'r2',checkpointOnly:true});await uploading;
+  refresher=operationsRefresher({checkpoint:cp,clock:()=>Date.parse(first.at)+31000});
+  assert.equal((await refresher.refresh()).published,true,'the last durable copy must remain refreshable while the next upload waits');
+  assert.equal(operationPuts(puts).at(-1).state_at,first.at);
+  release();await saving;
+});
+
+test('background dashboard history is captured off the collector thread',async t=>{
+  const {env,objects}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});
+  t.after(async()=>{await cp.flush();cp.close();});
+  const prepare=DatabaseSync.prototype.prepare;
+  t.mock.method(DatabaseSync.prototype,'prepare',function(sql){
+    if(sql.startsWith('SELECT payload FROM rs_shadow_tracks ORDER BY'))throw new Error('expensive dashboard history queried on collector thread');
+    return prepare.call(this,sql);
+  });
+  const receipt=await cp.save({publicationMode:'r2',backgroundViews:true});
+  await cp.flush();
+  assert.ok(objects.has('collector-dashboard/shadow.json'));
+  assert.equal(decode(objects.get(OPERATIONS_KEY)).state_at,receipt.at);
+});
 async function addEvent(env,id,firstSeen){
   const payload={id,cik:'1'+id.length,ticker:'QA'+id.slice(-2).toUpperCase(),company:'Synthetic '+id,status:'scheduled',result:'passes_screen',first_seen_at:firstSeen,published_at:firstSeen,analyzed_at:firstSeen,sources:[]};
   await env.DB.prepare('INSERT INTO rs_events(id,cik,ticker,company,first_seen_at,published_at,analyzed_at,result,payload) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,payload.cik,payload.ticker,payload.company,firstSeen,firstSeen,firstSeen,payload.result,JSON.stringify(payload)).run();
