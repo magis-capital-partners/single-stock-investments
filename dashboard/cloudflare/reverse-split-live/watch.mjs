@@ -107,8 +107,8 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
           }}catch(e){await putState(env,'shadow_news_error',{at:now(),message:e.message});}
           })().finally(()=>{newsTask=null;});
         }
-        let handled=0;
-        while(!stopping&&Date.now()-cycle<Math.max(1000,interval*1000)&&handled<2){if(!env.pending.length)await dispatch(env,{minimumPriority:10});if(!env.pending.length)await dispatch(env,{maximumPriority:9});const body=env.pending.shift();if(!body)break;const row=await env.DB.prepare('SELECT priority FROM rs_jobs WHERE id=?').bind(body.id).first();await consume({messages:[{body,ack(){}}]},{...env,deadline:Date.now()+(row?.priority>=10?15000:25000)});jobs++;handled++;}
+        let handled=0;const jobsStarted=Date.now();
+        while(!stopping&&Date.now()-jobsStarted<Math.max(1000,interval*1000)&&handled<2){if(!env.pending.length)await dispatch(env,{minimumPriority:10});if(!env.pending.length)await dispatch(env,{maximumPriority:9});const body=env.pending.shift();if(!body)break;const row=await env.DB.prepare('SELECT priority FROM rs_jobs WHERE id=?').bind(body.id).first();await consume({messages:[{body,ack(){}}]},{...env,deadline:Date.now()+(row?.priority>=10?15000:25000)});jobs++;handled++;}
         if(Date.now()-lastBorrow>60000){if(!borrowTask)borrowTask=pollIBKRBorrow(env).catch(()=>{}).finally(()=>{borrowTask=null;});if(!flexTask)flexTask=pollFlexBorrow(env).catch(()=>{}).finally(()=>{flexTask=null;});lastBorrow=Date.now();}
         ticks++;if(Date.now()-lastHeartbeat>=60000){await archiveDailyHealth(env);}
         if(Date.now()-lastHeartbeat>=60000)await heartbeat('running');
