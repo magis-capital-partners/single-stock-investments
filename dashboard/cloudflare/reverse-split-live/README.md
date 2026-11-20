@@ -144,8 +144,8 @@ Free limit and does not reset or conceal consumed usage. The budget remains a
 fail-closed stop; it is not an unlimited production-service guarantee.
 
 Between checkpoints the collector refreshes `collector-dashboard/operations.json`
-every 30 seconds (`RS_OPERATIONS_PUBLISH_SECONDS`; `0` disables), so the RS
-executor's 120-second report-age rule holds between full dashboard publications.
+at a 30-second target (`RS_OPERATIONS_PUBLISH_SECONDS`; `0` disables), independently
+of full dashboard publications. The executor still enforces its 120-second age rules.
 A refresh itself never checkpoints and makes no D1 call: a worker
 thread re-evaluates the operations snapshot over a copy of the last committed
 checkpoint (its SHA-256 must match the receipt) at the publication time. Candidates,
@@ -167,7 +167,10 @@ checkpoint. The refresh put skips the shared R2 request pacer, so it takes no sl
 from checkpoint, validation or archive requests.
 
 Historical dashboard capture also runs on a worker, over the checksum-verified
-committed checkpoint. It streams one encoded object at a time back to the existing
+committed checkpoint. It evaluates and urgently publishes operations before
+capturing historical views or uploading dashboard pages. Cohorts are grouped by
+event once rather than scanning every historical track for each candidate. It
+then streams one encoded object at a time back to the existing
 leased writer, preserving the first five current views, content-hash deduplication,
 newer-snapshot priority and handoff deferral. Large historical SQL reads and JSON
 encoding therefore cannot stop the collector's feed/checkpoint timers. The previous

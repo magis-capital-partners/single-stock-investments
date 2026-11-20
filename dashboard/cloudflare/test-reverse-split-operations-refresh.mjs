@@ -46,6 +46,22 @@ test('background dashboard history is captured off the collector thread',async t
   assert.ok(objects.has('collector-dashboard/shadow.json'));
   assert.equal(decode(objects.get(OPERATIONS_KEY)).state_at,receipt.at);
 });
+
+test('durable operations publish urgently before a blocked dashboard page',async t=>{
+  const {env,objects,puts}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});
+  let release,blocked;const gate=new Promise(resolve=>{release=resolve;}),waiting=new Promise(resolve=>{blocked=resolve;});
+  const put=env.EVIDENCE.put;
+  env.EVIDENCE.put=async(key,bytes,options)=>{if(key==='collector-dashboard/financial-needs.json'){blocked();await gate;}return put(key,bytes,options);};
+  t.after(async()=>{release();await cp.flush();cp.close();});
+  const receipt=await cp.save({publicationMode:'r2',backgroundViews:true});
+  await waiting;
+  const visible=objects.get(OPERATIONS_KEY),first=puts.find(row=>row.key.startsWith('collector-dashboard/'));
+  release();await cp.flush();
+  assert.ok(visible,'operations must already be available while a large dashboard page waits');
+  assert.equal(decode(visible).state_at,receipt.at);
+  assert.equal(first.urgent,true);
+  assert.equal(first.key,OPERATIONS_KEY);
+});
 async function addEvent(env,id,firstSeen){
   const payload={id,cik:'1'+id.length,ticker:'QA'+id.slice(-2).toUpperCase(),company:'Synthetic '+id,status:'scheduled',result:'passes_screen',first_seen_at:firstSeen,published_at:firstSeen,analyzed_at:firstSeen,sources:[]};
   await env.DB.prepare('INSERT INTO rs_events(id,cik,ticker,company,first_seen_at,published_at,analyzed_at,result,payload) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,payload.cik,payload.ticker,payload.company,firstSeen,firstSeen,firstSeen,payload.result,JSON.stringify(payload)).run();
