@@ -1,4 +1,4 @@
-# ALAB — Insider conviction (2026-10-09)
+# ALAB — Insider conviction (2026-11-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- Mohan Jitendra: 578 @ $352.1051 on 2026-08-17
-- Mohan Jitendra: 1049 @ $351.2423 on 2026-08-17
-- Mohan Jitendra: 1984 @ $349.1934 on 2026-08-17
+- Mohan Jitendra: 1101 @ $210.6653 on 2026-11-16
+- Mohan Jitendra: 5043 @ $209.6586 on 2026-11-16
+- Mohan Jitendra: 12083 @ $208.7492 on 2026-11-16
 
 Source: `_system/reference/market-data/insider/ALAB_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
