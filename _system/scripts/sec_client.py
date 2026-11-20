@@ -7,6 +7,7 @@ This client targets about 5 requests a second and backs off on 403 and 429.
 from __future__ import annotations
 
 import json
+import gzip
 import os
 import random
 import time
@@ -44,7 +45,7 @@ class SecClient:
             self._last = time.monotonic()
 
     def get_bytes(self, url: str, *, accept: str | None = None, timeout: int = 120) -> bytes:
-        headers = {"User-Agent": sec_user_agent()}
+        headers = {"User-Agent": sec_user_agent(), "Accept-Encoding": "gzip"}
         if accept:
             headers["Accept"] = accept
         last_error: Exception | None = None
@@ -53,7 +54,8 @@ class SecClient:
             req = urllib.request.Request(url, headers=headers)
             try:
                 with urllib.request.urlopen(req, timeout=timeout) as resp:
-                    return resp.read()
+                    payload = resp.read()
+                    return gzip.decompress(payload) if getattr(resp, "headers", {}).get("Content-Encoding", "").lower() == "gzip" else payload
             except urllib.error.HTTPError as exc:
                 last_error = exc
                 if exc.code in {403, 429, 500, 502, 503, 504} and attempt + 1 < self.max_attempts:

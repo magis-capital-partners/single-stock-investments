@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+import time
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -509,11 +510,17 @@ def main() -> int:
     sys.path.insert(0, str(sys_path))
     from persona_lens_common import load_personas  # noqa: WPS433
 
+    started = time.monotonic()
+
+    def phase(label: str) -> None:
+        print(f"superinvestor phase {label}: {time.monotonic() - started:.1f}s elapsed", flush=True)
+
     persona_cfg = load_personas()
     master = load_security_master()
     resolver = FundResolver()
     source_files = scan_letter_files()
     files, document_meta_by_path, duplicate_audit = deduplicate_letter_files(source_files)
+    phase(f"exact dedup ({len(source_files)} files -> {len(files)})")
     tasks = [
         (str(path), document_meta_by_path.get(str(path.resolve()).lower(), {}))
         for path in files
@@ -541,9 +548,12 @@ def main() -> int:
             example = Path(str(row.get("source_file") or "")).stem
             if example and example not in examples and len(examples) < 5:
                 examples.append(example)
+    phase(f"letter records ({workers} workers)")
     resolver.write_unresolved()
     letters, fund_identity_audit = consolidate_letter_funds_stable(letters)
+    phase(f"fund identity ({fund_identity_audit.get('convergence_passes')} passes)")
     letters, duplicate_audit = deduplicate_letter_records(letters, duplicate_audit)
+    phase(f"near-duplicate audit ({duplicate_audit.get('near_duplicate_groups')} groups)")
     DUPLICATE_AUDIT_PATH.write_text(
         json.dumps(duplicate_audit, indent=2) + "\n", encoding="utf-8"
     )

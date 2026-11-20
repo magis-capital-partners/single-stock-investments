@@ -8,7 +8,10 @@ import urllib.request
 
 from .safety import SafetyError, timestamp
 
-KINDS = {"entry_halt", "submission_uncertain", "cover_trigger", "inbox_unavailable"}
+KINDS = {
+    "entry_halt", "submission_uncertain", "cover_trigger", "inbox_unavailable",
+    "shadow_entry", "paper_order_submitted", "operator_resume",
+}
 
 
 def slack_post(url, body):
@@ -53,11 +56,11 @@ def deliver_alerts(journal, url, now, post=slack_post):
             post(
                 url,
                 {
-                    "text": "RS PAPER executor: "
+                    "text": "RS executor (" + getattr(journal, "prefix", "RSPAPER|").rstrip("|") + "): "
                     + row["kind"]
                     + " at "
                     + row["at"]
-                    + ". Inspect the local paper status/journal."
+                    + ". Inspect the local status/journal."
                 },
             )
         journal.set("alert_cursor", row["id"])

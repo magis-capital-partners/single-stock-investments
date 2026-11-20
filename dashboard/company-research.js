@@ -51,6 +51,15 @@
     const c=meta.coverage||{};
     return `Library checked ${esc(String(c.checked_at||'unknown').slice(0,10))} · ${Number(meta.total||0).toLocaleString()} sources${c.pending?` · ${Number(c.pending).toLocaleString()} awaiting text processing`:''}${c.review_count?` · ${Number(c.review_count).toLocaleString()} possible matches awaiting review`:''}${c.status==='partial'?' · Coverage incomplete':''}`;
   }
+  function archiveMatch(row, spec) {
+    const text=JSON.stringify([row.title,row.reason,row.passages,row.locations,row.source_refs]);
+    const issuer=id=>id&&new RegExp('(?:CIK0*|edgar/data/0*)'+String(Number(id))+'(?:[/?.]|\\b)','i').test(text);
+    if(issuer(spec.excludedCik)||/\bStrive\b|Series A.*preferred|\bASST\b/i.test(row.title||''))return false;
+    if(issuer(spec.cik)||/\bEchoStar\b|\bDISH Network\b|\bHughes Network/i.test(text))return true;
+    if(row.date&&row.date.slice(0,10)<spec.cutoff)return true;
+    // The original issuer research folder is a dated archive, not a ticker match.
+    return (row.locations||[]).some(l=>/\/SATS\/(?:research|investor-documents)\//.test(l.url||''));
+  }
   function rowHTML(row) {
     const url=sourceURL(row);
     const passages=(row.passages||[]).map(p=>`<blockquote><p>${esc(p.text)}</p><cite>${esc(p.locator)}${p.timestamp?` · ${esc(p.timestamp)}`:''}</cite></blockquote>`).join('');
@@ -77,7 +86,7 @@
     const live=()=>host.isConnected&&host._companyRequest===request;
     host.innerHTML='<p class="cr-meta" role="status">Loading company sources…</p>';
     try {
-      const meta=await manifest(ticker); if(!live())return;
+      const meta={...await manifest(ticker)}; if(!live())return;
       if(options.summary&&options.brief) {
         host.innerHTML=`<div class="cr-overview-heading"><h3>Essential reading</h3><button type="button" data-rw-go="sources">Complete research library</button></div><ul class="cr-reading">${(meta.featured||[]).slice(0,3).map(r=>`<li><button type="button" class="sp-text-link" data-cr-open="${esc(r.id)}">${esc(r.title)}</button><span>${esc(String(r.date||'Undated').slice(0,10))}</span></li>`).join('')||'<li>No essential reading is currently indexed.</li>'}</ul>`;
         host.onclick=event=>{const button=event.target.closest('[data-cr-open]');if(button){global.CompanyResearch.pendingReadId=button.dataset.crOpen;global.ResearchWorkspace?.activate('sources');}};
@@ -94,6 +103,13 @@
       const rows=[];
       // Bounded concurrent requests; every manifest page is consumed without a result cutoff.
       for(let i=0;i<meta.pages.length;i+=6){const batch=await Promise.all(meta.pages.slice(i,i+6).map(asset));rows.push(...batch.flat());if(!live())return;}
+      if(options.archive) {
+        const original=rows.length,kept=rows.filter(row=>archiveMatch(row,options.archive));rows.splice(0,rows.length,...kept);
+        meta.total=rows.length;meta.categories={};for(const row of rows)meta.categories[row.category]=(meta.categories[row.category]||0)+1;
+        form.elements.category.innerHTML=`<option value="">All confirmed archive sources (${meta.total})</option>${Object.entries(categories).map(([id,label])=>`<option value="${id}">${esc(label)} (${meta.categories[id]||0})</option>`).join('')}`;
+        form.elements.category.value=state.category;
+        host.querySelector('p.cr-meta').textContent=`${rows.length.toLocaleString()} confirmed EchoStar archive sources · ${(original-rows.length).toLocaleString()} ambiguous or different-issuer matches excluded`;
+      }
       let index=null,version=0;
       async function render(){const v=++version;Object.assign(state,Object.fromEntries(new FormData(form)));if(state.query&&!index){host.querySelector('[data-cr-status]').textContent='Searching full source text…';index=await searchIndex(meta.search_path);}if(!live()||v!==version)return;const found=filter(rows,state,index);const pages=Math.max(1,Math.ceil(found.length/25));state.page=Math.min(state.page,pages-1);host.querySelector('[data-cr-results]').innerHTML=found.slice(state.page*25,(state.page+1)*25).map(rowHTML).join('')||'<p>No sources match these filters.</p>';host.querySelector('[data-cr-status]').textContent=`${found.length.toLocaleString()} of ${meta.total.toLocaleString()} sources${meta.coverage.pending?' · Some source text is still awaiting processing':''}`;host.querySelector('[data-cr-page]').textContent=`Page ${state.page+1} of ${pages}`;host.querySelector('[data-cr-prev]').disabled=state.page===0;host.querySelector('[data-cr-next]').disabled=state.page>=pages-1;}
       const redraw=()=>render().catch(e=>{if(live())host.querySelector('[data-cr-status]').textContent=e.message;});
@@ -106,6 +122,6 @@
       if(pending){global.CompanyResearch.pendingReadId=null;await read(pending,host);}
     }catch(e){if(live()){host.innerHTML=`<p class="cr-meta">${esc(e.message)}</p><button type="button" data-cr-retry>Retry library</button>`;host.querySelector('button').onclick=()=>mount(host,ticker,options);}}
   }
-  global.CompanyResearch={mount,filter,words,safeURL,rowHTML,categories,pendingCategory:''};
+  global.CompanyResearch={mount,filter,words,safeURL,rowHTML,categories,archiveMatch,pendingCategory:''};
   if(typeof module!=='undefined')module.exports=global.CompanyResearch;
 })(typeof window!=='undefined'?window:globalThis);

@@ -1,4 +1,4 @@
-import hashlib,hmac,io,json,sys,urllib.error
+import hashlib,hmac,http.client,io,json,ssl,sys,urllib.error
 from datetime import datetime,timezone
 from pathlib import Path
 import pytest
@@ -20,7 +20,7 @@ class Opener:
     def open(self,request,**kwargs):
         self.requests.append(request);result=self.responses.pop(0)
         if isinstance(result,Exception):raise result
-        return Response(result)
+        return result if isinstance(result,Response) else Response(result)
 
 def test_existing_token_is_derived_in_memory_and_verified_only_once(monkeypatch):
     token='existing authorized token';monkeypatch.setenv('CLOUDFLARE_API_TOKEN',token);identity=Identity();obj=s3.S3HTTP(CONFIG,identity_http=identity)
@@ -57,6 +57,50 @@ def test_request_limit_retry_preserves_identity_and_honors_bounded_wait(monkeypa
     client=s3.S3HTTP(CONFIG,identity_http=Identity(),opener=Opener([error,b'original']))
     assert client.request('GET','/'+CONFIG['bucket']+'/object',limit=8)==b'original'
     assert 60 in waits and 30 in waits and all(x<=60 for x in waits)
+
+@pytest.mark.parametrize('method',['GET','PUT'])
+@pytest.mark.parametrize('failure',[
+    urllib.error.URLError(ssl.SSLEOFError('interrupted handshake')),
+    urllib.error.URLError(ConnectionResetError('connection reset')),
+    TimeoutError('read timed out'),ssl.SSLEOFError('interrupted transfer')])
+def test_transient_connection_failure_replays_the_same_signed_object(monkeypatch,method,failure):
+    monkeypatch.setenv('CLOUDFLARE_API_TOKEN','existing token');waits=[];monkeypatch.setattr(s3.time,'sleep',waits.append)
+    identity=Identity();opener=Opener([failure,b'complete'])
+    client=s3.S3HTTP(CONFIG,identity_http=identity,opener=opener)
+    body=b'original immutable bytes' if method=='PUT' else None
+    assert client.request(method,'/'+CONFIG['bucket']+'/object',body,limit=8)==b'complete'
+    assert len(opener.requests)==2 and len(identity.calls)==1
+    assert opener.requests[0].full_url==opener.requests[1].full_url
+    assert all(r.get_method()==method and r.data==body for r in opener.requests)
+    assert 2 in waits and all(w<=60 for w in waits)
+
+def test_interrupted_response_never_returns_its_partial_bytes(monkeypatch):
+    monkeypatch.setenv('CLOUDFLARE_API_TOKEN','existing token');monkeypatch.setattr(s3.time,'sleep',lambda _:None)
+    class Interrupted(Response):
+        def read(self,limit):raise http.client.IncompleteRead(b'partial',7)
+    opener=Opener([Interrupted(b''),b'complete'])
+    client=s3.S3HTTP(CONFIG,identity_http=Identity(),opener=opener)
+    assert client.request('GET','/'+CONFIG['bucket']+'/object',limit=8)==b'complete'
+    assert len(opener.requests)==2
+
+def test_connection_retries_are_bounded_and_do_not_expose_error_details(monkeypatch):
+    monkeypatch.setenv('CLOUDFLARE_API_TOKEN','secret not for logs');waits=[];monkeypatch.setattr(s3.time,'sleep',waits.append)
+    opener=Opener([urllib.error.URLError('secret not for logs') for _ in range(4)])
+    client=s3.S3HTTP(CONFIG,identity_http=Identity(),opener=opener)
+    with pytest.raises(store.StorageError,match='exhausted its connection retries') as exc:
+        client.request('GET','/'+CONFIG['bucket']+'/object',limit=8)
+    assert len(opener.requests)==4 and [w for w in waits if w>=1]==[2,4,8]
+    assert 'secret not for logs' not in str(exc.value)
+
+@pytest.mark.parametrize('wrapped',[False,True])
+def test_certificate_verification_failure_is_not_retried(monkeypatch,wrapped):
+    monkeypatch.setenv('CLOUDFLARE_API_TOKEN','existing token')
+    failure=ssl.SSLCertVerificationError('certificate verification failed')
+    opener=Opener([urllib.error.URLError(failure) if wrapped else failure])
+    client=s3.S3HTTP(CONFIG,identity_http=Identity(),opener=opener)
+    with pytest.raises(store.StorageError,match='certificate verification'):
+        client.request('GET','/'+CONFIG['bucket']+'/object',limit=8)
+    assert len(opener.requests)==1
 
 @pytest.mark.parametrize('code',[401,403,413])
 def test_auth_and_size_failures_do_not_silently_change_transport(monkeypatch,code):

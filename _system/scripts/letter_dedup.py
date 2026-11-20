@@ -126,6 +126,100 @@ def _record_text(record: dict) -> str:
     return normalize_document_text(path.read_text(encoding="utf-8", errors="ignore"))
 
 
+def _suffix_automaton(text: str) -> tuple[list[dict[str, int]], list[int], list[int]]:
+    transitions: list[dict[str, int]] = [{}]
+    links = [-1]
+    lengths = [0]
+    last = 0
+    for char in text:
+        current = len(lengths)
+        transitions.append({})
+        lengths.append(lengths[last] + 1)
+        links.append(0)
+        state = last
+        while state != -1 and char not in transitions[state]:
+            transitions[state][char] = current
+            state = links[state]
+        if state != -1:
+            target = transitions[state][char]
+            if lengths[state] + 1 == lengths[target]:
+                links[current] = target
+            else:
+                clone = len(lengths)
+                transitions.append(dict(transitions[target]))
+                lengths.append(lengths[state] + 1)
+                links.append(links[target])
+                while state != -1 and transitions[state].get(char) == target:
+                    transitions[state][char] = clone
+                    state = links[state]
+                links[target] = clone
+                links[current] = clone
+        last = current
+    return transitions, links, lengths
+
+
+def _longest_match(a: str, alo: int, ahi: int, b: str, blo: int, bhi: int) -> tuple[int, int, int]:
+    """``SequenceMatcher(None, a, b, autojunk=False).find_longest_match`` in linear time.
+
+    Without junk, difflib returns the longest common substring of the two
+    windows, breaking ties by the earliest start in ``a`` and then in ``b``.
+    The automaton scan visits ``a`` in order and keeps only strictly longer
+    matches, and ``str.find`` returns the earliest window start in ``b``.
+    """
+    transitions, links, lengths = _suffix_automaton(b[blo:bhi])
+    state = length = best = 0
+    best_end = alo
+    for idx in range(alo, ahi):
+        char = a[idx]
+        step = transitions[state].get(char)
+        if step is None:
+            while state and char not in transitions[state]:
+                state = links[state]
+            step = transitions[state].get(char)
+            if step is None:
+                state = length = 0
+                continue
+            length = lengths[state]
+        state = step
+        length += 1
+        if length > best:
+            best = length
+            best_end = idx
+    if not best:
+        return alo, blo, 0
+    start = best_end - best + 1
+    return start, b.find(a[start : best_end + 1], blo, bhi), best
+
+
+def _matching_characters(a: str, b: str) -> int:
+    """Total size of ``SequenceMatcher.get_matching_blocks`` for junk-free input."""
+    queue = [(0, len(a), 0, len(b))]
+    total = 0
+    while queue:
+        alo, ahi, blo, bhi = queue.pop()
+        i, j, k = _longest_match(a, alo, ahi, b, blo, bhi)
+        if k:
+            total += k
+            if alo < i and blo < j:
+                queue.append((alo, i, blo, j))
+            if i + k < ahi and j + k < bhi:
+                queue.append((i + k, ahi, j + k, bhi))
+    return total
+
+
+def _similarity_ratio(left: str, right: str) -> float:
+    """Exact ``SequenceMatcher(None, left, right, autojunk=False).ratio()``.
+
+    difflib's own inner loop visits every position of each character in the
+    other text, which is quadratic on whole letters: a single 100 KB OCR twin
+    took over a minute, and a few dozen of them serialized the nightly build.
+    """
+    length = len(left) + len(right)
+    if not length:
+        return 1.0
+    return 2.0 * _matching_characters(left, right) / length
+
+
 def _near_duplicate(left: str, right: str) -> bool:
     if min(len(left), len(right)) < 500:
         return False
@@ -135,7 +229,7 @@ def _near_duplicate(left: str, right: str) -> bool:
     matcher = SequenceMatcher(None, left, right, autojunk=False)
     if matcher.real_quick_ratio() < 0.985 or matcher.quick_ratio() < 0.985:
         return False
-    return matcher.ratio() >= 0.985
+    return _similarity_ratio(left, right) >= 0.985
 
 
 def _record_score(record: dict, text_length: int) -> tuple:
@@ -199,10 +293,13 @@ def deduplicate_letter_records(letters: list[dict], exact_audit: dict) -> tuple[
         for candidate_indices in name_groups.values():
             if len(candidate_indices) < 2:
                 continue
+            for idx in candidate_indices:
+                if idx not in texts:
+                    texts[idx] = _record_text(letters[idx])
             for offset, left_idx in enumerate(candidate_indices):
-                left = texts.setdefault(left_idx, _record_text(letters[left_idx]))
+                left = texts[left_idx]
                 for right_idx in candidate_indices[offset + 1 :]:
-                    right = texts.setdefault(right_idx, _record_text(letters[right_idx]))
+                    right = texts[right_idx]
                     if left and right and _near_duplicate(left, right):
                         union(left_idx, right_idx)
 

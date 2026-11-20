@@ -227,7 +227,7 @@
         normalize(panel);
         if (state.open?.[id]) panel.querySelectorAll(':scope > details').forEach(el => { el.open = state.open[id].includes(el.querySelector(':scope > summary')?.textContent); });
         rendered.add(id); options.afterRender?.(id,panel);
-        panel.querySelectorAll('[data-company-library]').forEach(host=>global.CompanyResearch?.mount(host,t.ticker,{summary:host.dataset.companyLibrary==='summary',models:host.dataset.companyLibrary==='models',brief:pilot&&host.dataset.companyLibrary==='summary'}));
+        panel.querySelectorAll('[data-company-library]').forEach(host=>global.CompanyResearch?.mount(host,host.dataset.companyTicker||t.ticker,{summary:host.dataset.companyLibrary==='summary',models:host.dataset.companyLibrary==='models',brief:pilot&&host.dataset.companyLibrary==='summary',archive:host.dataset.archiveCutoff?{cutoff:host.dataset.archiveCutoff,cik:host.dataset.archiveCik,excludedCik:host.dataset.archiveExcludedCik}:null}));
         if(pilot)global.StockOnePager.hydrate(panel,t,h,renderers,id);
         global.StockPerformance?.mount(panel,t,h);
       }

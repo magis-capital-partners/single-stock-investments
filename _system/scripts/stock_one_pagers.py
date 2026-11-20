@@ -8,10 +8,12 @@ from copy import deepcopy
 from pathlib import Path
 import re
 from functools import lru_cache
+from stock_valuation_models import model_for_stock
+from stock_valuation_aliases import legacy_libraries
 
 PROFILES = {
     "CPRT": {
-        "type": "Operating company · auction marketplace", "fiscal_end": "07-31",
+        "type": "Operating company · auction marketplace", "category": "operating", "fiscal_end": "07-31",
         "description": "Copart connects insurers and other vehicle sellers with buyers through its auction network. Its yards, logistics, buyer participation and insurer relationships support the service revenue earned on each vehicle.",
         "focus": "Follow auction activity and revenue per vehicle, then check how much operating profit becomes cash after maintaining and expanding the yard network.",
         "countercase": "Lower insurer assignments, weaker pricing or higher yard and acquisition costs can reduce cash generation even while reported revenue holds up.",
@@ -549,9 +551,24 @@ def build_one_pager(root: Path, ticker: str, row: dict | None = None) -> dict:
     model.setdefault("source_ref", published_forecast.get("source_model_ref"))
     model["as_of"] = published_forecast.get("model_as_of") if reference_only and published_forecast.get("model_assumptions") else model.get("as_of") or published_forecast.get("model_as_of")
     history = financials(root, ticker, profile, cached.get("financials"))
+    worksheet = model_for_stock(root, ticker, profile, history, row)
+    if worksheet.get("financial_override"):
+        history = {**history, **worksheet["financial_override"]}
+    if worksheet.get("profile_override"):
+        profile = {**profile, **worksheet["profile_override"]}
+    if worksheet.get("performance_override"):
+        performance = worksheet["performance_override"]
+    if worksheet.get("invalidate_recorded_model"):
+        model = {"as_of": None, "assumptions": [], "components": [], "currency": worksheet["currency"], "source_ref": None, "reference_only": True}
+        assumptions = []
+    if worksheet.get("quarantine_library"):
+        risks = [worksheet["identity_note"]]
     thesis_text = thesis.get("why_market_wrong") or cached.get("thesis") or ""
     return {"schema_version": "stock-one-pager.v1", "ticker": ticker, "profile": profile,
             "financials": history, "performance": performance, "model": model,
+            "valuation_model": worksheet,
+            "identity_note": worksheet.get("identity_note"), "quarantine_library": bool(worksheet.get("quarantine_library")),
+            "legacy_libraries": worksheet.get("legacy_libraries") or legacy_libraries(root, ticker),
             "source_forecast": {k: source_forecast.get(k) for k in ("calculation_id", "forecast_hash", "model_as_of")},
             "thesis": re.sub(r"\*\*|\[(?:Fact|Inference|Assumption)\]", "", str(thesis_text)).strip(),
             "risks": risks,

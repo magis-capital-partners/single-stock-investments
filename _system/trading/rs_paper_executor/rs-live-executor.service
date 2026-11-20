@@ -1,0 +1,51 @@
+# TEMPLATE ONLY. Never installed by a workflow, by Box R, or by spx-0dte's
+# installer (which installs every file in its own deploy/linux/systemd/).
+# NY4 reverse-split executor: registered client 60, prefix RSLIVE|.
+# Install/enable only on the owner's explicit word, outside 07:45-16:20 ET.
+# As shipped it runs the dedicated SHADOW journal (--shadow): no entry is ever
+# transmitted, whatever /etc/rs-live/ARM.json says, and it refuses to start
+# while RS holds live names. The pilot is a separate owner decision: a drop-in
+# that removes --shadow and points --state at /var/lib/rs-live/state.sqlite.
+[Unit]
+Description=Reverse-split live executor (client 60; shadow journal)
+After=ibc.service rs-live-operations.service
+# The feed fetcher runs beside it and stops with it (PartOf there).
+Wants=rs-live-operations.service
+ConditionPathExists=/etc/rs-live-approved
+
+[Service]
+Type=simple
+User=rs-live
+Group=rs-live
+# Group shared with the spx user so ls-algo/the hub can READ the claims file.
+SupplementaryGroups=ib-claims
+WorkingDirectory=/srv/rs-live/repo
+Environment=TZ=America/New_York
+# Optional: RS_PAPER_SLACK_WEBHOOK only. The executor holds NO feed credential and
+# makes no feed network read: rs-live-operations writes feed/operations.json and
+# this process reads that local copy. The executor refuses a snapshot whose
+# producer clock is older than 120 s.
+EnvironmentFile=-/etc/rs-live/executor.env
+ExecStart=/srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor run --shadow --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite --evidence /var/lib/rs-live/evidence.json --operations-file /var/lib/rs-live/feed/operations.json --kill-file /var/lib/rs-live/FLATTEN --connect-live
+# No restart: a crash must not become a connect loop (AGENTS.md rule 9). The
+# executor's own 3-per-day connect budget covers transient disconnects.
+Restart=no
+# Session-bounded: started by the timer at 09:05, stopped after the close.
+RuntimeMaxSec=27000
+TimeoutStopSec=60
+# It trades, so a weight rather than a quota, but below etf-0dte's 50: RS yields.
+CPUWeight=20
+# Killed before any SPX/ETF process under memory pressure.
+OOMScoreAdjust=700
+MemoryMax=512M
+UMask=0027
+StateDirectory=rs-live
+StateDirectoryMode=0750
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/rs-live /var/lib/ib-account-claims
+
+[Install]
+WantedBy=multi-user.target

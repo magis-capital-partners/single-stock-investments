@@ -57,6 +57,37 @@ def fresh(value, now, max_age):
         raise SafetyError("stale or future evidence")
 
 
+PREFIX = "RSPAPER|"
+LIVE_PREFIX = "RSLIVE|"
+RS_SYSTEM = "reverse-split"
+LIVE_APPROVAL = Path("/etc/rs-live-approved")
+BOX_R_HOSTS = {"magis-collector-3", "magis-collector-2"}
+# NY4 answers to several names (SSH alias spx-ny4, provider name FXVPS374628).
+# Paper must never run there: a paper Gateway beside the live one is route B,
+# which the owner declined on 2026-11-18. The SPX install path is a second proof.
+NY4_HOSTS = {"ny4", "spx-ny4", "fxvps374628"}
+NY4_MARKERS = (Path("/home/spx/spx-0dte"), Path("/home/spx/.config/spx-0dte"))
+# Names other systems in this account trade as products or deliverables. An RS
+# order or position here would switch off that product's delivery attribution
+# in spx-0dte (order_ownership foreign-share rule); never an RS name.
+PROTECTED_SYMBOLS = frozenset(
+    {"SPX", "SPXW", "XSP", "VIX", "SPY", "QQQ", "TSLA", "NVDA", "AMZN"}
+)
+
+
+def _refuse_box_r():
+    import socket
+
+    host = socket.gethostname().lower()
+    if (
+        host in BOX_R_HOSTS
+        or os.environ.get("RS_COLLECTOR_HOST")
+        or Path("/etc/reverse-split-live.env").exists()
+    ):
+        raise SafetyError("broker adapter may not run on Box R")
+    return host
+
+
 @dataclass(frozen=True)
 class PaperEndpoint:
     account: str
@@ -65,6 +96,8 @@ class PaperEndpoint:
     host: str = "127.0.0.1"
     mode: str = "paper"
     deployment_role: str = "isolated_paper_executor"
+    prefix = PREFIX
+    live = False
 
     def validate(self):
         if self.mode != "paper" or self.deployment_role != "isolated_paper_executor":
@@ -92,24 +125,83 @@ class PaperEndpoint:
             raise SafetyError("broker client identity mismatch")
 
     def runtime_guard(self):
-        import socket
-
-        host = socket.gethostname().lower()
-        if (
-            host in {"ny4", "magis-collector-3", "magis-collector-2"}
-            or os.environ.get("RS_COLLECTOR_HOST")
-            or Path("/etc/reverse-split-live.env").exists()
-        ):
+        host = _refuse_box_r()
+        if host.split(".")[0] in NY4_HOSTS or any(m.exists() for m in NY4_MARKERS):
             raise SafetyError("paper broker adapter may not run on Box R or NY4")
 
 
-PREFIX = "RSPAPER|"
+@dataclass(frozen=True)
+class LiveEndpoint:
+    """The shared NY4 Gateway, as the registered reverse-split system.
+
+    Connectable only when the canonical registry (hash-pinned) allocates
+    ``client_id`` to ``reverse-split`` as an active transmit executor and lists
+    ``RSLIVE|`` as its only order prefix, the port is the registry's Gateway
+    live port on loopback, the account is the pinned ``U`` account, and the host
+    carries the operator approval file. Transmission is a further, separate arm
+    (see ``arm.py``): a validated live endpoint alone only runs in shadow.
+    """
+
+    account: str
+    client_id: int
+    port: int
+    host: str = "127.0.0.1"
+    mode: str = "live"
+    deployment_role: str = "ny4_reverse_split_live"
+    prefix = LIVE_PREFIX
+    live = True
+
+    def validate(self):
+        if self.mode != "live" or self.deployment_role != "ny4_reverse_split_live":
+            raise SafetyError("live endpoint requires the ny4_reverse_split_live role")
+        if not re.fullmatch(r"U[0-9]+", self.account or ""):
+            raise SafetyError("explicit pinned U live account required")
+        registry, _ = load_registry()
+        if self.host != "127.0.0.1" or self.port != int(registry["gateway"]["live_port"]):
+            raise SafetyError("live endpoint must be the registry Gateway port on loopback")
+        client = integer(self.client_id, "live client ID", minimum=1)
+        allocation = allocation_index(registry).get(client)
+        if (
+            allocation is None
+            or allocation.system != RS_SYSTEM
+            or allocation.access != "transmit"
+            or not allocation.connectable
+            or "executor" not in allocation.role
+            or "watchdog" in allocation.role
+        ):
+            raise SafetyError("client ID is not the registered reverse-split executor")
+        prefixes = registry["systems"][RS_SYSTEM].get("order_ref_prefixes")
+        if prefixes != [LIVE_PREFIX]:
+            raise SafetyError("registry reverse-split prefixes do not match RSLIVE|")
+        return self
+
+    def prove_session(self, managed_accounts, actual_client):
+        # The shared Gateway may list other managed accounts (see SPX's account
+        # pin); every request here is account-scoped, so only presence is proven.
+        self.validate()
+        if self.account not in tuple(managed_accounts):
+            raise SafetyError("pinned live account not offered by this session")
+        if actual_client != self.client_id:
+            raise SafetyError("broker client identity mismatch")
+
+    def runtime_guard(self):
+        _refuse_box_r()
+        if not LIVE_APPROVAL.exists():
+            raise SafetyError("live host approval file is absent")
+
+
+def endpoint_from_config(block):
+    mode = (block or {}).get("mode")
+    if mode == "live":
+        return LiveEndpoint(**block).validate()
+    return PaperEndpoint(**block).validate()
 
 
 def owned_order(row, endpoint, known_refs):
+    prefix = re.escape(endpoint.prefix)
     return (
         row.get("account") == endpoint.account
         and row.get("client_id") == endpoint.client_id
         and row.get("ref") in known_refs
-        and re.fullmatch(r"RSPAPER\|[a-f0-9]{20}", row.get("ref", "")) is not None
+        and re.fullmatch(prefix + r"[a-f0-9]{20}", row.get("ref", "")) is not None
     )
