@@ -7,7 +7,7 @@ import {createHash} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter} from './reverse-split-live/checkpoint.mjs';
 import {limitedFetch} from './reverse-split-live/worker.mjs';
-import {openRecoveryBundle,installRecoveryBundle,reconcileUnavailableFiling} from './reverse-split-live/recovery-bundle.mjs';
+import {openRecoveryBundle,installRecoveryBundle,reconcileUnavailableFiling,drainRecoveryBodies} from './reverse-split-live/recovery-bundle.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const archive='https://www.prnewswire.com/news-releases/news-releases-list/?page=1&pagesize=100',article='https://www.prnewswire.com/news-releases/ordinary-302900002.html',at='2026-11-20T16:00:00Z';
 function setup(t,{missingBody=false}={}){
@@ -48,4 +48,17 @@ test('a retired SEC reference requires official same-day inventory and an alread
  db.prepare('INSERT INTO rs_documents VALUES(?,?,?,?,?,?)').run('c'.repeat(64),canonical.url,'documents/'+'c'.repeat(64),at,100,'text/plain');assert.equal((await reconcileUnavailableFiling(env,bundle,{now:at})).reconciled,1);
  const row=db.prepare('SELECT * FROM rs_jobs WHERE id=?').get('history-filing:'+original.accession);assert.equal(row.state,'superseded');assert.equal(row.payload,JSON.stringify(original));assert.match(row.error,/Unavailable reference retained/);
  const proof=[...objects.entries()].filter(([key])=>key.startsWith('review/repairs/')).map(([,b])=>JSON.parse(new TextDecoder().decode(b)))[0];assert.equal(proof.original_job.error,'Source returned HTTP 404');assert.ok(proof.limitations.some(v=>v.includes('not recovered')));assert.equal((await reconcileUnavailableFiling(env,bundle,{now:at})).reconciled,0);
+});
+
+test('bounded in-process repair archives and analyzes a captured body through the real job consumer',async t=>{
+ const {bundle,db,env}=setup(t);await installRecoveryBundle(env,bundle,{now:at});env.recoveryBundle=bundle;env.recoveryDocument=bundle.fetchDocument;
+ db.prepare("INSERT INTO rs_jobs(id,kind,payload,state,created_at,updated_at) VALUES('unrelated','news','{}','pending',?,?)").run(at,at);
+ assert.equal((await drainRecoveryBodies(env)).jobs,1);assert.equal(db.prepare("SELECT state FROM rs_jobs WHERE id LIKE 'publisher-article:%'").get().state,'complete');assert.equal(db.prepare("SELECT state FROM rs_jobs WHERE id='unrelated'").get().state,'pending');assert.equal(db.prepare('SELECT count(*) n FROM rs_documents WHERE url=?').get(article).n,1);assert.equal(db.prepare('SELECT resolved_at FROM rs_source_gaps').get().resolved_at,null);
+});
+test('repair yields to fresh disclosures and never claims a job after losing the collector lease',async t=>{
+ const {bundle,db,env}=setup(t);await installRecoveryBundle(env,bundle,{now:at});env.recoveryBundle=bundle;env.recoveryDocument=bundle.fetchDocument;
+ db.prepare("INSERT INTO rs_jobs(id,kind,payload,state,priority,created_at,updated_at) VALUES('urgent','filing','{}','pending',15,?,?)").run(at,at);
+ assert.equal((await drainRecoveryBodies(env)).jobs,0);assert.equal(db.prepare("SELECT state FROM rs_jobs WHERE id LIKE 'publisher-article:%'").get().state,'pending');
+ db.prepare("UPDATE rs_jobs SET state='running',lease_until=? WHERE id='urgent'").run(Date.now()+60000);assert.equal((await drainRecoveryBodies(env)).jobs,0);
+ db.prepare("UPDATE rs_jobs SET state='complete' WHERE id='urgent'").run();env.assertCollectorLease=()=>{throw new Error('Collector lease lost');};await assert.rejects(drainRecoveryBodies(env),/lease lost/);assert.equal(db.prepare("SELECT state FROM rs_jobs WHERE id LIKE 'publisher-article:%'").get().state,'pending');
 });

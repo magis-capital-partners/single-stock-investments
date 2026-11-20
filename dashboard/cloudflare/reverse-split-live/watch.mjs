@@ -19,13 +19,14 @@ import {finishHandoff} from './handoff.mjs';
 import {importMarketStatus} from './market-status-import.mjs';
 import {claimCollectorLease,readReclaimOwner,recordOwner} from './collector-lease.mjs';
 import {operationsRefreshSettings,operationsRefresher} from './operations-publication.mjs';
-import {installRecoveryBundle,installRequestedRecovery} from './recovery-bundle.mjs';
+import {installRecoveryBundle,installRequestedRecovery,drainRecoveryBodies} from './recovery-bundle.mjs';
 const now=()=>new Date().toISOString();
 export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
 export const needsStartupReconciliation=(last,at=Date.now())=>Number.isFinite(Date.parse(last))&&at-Date.parse(last)>15*60000;
 export async function watchCollector(env,{interval=1,maximumMs=300*60000,standbyMs=0,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false,operations=operationsRefreshSettings()}={}){
   const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastFullSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,lastSources=0,lastFullEvaluation=0,budgetDay,baseline={},flexTask=null,financialTask=null,sourceTask=null,newsTask=null,borrowTask=null,evaluation,unsubscribe,leaseTimer,leaseError,renewing=Promise.resolve(),saving=Promise.resolve(),evaluationSavePending=false;let activeSymbols=new Set();
   let announcementTimer,announcementTask=null,refresher=null,operationsTimer,operationsTask=null,operationsCheckpointTask=null,operationsCheckpointRetryAt=0;let evaluationTimer,draining=false,normalHandoff=false,warmTask=null,warmQueued=false,warmAttempts=0,warmRetryAt=0;const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
+  let recoveryTimer,recoveryTask=null;
   const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,source_poll_target_seconds:15,quote_evaluation:'event_driven_serialized',ticks,jobs,error,maximum_minutes:Number.isFinite(maximumMs)?maximumMs/60000:null,broker_connections:0,pipeline_version:PIPELINE_VERSION,pipeline_commit:process.env.RS_PIPELINE_COMMIT||null,storage_usage:{scope:'collector_only_not_account_total',day:budgetDay,rows_read:Number(baseline.rows_read||0)+(env.usage?.rows_read||0),rows_written:Number(baseline.rows_written||0)+(env.usage?.rows_written||0),read_ceiling:450000,write_ceiling:researchWriteBudget(budgetDay,env.EXECUTION_REGISTRATION_DAY)},market_data:env.market?.health||null,publication:env.publicationHealth||null,checkpoint:env.checkpointHealth||null,operations_publication:refresher?.health()||null,restored_financial_scores:env.financialScoreCache?.size||0,memory:{...process.memoryUsage(),max_rss_bytes:process.resourceUsage().maxRSS*1024,retained_financial_profiles:env.financialProfiles?.size||0}};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);await recordSessionHealth(env,value);await env.EVIDENCE.put('collector-dashboard/runtime.json',new TextEncoder().encode(JSON.stringify(value)),{httpMetadata:{contentType:'application/json'}});lastHeartbeat=Date.now();};
   async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<researchWriteBudget(day,env.EXECUTION_REGISTRATION_DAY);}
   const renewLease=()=>{renewing=renewing.then(async()=>{const next=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(next,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=next;}).catch(e=>{leaseError=e;stopping=true;});return renewing;};
@@ -79,6 +80,10 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
       if(operationsTask||!refresher.due())return;
       operationsTask=refresher.refresh().catch(error=>console.error(JSON.stringify({event:'operations_refresh_deferred',error:error.message}))).finally(()=>{operationsTask=null;});
     },refresher.tickMs);}
+    if(env.recoveryBundle||process.env.RS_RECOVERY_REQUEST)recoveryTimer=setInterval(()=>{
+      if(stopping||draining||shouldStop()||recoveryTask)return;
+      recoveryTask=drainRecoveryBodies(env,{shouldStop:()=>stopping||draining||shouldStop()}).then(result=>{jobs+=result.jobs;}).catch(error=>console.error(JSON.stringify({event:'public_recovery_deferred',error:error.message}))).finally(()=>{recoveryTask=null;});
+    },1000);
     while(!stopping&&!shouldStop()&&Date.now()-started<maximumMs){
       const cycle=Date.now();
       if(!warmQueued&&!warmTask&&env.queueWarmSuccessor&&warmAttempts<3&&cycle>=warmRetryAt&&cycle>=started+maximumMs-600000){warmAttempts++;warmTask=env.queueWarmSuccessor().then(result=>{warmQueued=true;return putState(env,'handoff_preparation',{status:'successor_dispatched',attempts:warmAttempts,...result});}).catch(error=>{warmRetryAt=Date.now()+30000;return putState(env,'handoff_preparation',{status:'dispatch_retry_pending',attempts:warmAttempts,error:error.message});}).finally(()=>{warmTask=null;});}
@@ -117,12 +122,12 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
   }finally{
     draining=true;
     try{await finishHandoff({keepQuotes:normalHandoff&&!stopping&&!leaseError,
-      drain:async()=>{if(operationsCheckpointTask)await operationsCheckpointTask;if(operationsTask)await operationsTask;if(sourceTask)await sourceTask;if(newsTask)await newsTask;if(borrowTask)await borrowTask;if(flexTask)await flexTask;if(financialTask)await financialTask;if(warmTask)await warmTask;if(announcementTask)await announcementTask;if(env.financialLoads?.size)await Promise.allSettled([...env.financialLoads.values()]);await saving;await checkpoint?.flush({handoff:true});},
+      drain:async()=>{if(recoveryTask)await recoveryTask;if(operationsCheckpointTask)await operationsCheckpointTask;if(operationsTask)await operationsTask;if(sourceTask)await sourceTask;if(newsTask)await newsTask;if(borrowTask)await borrowTask;if(flexTask)await flexTask;if(financialTask)await financialTask;if(warmTask)await warmTask;if(announcementTask)await announcementTask;if(env.financialLoads?.size)await Promise.allSettled([...env.financialLoads.values()]);await saving;await checkpoint?.flush({handoff:true});},
       quiesce:async()=>{stopping=true;clearInterval(evaluationTimer);clearInterval(announcementTimer);clearInterval(operationsTimer);if(operationsTask)await operationsTask;env.onAnnouncementDetection=null;unsubscribe?.();env.onShadowDecision=null;await evaluation?.close();},
       persist:async()=>{if(checkpoint){try{await heartbeat(normalHandoff?'handoff':'stopped');}finally{await save({checkpointOnly:true});}}},
       close:async()=>{try{await refresher?.close();}finally{checkpoint?.close();}}});}finally{
     process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);clearInterval(evaluationTimer);
-    clearInterval(announcementTimer);clearInterval(operationsTimer);clearInterval(leaseTimer);await renewing;await env.market?.releaseForHandoff?.();delete env.assertCollectorLease;delete env.collectorLeaseOwner;env.DB=remote;await remote.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key='collector_lease' AND value=?").bind(now(),lease||'').run();
+    clearInterval(announcementTimer);clearInterval(operationsTimer);clearInterval(recoveryTimer);clearInterval(leaseTimer);await renewing;await env.market?.releaseForHandoff?.();delete env.assertCollectorLease;delete env.collectorLeaseOwner;env.DB=remote;await remote.prepare("UPDATE rs_state SET value='0',updated_at=? WHERE key='collector_lease' AND value=?").bind(now(),lease||'').run();
     }
   }
 }
