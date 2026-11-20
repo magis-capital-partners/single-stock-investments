@@ -176,11 +176,17 @@ def fetch_once(source, directory, now):
     data = json.loads(body)
     generated = data.get("generated_at") if isinstance(data, dict) else None
     timestamp(generated)  # a snapshot without a producer clock is never published
+    state_at = data.get("state_at", generated)
+    timestamp(state_at)  # explicit null/invalid state clocks never replace a good copy
     previous = meta.get("source_generated_at")
     _atomic_write(directory / "operations.json", body)
+    report_stat = (directory / "operations.json").stat()
     new_meta = {"schema": "rs_operations_feed_meta.v1", "source_generated_at": generated,
+                "source_state_at": state_at,
                 "downloaded_at": now, "sha256": hashlib.sha256(body).hexdigest(),
                 "bytes": len(body), "etag": etag,
+                "report_mtime_ns": report_stat.st_mtime_ns,
+                "report_inode": report_stat.st_ino,
                 "candidates": len(data.get("candidates") or [])}
     _atomic_write(directory / "operations.meta.json",
                   json.dumps(new_meta, sort_keys=True).encode("utf-8"))
@@ -231,6 +237,38 @@ def read_local(path):
     except (OSError, ValueError):
         meta = {}
     return json.loads(data), meta
+
+
+def read_local_clocks(path):
+    """Read clocks from validated download metadata, bound to its report file.
+
+    Re-parsing the multi-megabyte catalog at low CPU priority can finish after
+    a newer report has replaced it. A clock monitor needs the current file's
+    clocks, not that older in-flight parse. Trading still reads the report.
+    """
+    path = Path(path)
+    meta_path = path.with_name("operations.meta.json")
+    for _ in range(3):
+        raw = meta_path.read_bytes()
+        if len(raw) > 64_000:
+            raise SafetyError("feed clock metadata exceeds input limit")
+        meta = json.loads(raw)
+        before = path.stat()
+        expected = (meta.get("report_inode"), meta.get("report_mtime_ns"),
+                    meta.get("bytes"))
+        identity = lambda stat: (stat.st_ino, stat.st_mtime_ns, stat.st_size)
+        if (identity(before) != expected or meta_path.read_bytes() != raw
+                or identity(path.stat()) != expected):
+            continue
+        if (not re.fullmatch(r"[a-f0-9]{64}", meta.get("sha256") or "")
+                or not 0 < before.st_size <= MAX_BYTES):
+            raise SafetyError("invalid feed clock metadata")
+        clocks = {"generated_at": meta.get("source_generated_at"),
+                  "state_at": meta.get("source_state_at")}
+        for value in clocks.values():
+            timestamp(value)
+        return clocks, meta
+    raise SafetyError("feed was replaced or its clock metadata does not match")
 
 
 def cadence_report(directory, day):

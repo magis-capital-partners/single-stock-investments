@@ -121,7 +121,34 @@ def test_fetch_keeps_producer_and_download_clocks_apart(tmp_path):
     assert report["publications_seen"] == 2 and report["share_within_30s"] == 1.0
 
 
+def test_clock_monitor_uses_bound_download_metadata_without_reparsing_catalog(tmp_path, monkeypatch):
+    payload=json.dumps({"generated_at":"2026-11-20T15:21:57Z", "state_at":"2026-11-20T15:21:00Z", "candidates":[{}]*1000}).encode()
+    source=feed.R2Object(ENDPOINT,"id","secret",opener=Opener(payload))
+    feed.fetch_once(source,tmp_path,"2026-11-20T15:22:00Z")
+    path=tmp_path/"operations.json"
+    read=type(path).read_bytes
+    def bounded_read(target):
+        if target==path:pytest.fail("The clock monitor reparsed the full catalog while a new report could replace it")
+        return read(target)
+    monkeypatch.setattr(type(path),"read_bytes",bounded_read)
+    clocks,meta=feed.read_local_clocks(path)
+    assert clocks=={"generated_at":"2026-11-20T15:21:57Z", "state_at":"2026-11-20T15:21:00Z"}
+    assert meta["downloaded_at"]=="2026-11-20T15:22:00Z"
+
+
+def test_clock_metadata_never_attests_to_a_different_report_file(tmp_path):
+    payload=json.dumps({"generated_at":"2026-11-20T15:21:57Z", "state_at":"2026-11-20T15:21:00Z", "candidates":[]}).encode()
+    source=feed.R2Object(ENDPOINT,"id","secret",opener=Opener(payload))
+    feed.fetch_once(source,tmp_path,"2026-11-20T15:22:00Z")
+    path=tmp_path/"operations.json"
+    path.write_bytes(body("2026-11-20T15:22:15Z"))
+    with pytest.raises(SafetyError,match="metadata|replaced"):
+        feed.read_local_clocks(path)
+
+
 @pytest.mark.parametrize("bad", [b"{", json.dumps({"candidates": []}).encode(),
+                                 json.dumps({"generated_at": "2026-11-19T15:00:00Z", "state_at": None}).encode(),
+                                 json.dumps({"generated_at": "2026-11-19T15:00:00Z", "state_at": "bad"}).encode(),
                                  json.dumps({"generated_at": "no clock"}).encode()])
 def test_a_snapshot_without_a_producer_clock_never_replaces_the_good_copy(tmp_path, bad):
     source = feed.R2Object(ENDPOINT, "id", "secret",

@@ -33,6 +33,9 @@ async function state(env,key,value){if(value===undefined)return env.DB.prepare('
 export async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}={}){
   const url=sourceURL(value),sec=SEC_HOSTS.has(url.hostname);
   if(env.deadline&&Date.now()>=env.deadline)throw new Error('Collector source deadline reached; work will retry');
+  // An explicitly pinned local primary-source capture uses the same archival and
+  // analysis path. It does not retry or route around an upstream access denial.
+  if(env.recoveryDocument){const captured=await env.recoveryDocument(url.href,{maximum});if(captured)return captured;}
   if(sec){
     if(Number(await state(env,'sec_cooldown'))>Date.now())throw new Error('SEC access is in backoff');
     await env.DB.prepare("INSERT OR IGNORE INTO rs_state(key,value,updated_at) VALUES('sec_slot','0',?)").bind(stamp()).run();
@@ -307,6 +310,7 @@ export async function scheduled(event,env){
     await queueReviewedHistoryRepair(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'extended_primary_pdf.2026-11-10.v1',eligible:(error,row)=>['history-filing:0001015820-24-000069','history-filing:0001193125-22-108042'].includes(row.id)&&/Announcement PDF (?:exceeds byte limit|requires verified readable text)/.test(error||'')});
     await repairReviewedLargePdf(env);
+    await recoverReaderFailures(env,{hash:sha,version:'reviewed_rezolve_pdf.2026-11-20.v1',eligible:(error,row)=>row.id==='filing:0001193125-26-467904'&&/^Announcement PDF requires verified readable text/.test(error||'')});
     await recoverHistorySearch(env,{hash:sha,enqueue:(k,p,priority,id)=>enqueue(env,k,p,priority,id)});
     await recoverReaderFailures(env,{hash:sha,version:'oversized_primary.2026-11-09.v1',eligible:error=>/Source exceeds document size limit/.test(error||'')});
     await recoverReaderFailures(env,{hash:sha,version:'reviewed_pdf.2026-11-09.v1',eligible:(error,row)=>row.id==='filing:0001193125-26-450710'&&/OCR candidates require review/.test(error||'')});

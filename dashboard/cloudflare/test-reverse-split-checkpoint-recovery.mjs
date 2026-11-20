@@ -80,3 +80,10 @@ test('generation keys must bind both their digest and generation to the receipt'
  assert.equal(checkpointObjectKey(receipt),key);assert.throws(()=>checkpointObjectKey({...receipt,stored_sha256:'b'.repeat(64)}),/identity/);assert.throws(()=>checkpointObjectKey({...receipt,generation:'invalid'}),/identity/);assert.throws(()=>checkpointObjectKey({...receipt,key:'review/private-original.json'}),/identity/);
  assert.equal(checkpointObjectKey({slot:1}),'collector-state/slot1.sqlite');
 });
+
+test('committed operations bytes become available before slow obsolete-object cleanup',async t=>{
+ const {env}=fixture(t),cp=await openCheckpoint(env,{retainDurableBytes:true});t.after(()=>cp.close());await save(cp);await save(cp);const old=cp.durable().generation;
+ let arrived,release;const entered=new Promise(r=>{arrived=r;}),blocked=new Promise(r=>{release=r;});env.EVIDENCE.delete=async()=>{arrived();await blocked;};
+ const pending=save(cp);await entered;
+ try{const receipt=JSON.parse((await env.controlDB.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").first()).value);assert.notEqual(cp.durable().generation,old);assert.equal(cp.durable().generation,receipt.generation);}finally{release();await pending;}
+});
