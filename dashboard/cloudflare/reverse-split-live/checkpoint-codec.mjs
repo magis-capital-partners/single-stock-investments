@@ -1,7 +1,7 @@
 import {gzip,gunzip} from 'node:zlib';
 import {promisify} from 'node:util';
 import {createHash} from 'node:crypto';
-const zip=promisify(gzip),unzip=promisify(gunzip),MAX=1024*1024*1024,hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+const zip=promisify(gzip),unzip=promisify(gunzip),MAX=2*1024*1024*1024,hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 export async function compressCheckpoint(bytes){
  if(bytes.length>MAX)throw new Error('Checkpoint exceeds bounded restore size');const stored=await zip(bytes,{level:1});return {stored,compression:'gzip',stored_bytes:stored.length,stored_sha256:hash(stored)};
 }

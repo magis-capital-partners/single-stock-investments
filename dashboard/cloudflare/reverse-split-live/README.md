@@ -166,6 +166,16 @@ and checkpoint publications of the object; it never moves back to an older
 checkpoint. The refresh put skips the shared R2 request pacer, so it takes no slot
 from checkpoint, validation or archive requests.
 
+Historical dashboard capture also runs on a worker, over the checksum-verified
+committed checkpoint. It streams one encoded object at a time back to the existing
+leased writer, preserving the first five current views, content-hash deduplication,
+newer-snapshot priority and handoff deferral. Large historical SQL reads and JSON
+encoding therefore cannot stop the collector's feed/checkpoint timers. The previous
+committed bytes remain available to the operations refresher until a successor
+checkpoint commits. The bounded restore size is 2 GiB (the production working
+database reached roughly 1 GiB); checksums and the two-generation retention policy
+are unchanged. Heartbeats expose checkpoint copy/store timings for verification.
+
 The eight `rs_ibkr_{capacity|executable}_{10|25|50|100}bps.v1` cohorts are
 separately registered forward experiments. The original fourteen policies,
 their $1m reference portfolio, fixed 50% borrow assumption and results remain
