@@ -7,12 +7,13 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {restoreCheckpoint} from './checkpoint-codec.mjs';
 import {captureReadSnapshot} from './snapshot-publish.mjs';
+import {operationalEvidence} from './operational-evidence.mjs';
 
 const waiting=new Map(),encoder=new TextEncoder();let sequence=0;
-function send(object,receipt,core=false){
+function send(object,receipt,core=false,urgent=false){
   const value=object.key==='operations.json'?{...object.value,state_at:receipt.at}:object.value;
   const bytes=encoder.encode(JSON.stringify(value)),digest=createHash('sha256').update(bytes).digest('hex'),id=++sequence;
-  return new Promise(resolve=>{waiting.set(id,resolve);parentPort.postMessage({type:'object',id,key:object.key,bytes:bytes.buffer,digest,core,stateAt:receipt.at,generatedAt:value?.generated_at},[bytes.buffer]);});
+  return new Promise(resolve=>{waiting.set(id,resolve);parentPort.postMessage({type:'object',id,key:object.key,bytes:bytes.buffer,digest,core,urgent,stateAt:receipt.at,generatedAt:value?.generated_at},[bytes.buffer]);});
 }
 async function run(message){
   const file=join(workerData.dir,'snapshot.sqlite');let db,raw;
@@ -20,9 +21,15 @@ async function run(message){
     raw=await restoreCheckpoint(new Uint8Array(message.stored),message.receipt);
     message.stored=null;writeFileSync(file,raw);raw=null;
     db=new DatabaseSync(file,{readOnly:true});
-    const snapshot=captureReadSnapshot(db),receipt=message.receipt;
+    // The operations handoff must not wait for historical SQL, JSON, or uploads
+    // of large dashboard pages. It still uses only these committed bytes and
+    // the collector's single serialized operations writer.
+    const receipt=message.receipt,operations=operationalEvidence(db);
+    await send({key:'operations.json',value:operations},receipt,true,true);
+    const snapshot=captureReadSnapshot(db,{operations});
     for(let i=0;i<snapshot.objects.length;i++){
       const object=snapshot.objects[i];snapshot.objects[i]=null;
+      if(object.key==='operations.json')continue;
       if((await send(object,receipt,i<5)).stop){parentPort.postMessage({type:'done',complete:false,at:snapshot.at});return;}
     }
     const days={};for(const row of snapshot.borrow)(days[row.observed_at.slice(0,10)]||=[]).push(row);
