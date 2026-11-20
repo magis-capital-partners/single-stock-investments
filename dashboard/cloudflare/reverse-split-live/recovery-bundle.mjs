@@ -93,7 +93,7 @@ export async function drainRecoveryBodies(env,{maxJobs=4,maximumMs=3000,shouldSt
  const pin=env.recoveryBundle?.sha256;if(!pin)return {jobs:0};const started=Date.now();let jobs=0;
  while(jobs<Math.min(4,Math.max(1,maxJobs))&&Date.now()-started<Math.min(5000,Math.max(1,maximumMs))&&!shouldStop()){
   env.assertCollectorLease?.();const at=Date.now();
-  const urgent=await env.DB.prepare("SELECT id FROM rs_jobs WHERE priority>=10 AND ((state='pending' AND available_at<=?) OR (state IN ('queued','running') AND lease_until>?)) LIMIT 1").bind(at,at).first();if(urgent)break;
+  const urgent=await env.DB.prepare("SELECT id FROM rs_jobs WHERE priority>=10 AND kind IN ('filing','news') AND coalesce(json_extract(payload,'$.first_seen_at'),created_at)>=? AND ((state='pending' AND available_at<=?) OR (state IN ('queued','running') AND lease_until>?)) LIMIT 1").bind(new Date(at-900000).toISOString(),at,at).first();if(urgent)break;
   // The same in-process writer and existing token-checked job consumer. Never
   // share the main loop's outbound queue or open a second SQLite writer.
   const token=crypto.randomUUID(),row=await env.DB.prepare("UPDATE rs_jobs SET state='queued',token=?,lease_until=?,updated_at=? WHERE id=(SELECT id FROM rs_jobs WHERE state='pending' AND kind='news' AND priority<10 AND available_at<=? AND json_extract(payload,'$.recovery_bundle_sha256')=? ORDER BY created_at,id LIMIT 1) AND state='pending' RETURNING id").bind(token,at+600000,new Date(at).toISOString(),at,pin).first();if(!row)break;

@@ -57,8 +57,13 @@ test('bounded in-process repair archives and analyzes a captured body through th
 });
 test('repair yields to fresh disclosures and never claims a job after losing the collector lease',async t=>{
  const {bundle,db,env}=setup(t);await installRecoveryBundle(env,bundle,{now:at});env.recoveryBundle=bundle;env.recoveryDocument=bundle.fetchDocument;
- db.prepare("INSERT INTO rs_jobs(id,kind,payload,state,priority,created_at,updated_at) VALUES('urgent','filing','{}','pending',15,?,?)").run(at,at);
+ db.prepare("INSERT INTO rs_jobs(id,kind,payload,state,priority,created_at,updated_at) VALUES('urgent','filing','{}','pending',15,?,?)").run(new Date().toISOString(),new Date().toISOString());
  assert.equal((await drainRecoveryBodies(env)).jobs,0);assert.equal(db.prepare("SELECT state FROM rs_jobs WHERE id LIKE 'publisher-article:%'").get().state,'pending');
  db.prepare("UPDATE rs_jobs SET state='running',lease_until=? WHERE id='urgent'").run(Date.now()+60000);assert.equal((await drainRecoveryBodies(env)).jobs,0);
  db.prepare("UPDATE rs_jobs SET state='complete' WHERE id='urgent'").run();env.assertCollectorLease=()=>{throw new Error('Collector lease lost');};await assert.rejects(drainRecoveryBodies(env),/lease lost/);assert.equal(db.prepare("SELECT state FROM rs_jobs WHERE id LIKE 'publisher-article:%'").get().state,'pending');
+});
+test('old filings and history work cannot starve the bounded public-body repair',async t=>{
+ const {bundle,db,env}=setup(t);await installRecoveryBundle(env,bundle,{now:at});env.recoveryBundle=bundle;env.recoveryDocument=bundle.fetchDocument;
+ for(const [id,kind] of [['old-filing','filing'],['history','history_filing']])db.prepare("INSERT INTO rs_jobs(id,kind,payload,state,priority,created_at,updated_at) VALUES(?,?,?,'pending',15,?,?)").run(id,kind,JSON.stringify({first_seen_at:'2025-01-01T00:00:00Z'}),'2025-01-01T00:00:00Z',at);
+ assert.equal((await drainRecoveryBodies(env,{maxJobs:1})).jobs,1);assert.equal(db.prepare("SELECT count(*) n FROM rs_jobs WHERE id IN ('old-filing','history') AND state='pending'").get().n,2);
 });
