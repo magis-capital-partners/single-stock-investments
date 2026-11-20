@@ -17,7 +17,7 @@ const fullMarketPolicies=[
 export const SHADOW_POLICIES=Object.freeze([...fullMarketPolicies,...fullMarketPolicies.map(p=>({...p,id:p.id.replace('.v1','_mini.v1'),label:p.label.replace(' · primary','')+' · Mini indicative',primary:false,quote_feed:'databento_mini',quote_coverage:'selected_venues_not_sip_nbbo',indicative:true}))].map(Object.freeze));
 export const sessions=calendar.sessions;
 export const finite=x=>typeof x==='number'&&Number.isFinite(x);
-export const at=x=>Number.isFinite(Date.parse(x))?Date.parse(x):null;
+export const at=x=>{const value=Date.parse(x);return Number.isFinite(value)?value:null;};
 export const iso=x=>new Date(x).toISOString();
 export function sessionAt(value){const t=at(value);return sessions.find(s=>t>=at(s.open)&&t<at(s.close))||null;}
 export function nextSession(value){const t=at(value);return sessions.find(s=>at(s.close)>t)||null;}

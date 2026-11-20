@@ -4,7 +4,8 @@ import {selectedAnnouncementTerms} from './announcement-terms.mjs';
 export const POLICY = Object.freeze({id:'reverse_split_live.v1',score_method:'as_filed_annual_or_matched_fiscal_ytd.v3',minimum_ordinal:2,minimum_score:60,minimum_signals:3,max_period_age_days:200,holding_sessions:5,timing:'observed_announcement_time',research_only:true,authority:'none'});
 export const DAY=86400000;
 export const finite=x=>typeof x==='number'&&Number.isFinite(x);
-export const etDay=x=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(x));
+const easternDayFormatter=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
+export const etDay=x=>easternDayFormatter.format(new Date(x));
 export const days=(a,b)=>(Date.parse(b)-Date.parse(a))/DAY;
 export function iso(value){const t=Date.parse(value);return Number.isFinite(t)?new Date(t).toISOString():null;}
 export function easternTime(day,time='00:00:00') {const guess=new Date(day+'T'+time+'Z'),zone=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',timeZoneName:'shortOffset'}).formatToParts(guess).find(p=>p.type==='timeZoneName').value,match=/GMT([+-])(\d+)(?::(\d+))?/.exec(zone),offset=match?(match[1]==='-'?-1:1)*(Number(match[2])*60+Number(match[3]||0))*60000:0;return new Date(guess.getTime()-offset).toISOString();}
