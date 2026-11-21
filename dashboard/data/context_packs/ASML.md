@@ -163,11 +163,11 @@ Documents in folder: **9** (all listed below; Tier 1–3 extracted or keyword-sc
 - RevenueFromContractWithCustomerEx
 
 ## Canonical pointers (open only when needed)
-- deep_dive: ASML/research/deep_dive_2026-11-06.md (sha256 sha256:67225e48f79f48f6...)
+- deep_dive: ASML/research/deep_dive_2026-11-06.md (sha256 sha256:ecd613450b0d5622...)
 - filing_digest: ASML/research/evidence/filing_digest.md (sha256 sha256:e2494a1304738098...)
 - adversarial: ASML/research/adversarial_2026-11-06.md (sha256 sha256:7b7c7186e50b0a3d...)
-- valuation: ASML/research/valuation.json (sha256 sha256:6cb51ef5ada204d6...)
-- thesis_card: ASML/research/thesis_card.json (sha256 sha256:51092e60f517725e...)
+- valuation: ASML/research/valuation.json (sha256 sha256:d3c16dbd41102803...)
+- thesis_card: ASML/research/thesis_card.json (sha256 sha256:6773c655aded55de...)
 - cross_check: ASML/research/cross_check_third_party_2026-11-06.md (sha256 sha256:b5cb4dae51bce6f7...)
 
 ## Excluded from this pack
