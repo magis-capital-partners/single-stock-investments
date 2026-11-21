@@ -1,7 +1,7 @@
 # Event triage — human review queue
 
 **Date:** 2026-11-20
-**Rows:** 2375
+**Rows:** 2368
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
