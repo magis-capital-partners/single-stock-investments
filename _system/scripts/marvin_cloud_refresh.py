@@ -32,7 +32,12 @@ from economic_value_framework import economic_value_trigger  # noqa: E402
 
 def run(label: str, cmd: list[str], *, optional: bool = False, cwd: Path | None = None) -> bool:
     print(f"  {label}...", flush=True)
-    r = subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
+    timeout_s = 300 if optional else None
+    try:
+        r = subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True, timeout=timeout_s)
+    except subprocess.TimeoutExpired:
+        print(f"  WARN {label} timed out after {timeout_s}s")
+        return optional
     out = (r.stdout or "") + (r.stderr or "")
     if out.strip():
         for line in out.strip().splitlines()[-10:]:
