@@ -2,7 +2,7 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 3.46 (weak) · **Bull case support:** none
+**ICS:** 3.44 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Inglis John C | 2026-11-09 | 127 | $78.4123 | $9958.36 | 1.878 |
+| Inglis John C | 2026-11-09 | 127 | $78.4123 | $9958.36 | 1.863 |
 | Inglis John C | 2025-12-30 | 13 | $86.47 | $1124.11 | 0.686 |
 | Walsh Keith | 2025-12-30 | 5 | $86.54 | $432.7 | 0.518 |
 

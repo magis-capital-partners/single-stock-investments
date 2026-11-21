@@ -2,20 +2,20 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.32 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
 | Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Base | 55% | 42% |
+| Bull | 25% | 38% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | LARSON KEITH R | 2025-12-17 | 715 | $70.02 | $50064.3 | 2.125 |
 | LARSON KEITH R | 2025-12-24 | 625 | $80.0 | $50000.0 | 1.935 |
-| Cisneros Adriana | 2026-08-31 | 8768 | $57.0 | $499776.0 | 1.438 |
-| Cisneros Adriana | 2026-08-31 | 1384 | $57.79 | $79981.36 | 1.289 |
+| Cisneros Adriana | 2026-08-31 | 8768 | $57.0 | $499776.0 | 1.426 |
+| Cisneros Adriana | 2026-08-31 | 1384 | $57.79 | $79981.36 | 1.278 |
 | LARSON KEITH R | 2025-12-10 | 675 | $72.71 | $49079.25 | 1.165 |
 
 **Routine / planned sales (context):**

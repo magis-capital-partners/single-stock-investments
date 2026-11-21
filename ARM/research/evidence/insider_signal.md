@@ -1,4 +1,4 @@
-# ARM — Insider conviction (2026-09-23)
+# ARM — Insider conviction (2026-11-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
+- Grisenthwaite Richard Roy: 5762 @ $180.4 on 2026-11-17
 - Bartels Laura Kathleen: 11306 @ $392.7 on 2026-06-02
 - Abbey William: 2644 @ $383.73 on 2026-06-01
-- Abbey William: 3922 @ $415.52 on 2026-06-01
 
 Source: `_system/reference/market-data/insider/ARM_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

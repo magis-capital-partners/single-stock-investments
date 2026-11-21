@@ -1,12 +1,12 @@
-# APH — Insider conviction (2026-08-05)
+# APH — Insider conviction (2026-11-03)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 0.76 (negligible) · **Bull case support:** none
+**ICS:** 0.68 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 26% |
+| Bear | 20% | 27% |
 | Base | 55% | 48% |
 | Bull | 25% | 25% |
 
@@ -18,7 +18,7 @@
 
 - Lampo Craig A: 193200 @ $167.3093 on 2026-08-04
 - Lampo Craig A: 100000 @ $149.9813 on 2026-02-18
-- Silverman David M: 120000 @ $174.2373 on 2026-08-05
+- NORWITT RICHARD ADAM: 799576 @ $82.4762 on 2026-11-02
 
 Source: `_system/reference/market-data/insider/APH_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
