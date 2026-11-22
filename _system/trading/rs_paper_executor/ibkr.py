@@ -152,6 +152,7 @@ class PaperIBKR:
             1: "bid_at",
             2: "ask_at",
             3: "ask_size_at",
+            67: "delayed_ask_at",
             89: "shortable_at",
         }
         for ticker in tickers:
@@ -365,7 +366,8 @@ class PaperIBKR:
             fee = fill.commissionReport.commission
             # Pending commission is a disclosed conservative estimate, not an
             # actually charged paper-position fee.
-            if not math_is_set(fee):
+            reported = fill.commissionReport.execId == e.execId and math_is_set(fee)
+            if not reported:
                 fee = max(1, 0.005 * float(e.shares))
             executions.append(
                 {
@@ -375,10 +377,12 @@ class PaperIBKR:
                     "conid": fill.contract.conId,
                     "side": {"SLD": "SELL", "BOT": "BUY"}.get(e.side, e.side),
                     "exec_id": e.execId,
+                    "order_id": e.orderId,
                     "shares": e.shares,
                     "price": e.price,
                     "at": e.time.isoformat(),
                     "commission": fee,
+                    "commission_source": "broker" if reported else "estimate",
                 }
             )
         self.prove()

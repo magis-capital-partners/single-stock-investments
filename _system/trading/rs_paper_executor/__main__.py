@@ -27,7 +27,7 @@ from .notify import deliver_alerts
 from .operations_feed import read_local
 from .policy import Policy
 from .probe import probe, require_local_ib_listener
-from .safety import LIVE_APPROVAL, RS_SYSTEM, SafetyError, endpoint_from_config, fresh
+from .safety import LIVE_APPROVAL, RS_SYSTEM, SafetyError, endpoint_from_config
 
 # Owner decisions a live config must state explicitly (never template defaults).
 LIVE_REQUIRED_POLICY = (
@@ -292,6 +292,8 @@ def main(argv=None):
     parser.add_argument("--conid", type=int, help="probe: reviewed IB conid")
     parser.add_argument("--shares", type=int, help="probe WhatIf size (1); mechanics size (10)")
     parser.add_argument("--report", help="probe/integration-test: write the JSON report here")
+    parser.add_argument("--publish-paper-dashboard", action="store_true",
+                        help="Publish the supervised paper journal to the private SSI Execution tab")
     parser.add_argument(
         "--journal", help="integration-test: a NEW *.integration.sqlite file"
     )
@@ -332,6 +334,8 @@ def main(argv=None):
         endpoint = endpoint_from_config(config["endpoint"])
         check_live_config(config, endpoint)
         policy = Policy(**config["policy"]).validate()
+        if args.publish_paper_dashboard and args.command != "integration-test":
+            raise SafetyError("--publish-paper-dashboard requires integration-test")
         if args.command == "preflight":
             report = {
                 "paper_only": not endpoint.live,
@@ -493,11 +497,24 @@ def main(argv=None):
                 finally:
                     broker.close()
 
-            report = asyncio.run(stage6())
+            dashboard = None
+            if args.publish_paper_dashboard:
+                from .execution_feed import finish_publisher, start_publisher
+
+                publisher, done, session = start_publisher(args.journal)
+                dashboard = {"session_id": session, "final_snapshot_acknowledged": False}
+                print(json.dumps({"paper_execution_session": session}), flush=True)
+            try:
+                report = asyncio.run(stage6())
+            finally:
+                if dashboard is not None:
+                    dashboard["final_snapshot_acknowledged"] = finish_publisher(publisher, done)
+            if dashboard is not None:
+                report["dashboard"] = dashboard
             if args.report:
                 Path(args.report).write_text(dumps(report) + "\n", encoding="utf-8")
             print(dumps(report))
-            return 0 if report["pass"] else 3
+            return 0 if report["pass"] and (dashboard is None or dashboard["final_snapshot_acknowledged"]) else 3
         else:
             asyncio.run(run(args, endpoint, policy, config))
     except (SafetyError, KeyError, TypeError, ValueError) as exc:

@@ -366,6 +366,31 @@ overestimate partial/same-day positions and is **not** settled Flex accounting.
 Do not label it actual net P&L. Real fee schedules, settlement/recall/dividend costs,
 economic sizing and full corporate-action support require further validation.
 
+## SSI Execution tab
+
+Open `#/strategies/reverse-split/execution` as an SSI owner. The tab shows
+paper orders, every observed state change, partial fills, cancels, covers,
+open shares and P&L with mark and feed freshness. Historical sessions are
+available from the session selector. Paper fills are the broker's simulated
+executions. Delayed ask marks and estimated commissions have separate labels.
+Marked P&L includes the journaled commissions and excludes settled borrow.
+
+Use the supervised `integration-test` with the existing one-share paper
+operator controls. Add `--publish-paper-dashboard` and load the dedicated
+`RS_EXECUTION_PUBLISH_KEY` in that terminal from the private credential store.
+Pages receives the matching repository secret via the normal dashboard deploy.
+The runner verifies the endpoint before connecting, starts an independent
+read-only journal publisher, prints the session ID and records final delivery
+in the mechanics report. Use a new `*.integration.sqlite` journal on each
+supervised attempt. Keep the journal and report for reconciliation.
+
+While the test runs, keep the Execution tab open and compare each observed
+order, cancellation and execution against the DU blotter. Record the delay from
+each broker event to its appearance in SSI. Confirm that reconnect adds no
+duplicate executions, the cover leaves zero short shares, and the final session
+shows the same fills and commission provenance as the journal. The browser
+checks every two seconds when active.
+
 ## Safe startup (operator-run; not performed by this change)
 
 Use a dedicated Python 3.12 virtual environment on the operator's machine (never

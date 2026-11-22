@@ -1,6 +1,8 @@
 import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
 import { reserveNonce, storeAccountSnapshot, storeAllocationProjection, storeFlexEod, storeStrategySnapshot, validateAccountSnapshot, validateAllocationProjection, validateFlexEod, validateStrategySnapshot, verifyPortfolioHmac } from "../../../_lib/portfolio.js";
 
+import { EXECUTION_DOMAIN, EXECUTION_HEADER, ingestPaperExecution } from "../../../_lib/rs-execution.js";
+
 const MAX_BODY_BYTES = 8_000_000;
 
 export async function onRequestPost(context) {
@@ -8,6 +10,9 @@ export async function onRequestPost(context) {
   try {
     const bytes = await context.request.arrayBuffer();
     if (bytes.byteLength > MAX_BODY_BYTES) return json({ error: "Payload too large.", request_id: id }, 413, { "cache-control": "no-store" });
+    if (context.request.headers.get(EXECUTION_HEADER) === EXECUTION_DOMAIN) {
+      return await ingestPaperExecution(context, bytes);
+    }
     const authorization = await verifyPortfolioHmac(context.request, context.env, bytes);
     if (!authorization) return json({ error: "Unauthorized or expired signature.", request_id: id }, 401, { "cache-control": "no-store" });
     const db = requireDatabase(context.env);
