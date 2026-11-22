@@ -50,6 +50,9 @@ def publish_live(root, document, store=None, *, workers=None):
         nonlocal changed
         record,did_change=future.result();companies[ticker]=record;changed+=did_change
         if len(companies)%50==0:print(json.dumps({'verified_live_companies':len(companies),'changed':changed}),flush=True)
+    from financial_changes import ComparisonIndex
+    comparison = ComparisonIndex(root, document['as_of'])
+    benchmark = document['companies'].get('SPY', {}).get('comparison_performance', {})
     with ThreadPoolExecutor(max_workers=workers) as pool:
         pending=[]
         for ticker in sorted(document['companies']):
@@ -57,13 +60,21 @@ def publish_live(root, document, store=None, *, workers=None):
             compact=compact_company(company);raw=(json.dumps(compact,ensure_ascii=False,separators=(',',':'))+'\n').encode()
             if len(raw)>20*1024*1024:raise ValueError('Company research exceeds hosting budget')
             pending.append((ticker,pool.submit(upload,ticker,raw)))
-            rows.append(summary({**expand_company(compact),'as_of':document['as_of']}))
+            expanded = {**expand_company(compact), 'as_of':document['as_of']}
+            rows.append(summary(expanded))
+            comparison.add(expanded, expanded.get('comparison_performance'), benchmark)
             if len(pending)>=workers:finish(*pending.pop(0))
         for ticker,future in pending:finish(ticker,future)
     index={'schema_version':'stock-research-index.v1','as_of':document['as_of'],'companies':rows}
     raw=(json.dumps(index,ensure_ascii=False,separators=(',',':'))+'\n').encode();index_record=store_bytes(objects,raw)
     if store.restore('live/index',records={'live/index':index_record})!=raw:raise ValueError('Research index failed read-back')
-    pointer={'schema_version':'stock-research-live.v1','as_of':document['as_of'],'companies':companies,'index':index_record,
+    raw_changes = json.dumps(comparison.finish(rows), ensure_ascii=False, separators=(',',':')).encode()
+    if len(raw_changes) > 20 * 1024 * 1024:
+        raise ValueError('Financial changes exceed the hosted object budget')
+    change_record = store_bytes(objects,raw_changes)
+    if store.restore('live/changes',records={'live/changes':change_record}) != raw_changes:
+        raise ValueError('Financial comparison index failed read-back')
+    pointer={'changes':change_record,'schema_version':'stock-research-live.v1','as_of':document['as_of'],'companies':companies,'index':index_record,
              'previous_pointer_sha256':hashlib.sha256(prior_raw).hexdigest() if prior_raw else None}
     pointer_raw=(json.dumps(pointer,separators=(',',':'))+'\n').encode()
     if len(pointer_raw)>1024*1024:raise ValueError('Live research pointer exceeds its bound')

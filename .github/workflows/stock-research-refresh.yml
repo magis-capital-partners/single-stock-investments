@@ -23,9 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /*.CVR/research/cvr_terms.json
             _system/scripts
             _system/config
+            _system/portfolio/registry.json
+            _system/reference/market-data/fundamentals/_sic_map.json
             _system/reference/stock-research
             dashboard/private-assets.json
             dashboard/data/core.json

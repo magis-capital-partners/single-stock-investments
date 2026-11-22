@@ -202,6 +202,8 @@ def test_live_release_never_switches_the_pointer_before_all_shards_verify(tmp_pa
     report=publish_live(tmp_path,document,store)
     assert report['verified'] is True and writes[-1].endswith('current.json')
     prior=bodies[objects.base+'research-explorer/v1/current.json']
+    changes=json.loads(restore('changes',records={'changes':json.loads(prior)['changes']}))
+    assert changes['as_of']==document['as_of'] and set(changes['rows'])=={'A'}
     store.restore=lambda *a,**k:b'corrupted'
     document['companies']['A']['gaps']=['Changed source gap']
     with pytest.raises(ValueError,match='round-trip'):publish_live(tmp_path,document,store)
@@ -283,6 +285,9 @@ def test_publication_fallback_bundles_cover_every_stock_within_the_file_budget(t
     (target/'A.json').write_text(json.dumps(companies['A']))
     report=explorer.stage_explorer(tmp_path,data,set(companies))
     manifest=json.loads((target/'manifest.json').read_text())
+    changes=json.loads((target/'changes.json').read_text())
+    assert set(changes['rows'])==set(companies) and changes['as_of']=='2026-03-04'
+    assert changes['rows']['A']['ttm']['revenue']['value']==100
     assert report['stocks']==5 and report['fallback_bundles']>=2
     assert set(manifest['company_bundles'])==set(companies) and not (target/'A.json').exists()
     for ticker,name in manifest['company_bundles'].items():

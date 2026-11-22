@@ -92,7 +92,9 @@ def compact_company(company):
             elif k == "source_refs" and isinstance(v,list): result[k] = [ref(s) for s in v]
             else: result[k] = visit(v)
         return result
-    result = visit(company); result["sources"] = sources
+    result = visit(company)
+    del visit  # Release the recursive closure and its source table between issuers.
+    result["sources"] = sources
     return result
 
 
@@ -107,6 +109,7 @@ def expand_company(company):
             return sources[value["source_id"]]
         return {k:visit(v) for k,v in value.items() if k!="sources"}
     document=visit(company)
+    del visit
     for series in document.get('series',[]):
         if not series.get('label'):series['label']=series['id'].replace('_',' ').capitalize()
     return document
@@ -195,6 +198,11 @@ def stage_explorer(root: Path, data: Path, expected: set[str],links=None):
         return {"stocks": 0, "status": "no_private_snapshot"}
     # New universe entrants still get the complete interface, with truthful gaps.
     from build_stock_research_explorer import empty_company, summary
+    from financial_changes import ComparisonIndex
+    from stock_one_pagers import universe_inputs
+    comparison = ComparisonIndex(root, document["as_of"])
+    briefs = universe_inputs(root)
+    benchmark = (briefs.get("SPY") or {}).get("performance") or {}
     target = data / "research-explorer"
     target.mkdir(parents=True, exist_ok=True)
     rows, largest, with_history = [], 0, 0
@@ -212,7 +220,6 @@ def stage_explorer(root: Path, data: Path, expected: set[str],links=None):
         pending={};pending_bytes=0
     for ticker in sorted(expected):
         company = companies.get(ticker) or empty_company(ticker, document.get("as_of"))
-        expanded = expand_company(company)
         path = target / (quote(ticker, safe="") + ".json")
         compact=compact_company(company)
         if links and compact.get('sources'):
@@ -233,11 +240,19 @@ def stage_explorer(root: Path, data: Path, expected: set[str],links=None):
         pending[ticker]=compact;pending_bytes+=item_bytes
         # Remove only this generated, obsolete per-company publication copy.
         if path.is_file():path.unlink()
+        expanded = expand_company(compact)
         rows.append(summary(expanded))
+        performance = (briefs.get(ticker) or {}).get("performance") or {}
+        comparison.add(expanded, performance, benchmark)
         with_history += any(s.get("monthly") for s in company.get("series", []))
     flush()
     for path in target.glob('bundle-*.json'):
         if re.fullmatch(r'bundle-\d+\.json',path.name) and path.name not in bundles:path.unlink()
+    change_bytes = json.dumps(comparison.finish(rows), ensure_ascii=False, separators=(",", ":"))
+    change_size = len(change_bytes.encode())
+    if change_size > 20 * 1024 * 1024:
+        raise ValueError("Financial changes exceed the hosted object budget")
+    _atomic_write_text(target / "changes.json", change_bytes)
     fallback={'schema_version':'stock-research-fallback.v1','as_of':document.get('as_of'),'company_bundles':locations}
     _atomic_write_text(target/'manifest.json',json.dumps(fallback,separators=(',',':'))+'\n')
     index = {"schema_version": "stock-research-index.v1", "as_of": document.get("as_of"), "companies": rows}
@@ -245,5 +260,5 @@ def stage_explorer(root: Path, data: Path, expected: set[str],links=None):
     if len(raw.encode()) > 20 * 1024 * 1024:
         raise ValueError("Research screener index exceeds hosting budget")
     _atomic_write_text(target / "index.json", raw)
-    return {"stocks": len(rows), "historical_valuation_stocks": with_history, "largest_asset_bytes": largest,
+    return {"stocks": len(rows), "historical_valuation_stocks": with_history, "largest_asset_bytes": max(largest,change_size), "comparison_bytes":change_size,
             "index_bytes": len(raw.encode()),'fallback_bundles':len(bundles)}
