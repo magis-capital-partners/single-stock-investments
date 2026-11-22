@@ -258,6 +258,14 @@ def test_a_login_that_cannot_be_refreshed_is_not_used(mac_home, monkeypatch):
         store.cloudflare_token()
 
 
+def test_still_valid_wrangler_session_survives_a_declined_proactive_refresh(mac_home, monkeypatch):
+    from datetime import datetime, timedelta, timezone
+    expires=(datetime.now(timezone.utc)+timedelta(minutes=1)).isoformat()
+    wrangler_login(mac_home,'still-valid',expires)
+    monkeypatch.setattr(store,'_refresh_wrangler_session',lambda:None)
+    assert store.cloudflare_token()=='still-valid'
+
+
 def test_public_catalog_is_rejected(tmp_path):
     config = {"catalog_repository": "magis-capital-partners/research-catalog", "catalog_repository_id": 1}
     catalog = store.Catalog(config, tmp_path / "catalog.git")

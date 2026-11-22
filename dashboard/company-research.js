@@ -122,6 +122,27 @@
       if(pending){global.CompanyResearch.pendingReadId=null;await read(pending,host);}
     }catch(e){if(live()){host.innerHTML=`<p class="cr-meta">${esc(e.message)}</p><button type="button" data-cr-retry>Retry library</button>`;host.querySelector('button').onclick=()=>mount(host,ticker,options);}}
   }
-  global.CompanyResearch={mount,filter,words,safeURL,rowHTML,categories,archiveMatch,pendingCategory:''};
+  async function retrieve(ticker, question, options={}) {
+    const stop=new Set(['what','when','where','which','have','has','had','the','are','and','about','with','from','that','this','how','does','did','for','stock','company','saying','been','into','their','they','our','its']);
+    const terms=words(question).filter(w=>w.length>2&&!stop.has(w));
+    if(!terms.length)return [];
+    const requests=[{ticker},...(options.archives||[]).map(a=>({ticker:a.ticker,archive:{cutoff:a.cutoff,cik:a.issuer_cik||a.cik,excludedCik:a.excluded_cik||a.excludedCik}}))],rows=[],indexedScores=new Map();
+    for(const request of requests){
+      const meta=await manifest(request.ticker);
+      for(let i=0;i<meta.pages.length;i+=6){const batch=(await Promise.all(meta.pages.slice(i,i+6).map(asset))).flat();rows.push(...batch.filter(r=>r.is_latest!==false&&(!request.archive||archiveMatch(r,request.archive))));}
+      if(meta.search_path){const index=await searchIndex(meta.search_path);for(const term of terms){const ids=new Set(index[term]||[]);for(const id of ids)indexedScores.set(id,(indexedScores.get(id)||0)+1);}}
+    }
+    const score=text=>{const tokens=words(text);return terms.reduce((n,t)=>n+Number(tokens.some(w=>w===t||(t.length>4&&w.startsWith(t.slice(0,-1))))),0);};
+    // Candidate passages and full indexed text are source material only. Neither
+    // retrieved instructions nor markup is executed or treated as user intent.
+    const ranked=rows.map(r=>({r,score:score([r.title,r.reason,...(r.passages||[]).map(p=>p.text)].join(' '))+(indexedScores.get(r.id)||0)})).filter(r=>r.score).sort((a,b)=>b.score-a.score||Number(b.r.relationship==='direct')-Number(a.r.relationship==='direct')||String(b.r.date||'').localeCompare(String(a.r.date||''))).slice(0,Math.min(options.limit||6,12));
+    const results=[];
+    for(const {r}of ranked){let passages=(r.passages||[]).filter(p=>score(p.text)).sort((a,b)=>score(b.text)-score(a.text)).slice(0,2);
+      if(!passages.length&&r.content_path){const bundle=await asset(r.content_path),doc=bundle[r.id];const chunks=String(doc?.text||'').split(/\n\s*\n/).filter(p=>p.trim().length>30);passages=chunks.map((text,i)=>({text,locator:'Source text, paragraph '+(i+1),score:score(text)})).filter(p=>p.score).sort((a,b)=>b.score-a.score).slice(0,2).map(p=>({...p,text:p.text.slice(0,1800)}));}
+      if(passages.length)results.push({id:r.id,title:r.title,date:r.date,author:r.author,category:r.category,relationship:r.relationship,url:sourceURL(r),passages});
+    }
+    return results;
+  }
+  global.CompanyResearch={mount,filter,words,safeURL,rowHTML,categories,archiveMatch,retrieve,pendingCategory:''};
   if(typeof module!=='undefined')module.exports=global.CompanyResearch;
 })(typeof window!=='undefined'?window:globalThis);

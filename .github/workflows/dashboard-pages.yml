@@ -22,6 +22,9 @@ on:
       - "_system/scripts/build_cloudflare_pages_site.py"
       - "_system/scripts/prepare_stock_research_publication.py"
       - "_system/scripts/stock_one_pagers.py"
+      - "_system/scripts/stock_research_explorer.py"
+      - "_system/scripts/stock_research_share_basis.py"
+      - "_system/scripts/build_stock_research_explorer.py"
       - "_system/scripts/stock_valuation_models.py"
       - "_system/scripts/stock_valuation_identity.py"
       - "_system/scripts/stock_valuation_aliases.py"
@@ -316,9 +319,9 @@ jobs:
       group: dashboard-deploy
       cancel-in-progress: false
     runs-on: ubuntu-latest
-    # Restoring the private vault and archive index takes close to two hours
-    # before the D1 stages and the Pages upload even start.
-    timeout-minutes: 180
+    # Allow a cold restore of research and financial shards before D1 and Pages.
+    # Per-file, startup-payload, privacy and source-integrity guards stay strict.
+    timeout-minutes: 240
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

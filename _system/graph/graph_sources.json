@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "updated": "2026-09-24",
+  "updated": "2026-11-21",
   "notes": [
     "Config for _system/scripts/graph_build.py, graph_invariants.py (P3 lane contract, P8 lane freshness), build_lane_receipts.py and supervise_repository_health.py.",
     "Lanes (schema 2.0, 2026-09-24): each lane is one workflow JOB. build_lane_receipts.py advances a lane's receipt only when that job concluded success on main and, if work_step is set, that step concluded success too; a job killed by timeout-minutes counts as a failure; skipped and no-op runs never refresh a receipt. job is the Actions display name (the job name: if set, else its id; 'caller / callee' for a reusable-workflow job; fnmatch patterns for matrix jobs). work_step is only needed where an if: can skip the real work while the job still succeeds.",
@@ -12,6 +12,16 @@
     "enforced_by entries may be validator scripts (five-prefix) or test suites; whether any CI job actually invokes them is projected separately (INVOKED_BY) and judged by invariant P2."
   ],
   "lanes": [
+    {
+      "name": "stock-financial-research",
+      "workflow_file": "stock-research-refresh.yml",
+      "job": "refresh",
+      "work_step": "Refresh sourced charts and switch verified private release",
+      "cadence_cron": [
+        "23 3 * * 2-6"
+      ],
+      "freshness_hours": 102
+    },
     {
       "name": "supervisor",
       "workflow_file": "repository-health-supervisor.yml",

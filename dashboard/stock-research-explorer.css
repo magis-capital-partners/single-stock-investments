@@ -1,0 +1,80 @@
+/* The approved one-pager, extended with a quiet and consistent chart workspace. */
+.sx-workspace { margin:0 0 32px; min-width:0; }
+.sx-workspace * { box-sizing:border-box; }
+.sx-heading { display:flex; gap:14px; align-items:flex-start; justify-content:space-between; margin:8px 0 20px; }
+.sx-heading h3 { margin-bottom:4px; }
+.sx-heading p { color:var(--text-secondary); max-width:76ch; margin:0; }
+.sx-eyebrow { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-cyan); }
+.sx-toolbar { display:flex; gap:12px; align-items:end; flex-wrap:wrap; margin:12px 0; }
+.sx-toolbar label,.sx-field { display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--text-secondary); min-width:100px; }
+.sx-workspace :is(input,select,textarea,button) { font:inherit; }
+.sx-workspace :is(input,select,textarea) { background:var(--bg-primary); color:var(--text-primary); border:1px solid var(--border); border-radius:4px; padding:9px 10px; min-height:40px; max-width:100%; }
+.sx-workspace button { background:var(--bg-secondary); color:var(--text-primary); border:1px solid var(--border); border-radius:4px; padding:8px 12px; min-height:38px; cursor:pointer; }
+.sx-workspace button:hover { border-color:var(--accent-cyan); }
+.sx-workspace button[aria-pressed=true],.sx-workspace button.sx-primary { border-color:var(--accent-cyan); color:var(--accent-cyan); }
+.sx-workspace button:disabled { opacity:.5; cursor:default; }
+.sx-workspace :is(button,input,select,textarea,summary):focus-visible { outline:2px solid var(--accent-cyan); outline-offset:3px; }
+.sx-presets { display:flex; gap:7px; flex-wrap:wrap; margin:16px 0; }
+.sx-presets button { padding:6px 11px; font-size:12px; min-height:34px; }
+.sx-chart-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr)); gap:20px; }
+.sx-chart { margin:0; min-width:0; padding:16px 0 10px; border-top:1px solid var(--border); }
+.sx-chart figcaption { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:12px; }
+.sx-chart figcaption span { font-size:12px; color:var(--text-secondary); }
+.sx-chart svg { display:block; width:100%; height:auto; overflow:visible; touch-action:pan-y; }
+.sx-chart .sx-point:focus { outline:none; r:5; stroke:#fff; stroke-width:2; stroke-opacity:1; }
+.sx-chart-readout { min-height:25px; font-size:12px; color:var(--text-secondary); }
+.sx-chart-readout a { margin-left:8px; }
+.sx-stats { display:flex; flex-wrap:wrap; gap:12px 24px; margin:6px 0 12px; }
+.sx-stats dt { color:var(--text-secondary); font-size:12px; }
+.sx-stats dd { margin:3px 0; font-size:18px; font-variant-numeric:tabular-nums; }
+.sx-values { margin-top:12px; }
+.sx-values summary,.sx-method summary { color:var(--text-secondary); font-size:12px; cursor:pointer; padding:7px 0; }
+.sx-workspace table { border-collapse:collapse; width:100%; font-size:12px; font-variant-numeric:tabular-nums; }
+.sx-workspace :is(th,td) { padding:11px 12px; border-bottom:1px solid var(--border); text-align:right; vertical-align:top; white-space:nowrap; }
+.sx-workspace :is(th,td):first-child,.sx-workspace td.sx-text { text-align:left; white-space:normal; min-width:145px; }
+.sx-workspace th { font-weight:500; color:var(--text-secondary); }
+.sx-workspace td small { display:block; color:var(--text-secondary); font-size:12px; }
+.sx-workspace caption { color:var(--text-secondary); text-align:left; padding:8px 0; }
+.sx-result-period { display:block; margin:6px 0; }
+.sx-scroll { overflow-x:auto; max-width:100%; }
+.sx-empty { padding:22px 0; color:var(--text-secondary); max-width:85ch; }
+.sx-method { border-top:1px solid var(--border); margin:18px 0; }
+.sx-method p { max-width:90ch; font-size:12px; color:var(--text-secondary); }
+.sx-status { color:var(--text-secondary); font-size:12px; min-height:22px; }
+.sx-module { margin:32px 0; padding-top:22px; border-top:1px solid var(--border); }
+.sx-module h4 { font-size:16px; }
+.sx-two-col { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+.sx-result { border-left:2px solid var(--accent-cyan); padding:12px 18px; margin:16px 0; }
+.sx-result h4 { margin-bottom:8px; }
+.sx-result blockquote { padding:8px 0; margin:0; font-size:13px; color:var(--text-secondary); }
+.sx-workspace textarea { min-height:95px; width:100%; }
+.sx-event { display:grid; grid-template-columns:100px 1fr; gap:18px; padding:14px 0; border-bottom:1px solid var(--border); }
+.sx-event time { color:var(--text-secondary); font-size:12px; }
+.sx-event h4,.sx-event p { margin:0 0 5px; }
+.sx-event-links { display:flex; flex-wrap:wrap; gap:12px; font-size:12px; }
+.sx-bar-track { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:8px; }
+.sx-bar-track i { display:block; height:100%; background:var(--accent-cyan); }
+.sx-warning { color:var(--accent-amber); }
+.sx-badge { display:inline-block; padding:2px 7px; margin-right:5px; border:1px solid var(--border); border-radius:3px; font-size:12px; color:var(--text-secondary); }
+.sx-alert-list { list-style:none; padding:0; }
+.sx-alert-list li { padding:12px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:12px; }
+.sx-metric-checks { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:5px 16px; max-height:240px; overflow:auto; padding:12px 0; }
+.sx-metric-checks label { display:flex; gap:8px; align-items:center; font-size:12px; }
+.sx-metric-checks input { min-height:auto; }
+.sx-sensitivity td { background:color-mix(in srgb,var(--accent-cyan) var(--sx-intensity,0%),transparent); }
+.sx-sensitivity td.sx-loss { background:color-mix(in srgb,var(--accent-amber) var(--sx-intensity,0%),transparent); }
+.sx-share { margin-left:auto; }
+@media(max-width:760px) {
+ .sx-heading { display:block; }
+ .sx-heading>button { margin-top:10px; }
+ .sx-toolbar { gap:10px; }
+ .sx-toolbar label { flex:1 1 135px; }
+ .sx-toolbar :is(input,select) { width:100%; }
+ .sx-toolbar .sx-share { margin-left:0; }
+ .sx-two-col { grid-template-columns:1fr; }
+ .sx-stats { gap:12px 20px; }
+ .sx-stats dd { font-size:16px; }
+ .sx-event { grid-template-columns:80px 1fr; gap:10px; }
+ .sx-chart figcaption { flex-wrap:wrap; }
+}
+@media(prefers-reduced-motion:reduce) { .sx-workspace * { animation:none!important; transition:none!important; } }

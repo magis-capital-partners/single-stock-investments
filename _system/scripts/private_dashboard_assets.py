@@ -350,6 +350,11 @@ def hydrate_repository(root: Path) -> int:
     state = hydration_state(root)
     count = 0
     for relative in manifest["assets"]:
+        # The financial explorer has its own bounded, direct R2 reader. General
+        # hydration would stage its raw objects in a writable legacy vault and
+        # then re-export gigabytes that are already privately preserved.
+        if relative.startswith('_system/reference/stock-research/explorer/') or relative=='_system/reference/stock-research/share-basis.json':
+            continue
         if not (root / safe_relative(relative)).is_file():
             continue
         private = private_source(root, relative, manifest)

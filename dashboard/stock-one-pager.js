@@ -135,7 +135,9 @@
     return `${intro('Risks and what would change the view',t.one_pager.profile.countercase)}<section class="sp-section"><h3>Conditions to monitor</h3><ul class="sp-risk-list">${risks.map(r=>`<li>${esc(typeof r==='string'?r:r.falsifier||r.description||r.metric||'Review the source condition')}</li>`).join('')||`<li>${esc(t.one_pager.profile.countercase)}</li>`}</ul></section><section class="sp-section"><h3>Latest recorded developments</h3><ol class="sp-update-list">${(h.developments||[]).slice(0,12).map(r=>`<li><time>${esc(dateLabel(r.date||r.as_of))}</time><div>${r.url?h.linkHtml(r.url,esc(r.label||r.title||'Development')):esc(r.label||r.title||'Development')}</div></li>`).join('')||'<li>No dated development is currently published.</li>'}</ol></section><details class="sp-method"><summary>Research revisions, prior views and decision history</summary>${renderers.evidence?.()||'<p>No earlier review is published.</p>'}</details>`;
   }
   function render(tab,t,h,renderers) {
-    return `<div class="sp-content">${({overview:summary,financials,business,valuation,sources:research,updates})[validTab(tab)](t,h,renderers)}</div>`;
+    const id=validTab(tab),tools=global.StockResearchExplorer?'<section data-stock-research-tools></section>':'';
+    const content=({overview:summary,financials,business,valuation,sources:research,updates})[id](t,h,renderers);
+    return `<div class="sp-content">${['financials','sources'].includes(id)?tools:''}${id==='financials'?'<div data-sp-financial-fallback>':''}${content}${id==='financials'?'</div>':''}${!['financials','sources'].includes(id)?tools:''}</div>`;
   }
   function hydrate(panel,t,h,renderers,tab) {
     const old=charts.get(panel)||[];old.forEach(c=>c.destroy());const instances=[];charts.set(panel,instances);
@@ -172,6 +174,10 @@
     }
     const redraw=selector=>{panel.innerHTML=render(tab,t,h,renderers);hydrate(panel,t,h,renderers,tab);panel.querySelector(selector)?.focus({preventScroll:true});};
     instances.push(...(global.StockValuationView?.hydrate(panel,t,h,redraw)||[]));
+    const tools=panel.querySelector('[data-stock-research-tools]');
+    if(tools){let stopped=false,controller;global.StockResearchExplorer.mount(tools,t,validTab(tab)).then(c=>{controller=c;if(stopped)c?.destroy();});instances.push({destroy(){stopped=true;controller?.destroy();}});}
+    if(panel._researchModelChanged)panel.removeEventListener('stock-research-model-changed',panel._researchModelChanged);
+    panel._researchModelChanged=()=>redraw('.sv-apply');panel.addEventListener('stock-research-model-changed',panel._researchModelChanged);
     panel.onchange=event=>{const key=event.target.dataset.spControl;if(key){state(t)[key]=event.target.value;redraw(`[data-sp-control="${key}"]`);}};
     panel.onclick=event=>{const button=event.target.closest('[data-sp-metric]');if(button){state(t).metric=button.dataset.spMetric;redraw(`[data-sp-metric="${button.dataset.spMetric}"]`);}};
   }

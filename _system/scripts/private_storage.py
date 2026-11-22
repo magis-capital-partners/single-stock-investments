@@ -130,6 +130,7 @@ class HTTP:
 
 WRANGLER_CONFIG = Path(".wrangler") / "config" / "default.toml"
 WRANGLER_EXPIRY_MARGIN = timedelta(minutes=2)
+_WRANGLER_SESSION_LOCK = threading.Lock()
 
 
 def wrangler_config_paths():
@@ -148,7 +149,7 @@ def _wrangler_session():
     return {}
 
 
-def _session_expired(values):
+def _session_expired(values, *, margin=WRANGLER_EXPIRY_MARGIN):
     stamp = values.get("expiration_time")
     if not isinstance(stamp, str):
         return False
@@ -156,7 +157,7 @@ def _session_expired(values):
         expires = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
     except ValueError:
         return False
-    return expires <= datetime.now(timezone.utc) + WRANGLER_EXPIRY_MARGIN
+    return expires <= datetime.now(timezone.utc) + margin
 
 
 def _refresh_wrangler_session():
@@ -181,6 +182,11 @@ def cloudflare_token():
     value = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
     if value:
         return value
+    with _WRANGLER_SESSION_LOCK:
+        return _signed_in_cloudflare_token()
+
+
+def _signed_in_cloudflare_token():
     # Reuse the user's existing signed-in Wrangler session; never create keys.
     values = _wrangler_session()
     if values.get("oauth_token") and _session_expired(values):
@@ -189,7 +195,10 @@ def cloudflare_token():
     token = values.get("oauth_token")
     if not token:
         raise StorageError("Existing authorized Cloudflare storage credentials are required")
-    if _session_expired(values):
+    # Wrangler may decline a proactive refresh until actual expiry. Its still
+    # valid token remains usable during our safety margin; do not abort a long
+    # verified upload two minutes before the refresh is even permitted.
+    if _session_expired(values, margin=timedelta(0)):
         raise StorageError("The signed-in Wrangler session expired and could not be refreshed")
     return token
 
