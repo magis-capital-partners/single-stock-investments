@@ -59,11 +59,6 @@ class Journal:
                 id INTEGER PRIMARY KEY, at TEXT NOT NULL, ref TEXT NOT NULL,
                 state TEXT NOT NULL, filled INTEGER NOT NULL
               );
-              CREATE TRIGGER IF NOT EXISTS execution_order_intent AFTER INSERT ON orders
-              BEGIN
-                INSERT INTO execution_order_states(at,ref,state,filled)
-                VALUES(json_extract(new.payload,'$.at'),new.ref,new.state,new.filled);
-              END;
               CREATE TRIGGER IF NOT EXISTS execution_order_state AFTER UPDATE ON orders
               WHEN new.state != old.state OR new.filled != old.filled
               BEGIN
@@ -140,6 +135,11 @@ class Journal:
                     json.dumps(payload),
                 ),
             )
+            if self.prefix == PREFIX:
+                self.db.execute(
+                    "INSERT INTO execution_order_states(at,ref,state,filled) VALUES(?,?,'submitting',0)",
+                    (at, ref),
+                )
         return ref
 
     def acknowledge(self, ref, order_id, perm_id=0):
