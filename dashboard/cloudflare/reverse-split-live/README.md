@@ -473,3 +473,42 @@ Public SEC fixture receipts, captured November 9, 2026 (hashes of full responses
 - SEC `master.20261026.idx`:
   `ddfad12d4fe1d8e3513725e9c9b0d274683de1cffcb2eb2e73d26205bb135ba3`.
 
+# Dated feed acceptance: publication acknowledgements
+
+The Node collector is research-only. Its serialized operations channel applies
+the configured state-age guard to both full-checkpoint and refresh writes,
+after queue wait and again at acknowledgement. Fresh checkpoint uploads bypass
+the background research-object pacer. Operations uploads have a bounded total
+deadline, including retry waits; a timeout has an unknown outcome and never
+gets a manufactured completion timestamp.
+
+Every report identifies an immutable `operations-receipts/<UTC-day>/<id>.json`
+record. The record carries the completed upload acknowledgement, original state
+and generation clocks, exact report SHA-256, release and guard settings. It must
+be separate from the report: an upload cannot contain its own later ACK clock.
+`RS_OPERATIONS_AUDIT_DIR` enables a local fsynced publication/checkpoint journal;
+the collector mirrors the current UTC-day journal to `operations-audit/` during
+its heartbeat. Historical unknown/failed outcomes remain explicit.
+
+The independent Python fetcher records request start and complete-body receipt
+separately. `downloaded_at` now means complete-body receipt; use
+`request_started_at` for the old request-start meaning. With
+`RS_OPERATIONS_REQUIRE_RECEIPT=1`, missing, mismatched, unaccepted or over-age
+publisher receipts cannot replace a good local generation. An atomic metadata
+pointer selects an immutable local report, so a concurrent report replacement
+does not create a transient mismatched pair. Duplicate downloads do not retime
+the first receipt. Original source clocks and the consumer's 120s rule remain.
+
+The observer module has no broker adapter:
+
+```text
+python -m _system.trading.rs_paper_executor.observation monitor --feed-dir <dir> --log <clocks.jsonl> --until <absolute ISO time>
+python -m _system.trading.rs_paper_executor.observation report --feed-dir <dir> --log <clocks.jsonl> --day <ET-day> --start <09:30 ISO> --end <16:00 ISO> --expected <frozen-release.json> --output <report.json>
+```
+
+The report preserves every reading above 120s, unavailable readings, matched
+publisher/fetch evidence, p50/p95/max for each clock stage, measured-time
+coverage and configuration changes. Pipeline-stage attribution is evidence;
+an unobserved external root cause remains unestablished. A complete feed-only
+observation always counts as zero qualifying broker-aware shadow sessions.
+

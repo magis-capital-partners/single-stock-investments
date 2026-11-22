@@ -20,15 +20,34 @@ function storage(t){
 }
 const operationPuts=puts=>puts.filter(p=>p.key===OPERATIONS_KEY).map(p=>({...decode(p.bytes),urgent:p.urgent}));
 
+test('freshness checkpoint upload bypasses background research object pacing',async t=>{
+ const {env,puts}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});
+ t.after(()=>cp.close());
+ await cp.save({publicationMode:'r2',checkpointOnly:true});
+ const upload=puts.find(p=>p.key.startsWith('collector-state/checkpoints/'));
+ assert.equal(upload.urgent,true,'fresh state cannot sit behind queued financial/history object requests');
+});
+
+test('the actual full-checkpoint worker cannot publish an over-age report',async t=>{
+ const {env,puts}=storage(t);let clock;const write=env.EVIDENCE.put;
+ env.EVIDENCE.put=async(key,bytes,options)=>{if(key.startsWith('collector-state/checkpoints/'))clock=Date.now()+76000;return write(key,bytes,options);};
+ const cp=await openCheckpoint(env,{operationsOptions:{clock:()=>clock??Date.now(),maxStateAgeMs:75000}});
+ t.after(async()=>{await cp.flush();cp.close();});
+ await cp.save({publicationMode:'r2',backgroundViews:true});await cp.flush();
+ assert.equal(operationPuts(puts).length,0);
+ assert.equal(env.publicationHealth.status,'retry_pending');
+ assert.match(env.publicationHealth.error,/checkpoint_too_old/);
+});
+
 test('an uploading successor checkpoint does not remove the last committed bytes from the refresher',async t=>{
-  const {env,puts}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});
+  const {env,puts}=storage(t);let clock;const cp=await openCheckpoint(env,{retainDurableBytes:true,operationsOptions:{clock:()=>clock??Date.now()}});
   let refresher,release,saving;const gate=new Promise(resolve=>{release=resolve;});
   t.after(async()=>{release();await saving?.catch(()=>{});await refresher?.close();await cp.flush();cp.close();});
   const first=await cp.save({publicationMode:'r2'}),put=env.EVIDENCE.put;
   let uploaded;const uploading=new Promise(resolve=>{uploaded=resolve;});
   env.EVIDENCE.put=async(key,bytes,options)=>{if(key.startsWith('collector-state/checkpoints/')){uploaded();await gate;}return put(key,bytes,options);};
   saving=cp.save({publicationMode:'r2',checkpointOnly:true});await uploading;
-  refresher=operationsRefresher({checkpoint:cp,clock:()=>Date.parse(first.at)+31000});
+  clock=Date.parse(first.at)+31000;refresher=operationsRefresher({checkpoint:cp,clock:()=>clock});
   assert.equal((await refresher.refresh()).published,true,'the last durable copy must remain refreshable while the next upload waits');
   assert.equal(operationPuts(puts).at(-1).state_at,first.at);
   release();await saving;
@@ -82,7 +101,7 @@ test('refresh interval defaults to 30 s, is configurable, and 0 disables it',()=
 test('the operations channel never regresses state, skips unchanged content and asserts the lease before a put',async t=>{
   const db=markerDB(t),puts=[];let leaseLost=false;
   const env={assertCollectorLease:()=>{if(leaseLost)throw new Error('Collector lease expired');},EVIDENCE:{put:async(key,bytes,options)=>puts.push({key,urgent:options.urgent===true,body:decode(bytes)})}};
-  const channel=operationsChannel(env,{db}),T=Date.parse('2026-11-19T15:00:00.000Z'),text=(state,generated)=>JSON.stringify({state_at:iso(state),generated_at:iso(generated)});
+  const channel=operationsChannel(env,{db,clock:()=>Date.parse('2026-11-19T15:01:35.000Z')}),T=Date.parse('2026-11-19T15:00:00.000Z'),text=(state,generated)=>JSON.stringify({state_at:iso(state),generated_at:iso(generated)});
   const send=(state,generated,urgent=false)=>channel.publish({text:text(state,generated),stateAt:iso(state),generatedAt:iso(generated),urgent});
   assert.equal((await send(T,T)).published,true);
   assert.equal((await send(T,T+30000,true)).published,true,'a refresh of the same checkpoint at a later time publishes');
@@ -91,14 +110,14 @@ test('the operations channel never regresses state, skips unchanged content and 
   assert.equal((await send(T+20000,T+20000)).published,true,'a newer checkpoint wins even with an earlier generated_at');
   assert.equal((await channel.publish({text:text(T+20000,T+20000),stateAt:iso(T+20000),generatedAt:iso(T+50000)})).reason,'unchanged','identical bytes are not re-put');
   leaseLost=true;await assert.rejects(send(T+90000,T+90000),/lease expired/);
-  assert.deepEqual(puts.map(p=>[p.body.state_at,p.body.generated_at,p.urgent]),[[iso(T),iso(T),false],[iso(T),iso(T+30000),true],[iso(T+20000),iso(T+20000),false]]);
+  assert.deepEqual(puts.filter(p=>p.key===OPERATIONS_KEY).map(p=>[p.body.state_at,p.body.generated_at,p.urgent]),[[iso(T),iso(T),true],[iso(T),iso(T+30000),true],[iso(T+20000),iso(T+20000),true]]);
   assert.equal(db.prepare("SELECT value FROM rs_state WHERE key='snapshot:operations.json'").get().value.length,64);
 });
 
 test('channel puts are serialized: a refresh and a checkpoint publication are never in flight together',async t=>{
   let inFlight=0,most=0,release;const gate=new Promise(r=>{release=r;}),order=[];
-  const env={EVIDENCE:{put:async(key,bytes)=>{inFlight++;most=Math.max(most,inFlight);const body=decode(bytes);if(order.length===0)await gate;order.push(body.generated_at);inFlight--;}}};
-  const channel=operationsChannel(env,{db:markerDB(t)}),T=Date.parse('2026-11-19T15:00:00.000Z');
+  const env={EVIDENCE:{put:async(key,bytes)=>{if(key!==OPERATIONS_KEY)return;inFlight++;most=Math.max(most,inFlight);const body=decode(bytes);if(order.length===0)await gate;order.push(body.generated_at);inFlight--;}}};
+  const channel=operationsChannel(env,{db:markerDB(t),clock:()=>Date.parse('2026-11-19T15:00:30.000Z')}),T=Date.parse('2026-11-19T15:00:00.000Z');
   const first=channel.publish({text:JSON.stringify({generated_at:iso(T)}),stateAt:iso(T),generatedAt:iso(T)}),second=channel.publish({text:JSON.stringify({generated_at:iso(T+30000)}),stateAt:iso(T),generatedAt:iso(T+30000),urgent:true});
   await new Promise(r=>setTimeout(r,20));assert.equal(order.length,0);release();await Promise.all([first,second]);
   assert.equal(most,1);assert.deepEqual(order,[iso(T),iso(T+30000)]);
@@ -106,13 +125,13 @@ test('channel puts are serialized: a refresh and a checkpoint publication are ne
 
 test('a refresh publishes the last committed checkpoint re-evaluated now, never uncommitted live rows, with no database call',async t=>{
   const {env,objects,puts,counter}=storage(t),start=Date.now();
-  let cp=await openCheckpoint(env,{retainDurableBytes:true});
+  let clock;let cp=await openCheckpoint(env,{retainDurableBytes:true,operationsOptions:{clock:()=>clock??Date.now()}});
   let refresher;t.after(async()=>{await refresher?.close();cp?.close();});
   await addEvent(env,'qa-durable-01',iso(start-60000));
   const receipt=await cp.save({publicationMode:'r2'});
-  const atCheckpoint=operationPuts(puts);assert.equal(atCheckpoint.length,1);assert.equal(atCheckpoint[0].state_at,receipt.at);assert.equal(atCheckpoint[0].urgent,false);assert.equal(atCheckpoint[0].candidate_count,1);
+  const atCheckpoint=operationPuts(puts);assert.equal(atCheckpoint.length,1);assert.equal(atCheckpoint[0].state_at,receipt.at);assert.equal(atCheckpoint[0].urgent,true);assert.equal(atCheckpoint[0].candidate_count,1);
   await addEvent(env,'qa-live-only-02',iso(start-30000));
-  let clock=Date.parse(receipt.at)+40000;
+  clock=Date.parse(receipt.at)+40000;
   refresher=operationsRefresher({checkpoint:cp,intervalMs:30000,maxStateAgeMs:180000,clock:()=>clock});
   assert.equal(refresher.due(),true);
   counter.remote=0;const result=await refresher.refresh();assert.equal(result.published,true);assert.equal(counter.remote,0,'a refresh makes no remote database read or write');
@@ -129,9 +148,9 @@ test('a refresh publishes the last committed checkpoint re-evaluated now, never 
 });
 
 test('a newer checkpoint is reloaded, and refresh pauses once the committed checkpoint is too old',async t=>{
-  const {env,puts}=storage(t),start=Date.now();const cp=await openCheckpoint(env,{retainDurableBytes:true});let refresher;t.after(async()=>{await refresher?.close();cp.close();});
+  const {env,puts}=storage(t),start=Date.now();let clock;const cp=await openCheckpoint(env,{retainDurableBytes:true,operationsOptions:{clock:()=>clock??Date.now()}});let refresher;t.after(async()=>{await refresher?.close();cp.close();});
   await addEvent(env,'qa-first-01',iso(start-60000));const first=await cp.save({publicationMode:'r2'});
-  let clock=Date.parse(first.at)+35000;refresher=operationsRefresher({checkpoint:cp,intervalMs:30000,maxStateAgeMs:120000,clock:()=>clock});
+  clock=Date.parse(first.at)+35000;refresher=operationsRefresher({checkpoint:cp,intervalMs:30000,maxStateAgeMs:120000,clock:()=>clock});
   assert.equal((await refresher.refresh()).published,true);assert.equal(operationPuts(puts).at(-1).candidate_count,1);
   await addEvent(env,'qa-second-02',iso(start-30000));const second=await cp.save({publicationMode:'r2'});assert.notEqual(second.generation,first.generation);
   clock=Math.max(clock,Date.parse(second.at))+31000;assert.equal((await refresher.refresh()).published,true);

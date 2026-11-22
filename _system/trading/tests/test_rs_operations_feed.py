@@ -11,6 +11,11 @@ from _system.trading.rs_paper_executor import operations_feed as feed
 from _system.trading.rs_paper_executor.safety import SafetyError
 from _system.trading.rs_paper_executor.inbox import proposals
 
+def fetch_at(source,directory,now,**kwargs):
+    kwargs.setdefault('clock',lambda:now)
+    return feed.fetch_once(source,directory,now,**kwargs)
+
+
 ENDPOINT = "https://" + "0123456789abcdef" * 2 + ".r2.cloudflarestorage.com"
 
 
@@ -85,6 +90,68 @@ class Opener:
         return Response(answer)
 
 
+def test_receipt_time_is_after_download_and_bound_to_publisher_ack(tmp_path):
+    import hashlib
+    key = 'collector-dashboard/operations-receipts/2026-11-23/11111111-1111-4111-8111-111111111111.json'
+    payload = json.dumps({'generated_at':'2026-11-23T14:30:00Z',
+                          'state_at':'2026-11-23T14:29:30Z', 'candidates':[],
+                          'publication':{'id':'11111111-1111-4111-8111-111111111111',
+                                         'receipt_key':key}}).encode()
+    receipt = json.dumps({'schema':'rs_operations_publication_receipt.v1',
+                          'publication_id':'11111111-1111-4111-8111-111111111111',
+                          'report_sha256':hashlib.sha256(payload).hexdigest(),
+                          'generated_at':'2026-11-23T14:30:00Z',
+                          'state_at':'2026-11-23T14:29:30Z',
+                          'upload_started_at':'2026-11-23T14:30:01Z',
+                          'upload_completed_at':'2026-11-23T14:30:02Z',
+                          'max_state_age_seconds':75,
+                          'accepted':True}).encode()
+    source = feed.R2Object(ENDPOINT,'id','secret',opener=Opener(payload,receipt))
+    fetch_at(source,tmp_path,'2026-11-23T14:30:10Z',clock=lambda:'2026-11-23T14:30:13Z')
+    _,meta=feed.read_local(tmp_path/'operations.json')
+    assert meta['request_started_at']=='2026-11-23T14:30:10Z'
+    assert meta['received_at']=='2026-11-23T14:30:13Z'
+    assert meta['publish_receipt']['upload_completed_at']=='2026-11-23T14:30:02Z'
+    assert meta['publication_to_receipt_seconds']==11
+
+
+def test_reader_keeps_previous_committed_generation_during_report_metadata_swap(tmp_path,monkeypatch):
+    source=feed.R2Object(ENDPOINT,'id','secret',opener=Opener(
+        body('2026-11-23T14:30:00Z'),body('2026-11-23T14:30:10Z')))
+    fetch_at(source,tmp_path,'2026-11-23T14:30:01Z')
+    original=feed._atomic_write
+    def interleaved(path,data):
+        original(path,data)
+        if path.name=='operations.json':
+            clocks,_=feed.read_local_clocks(path)
+            assert clocks['generated_at']=='2026-11-23T14:30:00Z'
+    monkeypatch.setattr(feed,'_atomic_write',interleaved)
+    fetch_at(source,tmp_path,'2026-11-23T14:30:11Z')
+
+
+def test_receipt_is_mandatory_when_the_dated_observation_requires_it(tmp_path):
+    source=feed.R2Object(ENDPOINT,'id','secret',opener=Opener(body('2026-11-23T14:30:00Z')),require_receipt=True)
+    with pytest.raises(SafetyError,match='receipt required'):
+        fetch_at(source,tmp_path,'2026-11-23T14:30:01Z')
+    assert not (tmp_path/'operations.meta.json').exists()
+
+
+def test_replayed_older_state_cannot_replace_a_newer_local_generation(tmp_path):
+    source=feed.R2Object(ENDPOINT,'id','secret',opener=Opener(body('2026-11-23T14:30:10Z'),body('2026-11-23T14:30:00Z')))
+    fetch_at(source,tmp_path,'2026-11-23T14:30:11Z')
+    with pytest.raises(SafetyError,match='regressed'):
+        fetch_at(source,tmp_path,'2026-11-23T14:30:12Z')
+    assert feed.read_local(tmp_path/'operations.json')[0]['generated_at']=='2026-11-23T14:30:10Z'
+
+
+def test_duplicate_download_does_not_retime_the_first_receipt(tmp_path):
+    payload=body('2026-11-23T14:30:00Z')
+    source=feed.R2Object(ENDPOINT,'id','secret',opener=Opener(payload,payload))
+    fetch_at(source,tmp_path,'2026-11-23T14:30:01Z')
+    fetch_at(source,tmp_path,'2026-11-23T14:30:10Z')
+    assert feed.read_local(tmp_path/'operations.json')[1]['received_at']=='2026-11-23T14:30:01Z'
+
+
 def body(generated_at, candidates=2):
     return json.dumps({"generated_at": generated_at,
                        "candidates": [{} for _ in range(candidates)]}).encode()
@@ -107,9 +174,9 @@ def test_signed_get_of_the_pinned_object_with_conditional_refetch():
 def test_fetch_keeps_producer_and_download_clocks_apart(tmp_path):
     opener = Opener(body("2026-11-19T15:00:00+00:00"), 304, body("2026-11-19T15:00:30+00:00", 3))
     source = feed.R2Object(ENDPOINT, "id", "secret", opener=opener)
-    feed.fetch_once(source, tmp_path, "2026-11-19T15:00:04+00:00")
-    assert feed.fetch_once(source, tmp_path, "2026-11-19T15:00:09+00:00")["changed"] is False
-    feed.fetch_once(source, tmp_path, "2026-11-19T15:00:36+00:00")
+    fetch_at(source, tmp_path, "2026-11-19T15:00:04+00:00")
+    assert fetch_at(source, tmp_path, "2026-11-19T15:00:09+00:00")["changed"] is False
+    fetch_at(source, tmp_path, "2026-11-19T15:00:36+00:00")
     data, meta = feed.read_local(tmp_path / "operations.json")
     assert data["generated_at"] == "2026-11-19T15:00:30+00:00"
     assert meta["source_generated_at"] == "2026-11-19T15:00:30+00:00"
@@ -124,7 +191,7 @@ def test_fetch_keeps_producer_and_download_clocks_apart(tmp_path):
 def test_clock_monitor_uses_bound_download_metadata_without_reparsing_catalog(tmp_path, monkeypatch):
     payload=json.dumps({"generated_at":"2026-11-20T15:21:57Z", "state_at":"2026-11-20T15:21:00Z", "candidates":[{}]*1000}).encode()
     source=feed.R2Object(ENDPOINT,"id","secret",opener=Opener(payload))
-    feed.fetch_once(source,tmp_path,"2026-11-20T15:22:00Z")
+    fetch_at(source,tmp_path,"2026-11-20T15:22:00Z")
     path=tmp_path/"operations.json"
     read=type(path).read_bytes
     def bounded_read(target):
@@ -139,7 +206,7 @@ def test_clock_monitor_uses_bound_download_metadata_without_reparsing_catalog(tm
 def test_clock_metadata_never_attests_to_a_different_report_file(tmp_path):
     payload=json.dumps({"generated_at":"2026-11-20T15:21:57Z", "state_at":"2026-11-20T15:21:00Z", "candidates":[]}).encode()
     source=feed.R2Object(ENDPOINT,"id","secret",opener=Opener(payload))
-    feed.fetch_once(source,tmp_path,"2026-11-20T15:22:00Z")
+    fetch_at(source,tmp_path,"2026-11-20T15:22:00Z")
     path=tmp_path/"operations.json"
     path.write_bytes(body("2026-11-20T15:22:15Z"))
     with pytest.raises(SafetyError,match="metadata|replaced"):
@@ -153,16 +220,16 @@ def test_clock_metadata_never_attests_to_a_different_report_file(tmp_path):
 def test_a_snapshot_without_a_producer_clock_never_replaces_the_good_copy(tmp_path, bad):
     source = feed.R2Object(ENDPOINT, "id", "secret",
                            opener=Opener(body("2026-11-19T15:00:00+00:00"), bad))
-    feed.fetch_once(source, tmp_path, "2026-11-19T15:00:04+00:00")
+    fetch_at(source, tmp_path, "2026-11-19T15:00:04+00:00")
     with pytest.raises((SafetyError, ValueError)):
-        feed.fetch_once(source, tmp_path, "2026-11-19T15:00:09+00:00")
+        fetch_at(source, tmp_path, "2026-11-19T15:00:09+00:00")
     assert json.loads((tmp_path / "operations.json").read_bytes())["generated_at"] \
         == "2026-11-19T15:00:00+00:00"
 
 
 def test_fetcher_records_errors_and_backs_off_instead_of_exiting(tmp_path):
     source = feed.R2Object(ENDPOINT, "id", "secret", opener=Opener(403, 403, body("2026-11-19T15:00:00+00:00")))
-    sleeps, ticks = [], iter(["2026-11-19T15:00:0%d+00:00" % i for i in range(3)])
+    sleeps, ticks = [], iter(["2026-11-19T15:00:0%d+00:00" % i for i in [0,1,2,2,2,2]])
     feed.run_fetcher(source, tmp_path, poll_seconds=5, clock=lambda: next(ticks),
                      sleep=sleeps.append, stop=lambda: len(sleeps) >= 3)
     assert sleeps == [10, 20, 5]
