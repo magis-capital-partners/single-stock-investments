@@ -147,6 +147,29 @@ def ensure_model() -> bool:
     return ready
 
 
+def media_lane_holds_model() -> bool:
+    """True while the media lane is inside a window that needs the model.
+
+    Unloading during that window is how a two-hour summary pass used to die
+    on the first connection refusal. The receipt is written at the start of
+    the reader and analysis phases.
+    """
+    override = os.environ.get("MEDIA_LANE_RECEIPT", "").strip()
+    path = Path(override) if override else (
+        Path.home() / "Projects/ssi-local-lanes/_system/data/lane_receipts/media-analysis.json"
+    )
+    try:
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        probed = datetime.strptime(
+            str(receipt.get("probed_at") or ""), "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=timezone.utc)
+    except (OSError, json.JSONDecodeError, ValueError, TypeError):
+        return False
+    if receipt.get("phase") not in {"reader-summary", "video-analysis", "podcast-analysis"}:
+        return False
+    return (datetime.now(timezone.utc) - probed).total_seconds() < 3 * 3600
+
+
 def release_model() -> bool:
     """Unload the model while the machine is short of memory. True when it was unloaded.
 
@@ -154,6 +177,9 @@ def release_model() -> bool:
     it anything. It is left alone when another lane is in the middle of a
     reply; `ensure_model` in either lane loads it again when it is next wanted.
     """
+    if media_lane_holds_model():
+        print(json.dumps({"note": "leaving the model loaded; the media lane is using it"}), flush=True)
+        return False
     lms = find_lms()
     if lms is None:
         return False

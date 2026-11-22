@@ -129,6 +129,55 @@ def restore_from_private_storage(vault: Path, sha256: str) -> bool:
     return stored_object(vault, sha256).is_file()
 
 
+def _snapshot_cache(vault: Path, sha256: str, data: bytes) -> Path:
+    """A verified copy outside the vault, so a sparse checkout can stay sparse."""
+    identity = hashlib.sha256(str(vault.resolve()).encode()).hexdigest()[:20]
+    cache = Path(tempfile.gettempdir()) / "magis-private-snapshots" / identity
+    cache.mkdir(parents=True, exist_ok=True, mode=0o700)
+    target = cache / sha256
+    if target.is_file() and digest(target) == sha256:
+        return target
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=cache, delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(data)
+        temporary.replace(target)
+    finally:
+        if temporary:
+            temporary.unlink(missing_ok=True)
+    return target
+
+
+def _object_from_vault_git(vault: Path, sha256: str) -> Path | None:
+    """Read one object from the vault commit when sparse checkout hid the file.
+
+    ``dashboard-private/objects/`` is excluded from the working tree. The blob
+    is still in git. Private storage is not configured on the media lane, so
+    materialize() cannot fill the file, and the publisher then treats a
+    present snapshot as missing.
+    """
+    if not (vault / ".git").exists():
+        return None
+    try:
+        shown = subprocess.run(
+            ["git", "-C", str(vault), "cat-file", "blob",
+             f"HEAD:dashboard-private/objects/{sha256}"],
+            capture_output=True,
+            timeout=120,
+            env={**os.environ, "GIT_NO_LAZY_FETCH": "1"},
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if shown.returncode != 0 or not shown.stdout:
+        return None
+    try:
+        data = decode_object_bytes(shown.stdout, sha256)
+    except RuntimeError:
+        return None
+    return _snapshot_cache(vault, sha256, data)
+
+
 def private_object(vault: Path, sha256: str) -> Path:
     stored = stored_object(vault, sha256)
     if not stored.is_file():
@@ -136,6 +185,10 @@ def private_object(vault: Path, sha256: str) -> Path:
         materialize(vault, "dashboard-private/objects/" + sha256)
     if not stored.is_file():
         recover_from_history(vault, sha256)
+    if not stored.is_file():
+        recovered = _object_from_vault_git(vault, sha256)
+        if recovered is not None:
+            return recovered
     if not stored.is_file():
         return stored
     with stored.open('rb') as stream:

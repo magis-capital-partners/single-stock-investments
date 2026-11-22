@@ -743,8 +743,13 @@ def drain_whisper_backlog(*, batch: int = 20) -> dict:
                         row["attempts"] = max(0, int(row.get("attempts") or 0) - 1)
                         row["last_transient_error"] = str(result.get("status"))[:200]
                     elif int(row.get("attempts") or 0) >= 3:
-                        row["status"] = "failed"
-                        row["failed_reason"] = str(result.get("status"))[:200]
+                        reason = str(result.get("status"))[:200]
+                        row["failed_reason"] = reason
+                        if "404" in reason:
+                            row["status"] = "unavailable"
+                            row["settled_reason"] = "audio URL returned 404"
+                        else:
+                            row["status"] = "failed"
                     break
             doc["pending_count"] = sum(1 for i in (doc.get("items") or []) if i.get("status") == "pending")
             save_whisper_backlog(doc)

@@ -1221,37 +1221,52 @@ def run(
                 skipped += 1
                 continue
 
-            try:
-                if use_llm and source.get("basis") in {"transcript", "notes"}:
-                    summary = model_reader_summary(meta, source, model=model)
-                else:
-                    summary = generate_reader_summary(
-                        meta,
-                        source,
-                        use_llm=False,
-                        catalog_episode=row.get("catalog"),
+            from llm_local import retry_after_outage
+
+            model_down = False
+            while True:
+                try:
+                    if use_llm and source.get("basis") in {"transcript", "notes"}:
+                        summary = model_reader_summary(meta, source, model=model)
+                    else:
+                        summary = generate_reader_summary(
+                            meta,
+                            source,
+                            use_llm=False,
+                            catalog_episode=row.get("catalog"),
+                        )
+                    break
+                except LocalLLMUnavailable as exc:
+                    # The server port changes every time the model is reloaded.
+                    # Stay on this episode until the window ends, then keep a
+                    # fallback so the next window can resume.
+                    if retry_after_outage(exc, deadline):
+                        continue
+                    if not dry_run:
+                        fallback = fallback_reader_summary(
+                            meta,
+                            source,
+                            status="pending_model" if source.get("basis") == "transcript" else "ready",
+                            catalog_episode=row.get("catalog"),
+                        )
+                        meta["reader_summary"] = fallback
+                        _atomic_write_json(row["meta_path"], meta)
+                    pending += 1
+                    model_down = True
+                    print(f"[{_stamp()}] LLM unavailable: {exc}", flush=True)
+                    summary = None
+                    break
+                except Exception as exc:  # one bad episode must not end the run
+                    failed += 1
+                    print(
+                        f"[{_stamp()}] FAILED {row['episode_id']}: {type(exc).__name__} {exc}",
+                        flush=True,
                     )
-            except LocalLLMUnavailable as exc:
-                # Publish/retain a fallback, then stop: every later episode
-                # would hit the same dead server and burn its repair budget.
-                if not dry_run:
-                    fallback = fallback_reader_summary(
-                        meta,
-                        source,
-                        status="pending_model" if source.get("basis") == "transcript" else "ready",
-                        catalog_episode=row.get("catalog"),
-                    )
-                    meta["reader_summary"] = fallback
-                    _atomic_write_json(row["meta_path"], meta)
-                pending += 1
-                print(f"[{_stamp()}] LLM unavailable: {exc}", flush=True)
+                    summary = None
+                    break
+            if model_down:
                 break
-            except Exception as exc:  # one bad episode must not end the run
-                failed += 1
-                print(
-                    f"[{_stamp()}] FAILED {row['episode_id']}: {type(exc).__name__} {exc}",
-                    flush=True,
-                )
+            if summary is None:
                 continue
 
             errors = reader_summary_errors(

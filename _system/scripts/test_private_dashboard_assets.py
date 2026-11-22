@@ -313,3 +313,31 @@ def test_git_line_ending_conversion_cannot_change_snapshot_checksums(workspace):
     assert private.read_bytes() == original
     assert assets.digest(private) == entry["private_sha256"]
     assert assets.digest(csv_path) == assets.overlay_manifest(source)["assets"]["data/letters.csv"]["public_sha256"]
+
+
+def test_sparse_excluded_object_is_read_from_the_vault_commit(tmp_path, monkeypatch):
+    import hashlib
+    import os
+
+    vault = tmp_path / "vault"
+    raw = b'{"events":[{"id":"e1"}]}\n'
+    sha = hashlib.sha256(raw).hexdigest()
+    obj = vault / "dashboard-private" / "objects" / sha
+    obj.parent.mkdir(parents=True)
+    obj.write_bytes(raw)
+    env = {
+        **os.environ,
+        "GIT_AUTHOR_NAME": "test",
+        "GIT_AUTHOR_EMAIL": "test@example.com",
+        "GIT_COMMITTER_NAME": "test",
+        "GIT_COMMITTER_EMAIL": "test@example.com",
+    }
+    subprocess.run(["git", "init", "-q"], cwd=vault, check=True)
+    subprocess.run(["git", "add", "--", f"dashboard-private/objects/{sha}"], cwd=vault, check=True, env=env)
+    subprocess.run(["git", "commit", "-q", "-m", "snapshot"], cwd=vault, check=True, env=env)
+    obj.unlink()
+    monkeypatch.setattr(assets, "research_vault_root", lambda: vault)
+    restored = assets.private_object(vault, sha)
+    assert restored.is_file()
+    assert restored.read_bytes() == raw
+    assert not obj.exists()

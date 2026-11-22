@@ -161,6 +161,28 @@ def reconcile_with_disk(doc: dict) -> int:
     return healed
 
 
+def settle_missing_audio(doc: dict) -> int:
+    """A 404 is a dead URL, not a transcription error.
+
+    Those rows used to stay ``failed`` forever and show up as a broken queue.
+    """
+    settled = 0
+    for item in doc.get("items") or []:
+        if item.get("status") != "failed":
+            continue
+        if "404" not in str(item.get("failed_reason") or ""):
+            continue
+        item["status"] = "unavailable"
+        item["settled_reason"] = "audio URL returned 404"
+        settled += 1
+    if settled:
+        from fetch_podcast_transcript import atomic_write_text
+
+        doc["updated_at"] = _stamp()
+        atomic_write_text(backlog_path(), json.dumps(doc, indent=2) + "\n")
+    return settled
+
+
 def park_exhausted(doc: dict) -> int:
     """Mark repeatedly-failing items so they stop being selected."""
     parked = 0
@@ -355,6 +377,9 @@ def run(*, chunk: int, deadline: datetime | None, until_empty: bool, push: bool,
     parked = park_exhausted(read_backlog())
     if parked:
         print(f"parked {parked} items at >= {MAX_ATTEMPTS} attempts", flush=True)
+    settled = settle_missing_audio(read_backlog())
+    if settled:
+        print(f"settled {settled} items whose audio URL returns 404", flush=True)
 
     while True:
         reconcile_with_disk(read_backlog())

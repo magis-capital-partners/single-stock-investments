@@ -372,10 +372,24 @@ def phase_podcast_discovery() -> int:
     return run_python([str(SCRIPTS / "fetch_podcast_transcript.py"), "--no-whisper"])
 
 
+def video_whisper_pending() -> int:
+    """Videos that already have audio queued and no transcript yet."""
+    try:
+        from vault_paths import videos_root
+        doc = json.loads((videos_root() / "whisper_backlog.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        return 0
+    return sum(
+        1 for row in (doc.get("items") or [])
+        if isinstance(row, dict) and row.get("status") == "pending"
+    )
+
+
 def phase_reader_summary(*, model: str, hours: float, push: bool) -> int:
     wait_for_memory(_active_floor_mb, log=log, stop_flag=lambda: _stop)
     if _stop:
         return 0
+    write_receipt(ready=True, phase="reader-summary")
     args = [
         str(SCRIPTS / "summarize_podcast_episode.py"),
         "--llm",
@@ -406,6 +420,10 @@ def phase_analysis(script: str, *, model: str, hours: float, push: bool) -> int:
     wait_for_memory(_active_floor_mb, log=log, stop_flag=lambda: _stop)
     if _stop:
         return 0
+    write_receipt(
+        ready=True,
+        phase="video-analysis" if "video" in script else "podcast-analysis",
+    )
     args = [
         str(SCRIPTS / script),
         "--model", model,
@@ -501,6 +519,12 @@ def run_forever(args: argparse.Namespace) -> int:
             state = load_state()
             if youtube_due(state) and not _stop:
                 yt_whisper = args.yt_whisper
+                # Captions stay the default while podcast Whisper still has
+                # work. Once that queue is empty, transcribe the videos that
+                # have no captions. A small cap keeps one pass from taking the
+                # machine for the rest of the day.
+                if yt_whisper <= 0 and pending <= 0:
+                    yt_whisper = min(video_whisper_pending(), 8)
                 log(f"phase=youtube (hours={args.yt_hours} whisper={yt_whisper})")
                 code = phase_youtube(
                     hours=args.yt_hours,

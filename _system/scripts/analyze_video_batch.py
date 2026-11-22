@@ -281,22 +281,36 @@ def run(*, limit: int | None, model: str | None, push: bool, push_minutes: int,
             if not segments:
                 no_timing += 1
             started = time.time()
-            try:
-                result = analyze(
-                    txt.read_text(encoding="utf-8", errors="ignore"),
-                    title=title,
-                    channel=meta.get("channel_title") or meta.get("channel_id") or "",
-                    role=role,
-                    segments=segments,
-                    model=model,
-                    aliases=aliases,
-                )
-            except LocalLLMUnavailable as exc:
-                print(f"[{_stamp()}] LLM unavailable: {exc}", flush=True)
+            from llm_local import retry_after_outage
+
+            model_down = False
+            while True:
+                try:
+                    result = analyze(
+                        txt.read_text(encoding="utf-8", errors="ignore"),
+                        title=title,
+                        channel=meta.get("channel_title") or meta.get("channel_id") or "",
+                        role=role,
+                        segments=segments,
+                        model=model,
+                        aliases=aliases,
+                    )
+                    break
+                except LocalLLMUnavailable as exc:
+                    if retry_after_outage(exc, deadline):
+                        continue
+                    print(f"[{_stamp()}] LLM unavailable: {exc}", flush=True)
+                    result = None
+                    model_down = True
+                    break
+                except Exception as exc:  # one bad video must not end the run
+                    failed += 1
+                    print(f"[{_stamp()}] FAILED {title[:48]}: {type(exc).__name__} {exc}", flush=True)
+                    result = None
+                    break
+            if model_down:
                 break
-            except Exception as exc:  # one bad video must not end the run
-                failed += 1
-                print(f"[{_stamp()}] FAILED {title[:48]}: {type(exc).__name__} {exc}", flush=True)
+            if result is None:
                 continue
 
             result["transcript_sha1"] = digest

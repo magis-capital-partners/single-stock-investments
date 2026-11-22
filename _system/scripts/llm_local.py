@@ -25,6 +25,7 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
 
 DEFAULT_BASE = os.environ.get("LOCAL_LLM_BASE", "http://localhost:1234/v1")
 # LM Studio's user-facing server needs no key; its internal llama-server does,
@@ -53,6 +54,32 @@ DISABLE_THINKING = os.environ.get("LOCAL_LLM_THINKING", "off").lower() != "on"
 
 class LocalLLMUnavailable(RuntimeError):
     """The server is not reachable, or has no model loaded."""
+
+
+def retry_after_outage(exc: BaseException, deadline: datetime | None, *, sleep_seconds: float = 30) -> bool:
+    """Keep a batch window alive while the local server is reloaded.
+
+    LM Studio assigns a new port every time the model is loaded, and the fund
+    letter lane unloads that model when memory is short. Three quick connection
+    refusals used to end a two-hour summary window in about a minute. True
+    means the caller should try the same item again. The discovered address is
+    forgotten so the next call finds the server that is actually listening.
+    """
+    if deadline is None:
+        return False
+    if deadline.tzinfo is None:
+        deadline = deadline.replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) >= deadline:
+        return False
+    _RESOLVED.clear()
+    remaining = int((deadline - datetime.now(timezone.utc)).total_seconds())
+    print(
+        f"[llm_local] model unavailable ({exc}); retrying the same item "
+        f"for another {remaining}s",
+        flush=True,
+    )
+    time.sleep(max(0, sleep_seconds))
+    return True
 
 
 def _parse_llama_cmdline(cmdline: str) -> tuple[str, str] | None:

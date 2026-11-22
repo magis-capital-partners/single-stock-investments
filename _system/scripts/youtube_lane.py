@@ -440,8 +440,10 @@ def _events_beside(manifest_path: Path) -> list | None:
         from private_dashboard_assets import read_resolved_json
         try:
             document, _restored = read_resolved_json(root / "dashboard", "data/insights/events.json")
-        except (OSError, RuntimeError, ValueError):
-            return None
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise ValueError(
+                f"could not read the private events snapshot: {exc}"
+            ) from exc
     events = document.get("events")
     if isinstance(events, list) and all(isinstance(event, dict) for event in events):
         return events
