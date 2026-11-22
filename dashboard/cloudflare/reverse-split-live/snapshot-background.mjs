@@ -31,7 +31,8 @@ export async function publishCheckpointSnapshot(env,db,{stored,receipt},{shouldY
           env.assertCollectorLease?.();
           const bytes=new Uint8Array(message.bytes),marker='snapshot:'+message.key;
           if(operations&&message.key==='operations.json'){
-            await operations.publish({text:new TextDecoder().decode(bytes),digest:message.digest,stateAt:message.stateAt,generatedAt:message.generatedAt,urgent:message.urgent===true});
+            const published=await operations.publish({text:new TextDecoder().decode(bytes),digest:message.digest,stateAt:message.stateAt,generatedAt:message.generatedAt,urgent:message.urgent===true,kind:'full_checkpoint'});
+            if(!published.published&&!['superseded','unchanged'].includes(published.reason))throw new Error('Operations publication refused: '+published.reason);
           }else if(db.prepare('SELECT value FROM rs_state WHERE key=?').get(marker)?.value!==message.digest){
             await env.EVIDENCE.put('collector-dashboard/'+message.key,bytes,{httpMetadata:{contentType:'application/json'}});
             db.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(marker,message.digest,receipt.at);

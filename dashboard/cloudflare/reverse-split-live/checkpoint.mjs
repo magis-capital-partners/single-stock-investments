@@ -24,7 +24,7 @@ export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>m
 
 // retainDurableBytes: keep the last committed checkpoint's bytes (one generation)
 // for the operations refresh, which evaluates only already-durable state.
-export async function openCheckpoint(env,{retainDurableBytes=false}={}){
+export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={}}={}){
   const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null;
   try{
     receiptValue=(await remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").first())?.value??null;receipt=JSON.parse(receiptValue||'null');
@@ -39,7 +39,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
       db.exec('BEGIN');try{for(const r of data.records){if(!r.verified||!r.cik||!r.effective_date||!r.known_at||!r.source_url?.startsWith('https://'))throw new Error('Unbound historical action');db.prepare('INSERT OR IGNORE INTO rs_history(id,cik,effective_date,known_at,verified,payload) VALUES(?,?,?,?,1,?)').run(r.cik+':'+r.effective_date,r.cik,r.effective_date,r.known_at,JSON.stringify(r));}db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('prior_history_bootstrap',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(bootstrapHash,new Date().toISOString());db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}
     }
   }catch(e){db?.close();cleanup(dir);throw e;}
-  const operations=operationsChannel(env,{db});
+  const operations=operationsChannel(env,{db,...operationsOptions});
   async function commitPointer(next,at){
     env.assertCollectorLease?.();
     const value=JSON.stringify(next),lease=env.collectorLeaseOwner?" AND EXISTS(SELECT 1 FROM rs_state WHERE key='collector_lease' AND substr(value,instr(value,':')+1)=? AND CAST(value AS INTEGER)>?)":'',args=env.collectorLeaseOwner?[env.collectorLeaseOwner,Date.now()+30000]:[];
@@ -56,8 +56,11 @@ export async function openCheckpoint(env,{retainDurableBytes=false}={}){
     if(encoded)Object.assign(next,{compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256});
     if(parent)next.previous=previousReceipt(parent);
     env.assertCollectorLease?.();
-    await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'}});
+    const uploadStarted=Date.now();
+    await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true});
+    const uploadCompleted=Date.now();
     await commitPointer(next,at);
+    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),stored_bytes:encoded?.stored_bytes||bytes.length});
     onCommitted?.(next);
     onCommittedBytes?.(encoded?.stored||bytes);
     // Keep two committed generations. Legacy slots, review archives and uncertain

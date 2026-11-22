@@ -39,7 +39,7 @@ export async function publishReadSnapshot(env,db,snapshot,{shouldYield=()=>false
   // Persisted content hashes let the successor resume history without losing work.
   // operations.json goes through the checkpoint's operations channel when there is one,
   // so it is ordered against between-checkpoint refreshes of the same object.
-  for(let i=0;i<snapshot.objects.length;i++){if(i>=5&&shouldYield())return {complete:false};const object=snapshot.objects[i];if(operations&&object.key==='operations.json'&&snapshot.stateAt)await operations.publish({text:operationsText(object.value,snapshot.stateAt),stateAt:snapshot.stateAt,generatedAt:object.value.generated_at});else await put(object.key,object.value);}
+  for(let i=0;i<snapshot.objects.length;i++){if(i>=5&&shouldYield())return {complete:false};const object=snapshot.objects[i];if(operations&&object.key==='operations.json'&&snapshot.stateAt){const published=await operations.publish({text:operationsText(object.value,snapshot.stateAt),stateAt:snapshot.stateAt,generatedAt:object.value.generated_at,kind:'full_checkpoint'});if(!published.published&&!['superseded','unchanged'].includes(published.reason))throw new Error('Operations publication refused: '+published.reason);}else await put(object.key,object.value);}
   const days={};for(const row of snapshot.borrow){const day=row.observed_at.slice(0,10);(days[day]||=[]).push(row);}
   for(const [day,observations] of Object.entries(days)){if(shouldYield())return {complete:false};await put('borrow/'+day+'.json',observations);}
   if(shouldYield())return {complete:false};

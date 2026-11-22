@@ -11,8 +11,8 @@
 // names the checkpoint the content came from. Evaluation runs on a worker thread,
 // so it never blocks quote, exit or validation work, and it makes no database call.
 import {Worker} from 'node:worker_threads';
-import {createHash} from 'node:crypto';
-import {mkdtempSync,rmSync,realpathSync} from 'node:fs';
+import {createHash,randomUUID} from 'node:crypto';
+import {mkdtempSync,rmSync,realpathSync,mkdirSync,appendFileSync,readFileSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
 
@@ -35,24 +35,61 @@ export function operationsRefreshSettings(source=process.env){
 // The only writer of operations.json for a checkpoint: full snapshots and refreshes
 // share one queue, so two puts are never in flight for the key and the published
 // state never moves back to an older checkpoint.
-export function operationsChannel(env,{db=null}={}){
+export function operationsChannel(env,{db=null,clock=Date.now,maxStateAgeMs=operationsRefreshSettings({...process.env,...env}).maxStateAgeMs}={}){
   let tail=Promise.resolve(),last=null;
+  maxStateAgeMs=Math.min(120000,Math.max(1000,maxStateAgeMs));
+  const auditDir=env.RS_OPERATIONS_AUDIT_DIR||process.env.RS_OPERATIONS_AUDIT_DIR;
+  const record=row=>{env.onOperationsAudit?.(row);if(auditDir){mkdirSync(auditDir,{recursive:true});appendFileSync(join(auditDir,row.at.slice(0,10)+'.jsonl'),JSON.stringify(row)+'\n',{flush:true});}};
   const readMarker=()=>db?db.prepare('SELECT value FROM rs_state WHERE key=?').get(MARKER)?.value??null:null;
   const writeMarker=(digest,at)=>{db?.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').run(MARKER,digest,at);};
   return {
     last:()=>last,
+    record,
+    async archiveAudit(day=new Date(clock()).toISOString().slice(0,10)){
+      if(!auditDir)return;
+      const path=join(auditDir,day+'.jsonl');if(!existsSync(path))return;
+      const data=readFileSync(path);if(data.length>32000000)throw new Error('Operations audit exceeded its daily bound');
+      await env.EVIDENCE.put('collector-dashboard/operations-audit/'+day+'.jsonl',data,{httpMetadata:{contentType:'application/x-ndjson'}});
+    },
     idle:()=>tail.catch(()=>{}),
-    publish({text,digest=null,stateAt,generatedAt,urgent=false}){
+    publish({text,digest=null,stateAt,generatedAt,urgent=false,kind=urgent?'refresh':'full_checkpoint'}){
+      const queuedAt=clock();
       const task=tail.catch(()=>{}).then(async()=>{
         const state=clockOf(stateAt),generated=clockOf(generatedAt),seen={state,generated,stateAt,generatedAt};
         if(last&&(state<last.state||(state===last.state&&generated<=last.generated)))return {published:false,reason:'superseded'};
         env.assertCollectorLease?.();
+        const started=clock(),at=new Date(started).toISOString();
+        if(started-state>maxStateAgeMs||state-started>2000||generated-started>2000){
+          const reason=started-state>maxStateAgeMs?'paused_checkpoint_too_old':'future_source_clock';
+          record({event:'publication_refused',at,reason,kind,state_at:stateAt,generated_at:generatedAt,queue_wait_ms:started-queuedAt,max_state_age_seconds:maxStateAgeMs/1000});
+          return {published:false,reason};
+        }
         const hash=digest||operationsDigest(text);
         if(readMarker()===hash){last=seen;return {published:false,reason:'unchanged'};}
-        // `urgent` skips the R2 request pacer: the refresh never takes a slot from
-        // the checkpoint, validation archives or any other queued object request.
-        await env.EVIDENCE.put(OPERATIONS_KEY,encoder.encode(text),{httpMetadata:{contentType:'application/json'},...(urgent?{urgent:true}:{})});
-        writeMarker(hash,generatedAt);last=seen;return {published:true};
+        const id=randomUUID(),receiptKey='collector-dashboard/operations-receipts/'+at.slice(0,10)+'/'+id+'.json';
+        const content=JSON.stringify({...JSON.parse(text),publication:{id,receipt_key:receiptKey,upload_started_at:at}}),reportHash=operationsDigest(content);
+        const receipt={schema:'rs_operations_publication_receipt.v1',publication_id:id,report_sha256:reportHash,report_bytes:Buffer.byteLength(content),state_at:stateAt,generated_at:generatedAt,kind,queued_at:new Date(queuedAt).toISOString(),upload_started_at:at,upload_completed_at:null,accepted:false,max_state_age_seconds:maxStateAgeMs/1000,publish_interval_seconds:operationsRefreshSettings().intervalMs/1000,pipeline_commit:process.env.RS_PIPELINE_COMMIT||null};
+        const budget=Math.max(1,Math.min(15000,maxStateAgeMs-(started-state)));
+        try{
+          await env.EVIDENCE.put(OPERATIONS_KEY,encoder.encode(content),{httpMetadata:{contentType:'application/json'},urgent:true,signal:AbortSignal.timeout(budget)});
+          const completed=clock();receipt.upload_completed_at=new Date(completed).toISOString();
+          receipt.state_age_at_upload_completion_seconds=(completed-state)/1000;
+          receipt.accepted=completed>=started&&completed-state>=-2000&&completed-state<=maxStateAgeMs;
+          receipt.outcome=receipt.accepted?'acknowledged':'state_too_old_at_ack';
+        }catch(error){
+          receipt.outcome='upload_outcome_unknown';receipt.error_type=error.name;
+          record({event:'publication_upload',at:new Date(clock()).toISOString(),...receipt});
+          throw error;
+        }
+        record({event:'publication_upload',at:receipt.upload_completed_at,...receipt});
+        // The ACK clock cannot be in the bytes whose upload it timestamps.
+        // The immutable receipt binds it to those bytes by id AND SHA-256.
+        try{
+          await env.EVIDENCE.put(receiptKey,encoder.encode(JSON.stringify(receipt)),{httpMetadata:{contentType:'application/json'},urgent:true,signal:AbortSignal.timeout(10000)});
+        }catch(error){record({event:'receipt_archive_failed',at:new Date(clock()).toISOString(),publication_id:id,report_sha256:reportHash,error_type:error.name});throw error;}
+        last={...seen,uploadCompletedAt:receipt.upload_completed_at,receiptKey,reportHash};
+        if(!receipt.accepted)return {published:false,reason:'state_too_old_at_ack',receipt};
+        writeMarker(hash,generatedAt);return {published:true,receipt};
       });
       tail=task;return task;
     },
@@ -95,7 +132,8 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
     }).finally(()=>{if(!waiting.size&&worker===current)current.unref();});
   }
   const count=reason=>{health.skipped[reason]=(health.skipped[reason]||0)+1;};
-  const skip=reason=>{count(reason);health.status=reason;return {published:false,reason};};
+  let lastSkip='';
+  const skip=reason=>{count(reason);health.status=reason;const key=reason+':'+checkpoint.durable()?.generation;if(key!==lastSkip){lastSkip=key;channel.record?.({event:'refresh_refused',at:new Date(clock()).toISOString(),reason,state_at:checkpoint.durable()?.at||null,max_state_age_seconds:maxStateAgeMs/1000});}return {published:false,reason};};
   async function refreshOnce(){
     const durable=checkpoint.durable();if(!durable)return skip('waiting_for_checkpoint');
     const nowMs=clock(),now=new Date(nowMs).toISOString();
@@ -110,7 +148,7 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
     const evaluated=await call({type:'evaluate',generation:durable.generation,now,stateAt:durable.at});
     if(clock()-Date.parse(durable.at)>maxStateAgeMs)return skip('paused_checkpoint_too_old');
     const result=await channel.publish({text:evaluated.text,digest:evaluated.digest,stateAt:durable.at,generatedAt:now,urgent:true});
-    health.refreshes++;if(result.published){health.published++;health.last_published_at=new Date(clock()).toISOString();}else count(result.reason);
+    health.refreshes++;if(result.published){health.published++;health.last_published_at=result.receipt?.upload_completed_at||new Date(clock()).toISOString();}else count(result.reason);
     Object.assign(health,{status:'refreshing',last_generated_at:now,last_state_at:durable.at,last_error:null});return result;
   }
   return {

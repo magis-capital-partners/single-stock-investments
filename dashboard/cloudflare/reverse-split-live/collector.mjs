@@ -52,7 +52,7 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
   const prefix=`/r2/buckets/${encodeURIComponent(bucket)}/objects/`;
   const EVIDENCE={
     // `urgent` (operations refresh only) skips the shared R2 pacer; it still retries 429/5xx.
-    async put(key,bytes,options={}){await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':safeContentType(options.httpMetadata?.contentType)},body:bytes,urgent:options.urgent===true});},
+    async put(key,bytes,options={}){const response=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':safeContentType(options.httpMetadata?.contentType)},body:bytes,urgent:options.urgent===true,signal:options.signal});await response.arrayBuffer();},
     async delete(key){await environment?.assertCollectorLease?.();await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'DELETE'},true);},
     async get(key,{signal,urgent=false}={}){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal,urgent},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
   };

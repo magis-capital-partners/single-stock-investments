@@ -20,6 +20,15 @@ const q=(extra={})=>({ticker:'QA',cik:'123',security_id:'qa-security',type:'CS',
 const borrow=(extra={})=>({id:'borrow-qa',ticker:'QA',broker:'IBKR',kind:'indicative',status:'quoted',as_of:now,observed_at:now,apr:1.2,available_shares:100000,...extra});
 const evidence=()=>['locate','margin','ssr','trading_status'].map(kind=>({id:'e-'+kind,kind,event_id:'qa-execution-only',broker:'IBKR',scope:'reverse_split',observed_at:now,valid_until:'2026-11-05T21:00:00Z',approved:true,shares:100000,apr:1.2,available_notional:1000000,restricted:false,halted:false,allocation_id:kind+'-qa',account_scope:'qa-account',cik:'123',ticker:'QA',source_sha256:'a'.repeat(64),source_url:'https://example.test/ibkr',reference:'qa-only'}));
 const get=(db,id=p.id)=>JSON.parse(db.prepare('SELECT payload FROM rs_execution_tracks WHERE policy_id=?').get(id).payload);
+
+test('removing Flex credentials withdraws current fee availability without any report request',async t=>{
+ const {env,db}=setup(t);
+ db.prepare('INSERT INTO rs_state VALUES(?,?,?)').run('flex_borrow_health',JSON.stringify({status:'available',matching_charged_rows:175}),now);
+ await pollFlexBorrow(env,{now,token:null,query:null,fetcher:()=>assert.fail('disabled Flex must make no network request')});
+ const health=JSON.parse(db.prepare("SELECT value FROM rs_state WHERE key='flex_borrow_health'").get().value);
+ assert.equal(health.status,'not_configured');assert.equal(health.public_borrow_only,true);
+ assert.equal(health.actual_charged_fees_current,false);
+});
 test('one-time registration headroom is tied to its immutable UTC day; later days return to 40k',()=>{assert.equal(researchWriteBudget('2026-11-05','2026-11-05'),70000);assert.equal(researchWriteBudget('2026-11-06','2026-11-05'),40000);assert.equal(researchWriteBudget('2026-11-05',undefined),40000);});
 test('unchanged summaries retain their observation clock and a changed result publishes immediately',async t=>{const {env}=setup(t);assert.equal(await putSummaryIfChanged(env,'qa-summary',{generated_at:now,result:1},now),true);assert.equal(await putSummaryIfChanged(env,'qa-summary',{generated_at:'2026-11-05T16:00:00Z',result:1},'2026-11-05T16:00:00Z'),false);assert.equal(JSON.parse((await env.DB.prepare("SELECT value FROM rs_state WHERE key='qa-summary'").first()).value).generated_at,now);assert.equal(await putSummaryIfChanged(env,'qa-summary',{generated_at:'2026-11-05T16:00:00Z',result:2},'2026-11-05T16:00:00Z'),true);});
 test('actual rate reconciliation needs exact conid and unambiguous account, and cannot change entry-known cutoffs',()=>{
