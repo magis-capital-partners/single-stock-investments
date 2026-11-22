@@ -128,8 +128,10 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
         if size > MAX_FILE_BYTES:
             raise ValueError(f"Published data asset exceeds the hosting size limit: {path.relative_to(data)}")
         largest = max(largest, size)
+    file_count=sum(p.is_file() for p in site.rglob('*'))
+    if file_count>20000:raise ValueError(f'Complete publication has {file_count} files; hosting limit is 20,000')
     return {"stocks": len(pilots), "tickers": sorted(pilots), "explorer": explorer, "changed_publication_files": changed,
-            "largest_data_asset_bytes": largest, "source_links": dict(links.counts)}
+            "largest_data_asset_bytes": largest,'file_count':file_count, "source_links": dict(links.counts)}
 
 
 if __name__ == "__main__":

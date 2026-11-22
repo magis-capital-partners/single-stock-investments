@@ -198,6 +198,18 @@ def stage_explorer(root: Path, data: Path, expected: set[str],links=None):
     target = data / "research-explorer"
     target.mkdir(parents=True, exist_ok=True)
     rows, largest, with_history = [], 0, 0
+    pending,locations,bundles={}, {}, []
+    pending_bytes=0
+    def flush():
+        nonlocal pending,pending_bytes,largest
+        if not pending:return
+        name=f'bundle-{len(bundles):03d}.json'
+        raw=json.dumps({'schema_version':SCHEMA,'companies':pending},ensure_ascii=False,separators=(',',':'))+'\n'
+        size=len(raw.encode())
+        if size>MAX_PART:raise ValueError('Research fallback bundle exceeds 8 MiB')
+        _atomic_write_text(target/name,raw);largest=max(largest,size)
+        locations.update({ticker:name for ticker in pending});bundles.append(name)
+        pending={};pending_bytes=0
     for ticker in sorted(expected):
         company = companies.get(ticker) or empty_company(ticker, document.get("as_of"))
         expanded = expand_company(company)
@@ -214,16 +226,24 @@ def stage_explorer(root: Path, data: Path, expected: set[str],links=None):
             compact={**compact,'sources':links.repair_tree(compact['sources'])}
         raw = json.dumps(compact, ensure_ascii=False, separators=(",", ":")) + "\n"
         size = len(raw.encode())
-        if size > 20 * 1024 * 1024:
+        if size > MAX_PART-256:
             raise ValueError(f"Explorer asset too large: {ticker}")
-        _atomic_write_text(path, raw)
+        item_bytes=size+len(json.dumps(ticker).encode())+2
+        if pending_bytes+item_bytes>MAX_PART-256:flush()
+        pending[ticker]=compact;pending_bytes+=item_bytes
+        # Remove only this generated, obsolete per-company publication copy.
+        if path.is_file():path.unlink()
         rows.append(summary(expanded))
-        largest = max(largest, size)
         with_history += any(s.get("monthly") for s in company.get("series", []))
+    flush()
+    for path in target.glob('bundle-*.json'):
+        if re.fullmatch(r'bundle-\d+\.json',path.name) and path.name not in bundles:path.unlink()
+    fallback={'schema_version':'stock-research-fallback.v1','as_of':document.get('as_of'),'company_bundles':locations}
+    _atomic_write_text(target/'manifest.json',json.dumps(fallback,separators=(',',':'))+'\n')
     index = {"schema_version": "stock-research-index.v1", "as_of": document.get("as_of"), "companies": rows}
     raw = json.dumps(index, ensure_ascii=False, separators=(",", ":")) + "\n"
     if len(raw.encode()) > 20 * 1024 * 1024:
         raise ValueError("Research screener index exceeds hosting budget")
     _atomic_write_text(target / "index.json", raw)
     return {"stocks": len(rows), "historical_valuation_stocks": with_history, "largest_asset_bytes": largest,
-            "index_bytes": len(raw.encode())}
+            "index_bytes": len(raw.encode()),'fallback_bundles':len(bundles)}

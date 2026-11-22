@@ -272,3 +272,19 @@ def test_refresh_inputs_restore_directly_without_a_legacy_vault(tmp_path):
     store=SimpleNamespace(snapshot=lambda:('commit',{}),restore=lambda key,**_:objects[key])
     assert {p:read_explorer_json(tmp_path,p,store) for p in payloads}==payloads
     assert not (tmp_path/'research-vault').exists() and not (tmp_path/'_external').exists()
+
+
+def test_publication_fallback_bundles_cover_every_stock_within_the_file_budget(tmp_path,monkeypatch):
+    import stock_research_explorer as explorer
+    monkeypatch.setattr(explorer,'MAX_PART',1200)
+    companies={ticker:{'schema_version':SCHEMA,'ticker':ticker,'as_of':'2026-03-04','series':[{'id':'revenue','label':'Revenue','unit':'USD','statement':'income','annual':[{'period':'2025-12-31','value':100,'source':{'url':'https://issuer.example/'+ticker,'filed':'2026-02-01'}}]}]} for ticker in ('A','B','C','D','E')}
+    explorer.set_explorer_inputs(tmp_path,{'schema_version':SCHEMA,'as_of':'2026-03-04','companies':companies})
+    data=tmp_path/'data';target=data/'research-explorer';target.mkdir(parents=True)
+    (target/'A.json').write_text(json.dumps(companies['A']))
+    report=explorer.stage_explorer(tmp_path,data,set(companies))
+    manifest=json.loads((target/'manifest.json').read_text())
+    assert report['stocks']==5 and report['fallback_bundles']>=2
+    assert set(manifest['company_bundles'])==set(companies) and not (target/'A.json').exists()
+    for ticker,name in manifest['company_bundles'].items():
+        path=target/name;assert path.stat().st_size<=1200
+        assert explorer.expand_company(json.loads(path.read_text())['companies'][ticker])==companies[ticker]

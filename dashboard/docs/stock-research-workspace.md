@@ -93,6 +93,9 @@ Raw captures and full snapshots stay outside Git. The initial fallback uses
 private artifact receipts, parts no larger than 8 MiB, startup core below
 6,000,000 bytes, and hosted JSON assets no larger than 20 MiB. Citations are
 deduplicated losslessly. Publication loads one private part at a time.
+The static fallback packs companies into bundles no larger than 8 MiB and loads
+only the selected bundle; live requests still load one company. This keeps the
+complete site within the 20,000-file hosting limit.
 
 `Stock financial charts refresh` runs after the US close using public/licensed
 HTTPS inputs. It preserves per-company source caches, publishes immutable R2

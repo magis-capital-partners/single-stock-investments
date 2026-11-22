@@ -82,6 +82,12 @@ test('reverse valuation recovers the actual model driver for every supported com
   assert.ok(Math.abs(r.value-c[r.key])<1e-8,method+' did not recover '+r.key);
  }
 });
+test('a failed live request falls back to the correct bounded company bundle',async()=>{
+ const original=global.fetch,requests=[],doc={schema_version:'stock-research-explorer.v1',ticker:'PACKED',series:[]};
+ const assets={'data/research-explorer/manifest.json':{schema_version:'stock-research-fallback.v1',company_bundles:{PACKED:'bundle-000.json'}},'data/research-explorer/bundle-000.json':{schema_version:'stock-research-explorer.v1',companies:{PACKED:doc}}};
+ global.fetch=async url=>{requests.push(String(url));return {ok:Object.hasOwn(assets,url),json:async()=>assets[url]};};
+ try{assert.equal((await UI.company('PACKED')).ticker,'PACKED');assert.equal(requests.length,3);assert.ok(requests.includes('data/research-explorer/bundle-000.json'));assert.ok(!requests.includes('data/research-explorer/PACKED.json'));}finally{global.fetch=original;}
+});
 test('research retrieval keeps EchoStar evidence and excludes Strive from the SATS archive',async()=>{
  const original=global.fetch;
  const row=(id,cik,date)=>({id,title:'Capital allocation discussion',date,relationship:'direct',is_latest:true,category:'letters',passages:[{text:'Capital allocation and investment returns need careful review.',locator:'Fund letter paragraph'}],source_refs:[{url:'https://www.sec.gov/Archives/edgar/data/'+cik+'/filing'}],locations:[{url:'https://fund.example/'+id}]});
