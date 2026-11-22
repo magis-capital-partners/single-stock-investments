@@ -2611,9 +2611,14 @@ function applyRouteFromHash() {
 }
 
 function applyParsedRouteFromHash() {
-  if (!data) return false;
   const route = parseRouteFromHash();
   if (!route) return false;
+  if (!data) {
+    if (route.view !== 'reverse-split-strategy' || route.reverseSplitStrategySection !== 'execution') return false;
+    reverseSplitStrategySection = 'execution';
+    setView(route.view, { syncHash: false });
+    return true;
+  }
   if (['biotech-quant'].includes(route.view)) {
     researchStrategyRoutes[route.view] = StrategyWorkbench.route(route.view, route.strategySection, Object.fromEntries(new URLSearchParams(route.query || '')));
     if (route.canonical) setAppHash(researchStrategyRoutes[route.view]);
@@ -6719,10 +6724,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-window.addEventListener('hashchange', () => {
-  if (data) applyRouteFromHash();
-});
+window.addEventListener('hashchange', applyRouteFromHash);
 
+if (parseRouteFromHash()?.reverseSplitStrategySection === 'execution') applyRouteFromHash();
 load().catch(err => {
   const msg = err && err.message ? err.message : String(err);
   document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/core.json<br><br>${escapeHtml(msg)}</div>`;
