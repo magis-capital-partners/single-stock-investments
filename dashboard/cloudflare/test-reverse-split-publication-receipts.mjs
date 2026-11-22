@@ -7,6 +7,16 @@ const T=Date.parse('2026-11-23T14:30:00.000Z');
 const iso=ms=>new Date(ms).toISOString();
 const text=(state=T,generated=T)=>JSON.stringify({schema:'reverse_split_operations.v1',state_at:iso(state),generated_at:iso(generated),candidates:[]});
 
+test('an upload acknowledged after the age deadline is recorded but cannot be accepted',async()=>{
+ let now=T+74000;const objects=new Map(),audit=[];
+ const env={RS_OPERATIONS_MAX_STATE_AGE_SECONDS:'75',onOperationsAudit:r=>audit.push(r),EVIDENCE:{put:async(key,bytes)=>{objects.set(key,Buffer.from(bytes));if(key===OPERATIONS_KEY)now+=2000;}}};
+ const channel=operationsChannel(env,{clock:()=>now});
+ const result=await channel.publish({text:text(T,T+73000),stateAt:iso(T),generatedAt:iso(T+73000)});
+ assert.equal(result.published,false);assert.equal(result.reason,'state_too_old_at_ack');
+ assert.equal(result.receipt.upload_completed_at,iso(T+76000));
+ assert.equal(result.receipt.accepted,false);assert.equal(audit[0].outcome,'state_too_old_at_ack');
+});
+
 test('full-checkpoint publication refuses state beyond the same configured 75s guard',async()=>{
  const writes=[];let now=T+76000;
  const env={RS_OPERATIONS_MAX_STATE_AGE_SECONDS:'75',EVIDENCE:{put:async(key,bytes)=>writes.push({key,bytes})}};

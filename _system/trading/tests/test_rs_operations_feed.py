@@ -152,6 +152,25 @@ def test_duplicate_download_does_not_retime_the_first_receipt(tmp_path):
     assert feed.read_local(tmp_path/'operations.json')[1]['received_at']=='2026-11-23T14:30:01Z'
 
 
+@pytest.mark.parametrize('change',[{'accepted':False},{'report_sha256':'0'*64},
+                                  {'max_state_age_seconds':180},{'state_at':'2026-11-23T14:20:00Z'}])
+def test_invalid_publisher_receipt_never_replaces_a_good_local_generation(tmp_path,change):
+    import hashlib
+    identifier='11111111-1111-4111-8111-111111111111'
+    key='collector-dashboard/operations-receipts/2026-11-23/'+identifier+'.json'
+    payload=json.dumps({'generated_at':'2026-11-23T14:30:00Z','state_at':'2026-11-23T14:29:30Z',
+                        'publication':{'id':identifier,'receipt_key':key},'candidates':[]}).encode()
+    proof={'schema':'rs_operations_publication_receipt.v1','publication_id':identifier,
+           'report_sha256':hashlib.sha256(payload).hexdigest(),'accepted':True,
+           'state_at':'2026-11-23T14:29:30Z','generated_at':'2026-11-23T14:30:00Z',
+           'upload_started_at':'2026-11-23T14:30:01Z','upload_completed_at':'2026-11-23T14:30:02Z',
+           'max_state_age_seconds':75,**change}
+    source=feed.R2Object(ENDPOINT,'id','secret',opener=Opener(body('2026-11-23T14:29:20Z'),payload,json.dumps(proof).encode()))
+    fetch_at(source,tmp_path,'2026-11-23T14:29:21Z')
+    with pytest.raises(SafetyError):fetch_at(source,tmp_path,'2026-11-23T14:30:03Z')
+    assert feed.read_local(tmp_path/'operations.json')[0]['generated_at']=='2026-11-23T14:29:20Z'
+
+
 def body(generated_at, candidates=2):
     return json.dumps({"generated_at": generated_at,
                        "candidates": [{} for _ in range(candidates)]}).encode()

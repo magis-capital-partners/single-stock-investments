@@ -195,8 +195,9 @@ def publication_receipt(source,data,body,now):
         if getattr(source,'require_receipt',False):
             raise SafetyError('publication receipt required; legacy clock-only report refused')
         return None
-    key=publication.get('receipt_key');match=RECEIPT_KEY.fullmatch(key or '')
-    if not match or match[1]!=publication.get('id'):
+    key=publication.get('receipt_key')
+    identity_match=RECEIPT_KEY.fullmatch(key or '')
+    if not identity_match or identity_match[1]!=publication.get('id'):
         raise SafetyError('publication receipt identity invalid')
     proof=json.loads(source.get_receipt(key,now))
     if (proof.get('schema')!='rs_operations_publication_receipt.v1'
