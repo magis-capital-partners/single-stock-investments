@@ -106,11 +106,11 @@ Documents in folder: **74** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-03-03 | `investor-documents/sec-edgar/8-K_20260303_rpt20260303_acc0001535527_26_000007
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CRWD/research/deep_dive_2026-10-12.md (sha256 sha256:15dda9e82cb34f7f...)
+- deep_dive: CRWD/research/deep_dive_2026-10-12.md (sha256 sha256:11037ef3c07e9c2d...)
 - filing_digest: CRWD/research/evidence/filing_digest.md (sha256 sha256:5375acc530ccb181...)
 - adversarial: CRWD/research/adversarial_2026-10-12.md (sha256 sha256:0cbaeaf5701628ed...)
-- valuation: CRWD/research/valuation.json (sha256 sha256:28da90fefb798ac9...)
-- thesis_card: CRWD/research/thesis_card.json (sha256 sha256:4c27d73cae57d4b8...)
+- valuation: CRWD/research/valuation.json (sha256 sha256:7a26a5f711dd0968...)
+- thesis_card: CRWD/research/thesis_card.json (sha256 sha256:4daec46f634af94d...)
 - cross_check: CRWD/research/cross_check_third_party_2026-10-12.md (sha256 sha256:bef5ef8e4f391dc4...)
 
 ## Excluded from this pack
