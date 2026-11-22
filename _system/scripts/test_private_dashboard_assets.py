@@ -274,6 +274,25 @@ def test_repository_jsonl_and_source_linked_research_restore_exactly(workspace):
     assert all(p.read_bytes() == content for p, content in original.items())
 
 
+def test_financial_explorer_partitions_remain_lazy_private_inputs(workspace):
+    root,source,vault=workspace
+    normal=root/'_system/data/normal.json'
+    write(normal,{'source_file':'_system/reference/superinvestor-letters/report.txt','text':'private evidence'})
+    original=normal.read_bytes()
+    migration.migrate(root,paths=[normal.relative_to(root).as_posix()])
+    manifest=assets.overlay_manifest(source)
+    lazy=['_system/reference/stock-research/explorer/part-000.json','_system/reference/stock-research/share-basis.json']
+    for relative in lazy:
+        write(root/relative,{'private_snapshot':True})
+        manifest['repository_assets'][relative]={'private_sha256':'a'*64,'public_sha256':assets.digest(root/relative)}
+    write(source/'private-assets.json',manifest)
+    before={p.relative_to(vault).as_posix():p.read_bytes() for p in vault.rglob('*') if p.is_file()}
+    assert assets.hydrate_repository(root)==1
+    assert normal.read_bytes()==original
+    assert all(json.loads((root/p).read_text())=={'private_snapshot':True} for p in lazy)
+    assert {p.relative_to(vault).as_posix():p.read_bytes() for p in vault.rglob('*') if p.is_file()}==before
+
+
 def test_git_line_ending_conversion_cannot_change_snapshot_checksums(workspace):
     root, source, vault = workspace
     path = source / "data/letter.json"
