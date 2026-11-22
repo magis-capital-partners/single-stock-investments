@@ -21,11 +21,11 @@ _INPUTS = {}
 _PRIVATE_READERS={}
 
 
-def read_explorer_json(root,relative):
+def read_explorer_json(root,relative,storage=None):
     """Read through R2 or an already hydrated copy; never stage in vault Git."""
-    if not re.fullmatch(r'_system/reference/stock-research/(?:explorer/part-\d+|share-basis)\.json',relative):raise ValueError('Unsafe explorer source')
+    if relative not in {'dashboard/data/core.json','_system/reference/stock-research/valuation-inputs.json'} and not re.fullmatch(r'_system/reference/stock-research/(?:explorer/part-\d+|share-basis)\.json',relative):raise ValueError('Unsafe explorer source')
     publication=json.loads((root/'dashboard/private-assets.json').read_text(encoding='utf-8'))
-    receipt=publication.get('repository_assets',{}).get(relative)
+    receipt=publication.get('assets' if relative.startswith('dashboard/') else 'repository_assets',{}).get(relative.removeprefix('dashboard/'))
     if not receipt or not re.fullmatch(r'[a-f0-9]{64}',receipt.get('private_sha256','')):raise ValueError('Missing private explorer receipt')
     path=root/relative
     if path.is_file():
@@ -33,7 +33,7 @@ def read_explorer_json(root,relative):
         if hashlib.sha256(raw).hexdigest()==receipt['private_sha256']:return json.loads(raw)
     if root.resolve() not in _PRIVATE_READERS:
         from private_storage import PrivateStorage
-        store=PrivateStorage(root=root);_,records=store.snapshot();_PRIVATE_READERS[root.resolve()]=(store,records)
+        store=storage or PrivateStorage(root=root);_,records=store.snapshot();_PRIVATE_READERS[root.resolve()]=(store,records)
     store,records=_PRIVATE_READERS[root.resolve()]
     key='dashboard-private/objects/'+receipt['private_sha256']
     from private_dashboard_assets import decode_object_bytes

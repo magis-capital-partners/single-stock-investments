@@ -256,3 +256,19 @@ def test_bounded_parallel_release_preserves_transport_and_all_verified_company_o
     assert set(pointer['companies'])==set(doc['companies'])
     for ticker,record in pointer['companies'].items():assert json.loads(store.restore('live/'+ticker,records={'live/'+ticker:record}))['ticker']==ticker
     assert publish_live(tmp_path,doc,store,workers=3)['changed']==0
+
+
+def test_refresh_inputs_restore_directly_without_a_legacy_vault(tmp_path):
+    import hashlib
+    from types import SimpleNamespace
+    from stock_research_explorer import read_explorer_json
+    payloads={'dashboard/data/core.json':{'tickers':[{'ticker':'TEST'}]},'_system/reference/stock-research/valuation-inputs.json':{'companies':{'TEST':{'method':'earnings'}}}}
+    objects={};manifest={'assets':{},'repository_assets':{}}
+    for relative,value in payloads.items():
+        raw=json.dumps(value).encode();digest=hashlib.sha256(raw).hexdigest();objects['dashboard-private/objects/'+digest]=raw
+        manifest['assets' if relative.startswith('dashboard/') else 'repository_assets'][relative.removeprefix('dashboard/') ]={'private_sha256':digest}
+        path=tmp_path/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('{"private_snapshot":true}')
+    (tmp_path/'dashboard/private-assets.json').write_text(json.dumps(manifest))
+    store=SimpleNamespace(snapshot=lambda:('commit',{}),restore=lambda key,**_:objects[key])
+    assert {p:read_explorer_json(tmp_path,p,store) for p in payloads}==payloads
+    assert not (tmp_path/'research-vault').exists() and not (tmp_path/'_external').exists()

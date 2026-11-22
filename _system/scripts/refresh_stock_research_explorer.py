@@ -14,11 +14,10 @@ from urllib.parse import quote
 from atomic_io import _atomic_write_text
 from build_stock_research_explorer import build_company
 from build_stock_research_history import fetch_performance
-from private_dashboard_assets import read_resolved_json
 from private_storage import PrivateStorage
 from publish_stock_research_explorer import publish_live, isolated_storage_client
 from sec_client import SecClient
-from stock_research_explorer import SCHEMA, compact_company, expand_company, LocalCompanies
+from stock_research_explorer import SCHEMA, compact_company, expand_company, LocalCompanies, read_explorer_json
 from stock_valuation_aliases import research_aliases
 
 
@@ -28,8 +27,8 @@ def refresh(root,cache,*,only=None,publish=False,as_of=None):
     pointer_raw=objects.http.request('GET',objects.base+'research-explorer/v1/current.json',limit=1024*1024)
     if not pointer_raw:raise ValueError('Publish the initial verified explorer release before refreshing')
     pointer=json.loads(pointer_raw)
-    models=read_resolved_json(root,'_system/reference/stock-research/valuation-inputs.json')[0]['companies']
-    core=read_resolved_json(root,'dashboard/data/core.json')[0]
+    models=read_explorer_json(root,'_system/reference/stock-research/valuation-inputs.json',store)['companies']
+    core=read_explorer_json(root,'dashboard/data/core.json',store)
     aliases=research_aliases(root)
     stubs={r['ticker']:r for r in core.get('tickers',[]) if r['ticker'] not in aliases}
     sec=SecClient();registry=sec.get_json('https://www.sec.gov/files/company_tickers.json')
