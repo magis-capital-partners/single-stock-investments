@@ -554,6 +554,17 @@ def build_one_pager(root: Path, ticker: str, row: dict | None = None) -> dict:
     worksheet = model_for_stock(root, ticker, profile, history, row)
     if worksheet.get("financial_override"):
         history = {**history, **worksheet["financial_override"]}
+    from stock_research_explorer import load_explorer_inputs, expand_company
+    explorer = load_explorer_inputs(root).get("companies", {}).get(ticker)
+    if explorer: explorer = expand_company(explorer)
+    if explorer and explorer.get("series"):
+        from stock_research_share_basis import align_series
+        financial_series = [{k:v for k,v in align_series(explorer,s).items() if k not in {"monthly", "annual_as_reported", "quarterly_as_reported"}}
+                            for s in explorer["series"] if s.get("statement") != "valuation"]
+        ends = [p["period"] for s in financial_series for p in s.get("annual", [])]
+        history = {**history, "series": financial_series, "currency": explorer["currency"],
+                   "latest_period": explorer.get("latest_period"), "latest_fiscal_year_end": max(ends, default=None),
+                   "notes": ["Shared reported financial dataset; the editable model retains its dated source anchor.", *history.get("notes", [])]}
     if worksheet.get("profile_override"):
         profile = {**profile, **worksheet["profile_override"]}
     if worksheet.get("performance_override"):

@@ -10,6 +10,7 @@ from stock_one_pagers import build_one_pager, set_publication_inputs, load_unive
 from stock_valuation_models import INPUT_PATH as VALUATION_INPUT_PATH, set_valuation_inputs, valuation_inputs
 from stock_valuation_identity import quarantine_prior_valuation
 from stock_valuation_aliases import consolidate_aliases
+from stock_research_explorer import INPUT_PATH as EXPLORER_INPUT_PATH, load_explorer_inputs, stage_explorer
 from vault_paths import research_vault_root
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -51,6 +52,8 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
     if (root / VALUATION_INPUT_PATH).is_file():
         from private_dashboard_assets import read_resolved_json
         set_valuation_inputs(root, read_resolved_json(root, VALUATION_INPUT_PATH)[0])
+    if (root / EXPLORER_INPUT_PATH).is_file():
+        load_explorer_inputs(root, resolve_private=True)
     links = SourceLinks(root, vault)
     pilots, changed = [], 0
     data = site / "data"
@@ -60,8 +63,11 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
         for original in json.loads(prior_index.read_text(encoding="utf-8")).get("repairs", {}):
             links.resolve(original)
     curate_reading(data)
+    core_snapshot=json.loads((data/'core.json').read_text(encoding='utf-8')) if (data/'core.json').is_file() else {}
+    expected_explorer={r['ticker'] for r in core_snapshot.get('tickers',[])} or {p.stem for p in (data/'tickers').glob('*.json')}
+    explorer = stage_explorer(root, data, expected_explorer,links)
     for path in sorted(data.rglob("*.json")):
-        if path.name == "source_links.json":
+        if path.name == "source_links.json" or path.is_relative_to(data/'research-explorer'):
             continue
         raw = path.read_text(encoding="utf-8")
         pilot = path.parent == data / "tickers"
@@ -122,7 +128,7 @@ def prepare(root: Path, site: Path, vault: Path | None = None) -> dict:
         if size > MAX_FILE_BYTES:
             raise ValueError(f"Published data asset exceeds the hosting size limit: {path.relative_to(data)}")
         largest = max(largest, size)
-    return {"stocks": len(pilots), "tickers": sorted(pilots), "changed_publication_files": changed,
+    return {"stocks": len(pilots), "tickers": sorted(pilots), "explorer": explorer, "changed_publication_files": changed,
             "largest_data_asset_bytes": largest, "source_links": dict(links.counts)}
 
 

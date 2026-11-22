@@ -72,6 +72,8 @@
       return new global.Chart(canvas,{type:cash?'bar':'line',data:{labels:cash?r.cases.base.flows.map(p=>p.date):labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:fg}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+money(ctx.raw,modelOf(t))}}},scales:{x:{stacked:cash,grid:{display:false},ticks:{color:fg,maxRotation:0,maxTicksLimit:5}},y:{stacked:cash,grid:{color:grid},ticks:{color:fg},title:{display:true,text:modelOf(t).currency+' per share',color:fg}}}}});
     });
   }
-  global.StockValuationView={render,compact,hydrate};
+  function current(t) {const m=modelOf(t),e=local(t);return JSON.parse(JSON.stringify({...m,inputs:{...m.inputs,...e.inputs},cases:Object.fromEntries(global.StockValuation.cases.map(c=>[c,{...m.cases[c],...e.cases?.[c]}]))}));}
+  function apply(t,saved) {const m=modelOf(t);if(!saved||saved.ticker!==t.ticker||saved.method!==m.method)throw new Error('The saved scenario belongs to a different company or model method.');edits.set(t.ticker,{inputs:{...saved.inputs},cases:JSON.parse(JSON.stringify(saved.cases))});}
+  global.StockValuationView={render,compact,hydrate,current,apply};
   if(typeof module!=='undefined')module.exports=global.StockValuationView;
 })(typeof window!=='undefined'?window:globalThis);

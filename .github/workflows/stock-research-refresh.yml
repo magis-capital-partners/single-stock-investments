@@ -1,0 +1,66 @@
+name: Stock financial charts refresh
+on:
+  schedule:
+    - cron: '23 3 * * 2-6'
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: Optional single covered ticker; blank refreshes all stocks
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: stock-research-private-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      PYTHONUTF8: '1'
+      RESEARCH_D1_DATABASE: ${{ vars.CLOUDFLARE_D1_DATABASE || 'single-stock-investments' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts
+            _system/config
+            _system/reference/stock-research
+            dashboard/private-assets.json
+            dashboard/data/core.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing financial calendar dependencies
+        run: python -m pip install --disable-pip-version-check pyyaml exchange-calendars
+      - name: Restore private financial source cache
+        uses: actions/cache@v4
+        with:
+          path: .research-financial-cache
+          key: stock-financial-https-v1-${{ github.run_id }}
+          restore-keys: stock-financial-https-v1-
+      - name: Refresh sourced charts and switch verified private release
+        env:
+          SELECTED_TICKER: ${{ inputs.ticker }}
+        run: |
+          args=()
+          if [ -n "$SELECTED_TICKER" ]; then args+=(--ticker "$SELECTED_TICKER"); fi
+          python _system/scripts/refresh_stock_research_explorer.py \
+            --cache .research-financial-cache --publish "${args[@]}"
+      - name: Report source coverage
+        if: always()
+        run: |
+          if [ -f .research-financial-cache/last-refresh.json ]; then
+            python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path('.research-financial-cache/last-refresh.json').read_text())
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+              f.write(f"Refreshed {r['refreshed']} of {r['stocks']} stocks. Explicit source gaps: {len(r['source_gaps'])}.\n")
+              f.write('Published verified financial shards in private R2 storage. No letter/podcast rebuild, Git source blobs, broker connections or market-data terminals.\n')
+          PY
