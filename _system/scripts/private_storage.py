@@ -161,8 +161,9 @@ def _session_expired(values, *, margin=WRANGLER_EXPIRY_MARGIN):
 
 
 def _refresh_wrangler_session():
-    # The OAuth token lasts an hour. Wrangler exchanges its stored refresh token
-    # on any authenticated command and rewrites the session file itself.
+    # The OAuth token lasts an hour. The explicit token command exchanges an
+    # expired session and rewrites Wrangler's own session file. `whoami` can
+    # report cached account metadata without refreshing the expired token.
     explicit = os.environ.get("WRANGLER_JS", "").strip()
     scripts = [Path(explicit)] if explicit else []
     scripts.append(ROOT / "dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js")
@@ -173,7 +174,9 @@ def _refresh_wrangler_session():
     if command is None:
         return
     try:
-        subprocess.run([*command, "whoami"], capture_output=True, timeout=120)
+        # This command prints credentials: capture and discard both streams.
+        # Keep the existing grant; never initiate an interactive login here.
+        subprocess.run([*command, "auth", "token", "--json"], capture_output=True, timeout=120)
     except (OSError, subprocess.SubprocessError):
         pass
 

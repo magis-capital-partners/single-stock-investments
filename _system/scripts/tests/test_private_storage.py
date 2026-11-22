@@ -241,13 +241,15 @@ def test_an_expired_wrangler_login_is_refreshed_by_wrangler_itself(mac_home, mon
     monkeypatch.setenv("WRANGLER_JS", str(script))
     calls = []
 
-    def whoami(command, **_):
+    def refresh_token(command, **options):
         calls.append(command)
+        assert options['capture_output'] is True
+        assert options['timeout'] == 120
         wrangler_login(mac_home, "fresh", "2999-01-01T00:00:00.000Z")
 
-    monkeypatch.setattr(store.subprocess, "run", whoami)
+    monkeypatch.setattr(store.subprocess, "run", refresh_token)
     assert store.cloudflare_token() == "fresh"
-    assert calls == [["node", str(script), "whoami"]]
+    assert calls == [["node", str(script), "auth", "token", "--json"]]
     assert "fresh" in session.read_text()
 
 
