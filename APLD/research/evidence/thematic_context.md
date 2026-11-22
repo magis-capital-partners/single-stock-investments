@@ -1,13 +1,13 @@
-# APLD - Thematic context (2026-11-21)
+# APLD - Thematic context (2026-11-22)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-21 | n/a | flat | no (context) |
-| Natural gas (USD/MMBtu; spot or futures fallback) | 3.4110000133514404 | 2026-11-20 | -23.8% | down | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-22 | n/a | flat | no (context) |
+| Natural gas (USD/MMBtu; spot or futures fallback) | 3.747999906539917 | 2026-11-20 | -16.2% | down | no (context) |
 | US urban residential electricity price (USD/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
-| WTI crude (USD/bbl) | 83.9800033569336 | 2026-11-20 | +42.0% | up | no (context) |
+| WTI crude (USD/bbl) | 83.41000366210938 | 2026-11-20 | +41.0% | up | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |
 | TPL water segment revenue (USD m, FY) | 307.5 | 2026-06-01 | n/a | flat | no (context) |
 | US Treasury 10Y yield (%) | 4.9120001792907715 | 2026-11-20 | +19.6% | up | no (context) |
@@ -22,9 +22,9 @@
 | SPY 20-day realized vol (annualized %) | 26.99 | 2026-11-20 | +92.9% | up | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
-| Bitcoin spot (USD) | 60271.8515625 | 2026-11-21 | -29.2% | down | no (context) |
-| Natural gas (USD/MMBtu; spot or futures fallback) | 3.4110000133514404 | 2026-11-20 | -23.8% | down | no (context) |
+| Bitcoin spot (USD) | 60620.46875 | 2026-11-22 | -28.4% | down | no (context) |
+| Natural gas (USD/MMBtu; spot or futures fallback) | 3.747999906539917 | 2026-11-20 | -16.2% | down | no (context) |
 | US urban residential electricity price (USD/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-21 | n/a | flat | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-11-22 | n/a | flat | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.

@@ -1,4 +1,4 @@
-# SJT - Thematic context (2026-11-21)
+# SJT - Thematic context (2026-11-22)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
@@ -13,8 +13,8 @@
 | SPY 20-day realized vol (annualized %) | 26.99 | 2026-11-20 | +92.9% | up | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
-| WTI crude (USD/bbl) | 83.9800033569336 | 2026-11-20 | +42.0% | up | no (context) |
-| Natural gas (USD/MMBtu; spot or futures fallback) | 3.4110000133514404 | 2026-11-20 | -23.8% | down | no (context) |
+| WTI crude (USD/bbl) | 83.41000366210938 | 2026-11-20 | +41.0% | up | no (context) |
+| Natural gas (USD/MMBtu; spot or futures fallback) | 3.747999906539917 | 2026-11-20 | -16.2% | down | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.
