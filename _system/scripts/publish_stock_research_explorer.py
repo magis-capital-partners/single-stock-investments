@@ -9,35 +9,57 @@ import argparse
 import hashlib
 import json
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from atomic_io import _atomic_write_text
-from private_storage import PrivateStorage, store_bytes
+from private_storage import PrivateStorage, R2Objects, store_bytes
 from private_dashboard_assets import decode_object_bytes
 from stock_research_explorer import SCHEMA, compact_company, expand_company,LocalCompanies
 from build_stock_research_explorer import summary
 
 
-def publish_live(root, document, store=None):
+def isolated_storage_client(store):
+    objects=R2Objects(store.config,http=store.objects.http)
+    objects.base=store.objects.base # Preserve REST or existing S3 transport.
+    return PrivateStorage(config=store.config,objects=objects,catalog=store.catalog)
+
+
+def publish_live(root, document, store=None, *, workers=None):
+    workers=workers if workers is not None else (1 if store is not None else 3)
+    if not isinstance(workers,int) or not 1<=workers<=3:raise ValueError('Research uploads allow one to three workers')
     store=store or PrivateStorage(root=root);objects=store.objects
     pointer_key='research-explorer/v1/current.json'
     prior_raw=objects.http.request('GET',objects.base+pointer_key,limit=1024*1024)
     prior=json.loads(prior_raw) if prior_raw else {}
     if prior.get('as_of','')>document['as_of']:raise ValueError('Refusing to replace a newer research release')
-    companies={};rows=[];changed=0
-    for i,ticker in enumerate(sorted(document['companies']),1):
-        company=document['companies'][ticker]
-        compact=compact_company(company);raw=(json.dumps(compact,ensure_ascii=False,separators=(',',':'))+'\n').encode()
-        if len(raw)>20*1024*1024:raise ValueError('Company research exceeds hosting budget')
+    companies={};rows=[];changed=0;local=threading.local()
+    def upload(ticker,raw):
         old=prior.get('companies',{}).get(ticker)
-        if old and old.get('sha256')==hashlib.sha256(raw).hexdigest():record=old
-        else:
-            record=store_bytes(objects,raw)
-            # R2Objects.put verifies the stored object round trip; restore also
-            # verifies its decompressed size and raw content identity.
-            if store.restore('live/'+ticker,records={'live/'+ticker:record})!=raw:raise ValueError('Research upload did not round-trip')
-            changed+=1
-        companies[ticker]=record;rows.append(summary({**expand_company(compact),'as_of':document['as_of']}))
-        if i%50==0:print(json.dumps({'verified_live_companies':i,'changed':changed}),flush=True)
+        if old and old.get('sha256')==hashlib.sha256(raw).hexdigest():return old,False
+        if not hasattr(local,'store'):
+            # Separate bounded object caches, one shared HTTP rate limiter.
+            local.store=store if workers==1 else isolated_storage_client(store)
+        client=local.store
+        record=store_bytes(client.objects,raw)
+        # R2Objects.put verifies the stored object round trip; restore also
+        # verifies its decompressed size and raw content identity.
+        if client.restore('live/'+ticker,records={'live/'+ticker:record})!=raw:raise ValueError('Research upload did not round-trip')
+        return record,True
+    def finish(ticker,future):
+        nonlocal changed
+        record,did_change=future.result();companies[ticker]=record;changed+=did_change
+        if len(companies)%50==0:print(json.dumps({'verified_live_companies':len(companies),'changed':changed}),flush=True)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        pending=[]
+        for ticker in sorted(document['companies']):
+            company=document['companies'][ticker]
+            compact=compact_company(company);raw=(json.dumps(compact,ensure_ascii=False,separators=(',',':'))+'\n').encode()
+            if len(raw)>20*1024*1024:raise ValueError('Company research exceeds hosting budget')
+            pending.append((ticker,pool.submit(upload,ticker,raw)))
+            rows.append(summary({**expand_company(compact),'as_of':document['as_of']}))
+            if len(pending)>=workers:finish(*pending.pop(0))
+        for ticker,future in pending:finish(ticker,future)
     index={'schema_version':'stock-research-index.v1','as_of':document['as_of'],'companies':rows}
     raw=(json.dumps(index,ensure_ascii=False,separators=(',',':'))+'\n').encode();index_record=store_bytes(objects,raw)
     if store.restore('live/index',records={'live/index':index_record})!=raw:raise ValueError('Research index failed read-back')

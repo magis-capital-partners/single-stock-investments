@@ -235,3 +235,24 @@ def test_snapshot_publication_never_stages_source_blobs_in_the_git_vault(tmp_pat
     assert sorted(str(p.relative_to(vault)) for p in vault.rglob('*'))==['manifest.json']
     assert json.loads((root/relative).read_text())['private_snapshot'] is True
     assert catalog and (source/'explorer/part-000.json').read_bytes()==body
+
+
+def test_bounded_parallel_release_preserves_transport_and_all_verified_company_objects(tmp_path):
+    from private_storage import PrivateStorage, R2Objects
+    from publish_stock_research_explorer import publish_live
+    bodies={}
+    class HTTP:
+        def request(self,method,path,body=None,**kwargs):
+            assert path.startswith('/bucket/')
+            if method=='GET':return bodies.get(path)
+            bodies[path]=body;return b''
+    config={'account_id':'0'*32,'bucket':'private','object_prefix':'research-archive/v1/objects'}
+    objects=R2Objects(config,http=HTTP());objects.base='/bucket/'
+    store=PrivateStorage(config=config,objects=objects,catalog=object())
+    doc={'as_of':'2026-03-04','companies':{t:{'ticker':t,'schema_version':SCHEMA,'as_of':'2026-03-04','series':[]} for t in ('A','B','C','D')}}
+    result=publish_live(tmp_path,doc,store,workers=3)
+    assert result['stocks']==result['changed']==4
+    pointer=json.loads(bodies['/bucket/research-explorer/v1/current.json'])
+    assert set(pointer['companies'])==set(doc['companies'])
+    for ticker,record in pointer['companies'].items():assert json.loads(store.restore('live/'+ticker,records={'live/'+ticker:record}))['ticker']==ticker
+    assert publish_live(tmp_path,doc,store,workers=3)['changed']==0

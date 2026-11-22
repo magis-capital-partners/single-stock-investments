@@ -2,12 +2,8 @@ name: Stock financial charts refresh
 on:
   schedule:
     - cron: '23 3 * * 2-6'
-  workflow_dispatch:
-    inputs:
-      ticker:
-        description: Optional single covered ticker; blank refreshes all stocks
-        required: false
-        default: ''
+  repository_dispatch:
+    types: [stock-financial-refresh]
 permissions:
   contents: read
 concurrency:
@@ -46,7 +42,7 @@ jobs:
           restore-keys: stock-financial-https-v1-
       - name: Refresh sourced charts and switch verified private release
         env:
-          SELECTED_TICKER: ${{ inputs.ticker }}
+          SELECTED_TICKER: ${{ github.event.client_payload.ticker }}
         run: |
           args=()
           if [ -n "$SELECTED_TICKER" ]; then args+=(--ticker "$SELECTED_TICKER"); fi

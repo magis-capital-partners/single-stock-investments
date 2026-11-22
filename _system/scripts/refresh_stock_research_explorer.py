@@ -8,6 +8,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import threading
 from urllib.parse import quote
 
 from atomic_io import _atomic_write_text
@@ -15,7 +16,7 @@ from build_stock_research_explorer import build_company
 from build_stock_research_history import fetch_performance
 from private_dashboard_assets import read_resolved_json
 from private_storage import PrivateStorage
-from publish_stock_research_explorer import publish_live
+from publish_stock_research_explorer import publish_live, isolated_storage_client
 from sec_client import SecClient
 from stock_research_explorer import SCHEMA, compact_company, expand_company, LocalCompanies
 from stock_valuation_aliases import research_aliases
@@ -39,11 +40,17 @@ def refresh(root,cache,*,only=None,publish=False,as_of=None):
     captures=cache/'prices'/as_of
     # Reuse immutable company objects locally when the release hash agrees.
     company_paths={};failures=[];changed=[]
-    for ticker,record in pointer['companies'].items():
+    readers=threading.local()
+    def restore_cached(item):
+        ticker,record=item
         path=cache/'companies'/(quote(ticker,safe='')+'.json');path.parent.mkdir(exist_ok=True)
         if path.exists() and hashlib.sha256(path.read_bytes()).hexdigest()==record['sha256']:raw=path.read_bytes()
-        else:raw=store.restore('live/'+ticker,records={'live/'+ticker:record});path.write_bytes(raw)
-        company_paths[ticker]=path
+        else:
+            if not hasattr(readers,'store'):readers.store=isolated_storage_client(store)
+            raw=readers.store.restore('live/'+ticker,records={'live/'+ticker:record});path.write_bytes(raw)
+        return ticker,path
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        company_paths.update(pool.map(restore_cached,pointer['companies'].items()))
     companies=LocalCompanies(company_paths)
     def task(ticker):
         row=dict(stubs[ticker]);old=expand_company(companies.get(ticker,{}));model=models.get(ticker) or {'ticker':ticker,'inputs':{},'cases':{},'blockers':['A reviewed valuation input snapshot is required for this new listing.']}
@@ -102,7 +109,7 @@ def refresh(root,cache,*,only=None,publish=False,as_of=None):
     if verified['errors']:raise ValueError('Financial refresh failed source/identity/size audit: '+json.dumps(verified['errors'][:5]))
     report['audit']={k:v for k,v in verified.items() if k!='errors'}
     if publish:
-        report['publication']=publish_live(root,document,store)
+        report['publication']=publish_live(root,document,store,workers=3)
         from stock_research_alerts import evaluate_saved_alerts
         report['monitoring']=evaluate_saved_alerts(root,store)
     _atomic_write_text(cache/'last-refresh.json',json.dumps(report,indent=2)+'\n')
