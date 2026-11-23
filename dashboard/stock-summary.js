@@ -81,6 +81,7 @@
 
   function priceMarkup(price, range) {
     const source=sourceLink(price.source,'Price source');
+    const additionalSources=(price.sources||[]).filter(url=>url!==price.source).map(url=>sourceLink(url,'Additional price source'));
     const listing=sourceLink(price.listing_source,'Listing confirmation');
     const split=sourceLink(price.split?.source,price.split?price.split.factor+'-for-1 split · '+price.split.date:'');
     if (!price.points?.length) return '<div class="stock-price"><h3>Closing price</h3><p>'+esc(price.reason)+'</p>'+source+'</div>';
@@ -96,7 +97,7 @@
       (price.reason?'<p class="stock-price-status" role="status">'+esc(price.reason)+'</p>':'')+
       '<div class="stock-close-chart"><canvas data-close-chart role="img" aria-label="'+
       esc('Closing price in '+price.currency+' from '+first[0]+' to '+last[0])+'"></canvas></div>'+
-      '<p class="stock-summary-note">'+[source,listing,split].filter(Boolean).join(' · ')+' · '+visible.length.toLocaleString()+' sessions in view</p>'+
+      '<p class="stock-summary-note">'+[source,...additionalSources,listing,split].filter(Boolean).join(' · ')+' · '+visible.length.toLocaleString()+' sessions in view</p>'+
       '<details><summary>Closing price data</summary><div class="stock-close-data"><table><thead><tr><th scope="col">Date</th><th scope="col">Close</th></tr></thead>'+
       '<tbody>'+[...visible].reverse().slice(0,20).map(([day,close])=>'<tr><td>'+esc(day)+'</td><td>'+esc(formatPrice(close,price.currency))+'</td></tr>').join('')+
       '</tbody></table></div><button type="button" data-close-download>Download selected daily closes</button></details></div>';
