@@ -51,6 +51,21 @@ class Journal:
             conid INTEGER,shares INTEGER,entry_price REAL,entry_at TEXT,exit_at TEXT,payload TEXT);
           CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY,at TEXT,kind TEXT,payload TEXT);
         """)
+        if "commission_source" not in {r["name"] for r in self.db.execute("PRAGMA table_info(fills)")}:
+            self.db.execute("ALTER TABLE fills ADD COLUMN commission_source TEXT NOT NULL DEFAULT 'unknown'")
+        if prefix == PREFIX:
+            self.db.executescript("""
+              CREATE TABLE IF NOT EXISTS execution_order_states (
+                id INTEGER PRIMARY KEY, at TEXT NOT NULL, ref TEXT NOT NULL,
+                state TEXT NOT NULL, filled INTEGER NOT NULL
+              );
+              CREATE TRIGGER IF NOT EXISTS execution_order_state AFTER UPDATE ON orders
+              WHEN new.state != old.state OR new.filled != old.filled
+              BEGIN
+                INSERT INTO execution_order_states(at,ref,state,filled)
+                VALUES(strftime('%Y-%m-%dT%H:%M:%fZ','now'),new.ref,new.state,new.filled);
+              END;
+            """)
         old = self.get("policy_hash")
         if old and old != policy_hash:
             self.close()
@@ -120,6 +135,11 @@ class Journal:
                     json.dumps(payload),
                 ),
             )
+            if self.prefix == PREFIX:
+                self.db.execute(
+                    "INSERT INTO execution_order_states(at,ref,state,filled) VALUES(?,?,'submitting',0)",
+                    (at, ref),
+                )
         return ref
 
     def acknowledge(self, ref, order_id, perm_id=0):
@@ -134,7 +154,7 @@ class Journal:
             self.db.execute("UPDATE orders SET state='uncertain'WHERE ref=?", (ref,))
         self.event(at, "submission_uncertain", {"ref": ref})
 
-    def fill(self, ref, exec_id, shares, price, at, commission):
+    def fill(self, ref, exec_id, shares, price, at, commission, commission_source="unknown"):
         order = self.db.execute("SELECT *FROM orders WHERE ref=?", (ref,)).fetchone()
         if not order:
             raise SafetyError("foreign fill")
@@ -148,6 +168,14 @@ class Journal:
                 price,
             ):
                 raise SafetyError("conflicting execution identity")
+            if commission_source == "broker" and (
+                duplicate["commission_source"] != "broker" or duplicate["commission"] != commission
+            ):
+                with self.db:
+                    self.db.execute(
+                        "UPDATE fills SET commission=?,commission_source=? WHERE exec_id=?",
+                        (commission, commission_source, exec_id),
+                    )
             return False
         if shares <= 0 or order["filled"] + shares > order["shares"]:
             raise SafetyError("execution exceeds order quantity")
@@ -169,8 +197,8 @@ class Journal:
         )
         with self.db:
             self.db.execute(
-                "INSERT INTO fills VALUES(?,?,?,?,?,?)",
-                (exec_id, ref, shares, price, at, commission),
+                "INSERT INTO fills(exec_id,ref,shares,price,at,commission,commission_source) VALUES(?,?,?,?,?,?,?)",
+                (exec_id, ref, shares, price, at, commission, commission_source),
             )
             self.db.execute(
                 "UPDATE orders SET filled=filled+?,state=CASE WHEN filled+?=shares THEN 'filled' ELSE 'working' END WHERE ref=?",
@@ -190,6 +218,14 @@ class Journal:
                 ),
             )
         return True
+
+    def execution_mark(self, signal_id, ask, at, source):
+        if self.prefix != PREFIX:
+            return
+        key = "execution_mark:" + signal_id
+        mark = {"ask": ask, "at": at, "source": source}
+        if self.get(key) != mark:
+            self.set(key, mark)
 
     def close(self):
         self.db.close()

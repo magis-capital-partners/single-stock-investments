@@ -15,6 +15,7 @@
 <link href="strategy-workbench.css" rel="stylesheet">
 <link href="reverse-split-strategy.css?v=20261104-announcement-v1" rel="stylesheet">
 <link href="reverse-split-fundamentals.css?v=20261105-financials-v1" rel="stylesheet">
+<link href="reverse-split-execution.css?v=1" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
 <link href="sleeve-realized.css?v=20261027-realized" rel="stylesheet">
@@ -2051,7 +2052,8 @@
 <script src="reverse-split-live.js?v=20261029-live"></script>
 <script src="reverse-split-fundamentals.js?v=20261105-financials-v1"></script>
 <script src="reverse-split-research.js?v=20261029-research"></script>
-<script src="reverse-split-strategy.js?v=20261104-announcement-v1"></script>
+<script src="reverse-split-execution.js?v=1"></script>
+<script src="reverse-split-strategy.js?v=20261122-execution-v1"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261018-buyback"></script>
 <script src="buyback-viz.js?v=20261022-radar"></script>
@@ -2463,7 +2465,7 @@ function parseRouteFromHashString(hash) {
   const researchStrategy = typeof StrategyWorkbench === 'undefined' ? null : StrategyWorkbench.parseRoute(hash);
   if (researchStrategy) return researchStrategy;
   hash = path;
-  const reverseSplitStrategyMatch = /^#\/strategies\/reverse-split(?:\/(overview|trades|research|live|shadow|metrics|assumptions|comparisons|screen|provenance))?$/i.exec(hash);
+  const reverseSplitStrategyMatch = /^#\/strategies\/reverse-split(?:\/(overview|trades|research|live|shadow|execution|metrics|assumptions|comparisons|screen|provenance))?$/i.exec(hash);
   if (reverseSplitStrategyMatch) return { view:'reverse-split-strategy', reverseSplitStrategySection:(reverseSplitStrategyMatch[1]||'overview').toLowerCase(), ticker:null, watchlistSub:null };
   const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|realized|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
   if (portfolioMatch) {
@@ -2609,9 +2611,14 @@ function applyRouteFromHash() {
 }
 
 function applyParsedRouteFromHash() {
-  if (!data) return false;
   const route = parseRouteFromHash();
   if (!route) return false;
+  if (!data) {
+    if (route.view !== 'reverse-split-strategy' || route.reverseSplitStrategySection !== 'execution') return false;
+    reverseSplitStrategySection = 'execution';
+    setView(route.view, { syncHash: false });
+    return true;
+  }
   if (['biotech-quant'].includes(route.view)) {
     researchStrategyRoutes[route.view] = StrategyWorkbench.route(route.view, route.strategySection, Object.fromEntries(new URLSearchParams(route.query || '')));
     if (route.canonical) setAppHash(researchStrategyRoutes[route.view]);
@@ -6717,10 +6724,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-window.addEventListener('hashchange', () => {
-  if (data) applyRouteFromHash();
-});
+window.addEventListener('hashchange', applyRouteFromHash);
 
+if (parseRouteFromHash()?.reverseSplitStrategySection === 'execution') applyRouteFromHash();
 load().catch(err => {
   const msg = err && err.message ? err.message : String(err);
   document.getElementById('detail').innerHTML = `<div class="loading">Failed to load data/core.json<br><br>${escapeHtml(msg)}</div>`;

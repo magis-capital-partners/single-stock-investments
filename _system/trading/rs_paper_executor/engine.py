@@ -104,6 +104,7 @@ class Executor:
                 number(fill["price"], minimum=0.000001),
                 fill["at"],
                 number(fill["commission"], minimum=0),
+                fill.get("commission_source", "unknown"),
             )
         for row in snap.get("orders", []):
             if not owned_order(row, self.endpoint, known):
@@ -438,6 +439,7 @@ class Executor:
                 marks_complete = False
                 self.halt(now, "position_not_currently_protectable:" + str(exc))
                 continue  # a halted name must not prevent other names' exits
+            self.journal.execution_mark(pos["signal_id"], ask, q["ask_at"], "live_ask")
             mark_value += pos["shares"] * ask
             key = "borrow_bound:" + signal["id"]
             bound = self.journal.get(

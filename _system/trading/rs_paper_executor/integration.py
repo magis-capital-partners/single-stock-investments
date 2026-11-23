@@ -269,10 +269,24 @@ async def run_mechanics(endpoint, policy, broker, journal_path, *, symbol, conid
     def orders(side=None):
         return [o for o in journal.rows("orders") if side is None or o["side"] == side]
 
-    async def until(predicate):
-        # Reconcile and TTL expiry only: protect() would (correctly) halt on
-        # a position it cannot quote live.
-        for _ in range(int(timeout)):
+    async def display_marks():
+        # Reuse the subscription from the operating paper session.
+        while True:
+            cached_ticker = broker.tickers.get(conid)
+            ask = getattr(cached_ticker, "ask", None)
+            data_type = getattr(cached_ticker, "marketDataType", None)
+            clock_key = "delayed_ask_at" if data_type == 3 else "ask_at"
+            ask_at = getattr(broker, "components", {}).get(conid, {}).get(clock_key)
+            if ask_at and isinstance(ask, (int, float)) and 0 < ask < 1e100 and data_type in {1, 3}:
+                for position in journal.rows("positions"):
+                    if position["shares"] and position["conid"] == conid:
+                        source = "live_ask" if data_type == 1 else "delayed_ask"
+                        journal.execution_mark(position["signal_id"], ask, ask_at, source)
+            await asyncio.sleep(1)
+
+    async def until(predicate, seconds=timeout):
+        # protect() requires a live quote; mechanics only reconciles and expires orders.
+        for _ in range(int(seconds)):
             snap = await executor.reconcile(broker.now())
             await executor.expire_orders(snap, broker.now())
             if predicate():
@@ -283,12 +297,14 @@ async def run_mechanics(endpoint, policy, broker, journal_path, *, symbol, conid
     def tick_round(price):
         return round(price, 2)
 
+    marks = None
     try:
         if getattr(broker, "ib", None) is not None and hasattr(broker.ib, "reqMarketDataType"):
             broker.ib.reqMarketDataType(3)  # delayed where available
         await broker.qualify({"ticker": symbol, "expected_conid": conid})
         q = await broker.quote(conid)
         ref, source = reference_price(q, broker.tickers.get(conid), reference)
+        marks = asyncio.create_task(display_marks())
         if ref < 1:
             raise SafetyError("mechanics test needs a stock priced at $1 or more")
         report["reference"] = {"price": ref, "source": source,
@@ -346,9 +362,9 @@ async def run_mechanics(endpoint, policy, broker, journal_path, *, symbol, conid
         cancel_sig = control_signal(symbol, conid, broker.now(), cik="999999997")
         cancel_sig["conid"], cancel_sig["planned_exit_at"] = conid, broker.now()
         cref = await executor.submit(cancel_sig, "SELL", 1, far, broker.now())
-        await sleep(policy.entry_order_ttl_seconds + 1)
-        done = await until(lambda: any(o["ref"] == cref and o["state"] == "cancelled"
-                                       for o in orders()))
+        await until(lambda: any(o["ref"] == cref and o["state"] in TERMINAL for o in orders()),
+                    timeout + policy.entry_order_ttl_seconds + 1)
+        done = any(o["ref"] == cref and o["state"] == "cancelled" for o in orders())
         record("cancel_confirmed", done, ref=cref, limit=far,
                cancel_requested=journal.get("cancel_requested:" + cref) is not None)
 
@@ -367,7 +383,12 @@ async def run_mechanics(endpoint, policy, broker, journal_path, *, symbol, conid
         except SafetyError as exc:
             record("kill_latch_holds", True, reason=str(exc))
     finally:
-        journal.close()
+        try:
+            if marks is not None:
+                marks.cancel()
+                await asyncio.gather(marks, return_exceptions=True)
+        finally:
+            journal.close()
     report["pass"] = bool(steps) and all(s["pass"] for s in steps.values())
     report["journal"] = str(journal_path)
     return report
