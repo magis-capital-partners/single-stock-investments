@@ -15,8 +15,10 @@ import {createHash,randomUUID} from 'node:crypto';
 import {mkdtempSync,rmSync,realpathSync,mkdirSync,appendFileSync,readFileSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
+import {compressCheckpoint} from './checkpoint-codec.mjs';
 
 export const OPERATIONS_KEY='collector-dashboard/operations.json';
+export const OPERATIONS_STAGING_KEY='collector-dashboard/operations-upload.json.gz';
 const MARKER='snapshot:operations.json',encoder=new TextEncoder();
 export const operationsDigest=text=>createHash('sha256').update(text).digest('hex');
 export const operationsText=(value,stateAt)=>JSON.stringify({...value,state_at:stateAt});
@@ -69,12 +71,25 @@ export function operationsChannel(env,{db=null,clock=Date.now,maxStateAgeMs=oper
         const id=randomUUID(),receiptKey='collector-dashboard/operations-receipts/'+at.slice(0,10)+'/'+id+'.json';
         const content=JSON.stringify({...JSON.parse(text),publication:{id,receipt_key:receiptKey,upload_started_at:at}}),reportHash=operationsDigest(content);
         const receipt={schema:'rs_operations_publication_receipt.v1',publication_id:id,report_sha256:reportHash,report_bytes:Buffer.byteLength(content),state_at:stateAt,generated_at:generatedAt,kind,queued_at:new Date(queuedAt).toISOString(),upload_started_at:at,upload_completed_at:null,accepted:false,max_state_age_seconds:maxStateAgeMs/1000,publish_interval_seconds:operationsRefreshSettings().intervalMs/1000,pipeline_commit:process.env.RS_PIPELINE_COMMIT||null};
-        const budget=Math.max(1,Math.min(15000,maxStateAgeMs-(started-state)));
+        const bytes=encoder.encode(content);
+        const remaining=()=>maxStateAgeMs-(clock()-state);
+        const write=async(key,body,contentType)=>{
+          env.assertCollectorLease?.();
+          const budget=Math.min(15000,remaining());
+          if(budget<=0)throw new Error('Operations publication freshness budget expired');
+          await env.EVIDENCE.put(key,body,{httpMetadata:{contentType},urgent:true,signal:AbortSignal.timeout(budget)});
+        };
         try{
-          await env.EVIDENCE.put(OPERATIONS_KEY,encoder.encode(content),{httpMetadata:{contentType:'application/json'},urgent:true,signal:AbortSignal.timeout(budget)});
+          // Stage the complete report in a private, reusable slot. The receipt
+          // timestamps the acknowledged upload of this exact report (gzip on
+          // the wire), and binds the original bytes delivered to readers.
+          const staged=await compressCheckpoint(bytes);
+          receipt.upload_started_at=new Date(clock()).toISOString();
+          receipt.visibility_mode='after_receipt';
+          await write(OPERATIONS_STAGING_KEY,staged.stored,'application/gzip');
           const completed=clock();receipt.upload_completed_at=new Date(completed).toISOString();
           receipt.state_age_at_upload_completion_seconds=(completed-state)/1000;
-          receipt.accepted=completed>=started&&completed-state>=-2000&&completed-state<=maxStateAgeMs;
+          receipt.accepted=completed>=Date.parse(receipt.upload_started_at)&&completed-state>=-2000&&completed-state<=maxStateAgeMs;
           receipt.outcome=receipt.accepted?'acknowledged':'state_too_old_at_ack';
         }catch(error){
           receipt.outcome='upload_outcome_unknown';receipt.error_type=error.name;
@@ -82,13 +97,18 @@ export function operationsChannel(env,{db=null,clock=Date.now,maxStateAgeMs=oper
           throw error;
         }
         record({event:'publication_upload',at:receipt.upload_completed_at,...receipt});
-        // The ACK clock cannot be in the bytes whose upload it timestamps.
-        // The immutable receipt binds it to those bytes by id AND SHA-256.
-        try{
-          await env.EVIDENCE.put(receiptKey,encoder.encode(JSON.stringify(receipt)),{httpMetadata:{contentType:'application/json'},urgent:true,signal:AbortSignal.timeout(10000)});
-        }catch(error){record({event:'receipt_archive_failed',at:new Date(clock()).toISOString(),publication_id:id,report_sha256:reportHash,error_type:error.name});throw error;}
-        last={...seen,uploadCompletedAt:receipt.upload_completed_at,receiptKey,reportHash};
         if(!receipt.accepted)return {published:false,reason:'state_too_old_at_ack',receipt};
+        try{
+          await write(receiptKey,encoder.encode(JSON.stringify(receipt)),'application/json');
+        }catch(error){record({event:'receipt_archive_failed',at:new Date(clock()).toISOString(),publication_id:id,report_sha256:reportHash,error_type:error.name});throw error;}
+        // Preserve the existing report key and JSON format. A reader can only
+        // see these new bytes after the corresponding receipt is durable.
+        try{
+          await write(OPERATIONS_KEY,bytes,'application/json');
+        }catch(error){record({event:'publication_visibility_failed',at:new Date(clock()).toISOString(),publication_id:id,report_sha256:reportHash,error_type:error.name});throw error;}
+        const visibleAt=clock();
+        record({event:'publication_visible',at:new Date(visibleAt).toISOString(),publication_id:id,report_sha256:reportHash,state_age_at_visibility_ack_seconds:(visibleAt-state)/1000});
+        last={...seen,uploadCompletedAt:receipt.upload_completed_at,receiptKey,reportHash};
         writeMarker(hash,generatedAt);return {published:true,receipt};
       });
       tail=task;return task;

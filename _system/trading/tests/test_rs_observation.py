@@ -23,6 +23,25 @@ def test_full_window_retains_every_over_age_reading_and_download_cause():
     assert x['qualifying_shadow_sessions']==0
 
 
+def test_staged_upload_is_not_treated_as_visible_until_latest_report_acknowledgement():
+    publisher=[
+        {'event':'publication_upload','accepted':True,'publication_id':'new','visibility_mode':'after_receipt',
+         'at':'2026-11-23T14:30:05Z','upload_completed_at':'2026-11-23T14:30:05Z'},
+        {'event':'publication_visible','at':'2026-11-23T14:30:15Z','publication_id':'new'},
+    ]
+    committed={**row(25,50),'publication_id':'new','state_at':'2026-11-23T14:29:35Z',
+               'received_at':'2026-11-23T14:30:18Z'}
+    x=report([row(10,125),row(20,140),committed],'2026-11-23T14:30:00Z','2026-11-23T14:30:30Z',publisher=publisher)
+    assert [r['cause'] for r in x['over_120_readings']]==[
+        'publisher_newer_upload_acknowledged_visibility_unconfirmed',
+        'consumer_has_not_committed_a_newer_acknowledged_publication',
+    ]
+    assert x['publisher_visible_publications']==1
+    assert x['publisher_metrics_seconds']['upload_ack_to_visibility_ack_seconds']=={'samples':1,'p50':10,'p95':10,'max':10}
+    assert x['metrics_seconds']['state_age_at_visibility_ack_seconds']['max']==40
+    assert x['metrics_seconds']['visibility_ack_to_receipt_seconds']['max']==3
+
+
 def test_missing_observations_and_configuration_changes_cannot_be_counted_as_fresh():
     rows=[row(30,70),row(40,80,pipeline_commit='changed')]
     x=report(rows,'2026-11-23T14:30:00Z','2026-11-23T14:31:00Z',expected={'pipeline_commit':'reviewed'})

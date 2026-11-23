@@ -4,7 +4,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
-import {operationsChannel,operationsRefresher,operationsRefreshSettings,OPERATIONS_KEY} from './reverse-split-live/operations-publication.mjs';
+import {operationsChannel,operationsRefresher,operationsRefreshSettings,OPERATIONS_KEY,OPERATIONS_STAGING_KEY} from './reverse-split-live/operations-publication.mjs';
 import {watchCollector} from './reverse-split-live/watch.mjs';
 import {enqueue} from './reverse-split-live/worker.mjs';
 
@@ -19,6 +19,113 @@ function storage(t){
   return {env,objects,puts,counter};
 }
 const operationPuts=puts=>puts.filter(p=>p.key===OPERATIONS_KEY).map(p=>({...decode(p.bytes),urgent:p.urgent}));
+
+test('operations report does not replace the previous readable object before its receipt is saved', async t => {
+  const {env,objects}=storage(t), channel=operationsChannel(env);
+  const previous=Buffer.from('previous operations');
+  objects.set(OPERATIONS_KEY,previous);
+  const put=env.EVIDENCE.put;
+  let release,entered;
+  const gate=new Promise(resolve=>{release=resolve;});
+  const waiting=new Promise(resolve=>{entered=resolve;});
+  env.EVIDENCE.put=async(key,bytes,options)=>{
+    if(key.includes('/operations-receipts/')){entered();await gate;}
+    return put(key,bytes,options);
+  };
+  const at=new Date().toISOString();
+  const send=channel.publish({text:JSON.stringify({state_at:at,generated_at:at}),stateAt:at,generatedAt:at});
+  t.after(async()=>{release();await send.catch(()=>{});});
+  await waiting;
+  assert.equal(objects.get(OPERATIONS_KEY),previous);
+  release();
+  const {receipt}=await send;
+  const latest=decode(objects.get(OPERATIONS_KEY));
+  assert.equal(latest.publication.id,receipt.publication_id);
+  assert.deepEqual(decode(objects.get(latest.publication.receipt_key)),receipt);
+});
+
+test('a blocked cleanup cannot hold the next durable checkpoint', async t => {
+  const {env}=storage(t), cp=await openCheckpoint(env,{retainDurableBytes:true});
+  let release,entered,third,fourth;
+  const gate=new Promise(resolve=>{release=resolve;});
+  const waiting=new Promise(resolve=>{entered=resolve;});
+  env.EVIDENCE.delete=async()=>{entered();await gate;};
+  t.after(async()=>{release();await Promise.allSettled([third,fourth]);await cp.flush();cp.close();});
+  const save=()=>cp.save({publicationMode:'r2',checkpointOnly:true});
+  await save();
+  await save();
+  third=save();
+  await waiting;
+  fourth=save();
+  const result=await Promise.race([
+    fourth,
+    new Promise((_,reject)=>{const timer=setTimeout(()=>reject(new Error('checkpoint still waiting for cleanup')),250);timer.unref();}),
+  ]);
+  assert.equal(cp.durable().generation,result.generation);
+});
+
+test('a stalled checkpoint upload times out and the next queued save commits', async t => {
+  const {env}=storage(t);
+  const cp=await openCheckpoint(env,{retainDurableBytes:true,operationsOptions:{maxStateAgeMs:750}});
+  t.after(()=>cp.close());
+  const put=env.EVIDENCE.put;
+  let stall=true;
+  env.EVIDENCE.put=async(key,bytes,options)=>{
+    if(stall&&key.startsWith('collector-state/checkpoints/')){
+      stall=false;
+      assert.ok(options.signal instanceof AbortSignal);
+      await new Promise((_,reject)=>{
+        const keepAlive=setTimeout(()=>reject(new Error('checkpoint timeout did not fire')),2000);
+        options.signal.addEventListener('abort',()=>{
+          clearTimeout(keepAlive);
+          reject(options.signal.reason);
+        },{once:true});
+      });
+    }
+    return put(key,bytes,options);
+  };
+  const save=()=>cp.save({publicationMode:'r2',checkpointOnly:true});
+  const stalled=save();
+  const queued=save();
+  await assert.rejects(stalled,{name:'TimeoutError'});
+  const committed=await queued;
+  assert.equal(cp.durable().generation,committed.generation);
+});
+
+test('the next checkpoint recovers a pointer commit whose response was lost', async t => {
+  const {env}=storage(t), cp=await openCheckpoint(env,{retainDurableBytes:true});
+  t.after(()=>cp.close());
+  const prepare=env.controlDB.prepare;
+  const query="SELECT value FROM rs_state WHERE key='collector_checkpoint'";
+  const remotePointer=async()=>JSON.parse((await prepare(query).first()).value);
+  const save=()=>cp.save({publicationMode:'r2',checkpointOnly:true});
+  const first=await save();
+  let loseResponse=true;
+  env.controlDB.prepare=(sql,options)=>{
+    const statement=prepare(sql);
+    if(!sql.startsWith("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_checkpoint'"))return statement;
+    assert.ok(options.signal instanceof AbortSignal);
+    return {bind(...args){
+      const write=statement.bind(...args);
+      return {async first(){
+        const result=await write.first();
+        if(loseResponse){
+          loseResponse=false;
+          throw new DOMException('Lost pointer response','TimeoutError');
+        }
+        return result;
+      }};
+    }};
+  };
+  await assert.rejects(save(),{name:'TimeoutError'});
+  const committed=await remotePointer();
+  assert.notEqual(committed.generation,first.generation);
+  assert.equal(cp.durable().generation,first.generation);
+  const latest=await save();
+  assert.equal(latest.previous.generation,committed.generation);
+  assert.equal((await remotePointer()).generation,latest.generation);
+  assert.equal(cp.durable().generation,latest.generation);
+});
 
 test('freshness checkpoint upload bypasses background research object pacing',async t=>{
  const {env,puts}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});
@@ -75,7 +182,7 @@ test('durable operations publish urgently before a blocked dashboard page',async
   t.after(async()=>{release();await cp.flush();cp.close();});
   const receipt=await cp.save({publicationMode:'r2',backgroundViews:true});
   await waiting;
-  const visible=objects.get(OPERATIONS_KEY),first=puts.find(row=>row.key.startsWith('collector-dashboard/'));
+  const visible=objects.get(OPERATIONS_KEY),first=puts.find(row=>row.key===OPERATIONS_KEY||row.key==='collector-dashboard/financial-needs.json');
   release();await cp.flush();
   assert.ok(visible,'operations must already be available while a large dashboard page waits');
   assert.equal(decode(visible).state_at,receipt.at);
@@ -100,7 +207,7 @@ test('refresh interval defaults to 30 s, is configurable, and 0 disables it',()=
 
 test('the operations channel never regresses state, skips unchanged content and asserts the lease before a put',async t=>{
   const db=markerDB(t),puts=[];let leaseLost=false;
-  const env={assertCollectorLease:()=>{if(leaseLost)throw new Error('Collector lease expired');},EVIDENCE:{put:async(key,bytes,options)=>puts.push({key,urgent:options.urgent===true,body:decode(bytes)})}};
+  const env={assertCollectorLease:()=>{if(leaseLost)throw new Error('Collector lease expired');},EVIDENCE:{put:async(key,bytes,options)=>puts.push({key,urgent:options.urgent===true,body:key===OPERATIONS_STAGING_KEY?null:decode(bytes)})}};
   const channel=operationsChannel(env,{db,clock:()=>Date.parse('2026-11-19T15:01:35.000Z')}),T=Date.parse('2026-11-19T15:00:00.000Z'),text=(state,generated)=>JSON.stringify({state_at:iso(state),generated_at:iso(generated)});
   const send=(state,generated,urgent=false)=>channel.publish({text:text(state,generated),stateAt:iso(state),generatedAt:iso(generated),urgent});
   assert.equal((await send(T,T)).published,true);

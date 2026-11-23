@@ -33,10 +33,15 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
   async function save(options={}){
     const task=saving.catch(()=>{}).then(()=>saveInternal(options));saving=task;return task;
   }
-  async function saveInternal({checkpointOnly=false}={}){
-    const current=await remote.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first();if(current?.value?.split(':').at(-1)!==token||Number(current.value.split(':')[0])<=Date.now())throw new Error('Collector lease lost; stopping before publication');
+  // The checkpoint CAS checks the owner against D1. This extra local check
+  // avoids a potentially long control-plane read ahead of every upload.
+  const checkpointTarget=Math.max(1000,Math.min(60000,Math.floor(operations.maxStateAgeMs/3)));
+  const checkpointDue=()=>Date.now()-Date.parse(checkpoint.durable()?.at)>=checkpointTarget;
+  async function saveInternal({checkpointOnly=false,onlyIfDue=false}={}){
+    if(onlyIfDue&&!checkpointDue())return;
+    env.assertCollectorLease();
     await flushValidationSamples(env);await checkpoint.save({publicationMode:env.PUBLICATION_MODE,backgroundViews:true,checkpointOnly});lastSaved=Date.now();if(!checkpointOnly)lastFullSaved=lastSaved;
-    await remote.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind('collector_usage:'+budgetDay,JSON.stringify({rows_read:Number(baseline.rows_read||0)+env.usage.rows_read,rows_written:Number(baseline.rows_written||0)+env.usage.rows_written}),now()).run();
+    await remote.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at',{signal:AbortSignal.timeout(5000)}).bind('collector_usage:'+budgetDay,JSON.stringify({rows_read:Number(baseline.rows_read||0)+env.usage.rows_read,rows_written:Number(baseline.rows_written||0)+env.usage.rows_written}),now()).run();
   }
   try{
     const ownerFile=process.env.RS_COLLECTOR_OWNER_FILE,claimed=await claimCollectorLease(remote,{owner:token,reclaimOwner:readReclaimOwner(ownerFile),waitMs:Math.min(standbyMs,maximumMs),sleep,shouldStop:()=>stopping||shouldStop(),onWaiting:async status=>{const value={...status,status:'prepared_waiting_for_lease',pipeline_commit:process.env.RS_PIPELINE_COMMIT||null,market_data_connections:0,broker_connections:0,orders:0};await env.EVIDENCE.put('collector-standby/latest.json',new TextEncoder().encode(JSON.stringify(value)),{httpMetadata:{contentType:'application/json'}});}});
@@ -72,10 +77,9 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
       // Keep the saved research state current even when the main loop waits on a
       // filing job. This uses the existing serialized save path and skips the
       // expensive derived dashboard pages. Full views retain their own cadence.
-      const checkpointAge=Date.now()-Date.parse(checkpoint.durable()?.at),checkpointTarget=Math.max(1000,Math.min(60000,operations.maxStateAgeMs/2));
-      if(!operationsCheckpointTask&&Date.now()>=operationsCheckpointRetryAt&&checkpointAge>=checkpointTarget){
-        operationsCheckpointRetryAt=Date.now()+Math.min(15000,checkpointTarget);
-        operationsCheckpointTask=save({checkpointOnly:true}).catch(error=>console.error(JSON.stringify({event:'operations_checkpoint_deferred',error:error.message}))).finally(()=>{operationsCheckpointTask=null;});
+      if(!operationsCheckpointTask&&Date.now()>=operationsCheckpointRetryAt&&checkpointDue()){
+        operationsCheckpointRetryAt=Date.now()+Math.min(5000,checkpointTarget);
+        operationsCheckpointTask=save({checkpointOnly:true,onlyIfDue:true}).catch(error=>console.error(JSON.stringify({event:'operations_checkpoint_deferred',error:error.message}))).finally(()=>{operationsCheckpointTask=null;});
       }
       if(operationsTask||!refresher.due())return;
       operationsTask=refresher.refresh().catch(error=>console.error(JSON.stringify({event:'operations_refresh_deferred',error:error.message}))).finally(()=>{operationsTask=null;});

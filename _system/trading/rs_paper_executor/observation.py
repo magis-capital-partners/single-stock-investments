@@ -66,24 +66,62 @@ def percentiles(values):
 def report(rows,start,end,*,events=(),publisher=(),expected=None):
     begin,finish=timestamp(start),timestamp(end)
     all_rows=sorted(rows,key=lambda r:timestamp(r['checked_at']))
-    selected=[r for r in all_rows if begin<=timestamp(r['checked_at'])<finish]
-    numeric=[r for r in selected if 'state_age_seconds' in r]
+    visibility={
+        r['publication_id']: r['at']
+        for r in publisher if r.get('event')=='publication_visible'
+    }
+    selected=[]
+    for raw in all_rows:
+        if not begin<=timestamp(raw['checked_at'])<finish:
+            continue
+        row=dict(raw)
+        visible_at=visibility.get(row.get('publication_id'))
+        if visible_at and row.get('received_at') and row.get('state_at'):
+            row['publisher_visibility_ack_at']=visible_at
+            row['state_age_at_visibility_ack_seconds']=(timestamp(visible_at)-timestamp(row['state_at'])).total_seconds()
+            row['visibility_ack_to_receipt_seconds']=(timestamp(row['received_at'])-timestamp(visible_at)).total_seconds()
+        selected.append(row)
     fields=['report_age_seconds','state_age_seconds','state_age_at_publish_seconds','publication_to_receipt_seconds',
-            'receipt_to_check_seconds','upload_duration_seconds','download_duration_seconds']
+            'receipt_to_check_seconds','upload_duration_seconds','download_duration_seconds',
+            'state_age_at_visibility_ack_seconds','visibility_ack_to_receipt_seconds']
     metrics={key:percentiles([r[key] for r in selected if isinstance(r.get(key),(int,float))]) for key in fields}
-    accepted=sorted([r for r in publisher if r.get('event')=='publication_upload' and r.get('accepted') is True],key=lambda r:timestamp(r['upload_completed_at']))
-    ack_times=[timestamp(r['upload_completed_at']) for r in accepted]
+    publications=[r for r in publisher if r.get('event')=='publication_upload' and r.get('upload_completed_at')]
+    visible=[]
+    for publication in publications:
+        if publication.get('accepted') is not True:
+            continue
+        if publication.get('visibility_mode')=='after_receipt':
+            visible_at=visibility.get(publication['publication_id'])
+            available=timestamp(visible_at) if visible_at else None
+        else:
+            available=timestamp(publication['upload_completed_at'])
+        if available is not None:
+            visible.append((available,publication))
+    visible.sort(key=lambda item:item[0])
+    visible_times=[available for available,_ in visible]
     bad=[]
     for row in selected:
         if not any(row.get(k,0)>120 for k in ('report_age_seconds','state_age_seconds')):continue
-        checked=timestamp(row['checked_at']);index=bisect_right(ack_times,checked)-1
-        latest=accepted[index] if index>=0 else None
+        checked=timestamp(row['checked_at']);index=bisect_right(visible_times,checked)-1
+        latest=visible[index][1] if index>=0 else None
         evidence=[e for e in events if e.get('event') in ('fetch_failed','receipt_rejected') and 0<=(checked-timestamp(e['at'])).total_seconds()<=180]
         diagnostic=[e for e in publisher if e.get('at') and 0<=(checked-timestamp(e['at'])).total_seconds()<=180]
-        if any(e.get('event')=='receipt_archive_failed' for e in diagnostic):
-            cause='publisher_receipt_archive_failed'
-        elif latest and latest['publication_id']!=row.get('publication_id'):
+        newest_visible_at=visible_times[index] if index>=0 else None
+        pending_diagnostic=[e for e in diagnostic if newest_visible_at is None or timestamp(e['at'])>=newest_visible_at]
+        if latest and latest['publication_id']!=row.get('publication_id'):
             cause='consumer_has_not_committed_a_newer_acknowledged_publication'
+        elif any(e.get('event')=='publication_visibility_failed' for e in pending_diagnostic):
+            cause='publisher_latest_report_visibility_failed_or_unconfirmed'
+        elif any(e.get('event')=='receipt_archive_failed' for e in pending_diagnostic):
+            cause='publisher_receipt_archive_failed'
+        elif any(e.get('event')=='publication_upload' and e.get('visibility_mode')=='after_receipt'
+                 and e.get('accepted') is True and e['publication_id']!=row.get('publication_id')
+                 and (not visibility.get(e['publication_id']) or timestamp(visibility[e['publication_id']])>checked)
+                 for e in pending_diagnostic):
+            cause='publisher_newer_upload_acknowledged_visibility_unconfirmed'
+        elif any(e.get('event')=='checkpoint_failed' for e in pending_diagnostic):
+            failure=next(e for e in reversed(pending_diagnostic) if e.get('event')=='checkpoint_failed')
+            cause='publisher_checkpoint_pointer_unconfirmed' if failure.get('phase')=='pointer' else 'publisher_checkpoint_upload_unconfirmed'
         elif any(e.get('outcome')=='upload_outcome_unknown' for e in diagnostic):
             cause='publisher_upload_failed_or_acknowledgement_missing'
         elif any(e.get('reason')=='paused_checkpoint_too_old' for e in diagnostic):
@@ -113,11 +151,14 @@ def report(rows,start,end,*,events=(),publisher=(),expected=None):
     receipts=[r for r in selected if r.get('publication_id') and not r.get('error_type')]
     frozen=bool(receipts) and all(all(r.get(k)==v for k,v in expected.items()) for r in receipts) if expected else None
     duration=(finish-begin).total_seconds()
-    acknowledged=[r for r in publisher if r.get('event')=='publication_upload' and r.get('upload_completed_at') and begin<=timestamp(r['upload_completed_at'])<finish]
+    acknowledged=[r for r in publications if begin<=timestamp(r['upload_completed_at'])<finish]
+    published=[(at,r) for at,r in visible if begin<=at<finish]
     publisher_metrics={
         'state_age_at_publish_seconds':percentiles([(timestamp(r['upload_completed_at'])-timestamp(r['state_at'])).total_seconds() for r in acknowledged if r.get('state_at')]),
         'upload_duration_seconds':percentiles([(timestamp(r['upload_completed_at'])-timestamp(r['upload_started_at'])).total_seconds() for r in acknowledged if r.get('upload_started_at')]),
-        'queue_wait_seconds':percentiles([(timestamp(r['upload_started_at'])-timestamp(r['queued_at'])).total_seconds() for r in acknowledged if r.get('queued_at')])}
+        'queue_wait_seconds':percentiles([(timestamp(r['upload_started_at'])-timestamp(r['queued_at'])).total_seconds() for r in acknowledged if r.get('queued_at')]),
+        'upload_ack_to_visibility_ack_seconds':percentiles([(at-timestamp(r['upload_completed_at'])).total_seconds()
+                                                           for at,r in published if r.get('visibility_mode')=='after_receipt'])}
     if all_rows and timestamp(all_rows[0]['checked_at'])>begin:
         gaps.append(min(duration,(timestamp(all_rows[0]['checked_at'])-begin).total_seconds()))
     return {'schema':'rs_full_session_feed_observation.v1','start':start,'end':end,'generated_at':utc_now(),
@@ -131,6 +172,7 @@ def report(rows,start,end,*,events=(),publisher=(),expected=None):
             'expected_configuration':expected,'observed_configuration_variants':variants,'configuration_unchanged':frozen,
             'publisher_acknowledged_publications':len(acknowledged),
             'publisher_accepted_publications':sum(r.get('accepted') is True for r in acknowledged),
+            'publisher_visible_publications':len(published),
             'publisher_unacknowledged_attempts':[r for r in publisher if r.get('event')=='publication_upload' and not r.get('upload_completed_at') and r.get('at') and begin<=timestamp(r['at'])<finish],
             'percentile_method':'linear interpolation at (n-1)*p; numerical samples only; unavailable rows reported separately',
             'acceptance':'owner_review_required_full_feed_observation_is_not_broker_shadow'}
@@ -155,7 +197,9 @@ def main():
     result=report(read_rows(args.log),args.start,args.end,events=read_rows(Path(args.feed_dir)/'events'/(args.day+'.jsonl')),
                   publisher=read_rows(publisher_path),expected=json.loads(Path(args.expected).read_text()) if args.expected else None)
     result['publisher_audit_download_error']=publisher_error
-    if publisher_error:result['publisher_acknowledged_publications']=None
+    if publisher_error:
+        for key in ('publisher_acknowledged_publications','publisher_accepted_publications','publisher_visible_publications'):
+            result[key]=None
     Path(args.output).write_text(json.dumps(result,indent=2),encoding='utf-8')
     print(json.dumps({k:result[k] for k in ('samples','metrics_seconds','configuration_unchanged')}))
 
