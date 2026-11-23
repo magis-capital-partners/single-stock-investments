@@ -293,7 +293,7 @@ jobs:
           # intermediate. This sparse repair checkout validates the committed
           # browser payload instead of requiring that absent monolith.
           CI_PAGES_DEPLOY_ONLY=1 python _system/scripts/validate_dashboard_data.py
-      - name: Refresh vol metrics and the SPX surface snapshot
+      - name: Refresh the SPX surface snapshot
         if: always()
         # Same lane rather than a new cron slot: the decide job case-matches
         # exact cron strings and hard-errors on an unrecognized one, so a new
@@ -313,8 +313,12 @@ jobs:
           # has a start time and reports capitulation as not rebuilt.
           date -u +%Y-%m-%dT%H:%M:%S+00:00 > "$RUNNER_TEMP/capitulation_started_at"
           python _system/scripts/build_spx_surface.py
-          python _system/scripts/build_vol_metrics.py
-          python _system/scripts/build_capitulation_daily.py --workers 6
+      - name: Refresh volatility metrics
+        if: always()
+        run: python _system/scripts/build_vol_metrics.py
+      - name: Refresh capitulation signals
+        if: always()
+        run: python _system/scripts/build_capitulation_daily.py --workers 6
       # The capitulation builder exits 0 even when it writes nothing (a missing
       # model dependency), so judge it by its artifact, after the commit.
       - id: capitulation_rebuilt

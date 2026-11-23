@@ -11,6 +11,8 @@ import json
 import re
 import sys
 import unittest
+from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 from pathlib import Path
 
 import yaml
@@ -22,6 +24,7 @@ sys.path.insert(0, str(SCRIPTS))
 import build_dashboard_shards as shards  # noqa: E402
 import build_feed_status as feeds  # noqa: E402
 import ci_rebuild_profile as profile  # noqa: E402
+import check_separation_universe as checks  # noqa: E402
 import download_us_investor_docs as downloader  # noqa: E402
 import filing_sentinel_workflow as sentinel  # noqa: E402
 import onboard_ticker as onboard  # noqa: E402
@@ -69,6 +72,24 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(commit["with"]["git_add"].split(), ["_system/data/separations/", "dashboard/data/separations.json"])
         self.assertEqual(commit["if"], "always()")
         self.assertTrue(any("ci_checkout_workspace.sh minimal" in step.get("run", "") for step in steps))
+
+
+class RecoveryTests(unittest.TestCase):
+    def test_pending_payload_is_checked_against_its_own_build_stamp(self):
+        now = datetime.now(timezone.utc)
+        prior = {"generated_at": (now - timedelta(days=10)).isoformat()}
+        def read_prior(path, default):
+            return prior if path == checks.DASHBOARD_PATH else default
+
+        with (
+            patch.object(checks, "read_json", side_effect=read_prior),
+            patch.object(checks, "latest_registry", return_value=[]),
+            patch.object(checks, "structural_errors", return_value=[]),
+        ):
+            self.assertEqual(checks.health()["status"], "unhealthy")
+            fresh = checks.health(generated_at=now.isoformat())
+            self.assertEqual(fresh["status"], "healthy")
+            self.assertEqual(fresh["problems"], [])
 
 
 class GraphAndFeedTests(unittest.TestCase):
