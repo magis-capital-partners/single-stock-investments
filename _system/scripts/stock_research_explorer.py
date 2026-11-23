@@ -83,17 +83,16 @@ def compact_company(company):
         if raw not in identities:
             identity = str(len(identities)); identities[raw] = identity; sources[identity] = value
         return {"source_id": identities[raw]}
-    def visit(value):
-        if isinstance(value, list): return [visit(v) for v in value]
+    def visit(value, descend):
+        if isinstance(value, list): return [descend(v, descend) for v in value]
         if not isinstance(value, dict): return value
         result = {}
         for k,v in value.items():
             if k in {"source", "price_source"}: result[k] = ref(v)
             elif k == "source_refs" and isinstance(v,list): result[k] = [ref(s) for s in v]
-            else: result[k] = visit(v)
+            else: result[k] = descend(v, descend)
         return result
-    result = visit(company)
-    del visit  # Release the recursive closure and its source table between issuers.
+    result = visit(company, visit)
     result["sources"] = sources
     return result
 
@@ -101,15 +100,14 @@ def compact_company(company):
 def expand_company(company):
     sources = company.get("sources", {})
     if not sources: return company
-    def visit(value):
-        if isinstance(value,list): return [visit(v) for v in value]
+    def visit(value, descend):
+        if isinstance(value,list): return [descend(v, descend) for v in value]
         if not isinstance(value,dict): return value
         if set(value)=={"source_id"}:
             if value["source_id"] not in sources: raise ValueError("Missing source identity")
             return sources[value["source_id"]]
-        return {k:visit(v) for k,v in value.items() if k!="sources"}
-    document=visit(company)
-    del visit
+        return {k:descend(v, descend) for k,v in value.items() if k!="sources"}
+    document=visit(company, visit)
     for series in document.get('series',[]):
         if not series.get('label'):series['label']=series['id'].replace('_',' ').capitalize()
     return document

@@ -145,7 +145,7 @@ def price_capture(path, symbol, row, as_of, source_details):
     if (
         data.get("symbol") != symbol
         or meta.get("symbol") != symbol
-        or (market in EXCHANGES and venue not in EXCHANGES[market])
+        or (venue not in source_details.get("venues", EXCHANGES.get(market, {venue})))
     ):
         return None
     currency, scale = quote_currency(meta)
@@ -518,7 +518,8 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
         }
         return_stats = old.get("returns") or {}
         if return_backup:
-            observed_return = read(return_backup / (encoded + ".json"))
+            saved_return = read(return_backup / (encoded + ".json"))
+            observed_return = (saved_return.get("one_pager") or {}).get("performance") or saved_return
             return_stats = {
                 "status": observed_return.get("status", "unavailable"),
                 "as_of": observed_return.get("as_of"),
