@@ -1,6 +1,6 @@
 // Local scan database. Each upload has a private, non-reused generation identity.
 import {DatabaseSync} from 'node:sqlite';
-import {randomUUID} from 'node:crypto';
+import {createHash, randomUUID} from 'node:crypto';
 import {mkdtempSync,readFileSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
@@ -27,8 +27,10 @@ export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>m
 export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={}}={}){
   const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null,refreshPointer=false,pruneTask=null;
   const pruneQueue=new Set(),pruneStop=new AbortController();
-  const maxWriteMs=Math.max(250,Math.min(20000,Math.floor((operationsOptions.maxStateAgeMs??75000)/3)));
-  const readPointer=()=>remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'",{signal:AbortSignal.timeout(maxWriteMs)}).first();
+  // Large checkpoint blobs have a different latency budget from D1 pointer updates.
+  const uploadTimeoutMs=Math.max(250,Math.min(35000,Math.floor((operationsOptions.maxStateAgeMs??75000)/2)));
+  const pointerTimeoutMs=Math.min(5000,uploadTimeoutMs);
+  const readPointer=()=>remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'",{signal:AbortSignal.timeout(pointerTimeoutMs)}).first();
   try{
     receiptValue=(await readPointer())?.value??null;receipt=JSON.parse(receiptValue||'null');
     if(receipt){const object=await env.EVIDENCE.get(checkpointObjectKey(receipt));if(!object)throw new Error('Committed collector checkpoint is unavailable');const bytes=await restoreCheckpoint(new Uint8Array(await object.arrayBuffer()),receipt);writeFileSync(file,bytes);}
@@ -46,7 +48,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
   async function commitPointer(next,at){
     env.assertCollectorLease?.();
     const value=JSON.stringify(next),lease=env.collectorLeaseOwner?" AND EXISTS(SELECT 1 FROM rs_state WHERE key='collector_lease' AND substr(value,instr(value,':')+1)=? AND CAST(value AS INTEGER)>?)":'',args=env.collectorLeaseOwner?[env.collectorLeaseOwner,Date.now()+30000]:[];
-    const options={signal:AbortSignal.timeout(maxWriteMs)};
+    const options={signal:AbortSignal.timeout(pointerTimeoutMs)};
     try{
       const ok=receiptValue===null
         ?await remote.prepare("INSERT INTO rs_state(key,value,updated_at) SELECT 'collector_checkpoint',?,? WHERE NOT EXISTS(SELECT 1 FROM rs_state WHERE key='collector_checkpoint')"+lease+" ON CONFLICT(key) DO NOTHING RETURNING key",options).bind(value,at,...args).first()
@@ -86,7 +88,11 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
       if(receipt)checkpointObjectKey(receipt);
       refreshPointer=false;
     }
-    const parent=receipt,encoded=compressed?await compressCheckpoint(bytes):null,generation=randomUUID(),digest=await sha(bytes),key=`collector-state/checkpoints/${encoded?.stored_sha256||digest}-${generation}.sqlite`+(encoded?'.gz':'');
+    const preparationStarted=Date.now();
+    const parent=receipt,encoded=compressed?await compressCheckpoint(bytes):null;
+    const compressionCompleted=Date.now();
+    // Use the native incremental hash to avoid the Web Crypto input copy for a large SQLite image.
+    const generation=randomUUID(),digest=createHash('sha256').update(bytes).digest('hex'),key=`collector-state/checkpoints/${encoded?.stored_sha256||digest}-${generation}.sqlite`+(encoded?'.gz':'');
     const next={slot:parent?.slot===0?1:0,sha256:digest,bytes:bytes.length,at,key,generation};
     if(encoded)Object.assign(next,{compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256});
     if(parent)next.previous=previousReceipt(parent);
@@ -94,14 +100,14 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     const uploadStarted=Date.now();
     let uploadCompleted;
     try{
-      await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(maxWriteMs)});
+      await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(uploadTimeoutMs)});
       uploadCompleted=Date.now();
       await commitPointer(next,at);
     }catch(error){
       operations.record({event:'checkpoint_failed',at:new Date().toISOString(),state_at:at,generation,phase:uploadCompleted?'pointer':'upload',error_type:error.name});
       throw error;
     }
-    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),stored_bytes:encoded?.stored_bytes||bytes.length});
+    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:uploadStarted-compressionCompleted,stored_bytes:encoded?.stored_bytes||bytes.length});
     onCommitted?.(next);
     onCommittedBytes?.(encoded?.stored||bytes);
     // Keep two committed generations. Legacy slots, review archives and uncertain

@@ -496,8 +496,10 @@ session report can distinguish pending visibility from a delayed download.
 `RS_OPERATIONS_AUDIT_DIR` enables a local fsynced publication/checkpoint journal;
 the collector mirrors the current UTC-day journal to `operations-audit/` during
 its heartbeat. Historical unknown/failed outcomes remain explicit. Checkpoint
-storage bounds the upload and pointer update, reloads the pointer after an
-ambiguous commit, and prunes obsolete objects after releasing the save path.
+storage bounds the upload and pointer update separately (35s and 5s with
+the 75s publication guard), reloads the pointer after an ambiguous commit,
+and prunes obsolete objects after releasing the save path. The journal records
+compression and hashing time alongside the transfer and commit timestamps.
 
 The independent Python fetcher records request start and complete-body receipt
 separately. `downloaded_at` now means complete-body receipt; use
