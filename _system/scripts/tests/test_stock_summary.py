@@ -16,6 +16,7 @@ from stock_summary import (
     expected_sessions,
     price_capture,
     price_record,
+    quote_currency,
     short_excerpt,
 )
 
@@ -87,6 +88,34 @@ def test_history_remains_visible_while_awaiting_new_closes():
     )
     assert end["status"] == "ended"
     assert expected_sessions("LSE", "2026-11-18", "2026-11-22")[0] == "2026-11-20"
+
+
+def test_delisted_chart_reports_missing_earlier_history_at_the_listing_cutoff():
+    price = price_record(
+        capture({"2026-11-18": 11, "2026-11-19": 10}),
+        "2026-11-22",
+        {"first_session": "2025-01-02", "ended": "2026-11-19"},
+        {},
+    )
+    assert price["status"] == "ended_partial"
+    assert price["expected_last"] == "2026-11-19"
+    assert price["last"] == "2026-11-19"
+
+
+def test_tel_aviv_subunit_is_quoted_in_shekels():
+    assert quote_currency({"currency": "ILA"}) == ("ILS", 0.01)
+
+
+def test_merge_preserves_price_provenance():
+    old = capture({"2026-11-17": 11, "2026-11-18": 12, "2026-11-19": 13})
+    fresh = capture(
+        {"2026-11-17": 11, "2026-11-18": 12, "2026-11-19": 13, "2026-11-20": 15},
+        source="https://exchange.example/",
+    )
+    merged = combine_captures(old, fresh)
+    record = price_record(merged, "2026-11-22", {}, {})
+    assert record["sources"] == [fresh["source"], old["source"]]
+    assert record["points"][-1] == ("2026-11-20", 15)
 
 
 def test_profile_short_excerpt_keeps_initials_and_limits_quotations():

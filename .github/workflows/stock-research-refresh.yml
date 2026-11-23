@@ -90,8 +90,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install the exchange calendars
-        run: python -m pip install --disable-pip-version-check exchange-calendars
+      - name: Install exchange calendar and price parser dependencies
+        run: python -m pip install --disable-pip-version-check exchange-calendars==4.13.2 pandas-market-calendars==5.6.1 beautifulsoup4==4.15.0
       - name: Refresh descriptions and daily closes
         run: |
           python _system/scripts/refresh_stock_summary.py --cache "$RUNNER_TEMP/stock-summary" --publish

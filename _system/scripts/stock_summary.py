@@ -43,6 +43,9 @@ MARKETS = {
     "PAR": "XPAR",
     "AMS": "XAMS",
     "GER": "XETR",
+    "FRA": "XFRA",
+    "OSL": "XOSL",
+    "PHP": "XPHS",
     "EBS": "XSWX",
     "MIL": "XMIL",
     "MCE": "XMAD",
@@ -124,6 +127,8 @@ def quote_currency(meta):
     currency = meta.get("currency")
     if currency in {"GBp", "GBX"}:
         return "GBP", 0.01
+    if currency == "ILA":
+        return "ILS", 0.01
     return (currency, 1) if re.fullmatch("[A-Z]{3}", currency or "") else (None, 1)
 
 
@@ -187,11 +192,11 @@ def combine_captures(prior, fresh):
     if not prior or not fresh:
         return fresh or prior
     a, b = prior["points"], fresh["points"]
+    if not a or not b:
+        return fresh if b else prior
     common = sorted(a.keys() & b.keys())[-30:]
     if (prior["currency"], prior["exchange"]) != (fresh["currency"], fresh["exchange"]):
         return {**prior, "issue": "Listing currency or exchange changed between captures."}
-    if not a or not b:
-        return fresh if b else prior
     split = fresh.get("verified_split")
     if split and common:
         factor = split["factor"]
@@ -208,11 +213,20 @@ def combine_captures(prior, fresh):
             **max((prior, fresh), key=lambda c: len(c["points"])),
             "issue": "Price basis changed on overlapping sessions. Corporate action review is required.",
         }
-    return {**fresh, "points": {**a, **b}}
+    sources = list(dict.fromkeys([
+        fresh["source"], prior["source"], *fresh.get("sources", []), *prior.get("sources", []),
+    ]))
+    return {**fresh, "points": {**a, **b}, "sources": sources}
 
 
 @lru_cache(maxsize=64)
 def market_schedule(name, end):
+    if name in {"XNSE", "XTAE"}:
+        import pandas_market_calendars as calendars
+
+        calendar = calendars.get_calendar("NSE" if name == "XNSE" else "TASE")
+        return tuple(day.date().isoformat() for day in calendar.valid_days("1980-01-01", end))
+
     import exchange_calendars as calendars
 
     if name not in calendars.get_calendar_names():
@@ -255,11 +269,17 @@ def add_verified_close(capture, latest):
     return capture
 
 
-def alternate_capture(path):
+def alternate_capture(path, override):
     record = read(path)
-    if not record or not record.get("source", "").startswith(
-        ("https://stockanalysis.com/stocks/", "https://stockanalysis.com/quote/otc/")
-    ):
+    if not record:
+        return None
+    source = record.get("source", "")
+    archive = override.get("price_archive") or {}
+    if source == archive.get("source"):
+        currency, venue = archive["currency"], archive["venue"]
+    elif source.startswith(("https://stockanalysis.com/stocks/", "https://stockanalysis.com/quote/otc/")):
+        currency, venue = "USD", (override.get("venues") or ["NMS"])[0]
+    else:
         return None
     columns = record.get("headers", [])
     if "Date" not in columns or "Close" not in columns:
@@ -275,10 +295,11 @@ def alternate_capture(path):
             points[day] = value
     return {
         "points": points,
-        "currency": "USD",
-        "exchange": "NMS",
-        "source": record["source"],
-        "basis": "Daily close as reported by the source",
+        "currency": currency,
+        "exchange": venue,
+        "source": source,
+        "scale": 1,
+        "basis": archive.get("basis", "Daily close as reported by the source"),
     }
 
 
@@ -305,14 +326,19 @@ def price_record(capture, as_of, override, row):
             "source": capture["source"],
         }
     first, last = points[0][0], points[-1][0]
-    expected, sessions = expected_sessions(capture["exchange"], first, as_of)
+    end = min(as_of, override.get("ended", as_of))
+    expected, sessions = expected_sessions(capture["exchange"], first, end)
     prior = override.get("first_session") or capture.get("first_session")
     missing_count = sum(1 for day in sessions if day <= last and day not in capture["points"])
     stale = expected and last < expected
     started_late = prior and (date.fromisoformat(first) - date.fromisoformat(prior)).days > 21
-    gap = missing_count and missing_count > max(2, 0.015 * len(points))
+    gap = missing_count > max(2, 0.015 * len(points))
     status, reason = "complete", None
-    if override.get("ended") or row.get("listing_status") in {"delisted", "inactive", "acquired"}:
+    ended = override.get("ended") or row.get("listing_status") in {"delisted", "inactive", "acquired"}
+    unknown_start = capture["basis"] == "Daily close as reported by the source" and not prior
+    if ended and (unknown_start or started_late or gap or override.get("ended") and last < override["ended"]):
+        status, reason = "ended_partial", "The listing ended and its chart shows only the verified part of its history."
+    elif ended:
         status, reason = "ended", "Trading history ends on the last verified session."
     elif capture.get("issue"):
         status, reason = "review", capture["issue"]
@@ -320,7 +346,7 @@ def price_record(capture, as_of, override, row):
         status, reason = "stale", "Closes after the last verified session are pending."
     elif not expected:
         status, reason = "review", "The exchange calendar still needs verification."
-    elif capture["basis"] == "Daily close as reported by the source" and not prior:
+    elif unknown_start:
         status, reason = (
             "partial",
             "Earlier history is pending. The chart starts with the first verified close.",
@@ -334,10 +360,11 @@ def price_record(capture, as_of, override, row):
         )
     return {
         "status": status,
-        "reason": reason,
+        "reason": " ".join(x for x in (reason, override.get("price_note")) if x) or None,
         "currency": capture["currency"],
         "exchange": capture["exchange"],
         "source": capture["source"],
+        "sources": capture.get("sources", [capture["source"]]),
         "basis": capture["basis"],
         "split": override.get("split"),
         "ended": override.get("ended"),
@@ -445,7 +472,7 @@ def describe(root, ticker, override, profile_file, symbol, has_identity, alterna
     }
 
 
-def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backup=None):
+def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backup=None, *, tickers=None):
     registry = read(root / "_system/portfolio/registry.json")["holdings"]
     aliases = {k: v["ticker"] for k, v in research_aliases(root).items()}
     identity = read(SOURCE_FILE)
@@ -453,6 +480,9 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
     result = {}
     previous = previous or {}
     for ticker in sorted({aliases.get(t, t) for t in registry}):
+        if tickers is not None and ticker not in tickers and ticker in previous:
+            result[ticker] = previous[ticker]
+            continue
         row = {**registry.get(ticker, {}), **rows.get(ticker, {})}
         override = identity.get(ticker, {})
         symbol = symbol_for(ticker, row, override)
@@ -474,10 +504,35 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
             and saved.get("symbol") == symbol
             and not override.get("identity_exception")
         ):
-            prior = {**saved, "points": dict(saved["points"]), "scale": 1}
+            currency, scale = quote_currency({"currency": saved["currency"]})
+            prior = {
+                **saved,
+                "currency": currency,
+                "points": {day: round(close * scale, 6) for day, close in saved["points"]},
+                "scale": fresh["scale"] if fresh and fresh["currency"] == currency else scale,
+            }
         capture = combine_captures(prior, fresh)
-        if not capture or len(capture["points"]) < 2:
-            capture = alternate_capture(cache / "alternate" / (ticker + "-price.json")) or capture
+        if (
+            prior
+            and fresh
+            and prior["basis"] == "Daily close as reported by the source"
+            and prior["source"].startswith("https://stockanalysis.com/")
+            and prior["points"].keys() <= fresh["points"].keys()
+            and (fresh["exchange"] in override.get("venues", []))
+        ):
+            # The old archive used a placeholder venue. An exact-listing
+            # vendor capture with all previously covered dates supersedes it.
+            capture = fresh
+        alternate = alternate_capture(cache / "alternate" / (ticker + "-price.json"), override)
+        if alternate and capture and (
+            alternate["source"] == capture["source"] or override.get("supplement_history")
+        ):
+            capture = combine_captures(capture, alternate)
+        elif alternate and (not capture or len(alternate["points"]) > len(capture["points"])):
+            # A replacement archive must cover the prior date range before it
+            # can supersede a previously verified chart.
+            if not capture or not (capture["points"].keys() - alternate["points"].keys()):
+                capture = alternate
         description = describe(
             root,
             ticker,
@@ -512,7 +567,7 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
         result[ticker] = {
             "schema": SCHEMA,
             "ticker": ticker,
-            "company": row.get("company") or ticker,
+            "company": override.get("company") or row.get("company") or ticker,
             "description": description,
             "price": price,
         }
