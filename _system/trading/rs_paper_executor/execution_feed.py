@@ -161,6 +161,7 @@ def publish(url, key, snapshot, *, opener=None):
     signature = hmac.new(key.encode(), message, hashlib.sha256).hexdigest()
     request = Request(url, data=payload, headers={
         "content-type": "application/json", "x-ssi-ingest-purpose": DOMAIN,
+        "user-agent": "Magis-RS-Paper/1.0",
         "x-portfolio-timestamp": ts, "x-portfolio-nonce": nonce, "x-portfolio-signature": signature,
     })
     with (opener or build_opener(NoRedirect())).open(request, timeout=2) as response:

@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
+from io import BytesIO
 import sqlite3
 
 import pytest
 
-from _system.trading.rs_paper_executor.execution_feed import paper_snapshot
+from _system.trading.rs_paper_executor.execution_feed import paper_snapshot, publish
 from _system.trading.rs_paper_executor.journal import Journal
 
 
@@ -69,3 +70,21 @@ def test_live_journal_refused(tmp_path):
             assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='execution_order_states'").fetchone()
     finally:
         journal.close()
+
+
+def test_publisher_identifies_itself_to_cloudflare_pages():
+    class Response(BytesIO):
+        status = 200
+        headers = {"content-type": "application/json"}
+
+    class Opener:
+        @staticmethod
+        def open(request, timeout):
+            assert request.get_header("User-agent") == "Magis-RS-Paper/1.0"
+            assert request.get_header("X-ssi-ingest-purpose") == "rs_execution_paper"
+            return Response(b'{"available":true}')
+
+    assert publish(
+        "https://single-stock-investments-2wt.pages.dev/api/v2/portfolio/ingest",
+        "synthetic-test-key" * 4, {"schema": "rs_execution_probe.v1"}, opener=Opener(),
+    ) == {"available": True}
