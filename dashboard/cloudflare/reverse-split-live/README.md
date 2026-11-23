@@ -482,13 +482,22 @@ the background research-object pacer. Operations uploads have a bounded total
 deadline, including retry waits; a timeout has an unknown outcome and never
 gets a manufactured completion timestamp.
 
-Every report identifies an immutable `operations-receipts/<UTC-day>/<id>.json`
-record. The record carries the completed upload acknowledgement, original state
-and generation clocks, exact report SHA-256, release and guard settings. It must
-be separate from the report: an upload cannot contain its own later ACK clock.
+The collector uploads a gzipped copy of the complete report to a reusable
+private staging object. It then saves the immutable
+`operations-receipts/<UTC-day>/<id>.json` record with the staging upload
+acknowledgement, original clocks, exact uncompressed report SHA-256, release
+and guard settings. Only after the receipt is acknowledged does it write the
+same report bytes to the existing reader-facing JSON key. The three writes
+share the original state-age deadline. The staging upload ACK to download
+receipt interval includes receipt storage and the write to the reader-facing key.
+The publisher separately journals that final write's acknowledgement so the
+session report can distinguish pending visibility from a delayed download.
+
 `RS_OPERATIONS_AUDIT_DIR` enables a local fsynced publication/checkpoint journal;
 the collector mirrors the current UTC-day journal to `operations-audit/` during
-its heartbeat. Historical unknown/failed outcomes remain explicit.
+its heartbeat. Historical unknown/failed outcomes remain explicit. Checkpoint
+storage bounds the upload and pointer update, reloads the pointer after an
+ambiguous commit, and prunes obsolete objects after releasing the save path.
 
 The independent Python fetcher records request start and complete-body receipt
 separately. `downloaded_at` now means complete-body receipt; use

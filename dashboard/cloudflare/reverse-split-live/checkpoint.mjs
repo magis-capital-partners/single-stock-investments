@@ -25,9 +25,12 @@ export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>m
 // retainDurableBytes: keep the last committed checkpoint's bytes (one generation)
 // for the operations refresh, which evaluates only already-durable state.
 export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={}}={}){
-  const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null;
+  const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null,refreshPointer=false,pruneTask=null;
+  const pruneQueue=new Set(),pruneStop=new AbortController();
+  const maxWriteMs=Math.max(250,Math.min(20000,Math.floor((operationsOptions.maxStateAgeMs??75000)/3)));
+  const readPointer=()=>remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'",{signal:AbortSignal.timeout(maxWriteMs)}).first();
   try{
-    receiptValue=(await remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").first())?.value??null;receipt=JSON.parse(receiptValue||'null');
+    receiptValue=(await readPointer())?.value??null;receipt=JSON.parse(receiptValue||'null');
     if(receipt){const object=await env.EVIDENCE.get(checkpointObjectKey(receipt));if(!object)throw new Error('Committed collector checkpoint is unavailable');const bytes=await restoreCheckpoint(new Uint8Array(await object.arrayBuffer()),receipt);writeFileSync(file,bytes);}
     // synchronous=OFF: this file is a working copy restored from the committed R2
     // checkpoint on every start, so an fsync per write buys no durability.
@@ -43,23 +46,61 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
   async function commitPointer(next,at){
     env.assertCollectorLease?.();
     const value=JSON.stringify(next),lease=env.collectorLeaseOwner?" AND EXISTS(SELECT 1 FROM rs_state WHERE key='collector_lease' AND substr(value,instr(value,':')+1)=? AND CAST(value AS INTEGER)>?)":'',args=env.collectorLeaseOwner?[env.collectorLeaseOwner,Date.now()+30000]:[];
-    const ok=receiptValue===null
-      ?await remote.prepare("INSERT INTO rs_state(key,value,updated_at) SELECT 'collector_checkpoint',?,? WHERE NOT EXISTS(SELECT 1 FROM rs_state WHERE key='collector_checkpoint')"+lease+" ON CONFLICT(key) DO NOTHING RETURNING key").bind(value,at,...args).first()
-      :await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_checkpoint' AND value=?"+lease+" RETURNING key").bind(value,at,receiptValue,...args).first();
-    if(!ok)throw new Error('Collector lease lost or checkpoint superseded before checkpoint commit; original evidence preserved');
-    receipt=next;receiptValue=value;
+    const options={signal:AbortSignal.timeout(maxWriteMs)};
+    try{
+      const ok=receiptValue===null
+        ?await remote.prepare("INSERT INTO rs_state(key,value,updated_at) SELECT 'collector_checkpoint',?,? WHERE NOT EXISTS(SELECT 1 FROM rs_state WHERE key='collector_checkpoint')"+lease+" ON CONFLICT(key) DO NOTHING RETURNING key",options).bind(value,at,...args).first()
+        :await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_checkpoint' AND value=?"+lease+" RETURNING key",options).bind(value,at,receiptValue,...args).first();
+      if(!ok)throw new Error('Collector lease lost or checkpoint superseded before checkpoint commit; original evidence preserved');
+      receipt=next;receiptValue=value;
+    }catch(error){
+      // The server may have committed despite a timeout. Reload the current
+      // pointer before the next compare-and-swap; never promote an assumed ACK.
+      refreshPointer=true;
+      throw error;
+    }
+  }
+  function pruneCheckpoint(key){
+    pruneQueue.add(key);
+    if(pruneTask)return;
+    pruneTask=Promise.resolve().then(async()=>{
+      try{
+        while(pruneQueue.size&&!pruneStop.signal.aborted){
+          const obsolete=pruneQueue.values().next().value;
+          pruneQueue.delete(obsolete);
+          try{
+            env.assertCollectorLease?.();
+            await env.EVIDENCE.delete(obsolete,{signal:AbortSignal.any([pruneStop.signal,AbortSignal.timeout(5000)])});
+          }catch(error){
+            if(!pruneStop.signal.aborted)console.error(JSON.stringify({event:'checkpoint_prune_deferred',key:obsolete,error:error.message}));
+          }
+        }
+      }finally{pruneTask=null;}
+    });
   }
   async function storeCheckpoint(bytes,at,{compressed=false,onCommittedBytes=null,onCommitted=null}={}){
     env.assertCollectorLease?.();
+    if(refreshPointer){
+      receiptValue=(await readPointer())?.value??null;
+      receipt=JSON.parse(receiptValue||'null');
+      if(receipt)checkpointObjectKey(receipt);
+      refreshPointer=false;
+    }
     const parent=receipt,encoded=compressed?await compressCheckpoint(bytes):null,generation=randomUUID(),digest=await sha(bytes),key=`collector-state/checkpoints/${encoded?.stored_sha256||digest}-${generation}.sqlite`+(encoded?'.gz':'');
     const next={slot:parent?.slot===0?1:0,sha256:digest,bytes:bytes.length,at,key,generation};
     if(encoded)Object.assign(next,{compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256});
     if(parent)next.previous=previousReceipt(parent);
     env.assertCollectorLease?.();
     const uploadStarted=Date.now();
-    await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true});
-    const uploadCompleted=Date.now();
-    await commitPointer(next,at);
+    let uploadCompleted;
+    try{
+      await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(maxWriteMs)});
+      uploadCompleted=Date.now();
+      await commitPointer(next,at);
+    }catch(error){
+      operations.record({event:'checkpoint_failed',at:new Date().toISOString(),state_at:at,generation,phase:uploadCompleted?'pointer':'upload',error_type:error.name});
+      throw error;
+    }
     operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),stored_bytes:encoded?.stored_bytes||bytes.length});
     onCommitted?.(next);
     onCommittedBytes?.(encoded?.stored||bytes);
@@ -67,7 +108,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     // failed uploads are never deleted here. A late PUT cannot target a newer key.
     const obsolete=parent?.previous?.key;
     if(obsolete&&GENERATION_KEY.test(obsolete)&&obsolete!==key&&obsolete!==parent.key&&env.EVIDENCE.delete){
-      try{env.assertCollectorLease?.();await env.EVIDENCE.delete(obsolete);}catch(error){console.error(JSON.stringify({event:'checkpoint_prune_deferred',key:obsolete,error:error.message}));}
+      pruneCheckpoint(obsolete);
     }
     return next;
   }
@@ -141,6 +182,6 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     durable(){return durable&&{generation:durable.generation,at:durable.at,sha256:durable.sha256};},
     takeDurableBytes(generation){if(durable?.generation!==generation||!durable.bytes)return null;const bytes=durable.bytes;durable.bytes=null;return bytes;},
     async flush({handoff=false}={}){if(handoff)deferDerived=true;if(publicationTask)await publicationTask;},
-    close(){db.close();cleanup(dir);},
+    close(){pruneStop.abort();pruneQueue.clear();db.close();cleanup(dir);},
   };
 }
