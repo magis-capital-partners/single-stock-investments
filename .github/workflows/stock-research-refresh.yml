@@ -65,3 +65,34 @@ jobs:
               f.write('Published verified financial shards in private R2 storage. No letter/podcast rebuild, Git source blobs, broker connections or market-data terminals.\n')
           PY
           fi
+
+  summaries:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*.CVR/research/cvr_terms.json
+            /_system/scripts/
+            /_system/config/
+            /_system/portfolio/registry.json
+            /_system/reference/stock-research/ticker-aliases.json
+            /dashboard/private-assets.json
+            /dashboard/data/core.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the exchange calendars
+        run: python -m pip install --disable-pip-version-check exchange-calendars
+      - name: Refresh descriptions and daily closes
+        run: |
+          python _system/scripts/refresh_stock_summary.py --cache "$RUNNER_TEMP/stock-summary" --publish
+          python _system/scripts/publish_stock_summary.py --verify | tee -a "$GITHUB_STEP_SUMMARY"

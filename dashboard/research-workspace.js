@@ -201,6 +201,7 @@
   function mount(root, t, h, renderers, options = {}) {
     global.StockOnePager?.destroy(root);
     global.StockPerformance?.destroy(root);
+    global.StockSummary?.destroy(root);
     const pilot = !!global.StockOnePager?.isPilot(t);
     const tabList = pilot ? global.StockOnePager.tabs : tabs;
     const resolveTab = pilot ? global.StockOnePager.validTab : value => tabs.some(([key]) => key === value) ? value : ['valuation','business','buyback'].includes(value) ? 'models' : value === 'evidence' ? 'sources' : 'overview';
@@ -231,12 +232,24 @@
         if(pilot)global.StockOnePager.hydrate(panel,t,h,renderers,id);
         global.StockPerformance?.mount(panel,t,h);
       }
+      if (id === 'overview' && global.StockSummary) {
+        let overview = panel.querySelector('[data-stock-summary]');
+        if (!overview) {
+          overview = document.createElement('section');
+          overview.className = 'stock-summary';
+          overview.dataset.stockSummary = '';
+          panel.prepend(overview);
+        }
+        global.StockSummary.mount(overview,t,h);
+      }
       if (id === 'overview' && global.FinancialChanges) {
         let summary = panel.querySelector('.fc-summary');
         if (!summary) {
           summary = document.createElement('section');
           summary.className = 'fc-summary';
-          panel.prepend(summary);
+          const overview = panel.querySelector('[data-stock-summary]');
+          if (overview) overview.after(summary);
+          else panel.prepend(summary);
         }
         global.FinancialChanges.mount(summary, null, t.ticker);
       }
