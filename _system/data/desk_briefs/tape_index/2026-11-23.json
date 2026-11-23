@@ -1,0 +1,185 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "tape_index",
+  "as_of": "2026-11-23",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-11-23T11:10:31Z"
+    }
+  ],
+  "items": [
+    {
+      "ticker": "QDEL",
+      "headline": "QDEL RSI is 21.9, below 25 (was 29.0), and trend_z is -1.261, beyond -1.25. State is stress_building.",
+      "one_number": "RSI 21.9",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "rsi_14 21.9; trend_z -1.261; capitulation.state stress_building; cmf -0.23; return_5d_pct -22.53; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "selloff_type company_specific; direction lagging_downtrend; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored RSI is back through 25 or trend_z is back inside 1.25.",
+      "handoff": null
+    },
+    {
+      "ticker": "AMZN",
+      "headline": "AMZN capitulation state is panic, new (was normal), with RSI 50.7 (AMZO proxy).",
+      "one_number": "RSI 50.7",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "capitulation.state panic; rsi_14 50.7; cmf -0.192; selloff_type market_driven; direction pullback_in_uptrend; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored state leaves panic. AMZN is the tape proxy for AMZO.",
+      "handoff": null
+    },
+    {
+      "ticker": "SPGI",
+      "headline": "SPGI RSI is 30.6, below 35 (was 37.7), counter-trend (leading uptrend, TAPE-01).",
+      "one_number": "RSI 30.6",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "rsi_14 30.6; capitulation.state stress_building; direction leading_uptrend; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored RSI is back through 35.",
+      "handoff": null
+    },
+    {
+      "ticker": "BN",
+      "headline": "BN capitulation state is panic, new (was stress_building), with RSI 34.3.",
+      "one_number": "RSI 34.3",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "capitulation.state panic; rsi_14 34.3; rvol 1.94; selloff_type market_driven; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored state leaves panic or RSI is back through 35.",
+      "handoff": null
+    },
+    {
+      "ticker": "IBIT",
+      "headline": "IBIT capitulation state is panic, new (was stress_building), with RSI 16.5 and CMF -0.162 still past.",
+      "one_number": "RSI 16.5",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "capitulation.state panic; rsi_14 16.5; cmf -0.162; rvol 2.29; return_5d_pct -15.2; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored state leaves panic, RSI is back through 25, or Chaikin money flow is back through -0.10.",
+      "handoff": null
+    },
+    {
+      "ticker": "TPL",
+      "headline": "TPL is a capitulation_candidate (was panic), with RSI 22.7.",
+      "one_number": "RSI 22.7",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "capitulation.state capitulation_candidate; rsi_14 22.7; cmf -0.314; confirmations all false; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "TPL/EROK all-stock deal announced 2026-11-23 (EROK 8-K Ex.99.1); merger-arb TPL shorting is inference",
+          "url": null,
+          "as_of": "2026-11-23",
+          "claim_type": "inference"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored state leaves capitulation_candidate or RSI is back through 25.",
+      "handoff": null
+    },
+    {
+      "ticker": "MARA",
+      "headline": "MARA is a capitulation_candidate (was stress_building), with RSI 39.9 (MAAY proxy).",
+      "one_number": "RSI 39.9",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "capitulation.state capitulation_candidate; rsi_14 39.9; return_5d_pct -27.18; beta_252d 3.39; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored state leaves capitulation_candidate. MARA is the tape proxy for MAAY.",
+      "handoff": null
+    },
+    {
+      "ticker": "MSTR",
+      "headline": "MSTR capitulation state is panic, new (was stress_building), with RSI 16.5. MSCI USA deletion effective 2026-11-30 close (MSTZ proxy).",
+      "one_number": "RSI 16.5",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "capitulation.state panic; rsi_14 16.5; cmf -0.272; return_5d_pct -30.3; as_of 2026-11-20 [dashboard/data/technical_summary.json generated_at 2026-11-23T11:10:31Z]",
+          "url": null,
+          "as_of": "2026-11-20",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "MSCI Nov 2026 review STPublicList (announced 2026-11-11); MSCI USA deletion eff 2026-11-30 close",
+          "url": null,
+          "as_of": "2026-11-11",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Invalidated if the next stored state leaves panic or RSI is back through 25. MSTR is the tape proxy for MSTZ.",
+      "handoff": null
+    }
+  ],
+  "notes": "technical_summary generated_at 2026-11-23T11:10:31Z; US rows as_of 2026-11-20. Russell Nov 20 lists: WCN, FER, LB still additions; no universe-name deletions. Next update Nov 27 after close; lockdown Nov 30; effective after Dec 11 close. No S&P DJI notice after Oct 30 touches a universe name. MSTR MSCI USA deletion effective 2026-11-30 close unchanged. TPL/EROK all-stock deal announced 2026-11-23 is a corporate action, not a provider announcement. 35 held: LSEG rvol 0.1, RMS.PA rvol 0.17, DB1.DE rvol 0.23, TEQ.ST rvol 0.2 (partial session); 31 on the line cap. Baseline n=20.",
+  "screens_empty": [],
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}
