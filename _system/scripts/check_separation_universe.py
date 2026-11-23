@@ -61,7 +61,7 @@ def structural_errors() -> list[str]:
     return errors
 
 
-def health(today: date | None = None) -> dict:
+def health(today: date | None = None, *, generated_at: str | None = None) -> dict:
     today = today or date.today()
     state = read_json(DISCOVERY_STATE_PATH, {}) or {}
     streak = int(state.get("consecutive_failures") or 0)
@@ -70,8 +70,10 @@ def health(today: date | None = None) -> dict:
     if streak >= UNHEALTHY_FAILURE_STREAK:
         status = "unhealthy"
         problems.append(f"EDGAR discovery failed {streak} runs in a row")
-    feed = read_json(DASHBOARD_PATH, {}) or {}
-    stamp = feed.get("generated_at")
+    if generated_at is None:
+        feed = read_json(DASHBOARD_PATH, {}) or {}
+        generated_at = feed.get("generated_at")
+    stamp = generated_at
     if stamp:
         try:
             generated = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))

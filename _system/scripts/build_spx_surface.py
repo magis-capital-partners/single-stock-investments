@@ -152,6 +152,7 @@ def fetch_chain(url: str = SOURCE_URL, *, attempts: int = 3, timeout: int = 45) 
                 headers={
                     "User-Agent": USER_AGENT,
                     "Accept": "application/json",
+                    "Referer": "https://www.cboe.com/delayed_quotes/spx/quote_table/",
                     "Accept-Encoding": "gzip",
                 },
             )

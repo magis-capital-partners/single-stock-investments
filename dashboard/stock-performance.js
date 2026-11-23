@@ -33,7 +33,7 @@
     for(const p of points){peak=Math.max(peak,p[2]);drawdown=Math.min(drawdown,p[2]/peak-1);}
     const years=(new Date(last[0])-new Date(first[0]))/86400000/365.2425;
     const ratio=last[2]/base;
-    return {points, start:first[0], end:last[0], total:ratio-1, cagr:years>0?Math.pow(ratio,1/years)-1:null,
+    return {points, start:first[0], end:last[0], total:ratio-1, cagr:years>=365/365.2425?Math.pow(ratio,1/years)-1:null,
       drawdown, ending:10000*ratio, benchmark:benchmark&&benchBase>0?benchmark:null,
       values:points.map(p=>({date:p[0],total:10000*p[2]/base,price:10000*p[1]/priceBase,
         benchmark:benchBase>0&&Number.isFinite(bench.get(p[0]))?10000*bench.get(p[0])/benchBase:null}))};
@@ -41,13 +41,13 @@
 
   function markup(t,h={}) {
     const record=history(t), s=state(t), data=windowData(record,s.period,s.benchmark);
-    if(!data)return `<h3>Long-term shareholder returns</h3><p class="perf-empty">Comparable shareholder-return history is not available for this listing.${record?.reason?' '+esc(record.reason):''}</p>${/^https?:\/\//.test(record?.source_url||'')?(h.linkHtml?h.linkHtml(record.source_url,'Review history source'):`<a href="${esc(record.source_url)}" target="_blank" rel="noopener noreferrer">Review history source</a>`):''}`;
+    if(!data)return `<h3>Total return</h3><p class="perf-empty">Comparable shareholder-return history is not available for this listing.${record?.reason?' '+esc(record.reason):''}</p>${/^https?:\/\//.test(record?.source_url||'')?(h.linkHtml?h.linkHtml(record.source_url,'Review history source'):`<a href="${esc(record.source_url)}" target="_blank" rel="noopener noreferrer">Review history source</a>`):''}`;
     const currency=record.currency||'USD', initial=money(10000,currency);
     const links=[['Stock history',record.source_url], ...(data.benchmark?[['Benchmark history',data.benchmark.source_url]]:[])];
     const sourceLink=(label,url)=>h.linkHtml?h.linkHtml(url,esc(label)):`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
     const annual=data.values.filter((p,i,all)=>i===0 || i===all.length-1 || p.date.slice(0,4)!==all[i+1]?.date.slice(0,4));
-    return `<div class="perf-heading"><div><h3>Long-term shareholder returns</h3><p>${esc(day(data.start))} – ${esc(day(data.end))} · ${esc(currency)} · dividends reinvested</p></div><span class="perf-basis">${record.status==='complete'?'Distribution history reconciled':'Distribution verification incomplete'}</span></div>
-      <div class="perf-toolbar"><div class="perf-periods" role="group" aria-label="Performance period">${[['1','1Y'],['5','5Y'],['10','10Y'],['all','All history']].map(([v,label])=>`<button type="button" data-perf-period="${v}" aria-pressed="${s.period===v}">${label}</button>`).join('')}</div>
+    return `<div class="perf-heading"><div><h3>Total return</h3><p>${esc(day(data.start))} – ${esc(day(data.end))} · ${esc(currency)} · dividends reinvested</p></div><span class="perf-basis">${record.status==='complete'?'Distribution history reconciled':'Distribution verification incomplete'}</span></div>
+      <div class="perf-toolbar"><div class="perf-periods" role="group" aria-label="Performance period">${[['1','1Y'],['5','5Y'],['10','10Y'],['all','All history']].filter(([v])=>v==='all'||(Date.parse(record.points.at(-1)[0])-Date.parse(record.points[0][0]))/86400000>=Number(v)*365).map(([v,label])=>`<button type="button" data-perf-period="${v}" aria-pressed="${s.period===v}">${label}</button>`).join('')}</div>
       <label>Show<select data-perf-control="view"><option value="wealth"${s.view==='wealth'?' selected':''}>Growth of ${esc(initial)}</option><option value="return"${s.view==='return'?' selected':''}>Cumulative return %</option></select></label>
       <label>Scale<select data-perf-control="scale"><option value="logarithmic"${s.scale==='logarithmic'?' selected':''}>Logarithmic</option><option value="linear"${s.scale==='linear'?' selected':''}>Linear</option></select></label></div>
       <dl class="perf-stats"><div><dt>Ending value of ${esc(initial)}</dt><dd>${esc(money(data.ending,currency))}</dd></div><div><dt>Total return</dt><dd>${esc(pct(data.total))}</dd></div><div><dt>Annualized return</dt><dd>${esc(pct(data.cagr))}</dd></div><div><dt>Largest decline from a peak</dt><dd>${esc(pct(data.drawdown))}</dd></div></dl>

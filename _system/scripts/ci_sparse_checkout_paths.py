@@ -368,7 +368,7 @@ def paths_for_profile(profile: str) -> list[str]:
             for ticker in ("CPRT", "TBBK", "FRMO")
             for name in ("valuation_contract.json", "thesis_card.json", "falsifier_specs.json")
             if ticker != "FRMO" or name != "falsifier_specs.json"
-        ] + [f"/{ticker}/research/evidence/sec_companyfacts.json" for ticker in ("CPRT", "TBBK")]
+        ] + ["/*.CVR/research/cvr_terms.json"] + [f"/{ticker}/research/evidence/sec_companyfacts.json" for ticker in ("CPRT", "TBBK")]
 
     if profile == "thirteen-f":
         # Read by build_overlap_holdings.py / ingest_13f.py, and rewritten by

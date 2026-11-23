@@ -259,7 +259,7 @@ def test_lightweight_publication_and_ci_include_exact_pilot_inputs():
     from stock_one_pagers import PILOT_INPUT_PATHS
     from workflow_run_deploy_gate import DEPLOY_INPUTS
     for profile in ("pages", "dashboard"):
-        assert set(sparse.paths_for_profile(profile)) == {"/" + path for path in PILOT_INPUT_PATHS}
+        assert set(sparse.paths_for_profile(profile)) == {"/" + path for path in PILOT_INPUT_PATHS} | {"/*.CVR/research/cvr_terms.json"}
     assert set(PILOT_INPUT_PATHS) <= set(DEPLOY_INPUTS)
     assert all((ROOT / path).is_file() for path in PILOT_INPUT_PATHS)
 
@@ -273,4 +273,4 @@ def test_sparse_path_bootstrap_runs_without_the_presentation_builder(tmp_path):
     for profile in ("pages", "dashboard"):
         result = subprocess.run([sys.executable, str(script), "--count", profile], capture_output=True, text=True, encoding="utf-8")
         assert result.returncode == 0, result.stderr
-        assert int(result.stdout) == 10
+        assert int(result.stdout) == 11

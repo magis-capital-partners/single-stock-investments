@@ -26,6 +26,7 @@ export async function readResearchObject(bucket, record) {
 export async function onRequestGet(context) {
   if (!await requirePortfolioViewer(context)) return privateJson({ error: 'Unauthorized.' }, 401);
   const ticker = new URL(context.request.url).searchParams.get('ticker') || 'index';
+  const changes = new URL(context.request.url).searchParams.get('view') === 'changes';
   if (ticker !== 'index' && !/^[A-Za-z0-9^][A-Za-z0-9.^_-]{0,47}$/.test(ticker)) return privateJson({ error: 'Invalid stock identity.' }, 400);
   try {
     const bucket = context.env.PRIVATE_ARTIFACTS;
@@ -34,10 +35,10 @@ export async function onRequestGet(context) {
     if (!pointer || pointer.size > 1024 * 1024) return privateJson({ error: 'Use the publication snapshot.' }, 404);
     const manifest = await pointer.json();
     if (manifest.schema_version !== 'stock-research-live.v1') throw new Error('Unknown research release');
-    const record = ticker === 'index' ? manifest.index : manifest.companies?.[ticker];
+    const record = changes ? manifest.changes : ticker === 'index' ? manifest.index : manifest.companies?.[ticker];
     if (!record) return privateJson({ error: 'Company is awaiting the next research refresh.' }, 404);
     const raw = await readResearchObject(bucket, record), document = JSON.parse(raw);
-    if (ticker === 'index' ? document.schema_version !== 'stock-research-index.v1' : document.ticker !== ticker || document.schema_version !== 'stock-research-explorer.v1') throw new Error('Research identity mismatch');
+    if (changes ? document.version !== 1 || !document.rows || !document.profiles || !Array.isArray(document.registered) || document.as_of !== manifest.as_of : ticker === 'index' ? document.schema_version !== 'stock-research-index.v1' : document.ticker !== ticker || document.schema_version !== 'stock-research-explorer.v1') throw new Error('Research identity mismatch');
     return new Response(raw, { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store, private', 'x-content-type-options': 'nosniff', 'x-research-as-of': manifest.as_of } });
   } catch {
     // A failed or incomplete live release does not replace the checked Pages

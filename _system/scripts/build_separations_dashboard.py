@@ -478,9 +478,10 @@ def build(*, today: date | None = None, refresh: bool = False) -> dict:
         "closed": sum(1 for r in rows if r["lifecycle"] == "closed"),
         "by_kind": dict(Counter(r["kind"] for r in rows)),
     }
+    generated_at = utc_now()
     return {
         "schema_version": SCHEMA_VERSION,
-        "generated_at": utc_now(),
+        "generated_at": generated_at,
         "as_of": today.isoformat(),
         "caption": CAPTION,
         "definition": (
@@ -496,7 +497,7 @@ def build(*, today: date | None = None, refresh: bool = False) -> dict:
         "discovery_events": discovery_events(),
         "outcomes_summary": outcomes_summary(),
         "market_as_of": market.get("as_of"),
-        "health": health(today),
+        "health": health(today, generated_at=generated_at),
         **RESEARCH_ONLY,
     }
 

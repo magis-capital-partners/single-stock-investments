@@ -53,6 +53,13 @@ DEPLOY_INPUTS = (
     "_system/data/evidence_recovery_queue.json",
     "_system/scripts/build_cloudflare_pages_site.py",
     "_system/scripts/prepare_stock_research_publication.py",
+    "_system/scripts/financial_changes.py",
+    "_system/scripts/stock_summary.py",
+    "_system/scripts/publish_stock_summary.py",
+    "_system/scripts/stock_summary_sources.json",
+    "_system/scripts/financial_change_sources.json",
+    "_system/reference/market-data/fundamentals/_sic_map.json",
+    "_system/portfolio/registry.json",
     "_system/scripts/stock_one_pagers.py",
     "_system/scripts/stock_research_explorer.py",
     "_system/scripts/stock_research_share_basis.py",
@@ -109,6 +116,8 @@ DEPLOY_INPUTS = (
     for name in ("valuation_contract.json", "thesis_card.json", "falsifier_specs.json")
     if ticker != "FRMO" or name != "falsifier_specs.json"
 ) + tuple(f"{ticker}/research/evidence/sec_companyfacts.json" for ticker in ("CPRT", "TBBK"))
+
+DEPLOY_INPUTS += tuple(f"{ticker}/research/cvr_terms.json" for ticker in ("ABMD.CVR","MRTX.CVR","PRVL.CVR"))
 
 ALWAYS_DEPLOY_EVENTS = {"workflow_dispatch"}
 

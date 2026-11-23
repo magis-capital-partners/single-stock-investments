@@ -13,7 +13,7 @@ from urllib.parse import quote
 
 from atomic_io import _atomic_write_text
 from build_stock_research_explorer import build_company
-from build_stock_research_history import fetch_performance
+from build_stock_research_history import fetch_performance, reconcile_performance
 from private_storage import PrivateStorage
 from publish_stock_research_explorer import publish_live, isolated_storage_client
 from sec_client import SecClient
@@ -67,7 +67,8 @@ def refresh(root,cache,*,only=None,publish=False,as_of=None):
                 failures.append({'ticker':ticker,'source':'SEC','error':type(exc).__name__})
                 if path.exists():source=json.loads(gzip.decompress(path.read_bytes()))
         row['multiple_quoted_classes']=class_counts.get(str(cik).zfill(10),0)>1
-        try:fetch_performance(ticker,row,captures)
+        performance = {}
+        try:performance = fetch_performance(ticker,row,captures)
         except Exception as exc:failures.append({'ticker':ticker,'source':'prices','error':type(exc).__name__})
         path=captures/(quote(ticker,safe='')+'.json.gz')
         if not path.exists():
@@ -84,6 +85,12 @@ def refresh(root,cache,*,only=None,publish=False,as_of=None):
             try:vendor=vendor_history(fetch_history(capture.get('symbol') or ticker,cache/'vendor'/as_of),as_of)
             except Exception as exc:failures.append({'ticker':ticker,'source':'vendor_annual','error':type(exc).__name__})
         document=build_company(ticker,brief,row,model,source,capture,as_of,supplements,vendor)
+        document['instrument_method'] = model.get('method')
+        if document['profile']=='fund' or ticker=='SPY':
+            # A failed transport can retain dated history. An explicit evidence block supersedes it.
+            record = (reconcile_performance(performance,path) if performance
+                      else old.get('comparison_performance') or {})
+            document['comparison_performance'] = {**record, 'points':(record.get('points') or [])[-1200:]}
         document['events']=sorted({json.dumps(e,sort_keys=True):e for e in [*document['events'],*old.get('events',[])]}.values(),key=lambda e:e.get('date',''),reverse=True)[:200]
         if old.get('kpis'):document['kpis']=old['kpis']
         if old.get('peers'):document['peers']=old['peers']

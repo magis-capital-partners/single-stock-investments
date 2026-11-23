@@ -34,6 +34,19 @@ test('saved workspace rejects unrecognized keys, over-size values, cross-origin 
  const c=context();c.data.humanViewer.role='reader';assert.equal((await getPreferences(c)).status,401);
  const x=context('drew@example.com',{key:'workspace',value:{},revision:0});x.request=new Request(x.request,{headers:{origin:'https://attacker.example'}});assert.equal((await onRequestPut(x)).status,403);
 });
+test('financial changes require a viewer, a verified matching release and a changes receipt',async()=>{
+ const doc={version:1,as_of:'2026-11-22',rows:{A:{}},profiles:{},registered:['A']};
+ const raw=Buffer.from(JSON.stringify(doc)),digest=sha(raw);
+ const record={bytes:raw.length,sha256:digest,chunks:[{sha256:digest,bytes:raw.length,stored_sha256:digest,stored_bytes:raw.length,encoding:'raw'}]};
+ const manifest={schema_version:'stock-research-live.v1',as_of:doc.as_of,companies:{},changes:record};
+ const ctx=context();ctx.request=new Request('https://dashboard.example/api/v1/research/data?view=changes');
+ ctx.env.PRIVATE_ARTIFACTS={get:async key=>key.endsWith('current.json')?{size:500,json:async()=>manifest}:
+   {size:raw.length,arrayBuffer:async()=>raw.buffer.slice(raw.byteOffset,raw.byteOffset+raw.length)}};
+ assert.deepEqual(await (await getData(ctx)).json(),doc);
+ assert.equal((await getData({...ctx,data:{}})).status,401);
+ manifest.as_of='2026-11-23';assert.equal((await getData(ctx)).status,503);
+ delete manifest.changes;assert.equal((await getData(ctx)).status,404);
+});
 test('private financial shards verify compressed and raw hashes, sizes and company identity',async()=>{
  const raw=Buffer.from(JSON.stringify({schema_version:'stock-research-explorer.v1',ticker:'TEST'})),stored=gzipSync(raw);
  const chunk={sha256:sha(raw),bytes:raw.length,stored_sha256:sha(stored),stored_bytes:stored.length,encoding:'gzip'},record={sha256:sha(raw),bytes:raw.length,chunks:[chunk]};

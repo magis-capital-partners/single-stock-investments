@@ -1823,7 +1823,9 @@
     }
   }
 </style>
+<link rel="stylesheet" href="financial-changes.css?v=20261122">
 <link rel="stylesheet" href="research-workspace.css?v=20261025">
+<link rel="stylesheet" href="stock-summary.css?v=20261123">
 <link rel="stylesheet" href="stock-performance.css?v=20261118">
 <link rel="stylesheet" href="stock-one-pager.css?v=20261118">
 <link rel="stylesheet" href="stock-research-explorer.css?v=20261121">
@@ -1866,6 +1868,7 @@
   </nav>
   <nav class="view-tabs workspace-subnav" id="research-subnav" aria-label="Research" hidden>
     <a class="view-tab" data-view="holdings" data-research-scope="coverage" href="#/research/coverage">All coverage</a>
+    <a class="view-tab" data-view="holdings" data-research-scope="changes" href="#/research/changes">What changed?</a>
     <a class="view-tab" data-view="valuation" href="#/research/valuation">Decision Queue</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="ideas-subnav" aria-label="Ideas" hidden>
@@ -1907,6 +1910,7 @@
     </details>
     <span id="holdings-filter-status" class="coverage-filter-status" role="status"></span>
   </div>
+  <section id="financial-changes-home" class="fc-view" hidden></section>
   <div id="compounders-home" hidden></div>
 
   <div class="main detail-closed" id="main-grid">
@@ -2070,11 +2074,13 @@
 <script src="commodity-resolution.js?v=20261113"></script>
 <script src="commodity-model-viz.js?v=20261113"></script>
 <script src="source-links.js?v=20261118"></script>
+<script src="stock-summary.js?v=20261123"></script>
 <script src="stock-performance.js?v=20261118"></script>
 <script src="stock-valuation.js?v=20261119"></script>
 <script src="stock-valuation-view.js?v=20261119"></script>
 <script src="stock-research-metrics.js?v=20261121"></script>
 <script src="stock-research-preferences.js?v=20261121"></script>
+<script src="financial-changes.js?v=20261122"></script>
 <script src="stock-research-explorer.js?v=20261121"></script>
 <script src="stock-one-pager.js?v=20261119"></script>
 <script src="research-workspace.js?v=20261118"></script>
@@ -2482,7 +2488,7 @@ function parseRouteFromHashString(hash) {
       watchlistSub: null,
     };
   }
-  const researchMatch = /^#\/research\/(coverage|valuation|compounders|serial-acquirers)(?:\/([^/?#]+))?$/i.exec(hash || '');
+  const researchMatch = /^#\/research\/(coverage|valuation|changes|compounders|serial-acquirers)(?:\/([^/?#]+))?$/i.exec(hash || '');
   if (researchMatch) return { researchScope: researchMatch[1].toLowerCase(), view: researchMatch[1].toLowerCase() === 'valuation' ? 'valuation' : 'holdings', ticker: researchMatch[2] ? decodeURIComponent(researchMatch[2]).toUpperCase() : null, watchlistSub: null };
   if (/^#\/(?:ideas\/)?warrants$/i.test(hash || '')) {
     return { view: 'situations', ticker: null, watchlistSub: null, situationLane: 'warrants', situationFocus: '', situationGatesOpen: true };
@@ -2643,7 +2649,7 @@ function applyParsedRouteFromHash() {
     if (filters.has('claim-source')) memorySourceFilter = filters.get('claim-source');
     if (filters.has('claim-state')) memoryLifecycleFilter = filters.get('claim-state');
   }
-  if (route.view === 'holdings') researchScope = ['compounders', 'serial-acquirers'].includes(route.researchScope) ? route.researchScope : 'coverage';
+  if (route.view === 'holdings') researchScope = ['changes', 'compounders', 'serial-acquirers'].includes(route.researchScope) ? route.researchScope : 'coverage';
   if (route.view === 'watchlist' && route.watchlistSub && WATCHLIST_VIEWS.has(route.watchlistSub)) {
     watchlistViewMode = route.watchlistSub === 'queue' ? 'all' : route.watchlistSub;
     try { localStorage.setItem(WATCHLIST_VIEW_KEY, watchlistViewMode); } catch (_) { /* ignore */ }
@@ -6195,12 +6201,19 @@ function renderTable() {
   const compounders = ['compounders', 'serial-acquirers'].includes(researchScope);
   const host = document.getElementById('compounders-home');
   host.hidden = !compounders || !!selected;
+  const changes = activeView === 'holdings' && researchScope === 'changes' && !selected;
+  const changesHost = document.getElementById('financial-changes-home');
+  changesHost.hidden = !changes;
   document.querySelector('#holdings-view > .toolbar').hidden = false;
-  document.getElementById('main-grid').style.display = compounders && !selected ? 'none' : '';
-  document.getElementById('summary').style.display = activeView==='holdings' && !compounders ? '' : 'none';
-  document.getElementById('watchlist-wrap').style.display = activeView==='holdings' && !compounders && (data.watchlist||[]).length ? '' : 'none';
+  document.getElementById('main-grid').style.display = changes || (compounders && !selected) ? 'none' : '';
+  document.getElementById('summary').style.display = activeView==='holdings' && !compounders && !changes ? '' : 'none';
+  document.getElementById('watchlist-wrap').style.display = activeView==='holdings' && !compounders && !changes && (data.watchlist||[]).length ? '' : 'none';
   renderUniverseFilters();
   const eligible = filtered();
+  if (changes) FinancialChanges.mount(changesHost, {
+    rows: eligible, query: document.getElementById('search').value,
+    restricted: ownedOnly || needsWork || [marketFilter,sleeveFilter,valuationFilter,fearFilter].some(v => v !== 'ALL')
+  });
   if(activeView==='holdings' && compounders && !selected) Compounders.mount(host,filtered,loadTickerDetail,researchScope);
   const rows = compounders ? Compounders.rows(eligible,researchScope,true).map(r=>({...r.record,ticker:r.ticker,company:r.name})) : eligible;
   const grid = document.getElementById('main-grid');
@@ -6635,6 +6648,7 @@ function renderUniverseFilters() {
   if (!group || !data) return;
   const filters = [
     {id:'coverage', label:'All coverage'},
+    {id:'changes', label:'What changed?'},
     {id:'compounders', label:'Quality compounders', count:window.Compounders?.count('compounders')},
     {id:'serial-acquirers', label:'Serial acquirers', count:window.Compounders?.count('serial-acquirers')},
   ];
