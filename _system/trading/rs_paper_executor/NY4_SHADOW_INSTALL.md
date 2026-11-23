@@ -1,258 +1,155 @@
-# RS live shadow on NY4: pinned install, verification and rollback
+# Reverse-split execution on NY4
 
-**Status: a plan for the owner's explicit NY4 authorization. Nothing here runs
-without it.** Merging the PRs installs nothing. No NY4 work, Gateway connection,
-timer activation or arm file follows from a merge. Each numbered stage below is
-its own owner word.
+Owner direction, November 22, 2026. NY4, the existing SPX machine, is the live
+host. This is a rollout plan. Deployment, broker access and live orders each
+have their own approval and evidence.
 
-What shadow is: client 60 on the shared NY4 Gateway, with the dedicated shadow
-journal (`run --shadow`). It runs every entry gate on the real account and
-transmits no order. `ARM.json` does not exist, and shadow refuses to start
-while RS holds live names.
+| Location | Responsibility |
+| --- | --- |
+| Box R | Discover announcements, retain primary sources, calculate signals and publish dated research proposals. Use public borrow indications. |
+| Drew's PC | Run the supervised IBKR paper test and compare SSI with the DU blotter. |
+| NY4 | Observe the research feed without a broker socket. Eventually execute individually approved reverse-split tickets on the existing Gateway using the registered client 60 role. |
+| SSI | Show paper and live execution in separate views. Read signed journal events and independent market marks. Use Flex for broker reconciliation. |
 
-## 0. Preconditions (before any NY4 evening)
+The live path uses the existing NY4 machine and Gateway. The protected SPX
+executor keeps its connection, market-data capacity and risk priority.
+Separate processes and client IDs still share account margin and positions.
+The SPX and ls-algo registry files deployed on NY4 matched SSI's client-60
+allocation in the November 22 file check. Confirm registry bytes, role pins and
+claims compatibility again at rollout. [Account allocation registry](../ib_gateway_client_registry.v1.json)
 
-1. **CI green** on SSI #1823, ls-algo #70 and spx-0dte #681.
-2. **Registry merges, one after another, never together.** Before each merge,
-   check that the canonical bytes are identical in all three repos:
-   * raw file sha256 `b7d2766708eecb89ad6c9a824786227ec62b4c0f363c6f4bcd60d56549e07c3b`;
-   * canonical hash `2b8e284e47c5372afd2f2af587b03d1941c263b53c169496f44343205250f268`;
-   * version `2026-11-18.1`.
+## 1. Prove paper execution and the research feed
 
-   Check the pins against them in each repo too: SSI `ib_gateway_registry.py`,
-   spx-0dte `live/ib_client_registry.py`, and ls-algo `config/ib_client_ids.yml`.
-   Order: SSI (canonical) first, then spx-0dte #681, then ls-algo #70. Each merge
-   needs the owner's words.
-3. **No activation while deployed registries disagree.** spx-0dte's NY4 tree
-   must carry #681 through its normal deploy, outside hours, with its own gates
-   and `--approved`. #681 changes pins and docs only, and restarts nothing in
-   SPX's strategy. ls-algo #70 deploys in stage 3 below, after the claims file
-   exists.
-4. **Owner inputs:**
-   * the IBKR account number for `config.json`;
-   * an R2 "Object Read only" token scoped to the
-     `single-stock-reverse-splits-evidence` bucket. Only its S3 Access Key ID
-     and Secret Access Key go on NY4. No Cloudflare administration, no write or
-     delete, no Box R secret, no broker credential;
-   * one reviewed ticker and conid for the probe.
+Run the scheduled supervised paper test on Drew's PC with its DU account.
+Compare the broker blotter, the local journal and what the SSI browser
+receives. Verify the short, acknowledgements, cancellation and confirmation,
+cover, final flat position, reconnect recovery, execution-ID deduplication,
+commission provenance and each captured P&L update. Report event-to-browser
+latency by event type. If the paper account supplies delayed quotes, label
+those marks and retain unavailable marks as unavailable. Exercise partial
+fills on a deterministic replay and record any partials actually observed in
+the paper session. The target for execution events on an active browser is
+five seconds, measured during the test.
 
-## 1. Build the release on the laptop (pinned; no GitHub token or deploy key on NY4)
+Observe Box R for a full market session with the merged freshness repair.
+Record publication acknowledgement, receiver receipt, report and underlying
+state clocks against the deployed release. Both producer clocks must be within
+120 seconds. Keep Flex reporting credentials on a separately approved
+broker-reporting surface. Rotate the previous token and verify the replacement
+report before using it to reconcile live trades.
 
-```text
-COMMIT=<the approved merged SSI main commit>
-git -C <ssi checkout> archive --format=tar --prefix=rs-live-$COMMIT/ $COMMIT _system/__init__.py _system/trading | gzip -n > rs-live-$COMMIT.tar.gz
-python -m pip download --dest wheelhouse --only-binary=:all: --platform manylinux2014_x86_64 --python-version 3.12 -r _system/trading/rs_paper_executor/requirements.txt
-sha256sum rs-live-$COMMIT.tar.gz wheelhouse/* > rs-live-$COMMIT.sha256
-```
+## 2. Run Gateway-free shadow on NY4
 
-Copy the archive, `wheelhouse/` and `rs-live-$COMMIT.sha256` to NY4 with the
-existing SSH access. The R2 credential is never in this transfer; the owner
-types it into `operations.env` on NY4 with `sudoedit`.
+Reuse the receipt-checking observer already staged on NY4. Scheduled work can
+read R2 via a scoped credential and read existing SPX risk files. It runs with
+`Nice>=15`, a measured CPU quota, idle disk scheduling and bounded retry.
+Deny access to Gateway loopback ports in those services and verify that the
+observer package has no broker adapter. Keep elapsed-time and resource
+measurements with each release.
 
-## 2. Install on NY4
+For each fresh candidate, build a time-stamped evidence packet before the
+original 15-minute window closes. Bind the original source and its hash to
+the selected split terms, effective dates, issuer and approved stock conid.
+Verify the frozen repeat-split and financial eligibility rules, independently
+licensed consolidated NBBO and share depth, and fresh exchange halt and
+short-sale restriction status. An unknown restriction, delayed or incomplete
+quote, repaired timestamp, or unsettled security mapping blocks the entry.
+Public borrow indications support screening. At review, obtain current
+account-specific borrow and the broker's exact-stock margin preview, and
+record the observed share limit, fee indication, warning and margin effect.
+[IBKR short-stock information](https://www.interactivebrokers.com/support/faq/content/information-interactive-brokers-provide-about-707427431)
+and [IBKR margin preview](https://www.interactivebrokers.com/support/faq/content/691853055).
 
-A weekday evening after 16:20 ET, as root, with the owner's word. Not between
-Sunday 23:05 and Monday 07:10 ET, while the Gateway is closed. Nothing here
-touches the Gateway or ThetaData, and no SPX unit is restarted.
+For supervised shadow, the operator can supply a time-stamped margin preview
+and other broker evidence from an existing, authorized IBKR interface that
+can coexist with SPX. Use the current account, instrument, quantity and price
+from the proposed ticket. Bind the preview and broker evidence to the exact
+candidate and do not transmit an order during shadow. An additional login
+using the protected username can take over its broker session. If the needed
+evidence cannot be collected safely or within the original window, record the
+refusal and exclude the opportunity. [IBKR brokerage-session limits](https://www.interactivebrokers.com/docs/web-api/authentication/multiple-sessions)
 
-```text
-sha256sum -c rs-live-$COMMIT.sha256                       # refuse on any mismatch
-groupadd --system ib-claims
-usermod -aG ib-claims spx                                  # ls-algo runs as spx
-useradd --system --home-dir /srv/rs-live --shell /usr/sbin/nologin rs-live
-usermod -aG ib-claims rs-live
-install -d -o root    -g root     -m 0755 /srv/rs-live /srv/rs-live/releases
-install -d -o rs-live -g ib-claims -m 2750 /var/lib/ib-account-claims
-install -d -o rs-live -g rs-live  -m 0750 /var/lib/rs-live /var/lib/rs-live/feed
-install -d -o root    -g rs-live  -m 0750 /etc/rs-live          # the service cannot arm itself
-tar -xzf rs-live-$COMMIT.tar.gz -C /srv/rs-live/releases && mv /srv/rs-live/releases/rs-live-$COMMIT /srv/rs-live/releases/$COMMIT
-ln -sfn /srv/rs-live/releases/$COMMIT /srv/rs-live/repo
-python3.12 -m venv /srv/rs-live/venv
-/srv/rs-live/venv/bin/pip install --no-index --find-links ./wheelhouse -r /srv/rs-live/repo/_system/trading/rs_paper_executor/requirements.txt
-setfacl -m u:rs-live:--x /home/spx /home/spx/spx-0dte /home/spx/spx-0dte/data
-setfacl -R -m u:rs-live:r-X /home/spx/spx-0dte/data/live
-setfacl -R -d -m u:rs-live:r-X /home/spx/spx-0dte/data/live
-```
+Keep the existing acceptance bar. Qualifying shadow requires five complete
+regular sessions with an observer gap of at most 120 seconds and at least
+95% measured fresh coverage, plus three fully gated opportunities from
+three issuers across at least two sessions and a verified paper pass.
+Deduplicate issuer and corporate action. Conditional, late and incomplete
+records are excluded. The broker-free feed test measures uptime and
+delivery only. Before grading this new protocol, implement and review an
+offline import for source-, time- and ticket-bound broker evidence. The
+existing shadow grader needs that proof before it can count these sessions.
 
-Files:
-* `/etc/rs-live/config.json` (`root:rs-live 0640`): `config.live.example.json`
-  with the account filled in. Its policy values are the owner's pilot settings
-  of 2026-11-19. Do not change them here.
-* `/etc/rs-live/operations.env` (`root:root 0600`): `RS_OPERATIONS_S3_ENDPOINT`,
-  `RS_OPERATIONS_ACCESS_KEY_ID` and `RS_OPERATIONS_SECRET_ACCESS_KEY`.
-* `/var/lib/rs-live/evidence.json` (`rs-live 0640`): from `evidence.example.json`.
-* `/etc/rs-live-approved`: install approval, not an arm.
-* `rs-live-executor.service`, `rs-live-executor.timer` and
-  `rs-live-operations.service` into `/etc/systemd/system/`, then
-  `systemctl daemon-reload`. **Do not enable anything.**
+## 3. Prepare the NY4 ticket runner
 
-`R=/srv/rs-live/venv/bin/python -m _system.trading.rs_paper_executor` below, run
-from `/srv/rs-live/repo`.
+The current timer-based live implementation needs a one-ticket entry point
+before rollout. Keep the scheduled research observer independent. The
+eligible trigger for a Gateway session is a human approval of a specific
+order action. Require an explicit owner approval for each proposed Gateway
+action during the protected regular-hours window, including why it cannot wait
+until after 16:15 ET. An approval for installation or a prior ticket grants no
+permission for a subsequent Gateway action. [Gateway coexistence rules](../../../CLAUDE.md)
 
-## 3. Verify (same evening, before anything is enabled)
+Before installation, confirm the deployed SPX and ls-algo registry hash and
+read access to the shared symbol-claims file, even after an atomic file
+replacement. Confirm the read-only SPX book-margin input is fresh and
+budgeted. Stage a checksum-pinned release outside market hours under a
+separate restricted service account and low resource limits. Keep release
+activation, Gateway connection and any live-order approval as separate
+steps.
 
-1. **Paths, as the service user:** `sudo -u rs-live $R preflight --config /etc/rs-live/config.json`.
-   It checks that the SPX tree and its newest day are readable, and that the
-   claims and publish directories are writable. It exits 2 and names each
-   failure. It writes nothing.
-2. **SPX's files after atomic replacement.** The default ACL has to reach files
-   that spx-0dte REPLACES, not only the ones present now. Prove the mechanism
-   with spx-0dte's own writer in a scratch folder, never inside SPX's tree:
+For each approved ticket:
 
-   ```text
-   install -d -o spx -g spx -m 0750 /home/spx/.rs-acl-check
-   setfacl -m u:rs-live:r-x /home/spx/.rs-acl-check; setfacl -d -m u:rs-live:r-X /home/spx/.rs-acl-check
-   sudo -u spx bash -c 'cd /home/spx/spx-0dte/live && /home/spx/spx-0dte/.venv/bin/python -c "from pathlib import Path; from heartbeat import _atomic_write_text as w; p=Path(\"/home/spx/.rs-acl-check/x.json\"); w(p, \"1\"); w(p, \"2\")"'
-   sudo -u rs-live cat /home/spx/.rs-acl-check/x.json        # must print 2
-   getfacl /home/spx/.rs-acl-check/x.json                     # user:rs-live:r-- (effective r)
-   rm -r /home/spx/.rs-acl-check
-   ```
+1. Bind the authorized account, client 60, `RSLIVE|` reference, conid, side,
+   size, limit price, expiry, observed source clocks and frozen policy to
+   a durable intent. Recheck that another strategy or human book holds no
+   position or working order in the same name. Publish the symbol claim
+   and keep it until the broker position and all orders reconcile. Follow the
+   existing claim release window after flatness.
+2. Validate the registry at the connection boundary. Recheck current
+   shortability, locate or broker acceptance, fees, quote size, halt and
+   eligibility, exact-order WhatIf, SPX reserve, cash buffer and stressed
+   portfolio margin. Yield margin to SPX. Missing, stale or contradictory
+   evidence blocks an entry.
+3. Submit only the approved limit order. Use broker callbacks while handling
+   that ticket, preserve every acknowledgement, execution, rejection and
+   cancel, and release the connection at the terminal outcome. An ambiguous
+   submission blocks further tickets until the operator reconciles it.
+   Enforce the daily connection budget, real backoff and a persistent circuit
+   breaker. Each new entry, cancel or cover is another separately approved action.
+   A stopped worker leaves any broker-held order or position visible as
+   unresolved and must not infer a successful cancel or cover.
 
-   That is SPX's own interpreter (`SPX_PYTHON` in `scripts/linux/spx-env.sh`:
-   `.venv`, else `python3`). `heartbeat.py` imports only the standard library.
-   The next morning, the shadow
-   journal confirms the real tree. A refusal reason `SPX book margin directory
-   unreadable` in `shadow-report` means the grant failed.
-3. **The claims file, readable by spx BEFORE ls-algo's reader is deployed:**
-   ```text
-   sudo -u rs-live $R claims-init --config /etc/rs-live/config.json   # writes reverse-split.json (no claims), no socket
-   sudo -u spx id -nG | grep -w ib-claims                              # sudo opens a fresh login: current groups
-   sudo -u spx ls -l /var/lib/ib-account-claims && sudo -u spx cat /var/lib/ib-account-claims/reverse-split.json
-   ```
-   Running processes do not acquire the new group. None of SPX's long-running
-   units reads the claims, so none is restarted. ls-algo's four units are
-   one-shot jobs as `spx` and pick the group up at their next normal start.
-4. **Deploy ls-algo #70** through ls-algo's normal process, at a time no
-   ls-algo job is running. Then run its reader once as spx; it must report no
-   claims and no error. An unreadable claims directory is a global failure
-   there, which is why steps 3 and 4 come in this order.
-5. **Registry agreement on the box:**
-   ```text
-   sha256sum /srv/rs-live/repo/_system/trading/ib_gateway_client_registry.v1.json /home/spx/spx-0dte/config/ib_gateway_client_registry.v1.json /home/spx/ls-algo/config/ib_gateway_client_registry.v1.json
-   ```
-   All three must print `b7d27667...`. Stop here if any differs.
-6. **Feed, one fetch.** The credential reaches the process only through systemd:
-   ```text
-   sudo systemd-run --wait --pipe -p User=rs-live -p WorkingDirectory=/srv/rs-live/repo -p EnvironmentFile=/etc/rs-live/operations.env $R operations-fetch --once --config /etc/rs-live/config.json --feed-dir /var/lib/rs-live/feed
-   ```
-   Exit 0 means a fresh snapshot. Box R publishes less often when idle, so an
-   evening exit 3 (older than 120 s) is information, not a failure. A 403
-   means the token is wrong.
-7. **The only connection of the evening:**
-   `sudo -u rs-live $R probe --config /etc/rs-live/config.json --connect-live --symbol <TICKER> --conid <CONID> --report /var/lib/rs-live/probe.json`.
-   It opens one session as client 60, makes no journal, runs a 1-share WhatIf
-   and transmits nothing. Its quote checks need regular hours.
+Set the first pilot to one concurrent position. Record the reference size
+and set a ceiling of one-tenth of it, with explicit per-name, gross and
+loss caps. For a $25,000 reference the proposed ceiling is $2,500. The
+approval also fixes the hold and pre-split exit policy, stop and recall
+response, and who owns overnight cover decisions. Displayed depth, borrow
+and stressed margin can reduce size further. Review a reconciled first
+round trip before considering an increase.
 
-## 4. Enable (a separate owner word)
+## 4. Prove complete visibility before the first live short
 
-`systemctl enable --now rs-live-executor.timer`. The first shadow session starts at
-09:05 ET on the next weekday. The fetcher starts with the executor and stops with it.
-After each close:
+Publish the ticket's durable broker events from NY4 to an owner-only SSI
+execution feed. Use a live-only credential, namespace and storage partition.
+The existing paper endpoint remains isolated. Attribute live positions and
+P&L to reverse splits in SSI's portfolio, and reconcile execution IDs,
+positions, commissions and actual borrow charges with Flex when available.
 
-```text
-sudo -u rs-live $R shadow-report --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite --report /var/lib/rs-live/shadow-$(date +%F).json
-sudo -u rs-live $R operations-cadence --config /etc/rs-live/config.json --feed-dir /var/lib/rs-live/feed
-```
+During a hold, use authorized independent quotes for marked P&L. Display the
+mark source, age and distinction between estimated and posted fees. Prove a
+broker-supported or already-authorized operator notification path for
+broker-side changes between tickets, including recalls, buy-ins and external
+fills or cancels. Confirm which events it actually delivers, measure receipt
+latency and bind each event to the journal. Flex provides the reconciliation
+after the fact. A broker event that only arrives later through Flex leaves
+an intraday visibility gap. Keep the multi-session live pilot gated until
+the notifications and quote coverage pass. A shorter, fully supervised
+pilot would need an explicitly approved change to the hold policy.
 
-The stage-P paper report and its journal come from the laptop. Pass them with
-`--mechanics-report/--mechanics-journal` when reviewing (any machine works,
-read-only).
-
-## 5. Rollback
-
-Nothing below touches SPX's services or the Gateway.
-
-* **Pause.** `systemctl disable --now rs-live-executor.timer && systemctl stop rs-live-executor rs-live-operations`.
-  The shadow journal holds no orders or positions. Confirm with
-  `$R status --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite`;
-  it should show 0 unresolved and 0 positions. Nothing at IBKR needs unwinding.
-* **Code.** `ln -sfn /srv/rs-live/releases/<previous commit> /srv/rs-live/repo`,
-  reinstall the venv if `requirements.txt` changed, and start at the next session.
-  Keep the two previous releases.
-* **Feed credential.** Delete `/etc/rs-live/operations.env` and revoke the token in
-  Cloudflare.
-* **Full uninstall, after pausing:**
-  1. Archive `/var/lib/rs-live/shadow.sqlite` (it is the evidence).
-  2. Remove the three units, `/etc/rs-live`, `/srv/rs-live` and `/var/lib/rs-live`.
-  3. Remove the ACL:
-     ```text
-     setfacl -R -x u:rs-live /home/spx/spx-0dte/data/live
-     setfacl -R -d -x u:rs-live /home/spx/spx-0dte/data/live
-     setfacl -x u:rs-live /home/spx /home/spx/spx-0dte /home/spx/spx-0dte/data
-     ```
-  4. Leave `/var/lib/ib-account-claims/reverse-split.json` in place while ls-algo #70
-     runs. It holds no claims. A missing directory means "no claims" to ls-algo,
-     but an unreadable one is a global failure there.
-  5. `userdel rs-live`. Keep the `ib-claims` group until ls-algo stops reading claims.
-* **Registry.** Revert only with RS stopped, so client 60 is unused. Revert all
-  three repos, one after another, then deploy them in the same order.
-
-## 6. Not in this plan
-
-* No arm file and no pilot.
-* No Gateway restart, no SPX restart, no ThetaData.
-
-Before any live arming, all of these are needed:
-* ls-algo protection deployed;
-* the hub attribution PR;
-* watchdog 140;
-* off-host monitoring;
-* the daily account reconciliation (`account_ownership.py`).
-
-## 7. Evidence producers (#1825; only once #1825 is merged)
-
-Without them, `/var/lib/rs-live/evidence.json` stays the empty example, and
-every candidate is refused at the evidence step. They are a separate owner
-word from stages 2 to 4.
-
-* **No credential.** They read Box R's snapshot from
-  `/var/lib/rs-live/feed/operations.json`, which `rs-live-operations` writes.
-* **No socket to the Gateway, no client ID, no ThetaData.**
-* **Egress from NY4**, which needs the owner's OK:
-  * `www.nasdaqtrader.com:443` and `www.sec.gov:443`;
-  * `ftp2.interactivebrokers.com:21`. This is anonymous FTP, so passive-mode
-    data ports must be allowed outbound too.
-
-They are part of the same release archive (`_system/trading`), and need no
-extra wheels.
-
-Install, the same evening as stage 2 or later, as root:
-
-```text
-install -d -o rs-live -g rs-live -m 0750 /var/lib/rs-live/evidence-archive
-install -o root -g rs-live -m 0640 /srv/rs-live/repo/_system/trading/rs_evidence/config.example.json /etc/rs-live/producers.json
-sudoedit /etc/rs-live/producers.json   # set user_agent (the owner's SEC contact) and terms_mode; nothing else
-install -m 0644 /srv/rs-live/repo/_system/trading/rs_evidence/rs-evidence-producers.service /srv/rs-live/repo/_system/trading/rs_evidence/rs-evidence-producers.timer /etc/systemd/system/
-systemctl daemon-reload                # do not enable
-```
-
-`/var/lib/rs-live/evidence.json` from stage 2 can stay. The producers rewrite
-it section by section, each under its own lock.
-
-Verify, before enabling anything. Here
-`P=/srv/rs-live/venv/bin/python -m _system.trading.rs_evidence`, run from
-`/srv/rs-live/repo`:
-
-```text
-sudo -u rs-live $P once --config /etc/rs-live/producers.json --only references,ibkr_file,identity,borrow
-sudo -u rs-live $P status --config /etc/rs-live/producers.json
-```
-
-* `once` fetches SymDir and SEC once, plus IBKR's file once. The halt, Rule
-  201 and eligibility tasks are skipped outside the session.
-* `status` prints the row counts, the ages and `entry_gaps`: the exact field
-  that blocks each name.
-* **Today's expected blockers:**
-  * `eligibility.intraday_ssr_clearance_source_absent`, which only an SSR
-    source clears;
-  * `identity.owner_review_required` until reviews exist.
-
-Enable is a separate owner word: `systemctl enable --now rs-evidence-producers.timer`.
-It starts at 09:00 ET, before the executor's 09:05, and ends by
-`RuntimeMaxSec`. The unit runs `Nice=15` and `CPUQuota=10%` (rule 8).
-
-Rollback:
-* `systemctl disable --now rs-evidence-producers.timer && systemctl stop rs-evidence-producers`.
-* The executor then sees the evidence age out and refuses every entry.
-* Archive `/var/lib/rs-live/evidence.json`, `evidence-archive/` and
-  `reviews.jsonl` before an uninstall. They are the evidence history.
+Rehearse the end-to-end dashboard and emergency procedure using paper plus
+recorded failure scenarios. Confirm the audit stays complete through a
+reconnect and that stale feeds, lost ownership proof and ambiguous broker
+state visibly block new entries. Stop accepting tickets on any failed
+precondition. Use the operator's approved broker process to resolve outstanding
+orders or positions and retain the journal and claims until reconciliation.
+Keep SPX services and Gateway settings outside the rollback procedure.
