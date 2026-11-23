@@ -23,11 +23,23 @@ while RS holds live names.
    spx-0dte `live/ib_client_registry.py`, and ls-algo `config/ib_client_ids.yml`.
    Order: SSI (canonical) first, then spx-0dte #681, then ls-algo #70. Each merge
    needs the owner's words.
-3. **No activation while deployed registries disagree.** spx-0dte's NY4 tree
-   must carry #681 through its normal deploy, outside hours, with its own gates
-   and `--approved`. #681 changes pins and docs only, and restarts nothing in
-   SPX's strategy. ls-algo #70 deploys in stage 3 below, after the claims file
-   exists.
+
+   **Done 2026-11-19.** Bytes and pins were checked identical before each merge:
+   * SSI #1823 merged by the repo's agent-branch auto-merge (`a4c8934f`);
+   * spx-0dte #681 merged on the owner's word (`8f3ba503`);
+   * ls-algo #70 merged on the owner's word (squash `6bee24a5`).
+3. **No activation while deployed registries disagree.**
+   * spx-0dte's NY4 tree must carry #681 through its normal deploy, outside
+     hours, with its own gates and `--approved`. #681 changes pins and docs
+     only, and restarts nothing in SPX's strategy.
+   * **ls-algo needs no deploy step.** NY4's ls-algo checkout pulls `main`
+     itself; its `main` carries NY4's own screener and EOD commits and their
+     merge commits. So #70 (claims reader plus registry) goes live at ls-algo's
+     next pull after the merge. Confirm on the box that `/home/spx/ls-algo` is at
+     or after `6bee24a5`. That is BEFORE the claims
+     directory exists, and a missing directory means "no claims" there. The
+     hazard moves to the moment step 2 creates the directory; see the note on
+     that line.
 4. **Owner inputs:**
    * the IBKR account number for `config.json`;
    * an R2 "Object Read only" token scoped to the
@@ -55,6 +67,13 @@ A weekday evening after 16:20 ET, as root, with the owner's word. Not between
 Sunday 23:05 and Monday 07:10 ET, while the Gateway is closed. Nothing here
 touches the Gateway or ThetaData, and no SPX unit is restarted.
 
+**Why the claims directory waits for idle ls-algo.** ls-algo #70 is already
+live, because NY4 pulls its `main`. An ls-algo job that started BEFORE
+`usermod -aG ib-claims spx` runs without that group. If the 2750 directory
+appears while that job runs, the job cannot list it, which is a global failure
+for that ls-algo run. So create the directory only while no ls-algo unit is
+active. Every later job starts with the group.
+
 ```text
 sha256sum -c rs-live-$COMMIT.sha256                       # refuse on any mismatch
 groupadd --system ib-claims
@@ -62,7 +81,8 @@ usermod -aG ib-claims spx                                  # ls-algo runs as spx
 useradd --system --home-dir /srv/rs-live --shell /usr/sbin/nologin rs-live
 usermod -aG ib-claims rs-live
 install -d -o root    -g root     -m 0755 /srv/rs-live /srv/rs-live/releases
-install -d -o rs-live -g ib-claims -m 2750 /var/lib/ib-account-claims
+systemctl list-units 'ls-algo*' --state=activating,active --no-legend   # MUST print nothing
+install -d -o rs-live -g ib-claims -m 2750 /var/lib/ib-account-claims    # only after the check above
 install -d -o rs-live -g rs-live  -m 0750 /var/lib/rs-live /var/lib/rs-live/feed
 install -d -o root    -g rs-live  -m 0750 /etc/rs-live          # the service cannot arm itself
 tar -xzf rs-live-$COMMIT.tar.gz -C /srv/rs-live/releases && mv /srv/rs-live/releases/rs-live-$COMMIT /srv/rs-live/releases/$COMMIT
@@ -113,7 +133,7 @@ from `/srv/rs-live/repo`.
    The next morning, the shadow
    journal confirms the real tree. A refusal reason `SPX book margin directory
    unreadable` in `shadow-report` means the grant failed.
-3. **The claims file, readable by spx BEFORE ls-algo's reader is deployed:**
+3. **The claims file, readable by spx before ls-algo's next run reads it:**
    ```text
    sudo -u rs-live $R claims-init --config /etc/rs-live/config.json   # writes reverse-split.json (no claims), no socket
    sudo -u spx id -nG | grep -w ib-claims                              # sudo opens a fresh login: current groups
@@ -122,10 +142,11 @@ from `/srv/rs-live/repo`.
    Running processes do not acquire the new group. None of SPX's long-running
    units reads the claims, so none is restarted. ls-algo's four units are
    one-shot jobs as `spx` and pick the group up at their next normal start.
-4. **Deploy ls-algo #70** through ls-algo's normal process, at a time no
-   ls-algo job is running. Then run its reader once as spx; it must report no
+4. **ls-algo's reader, once, as spx:** check that `/home/spx/ls-algo` is at or
+   after `6bee24a5`, then load its foreign claims as spx. It must report no
    claims and no error. An unreadable claims directory is a global failure
-   there, which is why steps 3 and 4 come in this order.
+   there, which is why the group comes first and the directory waits for idle
+   ls-algo.
 5. **Registry agreement on the box:**
    ```text
    sha256sum /srv/rs-live/repo/_system/trading/ib_gateway_client_registry.v1.json /home/spx/spx-0dte/config/ib_gateway_client_registry.v1.json /home/spx/ls-algo/config/ib_gateway_client_registry.v1.json
