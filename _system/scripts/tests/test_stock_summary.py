@@ -124,6 +124,9 @@ def test_byma_includes_historical_sessions_and_excludes_verified_holidays():
     assert sessions == ("2025-06-13", "2025-06-17", "2025-06-18")
     _, sessions = expected_sessions("BUE", "2022-09-01", "2022-09-05")
     assert sessions == ("2022-09-01", "2022-09-05")
+    _, sessions = expected_sessions("BUE", "2026-12-23", "2026-12-31")
+    assert "2026-12-24" in sessions
+    assert sessions[-1] == "2026-12-30"
 
 
 def test_pse_archive_adjusts_old_exchange_closes_once(tmp_path):
