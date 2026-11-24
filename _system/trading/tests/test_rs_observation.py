@@ -53,3 +53,20 @@ def test_missing_observations_and_configuration_changes_cannot_be_counted_as_fre
 def test_sample_ceases_to_be_fresh_when_original_state_clock_crosses_120():
     x=report([row(0,115),row(10,125)],'2026-11-23T14:30:00Z','2026-11-23T14:30:20Z')
     assert x['conservative_fresh_time_share']==.25
+
+
+def test_older_publisher_ack_does_not_blame_reader_that_already_has_newer_report():
+    publisher=[
+        {'event':'publication_upload','accepted':True,'visibility_mode':'after_receipt',
+         'publication_id':'previous', 'state_at':'2026-11-23T14:27:52Z','generated_at':'2026-11-23T14:28:00Z',
+         'at':'2026-11-23T14:28:05Z','upload_completed_at':'2026-11-23T14:28:05Z'},
+        {'event':'publication_visible','publication_id':'previous','at':'2026-11-23T14:28:06Z'},
+        {'event':'publication_upload','accepted':True,'visibility_mode':'after_receipt',
+         'publication_id':'old', 'state_at':'2026-11-23T14:27:55Z','generated_at':'2026-11-23T14:28:08Z',
+         'at':'2026-11-23T14:28:10Z','upload_completed_at':'2026-11-23T14:28:10Z'},
+        {'event':'publication_visibility_failed','publication_id':'old','at':'2026-11-23T14:28:11Z'},
+        {'event':'refresh_refused','reason':'paused_checkpoint_too_old','at':'2026-11-23T14:30:05Z'},
+    ]
+    sampled=row(10,135,state_at='2026-11-23T14:27:55Z',generated_at='2026-11-23T14:28:08Z')
+    x=report([sampled],'2026-11-23T14:30:00Z','2026-11-23T14:30:20Z',publisher=publisher)
+    assert x['over_120_readings'][0]['cause']=='publisher_paused_because_committed_checkpoint_was_too_old'
