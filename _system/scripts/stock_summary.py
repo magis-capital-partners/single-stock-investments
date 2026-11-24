@@ -22,6 +22,7 @@ from stock_valuation_aliases import research_aliases
 
 SCHEMA = "stock-summary.v1"
 SOURCE_FILE = Path(__file__).with_name("stock_summary_sources.json")
+CALENDAR_FILE = Path(__file__).with_name("stock_summary_calendars.json")
 NO_COMMON_PRICE = (".CVR", ".DB", ".PS1", ".PS2", ".PS3")
 MARKETS = {
     "NYQ": "XNYS",
@@ -221,6 +222,14 @@ def combine_captures(prior, fresh):
 
 @lru_cache(maxsize=64)
 def market_schedule(name, end):
+    rules = calendar_overrides().get(name, {})
+    if name == "XATH":
+        first = date.fromisoformat(rules["first"])
+        last = date.fromisoformat(min(end, rules["through"]))
+        closed = set(rules["closed"])
+        days = (first + timedelta(days=n) for n in range((last - first).days + 1))
+        return tuple(day.isoformat() for day in days if day.weekday() < 5 and day.isoformat() not in closed)
+
     if name in {"XNSE", "XTAE"}:
         import pandas_market_calendars as calendars
 
@@ -237,7 +246,17 @@ def market_schedule(name, end):
     except ValueError:
         cal = calendars.get_calendar(name, start="2005-01-01", end=bound)
     latest = cal.date_to_session(end, direction="previous")
-    return tuple(str(d.date()) for d in cal.sessions_in_range(cal.first_session, latest))
+    sessions = tuple(str(d.date()) for d in cal.sessions_in_range(cal.first_session, latest))
+    if not rules:
+        return sessions
+    return tuple(sorted(
+        (set(sessions) - set(rules["closed"])) | {day for day in rules.get("opened", []) if day <= end}
+    ))
+
+
+@lru_cache(maxsize=1)
+def calendar_overrides():
+    return read(CALENDAR_FILE)
 
 
 def expected_sessions(venue, first, end):
@@ -269,13 +288,33 @@ def add_verified_close(capture, latest):
     return capture
 
 
+def normalize_archive_prices(capture, archive):
+    """Move official unadjusted closes onto the same share basis as the older archive."""
+    adjustments = archive.get("adjustments")
+    if not capture or not adjustments or capture["basis"] == archive["basis"]:
+        return capture
+    points = {
+        day: round(close / math.prod(action["factor"] for action in adjustments if day < action["date"]), 6)
+        for day, close in capture["points"].items()
+    }
+    return {
+        **capture,
+        "basis": archive["basis"],
+        "points": points,
+        "sources": list(dict.fromkeys([
+            *capture.get("sources", [capture["source"]]), *(action["source"] for action in adjustments),
+        ])),
+    }
+
+
 def alternate_capture(path, override):
     record = read(path)
     if not record:
         return None
     source = record.get("source", "")
     archive = override.get("price_archive") or {}
-    if source == archive.get("source"):
+    archive_sources = [archive.get("source"), *archive.get("supplemental_sources", [])]
+    if source in archive_sources:
         currency, venue = archive["currency"], archive["venue"]
     elif source.startswith(("https://stockanalysis.com/stocks/", "https://stockanalysis.com/quote/otc/")):
         currency, venue = "USD", (override.get("venues") or ["NMS"])[0]
@@ -284,23 +323,31 @@ def alternate_capture(path, override):
     columns = record.get("headers", [])
     if "Date" not in columns or "Close" not in columns:
         return None
+    date_column, close_column = columns.index("Date"), columns.index("Close")
     points = {}
     for row in record["rows"]:
         try:
-            day = datetime.strptime(row[columns.index("Date")] + " +0000", "%b %d, %Y %z").date().isoformat()
-            value = float(row[columns.index("Close")].replace(",", ""))
+            day = datetime.strptime(row[date_column], "%b %d, %Y").date().isoformat()
+            value = float(row[close_column].replace(",", ""))
         except (ValueError, IndexError):
             continue
         if math.isfinite(value) and value > 0:
             points[day] = value
-    return {
+    basis = archive.get("basis", "Daily close as reported by the source")
+    if archive.get("adjustments") and source == archive["source"] and record.get("basis") != basis:
+        basis = "Daily close as reported by the source"
+    capture = {
         "points": points,
         "currency": currency,
         "exchange": venue,
         "source": source,
+        "sources": list(dict.fromkeys([
+            source, *(url for url in record.get("sources", []) if url in archive_sources),
+        ])),
         "scale": 1,
-        "basis": archive.get("basis", "Daily close as reported by the source"),
+        "basis": basis,
     }
+    return normalize_archive_prices(capture, archive)
 
 
 def price_record(capture, as_of, override, row):
@@ -316,8 +363,18 @@ def price_record(capture, as_of, override, row):
             "status": "unavailable",
             "reason": override.get("price_reason") or "Daily closes were unavailable for the exact listing.",
         }
+    end = min(as_of, override.get("ended", as_of))
+    lower = override.get("first_session") or capture.get("first_session") or ""
+    name = MARKETS.get(capture["exchange"])
+    rules = calendar_overrides().get(name)
+    expected, sessions = expected_sessions(capture["exchange"], min(capture["points"]), end)
+    session_set = set(sessions)
     points = sorted(
-        (day, v) for day, v in capture["points"].items() if day <= min(as_of, override.get("ended", as_of))
+        (day, v) for day, v in capture["points"].items()
+        if lower <= day <= end and (
+            not rules or not expected or day in session_set
+            or not rules.get("first", "") <= day <= rules.get("through", end)
+        )
     )
     if len(points) < 2:
         return {
@@ -326,10 +383,8 @@ def price_record(capture, as_of, override, row):
             "source": capture["source"],
         }
     first, last = points[0][0], points[-1][0]
-    end = min(as_of, override.get("ended", as_of))
-    expected, sessions = expected_sessions(capture["exchange"], first, end)
     prior = override.get("first_session") or capture.get("first_session")
-    missing_count = sum(1 for day in sessions if day <= last and day not in capture["points"])
+    missing_count = sum(1 for day in sessions if first <= day <= last and day not in capture["points"])
     stale = expected and last < expected
     started_late = prior and (date.fromisoformat(first) - date.fromisoformat(prior)).days > 21
     gap = missing_count > max(2, 0.015 * len(points))
@@ -344,7 +399,7 @@ def price_record(capture, as_of, override, row):
         status, reason = "review", capture["issue"]
     elif stale:
         status, reason = "stale", "Closes after the last verified session are pending."
-    elif not expected:
+    elif not expected or rules and rules.get("through", end) < end:
         status, reason = "review", "The exchange calendar still needs verification."
     elif unknown_start:
         status, reason = (
@@ -369,6 +424,7 @@ def price_record(capture, as_of, override, row):
         "split": override.get("split"),
         "ended": override.get("ended"),
         "listing_source": override.get("listing_source"),
+        **({"calendar_sources": rules["sources"]} if rules else {}),
         "first_session": prior,
         "first": first,
         "last": last,
@@ -511,6 +567,7 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
                 "points": {day: round(close * scale, 6) for day, close in saved["points"]},
                 "scale": fresh["scale"] if fresh and fresh["currency"] == currency else scale,
             }
+            prior = normalize_archive_prices(prior, override.get("price_archive") or {})
         capture = combine_captures(prior, fresh)
         if (
             prior
