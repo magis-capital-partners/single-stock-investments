@@ -10,15 +10,20 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from stock_summary import (
     SCHEMA,
+    SOURCE_FILE,
     add_verified_close,
     alternate_capture,
     audit,
+    build,
     combine_captures,
     expected_sessions,
     price_capture,
     price_record,
     quote_currency,
+    read,
     short_excerpt,
+    symbol_for,
+    write,
 )
 
 
@@ -155,6 +160,32 @@ def test_pse_archive_adjusts_old_exchange_closes_once(tmp_path):
     saved = alternate_capture(path, {"price_archive": archive})
     assert saved["points"] == {"2013-12-09": 100}
     assert saved["sources"] == [supplement]
+
+
+def test_ft_fallback_adds_debenture_closes_without_rounding_tmx(tmp_path):
+    ticker = "CSU.DB"
+    row = {"market": "CA"}
+    archive = read(SOURCE_FILE)[ticker]["price_archive"]
+    write(tmp_path / "_system/portfolio/registry.json", {"holdings": {ticker: row}})
+    previous = {ticker: {"price": {
+        "points": [("2026-11-16", 117.695), ("2026-11-17", 119), ("2026-11-18", 120)],
+        "currency": archive["currency"],
+        "exchange": archive["venue"],
+        "source": archive["source"],
+        "basis": archive["basis"],
+        "symbol": symbol_for(ticker, row),
+    }}}
+    write(tmp_path / "alternate/CSU.DB-price.json", {
+        "source": archive["ft_source"],
+        "headers": ["Date", "Close"],
+        "rows": [["Nov 16, 2026", "117.70"], ["Nov 17, 2026", "119"],
+                 ["Nov 18, 2026", "120"], ["Nov 19, 2026", "123"]],
+    })
+    price = build(tmp_path, tmp_path, None, "2026-11-19", previous=previous)["listings"][ticker]["price"]
+    assert price["source"] == archive["source"]
+    assert price["sources"] == [archive["source"], archive["ft_source"]]
+    assert price["points"][0] == ("2026-11-16", 117.695)
+    assert price["points"][-1] == ("2026-11-19", 123)
 
 
 def test_merge_preserves_price_provenance():
