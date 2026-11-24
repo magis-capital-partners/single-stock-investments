@@ -1,4 +1,4 @@
-# ADP — Insider conviction (2026-11-06)
+# ADP — Insider conviction (2026-11-23)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -16,9 +16,9 @@
 
 **Routine / planned sales (context):**
 
-- Rodriguez Carlos A: 4 @ $301.815 on 2026-11-04 (10b5-1)
-- Rodriguez Carlos A: 6 @ $302.0966 on 2026-11-04 (10b5-1)
-- Rodriguez Carlos A: 9 @ $304.8711 on 2026-11-04 (10b5-1)
+- Orihuela Samantha D: 226 @ $306.905 on 2026-11-20
+- Orihuela Samantha D: 417 @ $307.49 on 2026-11-20
+- Orihuela Samantha D: 655 @ $307.1188 on 2026-11-20
 
 Source: `_system/reference/market-data/insider/ADP_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

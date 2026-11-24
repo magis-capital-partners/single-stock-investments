@@ -1,16 +1,16 @@
-# FIX - Thematic context (2026-11-21)
+# FIX - Thematic context (2026-11-24)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| High-yield OAS credit spread (%) | -0.43 | 2026-11-20 | -136.4% | down | no (context) |
-| US Treasury 10Y yield (%) | 4.9120001792907715 | 2026-11-20 | +19.6% | up | no (context) |
-| US Treasury 2Y yield (%) | 4.701000213623047 | 2026-11-20 | +28.0% | up | no (context) |
-| Trade-weighted USD index (broad) | 103.80999755859375 | 2026-11-20 | +3.6% | up | no (context) |
-| VIX index level | 35.88999938964844 | 2026-11-20 | +35.8% | up | no (context) |
-| HYG vs TLT 1-month return spread (%) | -0.64 | 2026-11-20 | -127.1% | down | no (context) |
-| SPY 20-day realized vol (annualized %) | 26.99 | 2026-11-20 | +92.9% | up | no (context) |
+| High-yield OAS credit spread (%) | -0.76 | 2026-11-23 | -226.7% | down | no (context) |
+| US Treasury 10Y yield (%) | 4.918000221252441 | 2026-11-23 | +21.8% | up | no (context) |
+| US Treasury 2Y yield (%) | 4.727999687194824 | 2026-11-23 | +31.2% | up | no (context) |
+| Trade-weighted USD index (broad) | 104.31700134277344 | 2026-11-23 | +4.2% | up | no (context) |
+| VIX index level | 26.6200008392334 | 2026-11-23 | +29.7% | up | no (context) |
+| HYG vs TLT 1-month return spread (%) | -1.12 | 2026-11-23 | -213.1% | down | no (context) |
+| SPY 20-day realized vol (annualized %) | 31.45 | 2026-11-23 | +117.3% | up | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | PPI: crushed and broken limestone mining (index) | 528.827 (stale) | 2026-08-01 | +6.1% | up | no (context) |
@@ -32,7 +32,7 @@
 | US manufacturing construction spending (USD m, SAAR) | 170701.0 (stale) | 2026-08-01 | -19.2% | down | no (context) |
 | US power construction spending (USD m, SAAR) | 185973.0 (stale) | 2026-08-01 | +8.5% | up | no (context) |
 | US 30-year fixed mortgage rate (%) | 7.4 (stale) | 2026-10-08 | +17.5% | up | no (context) |
-| US Treasury 10Y yield (%) | 4.9120001792907715 | 2026-11-20 | +19.6% | up | no (context) |
+| US Treasury 10Y yield (%) | 4.918000221252441 | 2026-11-23 | +21.8% | up | no (context) |
 | US construction employment (thousands) | 8364.0 (stale) | 2026-09-01 | +1.3% | up | no (context) |
 | US heavy and civil engineering construction employment (thousands) | 1210.8 (stale) | 2026-09-01 | +2.2% | up | no (context) |
 | US retail diesel price (USD/gal) | 6.199 (stale) | 2026-10-05 | +67.0% | up | no (context) |

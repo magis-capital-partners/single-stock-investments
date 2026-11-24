@@ -1,4 +1,4 @@
-# ACGL — Insider conviction (2026-08-20)
+# ACGL — Insider conviction (2026-11-23)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -16,9 +16,9 @@
 
 **Routine / planned sales (context):**
 
-- Papadopoulo Nicolas: 21930 @ $96.3093 on 2026-03-10
-- Posner Brian S: 3000 @ $19.66 on 2026-06-03
-- Posner Brian S: 2000 @ $17.1415 on 2026-05-11
+- PASQUESI JOHN M: 70320 @ $109.0407 on 2026-11-20
+- PASQUESI JOHN M: 103534 @ $110.0201 on 2026-11-20
+- PASQUESI JOHN M: 4029 @ $110.6474 on 2026-11-20
 
 Source: `_system/reference/market-data/insider/ACGL_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
