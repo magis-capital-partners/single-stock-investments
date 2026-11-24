@@ -1,10 +1,11 @@
-# CrowdStrike (CRWD)
+# CrowdStrike Holdings, Inc.  (CRWD)  (CIK 0001535527) contingent / CVR candidate (CRWD)
 
-**Ticker:** CRWD | **Market:** US
-**Last updated:** 2026-07-10
+**Ticker:** CRWD | **Market:** US  
+**Last updated:** 2026-11-24  
+**Stage:** pre-close stub (discovery)
 
-## Download
+## Next actions
 
-```powershell
-python CRWD/investor-documents/download_crwd_investor_docs.py
-```
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.
