@@ -268,7 +268,8 @@ test('a newer checkpoint is reloaded, and refresh pauses once the committed chec
 
 test('refresh evaluates only bytes matching the committed receipt, backs off after failure and fails closed on a lost lease',async t=>{
   const puts=[];let leaseLost=false;const env={assertCollectorLease:()=>{if(leaseLost)throw new Error('Collector lease lost');},EVIDENCE:{put:async key=>puts.push(key)}};
-  const fake={operations:operationsChannel(env),durable:()=>({generation:randomUUID(),at:new Date().toISOString(),sha256:'0'.repeat(64)}),takeDurableBytes:()=>new Uint8Array([1,2,3])};
+  const invalid={generation:randomUUID(),at:new Date().toISOString(),sha256:'0'.repeat(64)};
+  const fake={operations:operationsChannel(env),durable:()=>invalid,takeDurableBytes:()=>new Uint8Array([1,2,3])};
   const refresher=operationsRefresher({checkpoint:fake});t.after(()=>refresher.close());
   await assert.rejects(refresher.refresh(),/checksum mismatch/);assert.equal(puts.length,0);assert.equal(refresher.health().status,'retry_pending');
   assert.equal(refresher.due(),false,'a failed refresh backs off instead of retrying every tick');
@@ -284,7 +285,8 @@ function collectorEnv(t){
   return env;
 }
 test('the continuous collector refreshes operations between checkpoints and stops before releasing its lease',async t=>{
-  const env=collectorEnv(t),objects=new Map(),writes=[];
+  const env=collectorEnv(t),objects=new Map(),writes=[],audit=[];
+  env.onOperationsAudit=row=>audit.push(row);
   env.EVIDENCE={put:async(k,b,o={})=>{const lease=(await env.controlDB.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first())?.value;writes.push({key:k,urgent:o.urgent===true,leased:lease&&lease!=='0',bytes:new Uint8Array(b)});objects.set(k,new Uint8Array(b));},get:async k=>objects.has(k)?{arrayBuffer:async()=>objects.get(k).slice().buffer}:null};
   const old=globalThis.fetch;globalThis.fetch=async()=>new Response('<feed></feed>');t.after(()=>{globalThis.fetch=old;});
   let stopped=false;const result=await watchCollector(env,{maximumMs:20000,operations:{intervalMs:1000,maxStateAgeMs:60000},shouldStop:()=>stopped,sleep:async()=>{await new Promise(r=>setTimeout(r,3200));stopped=true;}});
@@ -295,6 +297,7 @@ test('the continuous collector refreshes operations between checkpoints and stop
   for(const r of refreshes)assert.ok(Date.parse(r.generated_at)>=Date.parse(r.state_at));
   for(let i=1;i<refreshes.length;i++)assert.ok(Date.parse(refreshes[i].generated_at)-Date.parse(refreshes[i-1].generated_at)<=2500,'consecutive refreshes stay near the target');
   assert.ok(ops.every(w=>w.leased),'no operations put after the lease is released');
+  assert.ok(!audit.some(row=>row.event==='publication_upload'&&row.kind==='full_checkpoint'),'dashboard must not compete for the report upload queue');
   const runtime=JSON.parse((await env.controlDB.prepare("SELECT value FROM rs_state WHERE key='shadow_runtime'").first()).value);
   assert.equal(runtime.status,'handoff');assert.ok(runtime.operations_publication.published>=2);assert.equal(runtime.operations_publication.interval_seconds,1);
   assert.equal((await env.controlDB.prepare("SELECT value FROM rs_state WHERE key='collector_lease'").first()).value,'0');
@@ -308,4 +311,63 @@ test('slow pre-job imports cannot consume the entire source-processing budget',a
  const previous=globalThis.fetch;t.after(()=>globalThis.fetch=previous);globalThis.fetch=async value=>new Response(String(value).endsWith('.html')?'<html><article>Ordinary source body</article></html>':'<feed></feed>');
  let stopped=false;const result=await watchCollector(env,{maximumMs:20000,operations:{intervalMs:0,maxStateAgeMs:60000},shouldStop:()=>stopped,sleep:async()=>{stopped=true;}});
  assert.equal(result.ticks,1);const cp=await openCheckpoint(env);try{assert.equal((await env.DB.prepare("SELECT state FROM rs_jobs WHERE id='slow-loop-source'").first()).state,'complete','The queued source must be analyzed even when imports took longer than one second');}finally{cp.close();}
+});
+
+
+test('a large successor checkpoint reuses unchanged compressed blocks and restores the exact database',async t=>{
+  const {env,objects}=storage(t);const audit=[];env.onOperationsAudit=row=>audit.push(row);
+  const cp=await openCheckpoint(env);t.after(()=>cp.close());env.CHECKPOINT_COMPRESSION='gzip';
+  await env.DB.prepare('CREATE TABLE large_fixture(payload BLOB)').run();
+  await env.DB.prepare('INSERT INTO large_fixture VALUES(?)').bind(new Uint8Array(20*1024*1024).fill(61)).run();
+  const first=await cp.save({publicationMode:'r2',checkpointOnly:true});
+  await env.DB.prepare('INSERT INTO rs_state VALUES(?,?,?)').bind('reuse-test','new','2026-11-24T00:00:00Z').run();
+  const second=await cp.save({publicationMode:'r2',checkpointOnly:true});
+  const rows=audit.filter(x=>x.event==='checkpoint_committed');
+  assert.ok(rows[1].reused_compression_blocks>=1,'mutating a small row must not compress every database block again');
+  assert.ok(rows[1].compressed_blocks<rows[0].compressed_blocks);
+  assert.ok(objects.get(second.key));assert.notEqual(first.sha256,second.sha256);
+  const recoveryEnv={...env};const recovered=await openCheckpoint(recoveryEnv);t.after(()=>recovered.close());
+  assert.equal((await recoveryEnv.DB.prepare("SELECT value FROM rs_state WHERE key='reuse-test'").first()).value,'new');
+  assert.equal((await recoveryEnv.DB.prepare('SELECT length(payload) AS bytes FROM large_fixture').first()).bytes,20*1024*1024);
+  assert.equal(second.compression,'gzip','rollback readers can still open ordinary gzip checkpoints');
+});
+
+test('a fresh checkpoint can publish during the backoff of a failed older checkpoint',async t=>{
+  const {env,puts}=storage(t);let clock;const cp=await openCheckpoint(env,{retainDurableBytes:true,operationsOptions:{clock:()=>clock??Date.now(),maxStateAgeMs:75000}});
+  let refresher;t.after(async()=>{await refresher?.close();cp.close();});
+  const first=await cp.save({publicationMode:'r2',checkpointOnly:true});
+  clock=Date.parse(first.at)+30000;
+  const put=env.EVIDENCE.put;
+  env.EVIDENCE.put=async(key,...args)=>{if(key===OPERATIONS_STAGING_KEY)throw new Error('publication transport failed');return put(key,...args);};
+  refresher=operationsRefresher({checkpoint:cp,intervalMs:10000,maxStateAgeMs:75000,clock:()=>clock});
+  await assert.rejects(refresher.refresh(),/publication transport failed/);
+  assert.equal(refresher.due(),false);
+  env.EVIDENCE.put=put;
+  const next=await cp.save({publicationMode:'r2',checkpointOnly:true});
+  clock+=1000;
+  assert.equal(refresher.due(),true,'newly committed evidence must not inherit a previous generation’s upload backoff');
+  assert.equal((await refresher.refresh()).published,true);
+  assert.equal(operationPuts(puts).at(-1).state_at,next.at);
+});
+
+test('a publication with insufficient time for all three writes does not start a doomed upload',async t=>{
+ const {env,puts}=storage(t);const T=Date.parse('2026-11-24T14:30:00Z');
+ const channel=operationsChannel(env,{clock:()=>T+70000,maxStateAgeMs:75000});
+ const at=iso(T),generated=iso(T+70000),result=await channel.publish({text:JSON.stringify({state_at:at,generated_at:generated}),stateAt:at,generatedAt:generated});
+ assert.equal(result.reason,'insufficient_publication_headroom');
+ assert.equal(puts.length,0);
+});
+
+
+test('an expired publication budget avoids opening a large committed database',async t=>{
+ const {env}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});let refresher;t.after(async()=>{await refresher?.close();cp.close();});
+ const receipt=await cp.save({publicationMode:'r2',checkpointOnly:true});
+ const clock=()=>Date.parse(receipt.at)+70000;
+ let loads=0;
+ const checkpoint={...cp,takeDurableBytes(generation){loads++;return cp.takeDurableBytes(generation);}};
+ refresher=operationsRefresher({checkpoint,clock,maxStateAgeMs:75000});
+ const result=await refresher.refresh();
+ assert.equal(loads,0,'loading bytes is wasted if all report writes cannot fit in the remaining age budget');
+ assert.equal(result.reason,'insufficient_publication_headroom');
+ assert.equal(refresher.due(),false,'wait for the next committed generation');
 });

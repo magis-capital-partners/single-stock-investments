@@ -21,11 +21,11 @@ async function run(message){
     raw=await restoreCheckpoint(new Uint8Array(message.stored),message.receipt);
     message.stored=null;writeFileSync(file,raw);raw=null;
     db=new DatabaseSync(file,{readOnly:true});
-    // The operations handoff must not wait for historical SQL, JSON, or uploads
-    // of large dashboard pages. It still uses only these committed bytes and
-    // the collector's single serialized operations writer.
-    const receipt=message.receipt,operations=operationalEvidence(db);
-    await send({key:'operations.json',value:operations},receipt,true,true);
+    // Without a separate refresher, hand off operations before dashboard
+    // pages. Otherwise compute only the dashboard's compact operations view.
+    const receipt=message.receipt, publishOperations=message.publishOperations!==false;
+    const operations=operationalEvidence(db,undefined,{includeCandidates:publishOperations});
+    if(publishOperations)await send({key:'operations.json',value:operations},receipt,true,true);
     const snapshot=captureReadSnapshot(db,{operations});
     for(let i=0;i<snapshot.objects.length;i++){
       const object=snapshot.objects[i];snapshot.objects[i]=null;

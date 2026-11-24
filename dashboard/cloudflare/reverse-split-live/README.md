@@ -498,8 +498,23 @@ the collector mirrors the current UTC-day journal to `operations-audit/` during
 its heartbeat. Historical unknown/failed outcomes remain explicit. Checkpoint
 storage bounds the upload and pointer update separately (35s and 5s with
 the 75s publication guard), reloads the pointer after an ambiguous commit,
-and prunes obsolete objects after releasing the save path. The journal records
-compression and hashing time alongside the transfer and commit timestamps.
+and prunes obsolete objects after releasing the save path. Large full
+checkpoints reuse unchanged 1 MiB blocks from the preceding in-memory gzip
+encoding. The uploaded object is still a complete gzip stream. The existing
+restore path verifies the compressed object and the reconstructed database,
+and can open both old and new checkpoints. The journal records reused and
+compressed block counts alongside capture, transfer and commit clocks.
+
+Working reports need enough time to complete staging, receipt storage and the
+reader-facing write before the same state-age limit. With the continuous
+refresher enabled, it alone writes the report, and a new committed generation
+can publish immediately even after an older upload failed. Dashboard workers
+produce the separate dashboard views. The full-checkpoint report path remains
+available with the refresher disabled and uses the same freshness checks.
+
+An older publisher acknowledgement can remain in the journal after a later
+write lost its acknowledgement. The session report compares the producer and
+reader state and generation clocks before assigning a delay to the reader.
 
 The independent Python fetcher records request start and complete-body receipt
 separately. `downloaded_at` now means complete-body receipt; use

@@ -63,6 +63,15 @@ def percentiles(values):
     return {'samples':len(values),'p50':p(.5),'p95':p(.95),'max':values[-1] if values else None}
 
 
+def is_newer_publication(candidate, sampled):
+    if candidate['publication_id']==sampled.get('publication_id'):
+        return False
+    clocks=('state_at','generated_at')
+    if all(candidate.get(key) and sampled.get(key) for key in clocks):
+        return tuple(timestamp(candidate[key]) for key in clocks)>tuple(timestamp(sampled[key]) for key in clocks)
+    return True
+
+
 def report(rows,start,end,*,events=(),publisher=(),expected=None):
     begin,finish=timestamp(start),timestamp(end)
     all_rows=sorted(rows,key=lambda r:timestamp(r['checked_at']))
@@ -86,6 +95,7 @@ def report(rows,start,end,*,events=(),publisher=(),expected=None):
             'state_age_at_visibility_ack_seconds','visibility_ack_to_receipt_seconds']
     metrics={key:percentiles([r[key] for r in selected if isinstance(r.get(key),(int,float))]) for key in fields}
     publications=[r for r in publisher if r.get('event')=='publication_upload' and r.get('upload_completed_at')]
+    by_publication={r['publication_id']:r for r in publications}
     visible=[]
     for publication in publications:
         if publication.get('accepted') is not True:
@@ -106,26 +116,37 @@ def report(rows,start,end,*,events=(),publisher=(),expected=None):
         latest=visible[index][1] if index>=0 else None
         evidence=[e for e in events if e.get('event') in ('fetch_failed','receipt_rejected') and 0<=(checked-timestamp(e['at'])).total_seconds()<=180]
         diagnostic=[e for e in publisher if e.get('at') and 0<=(checked-timestamp(e['at'])).total_seconds()<=180]
-        newest_visible_at=visible_times[index] if index>=0 else None
-        pending_diagnostic=[e for e in diagnostic if newest_visible_at is None or timestamp(e['at'])>=newest_visible_at]
-        if latest and latest['publication_id']!=row.get('publication_id'):
+        confirmed_progress=[]
+        if index>=0:
+            confirmed_progress.append(visible_times[index])
+        if row.get('received_at'):
+            confirmed_progress.append(timestamp(row['received_at']))
+        newest_progress=max(confirmed_progress,default=None)
+        pending_diagnostic=[e for e in diagnostic if newest_progress is None or timestamp(e['at'])>=newest_progress]
+        pending_publications=[
+            e for e in pending_diagnostic if e.get('publication_id') and
+            is_newer_publication(by_publication.get(e['publication_id'],e),row)
+        ]
+        if latest and is_newer_publication(latest,row):
             cause='consumer_has_not_committed_a_newer_acknowledged_publication'
-        elif any(e.get('event')=='publication_visibility_failed' for e in pending_diagnostic):
+        elif any(e.get('event')=='publication_visibility_failed' for e in pending_publications):
             cause='publisher_latest_report_visibility_failed_or_unconfirmed'
-        elif any(e.get('event')=='receipt_archive_failed' for e in pending_diagnostic):
+        elif any(e.get('event')=='receipt_archive_failed' for e in pending_publications):
             cause='publisher_receipt_archive_failed'
         elif any(e.get('event')=='publication_upload' and e.get('visibility_mode')=='after_receipt'
-                 and e.get('accepted') is True and e['publication_id']!=row.get('publication_id')
+                 and e.get('accepted') is True
                  and (not visibility.get(e['publication_id']) or timestamp(visibility[e['publication_id']])>checked)
-                 for e in pending_diagnostic):
+                 for e in pending_publications):
             cause='publisher_newer_upload_acknowledged_visibility_unconfirmed'
         elif any(e.get('event')=='checkpoint_failed' for e in pending_diagnostic):
             failure=next(e for e in reversed(pending_diagnostic) if e.get('event')=='checkpoint_failed')
             cause='publisher_checkpoint_pointer_unconfirmed' if failure.get('phase')=='pointer' else 'publisher_checkpoint_upload_unconfirmed'
-        elif any(e.get('outcome')=='upload_outcome_unknown' for e in diagnostic):
+        elif any(e.get('outcome')=='upload_outcome_unknown' for e in pending_publications):
             cause='publisher_upload_failed_or_acknowledgement_missing'
-        elif any(e.get('reason')=='paused_checkpoint_too_old' for e in diagnostic):
+        elif any(e.get('reason')=='paused_checkpoint_too_old' for e in pending_diagnostic):
             cause='publisher_paused_because_committed_checkpoint_was_too_old'
+        elif any(e.get('reason')=='insufficient_publication_headroom' for e in pending_diagnostic):
+            cause='publisher_refused_for_insufficient_publication_headroom'
         elif latest:
             cause='publisher_has_not_advanced_the_last_acknowledged_publication'
         else:cause='publisher_telemetry_unavailable_root_cause_not_established'

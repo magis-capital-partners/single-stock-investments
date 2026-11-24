@@ -11,7 +11,7 @@ function cleanup(dir){
   if(!same(dirname(target),parent)||!basename(target).startsWith('reverse-split-snapshot-'))throw new Error('Unsafe snapshot worker directory');
   rmSync(target,{recursive:true,force:true});
 }
-export async function publishCheckpointSnapshot(env,db,{stored,receipt},{shouldYield=()=>false,operations=null,timeoutMs=180000}={}){
+export async function publishCheckpointSnapshot(env,db,{stored,receipt},{shouldYield=()=>false,operations=null,publishOperations=true,timeoutMs=180000}={}){
   const dir=mkdtempSync(join(tmpdir(),'reverse-split-snapshot-'));
   const worker=new Worker(new URL('./snapshot-worker.mjs',import.meta.url),{workerData:{dir}});
   let pending=Promise.resolve(),settled=false,timer;
@@ -41,7 +41,7 @@ export async function publishCheckpointSnapshot(env,db,{stored,receipt},{shouldY
         }).catch(fail);
       });
       const input=Uint8Array.from(stored);
-      worker.postMessage({type:'start',stored:input.buffer,receipt},[input.buffer]);
+      worker.postMessage({type:'start',stored:input.buffer,receipt,publishOperations},[input.buffer]);
     });
   }finally{
     clearTimeout(timer);await pending.catch(()=>{});await worker.terminate().catch(()=>{});cleanup(dir);
