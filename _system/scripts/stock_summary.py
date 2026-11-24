@@ -188,7 +188,7 @@ def price_capture(path, symbol, row, as_of, source_details):
     }
 
 
-def combine_captures(prior, fresh):
+def combine_captures(prior, fresh, *, prefer_prior=False):
     """A shorter vendor response can extend a verified series without shrinking it."""
     if not prior or not fresh:
         return fresh or prior
@@ -214,6 +214,9 @@ def combine_captures(prior, fresh):
             **max((prior, fresh), key=lambda c: len(c["points"])),
             "issue": "Price basis changed on overlapping sessions. Corporate action review is required.",
         }
+    if prefer_prior:
+        prior, fresh = fresh, prior
+        a, b = b, a
     sources = list(dict.fromkeys([
         fresh["source"], prior["source"], *fresh.get("sources", []), *prior.get("sources", []),
     ]))
@@ -541,6 +544,7 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
             continue
         row = {**registry.get(ticker, {}), **rows.get(ticker, {})}
         override = identity.get(ticker, {})
+        archive = override.get("price_archive") or {}
         symbol = symbol_for(ticker, row, override)
         encoded = quote(ticker, safe="")
         fresh = prior = None
@@ -567,7 +571,7 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
                 "points": {day: round(close * scale, 6) for day, close in saved["points"]},
                 "scale": fresh["scale"] if fresh and fresh["currency"] == currency else scale,
             }
-            prior = normalize_archive_prices(prior, override.get("price_archive") or {})
+            prior = normalize_archive_prices(prior, archive)
         capture = combine_captures(prior, fresh)
         if (
             prior
@@ -584,7 +588,9 @@ def build(root, cache, raw_backup, as_of, core=None, previous=None, return_backu
         if alternate and capture and (
             alternate["source"] == capture["source"] or override.get("supplement_history")
         ):
-            capture = combine_captures(capture, alternate)
+            # The fallback can fill gaps without replacing a confirmed TMX close.
+            use_primary = alternate["source"] == archive.get("ft_source") and capture["source"] == archive["source"]
+            capture = combine_captures(capture, alternate, prefer_prior=use_primary)
         elif alternate and (not capture or len(alternate["points"]) > len(capture["points"])):
             # A replacement archive must cover the prior date range before it
             # can supersede a previously verified chart.
