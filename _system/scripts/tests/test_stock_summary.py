@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from stock_summary import (
     SCHEMA,
     add_verified_close,
+    alternate_capture,
     audit,
     combine_captures,
     expected_sessions,
@@ -104,6 +105,56 @@ def test_delisted_chart_reports_missing_earlier_history_at_the_listing_cutoff():
 
 def test_tel_aviv_subunit_is_quoted_in_shekels():
     assert quote_currency({"currency": "ILA"}) == ("ILS", 0.01)
+
+
+def test_athens_excludes_market_suspension_and_preserves_reopening():
+    old = capture(
+        {"2015-06-26": 8, "2015-06-29": 8, "2015-07-31": 8, "2015-08-03": 7},
+        exchange="ATH",
+    )
+    price = price_record(old, "2015-08-03", {}, {})
+    assert price["points"] == [("2015-06-26", 8), ("2015-08-03", 7)]
+    assert price["status"] == "complete"
+    assert price["missing_sessions"] == 0
+    assert price["calendar_sources"][0].endswith("/calendar")
+
+
+def test_byma_includes_historical_sessions_and_excludes_verified_holidays():
+    _, sessions = expected_sessions("BUE", "2025-06-13", "2025-06-18")
+    assert sessions == ("2025-06-13", "2025-06-17", "2025-06-18")
+    _, sessions = expected_sessions("BUE", "2022-09-01", "2022-09-05")
+    assert sessions == ("2022-09-01", "2022-09-05")
+    _, sessions = expected_sessions("BUE", "2026-12-23", "2026-12-31")
+    assert "2026-12-24" in sessions
+    assert sessions[-1] == "2026-12-30"
+
+
+def test_pse_archive_adjusts_old_exchange_closes_once(tmp_path):
+    path = tmp_path / "PSE-price.json"
+    source = "https://exchange.example/close"
+    supplement = "https://archive.example/close"
+    notice = "https://exchange.example/notice"
+    archive = {
+        "source": source,
+        "supplemental_sources": [supplement],
+        "currency": "PHP",
+        "venue": "PHP",
+        "basis": "Split-adjusted daily close in Philippine pesos",
+        "adjustments": [{"date": "2013-12-10", "factor": 1.2, "source": notice}],
+    }
+    raw = {"source": source, "headers": ["Date", "Close"], "rows": [
+        ["Dec 09, 2013", "120"], ["Dec 10, 2013", "101"],
+    ]}
+    path.write_text(json.dumps(raw))
+    verified = alternate_capture(path, {"price_archive": archive})
+    assert verified["points"] == {"2013-12-09": 100, "2013-12-10": 101}
+    assert verified["sources"] == [source, notice]
+    path.write_text(json.dumps({
+        **raw, "source": supplement, "rows": [["Dec 09, 2013", "100"]],
+    }))
+    saved = alternate_capture(path, {"price_archive": archive})
+    assert saved["points"] == {"2013-12-09": 100}
+    assert saved["sources"] == [supplement]
 
 
 def test_merge_preserves_price_provenance():

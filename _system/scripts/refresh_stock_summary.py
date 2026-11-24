@@ -36,6 +36,7 @@ _NEXT = {}
 
 PSE_CHART = "https://edge.pse.com.ph/common/DisclosureCht.ax"
 FT_HISTORY = "https://markets.ft.markitdigital.com/data/equities/ajax/get-historical-prices"
+TMX_HISTORY = "https://app-money.tmx.com/graphql"
 
 
 def request(url, lane, *, payload=None):
@@ -58,7 +59,7 @@ def request(url, lane, *, payload=None):
             )
             with urlopen(req, timeout=25) as response:
                 allowed = (
-                    response.url == PSE_CHART
+                    response.url in {PSE_CHART, TMX_HISTORY}
                     or response.url.startswith(("https://query1.finance.yahoo.com/", "https://finance.yahoo.com/"))
                     or url.startswith(FT_HISTORY + "?") and response.url == url
                 )
@@ -144,6 +145,33 @@ def capture_ft_history(archive, start, as_of):
     return prices
 
 
+def capture_tmx_history(symbol, start, as_of):
+    data = request(
+        TMX_HISTORY,
+        "tmx-history",
+        payload={
+            "query": """
+                query getCompanyChart($symbol: String!, $start: String!, $end: String!) {
+                    historical: getChartDataBySymbol(symbol: $symbol, freq: "day", fromDate: $start, toDate: $end) {
+                        dateTime close volume
+                    }
+                }
+            """,
+            "variables": {"symbol": symbol, "start": start.isoformat(), "end": as_of.isoformat()},
+        },
+    )
+    if not data:
+        return
+    try:
+        return [
+            [date.fromisoformat(row["dateTime"]).strftime("%b %d, %Y"), str(row["close"])]
+            for row in json.loads(data)["data"]["historical"]
+            if (row["volume"] or 0) > 0 and (row["close"] or 0) > 0
+        ]
+    except (ValueError, KeyError, TypeError):
+        return
+
+
 def capture(cache, ticker, row, previous, override, as_of, *, full_history=False):
     if override.get("identity_exception") or override.get("ended"):
         return
@@ -160,13 +188,18 @@ def capture(cache, ticker, row, previous, override, as_of, *, full_history=False
         else date.fromisoformat(override.get("first_session", "1960-01-01"))
     )
     prices = None
+    price_source = archive.get("source")
     if archive.get("company_id"):
         # The exchange provides the full available archive in one request.
         start = date.fromisoformat(override["first_session"])
         prices = capture_pse_history(archive, start, as_of)
     elif archive.get("ft_symbol"):
         start = date.fromisoformat(last) - timedelta(days=45) if last else start
-        prices = capture_ft_history(archive, start, as_of)
+        if archive.get("tmx_symbol"):
+            prices = capture_tmx_history(archive["tmx_symbol"], start, as_of)
+        if not prices:
+            price_source = archive.get("ft_source", price_source)
+            prices = capture_ft_history(archive, start, as_of)
     else:
         raw = capture_price(symbol, start, as_of)
         if raw:
@@ -174,7 +207,7 @@ def capture(cache, ticker, row, previous, override, as_of, *, full_history=False
     if prices:
         write(
             cache / "alternate" / (ticker + "-price.json"),
-            {"source": archive["source"], "headers": ["Date", "Close"], "rows": prices},
+            {"source": price_source, "headers": ["Date", "Close"], "rows": prices},
         )
     description = previous.get("description", {})
     observed = description.get("observed")
