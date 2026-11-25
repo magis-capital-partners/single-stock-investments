@@ -27,6 +27,9 @@ commit="$(git -C "$REPO" rev-parse HEAD)"
 case "${1:-}" in
   collector)
     export RS_PIPELINE_COMMIT="$commit"
+    # Box R can restore both full and changed-block checkpoints. Keep an
+    # explicit opt-out so a compatible revision can write a full checkpoint.
+    export RS_CHECKPOINT_DELTA="${RS_CHECKPOINT_DELTA:-1}"
     # Node sizes its default heap from machine memory (~2 GB on 8 GB, ~4 GB on
     # GitHub's 16 GB runners). Pin 4 GB so the box matches GitHub at any size.
     export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=4096}"
