@@ -1,13 +1,13 @@
 // Local scan database. Each upload has a private, non-reused generation identity.
 import {DatabaseSync} from 'node:sqlite';
 import {createHash, randomUUID} from 'node:crypto';
-import {closeSync,fstatSync,mkdtempSync,openSync,readFileSync,readSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
+import {constants,copyFileSync,linkSync,mkdtempSync,readFileSync,statSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
 import {setTimeout as sleep} from 'node:timers/promises';
 import {sha} from './worker.mjs';
 import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
-import {BLOCK_DELTA_FORMAT,createCheckpointCompressor,encodeCheckpointDelta,restoreCheckpoint,restoreCheckpointDelta,supportsCheckpointDelta} from './checkpoint-codec.mjs';
+import {COMPACT_BLOCK_BYTES,COMPACT_BLOCK_DELTA_FORMAT,assembleCheckpoint,createCheckpointCompressor,encodeCheckpointDelta,restoreCheckpoint,restoreCheckpointDelta,supportsCheckpointDelta} from './checkpoint-codec.mjs';
 import {operationsChannel} from './operations-publication.mjs';
 import {publishCheckpointSnapshot} from './snapshot-background.mjs';
 const GENERATION_KEY=/^collector-state\/checkpoints\/([a-f0-9]{64})-([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})\.sqlite(\.gz)?$/;
@@ -36,22 +36,6 @@ async function readCheckpoint(storage,receipt){
   return restoreCheckpointDelta(stored,receipt,await restoreCheckpoint(full,base));
 }
 
-function captureSharedCheckpoint(file){
-  const fd=openSync(file,'r');
-  try{
-    // One immutable image is read by the compressor and by the private report
-    // worker. Copying a production snapshot would add more than a GiB to RSS.
-    const bytes=Buffer.from(new SharedArrayBuffer(fstatSync(fd).size));
-    let offset=0;
-    while(offset<bytes.length){
-      const count=readSync(fd,bytes,offset,bytes.length-offset,null);
-      if(!count)throw new Error('Incomplete collector checkpoint capture');
-      offset+=count;
-    }
-    return bytes;
-  }finally{closeSync(fd);}
-}
-
 async function confirmTimedOutUpload(env,key,body,delta){
   const etag=createHash('md5').update(body).digest('hex');
   const deadline=AbortSignal.timeout(delta?4500:10500);
@@ -71,8 +55,7 @@ async function confirmTimedOutUpload(env,key,body,delta){
 
 export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>make(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>({meta:{changes:Number(db.prepare(sql).run(...args).changes)}})});return {prepare:sql=>make(sql),batch:async statements=>{db.exec('BEGIN');try{const rows=[];for(const s of statements)rows.push(await s.run());db.exec('COMMIT');return rows;}catch(e){db.exec('ROLLBACK');throw e;}}};}
 
-// retainDurableBytes: keep the last committed checkpoint's bytes (one generation)
-// for the operations refresh, which evaluates only already-durable state.
+// Keep one committed local image for refreshes, which evaluate only already-durable state.
 export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={},publishOperationsFromFull=true,prepareOperations=null,writeDeltas=false}={}){
   const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null,refreshPointer=false,pruneTask=null,fullBase=null;
   const pruneQueue=new Set(),pruneStop=new AbortController();
@@ -130,7 +113,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
       }finally{pruneTask=null;}
     });
   }
-  async function storeCheckpoint(bytes,at,{compressed=false,onCommittedBytes=null,onCommitted=null}={}){
+  async function storeCheckpoint(bytes,at,{image=null,generation=randomUUID(),captureMs=null,onCommitted=null}={}){
     env.assertCollectorLease?.();
     if(refreshPointer){
       receiptValue=(await readPointer())?.value??null;
@@ -138,21 +121,20 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
       if(receipt)checkpointObjectKey(receipt);
       refreshPointer=false;
     }
-    const hashStarted=Date.now();
-    // Use the native incremental hash to avoid the Web Crypto input copy for a large SQLite image.
-    const generation=randomUUID(),digest=createHash('sha256').update(bytes).digest('hex');
+    const hashStarted=Date.now(), rawDigest=image?null:createHash('sha256').update(bytes).digest('hex');
     if(retainDurableBytes&&prepareOperations){
-      try{prepareOperations({receipt:{at,generation,sha256:digest},bytes});}
+      try{prepareOperations({receipt:{at,generation,sha256:rawDigest},...(image?{image}:{bytes})});}
       catch(error){console.error(JSON.stringify({event:'operations_preparation_deferred',error:error.message}));}
     }
-    const preparationStarted=Date.now(),parent=receipt,encoded=compressed?await compressCheckpoint(bytes):null;
-    const compressionCompleted=Date.now();
+    const preparationStarted=Date.now(),parent=receipt,encoded=image?await compressCheckpoint(image):null;
+    const compressionCompleted=Date.now(),digest=encoded?.sha256??rawDigest,length=image?.length??bytes.length;
     const compatibleBase=fullBase&&(parent?.key===fullBase.receipt.key||parent?.base?.key===fullBase.receipt.key);
     const delta=writeDeltas&&encoded&&compatibleBase?encodeCheckpointDelta(encoded,fullBase.digests):null;
-    const payload=delta||encoded,key=`collector-state/checkpoints/${payload?.stored_sha256||digest}-${generation}.sqlite`+(encoded?'.gz':'');
-    const next={slot:parent?.slot===0?1:0,sha256:digest,bytes:bytes.length,at,key,generation};
+    const payload=delta||(encoded&&assembleCheckpoint(encoded));
+    const key=`collector-state/checkpoints/${payload?.stored_sha256||digest}-${generation}.sqlite`+(encoded?'.gz':'');
+    const next={slot:parent?.slot===0?1:0,sha256:digest,bytes:length,at,key,generation};
     if(encoded)Object.assign(next,{compression:encoded.compression,stored_bytes:payload.stored_bytes,stored_sha256:payload.stored_sha256});
-    if(delta)Object.assign(next,{format:BLOCK_DELTA_FORMAT,changed_blocks:delta.indices,base:fullBase.receipt});
+    if(delta)Object.assign(next,{format:COMPACT_BLOCK_DELTA_FORMAT,changed_blocks:delta.indices,base:fullBase.receipt});
     if(parent)next.previous=previousReceipt(parent);
     env.assertCollectorLease?.();
     const body=payload?.stored||bytes;
@@ -177,11 +159,8 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
       throw error;
     }
     if(!delta&&writeDeltas)fullBase=encoded?.blocks?{receipt:previousReceipt(next),digests:encoded.blocks.map(block=>block.digest)}:null;
-    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),upload_confirmation:uploadTimeoutAt===null?'put_response':'storage_metadata',upload_timeout_at:uploadTimeoutAt===null?null:new Date(uploadTimeoutAt).toISOString(),transfer_timeout_ms:transferTimeoutMs,compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:preparationStarted-hashStarted+uploadStarted-compressionCompleted,stored_bytes:body.length,storage_format:storageFormat,compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
     onCommitted?.(next);
-    // Dashboard workers receive a full image even when storage used an overlay.
-    const imageReceipt=delta?{at,generation,bytes:next.bytes,sha256:digest,compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256}:next;
-    onCommittedBytes?.({stored:encoded?.stored||bytes,receipt:imageReceipt});
+    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),upload_confirmation:uploadTimeoutAt===null?'put_response':'storage_metadata',upload_timeout_at:uploadTimeoutAt===null?null:new Date(uploadTimeoutAt).toISOString(),transfer_timeout_ms:transferTimeoutMs,capture_ms:captureMs,compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:preparationStarted-hashStarted+uploadStarted-compressionCompleted,stored_bytes:body.length,storage_format:storageFormat,checkpoint_block_bytes:encoded?COMPACT_BLOCK_BYTES:null,compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
     // Keep both restorable generations and any full image either depends on.
     const retained=receiptKeys(next);
     if(env.EVIDENCE.delete)for(const obsolete of receiptKeys(parent)){
@@ -195,9 +174,24 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     if(!env.snapshotActivated){await remote.prepare("INSERT INTO rs_state VALUES('collector_publication','r2',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(at).run();env.snapshotActivated=true;}
     env.publicationHealth={status:result.complete?'published':'current_published_history_pending',snapshot_at:at,history_complete:result.complete};
   }
+  function discardSnapshot(snapshot){
+    if(snapshot?.path)rmSync(snapshot.path,{force:true});
+  }
   function queueSnapshot(snapshot){
+    discardSnapshot(latestSnapshot);
     latestSnapshot=snapshot;
-    if(!publicationTask)publicationTask=(async()=>{while(latestSnapshot){const current=latestSnapshot;latestSnapshot=null;await publishSnapshot(current,{shouldYield:()=>deferDerived||Boolean(latestSnapshot)});}})().catch(e=>{env.publicationHealth={status:'retry_pending',error:e.message};console.error(JSON.stringify({event:'snapshot_publication_retry',error:e.message}));}).finally(()=>{publicationTask=null;});
+    if(publicationTask)return;
+    publicationTask=(async()=>{
+      while(latestSnapshot){
+        const current=latestSnapshot;
+        latestSnapshot=null;
+        try{await publishSnapshot(current,{shouldYield:()=>deferDerived||Boolean(latestSnapshot)});}
+        finally{discardSnapshot(current);}
+      }
+    })().catch(e=>{
+      env.publicationHealth={status:'retry_pending',error:e.message};
+      console.error(JSON.stringify({event:'snapshot_publication_retry',error:e.message}));
+    }).finally(()=>{publicationTask=null;});
   }
   async function saveInternal({publicationMode='d1',backgroundViews=false,checkpointOnly=false}={}){
       if(checkpointOnly&&publicationMode!=='r2')throw new Error('Checkpoint-only handoff requires private R2 publication');
@@ -205,19 +199,38 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
       const at=new Date().toISOString(),jobs=db.prepare('SELECT state,count(*) AS count,min(created_at) AS oldest FROM rs_jobs GROUP BY state').all();
       db.prepare("INSERT INTO rs_state(key,value,updated_at) VALUES('collector_job_counts',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").run(JSON.stringify(jobs),at);
       if(publicationMode==='r2'){
-        // Capture without yielding: every displayed fill belongs to these exact durable bytes.
-        // Retain the previous committed bytes until the successor commits: the
-        // refresher must remain usable while a large upload is in flight.
+        // No writes can interleave with this capture of the rollback-journal
+        // database. The workers and compressor all read the same private file.
         const started=Date.now(),snapshot=checkpointOnly||backgroundViews?null:captureReadSnapshot(db);
-        const compressed=env.CHECKPOINT_COMPRESSION==='gzip';
-        const bytes=compressed&&retainDurableBytes&&prepareOperations?captureSharedCheckpoint(file):readFileSync(file),captured=Date.now();let image=null;
-        const next=await storeCheckpoint(bytes,at,{compressed,onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{image=value;}:null,onCommitted:retainDurableBytes?committed=>{durable={generation:committed.generation,at:committed.at,sha256:committed.sha256,bytes};}:null});
-        env.checkpointHealth={state_at:at,bytes:bytes.length,stored_bytes:next.stored_bytes||bytes.length,capture_ms:captured-started,store_ms:Date.now()-captured,total_ms:Date.now()-started};
-        // These bytes became durable when the pointer committed; the refresh reads nothing newer.
-        if(snapshot)snapshot.stateAt=next.at;
-        if(image)queueSnapshot(image);
-        else if(snapshot)await publishSnapshot(snapshot);
-        return next;
+        const generation=randomUUID(),compressed=env.CHECKPOINT_COMPRESSION==='gzip';
+        const path=compressed?join(dir,'capture-'+generation+'.sqlite'):null;
+        let image,bytes;
+        try{
+          if(path){
+            copyFileSync(file,path,constants.COPYFILE_FICLONE);
+            image={path,length:statSync(path).size};
+          }else bytes=readFileSync(file);
+          const captured=Date.now();
+          const next=await storeCheckpoint(bytes,at,{image,generation,captureMs:captured-started,onCommitted:retainDurableBytes?committed=>{
+            const old=durable?.image;
+            durable={generation,at:committed.at,sha256:committed.sha256,image,bytes};
+            if(old)rmSync(old.path,{force:true});
+          }:null});
+          env.checkpointHealth={state_at:at,bytes:next.bytes,stored_bytes:next.stored_bytes||next.bytes,capture_ms:captured-started,store_ms:Date.now()-captured,total_ms:Date.now()-started};
+          if(backgroundViews&&!checkpointOnly){
+            if(image){
+              const linked=join(dir,'dashboard-'+generation+'.sqlite');
+              linkSync(image.path,linked);
+              queueSnapshot({path:linked,receipt:next});
+            }else queueSnapshot({stored:bytes,receipt:next});
+          }else if(snapshot){
+            snapshot.stateAt=next.at;
+            await publishSnapshot(snapshot);
+          }
+          return next;
+        }finally{
+          if(path&&(!image||durable?.image!==image))rmSync(path,{force:true});
+        }
       }
       const publications=[];
       const backgroundDue=Date.now()-Number(db.prepare("SELECT value FROM rs_state WHERE key='source_publication_at'").get()?.value||0)>=300000;
@@ -259,6 +272,7 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     changedSince(at){return Boolean(db.prepare('SELECT id FROM rs_events WHERE analyzed_at>? LIMIT 1').get(at));},
     operations,
     durable(){return durable&&{generation:durable.generation,at:durable.at,sha256:durable.sha256};},
+    durableImage(generation){return durable?.generation===generation?durable.image:null;},
     takeDurableBytes(generation){if(durable?.generation!==generation||!durable.bytes)return null;const bytes=durable.bytes;durable.bytes=null;return bytes;},
     async flush({handoff=false}={}){if(handoff)deferDerived=true;if(publicationTask)await publicationTask;},
     close(){pruneStop.abort();pruneQueue.clear();db.close();cleanup(dir);},

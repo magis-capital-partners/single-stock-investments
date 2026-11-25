@@ -3,20 +3,33 @@
 // event loop. It never opens the live working database and makes no network call.
 import {parentPort,workerData} from 'node:worker_threads';
 import {DatabaseSync} from 'node:sqlite';
-import {writeFileSync,rmSync} from 'node:fs';
+import {writeFileSync,rmSync,statSync} from 'node:fs';
 import {join} from 'node:path';
 import {operationalEvidence} from './operational-evidence.mjs';
 import {operationsText,operationsDigest} from './operations-publication.mjs';
 const GENERATION=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 let db=null,file=null,generation=null;
 function release(){try{db?.close();}finally{db=null;if(file)rmSync(file,{force:true});file=null;generation=null;}}
-function load({generation:next,sha256,bytes}){
+function load({generation:next,sha256,bytes,name,length}){
   if(!GENERATION.test(String(next)))throw new Error('Invalid checkpoint generation');
-  const data=new Uint8Array(bytes);
-  // Evaluate only the exact snapshot bytes: the receipt digest must match.
-  if(operationsDigest(data)!==sha256)throw new Error('Committed checkpoint copy checksum mismatch');
-  const path=join(workerData.dir,'durable-'+next+'.sqlite');let opened;
-  try{writeFileSync(path,data);opened=new DatabaseSync(path,{readOnly:true});}catch(error){try{opened?.close();}finally{rmSync(path,{force:true});}throw error;}
+  if(name&&!/^capture-[0-9]+\.sqlite$/.test(name))throw new Error('Invalid checkpoint image');
+  const path=join(workerData.dir,name||'durable-'+next+'.sqlite');
+  let opened;
+  try{
+    if(name){
+      // This private hard link points to the exact immutable capture hashed
+      // by the saver. The main process exposes its generation only after CAS.
+      if(statSync(path).size!==length)throw new Error('Checkpoint image length mismatch');
+    }else{
+      const data=new Uint8Array(bytes);
+      if(operationsDigest(data)!==sha256)throw new Error('Committed checkpoint copy checksum mismatch');
+      writeFileSync(path,data);
+    }
+    opened=new DatabaseSync(path,{readOnly:true});
+  }catch(error){
+    try{opened?.close();}finally{rmSync(path,{force:true});}
+    throw error;
+  }
   release();db=opened;file=path;generation=next;
 }
 parentPort.on('message',message=>{

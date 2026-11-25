@@ -18,9 +18,11 @@ function send(object,receipt,core=false,urgent=false){
 async function run(message){
   const file=join(workerData.dir,'snapshot.sqlite');let db,raw;
   try{
-    raw=await restoreCheckpoint(new Uint8Array(message.stored),message.receipt);
-    message.stored=null;writeFileSync(file,raw);raw=null;
-    db=new DatabaseSync(file,{readOnly:true});
+    if(!message.path){
+      raw=await restoreCheckpoint(new Uint8Array(message.stored),message.receipt);
+      message.stored=null;writeFileSync(file,raw);raw=null;
+    }
+    db=new DatabaseSync(message.path||file,{readOnly:true});
     // Without a separate refresher, hand off operations before dashboard
     // pages. Otherwise compute only the dashboard's compact operations view.
     const receipt=message.receipt, publishOperations=message.publishOperations!==false;

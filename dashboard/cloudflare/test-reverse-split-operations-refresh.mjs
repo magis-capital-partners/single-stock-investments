@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,readdirSync} from 'node:fs';
+import {existsSync,readFileSync,readdirSync,statSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter,openCheckpoint} from './reverse-split-live/checkpoint.mjs';
@@ -24,20 +24,26 @@ test('prepares exact checkpoint reports during storage, but exposes only the com
   const {env,puts}=storage(t),audit=[];
   env.onOperationsAudit=row=>audit.push(row);
   env.CHECKPOINT_COMPRESSION='gzip';
-  let refresher,preparation;
+  let refresher,preparation,captured;
   const cp=await openCheckpoint(env,{retainDurableBytes:true,prepareOperations(checkpoint){
-    assert.ok(checkpoint.bytes.buffer instanceof SharedArrayBuffer);
+    captured=checkpoint.image;
+    assert.ok(captured?.path && statSync(captured.path).size===captured.length);
+    assert.equal(checkpoint.bytes,undefined);
     preparation=refresher.prepare(checkpoint);
   }});
   refresher=operationsRefresher({checkpoint:cp,maxStateAgeMs:75000});
   t.after(async()=>{await refresher.close();cp.close();});
   const put=env.EVIDENCE.put;
+  let firstCapture;
   env.EVIDENCE.put=async(key,bytes,options)=>{
     if(key.startsWith('collector-state/checkpoints/')){
       assert.ok(preparation instanceof Promise);
       assert.equal(await preparation,true);
-      assert.equal(cp.durable(),null);
-      assert.equal(operationPuts(puts).length,0);
+      if(!firstCapture){
+        firstCapture=captured;
+        assert.equal(cp.durable(),null);
+        assert.equal(operationPuts(puts).length,0);
+      }
     }
     return put(key,bytes,options);
   };
@@ -45,6 +51,9 @@ test('prepares exact checkpoint reports during storage, but exposes only the com
   const published=await refresher.refresh();
   assert.equal(published.published,true);
   assert.equal(published.receipt.state_at,committed.at);
+  assert.equal(cp.durableImage(committed.generation),captured);
+  await cp.save({publicationMode:'r2',checkpointOnly:true});
+  assert.equal(existsSync(firstCapture.path),false);
   assert.equal(audit.find(r=>r.event==='publication_upload').render_mode,'prepared_during_upload');
 });
 
@@ -389,6 +398,8 @@ test('a large successor checkpoint reuses unchanged compressed blocks and restor
   const rows=audit.filter(x=>x.event==='checkpoint_committed');
   assert.ok(rows[1].reused_compression_blocks>=1,'mutating a small row must not compress every database block again');
   assert.ok(rows[1].compressed_blocks<rows[0].compressed_blocks);
+  assert.equal(rows[1].checkpoint_block_bytes,64*1024);
+  assert.ok(rows[1].compressed_blocks<16,'changing one page must reuse neighboring compressed blocks');
   assert.ok(objects.get(second.key));assert.notEqual(first.sha256,second.sha256);
   const recoveryEnv={...env};const recovered=await openCheckpoint(recoveryEnv);t.after(()=>recovered.close());
   assert.equal((await recoveryEnv.DB.prepare("SELECT value FROM rs_state WHERE key='reuse-test'").first()).value,'new');
