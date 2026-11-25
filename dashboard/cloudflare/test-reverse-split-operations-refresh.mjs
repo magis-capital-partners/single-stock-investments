@@ -20,6 +20,54 @@ function storage(t){
 }
 const operationPuts=puts=>puts.filter(p=>p.key===OPERATIONS_KEY).map(p=>({...decode(p.bytes),urgent:p.urgent}));
 
+test('prepares exact checkpoint reports during storage, but exposes only the committed generation',async t=>{
+  const {env,puts}=storage(t),audit=[];
+  env.onOperationsAudit=row=>audit.push(row);
+  env.CHECKPOINT_COMPRESSION='gzip';
+  let refresher,preparation;
+  const cp=await openCheckpoint(env,{retainDurableBytes:true,prepareOperations(checkpoint){preparation=refresher.prepare(checkpoint);}});
+  refresher=operationsRefresher({checkpoint:cp,maxStateAgeMs:75000});
+  t.after(async()=>{await refresher.close();cp.close();});
+  const put=env.EVIDENCE.put;
+  env.EVIDENCE.put=async(key,bytes,options)=>{
+    if(key.startsWith('collector-state/checkpoints/')){
+      assert.ok(preparation instanceof Promise);
+      assert.equal(await preparation,true);
+      assert.equal(cp.durable(),null);
+      assert.equal(operationPuts(puts).length,0);
+    }
+    return put(key,bytes,options);
+  };
+  const committed=await cp.save({publicationMode:'r2',checkpointOnly:true});
+  const published=await refresher.refresh();
+  assert.equal(published.published,true);
+  assert.equal(published.receipt.state_at,committed.at);
+  assert.equal(audit.find(r=>r.event==='publication_upload').render_mode,'prepared_during_upload');
+});
+
+test('a prepared report remains private if the checkpoint is rejected, and the previous report can refresh',async t=>{
+  const {env,puts}=storage(t);
+  let refresher,preparation,rejectNext=false;
+  const cp=await openCheckpoint(env,{retainDurableBytes:true,prepareOperations(candidate){preparation=refresher.prepare(candidate);}});
+  refresher=operationsRefresher({checkpoint:cp,maxStateAgeMs:75000});
+  t.after(async()=>{await refresher.close();cp.close();});
+  const put=env.EVIDENCE.put;
+  env.EVIDENCE.put=async(key,bytes,options)=>{
+    if(key.startsWith('collector-state/checkpoints/')){
+      assert.equal(await preparation,true);
+      if(rejectNext)throw new Error('Simulated rejected checkpoint');
+    }
+    return put(key,bytes,options);
+  };
+  const save=()=>cp.save({publicationMode:'r2',checkpointOnly:true});
+  const committed=await save();
+  await refresher.refresh();
+  rejectNext=true;
+  await assert.rejects(save(),/Simulated rejected checkpoint/);
+  await refresher.refresh();
+  assert.deepEqual(operationPuts(puts).map(row=>row.state_at),[committed.at,committed.at]);
+});
+
 test('operations report does not replace the previous readable object before its receipt is saved', async t => {
   const {env,objects}=storage(t), channel=operationsChannel(env);
   const previous=Buffer.from('previous operations');

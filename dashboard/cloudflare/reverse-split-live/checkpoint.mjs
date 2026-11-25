@@ -41,7 +41,7 @@ export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>m
 
 // retainDurableBytes: keep the last committed checkpoint's bytes (one generation)
 // for the operations refresh, which evaluates only already-durable state.
-export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={},publishOperationsFromFull=true}={}){
+export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={},publishOperationsFromFull=true,prepareOperations=null}={}){
   const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null,refreshPointer=false,pruneTask=null;
   const pruneQueue=new Set(),pruneStop=new AbortController();
   // Large checkpoint blobs have a different latency budget from D1 pointer updates.
@@ -115,9 +115,13 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     if(encoded)Object.assign(next,{compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256});
     if(parent)next.previous=previousReceipt(parent);
     env.assertCollectorLease?.();
-    const uploadStarted=Date.now();
     const body=encoded?.stored||bytes;
     let uploadCompleted,uploadTimeoutAt=null;
+    if(retainDurableBytes&&prepareOperations){
+      try{prepareOperations({receipt:next,bytes});}
+      catch(error){console.error(JSON.stringify({event:'operations_preparation_deferred',error:error.message}));}
+    }
+    const uploadStarted=Date.now();
     try{
       try{
         await env.EVIDENCE.put(key,body,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(uploadTimeoutMs)});

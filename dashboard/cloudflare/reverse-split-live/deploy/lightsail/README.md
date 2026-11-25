@@ -139,6 +139,12 @@ exact key, size and ETag match and the usual lease-checked pointer update.
 when the client confirmed the object. An unverifiable write leaves the prior
 checkpoint in place. The operations report still has its own state-age guard.
 
+With the continuous refresher enabled, a second worker prepares the first
+operations report from the exact captured bytes while the checkpoint uploads.
+It cannot publish anything itself. The refresher only uses the result once
+its generation has committed, then applies the usual age and receipt checks.
+The publication audit identifies this path as `render_mode: prepared_during_upload`.
+
 ## 5. Day to day
 
 - **Code updates:** `rs-update.timer` at 20:30 ET. A new commit that does not change the collector

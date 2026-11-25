@@ -1,5 +1,5 @@
 // Worker thread for operations-publication.mjs. It owns a read-only copy of the last
-// committed checkpoint and evaluates operationalEvidence on it, off the collector's
+// captured checkpoint and evaluates operationalEvidence on it, off the collector's
 // event loop. It never opens the live working database and makes no network call.
 import {parentPort,workerData} from 'node:worker_threads';
 import {DatabaseSync} from 'node:sqlite';
@@ -13,7 +13,7 @@ function release(){try{db?.close();}finally{db=null;if(file)rmSync(file,{force:t
 function load({generation:next,sha256,bytes}){
   if(!GENERATION.test(String(next)))throw new Error('Invalid checkpoint generation');
   const data=new Uint8Array(bytes);
-  // Evaluate only the exact committed bytes: the receipt digest must match.
+  // Evaluate only the exact snapshot bytes: the receipt digest must match.
   if(operationsDigest(data)!==sha256)throw new Error('Committed checkpoint copy checksum mismatch');
   const path=join(workerData.dir,'durable-'+next+'.sqlite');let opened;
   try{writeFileSync(path,data);opened=new DatabaseSync(path,{readOnly:true});}catch(error){try{opened?.close();}finally{rmSync(path,{force:true});}throw error;}
