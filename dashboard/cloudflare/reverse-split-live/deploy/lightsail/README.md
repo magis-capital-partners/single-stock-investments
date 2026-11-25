@@ -151,10 +151,11 @@ changed-block overlay. It validates both objects and the SHA-256 of the entire
 reconstructed SQLite file. The collector retains every full image needed by
 either of its two retained generations. The writer starts with a full image,
 then uses an overlay only when its gzip payload is under 60% of a new full
-image. A collector without `RS_CHECKPOINT_DELTA=1` still writes full images.
-Deploy and verify the compatible reader before enabling overlay writes. To
-roll back across the introduction of overlay support, first stop writing
-overlays on a compatible revision and verify a new full checkpoint has committed.
+image. Box R enables them through `run.sh`. Other collectors continue to
+write full images by default. To roll back across the introduction of
+overlay support, set `RS_CHECKPOINT_DELTA=0` for Box R on a compatible
+revision, then verify that a new full checkpoint has committed before
+rolling back.
 
 ## 5. Day to day
 
