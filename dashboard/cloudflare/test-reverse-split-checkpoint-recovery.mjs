@@ -14,6 +14,14 @@ const save=cp=>cp.save({publicationMode:'r2',checkpointOnly:true});
 
 test('changed-block checkpoints restore the exact newer SQLite state from one retained full checkpoint',async t=>{
  const {env,objects}=fixture(t);
+ const timeout=AbortSignal.timeout,budgets=new WeakMap(),transfers=[],put=env.EVIDENCE.put;
+ t.mock.method(AbortSignal,'timeout',ms=>{
+  const signal=timeout(ms);budgets.set(signal,ms);return signal;
+ });
+ env.EVIDENCE.put=async(key,body,{signal}={})=>{
+  transfers.push({bytes:body.length,timeout:budgets.get(signal)});
+  return put(key,body);
+ };
  const cp=await openCheckpoint(env,{writeDeltas:true});t.after(()=>cp.close());
  await env.DB.prepare('CREATE TABLE checkpoint_fixture(id INTEGER PRIMARY KEY,data BLOB NOT NULL)').run();
  for(let id=1;id<=8;id++)await env.DB.prepare('INSERT INTO checkpoint_fixture VALUES(?,?)').bind(id,randomBytes(1024*1024)).run();
@@ -24,6 +32,9 @@ test('changed-block checkpoints restore the exact newer SQLite state from one re
  assert.equal(delta.format,'sqlite_block_delta.v1');
  assert.equal(delta.base.key,full.key);
  assert.ok(delta.stored_bytes<full.stored_bytes/2);
+ assert.equal(transfers[1].bytes,delta.stored_bytes);
+ assert.equal(transfers[0].timeout,35000);
+ assert.ok(transfers[1].timeout<=12000,'a small checkpoint must not inherit the full upload timeout');
  const restoredEnv={...env},restored=await openCheckpoint(restoredEnv);
  try{
   const row=await restoredEnv.DB.prepare('SELECT data FROM checkpoint_fixture WHERE id=2').first();

@@ -52,12 +52,13 @@ function captureSharedCheckpoint(file){
   }finally{closeSync(fd);}
 }
 
-async function confirmTimedOutUpload(env,key,body){
+async function confirmTimedOutUpload(env,key,body,delta){
   const etag=createHash('md5').update(body).digest('hex');
-  const deadline=AbortSignal.timeout(10500);
+  const deadline=AbortSignal.timeout(delta?4500:10500);
   // These are read-only probes of a never-reused key. A delayed original PUT
   // may finish, but sending a second large body would add another stall.
-  for(const delay of [0,1800,2100,3500]){
+  const delays=delta?[0,900,1600]:[0,1800,2100,3500];
+  for(const delay of delays){
     if(delay)await sleep(delay,undefined,{signal:deadline}).catch(()=>{});
     if(deadline.aborted)return false;
     env.assertCollectorLease?.();
@@ -155,24 +156,28 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     if(parent)next.previous=previousReceipt(parent);
     env.assertCollectorLease?.();
     const body=payload?.stored||bytes;
+    // A small delta should not occupy the save path for a full archive's
+    // timeout. Allow ten seconds of overhead plus transfer at 8 MB/s.
+    const transferTimeoutMs=delta?Math.min(uploadTimeoutMs,10000+Math.ceil(body.length/8000000)*1000):uploadTimeoutMs;
+    const storageFormat=next.format||'full';
     let uploadCompleted,uploadTimeoutAt=null;
     const uploadStarted=Date.now();
     try{
       try{
-        await env.EVIDENCE.put(key,body,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(uploadTimeoutMs)});
+        await env.EVIDENCE.put(key,body,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(transferTimeoutMs)});
       }catch(error){
         if(!['TimeoutError','AbortError'].includes(error.name)||!env.EVIDENCE.stat)throw error;
         uploadTimeoutAt=Date.now();
-        if(!await confirmTimedOutUpload(env,key,body))throw error;
+        if(!await confirmTimedOutUpload(env,key,body,Boolean(delta)))throw error;
       }
       uploadCompleted=Date.now();
       await commitPointer(next,at);
     }catch(error){
-      operations.record({event:'checkpoint_failed',at:new Date().toISOString(),state_at:at,generation,phase:uploadCompleted?'pointer':'upload',error_type:error.name});
+      operations.record({event:'checkpoint_failed',at:new Date().toISOString(),state_at:at,generation,phase:uploadCompleted?'pointer':'upload',error_type:error.name,upload_started_at:new Date(uploadStarted).toISOString(),upload_timeout_at:uploadTimeoutAt===null?null:new Date(uploadTimeoutAt).toISOString(),transfer_timeout_ms:transferTimeoutMs,stored_bytes:body.length,storage_format:storageFormat});
       throw error;
     }
     if(!delta&&writeDeltas)fullBase=encoded?.blocks?{receipt:previousReceipt(next),digests:encoded.blocks.map(block=>block.digest)}:null;
-    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),upload_confirmation:uploadTimeoutAt===null?'put_response':'storage_metadata',upload_timeout_at:uploadTimeoutAt===null?null:new Date(uploadTimeoutAt).toISOString(),compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:preparationStarted-hashStarted+uploadStarted-compressionCompleted,stored_bytes:body.length,storage_format:next.format||'full',compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
+    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),upload_confirmation:uploadTimeoutAt===null?'put_response':'storage_metadata',upload_timeout_at:uploadTimeoutAt===null?null:new Date(uploadTimeoutAt).toISOString(),transfer_timeout_ms:transferTimeoutMs,compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:preparationStarted-hashStarted+uploadStarted-compressionCompleted,stored_bytes:body.length,storage_format:storageFormat,compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
     onCommitted?.(next);
     // Dashboard workers receive a full image even when storage used an overlay.
     const imageReceipt=delta?{at,generation,bytes:next.bytes,sha256:digest,compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256}:next;

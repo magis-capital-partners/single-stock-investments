@@ -71,6 +71,19 @@ test('a prepared report remains private if the checkpoint is rejected, and the p
   assert.deepEqual(operationPuts(puts).map(row=>row.state_at),[committed.at,committed.at]);
 });
 
+test('a repeated refresh gives up its write slot if its successor committed during rendering',async t=>{
+  const {env,puts}=storage(t),cp=await openCheckpoint(env,{retainDurableBytes:true});
+  let hasSuccessor=false,reads=0;
+  const first=await cp.save({publicationMode:'r2',checkpointOnly:true});
+  const durable=()=>hasSuccessor&&++reads>1?{generation:randomUUID(),at:iso(Date.parse(first.at)+250)}:cp.durable();
+  const refresher=operationsRefresher({checkpoint:{...cp,durable},intervalMs:100,maxStateAgeMs:75000});
+  t.after(async()=>{await refresher.close();cp.close();});
+  assert.equal((await refresher.refresh()).published,true);
+  hasSuccessor=true;
+  assert.equal((await refresher.refresh()).reason,'superseded');
+  assert.equal(operationPuts(puts).length,1);
+});
+
 test('operations report does not replace the previous readable object before its receipt is saved', async t => {
   const {env,objects}=storage(t), channel=operationsChannel(env);
   const previous=Buffer.from('previous operations');
