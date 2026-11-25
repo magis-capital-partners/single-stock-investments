@@ -7,7 +7,7 @@ import {join,dirname,basename} from 'node:path';
 import {setTimeout as sleep} from 'node:timers/promises';
 import {sha} from './worker.mjs';
 import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
-import {BLOCK_DELTA_FORMAT,createCheckpointCompressor,encodeCheckpointDelta,restoreCheckpoint,restoreCheckpointDelta} from './checkpoint-codec.mjs';
+import {BLOCK_DELTA_FORMAT,createCheckpointCompressor,encodeCheckpointDelta,restoreCheckpoint,restoreCheckpointDelta,supportsCheckpointDelta} from './checkpoint-codec.mjs';
 import {operationsChannel} from './operations-publication.mjs';
 import {publishCheckpointSnapshot} from './snapshot-background.mjs';
 const GENERATION_KEY=/^collector-state\/checkpoints\/([a-f0-9]{64})-([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})\.sqlite(\.gz)?$/;
@@ -30,7 +30,7 @@ async function readCheckpoint(storage,receipt){
   }
   if(!receipt.format)return restoreCheckpoint(await get(receipt),receipt);
   const base=receipt.base;
-  if(receipt.format!==BLOCK_DELTA_FORMAT||!base?.generation||base.format||base.base||base.previous||base.compression!=='gzip'||base.key===receipt.key)
+  if(!supportsCheckpointDelta(receipt.format)||!base?.generation||base.format||base.base||base.previous||base.compression!=='gzip'||base.key===receipt.key)
     throw new Error('Invalid full base for checkpoint delta');
   const [stored,full]=await Promise.all([get(receipt),get(base)]);
   return restoreCheckpointDelta(stored,receipt,await restoreCheckpoint(full,base));

@@ -9,6 +9,10 @@ export async function compressCheckpoint(bytes){
 
 const BLOCK_BYTES=1024*1024, MAX_CACHED_BYTES=256*1024*1024;
 export const BLOCK_DELTA_FORMAT='sqlite_block_delta.v1';
+export const COMPACT_BLOCK_DELTA_FORMAT='sqlite_block_delta.v2';
+export const COMPACT_BLOCK_BYTES=64*1024;
+const deltaBlockBytes=new Map([[BLOCK_DELTA_FORMAT,BLOCK_BYTES],[COMPACT_BLOCK_DELTA_FORMAT,COMPACT_BLOCK_BYTES]]);
+export const supportsCheckpointDelta=format=>deltaBlockBytes.has(format);
 
 // Independently deflated blocks are standard concatenated gzip members. The
 // existing restore path (including older releases) still validates the exact
@@ -90,11 +94,12 @@ export async function restoreCheckpoint(stored,receipt){
 
 export async function restoreCheckpointDelta(stored,receipt,base){
   boundedReceipt(receipt);
-  const indices=receipt.changed_blocks,count=Math.ceil(receipt.bytes/BLOCK_BYTES);
-  if(receipt.format!==BLOCK_DELTA_FORMAT||receipt.compression!=='gzip'||!Array.isArray(indices)||!indices.length||indices.length>count||
+  const blockBytes=deltaBlockBytes.get(receipt.format);
+  const indices=receipt.changed_blocks,count=Math.ceil(receipt.bytes/blockBytes);
+  if(!blockBytes||receipt.compression!=='gzip'||!Array.isArray(indices)||!indices.length||indices.length>count||
      indices.some((index,offset)=>!Number.isInteger(index)||index<0||index>=count||offset>0&&index<=indices[offset-1]))throw new Error('Invalid checkpoint delta block indices');
   checkStored(stored,receipt);
-  const lengthOf=index=>Math.min(BLOCK_BYTES,receipt.bytes-index*BLOCK_BYTES);
+  const lengthOf=index=>Math.min(blockBytes,receipt.bytes-index*blockBytes);
   const changeBytes=indices.reduce((total,index)=>total+lengthOf(index),0);
   const changed=await unzip(stored,{maxOutputLength:changeBytes});
   if(changed.length!==changeBytes)throw new Error('Checkpoint delta length mismatch');
@@ -103,7 +108,7 @@ export async function restoreCheckpointDelta(stored,receipt,base){
   let offset=0;
   for(const index of indices){
     const stop=offset+lengthOf(index);
-    bytes.set(changed.subarray(offset,stop),index*BLOCK_BYTES);
+    bytes.set(changed.subarray(offset,stop),index*blockBytes);
     offset=stop;
   }
   return checkRestored(bytes,receipt);
