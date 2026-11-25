@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHash} from 'node:crypto';
+import {createHash,randomBytes} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter,openCheckpoint,checkpointObjectKey} from './reverse-split-live/checkpoint.mjs';
 import {restoreCheckpoint} from './reverse-split-live/checkpoint-codec.mjs';
@@ -11,6 +11,62 @@ function fixture(t){
  return {remote,objects,env};
 }
 const save=cp=>cp.save({publicationMode:'r2',checkpointOnly:true});
+
+test('changed-block checkpoints restore the exact newer SQLite state from one retained full checkpoint',async t=>{
+ const {env,objects}=fixture(t);
+ const cp=await openCheckpoint(env,{writeDeltas:true});t.after(()=>cp.close());
+ await env.DB.prepare('CREATE TABLE checkpoint_fixture(id INTEGER PRIMARY KEY,data BLOB NOT NULL)').run();
+ for(let id=1;id<=8;id++)await env.DB.prepare('INSERT INTO checkpoint_fixture VALUES(?,?)').bind(id,randomBytes(1024*1024)).run();
+ const full=await save(cp);
+ const changed=randomBytes(1024*1024);
+ await env.DB.prepare('UPDATE checkpoint_fixture SET data=? WHERE id=2').bind(changed).run();
+ const delta=await save(cp);
+ assert.equal(delta.format,'sqlite_block_delta.v1');
+ assert.equal(delta.base.key,full.key);
+ assert.ok(delta.stored_bytes<full.stored_bytes/2);
+ const restoredEnv={...env},restored=await openCheckpoint(restoredEnv);
+ try{
+  const row=await restoredEnv.DB.prepare('SELECT data FROM checkpoint_fixture WHERE id=2').first();
+  assert.deepEqual(Buffer.from(row.data),changed);
+  const legacy=await save(restored);
+  assert.equal(legacy.format,undefined);
+  await restoreCheckpoint(objects.get(legacy.key),legacy);
+ }finally{restored.close();}
+ const corrupt=Buffer.from(objects.get(delta.key));corrupt[0]^=1;objects.set(delta.key,corrupt);
+ const corruptPointer={...env,controlDB:{prepare:()=>({first:async()=>({value:JSON.stringify(delta)})})}};
+ await assert.rejects(openCheckpoint(corruptPointer),/checksum/);
+});
+
+test('checkpoint pruning keeps a full base while either retained generation depends on it',async t=>{
+ const {env,objects}=fixture(t);
+ env.EVIDENCE.delete=async key=>objects.delete(key);
+ const cp=await openCheckpoint(env,{writeDeltas:true});t.after(()=>cp.close());
+ await env.DB.prepare('CREATE TABLE checkpoint_fixture(id INTEGER PRIMARY KEY,data BLOB NOT NULL)').run();
+ const insert=env.DB.prepare('INSERT INTO checkpoint_fixture VALUES(?,?)');
+ const update=env.DB.prepare('UPDATE checkpoint_fixture SET data=? WHERE id=?');
+ for(let id=1;id<=8;id++)await insert.bind(id,randomBytes(1024*1024)).run();
+ const base=await save(cp);
+ await update.bind(randomBytes(1024*1024),2).run();
+ const first=await save(cp);
+ await update.bind(randomBytes(1024*1024),2).run();
+ const prior=await save(cp);
+ assert.equal(prior.base.key,base.key);
+ assert.ok(objects.has(base.key));
+ for(let id=1;id<=8;id++)await update.bind(randomBytes(1024*1024),id).run();
+ const next=await save(cp);
+ assert.equal(next.format,undefined);
+ assert.equal(next.previous.key,prior.key);
+ assert.ok(objects.has(base.key));
+ assert.equal(objects.has(first.key),false);
+ await update.bind(randomBytes(1024*1024),2).run();
+ const latest=await save(cp);
+ assert.equal(latest.base.key,next.key);
+ await new Promise(setImmediate);
+ assert.equal(objects.has(base.key),false);
+ assert.equal(objects.has(prior.key),false);
+ assert.ok(objects.has(next.key));
+ assert.ok(objects.has(latest.key));
+});
 
 test('a lost upload response can commit once the original object is visible and its size and ETag match',async t=>{
  const {env,objects,remote}=fixture(t),audit=[];
