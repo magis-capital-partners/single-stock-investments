@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash,randomBytes} from 'node:crypto';
+import {gzipSync} from 'node:zlib';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter,openCheckpoint,checkpointObjectKey} from './reverse-split-live/checkpoint.mjs';
-import {restoreCheckpoint} from './reverse-split-live/checkpoint-codec.mjs';
+import {restoreCheckpoint,restoreCheckpointDelta} from './reverse-split-live/checkpoint-codec.mjs';
 
 function fixture(t){
  const remote=new DatabaseSync(':memory:');remote.exec('CREATE TABLE rs_state(key TEXT PRIMARY KEY,value TEXT NOT NULL,updated_at TEXT NOT NULL)');t.after(()=>remote.close());
@@ -46,6 +47,19 @@ test('changed-block checkpoints restore the exact newer SQLite state from one re
  const corrupt=Buffer.from(objects.get(delta.key));corrupt[0]^=1;objects.set(delta.key,corrupt);
  const corruptPointer={...env,controlDB:{prepare:()=>({first:async()=>({value:JSON.stringify(delta)})})}};
  await assert.rejects(openCheckpoint(corruptPointer),/checksum/);
+});
+
+test('compact checkpoint recovery overlays sparse 64 KiB blocks and binds the exact image',async()=>{
+ const size=64*1024,base=Buffer.alloc(40*size+4096,21),next=Buffer.from(base);
+ next.fill(45,2*size,3*size);next.fill(91,40*size);
+ const blocks=[2,40];
+ const stored=Buffer.concat(blocks.map(index=>gzipSync(next.subarray(index*size,(index+1)*size))));
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+ const receipt={format:'sqlite_block_delta.v2',compression:'gzip',bytes:next.length,sha256:hash(next),
+  stored_bytes:stored.length,stored_sha256:hash(stored),changed_blocks:blocks};
+ assert.deepEqual(await restoreCheckpointDelta(stored,receipt,Buffer.from(base)),next);
+ await assert.rejects(restoreCheckpointDelta(stored,{...receipt,format:'sqlite_block_delta.v3'},Buffer.from(base)),/indices/);
+ await assert.rejects(restoreCheckpointDelta(stored,{...receipt,changed_blocks:[40,2]},Buffer.from(base)),/indices/);
 });
 
 test('checkpoint pruning keeps a full base while either retained generation depends on it',async t=>{
