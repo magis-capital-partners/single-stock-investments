@@ -1,0 +1,172 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "tape_index",
+  "as_of": "2026-11-25",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-11-25T11:40:41Z"
+    },
+    {
+      "path": "dashboard/data/capitulation_daily.json",
+      "generated_at": "2026-11-25T11:42:17Z"
+    },
+    {
+      "path": "dashboard/data/index_membership.json",
+      "generated_at": "2026-11-19T13:42:45Z"
+    },
+    {
+      "path": "dashboard/data/desk_briefs.json",
+      "generated_at": "2026-11-23T13:49:19Z"
+    }
+  ],
+  "items": [
+    {
+      "ticker": "CPRT",
+      "headline": "CPRT is a new breakout: leading_uptrend, 10.17% above the 50-day average, rvol 1.23, and CMF 0.127.",
+      "one_number": "price vs 50-day +10.17%",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "price_vs_50d_pct 10.17; rvol_20d 1.23; cmf_20d 0.127; direction leading_uptrend; rsi_14 47.2; as_of 2026-11-24 [dashboard/data/technical_summary.json generated_at 2026-11-25T11:40:41Z]",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Confirms if the close stays above the 50-day average for 3 sessions (TA-BRK-3S, through 2026-11-30).",
+      "handoff": null
+    },
+    {
+      "ticker": "SPGI",
+      "headline": "SPGI CMF is 0.145, above 0.10 (new). RSI is still 33.9, under 35, as at the last run.",
+      "one_number": "CMF 0.145",
+      "lane": "cmf",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "cmf_20d 0.145; rsi_14 33.9; capitulation.state normal; direction leading_uptrend; as_of 2026-11-24 [dashboard/data/technical_summary.json generated_at 2026-11-25T11:40:41Z]",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "CMF still above 0.10 next session and the 5-session return positive (TA-Z-5D, ends 2026-12-02).",
+      "handoff": null
+    },
+    {
+      "ticker": "ICE",
+      "headline": "ICE CMF is 0.144, above 0.10, and trend_z is 1.257, just beyond 1.25 (both new).",
+      "one_number": "CMF 0.144",
+      "lane": "cmf",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "cmf_20d 0.144; trend_z 1.257; rsi_14 49.9; direction leading_uptrend; as_of 2026-11-24 [dashboard/data/technical_summary.json generated_at 2026-11-25T11:40:41Z]",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "CMF still above 0.10 next session and the 5-session return positive (TA-Z-5D, ends 2026-12-02).",
+      "handoff": null
+    },
+    {
+      "ticker": "TPL",
+      "headline": "TPL trend_z is -1.346, beyond -1.25 (new). It remains a capitulation_candidate, with RSI 28.4.",
+      "one_number": "trend_z -1.346",
+      "lane": "z_trend",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "trend_z -1.346; capitulation.state capitulation_candidate; rsi_14 28.4; rvol_20d 2.14; return_5d_pct -12.66; as_of 2026-11-24 [dashboard/data/technical_summary.json generated_at 2026-11-25T11:40:41Z]",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "TPL/EROK all-stock deal, closing expected 1H 2027; no dated passive flow in the next 10 sessions",
+          "url": null,
+          "as_of": "2026-11-23",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "trend_z still beyond -1.25 next session and the 5-session return negative (ends 2026-12-02).",
+      "handoff": null
+    },
+    {
+      "ticker": "COST",
+      "headline": "COST RSI is 75.6, above 70 (new), on the first session after the Nov 24 $30 special-dividend ex-date.",
+      "one_number": "RSI 75.6",
+      "lane": "overbought",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "rsi_14 75.6; price_vs_50d_pct 12.93; direction leading_uptrend; capitulation.state normal; as_of 2026-11-24 [dashboard/data/technical_summary.json generated_at 2026-11-25T11:40:41Z]",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "provider",
+          "ref": "Costco $30 special cash dividend: ex and record 2026-11-24, payable 2026-12-04, about $13.3B (issuer + OCC memo 60200)",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Passes if the 5-session return trails SPY (ends 2026-12-02). The $30 ex-date price step is in this print.",
+      "handoff": null
+    },
+    {
+      "ticker": "FRMO",
+      "headline": "FRMO capitulation state is panic, new (was stress_building), with RSI 36.0 and CMF -0.227.",
+      "one_number": "capitulation: panic",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "capitulation.state panic; rsi_14 36.0; cmf_20d -0.227; rvol_20d 2.17; return_5d_pct -2.82; as_of 2026-11-24 [dashboard/data/technical_summary.json generated_at 2026-11-25T11:40:41Z]",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "5-session close return beats SPY (ends 2026-12-02).",
+      "handoff": null
+    },
+    {
+      "ticker": "RACE",
+      "headline": "RACE RSI is 30.5, below 35 (new), in a pullback_in_uptrend, with CMF 0.121.",
+      "one_number": "RSI 30.5",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "rsi_14 30.5; cmf_20d 0.121; direction pullback_in_uptrend; capitulation.state normal; as_of 2026-11-24 [dashboard/data/technical_summary.json generated_at 2026-11-25T11:40:41Z]",
+          "url": null,
+          "as_of": "2026-11-24",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "5-session return beats SPY (ends 2026-12-02).",
+      "handoff": null
+    }
+  ],
+  "notes": "technical_summary 2026-11-25T11:40:41Z, US as_of 2026-11-24. index_membership 2026-11-19T13:42:45Z is 4 business days stale. SNDK still as_of 2026-11-19 after the 8-for-1 split. SPY/QQQ in panic (RSI 36.0/38.8). 22 of 45 universe complete-session rows in capitulation states. YBTY last trade Dec 11, cash about Dec 14. Next: Nov 27 Russell update; Nov 30 MSTR MSCI USA deletion; Dec 4 Russell update. S&P DJI Nov 23 release touches no universe name. FER, LB still Russell 3000 additions. Held cap: 8697.T, DRR.AX, MA, MKL, MSCI, WCN, V, MCO. Partial: DB1.DE, LSEG, RMS.PA. Stale: SNDK. Baseline n=20.",
+  "screens_empty": [],
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}
