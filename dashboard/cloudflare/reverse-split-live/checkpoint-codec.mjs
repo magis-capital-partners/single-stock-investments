@@ -8,6 +8,7 @@ export async function compressCheckpoint(bytes){
 }
 
 const BLOCK_BYTES=1024*1024, MAX_CACHED_BYTES=256*1024*1024;
+export const BLOCK_DELTA_FORMAT='sqlite_block_delta.v1';
 
 // Independently deflated blocks are standard concatenated gzip members. The
 // existing restore path (including older releases) still validates the exact
@@ -52,14 +53,58 @@ export function createCheckpointCompressor(){
       return part;
     }):[];
     return {stored,compression:'gzip',stored_bytes:stored.length,stored_sha256:hash(stored),
-      compressed_blocks:count-reused,reused_compression_blocks:reused};
+      compressed_blocks:count-reused,reused_compression_blocks:reused,blocks:previous.length?previous:next};
   };
 }
 
+export function encodeCheckpointDelta(encoded,baseDigests){
+  if(!encoded.blocks||!baseDigests)return null;
+  const indices=[],members=[];
+  let storedBytes=0;
+  for(const [index,block] of encoded.blocks.entries()){
+    if(block.digest===baseDigests[index])continue;
+    indices.push(index);members.push(block.stored);storedBytes+=block.stored.length;
+  }
+  if(!indices.length||storedBytes>=encoded.stored_bytes*.6)return null;
+  const stored=Buffer.concat(members,storedBytes);
+  return {stored,stored_bytes:storedBytes,stored_sha256:hash(stored),indices};
+}
+
+function boundedReceipt(receipt){
+  if(!Number.isInteger(receipt.bytes)||receipt.bytes<=0||receipt.bytes>MAX)throw new Error('Invalid bounded checkpoint receipt');
+}
+function checkStored(stored,receipt){
+  if(stored.length!==receipt.stored_bytes||hash(stored)!==receipt.stored_sha256)throw new Error('Compressed checkpoint checksum mismatch; original evidence preserved');
+}
+function checkRestored(bytes,receipt){
+  if(bytes.length!==receipt.bytes||hash(bytes)!==receipt.sha256)throw new Error('Collector checkpoint checksum mismatch; original evidence preserved');
+  return bytes;
+}
 export async function restoreCheckpoint(stored,receipt){
- if(!Number.isInteger(receipt.bytes)||receipt.bytes<=0||receipt.bytes>MAX)throw new Error('Invalid bounded checkpoint receipt');
- if(receipt.compression&&receipt.compression!=='gzip')throw new Error('Unsupported checkpoint compression');
- if(receipt.compression&&(stored.length!==receipt.stored_bytes||hash(stored)!==receipt.stored_sha256))throw new Error('Compressed checkpoint checksum mismatch; original evidence preserved');
+ boundedReceipt(receipt);
+ if(receipt.format||receipt.compression&&receipt.compression!=='gzip')throw new Error('Unsupported full checkpoint encoding');
+ if(receipt.compression)checkStored(stored,receipt);
  const bytes=receipt.compression?await unzip(stored,{maxOutputLength:receipt.bytes}):stored;
- if(bytes.length!==receipt.bytes||hash(bytes)!==receipt.sha256)throw new Error('Collector checkpoint checksum mismatch; original evidence preserved');return bytes;
+ return checkRestored(bytes,receipt);
+}
+
+export async function restoreCheckpointDelta(stored,receipt,base){
+  boundedReceipt(receipt);
+  const indices=receipt.changed_blocks,count=Math.ceil(receipt.bytes/BLOCK_BYTES);
+  if(receipt.format!==BLOCK_DELTA_FORMAT||receipt.compression!=='gzip'||!Array.isArray(indices)||!indices.length||indices.length>count||
+     indices.some((index,offset)=>!Number.isInteger(index)||index<0||index>=count||offset>0&&index<=indices[offset-1]))throw new Error('Invalid checkpoint delta block indices');
+  checkStored(stored,receipt);
+  const lengthOf=index=>Math.min(BLOCK_BYTES,receipt.bytes-index*BLOCK_BYTES);
+  const changeBytes=indices.reduce((total,index)=>total+lengthOf(index),0);
+  const changed=await unzip(stored,{maxOutputLength:changeBytes});
+  if(changed.length!==changeBytes)throw new Error('Checkpoint delta length mismatch');
+  const bytes=receipt.bytes<=base.length?base.subarray(0,receipt.bytes):Buffer.alloc(receipt.bytes);
+  if(receipt.bytes>base.length)bytes.set(base);
+  let offset=0;
+  for(const index of indices){
+    const stop=offset+lengthOf(index);
+    bytes.set(changed.subarray(offset,stop),index*BLOCK_BYTES);
+    offset=stop;
+  }
+  return checkRestored(bytes,receipt);
 }

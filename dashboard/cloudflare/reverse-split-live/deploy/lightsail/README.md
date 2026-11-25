@@ -140,10 +140,21 @@ when the client confirmed the object. An unverifiable write leaves the prior
 checkpoint in place. The operations report still has its own state-age guard.
 
 With the continuous refresher enabled, a second worker prepares the first
-operations report from the exact captured bytes while the checkpoint uploads.
+operations report from the exact captured bytes while the checkpoint is
+compressed and uploaded.
 It cannot publish anything itself. The refresher only uses the result once
 its generation has committed, then applies the usual age and receipt checks.
 The publication audit identifies this path as `render_mode: prepared_during_upload`.
+
+The checkpoint reader supports a full gzip image or a full image with one
+changed-block overlay. It validates both objects and the SHA-256 of the entire
+reconstructed SQLite file. The collector retains every full image needed by
+either of its two retained generations. The writer starts with a full image,
+then uses an overlay only when its gzip payload is under 60% of a new full
+image. A collector without `RS_CHECKPOINT_DELTA=1` still writes full images.
+Deploy and verify the compatible reader before enabling overlay writes. To
+roll back across the introduction of overlay support, first stop writing
+overlays on a compatible revision and verify a new full checkpoint has committed.
 
 ## 5. Day to day
 
