@@ -141,24 +141,24 @@ when the client confirmed the object. An unverifiable write leaves the prior
 checkpoint in place. The operations report still has its own state-age guard.
 
 With the continuous refresher enabled, a second worker prepares the first
-operations report from the exact captured bytes while the checkpoint is
-compressed and uploaded.
+operations report from the same immutable SQLite file read by the compressor.
+The dashboard worker also reads this file directly.
 It cannot publish anything itself. The refresher only uses the result once
 its generation has committed, then applies the usual age and receipt checks.
 The publication audit identifies this path as `render_mode: prepared_during_upload`.
 
 The checkpoint reader supports a full gzip image or a full image with one
-changed-block overlay. It validates both objects and the SHA-256 of the entire
+changed-block overlay. It supports older 1 MiB overlays and the 64 KiB overlays
+Box R now writes. It validates both objects and the SHA-256 of the entire
 reconstructed SQLite file. The collector retains every full image needed by
 either of its two retained generations. The writer starts with a full image,
 then uses an overlay only when its gzip payload is under 60% of a new full
 image. Changed-block uploads get ten seconds of overhead plus time to send
 the size at 8 MB/s, capped by the full-image timeout. Box R enables them
 through `run.sh`. Other collectors continue to
-write full images by default. To roll back across the introduction of
-overlay support, set `RS_CHECKPOINT_DELTA=0` for Box R on a compatible
-revision, then verify that a new full checkpoint has committed before
-rolling back.
+write full images by default. Before rolling back to a reader that predates
+64 KiB overlay support, set `RS_CHECKPOINT_DELTA=0` on the running compatible
+revision and verify that a full checkpoint has committed.
 
 ## 5. Day to day
 

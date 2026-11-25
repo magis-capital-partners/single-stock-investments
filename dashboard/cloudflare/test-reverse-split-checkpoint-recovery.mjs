@@ -30,10 +30,11 @@ test('changed-block checkpoints restore the exact newer SQLite state from one re
  const changed=randomBytes(1024*1024);
  await env.DB.prepare('UPDATE checkpoint_fixture SET data=? WHERE id=2').bind(changed).run();
  const delta=await save(cp);
- assert.equal(delta.format,'sqlite_block_delta.v1');
+ assert.equal(delta.format,'sqlite_block_delta.v2');
  assert.equal(delta.base.key,full.key);
  assert.ok(delta.stored_bytes<full.stored_bytes/2);
  assert.equal(transfers[1].bytes,delta.stored_bytes);
+ assert.ok(delta.changed_blocks.length<=24,'the delta includes only the fine blocks affected by the mutation');
  assert.equal(transfers[0].timeout,35000);
  assert.ok(transfers[1].timeout<=12000,'a small checkpoint must not inherit the full upload timeout');
  const restoredEnv={...env},restored=await openCheckpoint(restoredEnv);

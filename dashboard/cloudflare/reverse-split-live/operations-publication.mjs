@@ -13,7 +13,7 @@
 // so it never blocks quote, exit or validation work, and it makes no database call.
 import {Worker} from 'node:worker_threads';
 import {createHash,randomUUID} from 'node:crypto';
-import {mkdtempSync,rmSync,realpathSync,mkdirSync,appendFileSync,readFileSync,existsSync} from 'node:fs';
+import {mkdtempSync,rmSync,realpathSync,mkdirSync,appendFileSync,readFileSync,existsSync,linkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
 import {compressCheckpoint} from './checkpoint-codec.mjs';
@@ -152,9 +152,16 @@ function operationsWorker(workerURL,timeoutMs){
     const fail=error=>{if(worker!==current)return;settle(error);stopWorker();};
     current.on('error',fail);current.on('exit',code=>fail(new Error('Operations evaluation worker exited ('+code+')')));
   }
-  function call(message,{transfer=[],timeout=timeoutMs}={}){
+  function call(message,{transfer=[],timeout=timeoutMs,image=null}={}){
     if(closed)return Promise.reject(new Error('Operations worker closed'));
     if(!worker)start();const current=worker,id=++sequence;current.ref();
+    if(image){
+      // Pin this exact capture before yielding. Subsequent commits or a
+      // rejected upload can discard the collector's link independently.
+      const name='capture-'+id+'.sqlite';
+      try{linkSync(image.path,join(dir,name));}catch(error){current.unref();return Promise.reject(error);}
+      message={...message,name,length:image.length};
+    }
     return new Promise((resolve,reject)=>{
       const timer=setTimeout(()=>{waiting.delete(id);reject(new Error('Operations evaluation timed out'));if(worker===current){settle(new Error('Operations evaluation worker stopped'));stopWorker();}},timeout);
       waiting.set(id,{resolve,reject,timer});try{current.postMessage({...message,id},transfer);}catch(error){clearTimeout(timer);waiting.delete(id);reject(error);}
@@ -179,22 +186,27 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
   let attemptedGeneration=null,exhaustedGeneration=null;
   const health={status:'waiting_for_checkpoint',interval_seconds:intervalMs/1000,max_state_age_seconds:maxStateAgeMs/1000,refreshes:0,published:0,skipped:{},last_generated_at:null,last_state_at:null,last_published_at:null,last_error:null};
 
-  async function prepare({receipt,bytes}){
-    const state=clockOf(receipt.at),generation=receipt.generation;
-    if(closed||workBudget(state)<=0)return false;
-    // A successor may begin saving just as the previous checkpoint commits.
-    // Give the refresher a chance to take the committed report first.
+  function loadCheckpoint(worker,{receipt,bytes,image},timeout){
+    const request={type:'load',generation:receipt.generation,sha256:receipt.sha256};
+    if(image)return worker.call(request,{image,timeout});
+    const owned=bytes.byteOffset===0&&bytes.byteLength===bytes.buffer.byteLength?bytes:new Uint8Array(bytes);
+    return worker.call({...request,bytes:owned.buffer},{transfer:[owned.buffer],timeout});
+  }
+
+  async function prepare({receipt,bytes,image}){
+    const state=clockOf(receipt.at),generation=receipt.generation,loadBudget=workBudget(state);
+    if(closed||loadBudget<=0)return false;
+    // Give the refresher a chance to take a prepared report that has just
+    // committed before replacing it with the next candidate.
     const obsolete=prepared;
     if(obsolete&&checkpoint.durable()?.generation===obsolete.generation)return false;
     const entry={generation,worker:newWorker()};
     prepared=entry;
     entry.ready=(async()=>{
-      if(obsolete)await obsolete.worker.close();
-      const shared=bytes.buffer instanceof SharedArrayBuffer;
-      const buffer=shared?bytes.buffer:Uint8Array.from(bytes).buffer;
-      const loadBudget=workBudget(state);
-      if(loadBudget<=0)return null;
-      await entry.worker.call({type:'load',generation,sha256:receipt.sha256,bytes:buffer},{transfer:shared?[]:[buffer],timeout:loadBudget});
+      // Copy only the legacy uncompressed path, which otherwise transfers
+      // away the bytes still needed by the saver.
+      const loading=loadCheckpoint(entry.worker,{receipt,image,bytes:bytes&&Uint8Array.from(bytes)},loadBudget);
+      await Promise.all([loading,obsolete?.worker.close()]);
       const evaluateBudget=workBudget(state);
       if(evaluateBudget<=0)return null;
       const now=new Date(clock()).toISOString();
@@ -238,11 +250,12 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
       if(!active.alive()||loaded!==durable.generation){
         const loadBudget=workBudget(state);
         if(loadBudget<=0)return outOfTime();
-        const bytes=checkpoint.takeDurableBytes(durable.generation);if(!bytes)return skip('checkpoint_copy_unavailable');
-        // The captured image is shared read-only or transferred once after commit.
-        const owned=bytes.byteOffset===0&&bytes.byteLength===bytes.buffer.byteLength?bytes:new Uint8Array(bytes);
-        const transfer=owned.buffer instanceof SharedArrayBuffer?[]:[owned.buffer];
-        loaded=null;await active.call({type:'load',generation:durable.generation,sha256:durable.sha256,bytes:owned.buffer},{transfer,timeout:loadBudget});loaded=durable.generation;
+        const image=checkpoint.durableImage?.(durable.generation);
+        const bytes=image?null:checkpoint.takeDurableBytes(durable.generation);
+        if(!image&&!bytes)return skip('checkpoint_copy_unavailable');
+        loaded=null;
+        await loadCheckpoint(active,{receipt:durable,bytes,image},loadBudget);
+        loaded=durable.generation;
       }
       const evaluateBudget=workBudget(state);
       if(evaluateBudget<=0)return outOfTime();
