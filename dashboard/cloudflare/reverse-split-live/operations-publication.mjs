@@ -249,6 +249,9 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
       now=new Date(clock()).toISOString();
       evaluated=await active.call({type:'evaluate',generation:durable.generation,now,stateAt:durable.at},{timeout:evaluateBudget});
     }
+    // Keep the last verified report readable. If its replacement checkpoint
+    // committed during this repeated refresh, give the write slot to that one.
+    if(channel.last()?.state===state&&Date.parse(checkpoint.durable()?.at)-state>=intervalMs)return skip('superseded');
     if(remaining()<publicationHeadroom(maxStateAgeMs))return outOfTime();
     const result=await channel.publish({text:evaluated.text,digest:evaluated.digest,stateAt:durable.at,generatedAt:now,urgent:true,renderMode});
     if(result.reason==='insufficient_publication_headroom'||result.reason==='paused_checkpoint_too_old'){

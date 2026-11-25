@@ -132,7 +132,8 @@ Record each result, with the date and `soak-report.sh` output, in a dated note n
 | Transfer | Lightsail console, network out, first week | Projected month stays inside the plan's allowance. A full ~142 MB checkpoint every 2 minutes would be ~3 TB a month by itself. |
 
 When the checkpoint PUT response times out, the collector checks R2 metadata
-for the original unique key for up to 10.5 seconds. It commits only after an
+for the original unique key for up to 10.5 seconds for a full image or 4.5 for
+a changed-block upload. It commits only after an
 exact key, size and ETag match and the usual lease-checked pointer update.
 `upload_confirmation: storage_metadata` marks this path in the publisher audit.
 `upload_timeout_at` records the client timeout and `upload_completed_at` records
@@ -151,7 +152,9 @@ changed-block overlay. It validates both objects and the SHA-256 of the entire
 reconstructed SQLite file. The collector retains every full image needed by
 either of its two retained generations. The writer starts with a full image,
 then uses an overlay only when its gzip payload is under 60% of a new full
-image. Box R enables them through `run.sh`. Other collectors continue to
+image. Changed-block uploads get ten seconds of overhead plus time to send
+the size at 8 MB/s, capped by the full-image timeout. Box R enables them
+through `run.sh`. Other collectors continue to
 write full images by default. To roll back across the introduction of
 overlay support, set `RS_CHECKPOINT_DELTA=0` for Box R on a compatible
 revision, then verify that a new full checkpoint has committed before
