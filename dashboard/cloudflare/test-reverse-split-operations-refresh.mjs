@@ -25,7 +25,10 @@ test('prepares exact checkpoint reports during storage, but exposes only the com
   env.onOperationsAudit=row=>audit.push(row);
   env.CHECKPOINT_COMPRESSION='gzip';
   let refresher,preparation;
-  const cp=await openCheckpoint(env,{retainDurableBytes:true,prepareOperations(checkpoint){preparation=refresher.prepare(checkpoint);}});
+  const cp=await openCheckpoint(env,{retainDurableBytes:true,prepareOperations(checkpoint){
+    assert.ok(checkpoint.bytes.buffer instanceof SharedArrayBuffer);
+    preparation=refresher.prepare(checkpoint);
+  }});
   refresher=operationsRefresher({checkpoint:cp,maxStateAgeMs:75000});
   t.after(async()=>{await refresher.close();cp.close();});
   const put=env.EVIDENCE.put;

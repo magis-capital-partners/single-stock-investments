@@ -190,10 +190,11 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
     prepared=entry;
     entry.ready=(async()=>{
       if(obsolete)await obsolete.worker.close();
-      const owned=Uint8Array.from(bytes);
+      const shared=bytes.buffer instanceof SharedArrayBuffer;
+      const buffer=shared?bytes.buffer:Uint8Array.from(bytes).buffer;
       const loadBudget=workBudget(state);
       if(loadBudget<=0)return null;
-      await entry.worker.call({type:'load',generation,sha256:receipt.sha256,bytes:owned.buffer},{transfer:[owned.buffer],timeout:loadBudget});
+      await entry.worker.call({type:'load',generation,sha256:receipt.sha256,bytes:buffer},{transfer:shared?[]:[buffer],timeout:loadBudget});
       const evaluateBudget=workBudget(state);
       if(evaluateBudget<=0)return null;
       const now=new Date(clock()).toISOString();
@@ -238,9 +239,10 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
         const loadBudget=workBudget(state);
         if(loadBudget<=0)return outOfTime();
         const bytes=checkpoint.takeDurableBytes(durable.generation);if(!bytes)return skip('checkpoint_copy_unavailable');
-        // Transfer, not copy: the collector does not reuse these bytes after the commit.
+        // The captured image is shared read-only or transferred once after commit.
         const owned=bytes.byteOffset===0&&bytes.byteLength===bytes.buffer.byteLength?bytes:new Uint8Array(bytes);
-        loaded=null;await active.call({type:'load',generation:durable.generation,sha256:durable.sha256,bytes:owned.buffer},{transfer:[owned.buffer],timeout:loadBudget});loaded=durable.generation;
+        const transfer=owned.buffer instanceof SharedArrayBuffer?[]:[owned.buffer];
+        loaded=null;await active.call({type:'load',generation:durable.generation,sha256:durable.sha256,bytes:owned.buffer},{transfer,timeout:loadBudget});loaded=durable.generation;
       }
       const evaluateBudget=workBudget(state);
       if(evaluateBudget<=0)return outOfTime();

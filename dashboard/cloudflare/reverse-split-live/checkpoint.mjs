@@ -1,7 +1,7 @@
 // Local scan database. Each upload has a private, non-reused generation identity.
 import {DatabaseSync} from 'node:sqlite';
 import {createHash, randomUUID} from 'node:crypto';
-import {mkdtempSync,readFileSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
+import {closeSync,fstatSync,mkdtempSync,openSync,readFileSync,readSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
 import {setTimeout as sleep} from 'node:timers/promises';
@@ -20,6 +20,22 @@ export function checkpointObjectKey(receipt){
 }
 const previousReceipt=receipt=>receipt?Object.fromEntries(Object.entries(receipt).filter(([key])=>key!=='previous')):null;
 function cleanup(dir){const target=realpathSync(dir),parent=realpathSync(tmpdir()),equal=(a,b)=>process.platform==='win32'?a.toLowerCase()===b.toLowerCase():a===b;if(!equal(dirname(target),parent)||!basename(target).startsWith('reverse-split-'))throw new Error('Unsafe collector temporary directory');rmSync(target,{recursive:true,force:true});}
+
+function captureSharedCheckpoint(file){
+  const fd=openSync(file,'r');
+  try{
+    // One immutable image is read by the compressor and by the private report
+    // worker. Copying a production snapshot would add more than a GiB to RSS.
+    const bytes=Buffer.from(new SharedArrayBuffer(fstatSync(fd).size));
+    let offset=0;
+    while(offset<bytes.length){
+      const count=readSync(fd,bytes,offset,bytes.length-offset,null);
+      if(!count)throw new Error('Incomplete collector checkpoint capture');
+      offset+=count;
+    }
+    return bytes;
+  }finally{closeSync(fd);}
+}
 
 async function confirmTimedOutUpload(env,key,body){
   const etag=createHash('md5').update(body).digest('hex');
@@ -166,8 +182,10 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
         // Capture without yielding: every displayed fill belongs to these exact durable bytes.
         // Retain the previous committed bytes until the successor commits: the
         // refresher must remain usable while a large upload is in flight.
-        const started=Date.now(),snapshot=checkpointOnly||backgroundViews?null:captureReadSnapshot(db),bytes=readFileSync(file),captured=Date.now();let stored=null;
-        const next=await storeCheckpoint(bytes,at,{compressed:env.CHECKPOINT_COMPRESSION==='gzip',onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{stored=value;}:null,onCommitted:retainDurableBytes?committed=>{durable={generation:committed.generation,at:committed.at,sha256:committed.sha256,bytes};}:null});
+        const started=Date.now(),snapshot=checkpointOnly||backgroundViews?null:captureReadSnapshot(db);
+        const compressed=env.CHECKPOINT_COMPRESSION==='gzip';
+        const bytes=compressed&&retainDurableBytes&&prepareOperations?captureSharedCheckpoint(file):readFileSync(file),captured=Date.now();let stored=null;
+        const next=await storeCheckpoint(bytes,at,{compressed,onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{stored=value;}:null,onCommitted:retainDurableBytes?committed=>{durable={generation:committed.generation,at:committed.at,sha256:committed.sha256,bytes};}:null});
         env.checkpointHealth={state_at:at,bytes:bytes.length,stored_bytes:next.stored_bytes||bytes.length,capture_ms:captured-started,store_ms:Date.now()-captured,total_ms:Date.now()-started};
         // These bytes became durable when the pointer committed; the refresh reads nothing newer.
         if(snapshot)snapshot.stateAt=next.at;
