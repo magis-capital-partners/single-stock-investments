@@ -131,6 +131,20 @@ Record each result, with the date and `soak-report.sh` output, in a dated note n
 | Disk | Daily `df -h /` and the private `/tmp` size in `soak-report.sh` | More than half the disk free after a week. |
 | Transfer | Lightsail console, network out, first week | Projected month stays inside the plan's allowance. A full ~142 MB checkpoint every 2 minutes would be ~3 TB a month by itself. |
 
+When the checkpoint PUT response times out, the collector checks R2 metadata
+for the original unique key for up to 10.5 seconds. It commits only after an
+exact key, size and ETag match and the usual lease-checked pointer update.
+`upload_confirmation: storage_metadata` marks this path in the publisher audit.
+`upload_timeout_at` records the client timeout and `upload_completed_at` records
+when the client confirmed the object. An unverifiable write leaves the prior
+checkpoint in place. The operations report still has its own state-age guard.
+
+With the continuous refresher enabled, a second worker prepares the first
+operations report from the exact captured bytes while the checkpoint uploads.
+It cannot publish anything itself. The refresher only uses the result once
+its generation has committed, then applies the usual age and receipt checks.
+The publication audit identifies this path as `render_mode: prepared_during_upload`.
+
 ## 5. Day to day
 
 - **Code updates:** `rs-update.timer` at 20:30 ET. A new commit that does not change the collector

@@ -1,9 +1,10 @@
 // Local scan database. Each upload has a private, non-reused generation identity.
 import {DatabaseSync} from 'node:sqlite';
 import {createHash, randomUUID} from 'node:crypto';
-import {mkdtempSync,readFileSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
+import {closeSync,fstatSync,mkdtempSync,openSync,readFileSync,readSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
+import {setTimeout as sleep} from 'node:timers/promises';
 import {sha} from './worker.mjs';
 import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
 import {createCheckpointCompressor,restoreCheckpoint} from './checkpoint-codec.mjs';
@@ -20,11 +21,43 @@ export function checkpointObjectKey(receipt){
 const previousReceipt=receipt=>receipt?Object.fromEntries(Object.entries(receipt).filter(([key])=>key!=='previous')):null;
 function cleanup(dir){const target=realpathSync(dir),parent=realpathSync(tmpdir()),equal=(a,b)=>process.platform==='win32'?a.toLowerCase()===b.toLowerCase():a===b;if(!equal(dirname(target),parent)||!basename(target).startsWith('reverse-split-'))throw new Error('Unsafe collector temporary directory');rmSync(target,{recursive:true,force:true});}
 
+function captureSharedCheckpoint(file){
+  const fd=openSync(file,'r');
+  try{
+    // One immutable image is read by the compressor and by the private report
+    // worker. Copying a production snapshot would add more than a GiB to RSS.
+    const bytes=Buffer.from(new SharedArrayBuffer(fstatSync(fd).size));
+    let offset=0;
+    while(offset<bytes.length){
+      const count=readSync(fd,bytes,offset,bytes.length-offset,null);
+      if(!count)throw new Error('Incomplete collector checkpoint capture');
+      offset+=count;
+    }
+    return bytes;
+  }finally{closeSync(fd);}
+}
+
+async function confirmTimedOutUpload(env,key,body){
+  const etag=createHash('md5').update(body).digest('hex');
+  const deadline=AbortSignal.timeout(10500);
+  // These are read-only probes of a never-reused key. A delayed original PUT
+  // may finish, but sending a second large body would add another stall.
+  for(const delay of [0,1800,2100,3500]){
+    if(delay)await sleep(delay,undefined,{signal:deadline}).catch(()=>{});
+    if(deadline.aborted)return false;
+    env.assertCollectorLease?.();
+    const signal=AbortSignal.any([deadline,AbortSignal.timeout(2200)]);
+    const metadata=await env.EVIDENCE.stat(key,{signal}).catch(()=>null);
+    if(metadata)return metadata.size===body.length&&metadata.etag===etag;
+  }
+  return false;
+}
+
 export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>make(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>({meta:{changes:Number(db.prepare(sql).run(...args).changes)}})});return {prepare:sql=>make(sql),batch:async statements=>{db.exec('BEGIN');try{const rows=[];for(const s of statements)rows.push(await s.run());db.exec('COMMIT');return rows;}catch(e){db.exec('ROLLBACK');throw e;}}};}
 
 // retainDurableBytes: keep the last committed checkpoint's bytes (one generation)
 // for the operations refresh, which evaluates only already-durable state.
-export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={},publishOperationsFromFull=true}={}){
+export async function openCheckpoint(env,{retainDurableBytes=false,operationsOptions={},publishOperationsFromFull=true,prepareOperations=null}={}){
   const remote=env.controlDB,dir=mkdtempSync(join(tmpdir(),'reverse-split-')),file=join(dir,'research.sqlite');let db,receipt,receiptValue,publicationTask=null,latestSnapshot=null,deferDerived=false,saving=Promise.resolve(),durable=null,refreshPointer=false,pruneTask=null;
   const pruneQueue=new Set(),pruneStop=new AbortController();
   // Large checkpoint blobs have a different latency budget from D1 pointer updates.
@@ -98,17 +131,28 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     if(encoded)Object.assign(next,{compression:encoded.compression,stored_bytes:encoded.stored_bytes,stored_sha256:encoded.stored_sha256});
     if(parent)next.previous=previousReceipt(parent);
     env.assertCollectorLease?.();
+    const body=encoded?.stored||bytes;
+    let uploadCompleted,uploadTimeoutAt=null;
+    if(retainDurableBytes&&prepareOperations){
+      try{prepareOperations({receipt:next,bytes});}
+      catch(error){console.error(JSON.stringify({event:'operations_preparation_deferred',error:error.message}));}
+    }
     const uploadStarted=Date.now();
-    let uploadCompleted;
     try{
-      await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(uploadTimeoutMs)});
+      try{
+        await env.EVIDENCE.put(key,body,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(uploadTimeoutMs)});
+      }catch(error){
+        if(!['TimeoutError','AbortError'].includes(error.name)||!env.EVIDENCE.stat)throw error;
+        uploadTimeoutAt=Date.now();
+        if(!await confirmTimedOutUpload(env,key,body))throw error;
+      }
       uploadCompleted=Date.now();
       await commitPointer(next,at);
     }catch(error){
       operations.record({event:'checkpoint_failed',at:new Date().toISOString(),state_at:at,generation,phase:uploadCompleted?'pointer':'upload',error_type:error.name});
       throw error;
     }
-    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:uploadStarted-compressionCompleted,stored_bytes:encoded?.stored_bytes||bytes.length,compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
+    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),upload_confirmation:uploadTimeoutAt===null?'put_response':'storage_metadata',upload_timeout_at:uploadTimeoutAt===null?null:new Date(uploadTimeoutAt).toISOString(),compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:uploadStarted-compressionCompleted,stored_bytes:body.length,compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
     onCommitted?.(next);
     onCommittedBytes?.(encoded?.stored||bytes);
     // Keep two committed generations. Legacy slots, review archives and uncertain
@@ -138,8 +182,10 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
         // Capture without yielding: every displayed fill belongs to these exact durable bytes.
         // Retain the previous committed bytes until the successor commits: the
         // refresher must remain usable while a large upload is in flight.
-        const started=Date.now(),snapshot=checkpointOnly||backgroundViews?null:captureReadSnapshot(db),bytes=readFileSync(file),captured=Date.now();let stored=null;
-        const next=await storeCheckpoint(bytes,at,{compressed:env.CHECKPOINT_COMPRESSION==='gzip',onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{stored=value;}:null,onCommitted:retainDurableBytes?committed=>{durable={generation:committed.generation,at:committed.at,sha256:committed.sha256,bytes};}:null});
+        const started=Date.now(),snapshot=checkpointOnly||backgroundViews?null:captureReadSnapshot(db);
+        const compressed=env.CHECKPOINT_COMPRESSION==='gzip';
+        const bytes=compressed&&retainDurableBytes&&prepareOperations?captureSharedCheckpoint(file):readFileSync(file),captured=Date.now();let stored=null;
+        const next=await storeCheckpoint(bytes,at,{compressed,onCommittedBytes:backgroundViews&&!checkpointOnly?value=>{stored=value;}:null,onCommitted:retainDurableBytes?committed=>{durable={generation:committed.generation,at:committed.at,sha256:committed.sha256,bytes};}:null});
         env.checkpointHealth={state_at:at,bytes:bytes.length,stored_bytes:next.stored_bytes||bytes.length,capture_ms:captured-started,store_ms:Date.now()-captured,total_ms:Date.now()-started};
         // These bytes became durable when the pointer committed; the refresh reads nothing newer.
         if(snapshot)snapshot.stateAt=next.at;

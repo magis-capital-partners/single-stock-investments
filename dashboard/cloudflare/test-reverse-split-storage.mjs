@@ -52,6 +52,23 @@ test('object puts send only a well-formed single media type',async()=>{
   assert.equal(safeContentType('  image/png  '),'image/png');
 });
 
+test('object metadata confirms only an exact key via a bounded prefix listing',async()=>{
+  const key='collector-state/checkpoints/generation+1.sqlite.gz';
+  let result=[{key:key+'.other',size:10,etag:'duplicate-prefix'}];
+  const env=remote(async(url,options)=>{
+    const request=new URL(url);
+    assert.ok(request.pathname.endsWith('/r2/buckets/bucket/objects'));
+    assert.equal(request.searchParams.get('prefix'),key);
+    assert.equal(request.searchParams.get('per_page'),'1');
+    assert.ok(options.signal instanceof AbortSignal);
+    return Response.json({success:true,result});
+  });
+  const signal=AbortSignal.timeout(1000);
+  assert.equal(await env.EVIDENCE.stat(key,{signal}),null);
+  result=[{key,size:50,etag:'matching-etag'}];
+  assert.deepEqual(await env.EVIDENCE.stat(key,{signal}),{size:50,etag:'matching-etag'});
+});
+
 function storageFixture(t,{rejectPut=()=>false}={}){
   const db=new DatabaseSync(':memory:');t.after(()=>db.close());
   for(const name of readdirSync(new URL('./reverse-split-live/migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(readFileSync(new URL('./reverse-split-live/migrations/'+name,import.meta.url),'utf8'));

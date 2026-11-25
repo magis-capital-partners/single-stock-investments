@@ -4,7 +4,8 @@
 // A full save captures the views from the exact bytes it checkpoints and publishes
 // them only after the checkpoint pointer commits. Between saves, the refresher
 // re-evaluates operationalEvidence over a byte-identical copy of the LAST COMMITTED
-// checkpoint, at the publication time. Every count, candidate and decision therefore
+// checkpoint. The next report can be prepared while storage runs, but can only
+// publish once that exact generation commits. Every count, candidate and decision
 // comes from durable state: a restart restores that generation or a newer one, so
 // no published candidate can vanish or regress. Only clock-relative fields
 // (`generated_at`, source/heartbeat ages, entry windows) move forward; `state_at`
@@ -58,7 +59,7 @@ export function operationsChannel(env,{db=null,clock=Date.now,maxStateAgeMs=oper
       await env.EVIDENCE.put('collector-dashboard/operations-audit/'+day+'.jsonl',data,{httpMetadata:{contentType:'application/x-ndjson'}});
     },
     idle:()=>tail.catch(()=>{}),
-    publish({text,digest=null,stateAt,generatedAt,urgent=false,kind=urgent?'refresh':'full_checkpoint'}){
+    publish({text,digest=null,stateAt,generatedAt,urgent=false,kind=urgent?'refresh':'full_checkpoint',renderMode=null}){
       const queuedAt=clock();
       const task=tail.catch(()=>{}).then(async()=>{
         const state=clockOf(stateAt),generated=clockOf(generatedAt),seen={state,generated,stateAt,generatedAt};
@@ -79,6 +80,7 @@ export function operationsChannel(env,{db=null,clock=Date.now,maxStateAgeMs=oper
         const id=randomUUID(),receiptKey='collector-dashboard/operations-receipts/'+at.slice(0,10)+'/'+id+'.json';
         const content=JSON.stringify({...JSON.parse(text),publication:{id,receipt_key:receiptKey,upload_started_at:at}}),reportHash=operationsDigest(content);
         const receipt={schema:'rs_operations_publication_receipt.v1',publication_id:id,report_sha256:reportHash,report_bytes:Buffer.byteLength(content),state_at:stateAt,generated_at:generatedAt,kind,queued_at:new Date(queuedAt).toISOString(),upload_started_at:at,upload_completed_at:null,accepted:false,max_state_age_seconds:maxStateAgeMs/1000,publish_interval_seconds:operationsRefreshSettings().intervalMs/1000,pipeline_commit:process.env.RS_PIPELINE_COMMIT||null};
+        if(renderMode)receipt.render_mode=renderMode;
         const bytes=encoder.encode(content);
         const remaining=()=>maxStateAgeMs-(clock()-state);
         const write=async(key,body,contentType)=>{
@@ -116,7 +118,7 @@ export function operationsChannel(env,{db=null,clock=Date.now,maxStateAgeMs=oper
         }catch(error){record({event:'publication_visibility_failed',at:new Date(clock()).toISOString(),publication_id:id,report_sha256:reportHash,error_type:error.name});throw error;}
         const visibleAt=clock();
         record({event:'publication_visible',at:new Date(visibleAt).toISOString(),publication_id:id,report_sha256:reportHash,state_age_at_visibility_ack_seconds:(visibleAt-state)/1000});
-        last={...seen,uploadCompletedAt:receipt.upload_completed_at,receiptKey,reportHash};
+        last={...seen,visibleAt,uploadCompletedAt:receipt.upload_completed_at,receiptKey,reportHash};
         writeMarker(hash,generatedAt);return {published:true,receipt};
       });
       tail=task;return task;
@@ -130,16 +132,13 @@ function removeScratch(dir){
   rmSync(target,{recursive:true,force:true});
 }
 
-export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=120000,clock=Date.now,timeoutMs=60000,workerURL=new URL('./operations-worker.mjs',import.meta.url)}={}){
-  if(!checkpoint?.operations||!checkpoint.durable)throw new Error('Operations refresh requires a durable-checkpoint publisher');
-  const channel=checkpoint.operations,tickMs=Math.max(250,Math.min(1000,Math.floor(intervalMs/4))),waiting=new Map();
-  let worker=null,dir=null,loaded=null,running=null,closed=false,sequence=0,retryAt=0,stopping=Promise.resolve();
-  let attemptedGeneration=null,exhaustedGeneration=null;
-  const health={status:'waiting_for_checkpoint',interval_seconds:intervalMs/1000,max_state_age_seconds:maxStateAgeMs/1000,refreshes:0,published:0,skipped:{},last_generated_at:null,last_state_at:null,last_published_at:null,last_error:null};
+function operationsWorker(workerURL,timeoutMs){
+  const waiting=new Map();
+  let worker=null,dir=null,sequence=0,closed=false,closing=null,stopping=Promise.resolve();
   function settle(error){for(const [id,w] of waiting){clearTimeout(w.timer);waiting.delete(id);w.reject(error);}}
   function stopWorker(){
     if(!worker&&!dir)return stopping;
-    const current=worker,scratch=dir;worker=null;dir=null;loaded=null;
+    const current=worker,scratch=dir;worker=null;dir=null;
     stopping=(async()=>{
       if(current){current.removeAllListeners();current.on('error',()=>{});await current.terminate().catch(()=>{});}
       try{removeScratch(scratch);}catch(error){console.error(JSON.stringify({event:'operations_refresh_cleanup_deferred',error:error.message}));}
@@ -154,11 +153,58 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
     current.on('error',fail);current.on('exit',code=>fail(new Error('Operations evaluation worker exited ('+code+')')));
   }
   function call(message,{transfer=[],timeout=timeoutMs}={}){
+    if(closed)return Promise.reject(new Error('Operations worker closed'));
     if(!worker)start();const current=worker,id=++sequence;current.ref();
     return new Promise((resolve,reject)=>{
       const timer=setTimeout(()=>{waiting.delete(id);reject(new Error('Operations evaluation timed out'));if(worker===current){settle(new Error('Operations evaluation worker stopped'));stopWorker();}},timeout);
       waiting.set(id,{resolve,reject,timer});try{current.postMessage({...message,id},transfer);}catch(error){clearTimeout(timer);waiting.delete(id);reject(error);}
     }).finally(()=>{if(!waiting.size&&worker===current)current.unref();});
+  }
+  function close(){
+    if(closing)return closing;
+    const leave=worker&&!waiting.size?call({type:'close'},{timeout:2500}):Promise.resolve();
+    closed=true;
+    closing=leave.catch(()=>{}).then(()=>{settle(new Error('Operations worker closed'));return stopWorker();});
+    return closing;
+  }
+  return {call,alive:()=>worker!==null,close};
+}
+
+export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=120000,clock=Date.now,timeoutMs=60000,workerURL=new URL('./operations-worker.mjs',import.meta.url)}={}){
+  if(!checkpoint?.operations||!checkpoint.durable)throw new Error('Operations refresh requires a durable-checkpoint publisher');
+  const channel=checkpoint.operations,tickMs=Math.max(250,Math.min(1000,Math.floor(intervalMs/4)));
+  const workBudget=state=>Math.min(timeoutMs,maxStateAgeMs-(clock()-state)-publicationHeadroom(maxStateAgeMs));
+  const newWorker=()=>operationsWorker(workerURL,timeoutMs);
+  let active=newWorker(),prepared=null,loaded=null,running=null,closed=false,retryAt=0;
+  let attemptedGeneration=null,exhaustedGeneration=null;
+  const health={status:'waiting_for_checkpoint',interval_seconds:intervalMs/1000,max_state_age_seconds:maxStateAgeMs/1000,refreshes:0,published:0,skipped:{},last_generated_at:null,last_state_at:null,last_published_at:null,last_error:null};
+
+  async function prepare({receipt,bytes}){
+    const state=clockOf(receipt.at),generation=receipt.generation;
+    if(closed||workBudget(state)<=0)return false;
+    // A successor may begin saving just as the previous checkpoint commits.
+    // Give the refresher a chance to take the committed report first.
+    const obsolete=prepared;
+    if(obsolete&&checkpoint.durable()?.generation===obsolete.generation)return false;
+    const entry={generation,worker:newWorker()};
+    prepared=entry;
+    entry.ready=(async()=>{
+      if(obsolete)await obsolete.worker.close();
+      const shared=bytes.buffer instanceof SharedArrayBuffer;
+      const buffer=shared?bytes.buffer:Uint8Array.from(bytes).buffer;
+      const loadBudget=workBudget(state);
+      if(loadBudget<=0)return null;
+      await entry.worker.call({type:'load',generation,sha256:receipt.sha256,bytes:buffer},{transfer:shared?[]:[buffer],timeout:loadBudget});
+      const evaluateBudget=workBudget(state);
+      if(evaluateBudget<=0)return null;
+      const now=new Date(clock()).toISOString();
+      const evaluated=await entry.worker.call({type:'evaluate',generation,now,stateAt:receipt.at},{timeout:evaluateBudget});
+      return {evaluated,now};
+    })().catch(error=>{
+      if(prepared===entry&&!closed)console.error(JSON.stringify({event:'operations_preparation_deferred',error:error.message}));
+      return null;
+    });
+    return Boolean(await entry.ready);
   }
   const count=reason=>{health.skipped[reason]=(health.skipped[reason]||0)+1;};
   let lastSkip='';
@@ -166,27 +212,45 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
   async function refreshOnce(){
     const durable=checkpoint.durable();if(!durable)return skip('waiting_for_checkpoint');
     attemptedGeneration=durable.generation;
-    const nowMs=clock(),now=new Date(nowMs).toISOString(),state=clockOf(durable.at);
+    const state=clockOf(durable.at);
     const remaining=()=>maxStateAgeMs-(clock()-state);
-    const workBudget=()=>Math.min(timeoutMs,remaining()-publicationHeadroom(maxStateAgeMs));
     const outOfTime=()=>{
       exhaustedGeneration=durable.generation;
       return skip(remaining()<0?'paused_checkpoint_too_old':'insufficient_publication_headroom');
     };
-    const loadBudget=workBudget();
-    if(loadBudget<=0)return outOfTime();
+    if(workBudget(state)<=0)return outOfTime();
     const last=channel.last();if(last&&state<last.state)return skip('superseded');
-    if(loaded!==durable.generation){
-      const bytes=checkpoint.takeDurableBytes(durable.generation);if(!bytes)return skip('checkpoint_copy_unavailable');
-      // Transfer, not copy: the collector does not reuse these bytes after the commit.
-      const owned=bytes.byteOffset===0&&bytes.byteLength===bytes.buffer.byteLength?bytes:new Uint8Array(bytes);
-      loaded=null;await call({type:'load',generation:durable.generation,sha256:durable.sha256,bytes:owned.buffer},{transfer:[owned.buffer],timeout:loadBudget});loaded=durable.generation;
+    let now,evaluated,renderMode='after_commit';
+    if(prepared?.generation===durable.generation){
+      const entry=prepared;
+      prepared=null;
+      const result=await entry.ready;
+      if(result&&entry.worker.alive()){
+        await active.close();
+        active=entry.worker;
+        loaded=durable.generation;
+        checkpoint.takeDurableBytes(durable.generation);
+        ({evaluated,now}=result);
+        renderMode='prepared_during_upload';
+      }else await entry.worker.close();
     }
-    const evaluateBudget=workBudget();
-    if(evaluateBudget<=0)return outOfTime();
-    const evaluated=await call({type:'evaluate',generation:durable.generation,now,stateAt:durable.at},{timeout:evaluateBudget});
+    if(!evaluated){
+      if(!active.alive()||loaded!==durable.generation){
+        const loadBudget=workBudget(state);
+        if(loadBudget<=0)return outOfTime();
+        const bytes=checkpoint.takeDurableBytes(durable.generation);if(!bytes)return skip('checkpoint_copy_unavailable');
+        // The captured image is shared read-only or transferred once after commit.
+        const owned=bytes.byteOffset===0&&bytes.byteLength===bytes.buffer.byteLength?bytes:new Uint8Array(bytes);
+        const transfer=owned.buffer instanceof SharedArrayBuffer?[]:[owned.buffer];
+        loaded=null;await active.call({type:'load',generation:durable.generation,sha256:durable.sha256,bytes:owned.buffer},{transfer,timeout:loadBudget});loaded=durable.generation;
+      }
+      const evaluateBudget=workBudget(state);
+      if(evaluateBudget<=0)return outOfTime();
+      now=new Date(clock()).toISOString();
+      evaluated=await active.call({type:'evaluate',generation:durable.generation,now,stateAt:durable.at},{timeout:evaluateBudget});
+    }
     if(remaining()<publicationHeadroom(maxStateAgeMs))return outOfTime();
-    const result=await channel.publish({text:evaluated.text,digest:evaluated.digest,stateAt:durable.at,generatedAt:now,urgent:true});
+    const result=await channel.publish({text:evaluated.text,digest:evaluated.digest,stateAt:durable.at,generatedAt:now,urgent:true,renderMode});
     if(result.reason==='insufficient_publication_headroom'||result.reason==='paused_checkpoint_too_old'){
       exhaustedGeneration=durable.generation;
     }
@@ -195,19 +259,20 @@ export function operationsRefresher({checkpoint,intervalMs=30000,maxStateAgeMs=1
   }
   return {
     tickMs,
+    prepare,
     due(nowMs=clock()){
       const durable=checkpoint.durable(),last=channel.last();
       if(closed||running||!durable||durable.generation===exhaustedGeneration)return false;
       // A new committed generation can use its own budget immediately. Backoff
       // from an older report must never hold it until its publish slot expires.
       if(durable.generation!==attemptedGeneration&&(!last||Date.parse(durable.at)>last.state))return true;
-      return nowMs>=retryAt&&(!last||nowMs-last.generated>=intervalMs-tickMs);
+      return nowMs>=retryAt&&(!last||nowMs-(last.visibleAt??last.generated)>=intervalMs-tickMs);
     },
     refresh(){
       if(closed)return Promise.resolve({published:false,reason:'closed'});if(running)return running;
       running=refreshOnce().catch(error=>{retryAt=clock()+Math.min(intervalMs,15000);health.status='retry_pending';health.last_error=error.message;throw error;}).finally(()=>{running=null;});return running;
     },
     health:()=>({...health,skipped:{...health.skipped}}),
-    async close(){closed=true;if(running)await running.catch(()=>{});await channel.idle();if(worker)await call({type:'close'},{timeout:10000}).catch(()=>{});await stopWorker();},
+    async close(){closed=true;if(running)await running.catch(()=>{});await channel.idle();await Promise.all([active.close(),prepared?.worker.close()]);},
   };
 }
