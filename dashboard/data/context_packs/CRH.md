@@ -109,8 +109,8 @@ Documents in folder: **51** (all listed below; Tier 1–3 extracted or keyword-s
 - deep_dive: CRH/research/deep_dive_2026-11-06.md (sha256 sha256:058694e70ea30da6...)
 - filing_digest: CRH/research/evidence/filing_digest.md (sha256 sha256:e16c69d7b16ae434...)
 - adversarial: CRH/research/adversarial_2026-11-06.md (sha256 sha256:2ed2cb88db46d8cf...)
-- valuation: CRH/research/valuation.json (sha256 sha256:e44c38d2c5bd2d66...)
-- thesis_card: CRH/research/thesis_card.json (sha256 sha256:45db92edd35e07ca...)
+- valuation: CRH/research/valuation.json (sha256 sha256:86ef81fb869f5d69...)
+- thesis_card: CRH/research/thesis_card.json (sha256 sha256:f537675c76ff9596...)
 - cross_check: CRH/research/cross_check_third_party_2026-11-06.md (sha256 sha256:414e5cb738087f06...)
 
 ## Excluded from this pack
