@@ -274,6 +274,25 @@ def _etf_0dte_share_classification(
     return Classification(root, bucket, reason, None)
 
 
+
+def _operator_hold_ticker(pos: Mapping[str, Any], drew_symbols: Iterable[str] | None) -> str | None:
+    """Name pinned by operators.drew.symbols, or None.
+
+    Stock and options both pin. A wrapper on another root (TPLX) does not.
+    """
+    drew = {norm_sym(s) for s in (drew_symbols or [])}
+    if not drew:
+        return None
+    under = norm_sym(pos.get("underlyingSymbol") or pos.get("underlying") or "")
+    ticker = norm_sym(pos.get("symbol") or pos.get("ticker") or pos.get("localSymbol") or "")
+    sec = _sec_type(pos)
+    strategy_name = under or ticker if sec in OPTION_SEC_TYPES else ticker
+    pinned = strategy_name or ticker
+    if pinned in drew or (ticker in drew and sec not in OPTION_SEC_TYPES):
+        return pinned
+    return None
+
+
 def classify_position(
     pos: Mapping[str, Any],
     *,
@@ -303,7 +322,10 @@ def classify_position(
     if evidence and classification.bucket not in {"spx_0dte", "index_put_hedge", *ETF_0DTE_BUCKETS}:
         owner = evidence["owner"]
         bucket = "etf_ls" if owner == "excluded" else (owner if owner in {"drew", "michael"} else "ownership_review")
-        return Classification(classification.ticker, bucket, evidence["reason"], owner if owner in {"drew", "michael"} else None)
+        classification = Classification(classification.ticker, bucket, evidence["reason"], owner if owner in {"drew", "michael"} else None)
+    held = _operator_hold_ticker(pos, drew_symbols)
+    if held and classification.bucket not in {"spx_0dte", "index_put_hedge", *ETF_0DTE_BUCKETS}:
+        return Classification(held, "drew", "operator_hold", "drew")
     return classification
 
 
@@ -360,6 +382,14 @@ def _classify(
             return Classification(etf_root, ETF_0DTE, "etf_0dte_root", None)
 
     strategy_name = under or ticker if sec in OPTION_SEC_TYPES else ticker
+    # operators.drew.symbols stay on Drew after the index and etf-0dte guards
+    # and before the universe rule. An assigned TPL short put delivers stock
+    # the LS snapshot would otherwise keep, and a manual ETF_LS buy of that
+    # stock is the same position.
+    pinned = strategy_name or ticker
+    if pinned in drew or (ticker in drew and sec not in OPTION_SEC_TYPES):
+        return Classification(pinned, "drew", "operator_hold", "drew")
+
     if ref.startswith(("ETF_LS|", "B5P|")) and not (
         sec in OPTION_SEC_TYPES and re.match(r"^ETF_LS\|MANUAL\|SELL(?:PUT|CALL)\|", ref)
     ):

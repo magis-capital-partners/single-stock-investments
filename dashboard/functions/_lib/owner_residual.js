@@ -25,7 +25,8 @@ const ETF_LS_REFS = ["ETF_LS", "B5P"];
 const DREW_REF = "DREW_SLEEVE";
 const DREW_LOTS_OPENED_ON_OR_AFTER = { "3905.T": "20260913" };
 const MICHAEL_REF = "MICHAEL_SLEEVE";
-const DREW_HOLDING_REASONS = new Set(["drew_new", "drew_sleeve_holding", "sleeve_tag"]);
+const DREW_HOLDING_REASONS = new Set(["drew_new", "drew_sleeve_holding", "sleeve_tag", "operator_hold"]);
+const OPERATOR_HOLDS = new Set(["TPL"]);
 const OCC_ROOT = /^([A-Z0-9.]{1,6})\s+\d{6}[CP]\d/;
 // etf-0dte: spx-0dte's SPY / QQQ / TSLA / NVDA / AMZN 0DTE executors (clients 50-54, watchdogs 130-134).
 const ETF_0DTE_ROOTS = new Set(["SPY", "QQQ", "TSLA", "NVDA", "AMZN"]);
@@ -176,6 +177,11 @@ export function classifyPosition(pos, {
   }
 
   const strategyName = option ? (under || ticker) : ticker;
+  const holds = new Set([...OPERATOR_HOLDS, ...drew]);
+  const pinned = strategyName || ticker;
+  if (holds.has(pinned) || (!option && holds.has(ticker))) {
+    return { ticker: pinned, bucket: "drew", reason: "operator_hold", owner: "drew" };
+  }
   if ((ref.startsWith('ETF_LS|') || ref.startsWith('B5P|'))
       && !(option && /^ETF_LS\|MANUAL\|SELL(?:PUT|CALL)\|/.test(ref))) {
     return { ticker: strategyName || ticker, bucket: 'etf_ls', reason: 'executed_ls_order_reference', owner: null };

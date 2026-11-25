@@ -1471,14 +1471,19 @@
 
   async function overlayDrewSleeve(book) {
     if (state.scope !== 'drew' || !book) return book;
-    if (book.ownership_version) return book;
     let sleeve;
     try {
       sleeve = await getJson('/api/v1/sleeves/book?owner=drew');
     } catch (_) {
       return book;
     }
-    const rows = (sleeve.positions || []).map((pos) => sleeveAsPortfolioRow(pos, sleeve.as_of));
+    let rows = (sleeve.positions || []).map((pos) => sleeveAsPortfolioRow(pos, sleeve.as_of));
+    // The published ownership ledger is the Drew book. Operator holds are the
+    // exception: TPL is still in the LS universe, so the ledger omits the
+    // assigned shares until that projection is rebuilt.
+    if (book.ownership_version) {
+      rows = rows.filter((row) => row.symbol === 'TPL' || (row.allocations || []).some((lot) => lot.strategy === 'operator_hold' || lot.bucket === 'operator_hold'));
+    }
     if (!rows.length) return book;
     const seen = new Set(rows.map((row) => `${row.local_symbol}|${row.sec_type}`));
     const kept = (book.positions || []).filter((row) => !seen.has(`${row.local_symbol || row.symbol}|${String(row.sec_type || '').toUpperCase()}`));
