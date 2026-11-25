@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {localAdapter,openCheckpoint,checkpointObjectKey} from './reverse-split-live/checkpoint.mjs';
 import {restoreCheckpoint} from './reverse-split-live/checkpoint-codec.mjs';
@@ -10,6 +11,37 @@ function fixture(t){
  return {remote,objects,env};
 }
 const save=cp=>cp.save({publicationMode:'r2',checkpointOnly:true});
+
+test('a lost upload response can commit once the original object is visible and its size and ETag match',async t=>{
+ const {env,objects,remote}=fixture(t),audit=[];
+ env.onOperationsAudit=row=>audit.push(row);
+ const cp=await openCheckpoint(env,{retainDurableBytes:true});t.after(()=>cp.close());
+ const baseline=await save(cp),put=env.EVIDENCE.put;
+ let checks=0;
+ env.EVIDENCE.put=async(k,b)=>{await put(k,b);throw new DOMException('PUT response timed out','TimeoutError');};
+ env.EVIDENCE.stat=async(key,{signal})=>{
+  assert.equal(signal.aborted,false);
+  assert.equal(JSON.parse(remote.prepare("SELECT value FROM rs_state WHERE key='collector_checkpoint'").get().value).key,baseline.key);
+  if(++checks===1)return null;
+  const body=objects.get(key);
+  return {size:body.length,etag:createHash('md5').update(body).digest('hex')};
+ };
+ const receipt=await save(cp);
+ assert.equal(checks,2);
+ assert.equal(cp.durable().generation,receipt.generation);
+ await restoreCheckpoint(objects.get(receipt.key),receipt);
+ assert.equal(audit.at(-1).upload_confirmation,'storage_metadata');
+ assert.ok(audit.at(-1).upload_timeout_at<=audit.at(-1).upload_completed_at);
+});
+
+test('a same-size checkpoint object with a different ETag cannot recover an unconfirmed upload',async t=>{
+ const {env,objects}=fixture(t),cp=await openCheckpoint(env,{retainDurableBytes:true});t.after(()=>cp.close());
+ const baseline=await save(cp),put=env.EVIDENCE.put;
+ env.EVIDENCE.put=async(k,b)=>{await put(k,b);throw new DOMException('PUT response timed out','TimeoutError');};
+ env.EVIDENCE.stat=async key=>({size:objects.get(key).length,etag:'0'.repeat(32)});
+ await assert.rejects(save(cp),/PUT response timed out/);
+ assert.equal(cp.durable().generation,baseline.generation);
+});
 
 test('late upload from the previous owner cannot invalidate the committed compressed checkpoint',async t=>{
  const remote=new DatabaseSync(':memory:');

@@ -51,10 +51,18 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
   const DB={prepare:(query,options)=>prepare(query,[],options),batch:async statements=>sql({batch:statements.map(s=>({sql:s._query,params:s._params}))})};
   const prefix=`/r2/buckets/${encodeURIComponent(bucket)}/objects/`;
   const EVIDENCE={
-    // `urgent` (operations refresh only) skips the shared R2 pacer; it still retries 429/5xx.
+    // `urgent` skips the shared R2 pacer; it still retries 429/5xx.
     async put(key,bytes,options={}){const response=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':safeContentType(options.httpMetadata?.contentType)},body:bytes,urgent:options.urgent===true,signal:options.signal});await response.arrayBuffer();},
     async delete(key,{signal}={}){await environment?.assertCollectorLease?.();await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',signal},true);},
     async get(key,{signal,urgent=false}={}){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal,urgent},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
+    async stat(key,{signal}={}){
+      const query=new URLSearchParams({prefix:key,per_page:'1'});
+      const response=await request(prefix.slice(0,-1)+'?'+query,{signal,urgent:true});
+      const page=await response.json();
+      if(page.success!==true||!Array.isArray(page.result))throw new Error('Invalid R2 object metadata response');
+      const entry=page.result.find(row=>row.key===key);
+      return entry?{size:entry.size,etag:entry.etag}:null;
+    },
   };
   environment={DB,controlDB:DB,EVIDENCE,JOBS:{send:async body=>pending.push(body)},extractAnnouncementText,ENABLED:'true',SEC_USER_AGENT:'MagisCapitalResearch/1.0 (reverse-split monitoring; contact: drewgoldman01@gmail.com)',EXPECTED_CADENCE_SECONDS:String(cadence),MAX_DISPATCH:1,COLLECTOR_MODE:'external_collector',SHADOW_ENABLED:'true',pending,maxJobs,usage};return environment;
 }

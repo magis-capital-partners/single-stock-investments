@@ -4,6 +4,7 @@ import {createHash, randomUUID} from 'node:crypto';
 import {mkdtempSync,readFileSync,writeFileSync,readdirSync,rmSync,realpathSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname,basename} from 'node:path';
+import {setTimeout as sleep} from 'node:timers/promises';
 import {sha} from './worker.mjs';
 import {captureReadSnapshot,publishReadSnapshot} from './snapshot-publish.mjs';
 import {createCheckpointCompressor,restoreCheckpoint} from './checkpoint-codec.mjs';
@@ -19,6 +20,22 @@ export function checkpointObjectKey(receipt){
 }
 const previousReceipt=receipt=>receipt?Object.fromEntries(Object.entries(receipt).filter(([key])=>key!=='previous')):null;
 function cleanup(dir){const target=realpathSync(dir),parent=realpathSync(tmpdir()),equal=(a,b)=>process.platform==='win32'?a.toLowerCase()===b.toLowerCase():a===b;if(!equal(dirname(target),parent)||!basename(target).startsWith('reverse-split-'))throw new Error('Unsafe collector temporary directory');rmSync(target,{recursive:true,force:true});}
+
+async function confirmTimedOutUpload(env,key,body){
+  const etag=createHash('md5').update(body).digest('hex');
+  const deadline=AbortSignal.timeout(10500);
+  // These are read-only probes of a never-reused key. A delayed original PUT
+  // may finish, but sending a second large body would add another stall.
+  for(const delay of [0,1800,2100,3500]){
+    if(delay)await sleep(delay,undefined,{signal:deadline}).catch(()=>{});
+    if(deadline.aborted)return false;
+    env.assertCollectorLease?.();
+    const signal=AbortSignal.any([deadline,AbortSignal.timeout(2200)]);
+    const metadata=await env.EVIDENCE.stat(key,{signal}).catch(()=>null);
+    if(metadata)return metadata.size===body.length&&metadata.etag===etag;
+  }
+  return false;
+}
 
 export function localAdapter(db){const make=(sql,args=[])=>({bind:(...values)=>make(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>({meta:{changes:Number(db.prepare(sql).run(...args).changes)}})});return {prepare:sql=>make(sql),batch:async statements=>{db.exec('BEGIN');try{const rows=[];for(const s of statements)rows.push(await s.run());db.exec('COMMIT');return rows;}catch(e){db.exec('ROLLBACK');throw e;}}};}
 
@@ -99,16 +116,23 @@ export async function openCheckpoint(env,{retainDurableBytes=false,operationsOpt
     if(parent)next.previous=previousReceipt(parent);
     env.assertCollectorLease?.();
     const uploadStarted=Date.now();
-    let uploadCompleted;
+    const body=encoded?.stored||bytes;
+    let uploadCompleted,uploadTimeoutAt=null;
     try{
-      await env.EVIDENCE.put(key,encoded?.stored||bytes,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(uploadTimeoutMs)});
+      try{
+        await env.EVIDENCE.put(key,body,{httpMetadata:{contentType:encoded?'application/gzip':'application/vnd.sqlite3'},urgent:true,signal:AbortSignal.timeout(uploadTimeoutMs)});
+      }catch(error){
+        if(!['TimeoutError','AbortError'].includes(error.name)||!env.EVIDENCE.stat)throw error;
+        uploadTimeoutAt=Date.now();
+        if(!await confirmTimedOutUpload(env,key,body))throw error;
+      }
       uploadCompleted=Date.now();
       await commitPointer(next,at);
     }catch(error){
       operations.record({event:'checkpoint_failed',at:new Date().toISOString(),state_at:at,generation,phase:uploadCompleted?'pointer':'upload',error_type:error.name});
       throw error;
     }
-    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:uploadStarted-compressionCompleted,stored_bytes:encoded?.stored_bytes||bytes.length,compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
+    operations.record({event:'checkpoint_committed',at:new Date().toISOString(),state_at:at,generation,upload_started_at:new Date(uploadStarted).toISOString(),upload_completed_at:new Date(uploadCompleted).toISOString(),upload_confirmation:uploadTimeoutAt===null?'put_response':'storage_metadata',upload_timeout_at:uploadTimeoutAt===null?null:new Date(uploadTimeoutAt).toISOString(),compression_ms:compressionCompleted-preparationStarted,hash_and_key_ms:uploadStarted-compressionCompleted,stored_bytes:body.length,compressed_blocks:encoded?.compressed_blocks??0,reused_compression_blocks:encoded?.reused_compression_blocks??0});
     onCommitted?.(next);
     onCommittedBytes?.(encoded?.stored||bytes);
     // Keep two committed generations. Legacy slots, review archives and uncertain
