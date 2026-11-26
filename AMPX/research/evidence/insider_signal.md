@@ -1,4 +1,4 @@
-# AMPX — Insider conviction (2026-08-25)
+# AMPX — Insider conviction (2026-11-24)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- Stepien Thomas M: 8000 @ $10.03 on 2026-08-24
-- Stepien Thomas M: 23529 @ $10.341 on 2026-08-21
-- Stepien Thomas M: 2000 @ $20.97 on 2026-06-04
+- Stepien Thomas M: 5118 @ $5.7249 on 2026-11-24
+- Stepien Thomas M: 21281 @ $6.468 on 2026-11-23
+- Sun Kang: 56166 @ $6.468 on 2026-11-23
 
 Source: `_system/reference/market-data/insider/AMPX_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

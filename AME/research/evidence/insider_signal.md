@@ -2,12 +2,12 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.1 (weak) · **Bull case support:** none
+**ICS:** 2.52 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 24% |
-| Base | 55% | 51% |
+| Bear | 20% | 23% |
+| Base | 55% | 52% |
 | Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
@@ -17,8 +17,8 @@
 **Routine / planned sales (context):**
 
 - ZAPICO DAVID A: 28390 @ $201.76 on 2025-12-12
-- ZAPICO DAVID A: 7432 @ $194.89 on 2025-11-25
-- ZAPICO DAVID A: 25815 @ $195.82 on 2025-11-25
+- AMATO THOMAS A: 530 @ $216.78 on 2026-03-24
+- Hermance David F.: 6608 @ $254.0 on 2026-08-07
 
 Source: `_system/reference/market-data/insider/AME_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

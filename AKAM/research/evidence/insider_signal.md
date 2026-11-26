@@ -2,7 +2,7 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.05 (weak) · **Bull case support:** none
+**ICS:** 2.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| LEIGHTON F THOMSON | 2026-11-13 | 30000 | $85.08 | $2552400.0 | 2.422 |
+| LEIGHTON F THOMSON | 2026-11-13 | 30000 | $85.08 | $2552400.0 | 2.382 |
 
 **Routine / planned sales (context):**
 
