@@ -164,8 +164,8 @@ revision and verify that a full checkpoint has committed.
 
 - **Code updates:** `rs-update.timer` at 20:30 ET. A new commit that does not change the collector
   folder is fast-forwarded without a restart. A commit that does change it is taken only after
-  GitHub's "Reverse-split live service" push run for it succeeded (that run executes the test
-  suites and applies the D1 migrations). Then the box runs local checks, installs changed unit
+  the exact main commit passes the deploy job in GitHub's "Reverse-split live service" workflow.
+  Both push and repository dispatch releases run the test suites and apply the D1 migrations. Then the box runs local checks, installs changed unit
   files, restarts, and rolls back if the collector is not stable 3 minutes later.
   `journalctl -u rs-update` shows each night's decision.
 - **Logs:** `journalctl -u rs-collector -u rs-market-status --since -1h`.

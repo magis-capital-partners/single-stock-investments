@@ -7,11 +7,10 @@
 #
 #   1. Nothing new on origin/main                         -> exit.
 #   2. New commits, but the collector folder is unchanged -> fast-forward, no restart.
-#   3. Folder changed -> require a successful "Reverse-split live service" push
-#      run for the last main commit that touched the folder (that run executes
-#      the test suites and applies the D1 migrations), fast-forward, run the
-#      local checks, install changed unit files, restart, verify. Roll back on
-#      any failure.
+#   3. Folder changed -> require a successful "Reverse-split live service" deployment
+#      (push or repository dispatch) for the last main commit that touched the
+#      folder. Fast-forward, run local checks, update units, restart and verify.
+#      Roll back on failure.
 set -euo pipefail
 
 ROOT=/srv/rs
@@ -19,7 +18,6 @@ REPO="$ROOT/repo"
 LIVE_REL=dashboard/cloudflare/reverse-split-live
 DEPLOY="$REPO/$LIVE_REL/deploy/lightsail"
 OWNER_REPO=magis-capital-partners/single-stock-investments
-WORKFLOW_NAME="Reverse-split live service"
 UNITS=(rs-collector.service rs-market-status.service rs-update.service rs-update.timer)
 
 log() { echo "[rs-update $(date -Is)] $*"; }
@@ -46,22 +44,10 @@ if [ "$(rgit rev-parse "$old:$LIVE_REL")" = "$(rgit rev-parse "$new:$LIVE_REL")"
   exit 0
 fi
 
-# The last main commit that changed the folder. --first-parent keeps PR merges
-# as the unit, which is what the push-triggered workflow ran on.
+# The first-parent main change is the release unit for both GitHub triggers.
 changed=$(rgit log -1 --first-parent --format=%H "$new" -- "$LIVE_REL")
-ci=$(curl -fsS --max-time 30 \
-  "https://api.github.com/repos/$OWNER_REPO/actions/runs?head_sha=$changed&event=push&per_page=50" |
-  "$ROOT/venv/bin/python3" -c '
-import json, sys
-name = sys.argv[1]
-runs = [r for r in json.load(sys.stdin).get("workflow_runs", []) if r.get("name") == name]
-if any(r.get("conclusion") == "success" for r in runs):
-    print("success")
-elif runs:
-    print(runs[0].get("status", "?") + "/" + str(runs[0].get("conclusion")))
-else:
-    print("absent")
-' "$WORKFLOW_NAME") || ci="unreadable"
+checker="$(dirname -- "${BASH_SOURCE[0]}")/release_check.py"
+ci=$("$ROOT/venv/bin/python3" -B "$checker" "$OWNER_REPO" "$changed") || ci="unreadable"
 if [ "$ci" != "success" ]; then
   log "waiting: GitHub run for ${changed:0:12} is '$ci'; staying on ${old:0:12}"
   exit 0
