@@ -11,6 +11,45 @@ through private cold indexes; current records and the append-only ledger retain
 precedence. Explicit bootstrap commands remain available for a genuinely needed
 approved-handoff recovery.
 
+## Restore from the pinned Git vault
+
+SSI can read a missing R2 file from the private legacy vault if the authenticated
+legacy index can prove that the vault has the exact requested bytes. The reader
+checks the private repository identity, pinned commit, original tree path and
+blob, size, and complete SHA-256. A renamed current file can use the legacy
+copy when its size and complete hash match. A changed or corrupt R2 object
+still raises an error. An unchanged, recoverable file keeps its existing
+catalog reference on publication.
+
+Use a private proposed-removal plan with the active `catalog_commit`, the
+candidate `r2_digests`, and `restore_paths` that exercise those objects:
+
+```sh
+python _system/scripts/verify_private_storage_git.py <private-plan.json>
+```
+
+The check masks the named R2 payloads in that process and exercises both the
+SSI reader and the file materializer. It excludes the objects referenced by
+the live Research Explorer and Stock Summary pointers. Run it with the
+deployed automation credentials after testing the PR. Include packed legacy
+files, exact current files, and renamed files. Measure a cold renamed-file
+restore because it builds the content lookup from the legacy metadata shards
+once per reader.
+
+On trusted main, the `private-storage-git-check` repository event runs the
+same test with the production storage credentials. Pass the immutable private
+plan digest and size and the reviewed reader blob. Paths and object lists stay
+in private storage.
+
+Before each removal batch, repeat the reference audit against the live catalog
+and retained checkout or rollback catalog revisions. Keep all manifest and
+index objects and all objects used by a file without an exact Git match. For
+each batch, verify the affected restores against the proposed removal set
+before applying the exact keys separately. Keep the private plan and restore
+proof together. With R2 copies still present, the old reader can be restored
+immediately. After removal, restore the R2 payloads before rolling back to a
+reader that requires them.
+
 ## Integrity
 
 - Store each immutable encoded chunk by its SHA-256. Verify a complete readback
