@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-26",
+  "updated": "2026-11-27",
   "cadence": "weekly",
   "authority": "projection_of_triage_events_jsonl",
   "decisions": {
@@ -15050,6 +15050,23 @@
       "reason": "human review window of 30 days elapsed; text stays in the source daily log and was not promoted into MEMORY.md",
       "reason_code": "human_sla_elapsed",
       "source_ref": "_system/memory-hub/research-equity/daily/2026-10-26.md"
+    },
+    "a230f48dfe1c": {
+      "applied_ref": null,
+      "by": "memory-triage-bot",
+      "content": "TAPE-06 holds a name only after a gap over 10%; a 5% gap is not a hold, so post the other threshold that crossed. Evidence: GOOGL as_of 2026-11-25 printed gap_pct -5.0 with stretch_z -2.075 and capitulation.state panic; the gap was below the 10% hold, so the flag was posted rather than held. Seen: 2026-11-27. Harmful: holding a 5% gap and dropping a valid panic/stretch_z flag, or treating a 5% gap as a TAPE-06 skip. Scope: tape_index TAPE-06. Review after: 2026-12-11.",
+      "date": "2026-11-27",
+      "decision": "routed",
+      "delivery_acknowledged_at": null,
+      "delivery_status": "pending",
+      "destination": "_system/memory/triage_ledger.json",
+      "excerpt": "TAPE-06 holds a name only after a gap over 10%; a 5% gap is not a hold, so post the other threshold that crossed. Evidence: GOOGL as_of 2026-11-25 printed gap_p",
+      "first_seen": "2026-11-27",
+      "kind": "company_observation",
+      "lens": "GENERIC",
+      "reason": "company-specific observation routed to ticker research ownership",
+      "reason_code": "company_observation_routed",
+      "source_ref": "_system/memory-hub/research-equity/daily/2026-11-27.md"
     }
   }
 }
