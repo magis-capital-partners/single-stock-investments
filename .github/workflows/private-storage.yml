@@ -2,16 +2,47 @@ name: Verify private object storage
 
 on:
   repository_dispatch:
-    types: [private-storage-check, private-storage-migrate]
+    types: [private-storage-check, private-storage-migrate, private-storage-git-check]
 
 permissions:
   contents: read
 
 concurrency:
-  group: private-storage-maintenance
+  group: ${{ github.event.action == 'private-storage-git-check' && 'private-storage-git-check' || 'private-storage-maintenance' }}
   cancel-in-progress: false
 
 jobs:
+  git-restore:
+    if: github.event.action == 'private-storage-git-check' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PLAN_DIGEST: ${{ github.event.client_payload.plan_digest }}
+      PLAN_SIZE: ${{ github.event.client_payload.plan_size }}
+      EXPECTED_READER_BLOB: ${{ github.event.client_payload.reader_blob }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/config/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify the deployed reader and mask the proposed R2 objects
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:_system/scripts/private_storage.py)" = "$EXPECTED_READER_BLOB"
+          python _system/scripts/verify_private_storage_git.py --plan-digest "$PLAN_DIGEST" --plan-size "$PLAN_SIZE"
+
   verify:
     if: github.event.action == 'private-storage-check'
     runs-on: ubuntu-latest

@@ -6,6 +6,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import private_storage as storage
+import verify_private_storage_git as verifier
 from test_private_storage import MemoryCatalog, Objects
 from verify_private_storage_git import check_live_dashboard, verify_restores
 
@@ -111,3 +112,29 @@ def test_live_dashboard_references_block_removal():
     assert check_live_dashboard(objects, {"d" * 64}) == 3
     with pytest.raises(storage.StorageError, match="still referenced"):
         check_live_dashboard(objects, {"c" * 64})
+
+
+def test_cli_uses_immutable_private_plan_without_logging_paths(monkeypatch, capsys):
+    class Deployment:
+        objects = Objects()
+
+        def snapshot(self):
+            return "1" * 40, {}
+
+    deployed = Deployment()
+    wanted = ["private/report.txt"]
+    digests = ["b" * 64]
+    raw = storage.encoded_json({"catalog_commit": "1" * 40, "r2_digests": digests, "restore_paths": wanted})
+    plan = deployed.objects.put(raw)
+    monkeypatch.setattr(sys, "argv", ["verify", "--plan-digest", plan, "--plan-size", str(len(raw))])
+    monkeypatch.setattr(verifier, "PrivateStorage", lambda: deployed)
+    monkeypatch.setattr(verifier, "check_live_dashboard", lambda objects, mask: 2)
+
+    def verify(storage, records, paths, mask):
+        assert storage is deployed and paths == wanted and mask == set(digests)
+        return {"verified_restore_paths": 1, "r2_objects_deleted": 0}
+
+    monkeypatch.setattr(verifier, "verify_restores", verify)
+    verifier.main()
+    result = capsys.readouterr().out
+    assert '"verified_restore_paths": 1' in result and wanted[0] not in result

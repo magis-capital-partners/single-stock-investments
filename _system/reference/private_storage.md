@@ -36,6 +36,11 @@ files, exact current files, and renamed files. Measure a cold renamed-file
 restore because it builds the content lookup from the legacy metadata shards
 once per reader.
 
+On trusted main, the `private-storage-git-check` repository event runs the
+same test with the production storage credentials. Pass the immutable private
+plan digest and size and the reviewed reader blob. Paths and object lists stay
+in private storage.
+
 Before each removal batch, repeat the reference audit against the live catalog
 and retained checkout or rollback catalog revisions. Keep all manifest and
 index objects and all objects used by a file without an exact Git match. For
