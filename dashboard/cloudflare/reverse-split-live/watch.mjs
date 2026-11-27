@@ -21,6 +21,7 @@ import {claimCollectorLease,readReclaimOwner,recordOwner} from './collector-leas
 import {operationsRefreshSettings,operationsRefresher} from './operations-publication.mjs';
 import {installRecoveryBundle,installRequestedRecovery,drainRecoveryBodies} from './recovery-bundle.mjs';
 const now=()=>new Date().toISOString();
+const DASHBOARD_INTERVAL_MS=60000;
 export const researchWriteBudget=(day,registrationDay)=>day===registrationDay?70000:40000;
 export const needsStartupReconciliation=(last,at=Date.now())=>Number.isFinite(Date.parse(last))&&at-Date.parse(last)>15*60000;
 export async function watchCollector(env,{interval=1,maximumMs=300*60000,standbyMs=0,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false,operations=operationsRefreshSettings()}={}){
@@ -40,7 +41,13 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
   async function saveInternal({checkpointOnly=false,onlyIfDue=false}={}){
     if(onlyIfDue&&!checkpointDue())return;
     env.assertCollectorLease();
-    await flushValidationSamples(env);await checkpoint.save({publicationMode:env.PUBLICATION_MODE,backgroundViews:true,checkpointOnly});lastSaved=Date.now();if(!checkpointOnly)lastFullSaved=lastSaved;
+    await flushValidationSamples(env);
+    // A signal can force an immediate durable save. With the independent
+    // operations publisher active, only background views wait for their slot.
+    const renderViews=!checkpointOnly&&(operations.intervalMs===0||!lastFullSaved||Date.now()-lastFullSaved>=DASHBOARD_INTERVAL_MS);
+    await checkpoint.save({publicationMode:env.PUBLICATION_MODE,backgroundViews:true,checkpointOnly:!renderViews});
+    lastSaved=Date.now();
+    if(renderViews)lastFullSaved=lastSaved;
     await remote.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at',{signal:AbortSignal.timeout(5000)}).bind('collector_usage:'+budgetDay,JSON.stringify({rows_read:Number(baseline.rows_read||0)+env.usage.rows_read,rows_written:Number(baseline.rows_written||0)+env.usage.rows_written}),now()).run();
   }
   try{
@@ -118,7 +125,7 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
         if(Date.now()-lastHeartbeat>=60000){await heartbeat('running');await checkpoint.operations.archiveAudit().catch(error=>console.error(JSON.stringify({event:'operations_audit_archive_deferred',error:error.message})));}
         const records=(await env.DB.prepare('SELECT (SELECT count(*) FROM rs_shadow_records)+(SELECT count(*) FROM rs_execution_records) AS count').first()).count;
         const active=await env.DB.prepare("SELECT id FROM rs_execution_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') UNION ALL SELECT id FROM rs_shadow_tracks WHERE state IN ('armed','partial_entry','open','exit_pending') LIMIT 1").first();
-        if(Date.now()-lastFullSaved>=(active?60000:120000)||(records!==lastRecordCount&&Date.now()-lastSaved>=5000)){await save();lastRecordCount=records;}
+        if(Date.now()-lastFullSaved>=(active?DASHBOARD_INTERVAL_MS:2*DASHBOARD_INTERVAL_MS)||(records!==lastRecordCount&&Date.now()-lastSaved>=5000)){await save();lastRecordCount=records;}
       }catch(e){await heartbeat('degraded',e.message);if(/lease lost/i.test(e.message))throw e;console.error(JSON.stringify({event:'shadow_cycle_degraded',error:e.message}));}
       await sleep(Math.max(1000,interval*1000-(Date.now()-cycle)));
     }

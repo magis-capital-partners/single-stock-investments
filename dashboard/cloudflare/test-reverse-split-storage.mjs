@@ -6,10 +6,54 @@ import {remoteEnvironment,isolatedWriteFailure,safeContentType,cloudflareErrorDe
 import {runFinancialHarvest} from './reverse-split-live/financials-harvest.mjs';
 import {isSourceCooldown} from './reverse-split-live/financials-io.mjs';
 import {recoverWatch} from './reverse-split-live/recovery.mjs';
+import {archiveIndexedDocument,putDocument} from './reverse-split-live/document-archive.mjs';
+import {localAdapter} from './reverse-split-live/checkpoint.mjs';
 
 const TOKEN='fixture-secret-token';
 const D1_DAILY_LIMIT={result:[],success:false,errors:[{code:7500,message:"Your account has exceeded D1's free tier daily row read limit. Upgrade to a paid plan or wait until tomorrow (midnight UTC) to continue."}],messages:[]};
 const remote=fetcher=>remoteEnvironment({token:TOKEN,account:'acct',database:'db',bucket:'bucket',evidenceInterval:0,fetcher});
+
+test('an indexed original skips its duplicate PUT and repairs a missing object',async t=>{
+  const db=new DatabaseSync(':memory:');
+  t.after(()=>db.close());
+  db.exec('CREATE TABLE rs_documents(sha256 PRIMARY KEY,url,object_key,captured_at,bytes,content_type)');
+  const calls=[];
+  let present=false,canceled=0;
+  const env=remote(async(url,options)=>{
+    calls.push([options.method||'GET',new URL(url).pathname.split('/').slice(-2).join('/')]);
+    if(options.method==='PUT'){
+      present=true;
+      return new Response();
+    }
+    if(!present)return new Response(null,{status:404});
+    return new Response(new ReadableStream({cancel(){canceled++;}}));
+  });
+  env.DB=localAdapter(db);
+  const hash='a'.repeat(64),key='documents/'+hash;
+  const document={hash,url:'https://www.sec.gov/fixture',bytes:new Uint8Array([1,2,3]),capturedAt:'2026-11-27T16:00:00Z',contentType:'application/octet-stream'};
+  assert.equal(await archiveIndexedDocument(env,document),key);
+  assert.deepEqual(calls,[['PUT',key]],'new source performs no remote existence probe');
+  await archiveIndexedDocument(env,{...document,capturedAt:'2026-11-27T16:00:01Z'});
+  assert.deepEqual(calls,[['PUT',key],['GET',key]]);
+  assert.equal(canceled,1,'the exact-key probe never consumes the evidence body');
+  present=false;
+  await archiveIndexedDocument(env,document);
+  assert.deepEqual(calls.slice(-2),[['GET',key],['PUT',key]]);
+  assert.equal(db.prepare('SELECT captured_at FROM rs_documents').get().captured_at,document.capturedAt);
+});
+
+test('native R2 skips an exact stored length and repairs a mismatch or failed probe',async()=>{
+  const bytes=new Uint8Array(3),key='documents/'+'b'.repeat(64);
+  let storedSize=3,fail=false,puts=0;
+  const bucket={head:async()=>{if(fail)throw new Error('temporary');return {size:storedSize};},put:async()=>{puts++;}};
+  await putDocument(bucket,key,bytes,{}, {known:true});
+  assert.equal(puts,0);
+  storedSize=2;
+  await putDocument(bucket,key,bytes,{}, {known:true});
+  fail=true;
+  await putDocument(bucket,key,bytes,{}, {known:true});
+  assert.equal(puts,2);
+});
 
 test('D1 rejections report status, service, request path and the Cloudflare error without credentials',async()=>{
   const env=remote(async()=>Response.json(D1_DAILY_LIMIT,{status:400}));
