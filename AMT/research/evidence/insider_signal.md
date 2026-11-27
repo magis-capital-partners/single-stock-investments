@@ -2,7 +2,7 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.65 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.63 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -14,7 +14,7 @@
 |---------|------|--------|-------|-------|---------|
 | Kalathur Rajesh | 2026-03-10 | 2671 | $185.3 | $494936.3 | 2.531 |
 | Kalathur Rajesh | 2026-08-21 | 2829 | $177.0 | $500733.0 | 2.399 |
-| Clarke Teresa Hillary | 2026-10-20 | 42 | $183.2 | $7694.4 | 1.369 |
+| Clarke Teresa Hillary | 2026-10-20 | 42 | $183.2 | $7694.4 | 1.358 |
 | Clarke Teresa Hillary | 2026-07-13 | 46 | $167.52 | $7705.92 | 0.849 |
 | Clarke Teresa Hillary | 2026-04-28 | 43 | $177.08 | $7614.44 | 0.842 |
 
