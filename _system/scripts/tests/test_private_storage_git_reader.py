@@ -7,7 +7,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import private_storage as storage
 from test_private_storage import MemoryCatalog, Objects
-from verify_private_storage_git import verify_restores
+from verify_private_storage_git import check_live_dashboard, verify_restores
 
 
 def make_reader(monkeypatch):
@@ -89,3 +89,25 @@ def test_unchanged_git_backed_file_does_not_reupload_retired_chunks(monkeypatch,
     reader.publish({alias:raw}, expected=records)
     assert set(reader.objects.data) == before
     assert len(calls) == 2
+
+
+def test_live_dashboard_references_block_removal():
+    class HTTP:
+        def request(self, method, key, *, limit):
+            assert method == "GET" and limit == 1024 * 1024
+            if key.endswith("research-explorer/v1/current.json"):
+                return storage.encoded_json({
+                    "schema_version": "stock-research-live.v1",
+                    "index": {"chunks": [{"stored_sha256": "a" * 64}]}, "companies": {},
+                })
+            assert key.endswith("stock-summary/v1/current.json")
+            return storage.encoded_json({
+                "schema": "stock-summary.v1",
+                "coverage": {"chunks": [{"stored_sha256": "b" * 64}]},
+                "bundles": {"company": {"chunks": [{"stored_sha256": "c" * 64}]}},
+            })
+
+    objects = storage.R2Objects({"account_id": "a", "bucket": "b", "object_prefix": "p"}, http=HTTP())
+    assert check_live_dashboard(objects, {"d" * 64}) == 3
+    with pytest.raises(storage.StorageError, match="still referenced"):
+        check_live_dashboard(objects, {"c" * 64})

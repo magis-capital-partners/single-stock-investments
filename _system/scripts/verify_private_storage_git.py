@@ -50,6 +50,29 @@ def verify_restores(storage, records, paths, digests):
     return {"verified_restore_paths": len(paths), "masked_r2_objects": len(digests), "r2_objects_deleted": 0}
 
 
+def check_live_dashboard(objects, digests):
+    """Exclude the live dashboard objects whose Workers read R2 directly."""
+    def pointer(key):
+        raw = objects.http.request("GET", objects.base + key, limit=1024 * 1024)
+        if raw is None:
+            raise StorageError("A live dashboard pointer could not be checked")
+        return json.loads(raw)
+
+    research = pointer("research-explorer/v1/current.json")
+    summary = pointer("stock-summary/v1/current.json")
+    if research.get("schema_version") != "stock-research-live.v1" or summary.get("schema") != "stock-summary.v1":
+        raise StorageError("Unexpected live dashboard pointer schema")
+    receipts = [research["index"], *research["companies"].values(), summary["coverage"], *summary["bundles"].values()]
+    if research.get("changes") is not None:
+        receipts.append(research["changes"])
+    live = {chunk["stored_sha256"] for receipt in receipts for chunk in receipt["chunks"]}
+    if not live or not all(HEX.fullmatch(digest) for digest in live):
+        raise StorageError("A live dashboard receipt has an invalid object identity")
+    if live.intersection(digests):
+        raise StorageError("A proposed removal is still referenced by a live dashboard")
+    return len(live)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("plan", type=Path, help="Private JSON with catalog_commit, r2_digests, and restore_paths")
@@ -64,7 +87,9 @@ def main():
     commit, records = storage.snapshot()
     if commit != revision:
         raise StorageError("The active catalog changed; refresh the proposed batch")
-    print(json.dumps({"catalog_commit": commit, **verify_restores(storage, records, paths, set(digests))}))
+    live_count = check_live_dashboard(storage.objects, set(digests))
+    print(json.dumps({"catalog_commit": commit, "live_dashboard_objects_checked": live_count,
+                      **verify_restores(storage, records, paths, set(digests))}))
 
 
 if __name__ == "__main__":

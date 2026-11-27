@@ -29,10 +29,12 @@ python _system/scripts/verify_private_storage_git.py <private-plan.json>
 ```
 
 The check masks the named R2 payloads in that process and exercises both the
-SSI reader and the file materializer. Run it with the deployed automation
-credentials after testing the PR. Include packed legacy files, exact current
-files, and renamed files. Measure a cold renamed-file restore because it
-builds the content lookup from the legacy metadata shards once per reader.
+SSI reader and the file materializer. It excludes the objects referenced by
+the live Research Explorer and Stock Summary pointers. Run it with the
+deployed automation credentials after testing the PR. Include packed legacy
+files, exact current files, and renamed files. Measure a cold renamed-file
+restore because it builds the content lookup from the legacy metadata shards
+once per reader.
 
 Before each removal batch, repeat the reference audit against the live catalog
 and retained checkout or rollback catalog revisions. Keep all manifest and
