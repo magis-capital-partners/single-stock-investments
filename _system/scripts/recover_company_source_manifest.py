@@ -120,7 +120,7 @@ def main():
     from datetime import datetime, timezone
     import threading
     import time
-    from private_storage import PrivateStorage, restore_bytes, run_git
+    from private_storage import PrivateStorage, run_git
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--ticker', required=True, choices=['CPRT'])
@@ -167,10 +167,13 @@ def main():
 
     def read_verified(item):
         name, prior = item
-        if not hasattr(local, 'objects'):
-            local.objects = copy.copy(storage.objects)
-            local.objects._verified_cache = collections.OrderedDict()
-        raw = restore_bytes(local.objects, records[PREFIX + name])
+        if not hasattr(local, 'reader'):
+            objects = copy.copy(storage.objects)
+            objects._verified_cache = collections.OrderedDict()
+            local.reader = PrivateStorage(config=storage.config, objects=objects, catalog=storage.catalog)
+        raw = local.reader.restore(PREFIX + name, records=records)
+        if raw is None:
+            raise ValueError('A required source part is absent from the private catalog')
         profile, payloads = profile_part(raw, prior)
         path = work / (prior['sha256'] + '.json')
         path.write_bytes((json.dumps(profile, separators=(',', ':')) + chr(10)).encode())

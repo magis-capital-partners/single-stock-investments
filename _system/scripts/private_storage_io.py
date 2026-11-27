@@ -10,7 +10,7 @@ import subprocess
 from pathlib import Path
 
 from private_storage import (ROOT, ConcurrentUpdate, PrivateStorage, StorageError, enabled, encoded_json,
-                             relative_path, restore_file, run_git, sha, store_bytes, store_file)
+                             relative_path, run_git, sha, store_bytes, store_file)
 
 MARKER = '.private-storage-view.json'
 # The shared receipt index every dashboard producer updates; the legacy vault
@@ -303,10 +303,7 @@ def materialize(vault, relative, *, storage=None):
     if cache_key not in _VIEW_CACHE:
         _VIEW_CACHE[cache_key] = view(vault, storage)
     records = _VIEW_CACHE[cache_key]
-    entry = storage.lookup_entry(relative, records)
-    if entry:
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        restore_file(storage.objects, entry, destination)
+    storage.restore_to(relative, destination, records=records)
     return destination
 
 
@@ -358,6 +355,8 @@ def publish_paths(vault, paths, *, storage=None):
                 # An unchanged event stream is not a ledger publication, even
                 # when another author has since appended genuine remote events.
                 continue
+        if not relative.endswith('/ledger.jsonl') and storage.reuse_file(relative, path, prior, expected):
+            continue
         entry = store_file(storage.objects, path)
         if relative == 'valuation-underwriting/local-runtime/ledger.jsonl':
             from private_storage import merge_ledger

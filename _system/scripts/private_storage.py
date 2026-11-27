@@ -38,6 +38,10 @@ class StorageError(RuntimeError):
     pass
 
 
+class MissingPrivateObject(StorageError):
+    """The object key was absent, rather than unreadable or corrupt."""
+
+
 class StorageHTTPError(StorageError):
     def __init__(self, method, status):
         self.status = status
@@ -346,7 +350,7 @@ def decoded_chunks(objects, entry):
             raise StorageError("Invalid private file chunk size")
         raw = objects.get(item.get("stored_sha256", ""), item.get("stored_bytes"))
         if raw is None:
-            raise StorageError("Required immutable private object is missing")
+            raise MissingPrivateObject("Required immutable private object is missing")
         codec = item.get("encoding")
         if codec in ("packed-raw", "packed-gzip"):
             offset, size = item.get("packed_offset"), item.get("packed_bytes")
@@ -406,9 +410,10 @@ def restore_file(objects, entry, destination):
         raise
 
 
-def git_env():
+def git_env(token=None):
     env = dict(os.environ)
-    token = env.get("RESEARCH_CATALOG_TOKEN") or env.get("RESEARCH_VAULT_CLONE_TOKEN")
+    if token is None:
+        token = env.get("RESEARCH_CATALOG_TOKEN") or env.get("RESEARCH_VAULT_CLONE_TOKEN")
     if token:
         header = "AUTHORIZATION: basic " + base64.b64encode(("x-access-token:" + token).encode()).decode()
         count = int(env.get("GIT_CONFIG_COUNT", "0"))
@@ -550,12 +555,76 @@ class Catalog:
         raise ConcurrentUpdate("Private catalog changed repeatedly; verified objects remain preserved")
 
 
+class LegacyGitReader:
+    """Read exact pinned blobs without checking out or changing the legacy vault."""
+
+    def __init__(self, config):
+        self.repo = config["legacy_repository"]
+        self.repo_id = config["legacy_repository_id"]
+        self.pin = config["legacy_pin"]
+        self.workspace = None
+        self.lock = threading.Lock()
+
+    def prepare(self, token, env):
+        if self.repo != "magis-capital-partners/research-vault-legacy" or not re.fullmatch(r"[0-9a-f]{40}", self.pin):
+            raise StorageError("Unexpected private legacy repository or revision")
+        identity = subprocess.run(
+            ["gh", "api", "repos/" + self.repo], capture_output=True, timeout=60,
+            env={**os.environ, **({"GH_TOKEN": token} if token else {})},
+        )
+        if identity.returncode:
+            raise StorageError("Private legacy vault access is required")
+        meta = json.loads(identity.stdout)
+        if meta.get("private") is not True or meta.get("id") != self.repo_id:
+            raise StorageError("Private legacy repository identity or privacy changed")
+        workspace = tempfile.TemporaryDirectory(prefix="magis-legacy-reader-")
+        try:
+            run_git(workspace.name, "init", "--bare", "--quiet", env=env)
+            run_git(workspace.name, "remote", "add", "origin", "https://github.com/" + self.repo + ".git", env=env)
+            run_git(workspace.name, "fetch", "--no-tags", "--depth=1", "--filter=blob:none", "origin", self.pin, env=env)
+            if run_git(workspace.name, "rev-parse", "FETCH_HEAD", env=env).stdout.strip() != self.pin.encode():
+                raise StorageError("Private legacy pin changed")
+        except BaseException:
+            workspace.cleanup()
+            raise
+        self.workspace = workspace
+
+    def get(self, path, entry):
+        relative_path(path)
+        blob = entry.get("git_blob", "")
+        size = entry.get("bytes")
+        if (not re.fullmatch(r"[0-9a-f]{40}", blob) or type(size) is not int or not 0 <= size <= MAX_MEMORY_FILE_BYTES
+                or entry.get("git_mode") not in ("100644", "100755")):
+            raise StorageError("Invalid legacy backup identity")
+        token = os.environ.get("RESEARCH_VAULT_CLONE_TOKEN") or os.environ.get("RESEARCH_CATALOG_TOKEN")
+        env = {**git_env(token), "GIT_NO_LAZY_FETCH": "1"}
+        with self.lock:
+            if self.workspace is None:
+                self.prepare(token, env)
+            root = self.workspace.name
+            expected = f"{entry['git_mode']} blob {blob}\t{path}\0".encode()
+            listing = run_git(root, "--literal-pathspecs", "ls-tree", "-z", self.pin, "--", path, env=env).stdout
+            if listing != expected:
+                raise StorageError("Backup blob is outside the pinned legacy file")
+            if run_git(root, "cat-file", "-e", blob, env=env, check=False).returncode:
+                run_git(root, "fetch", "--no-tags", "origin", blob, env=env)
+            if run_git(root, "cat-file", "-s", blob, env=env).stdout.strip() != str(size).encode():
+                raise StorageError("Legacy Git backup size changed")
+            raw = run_git(root, "cat-file", "blob", blob, env=env).stdout
+        git_digest = hashlib.sha1(f"blob {size}\0".encode() + raw).hexdigest()
+        if len(raw) != size or git_digest != blob or sha(raw) != entry.get("sha256"):
+            raise StorageError("Legacy Git backup bytes do not match the catalog")
+        return raw
+
+
 class PrivateStorage:
     def __init__(self, root=ROOT, *, config=None, objects=None, catalog=None):
         self.config = config if config is not None else load_config(root, require_enabled=True)
         self.objects = objects or R2Objects(self.config)
         self.catalog = catalog or Catalog(self.config)
         self._legacy_indexes = OrderedDict()
+        self._legacy_content = None
+        self._git_reader = LegacyGitReader(self.config) if self.config.get("legacy_repository_id") else None
 
     def snapshot(self):
         commit = self.catalog.fetch()
@@ -569,10 +638,10 @@ class PrivateStorage:
             relative_path(relative)
             prior = expected.get(relative)
             if prior and relative.endswith("/ledger.jsonl"):
-                raw = merge_ledger(restore_bytes(self.objects, prior), raw)
+                raw = merge_ledger(self.restore(relative, records=expected), raw)
             if prior and prior.get("sha256") == sha(raw) and prior.get("bytes") == len(raw):
                 # A matching pointer alone is not proof the private bytes exist.
-                if restore_bytes(self.objects, prior) != raw:
+                if self.restore(relative, records=expected) != raw:
                     raise StorageError("Existing private file differs")
                 continue
             immutable = re.search(r"(?:^|/)(?:objects|packets|handoffs)/[0-9a-f]{64}(?:\.json|\.zip)?$", relative)
@@ -582,10 +651,7 @@ class PrivateStorage:
             updates[relative] = store_bytes(self.objects, raw)
         return self.catalog.publish(updates, expected)
 
-    def lookup_entry(self, relative, records):
-        relative_path(relative)
-        if relative in records:
-            return records[relative]
+    def _legacy_manifest(self, records):
         manifest_path = self.config.get("legacy_archive_manifest")
         if not manifest_path:
             return None
@@ -605,8 +671,10 @@ class PrivateStorage:
                     or not 0 < manifest["unique_git_blobs"] <= manifest["path_count"]):
                 raise StorageError("Legacy manifest source identity or completeness changed")
             self._legacy_indexes[identity] = manifest
-        manifest = self._legacy_indexes[identity]
-        prefix = sha(relative.encode())[:2]
+        return identity, self._legacy_indexes[identity]
+
+    def _legacy_shard(self, prefix, records, pinned):
+        identity, manifest = pinned
         shard_path = manifest.get("shards", {}).get(prefix)
         if shard_path is None:
             raise StorageError("Complete legacy manifest is missing a path shard")
@@ -623,23 +691,106 @@ class PrivateStorage:
             while len(self._legacy_indexes) > 3:
                 victim = next(k for k in self._legacy_indexes if k != identity)
                 del self._legacy_indexes[victim]
-        entry = self._legacy_indexes[shard_id].get(relative)
+        return self._legacy_indexes[shard_id]
+
+    def _legacy_entry(self, relative, records, pinned):
+        if pinned is None:
+            return None
+        entry = self._legacy_shard(sha(relative.encode())[:2], records, pinned).get(relative)
         if entry is not None:
             if not re.fullmatch(r"[0-9a-f]{40}", entry.get("git_blob", "")):
                 raise StorageError("Legacy Git blob identity is missing")
         return entry
+
+    def lookup_entry(self, relative, records):
+        relative_path(relative)
+        if relative in records:
+            return records[relative]
+        return self._legacy_entry(relative, records, self._legacy_manifest(records))
+
+    def _restore_from_git(self, relative, entry, records):
+        if self._git_reader is None:
+            return None
+        pinned = self._legacy_manifest(records)
+        if pinned is None:
+            return None
+        wanted = (entry["sha256"], entry["bytes"])
+        candidate = self._legacy_entry(relative, records, pinned)
+        if candidate and (candidate.get("sha256"), candidate.get("bytes")) == wanted:
+            return self._git_reader.get(relative, candidate)
+
+        # A small set of current paths hold byte-identical legacy files under
+        # different names. Build this index lazily only on a missing R2 object.
+        identity, manifest = pinned
+        if self._legacy_content is None or self._legacy_content[0] != identity:
+            by_content = {}
+            for prefix in sorted(manifest["shards"]):
+                for path, original in self._legacy_shard(prefix, records, pinned).items():
+                    key = (original["sha256"], original["bytes"])
+                    by_content.setdefault(key, (path, original))
+            self._legacy_content = identity, by_content
+        match = self._legacy_content[1].get(wanted)
+        return self._git_reader.get(*match) if match else None
 
     def restore(self, relative, *, records=None):
         relative_path(relative)
         if records is None:
             _, records = self.snapshot()
         entry = self.lookup_entry(relative, records)
-        raw = None if entry is None else restore_bytes(self.objects, entry)
+        if entry is None:
+            return None
+        try:
+            raw = restore_bytes(self.objects, entry)
+        except MissingPrivateObject:
+            raw = self._restore_from_git(relative, entry, records)
+            if raw is None:
+                raise
         if raw is not None and entry.get("git_blob"):
             git_identity = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
             if git_identity != entry["git_blob"]:
                 raise StorageError("Restored legacy Git blob identity changed")
         return raw
+
+    def restore_to(self, relative, destination, *, records=None):
+        if records is None:
+            _, records = self.snapshot()
+        entry = self.lookup_entry(relative, records)
+        if entry is None:
+            return False
+        destination = Path(destination)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            restore_file(self.objects, entry, destination)
+        except MissingPrivateObject:
+            raw = self._restore_from_git(relative, entry, records)
+            if raw is None:
+                raise
+            created = False
+            try:
+                with destination.open("xb") as out:
+                    created = True
+                    out.write(raw)
+            except BaseException:
+                if created:
+                    destination.unlink(missing_ok=True)
+                raise
+        return True
+
+    def reuse_file(self, relative, path, prior, records):
+        """Keep an existing small file reference if it still restores exactly."""
+        if self._git_reader is None or not prior:
+            return False
+        size = path.stat().st_size
+        if size != prior.get("bytes") or size > MAX_MEMORY_FILE_BYTES:
+            return False
+        with path.open("rb") as source:
+            if hashlib.file_digest(source, "sha256").hexdigest() != prior["sha256"]:
+                return False
+        try:
+            return self.restore(relative, records=records) is not None
+        except MissingPrivateObject:
+            # Publication can still repair a missing object from local bytes.
+            return False
 
 
 def merge_ledger(original, incoming):
