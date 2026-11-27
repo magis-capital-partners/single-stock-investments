@@ -202,130 +202,26 @@ with the S3 API, which is why the reader is not the REST API. That token can
 read every object in the bucket; the code reads exactly one key. `operations-cadence`
 reports the measured publication intervals per ET day.
 
-**Install, verification and rollback:** `NY4_SHADOW_INSTALL.md`, the pinned plan
-for the owner's explicit NY4 authorization. Nothing in it runs without that
-word.
+### NY4 rollout and acceptance
 
-### Live operator commands (on NY4, as `rs-live`)
+The [NY4 rollout plan](NY4_SHADOW_INSTALL.md) governs the next rollout. The
+live implementation above documents the existing code and shared-account
+guards. Its timer-based session is a reference implementation. The NY4 plan
+uses a Gateway-free observer and requires a bounded, human-approved ticket
+runner before live activation.
 
-Install or change anything only outside 07:45-16:20 ET.
+| Stage | Where | Required evidence |
+|---|---|---|
+| Paper | Supervised DU session on Drew's PC | Broker-confirmed short, cancel and cover, flat final position, reconnect without duplicates, and SSI journal and P&L reconciliation |
+| Shadow | Gateway-free observer on NY4 and supervised broker evidence | Five complete sessions, at least 95% fresh coverage, no process gap over 120 seconds, and three fully gated opportunities from three issuers across at least two sessions |
+| Pilot | Individually approved tickets on NY4 | Completed shadow review, one-tenth-size policy and owner approval, measured broker event visibility through the entire hold, and Flex reconciliation |
 
-```text
-python -m _system.trading.rs_paper_executor preflight --config /etc/rs-live/config.json
-python -m _system.trading.rs_paper_executor status   --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite
-systemctl start rs-live-executor        # owner word; the shipped unit runs the shadow journal
-touch /var/lib/rs-live/FLATTEN          # scoped flatten: cancels RS entries, covers RS names only
-systemctl stop rs-live-executor         # stop; working DAY orders stay at IBKR, check status
-rm /etc/rs-live/ARM.json                # disarm: back to shadow on the next cycle; covers continue
-```
-
-Recovery follows the paper procedure below:
-1. Restart, and let reconciliation import fills by execution ID.
-2. Inspect any `RSLIVE|` order it reports as uncertain.
-3. Run `run --resume-entries`.
-
-Never edit or delete the journal or the claims file to clear a position.
-
-### Acceptance path (owner, 2026-11-18: no paper host, no second IBKR username)
-
-The original plan ("paper acceptance on a separate host") needs live quotes in a
-paper session. IBKR gives a paper user live data only on the same machine as the
-live user, or while the live user is logged out, and NY4's live user is logged in
-through the session. Route A replaces that plan. Each stage needs the owner's word
-to start, and its evidence is reviewed before the next.
-
-| Stage | Where | Proves | Evidence |
-|---|---|---|---|
-| **P: paper mechanics** | Laptop paper, supervised, delayed data | Order mechanics only, on IBKR's simulated market (see the mechanics test above) | `integration-test --mechanics-only` report, `pass: true` |
-| **S: live shadow** | NY4, client 60, the dedicated shadow journal (`run --shadow`; never transmits an entry) | Every entry gate on the real account: live quotes and sizes, the live shortable tick, real WhatIf against SPX's actual exposure, symbol claims, book-margin room, cushion. Plus uptime. No order is transmitted. | `shadow-report`: ≥ 5 complete sessions, ≥ 3 deduplicated opportunities from 3 issuers over ≥ 2 sessions, verified stage-P mechanics (rules below). Option B's conditional entries are reported separately and never count (below) |
-| **L: live pilot** | NY4, owner arm file | Real fills, cancels, recalls and fees at the smallest size | The owner sets pilot caps (e.g. `max_names: 1`, a small `target_notional`) and widens them only after reviewing the pilot's fills and the account reconciliation |
-
-```text
-python -m _system.trading.rs_paper_executor shadow-report --config /etc/rs-live/config.json --state /var/lib/rs-live/shadow.sqlite --mechanics-report stage-p.json --mechanics-journal <stage-P>.integration.sqlite --report shadow.json
-```
-
-`shadow-report` is read-only. It holds no writer lock and opens no broker
-connection. The owner's acceptance rules (2026-11-19) are engineering facts,
-not proof of profitability. `ready_for_arm_review` needs every one of them, and
-`failed_checks` names the ones missing:
-
-* **A dedicated shadow journal with zero orders.** The journal must be
-  `journal_role: shadow` (`run --shadow`), and hold no order, no position and
-  no cover. Protection of genuine RS positions runs on the live journal, and is
-  never labelled zero-order shadow validation; `run --shadow` refuses to start
-  while RS holds live names.
-* **At least 5 complete operating sessions** (`--min-sessions`). Complete means
-  both:
-  * the process heartbeat gap stays within 120 s;
-  * the feed was fresh, by the producer's clock, for at least 95% of
-    heartbeats (`--min-feed-coverage`).
-
-  Each session reports the process gap, feed freshness, the longest stale
-  stretch, the download lag, and per-security quote availability
-  (`quote_check`), all separately.
-* **At least 3 fully gated opportunities from 3 issuers across at least 2
-  sessions** (`--min-opportunities`, `--min-issuers`,
-  `--min-opportunity-sessions`). Opportunities are deduplicated by issuer (CIK)
-  and action. These never count, and are listed under `excluded_entries`:
-  * synthetic controls;
-  * repeated evaluations;
-  * the same action under another publisher record;
-  * catch-up announcements, first seen more than the entry window after
-    publication.
-
-  Quiet sessions alone are never ready.
-* **A clear current entry-halt state**, and clear kill and daily-loss latches.
-* **Verified stage-P mechanics.** `--mechanics-report` is checked against its
-  own `--mechanics-journal`:
-  * the RSPAPER| namespace on a DU account;
-  * a filled SELL;
-  * a broker-confirmed cancel;
-  * a filled BUY cover;
-  * flat at the end, with the kill latch set;
-  * the report's fill count matching the journal.
-
-  Partial fills cannot be forced on IBKR's simulator, so they are reported
-  (`observed_on_paper`) rather than gated. The SimBroker unit tests cover them
-  deterministically.
-
-It exits 0 only when every check holds; the decision to arm stays with the
-owner. Shadow sees no would-be entry until the evidence producers exist, and
-the refusal histogram shows which input is missing.
-
-**Conditional would-be entries (owner 2026-11-19, option B).** No source available
-today can say "SSR clear" intraday, so every strict eligibility check fails.
-In **shadow only** (the `run --shadow` journal, or no valid arm file), an entry whose halt/SSR state is
-*unknown* runs the later gates anyway:
-* live quote and size, borrow, WhatIf on the real account;
-* the SPX reserve and cushion, and book-margin room.
-
-If all of them pass, it is recorded once per issuer/action as
-`shadow_entry_conditional` with `fully_gated: false`. The record carries the
-unknown inputs (`eligibility_unknown`), `cik`, `action_id` and the borrow
-*indication* used. It is recorded once, whichever publisher record carries
-the action, so later cycles do not repeat quote, borrow or WhatIf requests on
-the shared Gateway. The borrow is a public indication capped by tick 89. It
-is not an allocation, and the passing WhatIf does not prove a borrow.
-
-Some inputs refuse exactly as before:
-* a **known** halt (evidence or IB tick 49) or SSR restriction;
-* a stale eligibility row, meaning the producers stopped;
-* a contract mismatch.
-
-An armed executor refuses every unknown-SSR entry exactly as before. If an
-arm file appears mid-evaluation, the entry is refused, not sent.
-
-`shadow-report` lists them in a separate `conditional` block, with
-`counts_toward_readiness: false`:
-* the would-be entries, issuers and sessions, deduplicated and excluded by the
-  same rules as opportunities;
-* the unknown inputs;
-* `downstream_gates_exercised`, a non-gating fact.
-
-Opportunities are counted only from fully gated `shadow_entry` events, so
-conditional entries never count toward `ready_for_arm_review`. The owner's
-3-opportunity rule therefore cannot pass until an eligibility source can say
-"clear" (a paid feed; see `_system/trading/rs_evidence/README.md`).
+The local `shadow-report` command is read-only and the existing paper
+mechanics verifier checks the report against its journal. The NY4 plan calls
+for an offline evidence import for the new shadow protocol. Historical
+conditional entries retain their separate classification and contribute no
+qualifying opportunities. Keep the journal and symbol claims intact when
+resolving uncertain orders or positions.
 
 ### Account reconciliation (after the Flex day closes)
 
