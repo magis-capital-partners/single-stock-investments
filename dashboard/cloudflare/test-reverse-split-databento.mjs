@@ -68,3 +68,26 @@ test('a still-fresh cached quote received before the entry or exit clock cannot 
   await processShadowTrack(env,x,early,[x],exit);assert.equal(x.remaining_shares,50);assert.equal(x.reason,'waiting_for_post_exit_quote');
   await processShadowTrack(env,x,{...early,id:'cover',observed_at:exit},[x],exit);assert.equal(x.remaining_shares,0);assert.equal(x.state,'closed');
 });
+
+test('one unresolved subscription leaves valid books for other symbols available',async t=>{
+  const x=transport(t);
+  await assert.rejects(x.market.quote('QA',mini),/Waiting/);
+  x.market.warm('UNKNOWN');
+  x.send(row());
+  x.send({kind:'health',status:'subscription_error',error_category:'symbol_resolution'});
+  assert.equal((await x.market.quote('QA',mini)).bid,10);
+  assert.equal(x.market.health.symbol_resolution_errors,1);
+  assert.equal(x.market.health.quote_access,'received');
+  await assert.rejects(x.market.quote('UNKNOWN',mini),/Waiting/);
+});
+
+test('validation can distinguish an invalidated Databento book from a failed reference lookup',async t=>{
+  const x=transport(t);
+  await assert.rejects(x.market.quote('QA',mini),error=>error.quote_reason==='waiting_for_book');
+  x.send(row());
+  x.send({kind:'invalidate',ticker:'QA'});
+  await assert.rejects(x.market.quote('QA',mini),error=>error.quote_reason==='book_invalidated');
+  x.reference.identity=async()=>{throw new Error('Provider unavailable');};
+  x.send(row({ticker:'NEW'}));
+  await assert.rejects(x.market.quote('NEW',mini),error=>error.quote_reason==='reference_lookup_failed');
+});

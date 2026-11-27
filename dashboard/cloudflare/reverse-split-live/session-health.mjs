@@ -1,11 +1,45 @@
 import {etDay} from './core.mjs';
 import {sessionAt,sessions} from './shadow-core.mjs';
 import {sha} from './worker.mjs';
-export async function recordSessionHealth(env,runtime,now=new Date().toISOString()){
- if(!sessionAt(now))return;
+async function recordSessionHealth(env,runtime,now){
  const sources=(await env.DB.prepare('SELECT id,last_success,status,coverage_gap FROM rs_sources ORDER BY id').all()).results;
  const row={at:now,runtime_status:runtime.status,heartbeat_at:runtime.heartbeat_at,market_data:runtime.market_data,sources,publication:runtime.publication};
- await env.DB.prepare('INSERT OR IGNORE INTO rs_state VALUES(?,?,?)').bind('session_health:'+etDay(now)+':'+now.slice(11,16),JSON.stringify(row),now).run();
+ await env.DB.prepare(`INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET
+  value=excluded.value,updated_at=excluded.updated_at
+  WHERE json_extract(rs_state.value,'$.market_data.quote_access') IS NOT 'received'
+    AND json_extract(excluded.value,'$.market_data.quote_access') = 'received'`)
+  .bind('session_health:'+etDay(now)+':'+now.slice(11,16),JSON.stringify(row),now).run();
+}
+
+// Take a local sample even when Cloudflare or the collector's main work is slow.
+// A later accepted quote can fill in a minute first sampled before quotes arrived.
+export function createSessionHealthSampler(env,getRuntime,onError){
+ let current,write=Promise.resolve();
+ return {
+  sample(time=Date.now(),quote=false){
+   const minute=Math.floor(time/60000);
+   if(current?.minute!==minute){
+    const now=new Date(time).toISOString();
+    current={minute,inSession:!!sessionAt(now),recorded:false,fresh:false};
+   }
+   const state=current;
+   if(!state.inSession||state.fresh||(state.recorded&&!quote))return;
+   const runtime=getRuntime(),{per_symbol,...market}=runtime.market_data||{};
+   const fresh=market.quote_access==='received'&&Math.floor(Date.parse(market.last_success)/60000)===minute;
+   if(state.recorded&&!fresh)return;
+   if(!fresh&&market.quote_access==='received')market.quote_access='awaiting_live_quote';
+   state.recorded=true;
+   state.fresh=fresh;
+   const snapshot={...runtime,market_data:runtime.market_data?market:null};
+   const now=new Date(time).toISOString();
+   write=write.then(()=>recordSessionHealth(env,snapshot,now)).catch(error=>{
+    if(fresh)state.fresh=false;
+    if(!state.fresh)state.recorded=false;
+    onError(error);
+   });
+  },
+  flush:()=>write,
+ };
 }
 export async function archiveDailyHealth(env,now=new Date().toISOString()){
  const day=etDay(now),marker='daily_operating_review:'+day;if(await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(marker).first())return;

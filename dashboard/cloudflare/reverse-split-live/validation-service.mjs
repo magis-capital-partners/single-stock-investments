@@ -67,7 +67,7 @@ export async function validationTick(env,now=new Date().toISOString()){
     const minute=now.slice(0,16),sampleNames=env.validationActiveMinute===minute?[]:names,identities=new Map();env.validationActiveMinute=minute;
     const window=Math.floor(at(now)/5000),benchmarks=env.validationBookWindow===window?[]:p.benchmarks;env.validationBookWindow=window;
     for(const ticker of [...new Set([...benchmarks,...sampleNames])]){
-      let sample;try{const q=await (env.market.observe?env.market.observe(ticker):env.market.quote(ticker,{quote_feed:'databento_mini'}));sample=quoteLatency(q,new Date().toISOString());}catch{sample={ticker,evaluated_at:now,error:'fresh_quote_or_identity_unavailable'};}
+      let sample;try{const q=await (env.market.observe?env.market.observe(ticker):env.market.quote(ticker,{quote_feed:'databento_mini'}));sample=quoteLatency(q,new Date().toISOString());}catch(error){sample={ticker,evaluated_at:now,error:'fresh_quote_or_identity_unavailable',quote_reason:error?.quote_reason||null};}
       sample.sample_kind='latest_book';sample.regular_session=!!sessionAt(now);old.push(sample);identities.set(ticker,sample.identity_verified);
     }
     const telemetry=env.market.drainTelemetry?.()||{samples:[],dropped:0},evaluated=new Date().toISOString();
