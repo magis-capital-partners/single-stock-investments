@@ -13,7 +13,7 @@ import {createEvaluationLoop} from './evaluation-loop.mjs';
 import {initializeReview,reviewTick} from './review-service.mjs';
 import {preparedManifest} from './prepared-universe.mjs';
 import {ensureRemoteReadIndexes} from './read-indexes.mjs';
-import {recordSessionHealth,archiveDailyHealth} from './session-health.mjs';
+import {createSessionHealthSampler,archiveDailyHealth} from './session-health.mjs';
 import {PIPELINE_VERSION} from './pipeline-version.mjs';
 import {finishHandoff} from './handoff.mjs';
 import {importMarketStatus} from './market-status-import.mjs';
@@ -27,8 +27,11 @@ export const needsStartupReconciliation=(last,at=Date.now())=>Number.isFinite(Da
 export async function watchCollector(env,{interval=1,maximumMs=300*60000,standbyMs=0,sleep=ms=>new Promise(r=>setTimeout(r,ms)),shouldStop=()=>false,operations=operationsRefreshSettings()}={}){
   const remote=env.controlDB,token=crypto.randomUUID(),started=Date.now();let lease,checkpoint,stopping=false,ticks=0,jobs=0,lastSaved=0,lastFullSaved=0,lastRecordCount=0,lastHeartbeat=0,lastImport=0,lastNews=0,lastBorrow=0,lastSources=0,lastFullEvaluation=0,budgetDay,baseline={},flexTask=null,financialTask=null,sourceTask=null,newsTask=null,borrowTask=null,evaluation,unsubscribe,leaseTimer,leaseError,renewing=Promise.resolve(),saving=Promise.resolve(),evaluationSavePending=false;let activeSymbols=new Set();
   let announcementTimer,announcementTask=null,refresher=null,operationsTimer,operationsTask=null,operationsCheckpointTask=null,operationsCheckpointRetryAt=0;let evaluationTimer,draining=false,normalHandoff=false,warmTask=null,warmQueued=false,warmAttempts=0,warmRetryAt=0;const stop=()=>{stopping=true;};process.once('SIGTERM',stop);process.once('SIGINT',stop);
-  let recoveryTimer,recoveryTask=null;
-  const heartbeat=async(status,error=null)=>{const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:now(),interval_seconds:interval,source_poll_target_seconds:15,quote_evaluation:'event_driven_serialized',ticks,jobs,error,maximum_minutes:Number.isFinite(maximumMs)?maximumMs/60000:null,broker_connections:0,pipeline_version:PIPELINE_VERSION,pipeline_commit:process.env.RS_PIPELINE_COMMIT||null,storage_usage:{scope:'collector_only_not_account_total',day:budgetDay,rows_read:Number(baseline.rows_read||0)+(env.usage?.rows_read||0),rows_written:Number(baseline.rows_written||0)+(env.usage?.rows_written||0),read_ceiling:450000,write_ceiling:researchWriteBudget(budgetDay,env.EXECUTION_REGISTRATION_DAY)},market_data:env.market?.health||null,publication:env.publicationHealth||null,checkpoint:env.checkpointHealth||null,operations_publication:refresher?.health()||null,restored_financial_scores:env.financialScoreCache?.size||0,memory:{...process.memoryUsage(),max_rss_bytes:process.resourceUsage().maxRSS*1024,retained_financial_profiles:env.financialProfiles?.size||0}};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);await recordSessionHealth(env,value);await env.EVIDENCE.put('collector-dashboard/runtime.json',new TextEncoder().encode(JSON.stringify(value)),{httpMetadata:{contentType:'application/json'}});lastHeartbeat=Date.now();};
+  let recoveryTimer,recoveryTask=null,runtimeStatus='starting',runtimeHeartbeatAt=null;
+  const sessionHealth=createSessionHealthSampler(env,()=>({
+    status:runtimeStatus,heartbeat_at:runtimeHeartbeatAt,market_data:env.market?.health||null,publication:env.publicationHealth||null,
+  }),error=>console.error(JSON.stringify({event:'session_health_sample_deferred',error:error.message})));
+  const heartbeat=async(status,error=null)=>{runtimeStatus=status;runtimeHeartbeatAt=now();const value={mode:'continuous_external',status,started_at:new Date(started).toISOString(),heartbeat_at:runtimeHeartbeatAt,interval_seconds:interval,source_poll_target_seconds:15,quote_evaluation:'event_driven_serialized',ticks,jobs,error,maximum_minutes:Number.isFinite(maximumMs)?maximumMs/60000:null,broker_connections:0,pipeline_version:PIPELINE_VERSION,pipeline_commit:process.env.RS_PIPELINE_COMMIT||null,storage_usage:{scope:'collector_only_not_account_total',day:budgetDay,rows_read:Number(baseline.rows_read||0)+(env.usage?.rows_read||0),rows_written:Number(baseline.rows_written||0)+(env.usage?.rows_written||0),read_ceiling:450000,write_ceiling:researchWriteBudget(budgetDay,env.EXECUTION_REGISTRATION_DAY)},market_data:env.market?.health||null,publication:env.publicationHealth||null,checkpoint:env.checkpointHealth||null,operations_publication:refresher?.health()||null,restored_financial_scores:env.financialScoreCache?.size||0,memory:{...process.memoryUsage(),max_rss_bytes:process.resourceUsage().maxRSS*1024,retained_financial_profiles:env.financialProfiles?.size||0}};await putState({DB:remote},'shadow_runtime',value);await putState(env,'shadow_runtime',value);await env.EVIDENCE.put('collector-dashboard/runtime.json',new TextEncoder().encode(JSON.stringify(value)),{httpMetadata:{contentType:'application/json'}});lastHeartbeat=Date.now();};
   async function budget(){const day=now().slice(0,10);if(day!==budgetDay){budgetDay=day;baseline=JSON.parse((await remote.prepare('SELECT value FROM rs_state WHERE key=?').bind('collector_usage:'+day).first())?.value||'{}');Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});}return Number(baseline.rows_read||0)+env.usage.rows_read<450000&&Number(baseline.rows_written||0)+env.usage.rows_written<researchWriteBudget(day,env.EXECUTION_REGISTRATION_DAY);}
   const renewLease=()=>{renewing=renewing.then(async()=>{const next=String(Date.now()+600000)+':'+token,ok=await remote.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND value=? RETURNING value").bind(next,now(),lease).first();if(!ok)throw new Error('Collector lease lost');lease=next;}).catch(e=>{leaseError=e;stopping=true;});return renewing;};
   async function save(options={}){
@@ -61,7 +64,16 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
       if(full){const recent=(await env.DB.prepare('SELECT ticker FROM rs_events WHERE first_seen_at>=? AND ticker IS NOT NULL').bind(new Date(Date.now()-900000).toISOString()).all()).results.map(r=>r.ticker);env.market?.reconcileSymbols?.([...activeSymbols,...recent,...(env.announcementQuoteSymbols||[])]);}
       const count=(await env.DB.prepare('SELECT (SELECT count(*) FROM rs_shadow_records)+(SELECT count(*) FROM rs_execution_records) AS count').first()).count;
       if(!stopping&&!draining&&count!==lastRecordCount&&Date.now()-lastSaved>=5000&&!evaluationSavePending){evaluationSavePending=true;save().then(()=>{lastRecordCount=count;}).catch(error=>console.error(JSON.stringify({event:'quote_checkpoint_deferred',error:error.message}))).finally(()=>{evaluationSavePending=false;});}
-    }});unsubscribe=env.market?.onQuote?.(ticker=>evaluation.notify(ticker));evaluationTimer=setInterval(()=>{if(!stopping)evaluation.notify(null);},1000);
+    }});
+    unsubscribe=env.market?.onQuote?.(ticker=>{
+      if(!stopping)sessionHealth.sample(Date.now(),true);
+      evaluation.notify(ticker);
+    });
+    evaluationTimer=setInterval(()=>{
+      if(stopping)return;
+      sessionHealth.sample();
+      evaluation.notify(null);
+    },1000);
     const lastTick=(await env.DB.prepare("SELECT value FROM rs_state WHERE key='last_completed_tick'").first())?.value;
     const sourceGap=await env.DB.prepare("SELECT id FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id LIKE 'sec-%' LIMIT 1").first();if(needsStartupReconciliation(lastTick)||sourceGap)await enqueue(env,'reconcile',{day:etDay(now())},12,'startup-gap:'+etDay(now())+':'+lastTick);
     env.onShadowDecision=async event=>{
@@ -134,7 +146,7 @@ export async function watchCollector(env,{interval=1,maximumMs=300*60000,standby
     draining=true;
     try{await finishHandoff({keepQuotes:normalHandoff&&!stopping&&!leaseError,
       drain:async()=>{if(recoveryTask)await recoveryTask;if(operationsCheckpointTask)await operationsCheckpointTask;if(operationsTask)await operationsTask;if(sourceTask)await sourceTask;if(newsTask)await newsTask;if(borrowTask)await borrowTask;if(flexTask)await flexTask;if(financialTask)await financialTask;if(warmTask)await warmTask;if(announcementTask)await announcementTask;if(env.financialLoads?.size)await Promise.allSettled([...env.financialLoads.values()]);await saving;await checkpoint?.flush({handoff:true});},
-      quiesce:async()=>{stopping=true;clearInterval(evaluationTimer);clearInterval(announcementTimer);clearInterval(operationsTimer);if(operationsTask)await operationsTask;env.onAnnouncementDetection=null;unsubscribe?.();env.onShadowDecision=null;await evaluation?.close();},
+      quiesce:async()=>{stopping=true;clearInterval(evaluationTimer);clearInterval(announcementTimer);clearInterval(operationsTimer);if(operationsTask)await operationsTask;env.onAnnouncementDetection=null;unsubscribe?.();env.onShadowDecision=null;await sessionHealth.flush();await evaluation?.close();},
       persist:async()=>{if(checkpoint){try{await heartbeat(normalHandoff?'handoff':'stopped');}finally{await save({checkpointOnly:true});}}},
       close:async()=>{try{await refresher?.close();}finally{checkpoint?.close();}}});}finally{
     process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);clearInterval(evaluationTimer);

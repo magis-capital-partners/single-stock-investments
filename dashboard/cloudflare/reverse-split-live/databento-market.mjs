@@ -3,24 +3,30 @@ import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {createInterface} from 'node:readline';
 import {at} from './shadow-core.mjs';
+const quoteUnavailable=(message,quote_reason,cause)=>Object.assign(new Error(message,{cause}),{quote_reason});
 const resolvedCik=value=>/^\d{1,10}$/.test(String(value||''))&&Number(value)>0;
 
 export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>new Date().toISOString(),python=process.env.PYTHON||(process.platform==='win32'?'python':'python3')}={}){
   const health={provider:'Databento Equities Mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',status:key?'not_checked':'not_configured',quote_access:'unverified',nbbo_access:'unverified',last_success:null,last_heartbeat:null,error:null,subscriptions:0,invalidations:0,rejected_records:0};
-  const identityTimes=new Map(),identityLoads=new Map(),identities=new Map(),latest=new Map(),symbols=new Set(),telemetry=[],sampleWindows=new Map(),listeners=new Set();let child,closed=false,lines,dropped=0,nextStart=0;
-  function clear(status){latest.clear();health.status=status;health.quote_access=status==='not_entitled'?'not_entitled':'unavailable';}
+  const identityTimes=new Map(),identityLoads=new Map(),identities=new Map(),latest=new Map(),invalidated=new Set(),symbols=new Set(),telemetry=[],sampleWindows=new Map(),listeners=new Set();let child,closed=false,lines,dropped=0,nextStart=0;
+  function clear(status){latest.clear();invalidated.clear();health.status=status;health.quote_access=status==='not_entitled'?'not_entitled':'unavailable';}
   function accept(row){
     if(row.kind==='health'){
+      // Databento keeps resolved symbols streaming when a single symbol fails.
+      if(row.status==='subscription_error'&&row.error_category==='symbol_resolution'){
+        health.symbol_resolution_errors=(health.symbol_resolution_errors||0)+1;
+        return;
+      }
       if(['connecting','disconnected','not_entitled','subscription_error'].includes(row.status)){clear(row.status);if(row.error_class||row.error_category){health.last_transport_error={status:row.status,error_class:String(row.error_class||'').replace(/[^A-Za-z0-9_]/g,'').slice(0,60),error_category:String(row.error_category||'unknown').replace(/[^A-Za-z0-9_]/g,'').slice(0,60),at:clock()};health.error='Databento '+health.last_transport_error.error_category;}}
       else if(row.status==='subscribed'){health.status='subscribed';if(health.quote_access!=='received')health.quote_access='awaiting_live_quote';health.error=null;health.last_heartbeat=clock();}
       return;
     }
     if(row.kind==='heartbeat'){health.last_heartbeat=clock();return;}
-    if(row.kind==='invalidate'){health.invalidations++;latest.delete(row.ticker);return;}
+    if(row.kind==='invalidate'){if(symbols.has(row.ticker)){health.invalidations++;latest.delete(row.ticker);invalidated.add(row.ticker);}return;}
     if(row.kind!=='quote'||row.dataset!=='EQUS.MINI'||row.schema!=='mbp-1'||!symbols.has(row.ticker))return;
     const now=at(clock()),ts=at(row.quote_at),received=at(row.observed_at);
-    if(ts===null||received===null||ts>now+2000||received>now+2000||now-ts>15000||now-received>15000||(row.flags&12)||![row.bid,row.ask,row.bid_size,row.ask_size].every(Number.isFinite)||row.bid<=0||row.ask<row.bid||row.bid_size<=0||row.ask_size<=0){health.rejected_records++;latest.delete(row.ticker);return;}
-    latest.set(row.ticker,row);health.quote_access='received';health.status='available';health.last_success=clock();health.last_heartbeat=clock();
+    if(ts===null||received===null||ts>now+2000||received>now+2000||now-ts>15000||now-received>15000||(row.flags&12)||![row.bid,row.ask,row.bid_size,row.ask_size].every(Number.isFinite)||row.bid<=0||row.ask<row.bid||row.bid_size<=0||row.ask_size<=0){health.rejected_records++;latest.delete(row.ticker);invalidated.add(row.ticker);return;}
+    invalidated.delete(row.ticker);latest.set(row.ticker,row);health.quote_access='received';health.status='available';health.last_success=clock();health.last_heartbeat=clock();
     // Record the FIRST receipt in each five-second window, not just the latest
     // quote at a later poll. Otherwise processing latency would look falsely low.
     const window=Math.floor(received/5000);
@@ -55,10 +61,22 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
   async function miniQuote(ticker,benchmark=false){
     if(!/^[A-Z][A-Z0-9.]{0,11}$/.test(ticker||''))throw new Error('Databento raw symbol requires explicit verification');
     if(!key)throw new Error('Databento credential is not configured');
-    start();if(!child)throw new Error('Waiting for Databento helper recovery');if(!symbols.has(ticker)){if(symbols.size>=128)throw new Error('Databento symbol budget reached');symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}
-    await verifyIdentity(ticker);const row=latest.get(ticker),identity=boundIdentity(ticker,row);
-    if(!identity?.security_id||identity.currency!=='usd'||(!benchmark&&(!resolvedCik(identity.cik)||identity.type!=='CS')))throw new Error('Databento quote issuer or common-share identity is unresolved');
-    if(!row||at(clock())-at(row.quote_at)>15000)throw new Error('Waiting for a fresh Databento Mini quote');
+    start();
+    if(!child)throw quoteUnavailable('Waiting for Databento helper recovery','transport_unavailable');
+    if(!symbols.has(ticker)){
+      if(symbols.size>=128)throw quoteUnavailable('Databento symbol budget reached','subscription_budget_reached');
+      symbols.add(ticker);health.subscriptions=symbols.size;
+      child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');
+    }
+    try{await verifyIdentity(ticker);}
+    catch(error){throw quoteUnavailable('Databento quote reference lookup failed','reference_lookup_failed',error);}
+    const row=latest.get(ticker);
+    if(!row||at(clock())-at(row.quote_at)>15000){
+      const reason=row?'stale_book':invalidated.has(ticker)?'book_invalidated':'waiting_for_book';
+      throw quoteUnavailable('Waiting for a fresh Databento Mini quote',reason);
+    }
+    const identity=boundIdentity(ticker,row);
+    if(!identity?.security_id||identity.currency!=='usd'||(!benchmark&&(!resolvedCik(identity.cik)||identity.type!=='CS')))throw quoteUnavailable('Databento quote issuer or common-share identity is unresolved','identity_unverified');
     return {ticker,...identity,provider:'databento_mini',dataset:'EQUS.MINI',coverage:'selected_venues_not_sip_nbbo',quote_at:row.quote_at,observed_at:row.observed_at,bid:row.bid,ask:row.ask,bid_size:row.bid_size,ask_size:row.ask_size,consolidated:false,delayed:false,size_units:'shares',source_url:'https://databento.com/docs/datasets/equs-mini',raw:row};
   }
   return {
@@ -66,7 +84,7 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
     verifyIdentity,identityKnown:ticker=>identities.has(ticker)&&at(clock())-at(identityTimes.get(ticker))<300000,
     peek(ticker){const row=latest.get(ticker);if(!row)return null;const identity=boundIdentity(ticker,row);return {...identity,...row,raw:row,size_units:'shares',coverage:'selected_venues_not_sip_nbbo',identity_verified_at:identityTimes.get(ticker)||null,identity_verified:!!identity?.security_id&&resolvedCik(identity.cik)&&identity.type==='CS'&&identity.currency==='usd',security_id:identity?.security_id||null};},
     warm(ticker){if(!/^[A-Z][A-Z0-9.]{0,11}$/.test(ticker||'')||!key)return;start();if(!child)return;if(!symbols.has(ticker)){if(symbols.size>=128){health.symbol_budget_warning='Databento symbol budget reached';return;}symbols.add(ticker);health.subscriptions=symbols.size;child.stdin.write(JSON.stringify({kind:'subscribe',ticker})+'\n');}},
-    reconcileSymbols(wanted){const keep=[...new Set(['AAPL','SPY','IWM',...wanted])].filter(t=>/^[A-Z][A-Z0-9.]{0,11}$/.test(t)).slice(0,128);if(symbols.size<96||(!keep.some(t=>!symbols.has(t))&&keep.length>=symbols.size-16))return;const atNow=at(clock()),urgent=keep.slice(0,32).some(t=>!symbols.has(t));if(atNow-(health.last_rotation_ms||0)<(urgent?60000:300000))return;health.last_rotation_ms=atNow;health.subscription_rotations=(health.subscription_rotations||0)+1;symbols.clear();for(const t of keep)symbols.add(t);latest.clear();health.subscriptions=symbols.size;health.quote_access='awaiting_live_quote';child?.stdin.write(JSON.stringify({kind:'replace_subscriptions',tickers:keep})+'\n');},
+    reconcileSymbols(wanted){const keep=[...new Set(['AAPL','SPY','IWM',...wanted])].filter(t=>/^[A-Z][A-Z0-9.]{0,11}$/.test(t)).slice(0,128);if(symbols.size<96||(!keep.some(t=>!symbols.has(t))&&keep.length>=symbols.size-16))return;const atNow=at(clock()),urgent=keep.slice(0,32).some(t=>!symbols.has(t));if(atNow-(health.last_rotation_ms||0)<(urgent?60000:300000))return;health.last_rotation_ms=atNow;health.subscription_rotations=(health.subscription_rotations||0)+1;symbols.clear();for(const t of keep)symbols.add(t);latest.clear();invalidated.clear();health.subscriptions=symbols.size;health.quote_access='awaiting_live_quote';child?.stdin.write(JSON.stringify({kind:'replace_subscriptions',tickers:keep})+'\n');},
     activePolicy:key?'rs_immediate_mini.v1':'rs_immediate.v1',
     onQuote(listener){listeners.add(listener);return ()=>listeners.delete(listener);},
     observe(ticker){if(!['AAPL','SPY','IWM'].includes(ticker))return miniQuote(ticker);return miniQuote(ticker,true);},
@@ -85,8 +103,8 @@ export function makeDatabentoMarket({key,reference,spawnProcess=spawn,clock=()=>
         force=setTimeout(()=>old.kill('SIGKILL'),2000);limit=setTimeout(()=>finish(new Error('Databento helper close was not confirmed; collector lease retained')),7000);
         old.stdin.end(JSON.stringify({kind:'stop'})+'\n');
       });
-      child=null;nextStart=0;lines?.close();latest.clear();symbols.clear();health.subscriptions=0;health.quote_access='unavailable';health.status='closed_for_handoff';
+      child=null;nextStart=0;lines?.close();latest.clear();invalidated.clear();symbols.clear();health.subscriptions=0;health.quote_access='unavailable';health.status='closed_for_handoff';
     },
-    close(){closed=true;latest.clear();listeners.clear();if(child){child.stdin.end(JSON.stringify({kind:'stop'})+'\n');const timer=setTimeout(()=>child.kill(),3000);timer.unref();child.once('exit',()=>clearTimeout(timer));lines?.close();}},
+    close(){closed=true;latest.clear();invalidated.clear();listeners.clear();if(child){child.stdin.end(JSON.stringify({kind:'stop'})+'\n');const timer=setTimeout(()=>child.kill(),3000);timer.unref();child.once('exit',()=>clearTimeout(timer));lines?.close();}},
   };
 }

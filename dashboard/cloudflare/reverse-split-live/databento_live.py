@@ -68,6 +68,31 @@ def normalize_record(record, ticker, received_at, *, mapping_verified=False):
             "mapping_verified": mapping_verified, "raw_symbol": ticker}
 
 
+def classify_vendor_error(record, symbol_resolution_code):
+    if record.code == symbol_resolution_code:
+        return "symbol_resolution"
+    text = record.err.lower()
+    if re.search(r"auth|license|permission|entitle", text):
+        return "access_rejected"
+    if re.search(r"slow|buffer", text):
+        return "slow_reader"
+    if re.search(r"session|connection.*limit", text):
+        return "connection_limit"
+    return "vendor_subscription_error"
+
+
+def forward_book(value, ticker, emitted, emit, now):
+    last = emitted.get(ticker)
+    if value is None:
+        if ticker not in emitted or last is not None:
+            emitted[ticker] = None
+            emit({"kind": "invalidate", "ticker": ticker})
+    elif last is None or now - last >= .25:
+        # Forward the first valid book after an invalidation immediately.
+        emitted[ticker] = now
+        emit(value)
+
+
 def main():
     logging.disable(logging.CRITICAL)  # SDK diagnostics must never expose credentials.
     import databento as db
@@ -115,17 +140,10 @@ def main():
             if not ticker:
                 return
             value = normalize_record(record, ticker, received_at, mapping_verified=True)
-            if value is None:
-                emit({"kind": "invalidate", "ticker": ticker})
-                return
-            value = credits.update(value)
-            if value is None:
-                emit({"kind": "invalidate", "ticker": ticker})
-                return
+            if value is not None:
+                value = credits.update(value)
             # Bounded IPC; this never fabricates a fresh timestamp for an old book.
-            if time.monotonic() - emitted.get(ticker, 0) >= .25:
-                emitted[ticker] = time.monotonic()
-                emit(value)
+            forward_book(value, ticker, emitted, emit, time.monotonic())
         elif isinstance(record, dbn.SystemMsg):
             message = str(record.msg).lower()
             if "succeeded" in message:
@@ -134,8 +152,7 @@ def main():
                 emit({"kind": "heartbeat", "at": received_at})
         elif isinstance(record, dbn.ErrorMsg):
             # Do not forward arbitrary server text into logs or the dashboard.
-            text = str(record.msg).lower()
-            category = next((label for pattern, label in [(r"symbol|symbology", "symbol_resolution"), (r"auth|license|permission|entitle", "access_rejected"), (r"slow|buffer", "slow_reader"), (r"session|connection.*limit", "connection_limit")] if re.search(pattern, text)), "vendor_subscription_error")
+            category = classify_vendor_error(record, dbn.ErrorCode.SYMBOL_RESOLUTION_FAILED)
             emit({"kind": "health", "status": "subscription_error", "error_category": category, "at": received_at})
 
     threading.Thread(target=control, daemon=True).start()

@@ -1,6 +1,7 @@
 """Offline transport normalization. No SDK session or market-data request."""
 import unittest
 from types import SimpleNamespace
+import databento_live
 from databento_live import normalize_record
 
 
@@ -29,6 +30,22 @@ class NormalizationTest(unittest.TestCase):
             record = self.record()
             setattr(record.levels[0], field, value)
             self.assertIsNone(normalize_record(record, 'QA', 'now'))
+
+
+    def test_recovered_book_is_forwarded_immediately_after_invalidation(self):
+        forwarded = []
+        emitted = {}
+        book = {"kind": "quote", "ticker": "QA"}
+        send = databento_live.forward_book
+        for value, at in ((book, 1.0), (None, 1.05), (None, 1.08), (book, 1.1), (book, 1.13)):
+            send(value, "QA", emitted, forwarded.append, at)
+        self.assertEqual(forwarded, [book, {"kind": "invalidate", "ticker": "QA"}, book])
+
+    def test_reads_sdk_error_text_and_only_marks_the_exact_symbol_error_as_scoped(self):
+        classify = databento_live.classify_vendor_error
+        self.assertEqual(classify(SimpleNamespace(code=4, err="unresolved"), 4), "symbol_resolution")
+        self.assertEqual(classify(SimpleNamespace(code=0, err="permission rejected"), 4), "access_rejected")
+        self.assertEqual(classify(SimpleNamespace(code=0, err="symbol service failed"), 4), "vendor_subscription_error")
 
 
 if __name__ == '__main__':
