@@ -6,6 +6,7 @@ import {createHash} from 'node:crypto';
 import {sourceURL,enqueue,consume} from './worker.mjs';
 import {publisherInventory} from './publisher-inventory.mjs';
 import {publisherArchiveURL} from './publisher-recovery.mjs';
+import {archiveIndexedDocument} from './document-archive.mjs';
 const digest=b=>createHash('sha256').update(b).digest('hex');
 const encoded=value=>new TextEncoder().encode(JSON.stringify(value));
 const clock=value=>{if(typeof value!=='string'||!Number.isFinite(Date.parse(value))||!/(?:Z|[+-]\d\d:\d\d)$/.test(value))throw new Error('Recovery capture clock missing');return Date.parse(value);};
@@ -32,8 +33,8 @@ function verifyArticle(bundle,item){
  return doc;
 }
 async function archive(env,doc){
- env.assertCollectorLease?.();const key='documents/'+doc.sha256;await env.EVIDENCE.put(key,doc.bytes,{httpMetadata:{contentType:doc.content_type||'application/octet-stream'}});
- await env.DB.prepare('INSERT OR IGNORE INTO rs_documents(sha256,url,object_key,captured_at,bytes,content_type) VALUES(?,?,?,?,?,?)').bind(doc.sha256,doc.url,key,doc.retrieved_at,doc.bytes.length,doc.content_type||'application/octet-stream').run();return key;
+ env.assertCollectorLease?.();
+ return archiveIndexedDocument(env,{hash:doc.sha256,url:doc.url,bytes:doc.bytes,capturedAt:doc.retrieved_at,contentType:doc.content_type||'application/octet-stream'});
 }
 export async function reconcileUnavailableFiling(env,bundle,{now=new Date().toISOString()}={}){
  // One reviewed stale reference, not a policy for suppressing arbitrary 404s.

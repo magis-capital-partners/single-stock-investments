@@ -55,6 +55,14 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
     async put(key,bytes,options={}){const response=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'content-type':safeContentType(options.httpMetadata?.contentType)},body:bytes,urgent:options.urgent===true,signal:options.signal});await response.arrayBuffer();},
     async delete(key,{signal}={}){await environment?.assertCollectorLease?.();await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',signal},true);},
     async get(key,{signal,urgent=false}={}){const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal,urgent},true);if(r.status===404){await r.body?.cancel();return null;}return {json:()=>r.json(),text:()=>r.text(),arrayBuffer:()=>r.arrayBuffer()};},
+    // The account REST route does not support HEAD. Cancel the exact-key GET
+    // after headers and avoid a Class A LIST just to confirm a known document.
+    async hasDocument(key,size){
+      const r=await request(prefix+key.split('/').map(encodeURIComponent).join('/'),{signal:AbortSignal.timeout(3000)},true);
+      const length=r.headers.get('content-length');
+      await r.body?.cancel();
+      return r.ok&&(length===null||Number(length)===size);
+    },
     async stat(key,{signal}={}){
       const query=new URLSearchParams({prefix:key,per_page:'1'});
       const response=await request(prefix.slice(0,-1)+'?'+query,{signal,urgent:true});

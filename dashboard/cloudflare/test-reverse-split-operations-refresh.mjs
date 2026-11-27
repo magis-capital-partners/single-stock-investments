@@ -386,6 +386,38 @@ test('slow pre-job imports cannot consume the entire source-processing budget',a
  assert.equal(result.ticks,1);const cp=await openCheckpoint(env);try{assert.equal((await env.DB.prepare("SELECT state FROM rs_jobs WHERE id='slow-loop-source'").first()).state,'complete','The queued source must be analyzed even when imports took longer than one second');}finally{cp.close();}
 });
 
+test('a decision saves the next checkpoint without rerendering the minute-old dashboard',async t=>{
+  const env=collectorEnv(t),objects=new Map(),puts=[];
+  env.EVIDENCE={
+    put:async(key,bytes)=>{puts.push(key);objects.set(key,new Uint8Array(bytes));},
+    get:async key=>objects.has(key)?{arrayBuffer:async()=>objects.get(key).slice().buffer}:null,
+  };
+  const fetchBefore=globalThis.fetch;
+  globalThis.fetch=async()=>new Response('<feed></feed>');
+  t.after(()=>{globalThis.fetch=fetchBefore;});
+  const clock=Date.now;
+  let offset=0,cycles=0,firstCheckpointCount;
+  Date.now=()=>clock()+offset;
+  t.after(()=>{Date.now=clock;});
+  await watchCollector(env,{
+    maximumMs:30000,
+    operations:{intervalMs:10000,maxStateAgeMs:75000},
+    shouldStop:()=>cycles===2,
+    sleep:async()=>{
+      if(cycles++===0){
+        firstCheckpointCount=puts.filter(key=>key.startsWith('collector-state/checkpoints/')).length;
+        await env.DB.prepare('INSERT INTO rs_execution_records VALUES(?,?,?,?,?)').bind('fixture','fixture','2026-11-27T16:00:00Z','signal','{}').run();
+        offset=6000;
+      }else{
+        assert.ok(puts.filter(key=>key.startsWith('collector-state/checkpoints/')).length>firstCheckpointCount,'the decision made a durable save');
+        // Allow any accidentally requeued background render to reach storage.
+        await new Promise(resolve=>setTimeout(resolve,500));
+      }
+    },
+  });
+  assert.equal(puts.filter(key=>key==='collector-dashboard/manifest.json').length,1);
+});
+
 
 test('a large successor checkpoint reuses unchanged compressed blocks and restores the exact database',async t=>{
   const {env,objects}=storage(t);const audit=[];env.onOperationsAudit=row=>audit.push(row);

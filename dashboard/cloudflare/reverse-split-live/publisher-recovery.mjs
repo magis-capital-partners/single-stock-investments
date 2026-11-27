@@ -1,6 +1,7 @@
 // Bounded discovery from public publisher archives. Partial search never closes a gap.
 import {plain} from './core.mjs';
 import {publisherInventory} from './publisher-inventory.mjs';
+import {putDocument} from './document-archive.mjs';
 export async function schedulePublisherRecovery(env,enqueue,at=Date.now()){
  if(!await env.DB.prepare("SELECT id FROM rs_source_gaps WHERE resolved_at IS NULL AND source_id NOT LIKE 'sec-%' LIMIT 1").first())return false;
  // New disclosures and urgent screening retain precedence; bulk history cannot starve coverage repair.
@@ -33,11 +34,13 @@ export async function recoverPublisherGaps(env,{fetchDocument,enqueue,hash,now=n
   }
   if(state.page>120){state.status='bounded_archive_exhausted';state.coverage_complete=false;state.observed_at=now;await env.DB.prepare('INSERT INTO rs_state VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind(key,JSON.stringify(state),now).run();continue;}
   const url=publisherArchiveURL(gap.source_id,state.page,gap.start_at.slice(0,10));if(!url)continue;
-  try{const doc=await fetchDocument(url,{maximum:5*1024*1024}),raw=new TextDecoder().decode(doc.bytes),sha256=await hash(doc.bytes),object_key='documents/'+sha256;await env.EVIDENCE.put(object_key,doc.bytes,{httpMetadata:{contentType:doc.content_type}});
+  try{const doc=await fetchDocument(url,{maximum:5*1024*1024}),raw=new TextDecoder().decode(doc.bytes),sha256=await hash(doc.bytes),object_key='documents/'+sha256;
+   const repeated=state.pages.some(p=>p.sha256===sha256);
+   await putDocument(env.EVIDENCE,object_key,doc.bytes,{httpMetadata:{contentType:doc.content_type}},{known:repeated});
    let items;try{items=publisherInventory(raw,gap.source_id,url);}catch(error){for(const item of archiveCandidates(raw,url))await enqueue('news',{...item,first_seen_at:now,discovery_path:'publisher_archive_catchup',publication_clock:'unverified_archive',recovery_gap_id:gap.id},4,'news:'+await hash(item.url));throw error;}
    if(Date.parse(items[0].published_at)>Date.parse(now)+2000)throw new Error('Future publisher inventory');
    if(state.page===1){state.upper_bound_observed=Date.parse(items[0].published_at)>=Date.parse(gap.end_at)-60000;if(!state.upper_bound_observed)throw new Error('Publisher inventory does not reach interval end');}
-   if(state.pages.some(p=>p.sha256===sha256))throw new Error('Publisher pagination repeated the same page');
+   if(repeated)throw new Error('Publisher pagination repeated the same page');
    for(const item of items.filter(r=>Date.parse(r.published_at)>=Date.parse(gap.start_at)-60000&&Date.parse(r.published_at)<=Date.parse(gap.end_at)+60000)){
     const job_id='publisher-article:v2:'+await hash(item.url);await enqueue('news',{...item,first_seen_at:now,discovery_path:'publisher_archive_catchup',publication_clock:'timestamp',recovery_gap_id:gap.id},4,job_id);if(!state.items.some(r=>r.url===item.url))state.items.push({...item,job_id});
    }

@@ -5,6 +5,7 @@ import {isIP} from 'node:net';
 import {createHash} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {putDocument} from './document-archive.mjs';
 export const hash=v=>createHash('sha256').update(v).digest('hex');
 export const isSourceCooldown=e=>e?.code==='FINANCIAL_SOURCE_COOLDOWN'||[403,429].includes(e?.status)||/^Financial source (?:is in backoff|HTTP (?:403|429))$/.test(e?.message||e?.reason||'');
 const cooldownError=retryAt=>Object.assign(new Error('Financial source is in backoff'),{code:'FINANCIAL_SOURCE_COOLDOWN',retryAt});
@@ -42,11 +43,15 @@ export class FinancialSources {
   constructor(env,{offline=false,interval=1500}={}){this.env=env;this.offline=offline;this.interval=interval;this.last=0;this.cooldown=0;this.requests=0;}
   async get(url,{origins=[],mutable=false,maximum=24000000,refresh=false}={}){
     primaryURL(url,origins);const cacheKey='financials/http/'+hash(url)+'.json';const saved=await this.env.EVIDENCE.get(cacheKey),old=saved?await saved.json():null;
-    if(old&&(!mutable||(!refresh&&Date.now()-Date.parse(old.captured_at)<3600000)||this.offline)){const object=await this.env.EVIDENCE.get(old.object_key);if(object){const bytes=Buffer.from(await object.arrayBuffer());if(bytes.length<=maximum&&hash(bytes)===old.sha256)return {...old,bytes};}}
+    const readCached=old&&(!mutable||(!refresh&&Date.now()-Date.parse(old.captured_at)<3600000)||this.offline);
+    if(readCached){const object=await this.env.EVIDENCE.get(old.object_key);if(object){const bytes=Buffer.from(await object.arrayBuffer());if(bytes.length<=maximum&&hash(bytes)===old.sha256)return {...old,bytes};}}
     if(this.offline)throw new Error('Financial source is not cached');if(Date.now()<this.cooldown)throw cooldownError(this.cooldown);
     const wait=async()=>{await new Promise(r=>setTimeout(r,Math.max(0,this.interval-(Date.now()-this.last))));this.last=Date.now();this.requests++;};
     let doc;try{doc=await fetchPrimary(url,{origins,maximum,wait});}catch(e){if([403,429].includes(e.status)){this.cooldown=Date.now()+Math.max(300000,Math.min(3600000,(e.retryAfter||300)*1000));e.code='FINANCIAL_SOURCE_COOLDOWN';e.retryAt=this.cooldown;}throw e;}
     const record={url:doc.url,sha256:doc.sha256,object_key:'documents/'+doc.sha256,captured_at:new Date().toISOString(),bytes:doc.bytes.length,content_type:doc.headers['content-type']||'application/octet-stream'};
-    await this.env.EVIDENCE.put(record.object_key,doc.bytes,{httpMetadata:{contentType:record.content_type}});await this.env.EVIDENCE.put(cacheKey,new TextEncoder().encode(JSON.stringify(record)),{httpMetadata:{contentType:'application/json'}});return {...record,bytes:doc.bytes};
+    await putDocument(this.env.EVIDENCE,record.object_key,doc.bytes,{httpMetadata:{contentType:record.content_type}},{
+      known:!readCached&&old?.object_key===record.object_key&&old.bytes===record.bytes,
+    });
+    await this.env.EVIDENCE.put(cacheKey,new TextEncoder().encode(JSON.stringify(record)),{httpMetadata:{contentType:'application/json'}});return {...record,bytes:doc.bytes};
   }
 }

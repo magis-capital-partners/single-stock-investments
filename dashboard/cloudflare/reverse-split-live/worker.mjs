@@ -8,6 +8,7 @@ import {loadFilingDocuments} from './filing-documents.mjs';
 import {parseDailyIndex,recoverReaderFailures} from './source-recovery.mjs';
 import {recoverPublisherGaps,schedulePublisherRecovery} from './publisher-recovery.mjs';
 import {historySearchURL,historySearchPage,recoverHistorySearch,queueHistorySearch,HISTORY_SEARCH_VERSION} from './history-search.mjs';
+import {archiveIndexedDocument} from './document-archive.mjs';
 
 const stamp=()=>new Date().toISOString(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const json=(value,status=200)=>Response.json(value,{status,headers:{'cache-control':'no-store, private','x-content-type-options':'nosniff'}});
@@ -50,7 +51,14 @@ export async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}=
   if(!response.ok){await response.body?.cancel();if(response.status===403&&url.hostname==='www.globenewswire.com'&&redirects<3){const alternate=new URL(url);alternate.hostname='rss.globenewswire.com';return limitedFetch(env,alternate.href,{maximum,redirects:redirects+1});}if(sec&&[403,429].includes(response.status))await state(env,'sec_cooldown',Date.now()+Math.min(3600000,Math.max(300000,Number(response.headers.get('retry-after')||0)*1000)));throw new Error(`Source returned HTTP ${response.status}`);}
   return {bytes:await boundedBody(response,maximum),content_type:response.headers.get('content-type')||'',url:url.href};
 }
-async function archive(env,doc){doc={...doc,url:sourceURL(doc.url).href,content_type:doc.content_type||'application/octet-stream'};const hash=await sha(doc.bytes),key='documents/'+hash;await env.EVIDENCE.put(key,doc.bytes,{httpMetadata:{contentType:doc.content_type},customMetadata:{source_url:doc.url,captured_at:stamp()}});await env.DB.prepare('INSERT OR IGNORE INTO rs_documents(sha256,url,object_key,captured_at,bytes,content_type) VALUES(?,?,?,?,?,?)').bind(hash,doc.url,key,stamp(),doc.bytes.length,doc.content_type).run();return {hash,key,text:new TextDecoder().decode(doc.bytes)};}
+async function archive(env,doc){
+  const url=sourceURL(doc.url).href,hash=await sha(doc.bytes),capturedAt=stamp();
+  const key=await archiveIndexedDocument(env,{
+    hash,url,bytes:doc.bytes,capturedAt,contentType:doc.content_type||'application/octet-stream',
+    customMetadata:{source_url:url,captured_at:capturedAt},
+  });
+  return {hash,key,text:new TextDecoder().decode(doc.bytes)};
+}
 export async function enqueue(env,kind,payload,priority=0,id=null){const now=stamp();id ||= await sha(kind+':'+JSON.stringify(payload));await env.DB.prepare('INSERT OR IGNORE INTO rs_jobs(id,kind,payload,priority,created_at,updated_at) VALUES(?,?,?,?,?,?)').bind(id,kind,JSON.stringify(payload),priority,now,now).run();return id;}
 async function addFiling(env,item,priority){
   if(!item.cik||!/^\d{10}-\d{2}-\d{6}$/.test(item.accession||''))return;
