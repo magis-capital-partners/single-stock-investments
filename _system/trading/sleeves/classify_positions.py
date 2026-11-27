@@ -275,12 +275,23 @@ def _etf_0dte_share_classification(
 
 
 
+def _configured_operator_symbols() -> set[str]:
+    """operators.drew.symbols from the sleeve config. Only this list may beat the LS universe."""
+    from .config_loader import load_config
+
+    raw = ((load_config().get("operators") or {}).get("drew") or {}).get("symbols") or []
+    return {norm_sym(s) for s in raw}
+
+
 def _operator_hold_ticker(pos: Mapping[str, Any], drew_symbols: Iterable[str] | None) -> str | None:
     """Name pinned by operators.drew.symbols, or None.
 
     Stock and options both pin. A wrapper on another root (TPLX) does not.
+    A Drew sleeve tag is not an operator hold: the LS universe and an etf-0dte
+    delivery still beat a tag. The pin is the overlap of the names the caller
+    passed and the configured operator list (TPL).
     """
-    drew = {norm_sym(s) for s in (drew_symbols or [])}
+    drew = {norm_sym(s) for s in (drew_symbols or [])} & _configured_operator_symbols()
     if not drew:
         return None
     under = norm_sym(pos.get("underlyingSymbol") or pos.get("underlying") or "")
@@ -382,14 +393,6 @@ def _classify(
             return Classification(etf_root, ETF_0DTE, "etf_0dte_root", None)
 
     strategy_name = under or ticker if sec in OPTION_SEC_TYPES else ticker
-    # operators.drew.symbols stay on Drew after the index and etf-0dte guards
-    # and before the universe rule. An assigned TPL short put delivers stock
-    # the LS snapshot would otherwise keep, and a manual ETF_LS buy of that
-    # stock is the same position.
-    pinned = strategy_name or ticker
-    if pinned in drew or (ticker in drew and sec not in OPTION_SEC_TYPES):
-        return Classification(pinned, "drew", "operator_hold", "drew")
-
     if ref.startswith(("ETF_LS|", "B5P|")) and not (
         sec in OPTION_SEC_TYPES and re.match(r"^ETF_LS\|MANUAL\|SELL(?:PUT|CALL)\|", ref)
     ):
